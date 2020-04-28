@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\build\common.props" />
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>SharpAbp.DotCommon.Caching</AssemblyName>
+    <PackageId>SharpAbp.DotCommon.Caching</PackageId>
+    <RootNamespace>SharpAbp</RootNamespace>
+    <IsPackable>true</IsPackable>
+    <Description>Volo.Abp DotCommon Caching模块</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotCommon.Caching" Version="4.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SharpAbp.DotCommon\SharpAbp.DotCommon.csproj" />
+  </ItemGroup>
+
+</Project>
