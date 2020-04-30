@@ -3,16 +3,19 @@
   <Import Project="..\..\..\build\common.props" />
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>SharpAbp.AmazonKS3</AssemblyName>
-    <PackageId>SharpAbp.AmazonKS3</PackageId>
+    <AssemblyName>SharpAbp.FoDicom</AssemblyName>
+    <PackageId>SharpAbp.FoDicom</PackageId>
     <RootNamespace>SharpAbp</RootNamespace>
     <IsPackable>true</IsPackable>
-    <Description>Volo.Abp AmazonKS3模块</Description>
+    <Description>Volo.Abp FoDicom模块</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AmazonKS3" Version="0.9.0" />
+    <PackageReference Include="fo-dicom" Version="5.0.0-alpha1" />
     <PackageReference Include="Volo.Abp" Version="2.6.2" />
   </ItemGroup>
-  
+
+  <ItemGroup>
+    <ProjectReference Include="..\SharpAbp.DotCommon\SharpAbp.DotCommon.csproj" />
+  </ItemGroup>
 </Project>
