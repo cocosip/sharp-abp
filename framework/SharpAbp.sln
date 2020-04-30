@@ -29,13 +29,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.DotCommon.ProtoBuf
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.DotCommon.Json4Net", "src\SharpAbp.DotCommon.Json4Net\SharpAbp.DotCommon.Json4Net.csproj", "{9BE80ECB-3F70-4F7A-BF4B-291AB941C6B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.DotCommon.Tests", "test\SharpAbp.DotCommon.Tests\SharpAbp.DotCommon.Tests.csproj", "{548A0D1F-9B1E-473F-9874-BD7153E189A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.DotCommon.Tests", "test\SharpAbp.DotCommon.Tests\SharpAbp.DotCommon.Tests.csproj", "{548A0D1F-9B1E-473F-9874-BD7153E189A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Spool", "src\SharpAbp.Spool\SharpAbp.Spool.csproj", "{6FEDF62D-1A06-4EDC-A612-8E80809F9F04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Spool", "src\SharpAbp.Spool\SharpAbp.Spool.csproj", "{6FEDF62D-1A06-4EDC-A612-8E80809F9F04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.DPool", "src\SharpAbp.DPool\SharpAbp.DPool.csproj", "{7FFDC505-1D6D-45A2-9CE0-98FDDF85B682}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.DPool", "src\SharpAbp.DPool\SharpAbp.DPool.csproj", "{7FFDC505-1D6D-45A2-9CE0-98FDDF85B682}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.FastDFSCore", "src\SharpAbp.FastDFSCore\SharpAbp.FastDFSCore.csproj", "{77918E26-214B-434C-B512-DF6BAAA9AAE4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.FastDFSCore", "src\SharpAbp.FastDFSCore\SharpAbp.FastDFSCore.csproj", "{77918E26-214B-434C-B512-DF6BAAA9AAE4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.AmazonKS3", "src\SharpAbp.AmazonKS3\SharpAbp.AmazonKS3.csproj", "{3091C0EA-9B65-421F-96AD-FA77A91AA2F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -155,6 +157,18 @@ Global
 		{77918E26-214B-434C-B512-DF6BAAA9AAE4}.Release|x64.Build.0 = Release|Any CPU
 		{77918E26-214B-434C-B512-DF6BAAA9AAE4}.Release|x86.ActiveCfg = Release|Any CPU
 		{77918E26-214B-434C-B512-DF6BAAA9AAE4}.Release|x86.Build.0 = Release|Any CPU
+		{3091C0EA-9B65-421F-96AD-FA77A91AA2F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3091C0EA-9B65-421F-96AD-FA77A91AA2F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3091C0EA-9B65-421F-96AD-FA77A91AA2F4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3091C0EA-9B65-421F-96AD-FA77A91AA2F4}.Debug|x64.Build.0 = Debug|Any CPU
+		{3091C0EA-9B65-421F-96AD-FA77A91AA2F4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3091C0EA-9B65-421F-96AD-FA77A91AA2F4}.Debug|x86.Build.0 = Debug|Any CPU
+		{3091C0EA-9B65-421F-96AD-FA77A91AA2F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3091C0EA-9B65-421F-96AD-FA77A91AA2F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3091C0EA-9B65-421F-96AD-FA77A91AA2F4}.Release|x64.ActiveCfg = Release|Any CPU
+		{3091C0EA-9B65-421F-96AD-FA77A91AA2F4}.Release|x64.Build.0 = Release|Any CPU
+		{3091C0EA-9B65-421F-96AD-FA77A91AA2F4}.Release|x86.ActiveCfg = Release|Any CPU
+		{3091C0EA-9B65-421F-96AD-FA77A91AA2F4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -169,6 +183,7 @@ Global
 		{6FEDF62D-1A06-4EDC-A612-8E80809F9F04} = {C58E9514-CF44-46FC-9018-82C08DDE7025}
 		{7FFDC505-1D6D-45A2-9CE0-98FDDF85B682} = {C58E9514-CF44-46FC-9018-82C08DDE7025}
 		{77918E26-214B-434C-B512-DF6BAAA9AAE4} = {C58E9514-CF44-46FC-9018-82C08DDE7025}
+		{3091C0EA-9B65-421F-96AD-FA77A91AA2F4} = {C58E9514-CF44-46FC-9018-82C08DDE7025}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FA4BE5E5-5AC6-4830-9359-27B901051E0F}

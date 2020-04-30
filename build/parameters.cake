@@ -112,6 +112,21 @@ public class BuildParameters
         var target = context.Argument("target", "Default");
         var buildSystem = context.BuildSystem();
 
+        var projects = context.GetDirectories("./framework/src/*");
+		projects.Add(context.GetDirectories("./modules/*/src/*"));
+
+        var projectFiles = context.GetFiles("./framework/src/*/*.csproj");
+		projectFiles.Add(context.GetFiles("./modules/*/src/*/*.csproj"));
+
+        var testProjects = context.GetDirectories("./framework/test/*");
+		testProjects.Add(context.GetDirectories("./modules/*/test/*"));
+
+        var testProjectFiles = context.GetFiles("./framework/test/*/*.csproj");
+		testProjectFiles.Add(context.GetFiles("./modules/*/test/*/*.csproj"));
+
+        var packageIdsFiles = context.GetFiles("./framework/src/*/*.csproj");
+        packageIdsFiles.Add(context.GetFiles("./modules/*/src/*/*.csproj"));
+
         var parameters = new BuildParameters
         {
             Target = target,
@@ -135,11 +150,11 @@ public class BuildParameters
             SkipSigning = StringComparer.OrdinalIgnoreCase.Equals("True", context.Argument("skipsigning", "True")),
             SkipGitVersion = StringComparer.OrdinalIgnoreCase.Equals("True", context.EnvironmentVariable("SKIP_GITVERSION")),
             SkipOpenCover = true, //StringComparer.OrdinalIgnoreCase.Equals("True", context.EnvironmentVariable("CAKE_SKIP_OPENCOVER"))
-            Projects = context.GetDirectories("./framework/*/src/*"),
-            TestProjects = context.GetDirectories("./framework/test/*"),
-            ProjectFiles = context.GetFiles("./framework/*/src/*/*.csproj"),
-            TestProjectFiles = context.GetFiles("./framework/test/*/*.csproj"),
-            PackageIds = Util.GetPackageIds(context, context.GetFiles("./framework/*/src/*/*.csproj"))
+            Projects = projects,
+            TestProjects = testProjects,
+            ProjectFiles = projectFiles,
+            TestProjectFiles = testProjectFiles,
+            PackageIds = Util.GetPackageIds(context, packageIdsFiles)
         };
         context.Information($"Cake BuildParameters:-------------begin--------------");
         context.Information($"IsLocalBuild:{parameters.IsLocalBuild}");

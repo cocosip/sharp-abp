@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\..\build\common.props" />
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>SharpAbp.FileSystem</AssemblyName>
+    <PackageId>SharpAbp.FileSystem</PackageId>
+    <RootNamespace>SharpAbp</RootNamespace>
+    <IsPackable>true</IsPackable>
+    <Description>Volo.Abp FileSystem 模块</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.DotCommon\SharpAbp.DotCommon.csproj" />
+    <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.FastDFSCore\SharpAbp.FastDFSCore.csproj" />
+    <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.AmazonKS3\SharpAbp.AmazonKS3.csproj" />
+  </ItemGroup>
+
+</Project>
