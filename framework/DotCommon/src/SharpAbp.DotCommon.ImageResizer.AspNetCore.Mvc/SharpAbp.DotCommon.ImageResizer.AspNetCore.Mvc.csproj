@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../../../../build/common.props" />
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>SharpAbp.DotCommon.ImageResizer.AspNetCore.Mvc</AssemblyName>
+    <PackageId>SharpAbp.DotCommon.ImageResizer.AspNetCore.Mvc</PackageId>
+    <RootNamespace>SharpAbp</RootNamespace>
+    <IsPackable>true</IsPackable>
+    <OutputType>Library</OutputType>
+    <Description>SharpAbp DotCommon.ImageResizer.AspNetCore.Mvc模块</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SharpAbp.DotCommon.Caching\SharpAbp.DotCommon.Caching.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotCommon.ImageUtility" Version="4.0.4" />
+    <PackageReference Include="DotCommon.ImageResizer.AspNetCore.Mvc" Version="4.0.4" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../../../../build/common.props" />
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>SharpAbp.DotCommon.Json4Net</AssemblyName>
+    <PackageId>SharpAbp.DotCommon.Json4Net</PackageId>
+    <RootNamespace>SharpAbp</RootNamespace>
+    <Description>SharpAbp DotCommon.Json4Net模块</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SharpAbp.DotCommon\SharpAbp.DotCommon.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotCommon.Json4Net" Version="4.0.4" />
+  </ItemGroup>
+  
+</Project>

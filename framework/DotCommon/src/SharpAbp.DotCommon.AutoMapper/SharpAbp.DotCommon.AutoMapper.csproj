@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../../../../build/common.props" />
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>SharpAbp.DotCommon.AutoMapper</AssemblyName>
+    <PackageId>SharpAbp.DotCommon.AutoMapper</PackageId>
+    <RootNamespace>SharpAbp</RootNamespace>
+    <Description>SharpAbp DotCommon.AutoMapper模块</Description>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\SharpAbp.DotCommon\SharpAbp.DotCommon.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotCommon.AutoMapper" Version="4.0.4" />
+  </ItemGroup>
+
+</Project>

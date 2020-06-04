@@ -17,7 +17,7 @@ jobs:
     steps:
     - task: DotNetCoreInstaller@0
       inputs:
-        version: '3.1.201'
+        version: '3.1.300'
     - powershell: .\build.ps1
       displayName: 'Run build.ps1'
 
@@ -27,7 +27,7 @@ jobs:
     steps:
     - task: DotNetCoreInstaller@0
       inputs:
-        version: '3.1.201'
+        version: '3.1.300'
     - script: |
         chmod +x ./build.sh
       displayName: 'Chmod build.sh'

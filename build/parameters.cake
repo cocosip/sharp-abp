@@ -112,20 +112,15 @@ public class BuildParameters
         var target = context.Argument("target", "Default");
         var buildSystem = context.BuildSystem();
 
-        var projects = context.GetDirectories("./framework/src/*");
-		projects.Add(context.GetDirectories("./modules/*/src/*"));
+        var projects = context.GetDirectories("./framework/*/src/*");
 
-        var projectFiles = context.GetFiles("./framework/src/*/*.csproj");
-		projectFiles.Add(context.GetFiles("./modules/*/src/*/*.csproj"));
+        var projectFiles = context.GetFiles("./framework/*/src/*/*.csproj");
 
-        var testProjects = context.GetDirectories("./framework/test/*");
-		testProjects.Add(context.GetDirectories("./modules/*/test/*"));
+        var testProjects = context.GetDirectories("./framework/*/test/*");
 
-        var testProjectFiles = context.GetFiles("./framework/test/*/*.csproj");
-		testProjectFiles.Add(context.GetFiles("./modules/*/test/*/*.csproj"));
+        var testProjectFiles = context.GetFiles("./framework/*/test/*/*.csproj");
 
-        var packageIdsFiles = context.GetFiles("./framework/src/*/*.csproj");
-        packageIdsFiles.Add(context.GetFiles("./modules/*/src/*/*.csproj"));
+        var packageIdsFiles = context.GetFiles("./framework/*/src/*/*.csproj");
 
         var parameters = new BuildParameters
         {
