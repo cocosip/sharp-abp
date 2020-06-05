@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../../../../build/common.props" />
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>SharpAbp.AmazonS3.Multiplex</AssemblyName>
+    <PackageId>SharpAbp.AmazonS3.Multiplex</PackageId>
+    <RootNamespace>SharpAbp</RootNamespace>
+    <Description>SharpAbp AmazonS3.Multiplex模块</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AmazonS3.Multiplex" Version="1.2.1" />
+    <PackageReference Include="Volo.Abp" Version="2.9.0" />
+  </ItemGroup>
+
+</Project>
