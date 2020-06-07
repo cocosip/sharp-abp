@@ -14,8 +14,4 @@
     <PackageReference Include="Volo.Abp" Version="2.9.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="FoDicom\Logging\" />
-  </ItemGroup>
-
 </Project>
