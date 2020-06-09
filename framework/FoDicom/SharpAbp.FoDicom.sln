@@ -7,9 +7,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8166FAB9-CC9
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{338C4EC1-F2B0-4380-90C3-AAD2FE5261A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.FoDicom", "src\SharpAbp.FoDicom\SharpAbp.FoDicom.csproj", "{151C4988-0F81-49FC-A87F-472648EE5B66}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.FoDicom", "src\SharpAbp.FoDicom\SharpAbp.FoDicom.csproj", "{151C4988-0F81-49FC-A87F-472648EE5B66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.FoDicom.Tests", "test\SharpAbp.FoDicom.Tests\SharpAbp.FoDicom.Tests.csproj", "{15C04599-C698-4A35-BAF6-58B1D0F91665}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.FoDicom.Tests", "test\SharpAbp.FoDicom.Tests\SharpAbp.FoDicom.Tests.csproj", "{15C04599-C698-4A35-BAF6-58B1D0F91665}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.FoDicom.TextJson", "src\SharpAbp.FoDicom.TextJson\SharpAbp.FoDicom.TextJson.csproj", "{B64CF8FD-8C52-45B2-9F9F-2D7E1EB76ADF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,18 @@ Global
 		{15C04599-C698-4A35-BAF6-58B1D0F91665}.Release|x64.Build.0 = Release|Any CPU
 		{15C04599-C698-4A35-BAF6-58B1D0F91665}.Release|x86.ActiveCfg = Release|Any CPU
 		{15C04599-C698-4A35-BAF6-58B1D0F91665}.Release|x86.Build.0 = Release|Any CPU
+		{B64CF8FD-8C52-45B2-9F9F-2D7E1EB76ADF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B64CF8FD-8C52-45B2-9F9F-2D7E1EB76ADF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B64CF8FD-8C52-45B2-9F9F-2D7E1EB76ADF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B64CF8FD-8C52-45B2-9F9F-2D7E1EB76ADF}.Debug|x64.Build.0 = Debug|Any CPU
+		{B64CF8FD-8C52-45B2-9F9F-2D7E1EB76ADF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B64CF8FD-8C52-45B2-9F9F-2D7E1EB76ADF}.Debug|x86.Build.0 = Debug|Any CPU
+		{B64CF8FD-8C52-45B2-9F9F-2D7E1EB76ADF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B64CF8FD-8C52-45B2-9F9F-2D7E1EB76ADF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B64CF8FD-8C52-45B2-9F9F-2D7E1EB76ADF}.Release|x64.ActiveCfg = Release|Any CPU
+		{B64CF8FD-8C52-45B2-9F9F-2D7E1EB76ADF}.Release|x64.Build.0 = Release|Any CPU
+		{B64CF8FD-8C52-45B2-9F9F-2D7E1EB76ADF}.Release|x86.ActiveCfg = Release|Any CPU
+		{B64CF8FD-8C52-45B2-9F9F-2D7E1EB76ADF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -52,6 +66,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{151C4988-0F81-49FC-A87F-472648EE5B66} = {8166FAB9-CC93-4C0A-B9B2-4A9797316D19}
 		{15C04599-C698-4A35-BAF6-58B1D0F91665} = {338C4EC1-F2B0-4380-90C3-AAD2FE5261A4}
+		{B64CF8FD-8C52-45B2-9F9F-2D7E1EB76ADF} = {8166FAB9-CC93-4C0A-B9B2-4A9797316D19}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DA5F3766-A241-48CF-8540-422A3A881FB9}

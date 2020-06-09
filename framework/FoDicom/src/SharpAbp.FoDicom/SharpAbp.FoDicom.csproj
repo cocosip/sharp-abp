@@ -10,8 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="fo-dicom" Version="4.0.5" />
+    <PackageReference Include="fo-dicom" Version="5.0.0-alpha1" />
     <PackageReference Include="Volo.Abp" Version="2.9.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../../DotCommon/src/SharpAbp.DotCommon.Json4Net/SharpAbp.DotCommon.Json4Net.csproj" />
   </ItemGroup>
 
 </Project>

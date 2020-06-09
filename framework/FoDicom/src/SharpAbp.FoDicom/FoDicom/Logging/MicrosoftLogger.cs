@@ -5,44 +5,46 @@ namespace SharpAbp.FoDicom.Logging
 {
     /// <summary>微软日志记录器
     /// </summary>
-    public class MicrosoftLogger : Dicom.Log.Logger
+    public class MicrosoftLogger : FellowOakDicom.Log.Logger
     {
-        private readonly ILogger _microsoftLogger;
 
-        public MicrosoftLogger(ILogger microsoftLogger)
+        private readonly ILogger _logger;
+
+        public MicrosoftLogger(ILogger logger)
         {
-            _microsoftLogger = microsoftLogger;
+            _logger = logger;
         }
 
-        public override void Log(Dicom.Log.LogLevel level, string msg, params object[] args)
+        public override void Log(FellowOakDicom.Log.LogLevel level, string msg, params object[] args)
         {
             var microsoftLogLevel = GetMicrosoftLogLevel(level);
 
-            if (args.Length >= 1 && args[0] is Exception exception)
+            if (args.Length >= 1 && args[0] is Exception)
             {
-                _microsoftLogger.Log(microsoftLogLevel, exception, msg, args);
+                _logger.Log(microsoftLogLevel, (Exception)args[0], msg, args);
             }
             else
             {
-                _microsoftLogger.Log(microsoftLogLevel, msg, args);
+                _logger.Log(microsoftLogLevel, msg, args);
             }
         }
 
+
         /// <summary>转换为微软日志记录级别
         /// </summary>
-        public Microsoft.Extensions.Logging.LogLevel GetMicrosoftLogLevel(Dicom.Log.LogLevel level)
+        public LogLevel GetMicrosoftLogLevel(FellowOakDicom.Log.LogLevel level)
         {
             switch (level)
             {
-                case Dicom.Log.LogLevel.Debug:
+                case FellowOakDicom.Log.LogLevel.Debug:
                     return LogLevel.Debug;
-                case Dicom.Log.LogLevel.Error:
+                case FellowOakDicom.Log.LogLevel.Error:
                     return LogLevel.Error;
-                case Dicom.Log.LogLevel.Fatal:
+                case FellowOakDicom.Log.LogLevel.Fatal:
                     return LogLevel.Critical;
-                case Dicom.Log.LogLevel.Info:
+                case FellowOakDicom.Log.LogLevel.Info:
                     return LogLevel.Information;
-                case Dicom.Log.LogLevel.Warning:
+                case FellowOakDicom.Log.LogLevel.Warning:
                     return LogLevel.Warning;
                 default:
                     //pathological case - shouldn't occur
