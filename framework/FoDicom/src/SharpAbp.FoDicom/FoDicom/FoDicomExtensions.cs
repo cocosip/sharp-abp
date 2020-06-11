@@ -14,6 +14,10 @@ namespace SharpAbp.FoDicom
         /// </summary>
         public static DateTime? GetDate(this DicomDataset dataset, DicomTag tag, DateTime? defaultValue = null)
         {
+            if (defaultValue == null)
+            {
+                defaultValue = new DateTime(1970, 1, 1);
+            }
             var dateStringValue = dataset.GetSingleValueOrDefault(tag, "");
             if (dateStringValue.IsNullOrWhiteSpace())
             {
