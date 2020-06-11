@@ -6,10 +6,7 @@
 trigger:
   branches:
     include:
-    - master
-    - refs/tags/*
-    - dev
-    - develop
+    - '*'
 jobs:
   - job: Windows
     pool:
@@ -17,7 +14,7 @@ jobs:
     steps:
     - task: DotNetCoreInstaller@0
       inputs:
-        version: '3.1.300'
+        version: '3.1.301'
     - powershell: .\build.ps1
       displayName: 'Run build.ps1'
 
@@ -27,7 +24,7 @@ jobs:
     steps:
     - task: DotNetCoreInstaller@0
       inputs:
-        version: '3.1.300'
+        version: '3.1.301'
     - script: |
         chmod +x ./build.sh
       displayName: 'Chmod build.sh'

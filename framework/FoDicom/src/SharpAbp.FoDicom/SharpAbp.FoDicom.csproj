@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="../../../../build/common.props" />
+  <Import Project="..\..\..\..\build\common.props" />
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>SharpAbp.FoDicom</AssemblyName>
@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../../DotCommon/src/SharpAbp.DotCommon.Json4Net/SharpAbp.DotCommon.Json4Net.csproj" />
+    <ProjectReference Include="..\..\..\DotCommon\src\SharpAbp.DotCommon.Json4Net\SharpAbp.DotCommon.Json4Net.csproj" />
   </ItemGroup>
 
 </Project>
