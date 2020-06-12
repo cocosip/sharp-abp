@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\..\build\common.props" />
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>SharpAbp.AmazonS3.Multiplex.KS3</AssemblyName>
+    <PackageId>SharpAbp.AmazonS3.Multiplex.KS3</PackageId>
+    <RootNamespace>SharpAbp.Amazon.S3</RootNamespace>
+    <Description>SharpAbp AmazonS3.Multiplex.KS3模块</Description>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\SharpAbp.AmazonKS3\SharpAbp.AmazonKS3.csproj" />
+    <ProjectReference Include="..\SharpAbp.AmazonS3.Multiplex\SharpAbp.AmazonS3.Multiplex.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="AmazonS3.Multiplex.KS3" Version="1.3.0" />
+  </ItemGroup>
+
+</Project>

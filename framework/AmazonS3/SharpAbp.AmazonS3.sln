@@ -9,9 +9,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{199151F3-A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.AmazonKS3", "src\SharpAbp.AmazonKS3\SharpAbp.AmazonKS3.csproj", "{C06C9FA0-3BF0-4D5B-9A7A-0D20C6558366}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.AmazonS3.Multiplex", "src\SharpAbp.AmazonS3.Multiplex\SharpAbp.AmazonS3.Multiplex.csproj", "{66205079-A3C6-4E96-B5B2-3429D6A7B47F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.AmazonS3.Multiplex", "src\SharpAbp.AmazonS3.Multiplex\SharpAbp.AmazonS3.Multiplex.csproj", "{66205079-A3C6-4E96-B5B2-3429D6A7B47F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.AmazonS3", "test\SharpAbp.AmazonS3\SharpAbp.AmazonS3.csproj", "{E139C45A-BEB3-42BD-9936-6293A56BEA1E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.AmazonS3", "test\SharpAbp.AmazonS3\SharpAbp.AmazonS3.csproj", "{E139C45A-BEB3-42BD-9936-6293A56BEA1E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.AmazonS3.Multiplex.KS3", "src\SharpAbp.AmazonS3.Multiplex.KS3\SharpAbp.AmazonS3.Multiplex.KS3.csproj", "{D2E29FEC-10AB-4040-9F15-F6FF589E4E72}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +61,18 @@ Global
 		{E139C45A-BEB3-42BD-9936-6293A56BEA1E}.Release|x64.Build.0 = Release|Any CPU
 		{E139C45A-BEB3-42BD-9936-6293A56BEA1E}.Release|x86.ActiveCfg = Release|Any CPU
 		{E139C45A-BEB3-42BD-9936-6293A56BEA1E}.Release|x86.Build.0 = Release|Any CPU
+		{D2E29FEC-10AB-4040-9F15-F6FF589E4E72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2E29FEC-10AB-4040-9F15-F6FF589E4E72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2E29FEC-10AB-4040-9F15-F6FF589E4E72}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D2E29FEC-10AB-4040-9F15-F6FF589E4E72}.Debug|x64.Build.0 = Debug|Any CPU
+		{D2E29FEC-10AB-4040-9F15-F6FF589E4E72}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D2E29FEC-10AB-4040-9F15-F6FF589E4E72}.Debug|x86.Build.0 = Debug|Any CPU
+		{D2E29FEC-10AB-4040-9F15-F6FF589E4E72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2E29FEC-10AB-4040-9F15-F6FF589E4E72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2E29FEC-10AB-4040-9F15-F6FF589E4E72}.Release|x64.ActiveCfg = Release|Any CPU
+		{D2E29FEC-10AB-4040-9F15-F6FF589E4E72}.Release|x64.Build.0 = Release|Any CPU
+		{D2E29FEC-10AB-4040-9F15-F6FF589E4E72}.Release|x86.ActiveCfg = Release|Any CPU
+		{D2E29FEC-10AB-4040-9F15-F6FF589E4E72}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -67,6 +81,7 @@ Global
 		{C06C9FA0-3BF0-4D5B-9A7A-0D20C6558366} = {F3378F71-78D7-4052-812D-AD301ACD98B3}
 		{66205079-A3C6-4E96-B5B2-3429D6A7B47F} = {F3378F71-78D7-4052-812D-AD301ACD98B3}
 		{E139C45A-BEB3-42BD-9936-6293A56BEA1E} = {199151F3-ABAD-4BDB-9BE3-4AD556907F4D}
+		{D2E29FEC-10AB-4040-9F15-F6FF589E4E72} = {F3378F71-78D7-4052-812D-AD301ACD98B3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4B45BBE2-9579-4BE1-B696-409D847A7347}

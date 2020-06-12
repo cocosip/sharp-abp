@@ -2,7 +2,7 @@
 using Volo.Abp;
 using Volo.Abp.Modularity;
 
-namespace SharpAbp.AmazonS3.Multiplex
+namespace SharpAbp.Amazon.S3.Multiplex
 {
     public class SharpAbpAmazonS3MultiplexModule : AbpModule
     {
