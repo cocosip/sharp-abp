@@ -178,7 +178,7 @@ Task("Default")
    .IsDependentOn("Publish")
    .Does(() =>
    {
-      Information("QuickPay build complete!");
+      Information("SharpAbp build complete!");
    });
 
 RunTarget(parameters.Target);
