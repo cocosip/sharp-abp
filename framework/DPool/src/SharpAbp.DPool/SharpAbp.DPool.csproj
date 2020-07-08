@@ -11,6 +11,6 @@
 
   <ItemGroup>
     <PackageReference Include="DPool" Version="0.5.0" />
-    <PackageReference Include="Volo.Abp" Version="2.9.0" />
+    <PackageReference Include="Volo.Abp" Version="3.0.3" />
   </ItemGroup>
 </Project>

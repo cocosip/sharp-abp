@@ -4,11 +4,11 @@ using Volo.Abp.Modularity;
 namespace SharpAbp.FastDFSCore.Transport.DotNetty
 {
     [DependsOn(typeof(SharpAbpFastDFSCoreModule))]
-    public class SharpAbpFastDFSCoreTransportDotNettyModule : AbpModule
+    public class SharpAbpFastDFSCoreDotNettyModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            context.Services.AddFastDFSDotNettyTransport();
+            context.Services.AddFastDFSDotNetty();
         }
 
     }

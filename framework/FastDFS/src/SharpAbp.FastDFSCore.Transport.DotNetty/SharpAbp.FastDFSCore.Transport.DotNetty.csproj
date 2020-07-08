@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FastDFSCore.Transport.DotNetty" Version="1.0.2" />
+    <PackageReference Include="FastDFSCore.Transport.DotNetty" Version="1.2.0" />
   </ItemGroup>
 
   <ItemGroup>

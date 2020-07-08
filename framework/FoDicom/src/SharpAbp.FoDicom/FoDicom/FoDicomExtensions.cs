@@ -16,7 +16,7 @@ namespace SharpAbp.FoDicom
         {
             if (defaultValue == null)
             {
-                defaultValue = new DateTime(1970, 1, 1);
+                defaultValue = new DateTime(1900, 1, 1);
             }
             var dateStringValue = dataset.GetSingleValueOrDefault(tag, "");
             if (dateStringValue.IsNullOrWhiteSpace())
@@ -45,7 +45,7 @@ namespace SharpAbp.FoDicom
         {
             if (defaultValue == null)
             {
-                defaultValue = new DateTime(1970, 1, 1);
+                defaultValue = new DateTime(1900, 1, 1);
             }
             var timeStringValue = dataset.GetSingleValueOrDefault(tag, "");
             if (timeStringValue.IsNullOrWhiteSpace())
@@ -57,14 +57,14 @@ namespace SharpAbp.FoDicom
             {
                 if (DateTime.TryParseExact(timeStringValue, "HHmmss", CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime d1))
                 {
-                    return new DateTime(1970, 1, 1, d1.Hour, d1.Minute, d1.Second);
+                    return new DateTime(1900, 1, 1, d1.Hour, d1.Minute, d1.Second);
                 }
             }
             else if (Regex.IsMatch(timeStringValue, @"^[\d]{4}$"))
             {
                 if (DateTime.TryParseExact(timeStringValue, "HHmm", CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime d1))
                 {
-                    return new DateTime(1970, 1, 1, d1.Hour, d1.Minute, d1.Second);
+                    return new DateTime(1900, 1, 1, d1.Hour, d1.Minute, d1.Second);
                 }
             }
             else if (Regex.IsMatch(timeStringValue, @"^[\d]{6}\.[\d]{1,7}$"))
@@ -73,13 +73,13 @@ namespace SharpAbp.FoDicom
                 var f = "HHmmss.".PadRight(timeStringValue.Length, 'f');
                 if (DateTime.TryParseExact(timeStringValue, f, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime d1))
                 {
-                    return new DateTime(1970, 1, 1, d1.Hour, d1.Minute, d1.Second);
+                    return new DateTime(1900, 1, 1, d1.Hour, d1.Minute, d1.Second);
                 }
             }
 
             if (DateTime.TryParse(timeStringValue, out DateTime d2))
             {
-                return new DateTime(1970, 1, 1, d2.Hour, d2.Minute, d2.Second);
+                return new DateTime(1900, 1, 1, d2.Hour, d2.Minute, d2.Second);
             }
             return defaultValue;
         }
