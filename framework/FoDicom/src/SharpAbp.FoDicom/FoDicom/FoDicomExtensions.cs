@@ -1,6 +1,7 @@
 ﻿using FellowOakDicom;
 using System;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace SharpAbp.FoDicom
@@ -84,5 +85,16 @@ namespace SharpAbp.FoDicom
             return defaultValue;
         }
 
+        /// <summary>获取中文字符串
+        /// </summary>
+        public static string GetChineseString(this DicomDataset dataset, DicomTag tag, string encode = "utf-8", string defaultValue = "")
+        {
+            if (!dataset.Contains(tag))
+            {
+                return defaultValue;
+            }
+            var data = dataset.GetValues<byte>(tag);
+            return Encoding.GetEncoding(encode).GetString(data);
+        }
     }
 }
