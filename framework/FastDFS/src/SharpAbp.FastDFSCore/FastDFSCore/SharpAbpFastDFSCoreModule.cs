@@ -11,7 +11,7 @@ namespace SharpAbp.FastDFSCore
             context.Services.AddFastDFSCore();
         }
 
-        public override void OnApplicationInitialization(ApplicationInitializationContext context)
+        public override void OnPostApplicationInitialization(ApplicationInitializationContext context)
         {
             context.ServiceProvider.ConfigureFastDFSCore();
         }

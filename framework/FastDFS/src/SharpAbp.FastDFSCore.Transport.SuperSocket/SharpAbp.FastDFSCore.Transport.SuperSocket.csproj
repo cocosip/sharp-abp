@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\..\configureawait.props" />
+  <Import Project="..\..\..\..\build\common.props" />
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>SharpAbp.FastDFSCore.Transport.SuperSocket</AssemblyName>
+    <PackageId>SharpAbp.FastDFSCore.Transport.SuperSocket</PackageId>
+    <RootNamespace>SharpAbp</RootNamespace>
+    <Description>SharpAbp FastDFSCore.Transport.SuperSocket模块</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FastDFSCore.Transport.SuperSocket" Version="1.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SharpAbp.FastDFSCore\SharpAbp.FastDFSCore.csproj" />
+  </ItemGroup>
+
+</Project>
