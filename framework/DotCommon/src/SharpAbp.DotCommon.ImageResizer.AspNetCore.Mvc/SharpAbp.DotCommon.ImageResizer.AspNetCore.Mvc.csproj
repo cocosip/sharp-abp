@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotCommon.ImageUtility" Version="4.0.4" />
-    <PackageReference Include="DotCommon.ImageResizer.AspNetCore.Mvc" Version="4.0.4" />
+    <PackageReference Include="DotCommon.ImageUtility" Version="4.0.5" />
+    <PackageReference Include="DotCommon.ImageResizer.AspNetCore.Mvc" Version="4.0.5" />
   </ItemGroup>
 
 </Project>

@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotCommon.Json4Net" Version="4.0.4" />
+    <PackageReference Include="DotCommon.Json4Net" Version="4.0.5" />
   </ItemGroup>
   
 </Project>
