@@ -1,15 +1,20 @@
 <Project>
-  <Import Project="version.props" />
+
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
+    <Version>0.3.0</Version>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
     <Authors>virtual</Authors>
     <Product>sharp-abp</Product>
     <PackageProjectUrl>https://github.com/cocosip/sharp-abp</PackageProjectUrl>
     <PackageLicense>https://github.com/cocosip/sharp-abp/blob/master/LICENSE</PackageLicense>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/cocosip/sharp-abp</RepositoryUrl>
-    <Description>Abp-vNext extensions</Description>
-    <PackageTags>Abp,Abp-vNext,Extensions</PackageTags>
+    <PackageTags>Abp,Abp-vNext, Abp modules</PackageTags>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SourceLink.Create.CommandLine" Version="2.8.3" PrivateAssets="All" />
+  </ItemGroup>
 
 </Project>
