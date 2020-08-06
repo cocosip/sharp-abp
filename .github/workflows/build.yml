@@ -9,7 +9,9 @@ on:
       - v*
 jobs:
   publish:
-    runs-on: [windows-latest,ubuntu-18.04 ]
+    runs-on: 
+      - windows-latest
+      - ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: warrenbuckley/Setup-Nuget@v1
