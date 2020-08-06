@@ -4,10 +4,11 @@ $full = $args[0]
 
 # Test all solutions
 
-foreach ($solutionPath in $solutionPaths) {    
+foreach ($solutionPath in $solutionPaths) { 
+       
     $solutionAbsPath = (Join-Path $rootFolder $solutionPath)
     Set-Location $solutionAbsPath
-    dotnet test --no-build --no-restore
+    dotnet test
     if (-Not $?) {
         Write-Host ("Test failed for the solution: " + $solutionPath)
         Set-Location $rootFolder
