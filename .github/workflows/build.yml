@@ -9,9 +9,7 @@ on:
       - v*
 jobs:
   publish:
-    runs-on: 
-      - windows-latest
-      - ubuntu-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
       - uses: warrenbuckley/Setup-Nuget@v1
@@ -46,7 +44,6 @@ jobs:
           dir -name
       - name: dotnet nuget push to GitHub
         run: |
-          dotnet nuget add source https://nuget.pkg.github.com/EasyAbp/index.json -n github -u EasyAbp -p ${{secrets.GITHUB_TOKEN}} 
           dotnet nuget push dest\*.nupkg -s "github" --skip-duplicate
       - name: dotnet nuget push to NuGet
         run: dotnet nuget push dest\*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
