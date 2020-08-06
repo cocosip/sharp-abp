@@ -1,0 +1,31 @@
+name: "build and test"
+on:
+  push:
+    tags:
+      - v*
+jobs:
+  build-test:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.302
+
+    - name: Build All
+      run: .\build-all-release.ps1 -f
+      working-directory: .\build
+      shell: powershell
+
+    - name: Test All
+      run: .\test-all.ps1 -f
+      working-directory: .\build
+      shell: powershell
+    
+    - name: Pack All
+      run: .\pack-all.ps1 -f
+      working-directory: .\build
+      shell: powershell
+
+    - name: Publish
+      run: dotnet nuget push ..\dest\*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
