@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\common.props" />
+  <Import Project="..\..\..\configureawait.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>SharpAbp.Abp.CSRedisCore</AssemblyName>
+    <PackageId>SharpAbp.Abp.CSRedisCore</PackageId>
+    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <Description>SharpAbp CSRedisCore module</Description>
+    <RootNamespace />
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="CSRedisCore" Version="3.6.5" />
+    <PackageReference Include="Volo.Abp" Version="3.0.5" />
+  </ItemGroup>
+  
+</Project>

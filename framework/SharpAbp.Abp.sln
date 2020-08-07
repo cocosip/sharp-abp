@@ -9,19 +9,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{51F9C36E-7
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Spool", "src\SharpAbp.Abp.Spool\SharpAbp.Abp.Spool.csproj", "{4566D070-E753-44DD-9AC4-7924015F5134}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Spool.Tests", "test\SharpAbp.Abp.Spool.Tests\SharpAbp.Abp.Spool.Tests.csproj", "{68B9D91B-2F17-4329-9944-B3CB6F4A2393}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Spool.Tests", "test\SharpAbp.Abp.Spool.Tests\SharpAbp.Abp.Spool.Tests.csproj", "{68B9D91B-2F17-4329-9944-B3CB6F4A2393}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.DotCommon", "src\SharpAbp.Abp.DotCommon\SharpAbp.Abp.DotCommon.csproj", "{A81A3082-7FCB-4533-AB63-C24A4E0373E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.DotCommon", "src\SharpAbp.Abp.DotCommon\SharpAbp.Abp.DotCommon.csproj", "{A81A3082-7FCB-4533-AB63-C24A4E0373E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.FastDFS", "src\SharpAbp.Abp.FastDFS\SharpAbp.Abp.FastDFS.csproj", "{0DA45CDA-712F-426B-BADC-E5343449682D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FastDFS", "src\SharpAbp.Abp.FastDFS\SharpAbp.Abp.FastDFS.csproj", "{0DA45CDA-712F-426B-BADC-E5343449682D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.FastDFS.DotNetty", "src\SharpAbp.Abp.FastDFS.DotNetty\SharpAbp.Abp.FastDFS.DotNetty.csproj", "{DC13949F-0A91-4DE2-9C96-01DD16E10675}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FastDFS.DotNetty", "src\SharpAbp.Abp.FastDFS.DotNetty\SharpAbp.Abp.FastDFS.DotNetty.csproj", "{DC13949F-0A91-4DE2-9C96-01DD16E10675}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.FastDFS.SuperSocket", "src\SharpAbp.Abp.FastDFS.SuperSocket\SharpAbp.Abp.FastDFS.SuperSocket.csproj", "{351A0290-8002-4D28-A691-7D4947D09A44}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FastDFS.SuperSocket", "src\SharpAbp.Abp.FastDFS.SuperSocket\SharpAbp.Abp.FastDFS.SuperSocket.csproj", "{351A0290-8002-4D28-A691-7D4947D09A44}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.AmazonS3", "src\SharpAbp.Abp.AmazonS3\SharpAbp.Abp.AmazonS3.csproj", "{D6A1B355-BE49-4CCD-8C7B-F51DD0860ED7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.AmazonS3", "src\SharpAbp.Abp.AmazonS3\SharpAbp.Abp.AmazonS3.csproj", "{D6A1B355-BE49-4CCD-8C7B-F51DD0860ED7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.AmazonS3.KS3", "src\SharpAbp.Abp.AmazonS3.KS3\SharpAbp.Abp.AmazonS3.KS3.csproj", "{20262153-2DCB-4575-BA6E-0C7235AC6575}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.AmazonS3.KS3", "src\SharpAbp.Abp.AmazonS3.KS3\SharpAbp.Abp.AmazonS3.KS3.csproj", "{20262153-2DCB-4575-BA6E-0C7235AC6575}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.CSRedisCore", "src\SharpAbp.Abp.CSRedisCore\SharpAbp.Abp.CSRedisCore.csproj", "{C5BC3350-BFD3-46CC-A60D-FD395A2A6691}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -129,6 +131,18 @@ Global
 		{20262153-2DCB-4575-BA6E-0C7235AC6575}.Release|x64.Build.0 = Release|Any CPU
 		{20262153-2DCB-4575-BA6E-0C7235AC6575}.Release|x86.ActiveCfg = Release|Any CPU
 		{20262153-2DCB-4575-BA6E-0C7235AC6575}.Release|x86.Build.0 = Release|Any CPU
+		{C5BC3350-BFD3-46CC-A60D-FD395A2A6691}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5BC3350-BFD3-46CC-A60D-FD395A2A6691}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5BC3350-BFD3-46CC-A60D-FD395A2A6691}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C5BC3350-BFD3-46CC-A60D-FD395A2A6691}.Debug|x64.Build.0 = Debug|Any CPU
+		{C5BC3350-BFD3-46CC-A60D-FD395A2A6691}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C5BC3350-BFD3-46CC-A60D-FD395A2A6691}.Debug|x86.Build.0 = Debug|Any CPU
+		{C5BC3350-BFD3-46CC-A60D-FD395A2A6691}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5BC3350-BFD3-46CC-A60D-FD395A2A6691}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5BC3350-BFD3-46CC-A60D-FD395A2A6691}.Release|x64.ActiveCfg = Release|Any CPU
+		{C5BC3350-BFD3-46CC-A60D-FD395A2A6691}.Release|x64.Build.0 = Release|Any CPU
+		{C5BC3350-BFD3-46CC-A60D-FD395A2A6691}.Release|x86.ActiveCfg = Release|Any CPU
+		{C5BC3350-BFD3-46CC-A60D-FD395A2A6691}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -142,6 +156,7 @@ Global
 		{351A0290-8002-4D28-A691-7D4947D09A44} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 		{D6A1B355-BE49-4CCD-8C7B-F51DD0860ED7} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 		{20262153-2DCB-4575-BA6E-0C7235AC6575} = {16E4EB45-D029-4743-99CD-D125C72AE383}
+		{C5BC3350-BFD3-46CC-A60D-FD395A2A6691} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {30432CEA-45F2-4F5A-B44B-790A62AB73F1}
