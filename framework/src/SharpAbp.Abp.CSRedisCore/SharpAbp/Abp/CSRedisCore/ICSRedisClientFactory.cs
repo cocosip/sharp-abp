@@ -1,12 +1,24 @@
-﻿using System;
+﻿using CSRedis;
+using JetBrains.Annotations;
 using System.Collections.Generic;
-using System.Text;
 
 namespace SharpAbp.Abp.CSRedisCore
 {
     public interface ICSRedisClientFactory
     {
+        /// <summary>
+        /// Get csredis client by name
+        /// </summary>
+        /// <param name="name">name</param>
+        /// <returns></returns>
+        [NotNull]
+        CSRedisClient Get([NotNull] string name);
 
 
+        /// <summary>
+        /// Get all csredis client
+        /// </summary>
+        /// <returns></returns>
+        List<CSRedisClient> GetAllClients();
     }
 }
