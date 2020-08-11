@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\..\..\common.props" />
   <Import Project="..\..\..\configureawait.props" />
@@ -14,7 +14,6 @@
     <Description>SharpAbp CSRedisCore module</Description>
     <RootNamespace />
   </PropertyGroup>
-
 
   <ItemGroup>
     <PackageReference Include="CSRedisCore" Version="3.6.5" />

@@ -16,11 +16,9 @@
     <RootNamespace />
   </PropertyGroup>
 
-
   <ItemGroup>
     <PackageReference Include="Spool" Version="1.1.2" />
     <PackageReference Include="Volo.Abp" Version="3.0.5" />
   </ItemGroup>
-
 
 </Project>
