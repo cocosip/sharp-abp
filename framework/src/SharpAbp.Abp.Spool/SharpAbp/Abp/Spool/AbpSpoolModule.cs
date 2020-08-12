@@ -14,16 +14,10 @@ namespace SharpAbp.Abp.Spool
             context.Services.AddSpool();
         }
 
-        public override void OnApplicationInitialization(ApplicationInitializationContext context)
-        {
-            context.ServiceProvider.ConfigureSpool();
-        }
-
-
         public override void OnApplicationShutdown(ApplicationShutdownContext context)
         {
             var spoolPool = context.ServiceProvider.GetRequiredService<ISpoolPool>();
-            spoolPool.Shutdown();
+            spoolPool.Dispose();
         }
 
     }

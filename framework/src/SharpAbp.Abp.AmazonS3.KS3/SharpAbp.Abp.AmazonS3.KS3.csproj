@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AmazonS3.Multiplex.KS3" Version="1.3.2" />
+    <PackageReference Include="AmazonS3.Multiplex.KS3" Version="1.3.3" />
   </ItemGroup>
 
   <ItemGroup>

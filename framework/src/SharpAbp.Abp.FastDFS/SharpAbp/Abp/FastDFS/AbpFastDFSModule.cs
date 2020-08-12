@@ -14,17 +14,9 @@ namespace SharpAbp.Abp.FastDFS
             context.Services.AddFastDFSCore();
         }
 
-
-        public override void OnApplicationInitialization(ApplicationInitializationContext context)
-        {
-            context.ServiceProvider.ConfigureFastDFSCore();
-        }
-
-
         public override void OnApplicationShutdown(ApplicationShutdownContext context)
         {
-            var connectionManager = context.ServiceProvider.GetRequiredService<IConnectionManager>();
-            connectionManager.Release();
+           
         }
     }
 }
