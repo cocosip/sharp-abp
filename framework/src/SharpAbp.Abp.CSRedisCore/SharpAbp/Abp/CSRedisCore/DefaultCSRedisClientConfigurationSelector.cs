@@ -8,18 +8,18 @@ namespace SharpAbp.Abp.CSRedisCore
 {
     public class DefaultCSRedisClientConfigurationSelector : ICSRedisClientConfigurationSelector, ITransientDependency
     {
-        private readonly CSRedisOption _option;
+        private readonly CSRedisOptions _options;
 
-        public DefaultCSRedisClientConfigurationSelector(IOptions<CSRedisOption> options)
+        public DefaultCSRedisClientConfigurationSelector(IOptions<CSRedisOptions> options)
         {
-            _option = options.Value;
+            _options = options.Value;
         }
 
 
         [NotNull]
         public virtual CSRedisClientConfiguration Get([NotNull] string name)
         {
-            var configuration = _option.Configurations.FirstOrDefault(x => x.Name == name);
+            var configuration = _options.Configurations.FirstOrDefault(x => x.Name == name);
 
             if (configuration == null)
             {

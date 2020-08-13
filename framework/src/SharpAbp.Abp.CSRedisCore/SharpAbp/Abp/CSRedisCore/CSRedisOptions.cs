@@ -2,11 +2,11 @@
 
 namespace SharpAbp.Abp.CSRedisCore
 {
-    public class CSRedisOption
+    public class CSRedisOptions
     {
         public List<CSRedisClientConfiguration> Configurations { get; set; }
 
-        public CSRedisOption()
+        public CSRedisOptions()
         {
             Configurations = new List<CSRedisClientConfiguration>();
         }

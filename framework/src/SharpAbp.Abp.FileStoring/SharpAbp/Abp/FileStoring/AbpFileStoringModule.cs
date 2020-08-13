@@ -7,5 +7,10 @@ namespace SharpAbp.Abp.FileStoring
 {
     public class AbpFileStoringModule : AbpModule
     {
+
+        public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+
+        }
     }
 }

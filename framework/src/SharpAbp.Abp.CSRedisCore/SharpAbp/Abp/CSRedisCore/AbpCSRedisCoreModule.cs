@@ -11,7 +11,7 @@ namespace SharpAbp.Abp.CSRedisCore
         {
             context.Services
                 .AddAssembly(typeof(AbpCSRedisCoreModule).Assembly)
-                .Configure<CSRedisOption>(c => { });
+                .Configure<CSRedisOptions>(c => { });
         }
     }
 }
