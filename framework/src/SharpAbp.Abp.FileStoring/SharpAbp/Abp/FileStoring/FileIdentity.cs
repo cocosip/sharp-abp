@@ -13,11 +13,6 @@ namespace SharpAbp.Abp.FileStoring
         public Guid? TenantId { get; set; }
 
         /// <summary>
-        /// TenantName
-        /// </summary>
-        public string TenantName { get; set; }
-
-        /// <summary>
         /// File provider name
         /// </summary>
         public string ProviderName { get; set; }
@@ -54,7 +49,7 @@ namespace SharpAbp.Abp.FileStoring
 
         public override string ToString()
         {
-            return $"TenantId:{TenantId},TenantName:{TenantName},ProviderName:{ProviderName},ContainerId:{ContainerId},FileId:{FileId}";
+            return $"TenantId:{TenantId},ProviderName:{ProviderName},ContainerId:{ContainerId},FileId:{FileId}";
         }
     }
 }
