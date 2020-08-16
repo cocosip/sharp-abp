@@ -7,8 +7,14 @@ namespace SharpAbp.Abp.FileStoring
 {
     public class FileContainerConfiguration
     {
-        public Type ProviderType { get; set; }
+        /// <summary>
+        /// TenantId
+        /// </summary>
+        public Guid? TenantId { get; set; }
 
+        /// <summary>
+        /// Provider name
+        /// </summary>
         public string ProviderName { get; set; }
 
         [NotNull]
