@@ -1,18 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.Modularity;
 using Volo.Abp.MultiTenancy;
+using Volo.Abp.Threading;
 
-namespace SharpAbp.Abp.FileStoring
+namespace Volo.Abp.FileStoring
 {
-    [DependsOn(typeof(AbpMultiTenancyModule))]
+    [DependsOn(
+        typeof(AbpMultiTenancyModule),
+        typeof(AbpThreadingModule)
+        )]
     public class AbpFileStoringModule : AbpModule
     {
-
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
+            context.Services.AddTransient(
+                typeof(IFileContainer<>),
+                typeof(FileContainer<>)
+            );
 
+            context.Services.AddTransient(
+                typeof(IFileContainer),
+                serviceProvider => serviceProvider
+                    .GetRequiredService<IFileContainer<DefaultContainer>>()
+            );
         }
     }
 }
