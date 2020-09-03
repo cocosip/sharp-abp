@@ -20,8 +20,4 @@
     <ProjectReference Include="..\SharpAbp.Abp.FileStoring\SharpAbp.Abp.FileStoring.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="SharpAbp\Abp\FileStoring\" />
-  </ItemGroup>
-
 </Project>
