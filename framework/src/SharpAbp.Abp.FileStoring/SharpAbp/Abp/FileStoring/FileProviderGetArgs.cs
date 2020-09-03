@@ -1,19 +1,19 @@
 ﻿using JetBrains.Annotations;
 using System.Threading;
 
-namespace Volo.Abp.FileStoring
+namespace SharpAbp.Abp.FileStoring
 {
     public class FileProviderGetArgs : FileProviderArgs
     {
         public FileProviderGetArgs(
             [NotNull] string containerName,
             [NotNull] FileContainerConfiguration configuration,
-            [NotNull] string blobName,
+            [NotNull] string fileName,
             CancellationToken cancellationToken = default)
             : base(
                 containerName,
                 configuration,
-                blobName,
+                fileName,
                 cancellationToken)
         {
         }

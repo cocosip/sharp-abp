@@ -4,10 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.Threading;
 
-namespace Volo.Abp.FileStoring
+namespace SharpAbp.Abp.FileStoring
 {
     public class FileContainer<TContainer> : IFileContainer<TContainer>
         where TContainer : class
@@ -112,13 +113,13 @@ namespace Volo.Abp.FileStoring
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
             {
-                var (normalizedContainerName, normalizedBlobName) = NormalizeNaming(ContainerName, name);
+                var (normalizedContainerName, normalizedFileName) = NormalizeNaming(ContainerName, name);
 
                 await Provider.SaveAsync(
                     new FileProviderSaveArgs(
                         normalizedContainerName,
                         Configuration,
-                        normalizedBlobName,
+                        normalizedFileName,
                         stream,
                         overrideExisting,
                         CancellationTokenProvider.FallbackToProvider(cancellationToken)
@@ -133,14 +134,14 @@ namespace Volo.Abp.FileStoring
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
             {
-                var (normalizedContainerName, normalizedBlobName) =
+                var (normalizedContainerName, normalizedFileName) =
                     NormalizeNaming(ContainerName, name);
 
                 return await Provider.DeleteAsync(
                     new FileProviderDeleteArgs(
                         normalizedContainerName,
                         Configuration,
-                        normalizedBlobName,
+                        normalizedFileName,
                         CancellationTokenProvider.FallbackToProvider(cancellationToken)
                     )
                 );
@@ -153,14 +154,14 @@ namespace Volo.Abp.FileStoring
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
             {
-                var (normalizedContainerName, normalizedBlobName) =
+                var (normalizedContainerName, normalizedFileName) =
                     NormalizeNaming(ContainerName, name);
 
                 return await Provider.ExistsAsync(
                     new FileProviderExistsArgs(
                         normalizedContainerName,
                         Configuration,
-                        normalizedBlobName,
+                        normalizedFileName,
                         CancellationTokenProvider.FallbackToProvider(cancellationToken)
                     )
                 );
@@ -177,7 +178,7 @@ namespace Volo.Abp.FileStoring
             {
                 //TODO: Consider to throw some type of "not found" exception and handle on the HTTP status side
                 throw new AbpException(
-                    $"Could not found the requested BLOB '{name}' in the container '{ContainerName}'!");
+                    $"Could not found the requested FILE '{name}' in the container '{ContainerName}'!");
             }
 
             return stream;
@@ -189,14 +190,14 @@ namespace Volo.Abp.FileStoring
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
             {
-                var (normalizedContainerName, normalizedBlobName) =
+                var (normalizedContainerName, normalizedFileName) =
                     NormalizeNaming(ContainerName, name);
 
                 return await Provider.GetOrNullAsync(
                     new FileProviderGetArgs(
                         normalizedContainerName,
                         Configuration,
-                        normalizedBlobName,
+                        normalizedFileName,
                         CancellationTokenProvider.FallbackToProvider(cancellationToken)
                     )
                 );
@@ -212,12 +213,12 @@ namespace Volo.Abp.FileStoring
 
             return CurrentTenant.Id;
         }
-        
-        protected virtual (string, string) NormalizeNaming(string containerName,  string blobName)
+
+        protected virtual (string, string) NormalizeNaming(string containerName, string fileName)
         {
             if (!Configuration.NamingNormalizers.Any())
             {
-                return (containerName, blobName);
+                return (containerName, fileName);
             }
 
             using (var scope = ServiceProvider.CreateScope())
@@ -229,10 +230,10 @@ namespace Volo.Abp.FileStoring
                         .As<IFileNamingNormalizer>();
 
                     containerName = normalizer.NormalizeContainerName(containerName);
-                    blobName = normalizer.NormalizeBlobName(blobName);
+                    fileName = normalizer.NormalizeFileName(fileName);
                 }
 
-                return (containerName, blobName);
+                return (containerName, fileName);
             }
         }
     }

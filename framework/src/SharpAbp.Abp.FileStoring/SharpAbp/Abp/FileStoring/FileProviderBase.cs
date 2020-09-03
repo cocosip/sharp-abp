@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
-namespace Volo.Abp.FileStoring
+namespace SharpAbp.Abp.FileStoring
 {
     public abstract class FileProviderBase : IFileProvider
     {

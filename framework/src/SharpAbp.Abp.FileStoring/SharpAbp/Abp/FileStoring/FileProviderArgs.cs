@@ -1,7 +1,8 @@
-﻿using System.Threading;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
+using System.Threading;
+using Volo.Abp;
 
-namespace Volo.Abp.FileStoring
+namespace SharpAbp.Abp.FileStoring
 {
     public abstract class FileProviderArgs
     {
@@ -12,19 +13,19 @@ namespace Volo.Abp.FileStoring
         public FileContainerConfiguration Configuration { get; }
 
         [NotNull]
-        public string BlobName { get; }
+        public string FileName { get; }
         
         public CancellationToken CancellationToken { get; }
 
         protected FileProviderArgs(
             [NotNull] string containerName,
             [NotNull] FileContainerConfiguration configuration,
-            [NotNull] string blobName,
+            [NotNull] string fileName,
             CancellationToken cancellationToken = default)
         {
             ContainerName = Check.NotNullOrWhiteSpace(containerName, nameof(containerName));
             Configuration = Check.NotNull(configuration, nameof(configuration));
-            BlobName = Check.NotNullOrWhiteSpace(blobName, nameof(blobName));
+            FileName = Check.NotNullOrWhiteSpace(fileName, nameof(fileName));
             CancellationToken = cancellationToken;
         }
     }

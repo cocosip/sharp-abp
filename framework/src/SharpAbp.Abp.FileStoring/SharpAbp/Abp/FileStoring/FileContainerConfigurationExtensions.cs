@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
+using Volo.Abp;
 
-namespace Volo.Abp.FileStoring
+namespace SharpAbp.Abp.FileStoring
 {
     public static class FileContainerConfigurationExtensions
     {

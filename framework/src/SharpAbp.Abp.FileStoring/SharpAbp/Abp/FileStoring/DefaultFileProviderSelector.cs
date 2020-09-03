@@ -2,10 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.DynamicProxy;
 
-namespace Volo.Abp.FileStoring
+namespace SharpAbp.Abp.FileStoring
 {
     public class DefaultFileProviderSelector : IFileProviderSelector, ITransientDependency
     {
@@ -15,10 +16,10 @@ namespace Volo.Abp.FileStoring
 
         public DefaultFileProviderSelector(
             IFileContainerConfigurationProvider configurationProvider, 
-            IEnumerable<IFileProvider> blobProviders)
+            IEnumerable<IFileProvider> fileProviders)
         {
             ConfigurationProvider = configurationProvider;
-            FileProviders = blobProviders;
+            FileProviders = fileProviders;
         }
         
         [NotNull]
@@ -30,7 +31,7 @@ namespace Volo.Abp.FileStoring
             
             if (!FileProviders.Any())
             {
-                throw new AbpException("No BLOB Storage provider was registered! At least one provider must be registered to be able to use the Blog Storing System.");
+                throw new AbpException("No FILE Storage provider was registered! At least one provider must be registered to be able to use the Blog Storing System.");
             }
             
             foreach (var provider in FileProviders)
@@ -42,7 +43,7 @@ namespace Volo.Abp.FileStoring
             }
 
             throw new AbpException(
-                $"Could not find the BLOB Storage provider with the type ({configuration.ProviderType.AssemblyQualifiedName}) configured for the container {containerName} and no default provider was set."
+                $"Could not find the FILE Storage provider with the type ({configuration.ProviderType.AssemblyQualifiedName}) configured for the container {containerName} and no default provider was set."
             );
         }
     }

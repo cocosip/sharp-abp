@@ -1,14 +1,15 @@
+using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
+using Volo.Abp;
 using Volo.Abp.Collections;
 
-namespace Volo.Abp.FileStoring
+namespace SharpAbp.Abp.FileStoring
 {
     public class FileContainerConfiguration
     {
         /// <summary>
-        /// The provider to be used to store BLOBs of this container.
+        /// The provider to be used to store FILEs of this container.
         /// </summary>
         public Type ProviderType { get; set; }
 
@@ -26,9 +27,11 @@ namespace Volo.Abp.FileStoring
 
         public ITypeList<IFileNamingNormalizer> NamingNormalizers { get; }
 
-        [NotNull] private readonly Dictionary<string, object> _properties;
+        [NotNull]
+        private readonly Dictionary<string, object> _properties;
 
-        [CanBeNull] private readonly FileContainerConfiguration _fallbackConfiguration;
+        [CanBeNull]
+        private readonly FileContainerConfiguration _fallbackConfiguration;
 
         public FileContainerConfiguration(FileContainerConfiguration fallbackConfiguration = null)
         {
@@ -40,7 +43,7 @@ namespace Volo.Abp.FileStoring
         [CanBeNull]
         public T GetConfigurationOrDefault<T>(string name, T defaultValue = default)
         {
-            return (T) GetConfigurationOrNull(name, defaultValue);
+            return (T)GetConfigurationOrNull(name, defaultValue);
         }
 
         [CanBeNull]

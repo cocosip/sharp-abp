@@ -1,9 +1,9 @@
-﻿namespace Volo.Abp.FileStoring
+﻿namespace SharpAbp.Abp.FileStoring
 {
     public interface IFileNamingNormalizer
     {
         string NormalizeContainerName(string containerName);
 
-        string NormalizeBlobName(string blobName);
+        string NormalizeFileName(string fileName);
     }
 }

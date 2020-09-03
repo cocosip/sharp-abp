@@ -1,19 +1,19 @@
 ﻿using System.Threading;
 using JetBrains.Annotations;
 
-namespace Volo.Abp.FileStoring
+namespace SharpAbp.Abp.FileStoring
 {
     public class FileProviderDeleteArgs : FileProviderArgs
     {
         public FileProviderDeleteArgs(
             [NotNull] string containerName,
             [NotNull] FileContainerConfiguration configuration,
-            [NotNull] string blobName,
+            [NotNull] string fileName,
             CancellationToken cancellationToken = default)
             : base(
                 containerName,
                 configuration,
-                blobName,
+                fileName,
                 cancellationToken)
         {
         }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Volo.Abp.DependencyInjection;
 
-namespace Volo.Abp.FileStoring
+namespace SharpAbp.Abp.FileStoring
 {
     public class DefaultFileContainerConfigurationProvider : IFileContainerConfigurationProvider, ITransientDependency
     {

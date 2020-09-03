@@ -1,8 +1,9 @@
 ﻿using JetBrains.Annotations;
 using System;
 using System.Reflection;
+using Volo.Abp;
 
-namespace Volo.Abp.FileStoring
+namespace SharpAbp.Abp.FileStoring
 {
     public class FileContainerNameAttribute : Attribute
     {

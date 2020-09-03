@@ -1,30 +1,31 @@
 ﻿using JetBrains.Annotations;
 using System.IO;
 using System.Threading;
+using Volo.Abp;
 
-namespace Volo.Abp.FileStoring
+namespace SharpAbp.Abp.FileStoring
 {
     public class FileProviderSaveArgs : FileProviderArgs
     {
         [NotNull]
-        public Stream BlobStream { get; }
+        public Stream FileStream { get; }
         
         public bool OverrideExisting { get; }
 
         public FileProviderSaveArgs(
             [NotNull] string containerName,
             [NotNull] FileContainerConfiguration configuration,
-            [NotNull] string blobName,
-            [NotNull] Stream blobStream,
+            [NotNull] string fileName,
+            [NotNull] Stream fileStream,
             bool overrideExisting = false,
             CancellationToken cancellationToken = default)
             : base(
                 containerName,
                 configuration,
-                blobName,
+                fileName,
                 cancellationToken)
         {
-            BlobStream = Check.NotNull(blobStream, nameof(blobStream));
+            FileStream = Check.NotNull(fileStream, nameof(fileStream));
             OverrideExisting = overrideExisting;
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace Volo.Abp.FileStoring
+﻿namespace SharpAbp.Abp.FileStoring
 {
     public static class FileContainerFactoryExtensions
     {

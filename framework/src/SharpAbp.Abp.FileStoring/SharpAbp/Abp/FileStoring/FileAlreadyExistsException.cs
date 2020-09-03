@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Volo.Abp;
 
-namespace Volo.Abp.FileStoring
+namespace SharpAbp.Abp.FileStoring
 {
     public class FileAlreadyExistsException : AbpException
     {
