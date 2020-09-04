@@ -1,9 +1,25 @@
-﻿using Volo.Abp;
+﻿using Amazon.S3.Multiplex;
+using Volo.Abp;
 
 namespace SharpAbp.Abp.FileStoring
 {
     public class S3FileProviderConfiguration
     {
+        public string BucketName
+        {
+            get => _containerConfiguration.GetConfiguration<string>(S3FileProviderConfigurationNames.BucketName);
+            set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.BucketName, Check.NotNullOrWhiteSpace(value, nameof(value)));
+        }
+
+        /// <summary>
+        /// the server url to access
+        /// </summary>
+        public string ServerUrl
+        {
+            get => _containerConfiguration.GetConfiguration<string>(S3FileProviderConfigurationNames.ServerUrl);
+            set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.ServerUrl, Check.NotNullOrWhiteSpace(value, nameof(value)));
+        }
+
         /// <summary>
         /// accessKey is like user-id that uniquely identifies your account.This field is optional and can be omitted for anonymous access.
         /// </summary>
@@ -16,10 +32,10 @@ namespace SharpAbp.Abp.FileStoring
         /// <summary>
         /// secretKey is the password to your account.This field is optional and can be omitted for anonymous access.
         /// </summary>
-        public string SecretKey
+        public string SecretAccessKey
         {
-            get => _containerConfiguration.GetConfiguration<string>(S3FileProviderConfigurationNames.AccessKeySecret);
-            set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.AccessKeySecret, Check.NotNullOrWhiteSpace(value, nameof(value)));
+            get => _containerConfiguration.GetConfiguration<string>(S3FileProviderConfigurationNames.SecretAccessKey);
+            set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.SecretAccessKey, Check.NotNullOrWhiteSpace(value, nameof(value)));
         }
 
         /// <summary>
@@ -56,10 +72,10 @@ namespace SharpAbp.Abp.FileStoring
         /// <summary>
         ///  S3 Vendor
         /// </summary>
-        public string Vendor
+        public int VendorType
         {
-            get => _containerConfiguration.GetConfiguration<string>(S3FileProviderConfigurationNames.Vendor);
-            set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.Vendor, Check.NotNullOrWhiteSpace(value, nameof(value)));
+            get => _containerConfiguration.GetConfigurationOrDefault(S3FileProviderConfigurationNames.VendorType, (int)S3VendorType.Amazon);
+            set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.VendorType, value);
         }
 
 
@@ -88,6 +104,25 @@ namespace SharpAbp.Abp.FileStoring
         {
             get => _containerConfiguration.GetConfiguration<string>(S3FileProviderConfigurationNames.SignatureVersion);
             set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.SignatureVersion, Check.NotNullOrWhiteSpace(value, nameof(value)));
+        }
+
+        /// <summary>
+        ///Default value: false.
+        /// </summary>
+        public bool CreateBucketIfNotExists
+        {
+            get => _containerConfiguration.GetConfigurationOrDefault(S3FileProviderConfigurationNames.CreateBucketIfNotExists, false);
+            set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.CreateBucketIfNotExists, value);
+        }
+
+
+        /// <summary>
+        /// ClientCount
+        /// </summary>
+        public int ClientCount
+        {
+            get => _containerConfiguration.GetConfigurationOrDefault(S3FileProviderConfigurationNames.ClientCount, 10);
+            set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.ClientCount, value);
         }
 
 
