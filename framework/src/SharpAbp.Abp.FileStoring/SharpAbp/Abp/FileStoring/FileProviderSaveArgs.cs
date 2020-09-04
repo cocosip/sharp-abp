@@ -7,26 +7,57 @@ namespace SharpAbp.Abp.FileStoring
 {
     public class FileProviderSaveArgs : FileProviderArgs
     {
-        [NotNull]
         public Stream FileStream { get; }
-        
+
+        public string FilePath { get; set; }
+
+        public string FileExt { get; set; }
+
         public bool OverrideExisting { get; }
 
         public FileProviderSaveArgs(
             [NotNull] string containerName,
             [NotNull] FileContainerConfiguration configuration,
-            [NotNull] string fileName,
-            [NotNull] Stream fileStream,
+            [CanBeNull] string fileId,
             bool overrideExisting = false,
             CancellationToken cancellationToken = default)
             : base(
                 containerName,
                 configuration,
-                fileName,
+                fileId,
                 cancellationToken)
         {
-            FileStream = Check.NotNull(fileStream, nameof(fileStream));
             OverrideExisting = overrideExisting;
         }
+
+
+        public FileProviderSaveArgs(
+           [NotNull] string containerName,
+           [NotNull] FileContainerConfiguration configuration,
+           [CanBeNull] string fileId,
+           [NotNull] Stream fileStream,
+           [NotNull] string fileExt,
+           bool overrideExisting = false,
+           CancellationToken cancellationToken = default)
+           : this(containerName, configuration, fileId, overrideExisting, cancellationToken)
+        {
+            FileStream = Check.NotNull(fileStream, nameof(fileStream));
+            FileExt = Check.NotNullOrWhiteSpace(fileExt, nameof(fileExt));
+        }
+
+        public FileProviderSaveArgs(
+          [NotNull] string containerName,
+          [NotNull] FileContainerConfiguration configuration,
+          [CanBeNull] string fileId,
+          [NotNull] string filePath,
+          bool overrideExisting = false,
+          CancellationToken cancellationToken = default)
+          : this(containerName, configuration, fileId, overrideExisting, cancellationToken)
+        {
+            FilePath = Check.NotNullOrWhiteSpace(filePath, nameof(filePath));
+        }
+
+
+
     }
 }

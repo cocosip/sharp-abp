@@ -1,5 +1,5 @@
-﻿using System.Threading;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
+using System.Threading;
 
 namespace SharpAbp.Abp.FileStoring
 {
@@ -8,12 +8,12 @@ namespace SharpAbp.Abp.FileStoring
         public FileProviderExistsArgs(
             [NotNull] string containerName,
             [NotNull] FileContainerConfiguration configuration,
-            [NotNull] string fileName,
+            [NotNull] string fileId,
             CancellationToken cancellationToken = default)
         : base(
             containerName,
             configuration,
-            fileName,
+            fileId,
             cancellationToken)
         {
         }

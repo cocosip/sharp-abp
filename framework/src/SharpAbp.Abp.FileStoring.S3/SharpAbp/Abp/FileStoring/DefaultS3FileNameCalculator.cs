@@ -15,8 +15,8 @@ namespace SharpAbp.Abp.FileStoring
         public virtual string Calculate(FileProviderArgs args)
         {
             return CurrentTenant.Id == null
-                ? $"host/{args.FileName}"
-                : $"tenants/{CurrentTenant.Id.Value:D}/{args.FileName}";
+                ? $"host/{args.FileId}"
+                : $"tenants/{CurrentTenant.Id.Value:D}/{args.FileId}";
         }
     }
 }

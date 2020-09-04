@@ -22,7 +22,7 @@ namespace SharpAbp.Abp.FileStoring
 
             if (!args.OverrideExisting && await ExistsAsync(filePath))
             {
-                throw new FileAlreadyExistsException($"Saving BLOB '{args.FileName}' does already exists in the container '{args.ContainerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
+                throw new FileAlreadyExistsException($"Saving BLOB '{args.FileId}' does already exists in the container '{args.ContainerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
             }
 
             DirectoryHelper.CreateIfNotExists(Path.GetDirectoryName(filePath));

@@ -105,15 +105,16 @@ namespace SharpAbp.Abp.FileStoring
             ServiceProvider = serviceProvider;
         }
 
+
         public virtual async Task SaveAsync(
-            string name,
+            string fileId,
             Stream stream,
             bool overrideExisting = false,
             CancellationToken cancellationToken = default)
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
             {
-                var (normalizedContainerName, normalizedFileName) = NormalizeNaming(ContainerName, name);
+                var (normalizedContainerName, normalizedFileName) = NormalizeNaming(ContainerName, fileId);
 
                 await Provider.SaveAsync(
                     new FileProviderSaveArgs(
@@ -121,6 +122,7 @@ namespace SharpAbp.Abp.FileStoring
                         Configuration,
                         normalizedFileName,
                         stream,
+                        "",
                         overrideExisting,
                         CancellationTokenProvider.FallbackToProvider(cancellationToken)
                     )
@@ -214,11 +216,11 @@ namespace SharpAbp.Abp.FileStoring
             return CurrentTenant.Id;
         }
 
-        protected virtual (string, string) NormalizeNaming(string containerName, string fileName)
+        protected virtual (string, string) NormalizeNaming(string containerName, string fileId)
         {
             if (!Configuration.NamingNormalizers.Any())
             {
-                return (containerName, fileName);
+                return (containerName, fileId);
             }
 
             using (var scope = ServiceProvider.CreateScope())
@@ -230,10 +232,10 @@ namespace SharpAbp.Abp.FileStoring
                         .As<IFileNamingNormalizer>();
 
                     containerName = normalizer.NormalizeContainerName(containerName);
-                    fileName = normalizer.NormalizeFileName(fileName);
+                    fileId = normalizer.NormalizeFileName(fileId);
                 }
 
-                return (containerName, fileName);
+                return (containerName, fileId);
             }
         }
     }

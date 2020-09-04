@@ -32,7 +32,7 @@ namespace SharpAbp.Abp.FileStoring
                 filePath = Path.Combine(filePath, args.ContainerName);
             }
 
-            filePath = Path.Combine(filePath, args.FileName);
+            filePath = Path.Combine(filePath, args.FileId);
 
             return filePath;
         }

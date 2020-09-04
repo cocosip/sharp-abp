@@ -6,26 +6,30 @@ namespace SharpAbp.Abp.FileStoring
 {
     public abstract class FileProviderArgs
     {
+        /// <summary>
+        /// BucketName when use s3 storage
+        /// GroupName when use fastdfs storage
+        /// </summary>
         [NotNull]
         public string ContainerName { get; }
-        
+
         [NotNull]
         public FileContainerConfiguration Configuration { get; }
 
-        [NotNull]
-        public string FileName { get; }
-        
+        [CanBeNull]
+        public string FileId { get; }
+
         public CancellationToken CancellationToken { get; }
 
         protected FileProviderArgs(
             [NotNull] string containerName,
             [NotNull] FileContainerConfiguration configuration,
-            [NotNull] string fileName,
+            [CanBeNull] string fileId,
             CancellationToken cancellationToken = default)
         {
             ContainerName = Check.NotNullOrWhiteSpace(containerName, nameof(containerName));
             Configuration = Check.NotNull(configuration, nameof(configuration));
-            FileName = Check.NotNullOrWhiteSpace(fileName, nameof(fileName));
+            FileId = fileId;
             CancellationToken = cancellationToken;
         }
     }

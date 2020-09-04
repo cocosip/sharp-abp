@@ -3,9 +3,7 @@ using Amazon.S3.Model;
 using Amazon.S3.Multiplex;
 using AmazonKS3;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
 
@@ -32,7 +30,7 @@ namespace SharpAbp.Abp.FileStoring
 
             if (!args.OverrideExisting && await FileExistsAsync(client, containerName, fileName))
             {
-                throw new FileAlreadyExistsException($"Saving File '{args.FileName}' does already exists in the container '{containerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
+                throw new FileAlreadyExistsException($"Saving File '{args.FileId}' does already exists in the container '{containerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
             }
 
             if (configuration.CreateBucketIfNotExists)

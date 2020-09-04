@@ -8,12 +8,12 @@ namespace SharpAbp.Abp.FileStoring
         public FileProviderGetArgs(
             [NotNull] string containerName,
             [NotNull] FileContainerConfiguration configuration,
-            [NotNull] string fileName,
+            [NotNull] string fileId,
             CancellationToken cancellationToken = default)
             : base(
                 containerName,
                 configuration,
-                fileName,
+                fileId,
                 cancellationToken)
         {
         }
