@@ -19,4 +19,11 @@
     <ProjectReference Include="..\SharpAbp.Abp.AmazonS3.KS3\SharpAbp.Abp.AmazonS3.KS3.csproj" />
     <ProjectReference Include="..\SharpAbp.Abp.FileStoring\SharpAbp.Abp.FileStoring.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Fody" Version="6.2.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 </Project>

@@ -17,11 +17,18 @@
 
   <ItemGroup>
     <PackageReference Include="FluentSocket.DotNetty" Version="1.0.0" />
-    <PackageReference Include="Volo.Abp" Version="3.0.5" />
+    <PackageReference Include="Volo.Abp" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SharpAbp.Abp.FluentSocket\SharpAbp.Abp.FluentSocket.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Fody" Version="6.2.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>
