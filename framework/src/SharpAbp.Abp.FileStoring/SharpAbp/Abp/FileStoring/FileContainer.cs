@@ -232,7 +232,7 @@ namespace SharpAbp.Abp.FileStoring
                         .As<IFileNamingNormalizer>();
 
                     containerName = normalizer.NormalizeContainerName(containerName);
-                    fileId = normalizer.NormalizeFileName(fileId);
+                    fileId = normalizer.NormalizeFileId(fileId);
                 }
 
                 return (containerName, fileId);

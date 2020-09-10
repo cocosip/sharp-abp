@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System.Xml;
 using Volo.Abp.Modularity;
 using Volo.Abp.MultiTenancy;
-using Volo.Abp.SecurityLog;
 using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.FileStoring

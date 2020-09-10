@@ -16,7 +16,7 @@ namespace SharpAbp.Abp.FileStoring
             FilePathCalculator = filePathCalculator;
         }
 
-        public override async Task SaveAsync(FileProviderSaveArgs args)
+        public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
             var filePath = FilePathCalculator.Calculate(args);
 
@@ -45,6 +45,7 @@ namespace SharpAbp.Abp.FileStoring
                         await fileStream.FlushAsync();
                     }
                 });
+            return filePath;
         }
 
         public override Task<bool> DeleteAsync(FileProviderDeleteArgs args)

@@ -15,6 +15,7 @@ namespace SharpAbp.Abp.FileStoring
             Action<FastDFSFileProviderConfiguration> fastDFSConfigureAction)
         {
             containerConfiguration.ProviderType = typeof(FastDFSFileProvider);
+            containerConfiguration.NamingNormalizers.TryAdd<FastDFSFileNamingNormalizer>();
 
             fastDFSConfigureAction(new FastDFSFileProviderConfiguration(containerConfiguration));
 

@@ -19,22 +19,22 @@ namespace SharpAbp.Abp.FileStoring
             return Normalize(containerName);
         }
 
-        public virtual string NormalizeFileName(string fileName)
+        public virtual string NormalizeFileId(string fileId)
         {
-            return Normalize(fileName);
+            return Normalize(fileId);
         }
 
-        protected virtual string Normalize(string fileName)
+        protected virtual string Normalize(string name)
         {
             var os = _iosPlatformProvider.GetCurrentOSPlatform();
             if (os == OSPlatform.Windows)
             {
                 // A filename cannot contain any of the following characters: \ / : * ? " < > |
                 // In order to support the directory included in the blob name, remove / and \
-                fileName = Regex.Replace(fileName, "[:\\*\\?\"<>\\|]", string.Empty);
+                name = Regex.Replace(name, "[:\\*\\?\"<>\\|]", string.Empty);
             }
 
-            return fileName;
+            return name;
         }
     }
 }

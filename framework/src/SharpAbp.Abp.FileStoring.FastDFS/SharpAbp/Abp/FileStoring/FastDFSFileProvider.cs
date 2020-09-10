@@ -1,8 +1,6 @@
 ﻿using FastDFSCore;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
 
@@ -19,12 +17,13 @@ namespace SharpAbp.Abp.FileStoring
             FastDFSClient = fastDFSClient;
         }
 
-        public override async Task SaveAsync(FileProviderSaveArgs args)
+        public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
             var configuration = args.Configuration.GetFastDFSConfiguration();
             var containerName = GetContainerName(configuration, args);
             var storageNode = await FastDFSClient.GetStorageNodeAsync(containerName, configuration.ClusterName);
-            var _ = await FastDFSClient.UploadFileAsync(storageNode, args.FileStream, "", configuration.ClusterName);
+            var fileId = await FastDFSClient.UploadFileAsync(storageNode, args.FileStream, "", configuration.ClusterName);
+            return fileId;
         }
 
         public override async Task<bool> DeleteAsync(FileProviderDeleteArgs args)

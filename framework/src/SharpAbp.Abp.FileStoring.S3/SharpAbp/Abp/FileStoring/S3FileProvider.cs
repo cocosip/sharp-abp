@@ -21,14 +21,14 @@ namespace SharpAbp.Abp.FileStoring
             S3ClientFactory = s3ClientFactory;
         }
 
-        public override async Task SaveAsync(FileProviderSaveArgs args)
+        public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
-            var fileName = S3FileNameCalculator.Calculate(args);
+            var fileId = S3FileNameCalculator.Calculate(args);
             var configuration = args.Configuration.GetS3Configuration();
             var client = GetS3Client(args);
             var containerName = GetContainerName(args);
 
-            if (!args.OverrideExisting && await FileExistsAsync(client, containerName, fileName))
+            if (!args.OverrideExisting && await FileExistsAsync(client, containerName, fileId))
             {
                 throw new FileAlreadyExistsException($"Saving File '{args.FileId}' does already exists in the container '{containerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
             }
@@ -41,10 +41,12 @@ namespace SharpAbp.Abp.FileStoring
             await client.PutObjectAsync(new PutObjectRequest()
             {
                 BucketName = containerName,
-                Key = fileName,
+                Key = fileId,
                 InputStream = args.FileStream,
                 AutoCloseStream = true
             });
+
+            return fileId;
         }
 
         public override async Task<bool> DeleteAsync(FileProviderDeleteArgs args)
