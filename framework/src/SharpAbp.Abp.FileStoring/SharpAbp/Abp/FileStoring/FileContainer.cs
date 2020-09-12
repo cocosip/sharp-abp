@@ -20,14 +20,19 @@ namespace SharpAbp.Abp.FileStoring
             _container = fileContainerFactory.Create<TContainer>();
         }
 
-        public Task SaveAsync(
-            string name,
+        public FileContainerConfiguration GetConfiguration()
+        {
+            return _container.GetConfiguration();
+        }
+
+        public Task<string> SaveAsync(
+            string fileId,
             Stream stream,
             bool overrideExisting = false,
             CancellationToken cancellationToken = default)
         {
             return _container.SaveAsync(
-                name,
+                fileId,
                 stream,
                 overrideExisting,
                 cancellationToken
@@ -35,41 +40,41 @@ namespace SharpAbp.Abp.FileStoring
         }
 
         public Task<bool> DeleteAsync(
-            string name,
+            string fileId,
             CancellationToken cancellationToken = default)
         {
             return _container.DeleteAsync(
-                name,
+                fileId,
                 cancellationToken
             );
         }
 
         public Task<bool> ExistsAsync(
-            string name,
+            string fileId,
             CancellationToken cancellationToken = default)
         {
             return _container.ExistsAsync(
-                name,
+                fileId,
                 cancellationToken
             );
         }
 
         public Task<Stream> GetAsync(
-            string name,
+            string fileId,
             CancellationToken cancellationToken = default)
         {
             return _container.GetAsync(
-                name,
+                fileId,
                 cancellationToken
             );
         }
 
         public Task<Stream> GetOrNullAsync(
-            string name,
+            string fileId,
             CancellationToken cancellationToken = default)
         {
             return _container.GetOrNullAsync(
-                name,
+                fileId,
                 cancellationToken
             );
         }
@@ -105,8 +110,13 @@ namespace SharpAbp.Abp.FileStoring
             ServiceProvider = serviceProvider;
         }
 
+        public FileContainerConfiguration GetConfiguration()
+        {
+            return Configuration;
+        }
 
-        public virtual async Task SaveAsync(
+
+        public virtual async Task<string> SaveAsync(
             string fileId,
             Stream stream,
             bool overrideExisting = false,
@@ -116,28 +126,28 @@ namespace SharpAbp.Abp.FileStoring
             {
                 var (normalizedContainerName, normalizedFileName) = NormalizeNaming(ContainerName, fileId);
 
-                await Provider.SaveAsync(
-                    new FileProviderSaveArgs(
-                        normalizedContainerName,
-                        Configuration,
-                        normalizedFileName,
-                        stream,
-                        "",
-                        overrideExisting,
-                        CancellationTokenProvider.FallbackToProvider(cancellationToken)
-                    )
-                );
+                return await Provider.SaveAsync(
+                      new FileProviderSaveArgs(
+                          normalizedContainerName,
+                          Configuration,
+                          normalizedFileName,
+                          stream,
+                          "",
+                          overrideExisting,
+                          CancellationTokenProvider.FallbackToProvider(cancellationToken)
+                      )
+                  );
             }
         }
 
         public virtual async Task<bool> DeleteAsync(
-            string name,
+            string fileId,
             CancellationToken cancellationToken = default)
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
             {
                 var (normalizedContainerName, normalizedFileName) =
-                    NormalizeNaming(ContainerName, name);
+                    NormalizeNaming(ContainerName, fileId);
 
                 return await Provider.DeleteAsync(
                     new FileProviderDeleteArgs(
@@ -171,29 +181,29 @@ namespace SharpAbp.Abp.FileStoring
         }
 
         public virtual async Task<Stream> GetAsync(
-            string name,
+            string fileId,
             CancellationToken cancellationToken = default)
         {
-            var stream = await GetOrNullAsync(name, cancellationToken);
+            var stream = await GetOrNullAsync(fileId, cancellationToken);
 
             if (stream == null)
             {
                 //TODO: Consider to throw some type of "not found" exception and handle on the HTTP status side
                 throw new AbpException(
-                    $"Could not found the requested FILE '{name}' in the container '{ContainerName}'!");
+                    $"Could not found the requested FILE '{fileId}' in the container '{ContainerName}'!");
             }
 
             return stream;
         }
 
         public virtual async Task<Stream> GetOrNullAsync(
-            string name,
+            string fileId,
             CancellationToken cancellationToken = default)
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
             {
                 var (normalizedContainerName, normalizedFileName) =
-                    NormalizeNaming(ContainerName, name);
+                    NormalizeNaming(ContainerName, fileId);
 
                 return await Provider.GetOrNullAsync(
                     new FileProviderGetArgs(

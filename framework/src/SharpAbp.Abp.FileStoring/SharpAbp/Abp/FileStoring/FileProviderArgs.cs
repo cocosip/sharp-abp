@@ -6,10 +6,6 @@ namespace SharpAbp.Abp.FileStoring
 {
     public abstract class FileProviderArgs
     {
-        /// <summary>
-        /// BucketName when use s3 storage
-        /// GroupName when use fastdfs storage
-        /// </summary>
         [NotNull]
         public string ContainerName { get; }
 

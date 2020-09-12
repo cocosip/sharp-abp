@@ -9,8 +9,6 @@ namespace SharpAbp.Abp.FileStoring
     {
         public Stream FileStream { get; }
 
-        public string FilePath { get; set; }
-
         public string FileExt { get; set; }
 
         public bool OverrideExisting { get; }
@@ -44,19 +42,6 @@ namespace SharpAbp.Abp.FileStoring
             FileStream = Check.NotNull(fileStream, nameof(fileStream));
             FileExt = Check.NotNullOrWhiteSpace(fileExt, nameof(fileExt));
         }
-
-        public FileProviderSaveArgs(
-          [NotNull] string containerName,
-          [NotNull] FileContainerConfiguration configuration,
-          [CanBeNull] string fileId,
-          [NotNull] string filePath,
-          bool overrideExisting = false,
-          CancellationToken cancellationToken = default)
-          : this(containerName, configuration, fileId, overrideExisting, cancellationToken)
-        {
-            FilePath = Check.NotNullOrWhiteSpace(filePath, nameof(filePath));
-        }
-
 
 
     }
