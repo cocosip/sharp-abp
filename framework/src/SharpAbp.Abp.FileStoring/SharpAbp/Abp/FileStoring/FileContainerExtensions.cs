@@ -8,8 +8,9 @@ namespace SharpAbp.Abp.FileStoring
     {
         public static async Task SaveAsync(
             this IFileContainer container,
-            string name,
+            string fileId,
             byte[] bytes,
+            string ext,
             bool overrideExisting = false,
             CancellationToken cancellationToken = default
         )
@@ -17,36 +18,37 @@ namespace SharpAbp.Abp.FileStoring
             using (var memoryStream = new MemoryStream(bytes))
             {
                 await container.SaveAsync(
-                    name,
+                    fileId,
                     memoryStream,
+                    ext,
                     overrideExisting,
                     cancellationToken
                 );
             }
         }
-        
+
         public static async Task<byte[]> GetAllBytesAsync(
             this IFileContainer container,
-            string name,
+            string fileId,
             CancellationToken cancellationToken = default)
         {
-            using (var stream = await container.GetAsync(name, cancellationToken))
+            using (var stream = await container.GetAsync(fileId, cancellationToken))
             {
                 return await stream.GetAllBytesAsync(cancellationToken);
             }
         }
-        
+
         public static async Task<byte[]> GetAllBytesOrNullAsync(
             this IFileContainer container,
-            string name,
+            string fileId,
             CancellationToken cancellationToken = default)
         {
-            var stream = await container.GetOrNullAsync(name, cancellationToken);
+            var stream = await container.GetOrNullAsync(fileId, cancellationToken);
             if (stream == null)
             {
                 return null;
             }
-            
+
             using (stream)
             {
                 return await stream.GetAllBytesAsync(cancellationToken);

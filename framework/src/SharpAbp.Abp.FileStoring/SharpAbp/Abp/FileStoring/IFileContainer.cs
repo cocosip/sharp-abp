@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,6 +24,7 @@ namespace SharpAbp.Abp.FileStoring
         /// </summary>
         /// <param name="fileId">The name of the file</param>
         /// <param name="stream">A stream for the file</param>
+        /// <param name="ext">File ext</param>
         /// <param name="overrideExisting">
         /// Set <code>true</code> to override if there is already a file in the container with the given name.
         /// If set to <code>false</code> (default), throws exception if there is already a file in the container with the given name.
@@ -31,6 +33,7 @@ namespace SharpAbp.Abp.FileStoring
         Task<string> SaveAsync(
             string fileId,
             Stream stream,
+            string ext,
             bool overrideExisting = false,
             CancellationToken cancellationToken = default
         );
@@ -56,6 +59,19 @@ namespace SharpAbp.Abp.FileStoring
         /// <param name="cancellationToken">Cancellation token</param>
         Task<bool> ExistsAsync(
             string fileId,
+            CancellationToken cancellationToken = default
+        );
+
+        /// <summary>
+        /// Download file to local path
+        /// </summary>
+        /// <param name="fileId"></param>
+        /// <param name="path"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<bool> DownloadAsync(
+            string fileId,
+            string path,
             CancellationToken cancellationToken = default
         );
 
@@ -88,6 +104,20 @@ namespace SharpAbp.Abp.FileStoring
             string fileId,
             CancellationToken cancellationToken = default
         );
+
+        /// <summary>
+        /// Get file access url
+        /// </summary>
+        /// <param name="fileId">The name of the file</param>
+        /// <param name="expires">Expires time</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns></returns>
+        Task<string> GetAccessUrlAsync(
+            string fileId,
+            DateTime? expires = null,
+            CancellationToken cancellationToken = default
+        );
+
 
         //TODO: Create shortcut extension methods: GetAsArraryAsync, GetAsStringAsync(encoding) (and null versions)
     }

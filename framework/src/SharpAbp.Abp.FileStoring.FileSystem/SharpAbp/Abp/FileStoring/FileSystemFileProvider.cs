@@ -22,7 +22,7 @@ namespace SharpAbp.Abp.FileStoring
 
             if (!args.OverrideExisting && await ExistsAsync(filePath))
             {
-                throw new FileAlreadyExistsException($"Saving BLOB '{args.FileId}' does already exists in the container '{args.ContainerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
+                throw new FileAlreadyExistsException($"Saving File '{args.FileId}' does already exists in the container '{args.ContainerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
             }
 
             DirectoryHelper.CreateIfNotExists(Path.GetDirectoryName(filePath));
@@ -60,6 +60,31 @@ namespace SharpAbp.Abp.FileStoring
             return ExistsAsync(filePath);
         }
 
+        public override async Task<bool> DownloadAsync(FileProviderDownloadArgs args)
+        {
+            var filePath = FilePathCalculator.Calculate(args);
+
+            if (!File.Exists(filePath))
+            {
+                return false;
+            }
+
+            return await Policy.Handle<IOException>()
+                .WaitAndRetryAsync(2, retryCount => TimeSpan.FromSeconds(retryCount))
+                .ExecuteAsync(async () =>
+                {
+                    using (var fileStream = File.OpenRead(filePath))
+                    {
+                        using (var ts = new FileStream("", FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                        {
+                            await fileStream.CopyToAsync(ts, args.CancellationToken);
+                            return true;
+                        }
+                    }
+                });
+        }
+
+
         public override async Task<Stream> GetOrNullAsync(FileProviderGetArgs args)
         {
             var filePath = FilePathCalculator.Calculate(args);
@@ -82,9 +107,33 @@ namespace SharpAbp.Abp.FileStoring
                 });
         }
 
+        public override Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)
+        {
+            if (!args.Configuration.SupportUrlAccess)
+            {
+                return Task.FromResult("");
+            }
+
+            var configuration = args.Configuration.GetFileSystemConfiguration();
+            var fileId = FilePathCalculator.Calculate(args);
+
+            var accessUrl = BuildAccessUrl(configuration, fileId);
+            return Task.FromResult(accessUrl);
+        }
+
+
         protected virtual Task<bool> ExistsAsync(string filePath)
         {
             return Task.FromResult(File.Exists(filePath));
         }
+
+
+        protected virtual string BuildAccessUrl(FileSystemFileProviderConfiguration configuration, string fileId)
+        {
+            var accessUrl = $"{configuration.AccessServerUrl.TrimEnd('/')}/{fileId}";
+            return accessUrl;
+        }
+
+
     }
 }

@@ -11,6 +11,10 @@ namespace SharpAbp.Abp.FileStoring
 
         Task<bool> ExistsAsync(FileProviderExistsArgs args);
 
+        Task<bool> DownloadAsync(FileProviderDownloadArgs args);
+
         Task<Stream> GetOrNullAsync(FileProviderGetArgs args);
+
+        Task<string> GetAccessUrlAsync(FileProviderAccessArgs args);
     }
 }

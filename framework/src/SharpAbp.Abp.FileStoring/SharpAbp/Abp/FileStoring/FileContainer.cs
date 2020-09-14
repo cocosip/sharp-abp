@@ -28,12 +28,14 @@ namespace SharpAbp.Abp.FileStoring
         public Task<string> SaveAsync(
             string fileId,
             Stream stream,
+            string ext,
             bool overrideExisting = false,
             CancellationToken cancellationToken = default)
         {
             return _container.SaveAsync(
                 fileId,
                 stream,
+                ext,
                 overrideExisting,
                 cancellationToken
             );
@@ -59,6 +61,18 @@ namespace SharpAbp.Abp.FileStoring
             );
         }
 
+        public Task<bool> DownloadAsync(
+            string fileId,
+            string path,
+            CancellationToken cancellationToken = default)
+        {
+            return _container.DownloadAsync(
+                fileId,
+                path,
+                cancellationToken
+            );
+        }
+
         public Task<Stream> GetAsync(
             string fileId,
             CancellationToken cancellationToken = default)
@@ -77,6 +91,19 @@ namespace SharpAbp.Abp.FileStoring
                 fileId,
                 cancellationToken
             );
+        }
+
+
+        public Task<string> GetAccessUrlAsync(
+            string fileId,
+            DateTime? expires = null,
+            CancellationToken cancellationToken = default)
+        {
+            return _container.GetAccessUrlAsync(
+               fileId,
+               expires,
+               cancellationToken
+           );
         }
     }
 
@@ -119,6 +146,7 @@ namespace SharpAbp.Abp.FileStoring
         public virtual async Task<string> SaveAsync(
             string fileId,
             Stream stream,
+            string ext,
             bool overrideExisting = false,
             CancellationToken cancellationToken = default)
         {
@@ -132,7 +160,7 @@ namespace SharpAbp.Abp.FileStoring
                           Configuration,
                           normalizedFileName,
                           stream,
-                          "",
+                          ext,
                           overrideExisting,
                           CancellationTokenProvider.FallbackToProvider(cancellationToken)
                       )
@@ -161,13 +189,13 @@ namespace SharpAbp.Abp.FileStoring
         }
 
         public virtual async Task<bool> ExistsAsync(
-            string name,
+            string fileId,
             CancellationToken cancellationToken = default)
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
             {
                 var (normalizedContainerName, normalizedFileName) =
-                    NormalizeNaming(ContainerName, name);
+                    NormalizeNaming(ContainerName, fileId);
 
                 return await Provider.ExistsAsync(
                     new FileProviderExistsArgs(
@@ -178,6 +206,30 @@ namespace SharpAbp.Abp.FileStoring
                     )
                 );
             }
+        }
+
+        public virtual async Task<bool> DownloadAsync(
+            string fileId,
+            string path,
+            CancellationToken cancellationToken = default
+        )
+        {
+            using (CurrentTenant.Change(GetTenantIdOrNull()))
+            {
+                var (normalizedContainerName, normalizedFileName) =
+                    NormalizeNaming(ContainerName, fileId);
+
+                return await Provider.DownloadAsync(
+                     new FileProviderDownloadArgs(
+                         normalizedContainerName,
+                         Configuration,
+                         normalizedFileName,
+                         path,
+                         CancellationTokenProvider.FallbackToProvider(cancellationToken)
+                     )
+                 );
+            }
+
         }
 
         public virtual async Task<Stream> GetAsync(
@@ -196,6 +248,7 @@ namespace SharpAbp.Abp.FileStoring
             return stream;
         }
 
+
         public virtual async Task<Stream> GetOrNullAsync(
             string fileId,
             CancellationToken cancellationToken = default)
@@ -210,6 +263,28 @@ namespace SharpAbp.Abp.FileStoring
                         normalizedContainerName,
                         Configuration,
                         normalizedFileName,
+                        CancellationTokenProvider.FallbackToProvider(cancellationToken)
+                    )
+                );
+            }
+        }
+
+        public virtual async Task<string> GetAccessUrlAsync(
+            string fileId,
+            DateTime? expires = null,
+            CancellationToken cancellationToken = default)
+        {
+            using (CurrentTenant.Change(GetTenantIdOrNull()))
+            {
+                var (normalizedContainerName, normalizedFileName) =
+                    NormalizeNaming(ContainerName, fileId);
+
+                return await Provider.GetAccessUrlAsync(
+                    new FileProviderAccessArgs(
+                        normalizedContainerName,
+                        Configuration,
+                        normalizedFileName,
+                        expires,
                         CancellationTokenProvider.FallbackToProvider(cancellationToken)
                     )
                 );
@@ -248,5 +323,7 @@ namespace SharpAbp.Abp.FileStoring
                 return (containerName, fileId);
             }
         }
+
+
     }
 }

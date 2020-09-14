@@ -23,6 +23,15 @@ namespace SharpAbp.Abp.FileStoring
         }
 
         /// <summary>
+        /// Access server url
+        /// </summary>
+        public string AccessServerUrl
+        {
+            get => _containerConfiguration.GetConfiguration<string>(FastDFSFileProviderConfigurationNames.AccessServerUrl);
+            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.AccessServerUrl, Check.NotNullOrWhiteSpace(value, nameof(value)));
+        }
+
+        /// <summary>
         /// Trackers
         /// </summary>
         public List<Tracker> Trackers

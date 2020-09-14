@@ -63,7 +63,7 @@ namespace SharpAbp.Abp.FileStoring
         /// </summary>
         public int Protocol
         {
-            get => _containerConfiguration.GetConfigurationOrDefault(S3FileProviderConfigurationNames.Protocol, 1);
+            get => _containerConfiguration.GetConfigurationOrDefault(S3FileProviderConfigurationNames.Protocol, (int)Amazon.S3.Protocol.HTTP);
             set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.Protocol, value);
         }
 

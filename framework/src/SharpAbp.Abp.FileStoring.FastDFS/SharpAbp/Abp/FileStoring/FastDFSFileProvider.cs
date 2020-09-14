@@ -1,4 +1,5 @@
 ﻿using FastDFSCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -8,64 +9,99 @@ namespace SharpAbp.Abp.FileStoring
 {
     public class FastDFSFileProvider : FileProviderBase, ITransientDependency
     {
+        protected ILogger Logger { get; }
         protected IFastDFSFileNameCalculator FastDFSFileNameCalculator { get; }
-        protected IFastDFSClient FastDFSClient { get; }
+        protected IFastDFSClient Client { get; }
 
-        public FastDFSFileProvider(IFastDFSFileNameCalculator fastDFSFileNameCalculator, IFastDFSClient fastDFSClient)
+        public FastDFSFileProvider(ILogger<FastDFSFileProvider> logger, IFastDFSFileNameCalculator fastDFSFileNameCalculator, IFastDFSClient client)
         {
+            Logger = logger;
             FastDFSFileNameCalculator = fastDFSFileNameCalculator;
-            FastDFSClient = fastDFSClient;
+            Client = client;
         }
 
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
             var configuration = args.Configuration.GetFastDFSConfiguration();
             var containerName = GetContainerName(configuration, args);
-            var storageNode = await FastDFSClient.GetStorageNodeAsync(containerName, configuration.ClusterName);
-            var fileId = await FastDFSClient.UploadFileAsync(storageNode, args.FileStream, "", configuration.ClusterName);
+            var storageNode = await Client.GetStorageNodeAsync(containerName, configuration.ClusterName);
+            var fileId = await Client.UploadFileAsync(storageNode, args.FileStream, args.FileExt, configuration.ClusterName);
             return fileId;
         }
 
         public override async Task<bool> DeleteAsync(FileProviderDeleteArgs args)
         {
             var configuration = args.Configuration.GetFastDFSConfiguration();
-            var fileName = FastDFSFileNameCalculator.Calculate(args);
+            var fileId = FastDFSFileNameCalculator.Calculate(args);
             var containerName = GetContainerName(configuration, args);
-            return await FastDFSClient.RemoveFileAsync(containerName, fileName, configuration.ClusterName);
+            return await Client.RemoveFileAsync(containerName, fileId, configuration.ClusterName);
         }
 
         public override async Task<bool> ExistsAsync(FileProviderExistsArgs args)
         {
             var configuration = args.Configuration.GetFastDFSConfiguration();
-            var fileName = FastDFSFileNameCalculator.Calculate(args);
+            var fileId = FastDFSFileNameCalculator.Calculate(args);
             var containerName = GetContainerName(configuration, args);
 
-            var storageNode = await FastDFSClient.GetStorageNodeAsync(containerName, configuration.ClusterName);
-            var fileInfo = await FastDFSClient.GetFileInfo(storageNode, fileName, configuration.ClusterName);
+            var storageNode = await Client.GetStorageNodeAsync(containerName, configuration.ClusterName);
+            var fileInfo = await Client.GetFileInfo(storageNode, fileId, configuration.ClusterName);
             return fileInfo != null;
         }
 
-        public override async Task<Stream> GetOrNullAsync(FileProviderGetArgs args)
+
+        public override async Task<bool> DownloadAsync(FileProviderDownloadArgs args)
         {
-            //var fileName = FastDFSFileNameCalculator.Calculate(args);
-            //var client = GetS3Client(args);
-            //var containerName = GetContainerName(args);
-
-            //if (!await FileExistsAsync(client, containerName, fileName))
-            //{
-            //    return null;
-            //}
-
-            //var memoryStream = new MemoryStream();
-            //var getObjectResponse = await client.GetObjectAsync(containerName, fileName);
-            //if (getObjectResponse.ResponseStream != null)
-            //{
-            //    await getObjectResponse.ResponseStream.CopyToAsync(memoryStream);
-            //}
-            var memoryStream = new MemoryStream();
-            return await Task.FromResult(memoryStream);
+            var configuration = args.Configuration.GetFastDFSConfiguration();
+            var fileId = FastDFSFileNameCalculator.Calculate(args);
+            var containerName = GetContainerName(configuration, args);
+            var storageNode = await Client.GetStorageNodeAsync(containerName, configuration.ClusterName);
+            try
+            {
+                await Client.DownloadFileEx(storageNode, fileId, args.Path, configuration.ClusterName);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex, LogLevel.Error);
+                return false;
+            }
         }
 
+
+        public override async Task<Stream> GetOrNullAsync(FileProviderGetArgs args)
+        {
+            var configuration = args.Configuration.GetFastDFSConfiguration();
+            var fileId = FastDFSFileNameCalculator.Calculate(args);
+            var containerName = GetContainerName(configuration, args);
+            var storageNode = await Client.GetStorageNodeAsync(containerName, configuration.ClusterName);
+
+            try
+            {
+                var content = await Client.DownloadFileAsync(storageNode, fileId, configuration.ClusterName);
+                return new MemoryStream(content);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex, LogLevel.Error);
+                return null;
+            }
+        }
+
+
+        public override Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)
+        {
+            if (!args.Configuration.SupportUrlAccess)
+            {
+                return Task.FromResult("");
+            }
+
+            var configuration = args.Configuration.GetFastDFSConfiguration();
+            var fileId = FastDFSFileNameCalculator.Calculate(args);
+            var containerName = GetContainerName(configuration, args);
+
+            var accessUrl = BuildAccessUrl(configuration, containerName, fileId);
+            return Task.FromResult(accessUrl);
+        }
 
         private static string GetContainerName(FastDFSFileProviderConfiguration configuration, FileProviderArgs args)
         {
@@ -73,5 +109,13 @@ namespace SharpAbp.Abp.FileStoring
                 ? args.ContainerName
                 : configuration.GroupName;
         }
+
+
+        protected virtual string BuildAccessUrl(FastDFSFileProviderConfiguration configuration, string containerName, string fileId)
+        {
+            var accessUrl = $"{configuration.AccessServerUrl.TrimEnd('/')}/{containerName}/{fileId}";
+            return accessUrl;
+        }
+
     }
 }

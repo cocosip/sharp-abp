@@ -3,6 +3,7 @@
     public class FastDFSFileProviderConfigurationNames
     {
         public const string ClusterName = "FastDFS.ClusterName";
+        public const string AccessServerUrl = "FastDFS.AccessServerUrl";
         public const string GroupName = "FastDFS.GroupName";
         public const string Trackers = "FastDFS.Trackers";
         public const string ConnectionTimeout = "FastDFS.ConnectionTimeout";

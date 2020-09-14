@@ -4,6 +4,8 @@ using Amazon.S3.Multiplex;
 using AmazonKS3;
 using System;
 using System.IO;
+using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
 
@@ -28,7 +30,7 @@ namespace SharpAbp.Abp.FileStoring
             var client = GetS3Client(args);
             var containerName = GetContainerName(args);
 
-            if (!args.OverrideExisting && await FileExistsAsync(client, containerName, fileId))
+            if (!args.OverrideExisting && await FileExistsAsync(client, containerName, fileId, args.CancellationToken))
             {
                 throw new FileAlreadyExistsException($"Saving File '{args.FileId}' does already exists in the container '{containerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
             }
@@ -43,8 +45,9 @@ namespace SharpAbp.Abp.FileStoring
                 BucketName = containerName,
                 Key = fileId,
                 InputStream = args.FileStream,
+                UseChunkEncoding = configuration.UseChunkEncoding,
                 AutoCloseStream = true
-            });
+            }, args.CancellationToken);
 
             return fileId;
         }
@@ -55,9 +58,9 @@ namespace SharpAbp.Abp.FileStoring
             var client = GetS3Client(args);
             var containerName = GetContainerName(args);
 
-            if (await FileExistsAsync(client, containerName, fileName))
+            if (await FileExistsAsync(client, containerName, fileName, args.CancellationToken))
             {
-                await client.DeleteAsync(containerName, fileName, null);
+                await client.DeleteAsync(containerName, fileName, null, args.CancellationToken);
                 return true;
             }
 
@@ -70,7 +73,18 @@ namespace SharpAbp.Abp.FileStoring
             var client = GetS3Client(args);
             var containerName = GetContainerName(args);
 
-            return await FileExistsAsync(client, containerName, fileName);
+            return await FileExistsAsync(client, containerName, fileName, args.CancellationToken);
+        }
+
+        public override async Task<bool> DownloadAsync(FileProviderDownloadArgs args)
+        {
+            var fileName = S3FileNameCalculator.Calculate(args);
+            var client = GetS3Client(args);
+            var containerName = GetContainerName(args);
+
+            var getObjectResponse = await client.GetObjectAsync(containerName, fileName);
+            await getObjectResponse.WriteResponseStreamToFileAsync(args.Path, true, args.CancellationToken);
+            return true;
         }
 
         public override async Task<Stream> GetOrNullAsync(FileProviderGetArgs args)
@@ -79,20 +93,47 @@ namespace SharpAbp.Abp.FileStoring
             var client = GetS3Client(args);
             var containerName = GetContainerName(args);
 
-            if (!await FileExistsAsync(client, containerName, fileName))
+            if (!await FileExistsAsync(client, containerName, fileName, args.CancellationToken))
             {
                 return null;
             }
 
-            var memoryStream = new MemoryStream();
             var getObjectResponse = await client.GetObjectAsync(containerName, fileName);
             if (getObjectResponse.ResponseStream != null)
             {
+                var memoryStream = new MemoryStream();
                 await getObjectResponse.ResponseStream.CopyToAsync(memoryStream);
+                return memoryStream;
+            }
+            return null;
+        }
+
+        public override Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)
+        {
+            var fileName = S3FileNameCalculator.Calculate(args);
+            var client = GetS3Client(args);
+            var containerName = GetContainerName(args);
+
+            var configuration = args.Configuration.GetS3Configuration();
+
+            var preSignedUrlRequest = new GetPreSignedUrlRequest()
+            {
+                BucketName = containerName,
+                Key = fileName,
+                Protocol = (Protocol)configuration.Protocol
+            };
+
+            if (args.Expires.HasValue)
+            {
+                preSignedUrlRequest.Expires = args.Expires.Value;
             }
 
-            return memoryStream;
+            var accessUrl = client.GetPreSignedURL(preSignedUrlRequest);
+
+            return Task.FromResult(accessUrl);
         }
+
+
 
         protected virtual IAmazonS3 GetS3Client(FileProviderArgs args)
         {
@@ -138,27 +179,26 @@ namespace SharpAbp.Abp.FileStoring
             await client.EnsureBucketExistsAsync(containerName);
         }
 
-        private async Task<bool> FileExistsAsync(IAmazonS3 client, string containerName, string fileName)
+        private async Task<bool> FileExistsAsync(IAmazonS3 client, string containerName, string fileId, CancellationToken cancellationToken)
         {
             // Make sure Blob Container exists.
             if (await client.DoesS3BucketExistAsync(containerName))
             {
                 try
                 {
-                    var getObjectMetadataResponse = await client.GetObjectMetadataAsync(containerName, fileName);
+                    var getObjectMetadataResponse = await client.GetObjectMetadataAsync(containerName, fileId, cancellationToken);
+                    return getObjectMetadataResponse.HttpStatusCode == HttpStatusCode.OK;
 
                 }
                 catch (Exception e)
                 {
-                    if (e is Amazon.S3.AmazonS3Exception)
+                    if (e is AmazonS3Exception)
                     {
                         return false;
                     }
 
                     throw;
                 }
-
-                return true;
             }
 
             return false;
