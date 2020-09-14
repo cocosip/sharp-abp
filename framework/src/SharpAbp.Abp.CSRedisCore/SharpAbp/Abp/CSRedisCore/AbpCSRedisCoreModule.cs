@@ -9,9 +9,7 @@ namespace SharpAbp.Abp.CSRedisCore
 
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            context.Services
-                .AddAssembly(typeof(AbpCSRedisCoreModule).Assembly)
-                .Configure<CSRedisOptions>(c => { });
+            context.Services.Configure<CSRedisOptions>(c => { });
         }
     }
 }

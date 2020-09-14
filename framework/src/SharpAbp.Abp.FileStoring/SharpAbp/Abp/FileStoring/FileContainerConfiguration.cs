@@ -1,24 +1,50 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using Volo.Abp;
+using Volo.Abp.Collections;
 
 namespace SharpAbp.Abp.FileStoring
 {
     public class FileContainerConfiguration
     {
+        /// <summary>
+        /// The provider to be used to store FILEs of this container.
+        /// </summary>
         public Type ProviderType { get; set; }
 
-        public string ProviderName { get; set; }
+        /// <summary>
+        /// Indicates whether this container is multi-tenant or not.
+        ///
+        /// If this is <code>false</code> and your application is multi-tenant,
+        /// then the container is shared by all tenants in the system.
+        ///
+        /// This can be <code>true</code> even if your application is not multi-tenant.
+        ///
+        /// Default: true.
+        /// </summary>
+        public bool IsMultiTenant { get; set; } = true;
+
+        /// <summary>
+        /// Whether the container support use url to access object
+        /// Default: true
+        /// </summary>
+        public bool SupportUrlAccess { get; set; } = true;
+
+        public ITypeList<IFileNamingNormalizer> NamingNormalizers { get; }
 
         [NotNull]
         private readonly Dictionary<string, object> _properties;
 
-        public FileContainerConfiguration()
+        [CanBeNull]
+        private readonly FileContainerConfiguration _fallbackConfiguration;
+
+        public FileContainerConfiguration(FileContainerConfiguration fallbackConfiguration = null)
         {
+            NamingNormalizers = new TypeList<IFileNamingNormalizer>();
+            _fallbackConfiguration = fallbackConfiguration;
             _properties = new Dictionary<string, object>();
         }
-
 
         [CanBeNull]
         public T GetConfigurationOrDefault<T>(string name, T defaultValue = default)
@@ -29,7 +55,9 @@ namespace SharpAbp.Abp.FileStoring
         [CanBeNull]
         public object GetConfigurationOrNull(string name, object defaultValue = null)
         {
-            return _properties.GetOrDefault(name) ?? defaultValue;
+            return _properties.GetOrDefault(name) ??
+                   _fallbackConfiguration?.GetConfigurationOrNull(name, defaultValue) ??
+                   defaultValue;
         }
 
         [NotNull]

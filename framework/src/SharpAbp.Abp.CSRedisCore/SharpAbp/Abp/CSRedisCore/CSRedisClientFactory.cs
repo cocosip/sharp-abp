@@ -11,6 +11,7 @@ namespace SharpAbp.Abp.CSRedisCore
 {
     public class CSRedisClientFactory : ICSRedisClientFactory, ISingletonDependency
     {
+        private readonly object _syncObject = new object();
         private readonly ConcurrentDictionary<string, CSRedisClient> _clientDict;
 
         private readonly ILogger _logger;
@@ -33,26 +34,33 @@ namespace SharpAbp.Abp.CSRedisCore
         [NotNull]
         public virtual CSRedisClient Get([NotNull] string name)
         {
-            if (_clientDict.TryGetValue(name, out CSRedisClient client))
+
+            if (!_clientDict.TryGetValue(name, out CSRedisClient client))
             {
-                return client;
+                var configuration = _cSRedisClientConfigurationSelector.Get(name);
+                if (configuration == null)
+                {
+                    throw new AbpException($"Could not find configuration by name '{name}'");
+                }
+
+                lock (_syncObject)
+                {
+                    //Still can't find client
+                    if (_clientDict.TryGetValue(name, out client))
+                    {
+                        client = _cSRedisClientBuilder.CreateClient(configuration);
+                        if (_clientDict.TryAdd(name, client))
+                        {
+                            _logger.LogInformation("Create and add csredis client '{0}',ConnectionString:'{1}',Mode:'{2}'.", name, configuration.ConnectionString, configuration.Mode);
+                        }
+                        else
+                        {
+                            _logger.LogWarning("Add client to dict fail! client name:{0}", name);
+                        }
+                    }
+                }
             }
 
-            var configuration = _cSRedisClientConfigurationSelector.Get(name);
-            if (configuration == null)
-            {
-                throw new AbpException($"Could not find configuration by name '{name}'");
-            }
-
-            client = _cSRedisClientBuilder.CreateClient(configuration);
-            if (_clientDict.TryAdd(name, client))
-            {
-                _logger.LogInformation("Create and add csredis client '{0}',ConnectionString:'{1}',Mode:'{2}'.", name, configuration.ConnectionString, configuration.Mode);
-            }
-            else
-            {
-                _logger.LogWarning("Add client to dict fail! client name:{0}", name);
-            }
             return client;
         }
 

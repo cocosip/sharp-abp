@@ -1,0 +1,58 @@
+﻿using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace SharpAbp.Abp.FileStoring
+{
+    public static class FileContainerExtensions
+    {
+        public static async Task SaveAsync(
+            this IFileContainer container,
+            string fileId,
+            byte[] bytes,
+            string ext,
+            bool overrideExisting = false,
+            CancellationToken cancellationToken = default
+        )
+        {
+            using (var memoryStream = new MemoryStream(bytes))
+            {
+                await container.SaveAsync(
+                    fileId,
+                    memoryStream,
+                    ext,
+                    overrideExisting,
+                    cancellationToken
+                );
+            }
+        }
+
+        public static async Task<byte[]> GetAllBytesAsync(
+            this IFileContainer container,
+            string fileId,
+            CancellationToken cancellationToken = default)
+        {
+            using (var stream = await container.GetAsync(fileId, cancellationToken))
+            {
+                return await stream.GetAllBytesAsync(cancellationToken);
+            }
+        }
+
+        public static async Task<byte[]> GetAllBytesOrNullAsync(
+            this IFileContainer container,
+            string fileId,
+            CancellationToken cancellationToken = default)
+        {
+            var stream = await container.GetOrNullAsync(fileId, cancellationToken);
+            if (stream == null)
+            {
+                return null;
+            }
+
+            using (stream)
+            {
+                return await stream.GetAllBytesAsync(cancellationToken);
+            }
+        }
+    }
+}
