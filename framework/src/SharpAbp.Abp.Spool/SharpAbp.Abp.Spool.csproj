@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="Spool" Version="1.2.0" />
-    <PackageReference Include="Volo.Abp" Version="3.1.0" />
+    <PackageReference Include="Volo.Abp" Version="3.1.2" />
   </ItemGroup>
 
   <ItemGroup>

@@ -16,12 +16,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="3.0.5" />
+    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="3.1.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SharpAbp.Abp.FileStoring.Domain.Shared\SharpAbp.Abp.FileStoring.Domain.Shared.csproj" />
     <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.FileStoring\SharpAbp.Abp.FileStoring.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Fody" Version="6.2.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 
