@@ -4,6 +4,6 @@
     {
         public const string BasePath = "FileSystem.BasePath";
         public const string AppendContainerNameToBasePath = "FileSystem.AppendContainerNameToBasePath";
-        public const string AccessServerUrl = "FileSystem.AccessServerUrl";
+        public const string HttpServer = "FileSystem.HttpServer";
     }
 }

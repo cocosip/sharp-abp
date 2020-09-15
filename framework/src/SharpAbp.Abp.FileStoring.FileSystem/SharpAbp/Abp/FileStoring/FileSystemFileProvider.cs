@@ -109,7 +109,7 @@ namespace SharpAbp.Abp.FileStoring
 
         public override Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)
         {
-            if (!args.Configuration.SupportUrlAccess)
+            if (!args.Configuration.HttpSupport)
             {
                 return Task.FromResult(string.Empty);
             }
@@ -130,7 +130,7 @@ namespace SharpAbp.Abp.FileStoring
 
         protected virtual string BuildAccessUrl(FileSystemFileProviderConfiguration configuration, string fileId)
         {
-            var accessUrl = $"{configuration.AccessServerUrl.TrimEnd('/')}/{fileId}";
+            var accessUrl = $"{configuration.HttpServer.TrimEnd('/')}/{fileId}";
             return accessUrl;
         }
 

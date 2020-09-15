@@ -23,10 +23,10 @@ namespace SharpAbp.Abp.FileStoring
         /// <summary>
         /// Access server url
         /// </summary>
-        public string AccessServerUrl
+        public string HttpServer
         {
-            get => _containerConfiguration.GetConfiguration<string>(FileSystemFileProviderConfigurationNames.AccessServerUrl);
-            set => _containerConfiguration.SetConfiguration(FileSystemFileProviderConfigurationNames.AccessServerUrl, Check.NotNullOrWhiteSpace(value, nameof(value)));
+            get => _containerConfiguration.GetConfiguration<string>(FileSystemFileProviderConfigurationNames.HttpServer);
+            set => _containerConfiguration.SetConfiguration(FileSystemFileProviderConfigurationNames.HttpServer, Check.NotNullOrWhiteSpace(value, nameof(value)));
         }
 
         private readonly FileContainerConfiguration _containerConfiguration;

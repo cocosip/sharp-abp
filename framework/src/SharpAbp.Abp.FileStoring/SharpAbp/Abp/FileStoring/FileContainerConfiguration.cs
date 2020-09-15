@@ -26,10 +26,10 @@ namespace SharpAbp.Abp.FileStoring
         public bool IsMultiTenant { get; set; } = true;
 
         /// <summary>
-        /// Whether the container support use url to access object
+        /// Whether the container support use http url to access object
         /// Default: true
         /// </summary>
-        public bool SupportUrlAccess { get; set; } = true;
+        public bool HttpSupport { get; set; } = true;
 
         public ITypeList<IFileNamingNormalizer> NamingNormalizers { get; }
 
