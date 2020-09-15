@@ -111,7 +111,7 @@ namespace SharpAbp.Abp.FileStoring
         {
             if (!args.Configuration.SupportUrlAccess)
             {
-                return Task.FromResult("");
+                return Task.FromResult(string.Empty);
             }
 
             var configuration = args.Configuration.GetFileSystemConfiguration();

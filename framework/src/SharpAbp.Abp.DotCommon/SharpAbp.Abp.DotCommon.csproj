@@ -21,12 +21,4 @@
     <PackageReference Include="Volo.Abp" Version="3.1.2" />
   </ItemGroup>
 
-
-  <ItemGroup>
-    <PackageReference Update="Fody" Version="6.2.5">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-
 </Project>
