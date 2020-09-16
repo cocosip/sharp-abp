@@ -9,7 +9,12 @@ namespace SharpAbp.Abp.FileStoring
       )]
     public class AbpFileStoringS3Module : AbpModule
     {
-
-
+        public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            Configure<AbpFileStoringOptions>(c =>
+            {
+                //c.Providers.TryAdd(new FileProviderConfiguration(typeof(S3FileProvider), typeof(S3FileNamingNormalizer)));
+            });
+        }
     }
 }

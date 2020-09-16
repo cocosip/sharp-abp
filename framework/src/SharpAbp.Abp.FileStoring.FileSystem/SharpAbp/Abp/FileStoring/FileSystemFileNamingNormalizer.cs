@@ -19,9 +19,9 @@ namespace SharpAbp.Abp.FileStoring
             return Normalize(containerName);
         }
 
-        public virtual string NormalizeFileId(string fileId)
+        public virtual string NormalizeFileName(string fileName)
         {
-            return Normalize(fileId);
+            return Normalize(fileName);
         }
 
         protected virtual string Normalize(string name)

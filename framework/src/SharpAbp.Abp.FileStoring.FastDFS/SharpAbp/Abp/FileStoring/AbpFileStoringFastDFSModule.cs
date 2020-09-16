@@ -1,4 +1,6 @@
-﻿using SharpAbp.Abp.FastDFS.DotNetty;
+﻿using FastDFSCore;
+using SharpAbp.Abp.FastDFS.DotNetty;
+using System.Collections.Generic;
 using Volo.Abp.Modularity;
 
 namespace SharpAbp.Abp.FileStoring
@@ -9,6 +11,27 @@ namespace SharpAbp.Abp.FileStoring
       )]
     public class AbpFileStoringFastDFSModule : AbpModule
     {
-
+        public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            //Configure<AbpFileStoringOptions>(c =>
+            //{
+            //    var configuration = new FileProviderConfiguration(typeof(FastDFSFileProvider));
+            //    configuration.DefaultNamingNormalizers.TryAdd<FastDFSFileNamingNormalizer>();
+            //    configuration
+            //    .SetProperty(FastDFSFileProviderConfigurationNames.ClusterName, typeof(string))
+            //    .SetProperty(FastDFSFileProviderConfigurationNames.GroupName, typeof(string))
+            //    .SetProperty(FastDFSFileProviderConfigurationNames.HttpServer, typeof(string))
+            //    .SetProperty(FastDFSFileProviderConfigurationNames.Trackers, typeof(List<Tracker>))
+            //    .SetProperty(FastDFSFileProviderConfigurationNames.ConnectionTimeout, typeof(int))
+            //    .SetProperty(FastDFSFileProviderConfigurationNames.ConnectionLifeTime, typeof(int))
+            //    .SetProperty(FastDFSFileProviderConfigurationNames.Charset, typeof(string))
+            //    .SetProperty(FastDFSFileProviderConfigurationNames.ConnectionConcurrentThread, typeof(int))
+            //    .SetProperty(FastDFSFileProviderConfigurationNames.ScanTimeoutConnectionInterval, typeof(int))
+            //    .SetProperty(FastDFSFileProviderConfigurationNames.TrackerMaxConnection, typeof(int))
+            //    .SetProperty(FastDFSFileProviderConfigurationNames.StorageMaxConnection, typeof(int));
+                
+            //    c.Providers.TryAdd(configuration);
+            //});
+        }
     }
 }

@@ -44,9 +44,9 @@ namespace SharpAbp.Abp.FileStoring
         /// <summary>
         /// https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html
         /// </summary>
-        public virtual string NormalizeFileId(string fileId)
+        public virtual string NormalizeFileName(string fileName)
         {
-            return fileId;
+            return fileName;
         }
     }
 }

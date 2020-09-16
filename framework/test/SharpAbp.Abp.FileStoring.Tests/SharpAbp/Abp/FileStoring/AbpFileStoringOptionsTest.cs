@@ -1,5 +1,6 @@
 ﻿using SharpAbp.Abp.FileStoring.Fakes;
 using SharpAbp.Abp.FileStoring.TestObjects;
+using System;
 using Xunit;
 
 namespace SharpAbp.Abp.FileStoring
@@ -16,6 +17,7 @@ namespace SharpAbp.Abp.FileStoring
         [Fact]
         public void Should_Property_Set_And_Get_Options_For_Different_Containers()
         {
+
             var testContainer1Config = _configurationProvider.Get<TestContainer1>();
 
             Assert.Equal(typeof(FakeFileProvider1), testContainer1Config.ProviderType);

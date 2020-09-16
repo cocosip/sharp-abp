@@ -32,12 +32,12 @@ namespace SharpAbp.Abp.FileStoring
         }
 
         /// <summary>
-        /// Trackers
+        /// Trackers, 192.168.0.100:22122,192.168.0.101:22122
         /// </summary>
-        public List<Tracker> Trackers
+        public string Trackers
         {
-            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.Trackers, new List<Tracker>());
-            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.Trackers, value);
+            get => _containerConfiguration.GetConfiguration<string>(FastDFSFileProviderConfigurationNames.Trackers);
+            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.Trackers, Check.NotNullOrWhiteSpace(value, nameof(value)));
         }
 
         /// <summary>

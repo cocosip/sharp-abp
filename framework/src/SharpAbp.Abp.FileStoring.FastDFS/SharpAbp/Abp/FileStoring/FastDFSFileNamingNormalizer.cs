@@ -5,6 +5,7 @@ namespace SharpAbp.Abp.FileStoring
 {
     public class FastDFSFileNamingNormalizer : IFileNamingNormalizer, ITransientDependency
     {
+
         /// <summary>
         /// NormalizeContainerName
         /// </summary>
@@ -44,9 +45,9 @@ namespace SharpAbp.Abp.FileStoring
         /// <summary>
         /// NormalizeFileName
         /// </summary>
-        public virtual string NormalizeFileId(string fileId)
+        public virtual string NormalizeFileName(string fileName)
         {
-            return fileId;
+            return fileName;
         }
     }
 }

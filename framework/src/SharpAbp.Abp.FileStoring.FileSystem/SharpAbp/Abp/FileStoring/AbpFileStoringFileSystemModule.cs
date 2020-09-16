@@ -7,5 +7,12 @@ namespace SharpAbp.Abp.FileStoring
        )]
     public class AbpFileStoringFileSystemModule : AbpModule
     {
+        public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            Configure<AbpFileStoringOptions>(c =>
+            {
+                //c.Providers.TryAdd(new FileProviderConfiguration(typeof(FileSystemFileProvider), typeof(FileSystemFileNamingNormalizer)));
+            });
+        }
     }
 }
