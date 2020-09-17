@@ -13,16 +13,7 @@ namespace SharpAbp.Abp.FileStoringManagement
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            Configure<AbpFileStoringOptions>(options =>
-            {
-                //options.Containers.ConfigureDefault(container =>
-                //{
-                //    if (container.ProviderType == null)
-                //    {
-                //        container.UseDatabase();
-                //    }
-                //});
-            });
+
         }
 
     }

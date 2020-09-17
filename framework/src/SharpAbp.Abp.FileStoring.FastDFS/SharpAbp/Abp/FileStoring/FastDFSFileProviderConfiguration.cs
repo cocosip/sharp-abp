@@ -1,6 +1,4 @@
-﻿using FastDFSCore;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using Volo.Abp;
 
 namespace SharpAbp.Abp.FileStoring
@@ -14,7 +12,7 @@ namespace SharpAbp.Abp.FileStoring
         }
 
         /// <summary>
-        /// storage group name of fastdfs
+        /// Storage group name
         /// </summary>
         public string GroupName
         {

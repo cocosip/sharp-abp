@@ -1,38 +1,21 @@
 ﻿using FastDFSCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.FileStoring
 {
-    public class FileConfigurationClusterSelector : IClusterSelector, ISingletonDependency
+    public class FileConfigurationClusterSelector : IClusterSelector
     {
-        private readonly IFileContainerConfigurationProvider _fileContainerConfigurationProvider;
+        private readonly IFastDFSFileProviderConfigurationFactory _configurationFactory;
 
-        public FileConfigurationClusterSelector(IFileContainerConfigurationProvider fileContainerConfigurationProvider)
+        public FileConfigurationClusterSelector(IFastDFSFileProviderConfigurationFactory configurationFactory)
         {
-            _fileContainerConfigurationProvider = fileContainerConfigurationProvider;
+            _configurationFactory = configurationFactory;
         }
 
         public ClusterConfiguration Get(string name)
         {
-
-            bool f(FileContainerConfiguration c)
-            {
-                if (c.ProviderType == typeof(FastDFSFileProvider))
-                {
-                    var clusterName = c.GetConfiguration<string>(FastDFSFileProviderConfigurationNames.ClusterName);
-                    if (string.Equals(name, clusterName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-
-            var fastDFSFileProviderConfiguration = _fileContainerConfigurationProvider.GetList(f).FirstOrDefault()?.GetFastDFSConfiguration();
+            var fastDFSFileProviderConfiguration = _configurationFactory.GetConfiguration(name);
             if (fastDFSFileProviderConfiguration != null)
             {
 

@@ -11,8 +11,21 @@ namespace SharpAbp.Abp.FileStoring
         {
             Configure<AbpFileStoringOptions>(c =>
             {
-                //c.Providers.TryAdd(new FileProviderConfiguration(typeof(FileSystemFileProvider), typeof(FileSystemFileNamingNormalizer)));
+                var configuration = GetFileProviderConfiguration();
+                c.Providers.TryAdd(configuration);
             });
+        }
+
+
+        private FileProviderConfiguration GetFileProviderConfiguration()
+        {
+            var configuration = new FileProviderConfiguration(typeof(FileSystemFileProvider));
+            configuration.DefaultNamingNormalizers.TryAdd<FileSystemFileNamingNormalizer>();
+            configuration
+                .SetProperty(FileSystemFileProviderConfigurationNames.BasePath, typeof(string))
+                .SetProperty(FileSystemFileProviderConfigurationNames.AppendContainerNameToBasePath, typeof(string))
+                .SetProperty(FileSystemFileProviderConfigurationNames.HttpServer, typeof(string));
+            return configuration;
         }
     }
 }

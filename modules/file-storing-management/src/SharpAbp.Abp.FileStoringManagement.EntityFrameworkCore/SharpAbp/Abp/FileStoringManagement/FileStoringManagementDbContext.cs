@@ -20,6 +20,9 @@ namespace SharpAbp.Abp.FileStoringManagement
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            IFileContainerInfoRepository a = default;
+
             //builder.ConfigureFileStoring();
         }
     }

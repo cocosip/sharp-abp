@@ -11,18 +11,23 @@ namespace SharpAbp.Abp.FileStoring
     {
         protected ILogger Logger { get; }
         protected IFastDFSFileNameCalculator FastDFSFileNameCalculator { get; }
+        protected IFastDFSFileProviderConfigurationFactory ConfigurationFactory { get; }
         protected IFastDFSClient Client { get; }
 
-        public FastDFSFileProvider(ILogger<FastDFSFileProvider> logger, IFastDFSFileNameCalculator fastDFSFileNameCalculator, IFastDFSClient client)
+        public FastDFSFileProvider(ILogger<FastDFSFileProvider> logger, IFastDFSFileNameCalculator fastDFSFileNameCalculator, IFastDFSFileProviderConfigurationFactory configurationFactory, IFastDFSClient client)
         {
             Logger = logger;
             FastDFSFileNameCalculator = fastDFSFileNameCalculator;
+            ConfigurationFactory = configurationFactory;
             Client = client;
         }
 
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
             var configuration = args.Configuration.GetFastDFSConfiguration();
+
+            ConfigurationFactory.AddIfNotContains(configuration);
+
             var containerName = GetContainerName(configuration, args);
             var storageNode = await Client.GetStorageNodeAsync(containerName, configuration.ClusterName);
             var fileId = await Client.UploadFileAsync(storageNode, args.FileStream, args.FileExt, configuration.ClusterName);
@@ -32,6 +37,9 @@ namespace SharpAbp.Abp.FileStoring
         public override async Task<bool> DeleteAsync(FileProviderDeleteArgs args)
         {
             var configuration = args.Configuration.GetFastDFSConfiguration();
+
+            ConfigurationFactory.AddIfNotContains(configuration);
+
             var fileId = FastDFSFileNameCalculator.Calculate(args);
             var containerName = GetContainerName(configuration, args);
             return await Client.RemoveFileAsync(containerName, fileId, configuration.ClusterName);
@@ -40,6 +48,9 @@ namespace SharpAbp.Abp.FileStoring
         public override async Task<bool> ExistsAsync(FileProviderExistsArgs args)
         {
             var configuration = args.Configuration.GetFastDFSConfiguration();
+
+            ConfigurationFactory.AddIfNotContains(configuration);
+
             var fileId = FastDFSFileNameCalculator.Calculate(args);
             var containerName = GetContainerName(configuration, args);
 
@@ -52,6 +63,9 @@ namespace SharpAbp.Abp.FileStoring
         public override async Task<bool> DownloadAsync(FileProviderDownloadArgs args)
         {
             var configuration = args.Configuration.GetFastDFSConfiguration();
+
+            ConfigurationFactory.AddIfNotContains(configuration);
+
             var fileId = FastDFSFileNameCalculator.Calculate(args);
             var containerName = GetContainerName(configuration, args);
             var storageNode = await Client.GetStorageNodeAsync(containerName, configuration.ClusterName);
@@ -67,10 +81,12 @@ namespace SharpAbp.Abp.FileStoring
             }
         }
 
-
         public override async Task<Stream> GetOrNullAsync(FileProviderGetArgs args)
         {
             var configuration = args.Configuration.GetFastDFSConfiguration();
+
+            ConfigurationFactory.AddIfNotContains(configuration);
+
             var fileId = FastDFSFileNameCalculator.Calculate(args);
             var containerName = GetContainerName(configuration, args);
             var storageNode = await Client.GetStorageNodeAsync(containerName, configuration.ClusterName);
@@ -96,12 +112,16 @@ namespace SharpAbp.Abp.FileStoring
             }
 
             var configuration = args.Configuration.GetFastDFSConfiguration();
+
+            ConfigurationFactory.AddIfNotContains(configuration);
+
             var fileId = FastDFSFileNameCalculator.Calculate(args);
             var containerName = GetContainerName(configuration, args);
 
             var accessUrl = BuildAccessUrl(configuration, containerName, fileId);
             return Task.FromResult(accessUrl);
         }
+
 
         private static string GetContainerName(FastDFSFileProviderConfiguration configuration, FileProviderArgs args)
         {
