@@ -19,6 +19,9 @@ namespace SharpAbp.Abp.FileStoringManagement
         [NotNull]
         public virtual string ProviderTypeName { get; set; }
 
+        /// <summary>
+        /// Whether support http access or not
+        /// </summary>
         public virtual bool HttpSupport { get; set; }
 
         /// <summary>
