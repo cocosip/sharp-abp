@@ -1,0 +1,16 @@
+{
+  "culture": "en",
+  "texts": {
+    "FastDFS.ClusterName": "Cluster name",
+    "FastDFS.HttpServer": "Http server address",
+    "FastDFS.GroupName": "Group name",
+    "FastDFS.Trackers": "Tracker server address",
+    "FastDFS.ConnectionTimeout": "Connection time out",
+    "FastDFS.ConnectionLifeTime": "Connection lifetime",
+    "FastDFS.Charset": "Charset",
+    "FastDFS.ConnectionConcurrentThread": "Concurrent thread count",
+    "FastDFS.ScanTimeoutConnectionInterval": "Scan timeout connection interval",
+    "FastDFS.TrackerMaxConnection": "Tracker max connection count",
+    "FastDFS.StorageMaxConnection": "Storage max connection count"
+  }
+}

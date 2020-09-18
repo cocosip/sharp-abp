@@ -1,0 +1,16 @@
+{
+  "culture": "zh-Hant",
+  "texts": {
+    "FastDFS.ClusterName": "集群名稱",
+    "FastDFS.HttpServer": "Http服務器地址",
+    "FastDFS.GroupName": "組名",
+    "FastDFS.Trackers": "Tracker服務器",
+    "FastDFS.ConnectionTimeout": "連接超時時間",
+    "FastDFS.ConnectionLifeTime": "連接有效時間",
+    "FastDFS.Charset": "編碼",
+    "FastDFS.ConnectionConcurrentThread": "連接並發數",
+    "FastDFS.ScanTimeoutConnectionInterval": "掃描超時時間",
+    "FastDFS.TrackerMaxConnection": "Tracker最大連接數",
+    "FastDFS.StorageMaxConnection": "Storage最大連接數"
+  }
+}

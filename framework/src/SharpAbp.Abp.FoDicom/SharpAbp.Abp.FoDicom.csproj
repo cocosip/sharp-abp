@@ -4,7 +4,7 @@
   <Import Project="..\..\..\configureawait.props" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>SharpAbp.Abp.FoDicom</AssemblyName>
     <PackageId>SharpAbp.Abp.FoDicom</PackageId>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>

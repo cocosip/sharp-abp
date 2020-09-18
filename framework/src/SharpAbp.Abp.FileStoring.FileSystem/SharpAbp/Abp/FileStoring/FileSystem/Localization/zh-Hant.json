@@ -1,0 +1,8 @@
+{
+  "culture": "zh-Hant",
+  "texts": {
+    "FileSystem.BasePath": "存儲路徑",
+    "FileSystem.AppendContainerNameToBasePath": "附加容器名到路徑",
+    "FileSystem.HttpServer": "Http服務器地址"
+  }
+}

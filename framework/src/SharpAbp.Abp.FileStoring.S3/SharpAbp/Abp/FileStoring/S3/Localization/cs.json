@@ -1,0 +1,18 @@
+{
+  "culture": "cs",
+  "texts": {
+    "S3.BucketName": "Bucket name",
+    "S3.ServerUrl": "Server url",
+    "S3.AccessKeyId": "AccessKeyId",
+    "S3.SecretAccessKey": "SecretAccessKey",
+    "S3.ForcePathStyle": "Force path style",
+    "S3.UseChunkEncoding": "Chunk encoding",
+    "S3.Protocol": "Protocol",
+    "S3.VendorType": "Vendor",
+    "S3.EnableSlice": "Enable slice",
+    "S3.SliceSize": "Slice size",
+    "S3.SignatureVersion": "Signature version",
+    "S3.CreateBucketIfNotExists": "Auto create bucket if not exists",
+    "S3.ClientCount": "Client connection count"
+  }
+}

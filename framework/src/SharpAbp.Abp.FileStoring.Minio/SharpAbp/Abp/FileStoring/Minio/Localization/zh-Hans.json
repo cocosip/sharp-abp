@@ -1,0 +1,11 @@
+{
+  "culture": "zh-Hans",
+  "texts": {
+    "Minio.BucketName": "桶名",
+    "Minio.EndPoint": "终结点",
+    "Minio.AccessKey": "AccessKey",
+    "Minio.SecretKey": "SecretKey",
+    "Minio.WithSSL": "是否使用SSL",
+    "Minio.CreateBucketIfNotExists": "自动建桶"
+  }
+}

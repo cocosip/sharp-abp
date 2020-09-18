@@ -1,12 +1,19 @@
 ﻿using SharpAbp.Abp.AmazonS3.KS3;
+using SharpAbp.Abp.FileStoring.S3.Localization;
+using Volo.Abp.Localization;
+using Volo.Abp.Localization.ExceptionHandling;
 using Volo.Abp.Modularity;
+using Volo.Abp.Validation;
+using Volo.Abp.Validation.Localization;
+using Volo.Abp.VirtualFileSystem;
 
 namespace SharpAbp.Abp.FileStoring.S3
 {
     [DependsOn(
       typeof(AbpFileStoringModule),
-      typeof(AbpAmazonS3KS3Module)
-      )]
+      typeof(AbpAmazonS3KS3Module),
+      typeof(AbpValidationModule)
+    )]
     public class AbpFileStoringS3Module : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
@@ -15,6 +22,24 @@ namespace SharpAbp.Abp.FileStoring.S3
             {
                 var configuration = GetFileProviderConfiguration();
                 c.Providers.TryAdd(configuration);
+            });
+
+            Configure<AbpVirtualFileSystemOptions>(options =>
+            {
+                options.FileSets.AddEmbedded<AbpFileStoringS3Module>();
+            });
+
+            Configure<AbpLocalizationOptions>(options =>
+            {
+                options.Resources
+                    .Add<FileStoringS3Resource>("en")
+                    .AddBaseTypes(typeof(AbpValidationResource))
+                    .AddVirtualJson("/SharpAbp/Abp/FileStoring/S3/Localization");
+            });
+
+            Configure<AbpExceptionLocalizationOptions>(options =>
+            {
+                options.MapCodeNamespace("FileStoringS3", typeof(FileStoringS3Resource));
             });
         }
 

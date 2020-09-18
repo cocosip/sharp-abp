@@ -1,0 +1,8 @@
+{
+  "culture": "en",
+  "texts": {
+    "FileSystem.BasePath": "Store base path",
+    "FileSystem.AppendContainerNameToBasePath": "Append container name to base path",
+    "FileSystem.HttpServer": "Http server address"
+  }
+}
