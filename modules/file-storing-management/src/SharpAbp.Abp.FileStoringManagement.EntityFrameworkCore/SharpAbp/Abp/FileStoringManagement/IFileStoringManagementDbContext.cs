@@ -7,8 +7,8 @@ namespace SharpAbp.Abp.FileStoringManagement
     [ConnectionStringName(FileStoringManagementDbProperties.ConnectionStringName)]
     public interface IFileStoringManagementDbContext : IEfCoreDbContext
     {
-        DbSet<FileContainerInfo> FileContainerInfos { get; set; }
+        DbSet<FileStoringContainer> FileStoringContainers { get; set; }
 
-        DbSet<FileContainerItem> FileContainerItems { get; set; }
+        DbSet<FileStoringContainerItem> FileStoringContainerItems { get; set; }
     }
 }

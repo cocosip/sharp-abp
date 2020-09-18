@@ -3,7 +3,7 @@ using Volo.Abp.Domain.Repositories;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
-    public interface IFileContainerInfoRepository : IBasicRepository<FileContainerInfo, Guid>
+    public interface IFileStoringContainerRepository : IBasicRepository<FileStoringContainer, Guid>
     {
         
     }

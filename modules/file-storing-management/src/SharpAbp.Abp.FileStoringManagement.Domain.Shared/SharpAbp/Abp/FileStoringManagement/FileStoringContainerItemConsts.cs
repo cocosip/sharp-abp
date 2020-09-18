@@ -1,6 +1,6 @@
 ﻿namespace SharpAbp.Abp.FileStoringManagement
 {
-    public static class ContainerItemConsts
+    public static class FileStoringContainerItemConsts
     {
         /// <summary>
         /// Default value: 64.

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.Modularity;
 using Volo.Abp.MongoDB;
 
@@ -14,11 +12,11 @@ namespace SharpAbp.Abp.FileStoring.Database.MongoDB
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            //context.Services.AddMongoDbContext<FileStoringMongoDbContext>(options =>
-            //{
-            //    options.AddRepository<DatabaseBlobContainer, MongoDbDatabaseBlobContainerRepository>();
-            //    options.AddRepository<DatabaseBlob, MongoDbDatabaseBlobRepository>();
-            //});
+            context.Services.AddMongoDbContext<FileStoringMongoDbContext>(options =>
+            {
+               options.AddRepository<DatabaseFileContainer, MongoDbDatabaseFileContainerRepository>();
+               options.AddRepository<DatabaseFile, MongoDbDatabaseFileRepository>();
+            });
         }
     }
 }

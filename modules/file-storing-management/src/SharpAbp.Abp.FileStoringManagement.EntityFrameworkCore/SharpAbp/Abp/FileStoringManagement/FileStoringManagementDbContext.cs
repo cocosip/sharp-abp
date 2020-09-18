@@ -7,8 +7,8 @@ namespace SharpAbp.Abp.FileStoringManagement
     [ConnectionStringName(FileStoringManagementDbProperties.ConnectionStringName)]
     public class FileStoringManagementDbContext : AbpDbContext<FileStoringManagementDbContext>, IFileStoringManagementDbContext
     {
-        public DbSet<FileContainerInfo> FileContainerInfos { get; set; }
-        public DbSet<FileContainerItem> FileContainerItems { get; set; }
+        public DbSet<FileStoringContainer> FileStoringContainers { get; set; }
+        public DbSet<FileStoringContainerItem> FileStoringContainerItems { get; set; }
 
         public FileStoringManagementDbContext(DbContextOptions<FileStoringManagementDbContext> options)
             : base(options)
@@ -21,9 +21,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         {
             base.OnModelCreating(builder);
 
-            IFileContainerInfoRepository a = default;
-
-            //builder.ConfigureFileStoring();
+            builder.ConfigureFileStoringManagement();
         }
     }
 }
