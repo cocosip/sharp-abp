@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\..\..\common.props" />
   <Import Project="..\..\..\configureawait.props" />
@@ -18,13 +18,6 @@
   <ItemGroup>
     <ProjectReference Include="..\SharpAbp.Abp.FastDFS.DotNetty\SharpAbp.Abp.FastDFS.DotNetty.csproj" />
     <ProjectReference Include="..\SharpAbp.Abp.FileStoring\SharpAbp.Abp.FileStoring.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Update="Fody" Version="6.2.5">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
 
 </Project>

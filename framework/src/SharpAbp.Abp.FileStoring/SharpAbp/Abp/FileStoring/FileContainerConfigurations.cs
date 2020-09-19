@@ -1,6 +1,7 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
+using System.Linq;
 using Volo.Abp;
 
 namespace SharpAbp.Abp.FileStoring
@@ -75,6 +76,11 @@ namespace SharpAbp.Abp.FileStoring
 
             return _containers.GetOrDefault(name) ??
                    Default;
+        }
+
+        public List<FileContainerConfiguration> GetConfigurations([NotNull] Func<FileContainerConfiguration, bool> predicate)
+        {
+            return _containers.Values.Where(predicate).ToList();
         }
     }
 }

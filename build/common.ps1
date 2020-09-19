@@ -7,6 +7,8 @@ $rootFolder = (Get-Item -Path "./" -Verbose).FullName
 # List of solutions used only in development mode
 $solutionPaths = @(
 		"../framework"
+		"../modules/file-storing-database"
+		"../modules/file-storing-management"
 #		"../modules/users",
 #		"../modules/permission-management",
 	)

@@ -1,0 +1,11 @@
+{
+  "culture": "en",
+  "texts": {
+    "Minio.BucketName": "Bucket name",
+    "Minio.EndPoint": "EndPoint",
+    "Minio.AccessKey": "AccessKey",
+    "Minio.SecretKey": "SecretKey",
+    "Minio.WithSSL": "Use SSL",
+    "Minio.CreateBucketIfNotExists": "Auto create bucket if not exists"
+  }
+}

@@ -16,19 +16,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SharpAbp.Abp.FastDFS.DotNetty\SharpAbp.Abp.FastDFS.DotNetty.csproj" />
     <ProjectReference Include="..\SharpAbp.Abp.FileStoring\SharpAbp.Abp.FileStoring.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Polly" Version="7.2.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Update="Fody" Version="6.2.5">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
 
 </Project>

@@ -11,10 +11,11 @@ namespace SharpAbp.Abp.FileStoring
         {
             Options = options.Value;
         }
-        
+
         public virtual FileContainerConfiguration Get(string name)
         {
             return Options.Containers.GetConfiguration(name);
         }
+
     }
 }

@@ -4,6 +4,6 @@
     {
         string NormalizeContainerName(string containerName);
 
-        string NormalizeFileId(string fileId);
+        string NormalizeFileName(string fileName);
     }
 }
