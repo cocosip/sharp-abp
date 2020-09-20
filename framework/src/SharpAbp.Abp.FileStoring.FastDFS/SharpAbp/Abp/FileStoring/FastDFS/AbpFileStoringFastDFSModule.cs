@@ -22,7 +22,7 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             context.Services.Replace(ServiceDescriptor.Singleton<IClusterSelector, FileConfigurationClusterSelector>());
-            
+
             Configure<AbpFileStoringOptions>(c =>
             {
                 var configuration = GetFileProviderConfiguration();
@@ -58,7 +58,10 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
                 .SetProperty(FastDFSFileProviderConfigurationNames.ClusterName, typeof(string))
                 .SetProperty(FastDFSFileProviderConfigurationNames.GroupName, typeof(string))
                 .SetProperty(FastDFSFileProviderConfigurationNames.HttpServer, typeof(string))
+                .SetProperty(FastDFSFileProviderConfigurationNames.AppendGroupNameToUrl, typeof(bool))
                 .SetProperty(FastDFSFileProviderConfigurationNames.Trackers, typeof(string))
+                .SetProperty(FastDFSFileProviderConfigurationNames.AntiStealToken, typeof(bool))
+                .SetProperty(FastDFSFileProviderConfigurationNames.SecretKey, typeof(string))
                 .SetProperty(FastDFSFileProviderConfigurationNames.ConnectionTimeout, typeof(int))
                 .SetProperty(FastDFSFileProviderConfigurationNames.ConnectionLifeTime, typeof(int))
                 .SetProperty(FastDFSFileProviderConfigurationNames.Charset, typeof(string))
