@@ -60,7 +60,7 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
                 .SetProperty(FastDFSFileProviderConfigurationNames.HttpServer, typeof(string))
                 .SetProperty(FastDFSFileProviderConfigurationNames.AppendGroupNameToUrl, typeof(bool))
                 .SetProperty(FastDFSFileProviderConfigurationNames.Trackers, typeof(string))
-                .SetProperty(FastDFSFileProviderConfigurationNames.AntiStealToken, typeof(bool))
+                .SetProperty(FastDFSFileProviderConfigurationNames.AntiStealCheckToken, typeof(bool))
                 .SetProperty(FastDFSFileProviderConfigurationNames.SecretKey, typeof(string))
                 .SetProperty(FastDFSFileProviderConfigurationNames.ConnectionTimeout, typeof(int))
                 .SetProperty(FastDFSFileProviderConfigurationNames.ConnectionLifeTime, typeof(int))

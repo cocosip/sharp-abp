@@ -7,7 +7,7 @@
         public const string GroupName = "FastDFS.GroupName";
         public const string AppendGroupNameToUrl = "FastDFS.AppendGroupNameToUrl";
         public const string Trackers = "FastDFS.Trackers";
-        public const string AntiStealToken = "FastDFS.AntiStealToken";
+        public const string AntiStealCheckToken = "FastDFS.AntiStealCheckToken";
         public const string SecretKey = "FastDFS.SecretKey";
         public const string Charset = "FastDFS.Charset";
         public const string ConnectionTimeout = "FastDFS.ConnectionTimeout";

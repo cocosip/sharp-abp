@@ -137,7 +137,7 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
 
         protected virtual string BuildAccessUrl(FastDFSFileProviderConfiguration configuration, string containerName, string fileId)
         {
-            if (configuration.AntiStealToken)
+            if (configuration.AntiStealCheckToken)
             {
                 return $"{configuration.HttpServer.TrimEnd('/')}/{containerName}/{fileId}";
             }

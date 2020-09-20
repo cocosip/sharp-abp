@@ -51,10 +51,10 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
         /// <summary>
         /// AntiStealToken
         /// </summary>
-        public bool AntiStealToken
+        public bool AntiStealCheckToken
         {
-            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.AntiStealToken, true);
-            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.AntiStealToken, value);
+            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.AntiStealCheckToken, true);
+            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.AntiStealCheckToken, value);
         }
 
         /// <summary>
