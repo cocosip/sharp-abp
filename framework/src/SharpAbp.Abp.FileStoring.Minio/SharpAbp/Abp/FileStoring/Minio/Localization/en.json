@@ -6,6 +6,6 @@
     "Minio.AccessKey": "AccessKey",
     "Minio.SecretKey": "SecretKey",
     "Minio.WithSSL": "Use SSL",
-    "Minio.CreateBucketIfNotExists": "Auto create bucket if not exists"
+    "Minio.CreateBucketIfNotExists": "Create bucket if not exists"
   }
 }

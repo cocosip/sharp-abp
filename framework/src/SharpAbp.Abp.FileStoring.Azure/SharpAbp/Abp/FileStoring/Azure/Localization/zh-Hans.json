@@ -1,0 +1,8 @@
+{
+  "culture": "zh-Hans",
+  "texts": {
+    "Azure.ConnectionString": "连接字符串",
+    "Azure.ContainerName": "容器名",
+    "Azure.CreateContainerIfNotExists": "自动建桶"
+  }
+}
