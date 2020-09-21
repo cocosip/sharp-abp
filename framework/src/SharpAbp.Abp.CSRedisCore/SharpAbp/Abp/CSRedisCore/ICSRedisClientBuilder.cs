@@ -4,6 +4,6 @@ namespace SharpAbp.Abp.CSRedisCore
 {
     public interface ICSRedisClientBuilder
     {
-        CSRedisClient CreateClient(CSRedisClientConfiguration configuration);
+        CSRedisClient CreateClient(CSRedisConfiguration configuration);
     }
 }

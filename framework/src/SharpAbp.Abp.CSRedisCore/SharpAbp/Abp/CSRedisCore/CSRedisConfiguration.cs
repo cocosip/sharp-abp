@@ -2,12 +2,8 @@
 
 namespace SharpAbp.Abp.CSRedisCore
 {
-    public class CSRedisClientConfiguration
+    public class CSRedisConfiguration
     {
-        /// <summary>Name of configuration
-        /// </summary>
-        public string Name { get; set; }
-
         /// <summary>Mode
         /// </summary>
         public RedisMode Mode { get; set; }
@@ -24,8 +20,7 @@ namespace SharpAbp.Abp.CSRedisCore
         /// </summary>
         public bool ReadOnly { get; set; }
 
-
-        public CSRedisClientConfiguration()
+        public CSRedisConfiguration()
         {
             Sentinels = new List<string>();
         }

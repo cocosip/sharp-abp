@@ -12,7 +12,7 @@ namespace SharpAbp.Abp.CSRedisCore
         /// <param name="name">name</param>
         /// <returns></returns>
         [NotNull]
-        CSRedisClient Get([NotNull] string name);
+        CSRedisClient Get(string name = DefaultClient.Name);
 
 
         /// <summary>

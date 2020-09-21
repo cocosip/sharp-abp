@@ -3,9 +3,9 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.CSRedisCore
 {
-    public class CSRedisClientBuilder : ICSRedisClientBuilder, ISingletonDependency
+    public class DefaultCSRedisClientBuilder : ICSRedisClientBuilder, ITransientDependency
     {
-        public virtual CSRedisClient CreateClient(CSRedisClientConfiguration configuration)
+        public virtual CSRedisClient CreateClient(CSRedisConfiguration configuration)
         {
             if (configuration.Mode == RedisMode.Sentinel)
             {
