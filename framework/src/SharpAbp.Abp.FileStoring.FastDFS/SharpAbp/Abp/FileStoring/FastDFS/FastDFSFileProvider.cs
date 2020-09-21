@@ -1,22 +1,26 @@
-﻿using FastDFSCore;
+﻿using DotNetty.Common.Utilities;
+using FastDFSCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
+using Volo.Abp.Timing;
 
 namespace SharpAbp.Abp.FileStoring.FastDFS
 {
     public class FastDFSFileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }
+        protected IClock Clock { get; }
         protected IFastDFSFileNameCalculator FastDFSFileNameCalculator { get; }
         protected IFastDFSFileProviderConfigurationFactory ConfigurationFactory { get; }
         protected IFastDFSClient Client { get; }
 
-        public FastDFSFileProvider(ILogger<FastDFSFileProvider> logger, IFastDFSFileNameCalculator fastDFSFileNameCalculator, IFastDFSFileProviderConfigurationFactory configurationFactory, IFastDFSClient client)
+        public FastDFSFileProvider(ILogger<FastDFSFileProvider> logger, IClock clock, IFastDFSFileNameCalculator fastDFSFileNameCalculator, IFastDFSFileProviderConfigurationFactory configurationFactory, IFastDFSClient client)
         {
             Logger = logger;
+            Clock = clock;
             FastDFSFileNameCalculator = fastDFSFileNameCalculator;
             ConfigurationFactory = configurationFactory;
             Client = client;
@@ -133,8 +137,27 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
 
         protected virtual string BuildAccessUrl(FastDFSFileProviderConfiguration configuration, string containerName, string fileId)
         {
-            var accessUrl = $"{configuration.HttpServer.TrimEnd('/')}/{containerName}/{fileId}";
-            return accessUrl;
+            if (configuration.AntiStealCheckToken)
+            {
+                return $"{configuration.HttpServer.TrimEnd('/')}/{containerName}/{fileId}";
+            }
+            else
+            {
+                var timestamp = ToInt32(Clock.Now);
+                var token = Client.GetToken(fileId, timestamp, configuration.ClusterName);
+                return $"{configuration.HttpServer.TrimEnd('/')}/{containerName}/{fileId}?token={token}&ts={timestamp}";
+            }
+        }
+
+
+        /// <summary>Convert time to int32 timestamp(from 1970-01-01 00:00:00)
+        /// </summary>
+        /// <param name="datetime">time</param>
+        /// <returns></returns>
+        protected virtual int ToInt32(DateTime datetime)
+        {
+            var timeSpan = datetime.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            return Convert.ToInt32(timeSpan.TotalSeconds);
         }
 
     }

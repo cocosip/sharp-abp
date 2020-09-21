@@ -1,17 +1,17 @@
 {
   "culture": "en",
   "texts": {
-    "Aliyun.RegionId": "地區",
-    "Aliyun.Endpoint": "終結點",
-    "Aliyun.BucketName": "桶名",
+    "Aliyun.RegionId": "RegionId",
+    "Aliyun.Endpoint": "Endpoint",
+    "Aliyun.BucketName": "Bucket name",
     "Aliyun.AccessKeyId": "AccessKeyId",
     "Aliyun.AccessKeySecret": "AccessKeySecret",
-    "Aliyun.UseSecurityTokenService": "使用安全令牌服務",
-    "Aliyun.RoleArn": "角色名",
-    "Aliyun.RoleSessionName": "角色Session名",
-    "Aliyun.DurationSeconds": "臨時憑據有效期",
-    "Aliyun.Policy": "代理",
-    "Aliyun.CreateContainerIfNotExists": "自動建桶",
-    "Aliyun.TemporaryCredentialsCacheKey": "臨時憑證緩存Key"
+    "Aliyun.UseSecurityTokenService": "Use security token service",
+    "Aliyun.RoleArn": "Role name",
+    "Aliyun.RoleSessionName": "Role session name",
+    "Aliyun.DurationSeconds": "Duration seconds",
+    "Aliyun.Policy": "Policy",
+    "Aliyun.CreateContainerIfNotExists": "Create bucket if not exists",
+    "Aliyun.TemporaryCredentialsCacheKey": "Temporary credentials cache key"
   }
 }

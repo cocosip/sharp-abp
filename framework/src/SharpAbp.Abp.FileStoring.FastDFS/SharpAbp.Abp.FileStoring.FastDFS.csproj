@@ -20,4 +20,8 @@
     <ProjectReference Include="..\SharpAbp.Abp.FileStoring\SharpAbp.Abp.FileStoring.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Timing" Version="3.1.2" />
+  </ItemGroup>
+
 </Project>

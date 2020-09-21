@@ -2,7 +2,9 @@
 using Amazon.S3.Model;
 using Amazon.S3.Multiplex;
 using AmazonKS3;
+using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Threading;
@@ -13,12 +15,13 @@ namespace SharpAbp.Abp.FileStoring.S3
 {
     public class S3FileProvider : FileProviderBase, ITransientDependency
     {
+        protected ILogger Logger { get; }
         protected IS3FileNameCalculator S3FileNameCalculator { get; }
-
         protected IS3ClientFactory S3ClientFactory { get; }
 
-        public S3FileProvider(IS3FileNameCalculator s3FileNameCalculator, IS3ClientFactory s3ClientFactory)
+        public S3FileProvider(ILogger<S3FileProvider> logger, IS3FileNameCalculator s3FileNameCalculator, IS3ClientFactory s3ClientFactory)
         {
+            Logger = logger;
             S3FileNameCalculator = s3FileNameCalculator;
             S3ClientFactory = s3ClientFactory;
         }
@@ -40,14 +43,16 @@ namespace SharpAbp.Abp.FileStoring.S3
                 await CreateBucketIfNotExists(client, containerName);
             }
 
-            await client.PutObjectAsync(new PutObjectRequest()
+            if (configuration.EnableSlice && (args.FileStream.Length > configuration.SliceSize))
             {
-                BucketName = containerName,
-                Key = fileName,
-                InputStream = args.FileStream,
-                UseChunkEncoding = configuration.UseChunkEncoding,
-                AutoCloseStream = true
-            }, args.CancellationToken);
+                await MultipartUploadInternal(client, containerName, fileName, args.FileStream, configuration.UseChunkEncoding, configuration.SliceSize);
+            }
+            else
+            {
+                await SingleUploadInternal(client, containerName, fileName, args.FileStream, configuration.UseChunkEncoding);
+            }
+
+            args.FileStream?.Dispose();
 
             return fileName;
         }
@@ -131,6 +136,78 @@ namespace SharpAbp.Abp.FileStoring.S3
             var accessUrl = client.GetPreSignedURL(preSignedUrlRequest);
 
             return Task.FromResult(accessUrl);
+        }
+
+
+        /// <summary>单文件上传
+        /// </summary>
+        private async Task<PutObjectResponse> SingleUploadInternal(IAmazonS3 client, string bucketName, string fileName, Stream stream, bool useChunkEncoding)
+        {
+            var putObjectRequest = new PutObjectRequest()
+            {
+                BucketName = bucketName,
+                Key = fileName,
+                InputStream = stream,
+                AutoCloseStream = true,
+                UseChunkEncoding = useChunkEncoding
+            };
+            var putObjectResponse = await client.PutObjectAsync(putObjectRequest);
+            return putObjectResponse;
+        }
+
+        private async Task<CompleteMultipartUploadResponse> MultipartUploadInternal(IAmazonS3 client, string bucketName, string fileName, Stream stream, bool useChunkEncoding, int sliceSize)
+        {
+            var initiateMultipartUploadResponse = await client.InitiateMultipartUploadAsync(bucketName, fileName);
+            //UploadId
+            var uploadId = initiateMultipartUploadResponse.UploadId;
+            //Calculate slice part count
+            var partSize = sliceSize;
+            //var fi = new FileInfo(spoolFile.FilePath);//?
+            var fileSize = stream.Length;
+            var partCount = fileSize / partSize;
+            if (fileSize % partSize != 0)
+            {
+                partCount++;
+            }
+
+            // 开始分片上传。partETags是保存partETag的列表，OSS收到用户提交的分片列表后，会逐一验证每个分片数据的有效性。 当所有的数据分片通过验证后，OSS会将这些分片组合成一个完整的文件。
+            var partETags = new List<PartETag>();
+
+            for (var i = 0; i < partCount; i++)
+            {
+                var skipBytes = (long)partSize * i;
+                // 计算本次上传的片大小，最后一片为剩余的数据大小。
+                var size = (int)((partSize < fileSize - skipBytes) ? partSize : (fileSize - skipBytes));
+
+                byte[] buffer = new byte[size];
+                stream.Read(buffer, 0, size);
+
+                //分片上传
+                var uploadPartResponse = await client.UploadPartAsync(new UploadPartRequest()
+                {
+                    BucketName = bucketName,
+                    UploadId = uploadId,
+                    Key = fileName,
+                    InputStream = new MemoryStream(buffer),
+                    PartSize = size,
+                    PartNumber = i + 1,
+                    UseChunkEncoding = useChunkEncoding
+                });
+                partETags.Add(new PartETag(uploadPartResponse.PartNumber, uploadPartResponse.ETag));
+                Logger.LogDebug("Upload part file ,key:{0},UploadId:{1},Complete {2}/{3}", fileName, uploadId, partETags.Count, partCount);
+            }
+
+
+            //完成上传分片
+            var completeMultipartUploadResponse = await client.CompleteMultipartUploadAsync(new CompleteMultipartUploadRequest()
+            {
+                BucketName = bucketName,
+                Key = fileName,
+                UploadId = uploadId,
+                PartETags = partETags
+            });
+
+            return completeMultipartUploadResponse;
         }
 
 

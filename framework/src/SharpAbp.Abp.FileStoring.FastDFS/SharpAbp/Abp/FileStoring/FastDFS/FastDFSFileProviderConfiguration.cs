@@ -30,6 +30,16 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
         }
 
         /// <summary>
+        /// The url contain group name or not
+        /// </summary>
+        public bool AppendGroupNameToUrl
+        {
+            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.AppendGroupNameToUrl, true);
+            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.AppendGroupNameToUrl, value);
+        }
+
+
+        /// <summary>
         /// Trackers, 192.168.0.100:22122,192.168.0.101:22122
         /// </summary>
         public string Trackers
@@ -39,12 +49,21 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
         }
 
         /// <summary>
-        /// ConnectionTimeout
+        /// AntiStealToken
         /// </summary>
-        public int ConnectionTimeout
+        public bool AntiStealCheckToken
         {
-            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.ConnectionTimeout, 5);
-            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.ConnectionTimeout, value);
+            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.AntiStealCheckToken, true);
+            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.AntiStealCheckToken, value);
+        }
+
+        /// <summary>
+        /// SecretKey, to create access token
+        /// </summary>
+        public string SecretKey
+        {
+            get => _containerConfiguration.GetConfiguration<string>(FastDFSFileProviderConfigurationNames.SecretKey);
+            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.SecretKey, value);
         }
 
         /// <summary>
@@ -54,6 +73,15 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
         {
             get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.ConnectionLifeTime, 600);
             set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.ConnectionLifeTime, value);
+        }
+
+        /// <summary>
+        /// ConnectionTimeout
+        /// </summary>
+        public int ConnectionTimeout
+        {
+            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.ConnectionTimeout, 5);
+            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.ConnectionTimeout, value);
         }
 
         /// <summary>
