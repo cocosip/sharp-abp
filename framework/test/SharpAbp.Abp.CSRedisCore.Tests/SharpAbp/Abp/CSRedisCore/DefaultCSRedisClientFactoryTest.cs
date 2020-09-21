@@ -15,7 +15,7 @@ namespace SharpAbp.Abp.CSRedisCore
         }
 
         [Fact]
-        public void Get_Test()
+        public void Get_GetAll_Test()
         {
             var mockConfigurationSelector = new Mock<ICSRedisConfigurationSelector>();
             mockConfigurationSelector.Setup(x => x.Get("default")).Returns(new CSRedisConfiguration()
@@ -54,7 +54,7 @@ namespace SharpAbp.Abp.CSRedisCore
             mockConfigurationSelector.Verify(x => x.Get("Test2"), Times.Once);
 
 
-            var clients = redisClientFactory.GetAllClients();
+            var clients = redisClientFactory.GetAll();
             Assert.Equal(2, clients.Count);
 
         }

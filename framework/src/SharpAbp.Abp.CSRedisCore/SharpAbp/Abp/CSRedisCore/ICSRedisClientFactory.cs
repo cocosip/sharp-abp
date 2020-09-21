@@ -19,6 +19,6 @@ namespace SharpAbp.Abp.CSRedisCore
         /// Get all csredis client
         /// </summary>
         /// <returns></returns>
-        List<CSRedisClient> GetAllClients();
+        List<CSRedisClient> GetAll();
     }
 }

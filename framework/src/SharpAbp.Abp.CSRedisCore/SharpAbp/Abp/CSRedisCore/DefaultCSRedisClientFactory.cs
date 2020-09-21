@@ -69,7 +69,7 @@ namespace SharpAbp.Abp.CSRedisCore
         /// Get all csredis client
         /// </summary>
         /// <returns></returns>
-        public List<CSRedisClient> GetAllClients()
+        public List<CSRedisClient> GetAll()
         {
             return _clientDict.Values.ToList();
         }
