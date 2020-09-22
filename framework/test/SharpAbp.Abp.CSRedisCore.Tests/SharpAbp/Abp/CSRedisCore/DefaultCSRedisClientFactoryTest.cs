@@ -17,7 +17,7 @@ namespace SharpAbp.Abp.CSRedisCore
         [Fact]
         public void Get_GetAll_Test()
         {
-            var mockConfigurationSelector = new Mock<ICSRedisConfigurationSelector>();
+            var mockConfigurationSelector = new Mock<ICSRedisConfigurationProvider>();
             mockConfigurationSelector.Setup(x => x.Get("default")).Returns(new CSRedisConfiguration()
             {
                 ConnectionString = "192.168.0.1",
@@ -62,7 +62,7 @@ namespace SharpAbp.Abp.CSRedisCore
         [Fact]
         public void GetNullConfiguration_Test()
         {
-            var mockConfigurationSelector = new Mock<ICSRedisConfigurationSelector>();
+            var mockConfigurationSelector = new Mock<ICSRedisConfigurationProvider>();
 
             CSRedisConfiguration nullConfiguration = null;
             mockConfigurationSelector.Setup(x => x.Get(It.IsAny<string>())).Returns(nullConfiguration);

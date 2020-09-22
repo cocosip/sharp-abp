@@ -15,9 +15,9 @@ namespace SharpAbp.Abp.CSRedisCore
         private readonly ConcurrentDictionary<string, CSRedisClient> _clientDict;
 
         protected ILogger Logger { get; }
-        protected ICSRedisConfigurationSelector ConfigurationSelector { get; }
+        protected ICSRedisConfigurationProvider ConfigurationSelector { get; }
         protected ICSRedisClientBuilder ClientBuilder { get; }
-        public DefaultCSRedisClientFactory(ILogger<DefaultCSRedisClientFactory> logger, ICSRedisConfigurationSelector configurationSelector, ICSRedisClientBuilder clientBuilder)
+        public DefaultCSRedisClientFactory(ILogger<DefaultCSRedisClientFactory> logger, ICSRedisConfigurationProvider configurationSelector, ICSRedisClientBuilder clientBuilder)
         {
             Logger = logger;
             ConfigurationSelector = configurationSelector;

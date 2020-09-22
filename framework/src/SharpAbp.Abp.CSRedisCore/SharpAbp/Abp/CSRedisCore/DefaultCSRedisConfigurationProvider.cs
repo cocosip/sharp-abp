@@ -4,11 +4,11 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.CSRedisCore
 {
-    public class DefaultCSRedisConfigurationSelector : ICSRedisConfigurationSelector, ITransientDependency
+    public class DefaultCSRedisConfigurationProvider : ICSRedisConfigurationProvider, ITransientDependency
     {
         protected AbpCSRedisOptions Options { get; }
 
-        public DefaultCSRedisConfigurationSelector(IOptions<AbpCSRedisOptions> options)
+        public DefaultCSRedisConfigurationProvider(IOptions<AbpCSRedisOptions> options)
         {
             Options = options.Value;
         }

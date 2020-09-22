@@ -2,7 +2,7 @@
 
 namespace SharpAbp.Abp.CSRedisCore
 {
-    public interface ICSRedisConfigurationSelector
+    public interface ICSRedisConfigurationProvider
     {
         [NotNull]
         CSRedisConfiguration Get([NotNull] string name);
