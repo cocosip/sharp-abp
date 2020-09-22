@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 
 namespace SharpAbp.Abp.Consul
 {
@@ -12,8 +13,8 @@ namespace SharpAbp.Abp.Consul
 
         public TimeSpan? WaitTime { get; set; }
 
+        public HttpClient ClientOverride { get; set; }
 
-
-
+        public HttpClientHandler HandlerOverride { get; set; }
     }
 }

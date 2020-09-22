@@ -16,15 +16,14 @@ namespace SharpAbp.Abp.Consul
             _consuls = new Dictionary<string, ConsulConfiguration>()
             {
                 [ConsulNameAttribute.GetConsulName<DefaultConsul>()] = new ConsulConfiguration()
-
             };
         }
 
 
-        public ConsulConfigurations Configure<TContainer>(Action<ConsulConfiguration> configureAction)
+        public ConsulConfigurations Configure<TConsul>(Action<ConsulConfiguration> configureAction)
         {
             return Configure(
-                ConsulNameAttribute.GetConsulName<TContainer>(),
+                ConsulNameAttribute.GetConsulName<TConsul>(),
                 configureAction
             );
         }
