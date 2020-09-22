@@ -9,19 +9,19 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.CSRedisCore
 {
-    public class CSRedisClientFactory : ICSRedisClientFactory, ISingletonDependency
+    public class DefaultCSRedisClientFactory : ICSRedisClientFactory, ISingletonDependency
     {
-        private readonly object _syncObject = new object();
+        private readonly object SyncObject = new object();
         private readonly ConcurrentDictionary<string, CSRedisClient> _clientDict;
 
-        private readonly ILogger _logger;
-        private readonly ICSRedisClientConfigurationSelector _cSRedisClientConfigurationSelector;
-        private readonly ICSRedisClientBuilder _cSRedisClientBuilder;
-        public CSRedisClientFactory(ILogger<CSRedisClientFactory> logger, ICSRedisClientConfigurationSelector cSRedisClientConfigurationSelector, ICSRedisClientBuilder cSRedisClientBuilder)
+        protected ILogger Logger { get; }
+        protected ICSRedisConfigurationProvider ConfigurationSelector { get; }
+        protected ICSRedisClientBuilder ClientBuilder { get; }
+        public DefaultCSRedisClientFactory(ILogger<DefaultCSRedisClientFactory> logger, ICSRedisConfigurationProvider configurationSelector, ICSRedisClientBuilder clientBuilder)
         {
-            _logger = logger;
-            _cSRedisClientConfigurationSelector = cSRedisClientConfigurationSelector;
-            _cSRedisClientBuilder = cSRedisClientBuilder;
+            Logger = logger;
+            ConfigurationSelector = configurationSelector;
+            ClientBuilder = clientBuilder;
 
             _clientDict = new ConcurrentDictionary<string, CSRedisClient>();
         }
@@ -32,30 +32,30 @@ namespace SharpAbp.Abp.CSRedisCore
         /// <param name="name">name</param>
         /// <returns></returns>
         [NotNull]
-        public virtual CSRedisClient Get([NotNull] string name)
+        public virtual CSRedisClient Get(string name = DefaultClient.Name)
         {
 
             if (!_clientDict.TryGetValue(name, out CSRedisClient client))
             {
-                var configuration = _cSRedisClientConfigurationSelector.Get(name);
+                var configuration = ConfigurationSelector.Get(name);
                 if (configuration == null)
                 {
                     throw new AbpException($"Could not find configuration by name '{name}'");
                 }
 
-                lock (_syncObject)
+                lock (SyncObject)
                 {
                     //Still can't find client
-                    if (_clientDict.TryGetValue(name, out client))
+                    if (!_clientDict.TryGetValue(name, out client))
                     {
-                        client = _cSRedisClientBuilder.CreateClient(configuration);
+                        client = ClientBuilder.CreateClient(configuration);
                         if (_clientDict.TryAdd(name, client))
                         {
-                            _logger.LogInformation("Create and add csredis client '{0}',ConnectionString:'{1}',Mode:'{2}'.", name, configuration.ConnectionString, configuration.Mode);
+                            Logger.LogInformation("Create and add csredis client '{0}',ConnectionString:'{1}',Mode:'{2}'.", name, configuration.ConnectionString, configuration.Mode);
                         }
                         else
                         {
-                            _logger.LogWarning("Add client to dict fail! client name:{0}", name);
+                            Logger.LogWarning("Add client to dict fail! client name:{0}", name);
                         }
                     }
                 }
@@ -64,11 +64,12 @@ namespace SharpAbp.Abp.CSRedisCore
             return client;
         }
 
+
         /// <summary>
         /// Get all csredis client
         /// </summary>
         /// <returns></returns>
-        public List<CSRedisClient> GetAllClients()
+        public List<CSRedisClient> GetAll()
         {
             return _clientDict.Values.ToList();
         }
