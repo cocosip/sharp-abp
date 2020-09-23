@@ -11,7 +11,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Description>SharpAbp Caching CSRedisCore module</Description>
+    <Description>SharpAbp Caching CSRedisCore Module</Description>
     <RootNamespace />
   </PropertyGroup>
 

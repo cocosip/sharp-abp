@@ -11,7 +11,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Description>SharpAbp FastDFS SuperSocket module</Description>
+    <Description>SharpAbp FastDFS SuperSocket Module</Description>
     <RootNamespace />
   </PropertyGroup>
 

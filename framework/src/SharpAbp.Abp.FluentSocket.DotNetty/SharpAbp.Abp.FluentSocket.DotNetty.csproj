@@ -11,7 +11,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Description>SharpAbp FluentSocket DotNetty module</Description>
+    <Description>SharpAbp FluentSocket DotNetty Module</Description>
     <RootNamespace />
   </PropertyGroup>
 

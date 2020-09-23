@@ -11,10 +11,9 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Description>SharpAbp DotCommon module</Description>
+    <Description>SharpAbp DotCommon Module</Description>
     <RootNamespace />
   </PropertyGroup>
-
 
   <ItemGroup>
     <PackageReference Include="DotCommon" Version="4.0.8" />

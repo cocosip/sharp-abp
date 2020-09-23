@@ -4,20 +4,19 @@
   <Import Project="..\..\..\configureawait.props" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <AssemblyName>SharpAbp.Abp.FoDicom</AssemblyName>
-    <PackageId>SharpAbp.Abp.FoDicom</PackageId>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>SharpAbp.Abp.Micro</AssemblyName>
+    <PackageId>SharpAbp.Abp.Micro</PackageId>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Description>SharpAbp fo-dicom Module</Description>
+    <Description>SharpAbp Micro Service Module</Description>
     <RootNamespace />
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Volo.Abp" Version="3.1.2" />
-    <PackageReference Include="fo-dicom" Version="5.0.0-alpha2" />
   </ItemGroup>
 
 </Project>
