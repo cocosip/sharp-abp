@@ -13,8 +13,8 @@ namespace SharpAbp.Abp.Consul
 
         public TimeSpan? WaitTime { get; set; }
 
-        public HttpClient ClientOverride { get; set; }
+        public Action<HttpClient> ClientOverride { get; set; }
 
-        public HttpClientHandler HandlerOverride { get; set; }
+        public Action<HttpClientHandler> HandlerOverride { get; set; }
     }
 }

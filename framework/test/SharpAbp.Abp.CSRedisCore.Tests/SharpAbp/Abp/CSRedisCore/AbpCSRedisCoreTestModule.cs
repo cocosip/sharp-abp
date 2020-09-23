@@ -15,9 +15,6 @@ namespace SharpAbp.Abp.CSRedisCore
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            //context.Services.AddTransient<IFileProvider, FakeFileProvider1>();
-            //context.Services.AddTransient<IFileProvider, FakeFileProvider2>();
-
             Configure<AbpCSRedisOptions>(options =>
             {
                 options.Clients
