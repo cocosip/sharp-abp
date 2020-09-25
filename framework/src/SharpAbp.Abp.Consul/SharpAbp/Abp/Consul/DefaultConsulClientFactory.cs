@@ -27,7 +27,7 @@ namespace SharpAbp.Abp.Consul
 
 
         /// <summary>
-        /// Get csredis client by name
+        /// Get consul client by name
         /// </summary>
         /// <param name="name">name</param>
         /// <returns></returns>

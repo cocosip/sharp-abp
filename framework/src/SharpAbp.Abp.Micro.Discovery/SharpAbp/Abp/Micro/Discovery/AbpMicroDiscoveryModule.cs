@@ -12,9 +12,11 @@ namespace SharpAbp.Abp.Micro.ServiceDiscovery
         {
             Configure<AbpMicroDiscoveryOptions>(c =>
             {
-                c.DiscoveryProviders.Configure("", t => typeof(int));
+                c.DiscoveryServices.ConfigureDefault(d =>
+                {
+                    
+                });
             });
-
         }
     }
 }
