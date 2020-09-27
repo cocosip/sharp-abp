@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 
-namespace SharpAbp.Abp.Micro
+namespace SharpAbp.Abp.Micro.Discovery.AddressTable
 {
-    public class MicroService
+    public class AddressTableServiceEntry
     {
-        public string ID { get; set; }
-
         public string Service { get; set; }
 
         public string Address { get; set; }
@@ -16,10 +14,12 @@ namespace SharpAbp.Abp.Micro
 
         public Dictionary<string, string> Meta { get; set; }
 
-        public MicroService()
+        public AddressTableServiceEntry()
         {
             Tags = new List<string>();
             Meta = new Dictionary<string, string>();
         }
     }
+
+
 }

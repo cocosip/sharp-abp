@@ -22,11 +22,10 @@ namespace SharpAbp.Abp.Micro.Discovery
         /// <summary>
         /// Get service entry list by service name and tags
         /// </summary>
-        /// <param name="service">Service name</param>
-        /// <param name="tags">Tags</param>
+        /// <param name="tag">Tag</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<List<MicroService>> GetAsync(string service, List<string> tags = default, CancellationToken cancellationToken = default);
+        Task<List<MicroService>> GetAsync(string tag = "", CancellationToken cancellationToken = default);
 
     }
 }

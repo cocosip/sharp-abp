@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using System.Threading;
+using Volo.Abp;
 
 namespace SharpAbp.Abp.Micro.Discovery
 {
@@ -15,6 +16,8 @@ namespace SharpAbp.Abp.Micro.Discovery
 
         public ServiceDiscoveryProviderArgs([NotNull] string service, [NotNull] DiscoveryConfiguration configuration, CancellationToken cancellationToken = default)
         {
+            Check.NotNullOrWhiteSpace(service, nameof(service));
+
             Service = service;
             Configuration = configuration;
             CancellationToken = cancellationToken;

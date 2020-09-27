@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
 
-namespace SharpAbp.Abp.Micro.Discovery
+namespace SharpAbp.Abp.Micro.Discovery.AddressTable
 {
-    public class ConfigurationServiceDiscoveryProvider : IServiceDiscoveryProvider, ITransientDependency
+    public class AddressTableServiceDiscoveryProvider : IServiceDiscoveryProvider, ITransientDependency
     {
 
 

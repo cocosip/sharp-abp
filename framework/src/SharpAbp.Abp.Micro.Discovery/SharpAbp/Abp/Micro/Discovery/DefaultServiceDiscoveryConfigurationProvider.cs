@@ -14,7 +14,7 @@ namespace SharpAbp.Abp.Micro.Discovery
 
         public virtual DiscoveryConfiguration Get(string name)
         {
-            return Options.DiscoveryServices.GetConfiguration(name);
+            return Options.Discoverers.GetConfiguration(name);
         }
 
 

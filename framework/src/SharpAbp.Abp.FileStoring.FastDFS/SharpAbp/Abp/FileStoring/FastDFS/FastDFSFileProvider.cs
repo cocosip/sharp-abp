@@ -139,13 +139,14 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
         {
             if (configuration.AntiStealCheckToken)
             {
-                return $"{configuration.HttpServer.TrimEnd('/')}/{containerName}/{fileId}";
+
+                return $"{configuration.HttpServer.EnsureEndsWith('/')}/{containerName}/{fileId}";
             }
             else
             {
                 var timestamp = ToInt32(Clock.Now);
                 var token = Client.GetToken(fileId, timestamp, configuration.ClusterName);
-                return $"{configuration.HttpServer.TrimEnd('/')}/{containerName}/{fileId}?token={token}&ts={timestamp}";
+                return $"{configuration.HttpServer.EnsureEndsWith('/')}/{containerName}/{fileId}?token={token}&ts={timestamp}";
             }
         }
 

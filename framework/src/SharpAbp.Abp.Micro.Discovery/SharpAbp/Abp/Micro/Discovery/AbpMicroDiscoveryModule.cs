@@ -1,7 +1,7 @@
-﻿using SharpAbp.Abp.Micro.Discovery;
+﻿using SharpAbp.Abp.Micro.Discovery.AddressTable;
 using Volo.Abp.Modularity;
 
-namespace SharpAbp.Abp.Micro.ServiceDiscovery
+namespace SharpAbp.Abp.Micro.Discovery
 {
     [DependsOn(
         typeof(AbpMicroModule)
@@ -10,13 +10,9 @@ namespace SharpAbp.Abp.Micro.ServiceDiscovery
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            Configure<AbpMicroDiscoveryOptions>(c =>
-            {
-                c.DiscoveryServices.ConfigureDefault(d =>
-                {
-                    
-                });
-            });
+            Configure<AbpMicroDiscoveryOptions>(c => { });
+
+            //Configure<AddressTableDiscoveryOptions>(c => { });
         }
     }
 }

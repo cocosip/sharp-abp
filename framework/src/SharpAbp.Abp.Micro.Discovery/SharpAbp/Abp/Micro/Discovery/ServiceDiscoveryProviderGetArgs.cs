@@ -1,16 +1,15 @@
 ﻿using JetBrains.Annotations;
-using System.Collections.Generic;
 using System.Threading;
 
 namespace SharpAbp.Abp.Micro.Discovery
 {
     public class ServiceDiscoveryProviderGetArgs : ServiceDiscoveryProviderArgs
     {
-        public List<string> Tags { get; }
+        public string Tag { get; set; }
 
-        public ServiceDiscoveryProviderGetArgs([NotNull] string service, [NotNull] DiscoveryConfiguration configuration, List<string> tags = default, CancellationToken cancellationToken = default) : base(service, configuration, cancellationToken)
+        public ServiceDiscoveryProviderGetArgs([NotNull] string service, [NotNull] DiscoveryConfiguration configuration, string tag = "", CancellationToken cancellationToken = default) : base(service, configuration, cancellationToken)
         {
-            Tags = tags;
+            Tag = tag;
         }
     }
 }

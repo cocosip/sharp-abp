@@ -21,11 +21,11 @@ namespace SharpAbp.Abp.Micro.Discovery
         }
 
 
-        public DiscoveryConfigurations Configure<TContainer>(
+        public DiscoveryConfigurations Configure<T>(
           Action<DiscoveryConfiguration> configureAction)
         {
             return Configure(
-                ServiceNameAttribute.GetServiceName<TContainer>(),
+                ServiceNameAttribute.GetServiceName<T>(),
                 configureAction
             );
         }
@@ -64,9 +64,9 @@ namespace SharpAbp.Abp.Micro.Discovery
         }
 
         [NotNull]
-        public DiscoveryConfiguration GetConfiguration<TContainer>()
+        public DiscoveryConfiguration GetConfiguration<T>()
         {
-            return GetConfiguration(ServiceNameAttribute.GetServiceName<TContainer>());
+            return GetConfiguration(ServiceNameAttribute.GetServiceName<T>());
         }
 
         [NotNull]

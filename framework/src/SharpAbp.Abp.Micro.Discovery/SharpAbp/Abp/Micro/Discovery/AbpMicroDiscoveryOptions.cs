@@ -2,11 +2,11 @@
 {
     public class AbpMicroDiscoveryOptions
     {
-        public DiscoveryConfigurations DiscoveryServices { get; }
+        public DiscoveryConfigurations Discoverers { get; }
 
         public AbpMicroDiscoveryOptions()
         {
-            DiscoveryServices = new DiscoveryConfigurations();
+            Discoverers = new DiscoveryConfigurations();
         }
 
     }
