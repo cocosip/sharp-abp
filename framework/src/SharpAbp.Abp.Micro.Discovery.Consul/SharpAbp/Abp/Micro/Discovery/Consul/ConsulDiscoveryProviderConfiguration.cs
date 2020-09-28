@@ -15,6 +15,16 @@ namespace SharpAbp.Abp.Micro.Discovery.Consul
             set => _discoveryConfiguration.SetConfiguration(ConsulDiscoveryProviderConfigurationNames.ConsulName, value.IsNullOrWhiteSpace() ? DefaultConsul.Name : value);
         }
 
+        /// <summary>
+        ///  Expired seconds
+        /// </summary>
+        public int ExpiredSeconds
+        {
+            get => _discoveryConfiguration.GetConfigurationOrDefault(ConsulDiscoveryProviderConfigurationNames.ExpiredSeconds, 30);
+            set => _discoveryConfiguration.SetConfiguration(ConsulDiscoveryProviderConfigurationNames.ExpiredSeconds, value);
+        }
+
+
         private readonly DiscoveryConfiguration _discoveryConfiguration;
 
         public ConsulDiscoveryProviderConfiguration(DiscoveryConfiguration discoveryConfiguration)
