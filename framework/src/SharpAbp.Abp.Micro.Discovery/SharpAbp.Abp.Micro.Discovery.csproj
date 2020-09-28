@@ -19,4 +19,10 @@
     <ProjectReference Include="..\SharpAbp.Abp.Micro\SharpAbp.Abp.Micro.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="SharpAbp\Abp\Micro\Discovery\AddressTable\address-table.sample.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

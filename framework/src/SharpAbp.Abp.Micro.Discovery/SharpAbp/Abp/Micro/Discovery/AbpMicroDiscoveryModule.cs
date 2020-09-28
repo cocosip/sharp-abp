@@ -11,8 +11,8 @@ namespace SharpAbp.Abp.Micro.Discovery
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             Configure<AbpMicroDiscoveryOptions>(c => { });
+            Configure<AddressTableDiscoveryOptions>(c => { });
 
-            //Configure<AddressTableDiscoveryOptions>(c => { });
         }
     }
 }

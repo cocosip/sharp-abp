@@ -4,7 +4,7 @@ namespace SharpAbp.Abp.Micro
 {
     public class MicroService
     {
-        public string ID { get; set; }
+        public string Id { get; set; }
 
         public string Service { get; set; }
 
@@ -20,6 +20,14 @@ namespace SharpAbp.Abp.Micro
         {
             Tags = new List<string>();
             Meta = new Dictionary<string, string>();
+        }
+
+        public MicroService(string id, string service, string address, int port) : this()
+        {
+            Id = id;
+            Service = service;
+            Address = address;
+            Port = port;
         }
     }
 }
