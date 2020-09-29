@@ -5,24 +5,24 @@ using Volo.Abp;
 
 namespace SharpAbp.Abp.Micro.Discovery
 {
-    public class DiscoveryConfigurations
+    public class ServiceDiscoveryConfigurations
     {
-        private DiscoveryConfiguration Default => GetConfiguration<DefaultDiscovery>();
+        private ServiceDiscoveryConfiguration Default => GetConfiguration<DefaultDiscovery>();
 
-        private readonly Dictionary<string, DiscoveryConfiguration> _discoveryServices;
+        private readonly Dictionary<string, ServiceDiscoveryConfiguration> _discoveryServices;
 
-        public DiscoveryConfigurations()
+        public ServiceDiscoveryConfigurations()
         {
-            _discoveryServices = new Dictionary<string, DiscoveryConfiguration>
+            _discoveryServices = new Dictionary<string, ServiceDiscoveryConfiguration>
             {
                 //Add default service
-                [ServiceNameAttribute.GetServiceName<DefaultDiscovery>()] = new DiscoveryConfiguration()
+                [ServiceNameAttribute.GetServiceName<DefaultDiscovery>()] = new ServiceDiscoveryConfiguration()
             };
         }
 
 
-        public DiscoveryConfigurations Configure<T>(
-          Action<DiscoveryConfiguration> configureAction)
+        public ServiceDiscoveryConfigurations Configure<T>(
+          Action<ServiceDiscoveryConfiguration> configureAction)
         {
             return Configure(
                 ServiceNameAttribute.GetServiceName<T>(),
@@ -30,9 +30,9 @@ namespace SharpAbp.Abp.Micro.Discovery
             );
         }
 
-        public DiscoveryConfigurations Configure(
+        public ServiceDiscoveryConfigurations Configure(
            [NotNull] string name,
-           [NotNull] Action<DiscoveryConfiguration> configureAction)
+           [NotNull] Action<ServiceDiscoveryConfiguration> configureAction)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
             Check.NotNull(configureAction, nameof(configureAction));
@@ -40,20 +40,20 @@ namespace SharpAbp.Abp.Micro.Discovery
             configureAction(
                 _discoveryServices.GetOrAdd(
                     name,
-                    () => new DiscoveryConfiguration(Default)
+                    () => new ServiceDiscoveryConfiguration(Default)
                 )
             );
 
             return this;
         }
 
-        public DiscoveryConfigurations ConfigureDefault(Action<DiscoveryConfiguration> configureAction)
+        public ServiceDiscoveryConfigurations ConfigureDefault(Action<ServiceDiscoveryConfiguration> configureAction)
         {
             configureAction(Default);
             return this;
         }
 
-        public DiscoveryConfigurations ConfigureAll(Action<string, DiscoveryConfiguration> configureAction)
+        public ServiceDiscoveryConfigurations ConfigureAll(Action<string, ServiceDiscoveryConfiguration> configureAction)
         {
             foreach (var discoveryService in _discoveryServices)
             {
@@ -64,13 +64,13 @@ namespace SharpAbp.Abp.Micro.Discovery
         }
 
         [NotNull]
-        public DiscoveryConfiguration GetConfiguration<T>()
+        public ServiceDiscoveryConfiguration GetConfiguration<T>()
         {
             return GetConfiguration(ServiceNameAttribute.GetServiceName<T>());
         }
 
         [NotNull]
-        public DiscoveryConfiguration GetConfiguration([NotNull] string name)
+        public ServiceDiscoveryConfiguration GetConfiguration([NotNull] string name)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
 

@@ -14,7 +14,7 @@ namespace SharpAbp.Abp.Micro.Discovery
             _discoverer = serviceDiscoveryFactory.Create<T>();
         }
 
-        public DiscoveryConfiguration GetConfiguration()
+        public ServiceDiscoveryConfiguration GetConfiguration()
         {
             return _discoverer.GetConfiguration();
         }
@@ -31,7 +31,7 @@ namespace SharpAbp.Abp.Micro.Discovery
     {
         protected string Service { get; }
 
-        protected DiscoveryConfiguration Configuration { get; }
+        protected ServiceDiscoveryConfiguration Configuration { get; }
 
         protected IServiceDiscoveryProvider Provider { get; }
 
@@ -39,7 +39,7 @@ namespace SharpAbp.Abp.Micro.Discovery
 
         public ServiceDiscoverer(
             string service,
-            DiscoveryConfiguration configuration,
+            ServiceDiscoveryConfiguration configuration,
             IServiceDiscoveryProvider provider,
             ICancellationTokenProvider cancellationTokenProvider)
         {
@@ -49,7 +49,7 @@ namespace SharpAbp.Abp.Micro.Discovery
             CancellationTokenProvider = cancellationTokenProvider;
         }
 
-        public DiscoveryConfiguration GetConfiguration()
+        public ServiceDiscoveryConfiguration GetConfiguration()
         {
             return Configuration;
         }

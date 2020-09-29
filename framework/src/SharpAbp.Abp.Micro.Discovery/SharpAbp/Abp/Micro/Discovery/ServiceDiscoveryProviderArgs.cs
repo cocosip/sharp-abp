@@ -10,11 +10,11 @@ namespace SharpAbp.Abp.Micro.Discovery
         public string Service { get; }
 
         [NotNull]
-        public DiscoveryConfiguration Configuration { get; }
+        public ServiceDiscoveryConfiguration Configuration { get; }
 
         public CancellationToken CancellationToken { get; }
 
-        public ServiceDiscoveryProviderArgs([NotNull] string service, [NotNull] DiscoveryConfiguration configuration, CancellationToken cancellationToken = default)
+        public ServiceDiscoveryProviderArgs([NotNull] string service, [NotNull] ServiceDiscoveryConfiguration configuration, CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(service, nameof(service));
 

@@ -2,6 +2,6 @@
 {
     public interface IServiceDiscoveryConfigurationProvider
     {
-        DiscoveryConfiguration Get(string name);
+        ServiceDiscoveryConfiguration Get(string name);
     }
 }

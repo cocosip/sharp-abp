@@ -12,9 +12,9 @@
         }
 
 
-        private readonly DiscoveryConfiguration _discoveryConfiguration;
+        private readonly ServiceDiscoveryConfiguration _discoveryConfiguration;
 
-        public AddressTableDiscoveryProviderConfiguration(DiscoveryConfiguration discoveryConfiguration)
+        public AddressTableDiscoveryProviderConfiguration(ServiceDiscoveryConfiguration discoveryConfiguration)
         {
             _discoveryConfiguration = discoveryConfiguration;
         }

@@ -24,9 +24,9 @@ namespace SharpAbp.Abp.Micro.Discovery.Consul
         }
 
 
-        private readonly DiscoveryConfiguration _discoveryConfiguration;
+        private readonly ServiceDiscoveryConfiguration _discoveryConfiguration;
 
-        public ConsulDiscoveryProviderConfiguration(DiscoveryConfiguration discoveryConfiguration)
+        public ConsulDiscoveryProviderConfiguration(ServiceDiscoveryConfiguration discoveryConfiguration)
         {
             _discoveryConfiguration = discoveryConfiguration;
         }

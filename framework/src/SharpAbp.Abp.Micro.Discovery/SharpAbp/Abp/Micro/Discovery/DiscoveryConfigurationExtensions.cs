@@ -6,14 +6,14 @@ namespace SharpAbp.Abp.Micro.Discovery
     public static class DiscoveryConfigurationExtensions
     {
         public static T GetConfiguration<T>(
-           [NotNull] this DiscoveryConfiguration discoveryConfiguration,
+           [NotNull] this ServiceDiscoveryConfiguration discoveryConfiguration,
            [NotNull] string name)
         {
             return (T)discoveryConfiguration.GetConfiguration(name);
         }
 
         public static object GetConfiguration(
-            [NotNull] this DiscoveryConfiguration discoveryConfiguration,
+            [NotNull] this ServiceDiscoveryConfiguration discoveryConfiguration,
             [NotNull] string name)
         {
             var value = discoveryConfiguration.GetConfigurationOrNull(name);

@@ -8,7 +8,7 @@ namespace SharpAbp.Abp.Micro.Discovery
     {
         public List<string> Tags { get; set; }
 
-        public ServiceDiscoveryProviderGetArgs([NotNull] string service, [NotNull] DiscoveryConfiguration configuration, List<string> tags, CancellationToken cancellationToken = default) : base(service, configuration, cancellationToken)
+        public ServiceDiscoveryProviderGetArgs([NotNull] string service, [NotNull] ServiceDiscoveryConfiguration configuration, List<string> tags, CancellationToken cancellationToken = default) : base(service, configuration, cancellationToken)
         {
             Tags = tags;
         }

@@ -5,13 +5,13 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
     public static class AddressTableDiscoveryProviderConfigurationExtensions
     {
         public static AddressTableDiscoveryProviderConfiguration GetAddressTableDiscoveryConfiguration(
-       this DiscoveryConfiguration discoveryConfiguration)
+       this ServiceDiscoveryConfiguration discoveryConfiguration)
         {
             return new AddressTableDiscoveryProviderConfiguration(discoveryConfiguration);
         }
 
-        public static DiscoveryConfiguration UseAddressTableDiscovery(
-            this DiscoveryConfiguration containerConfiguration,
+        public static ServiceDiscoveryConfiguration UseAddressTableDiscovery(
+            this ServiceDiscoveryConfiguration containerConfiguration,
             Action<AddressTableDiscoveryProviderConfiguration> addressTableConfigureAction)
         {
             containerConfiguration.ProviderType = typeof(AddressTableServiceDiscoveryProvider);

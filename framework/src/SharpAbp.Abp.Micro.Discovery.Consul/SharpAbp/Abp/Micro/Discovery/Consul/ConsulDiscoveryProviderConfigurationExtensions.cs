@@ -6,13 +6,13 @@ namespace SharpAbp.Abp.Micro.Discovery.Consul
     {
 
         public static ConsulDiscoveryProviderConfiguration GetConsulDiscoveryConfiguration(
-         this DiscoveryConfiguration discoveryConfiguration)
+         this ServiceDiscoveryConfiguration discoveryConfiguration)
         {
             return new ConsulDiscoveryProviderConfiguration(discoveryConfiguration);
         }
 
-        public static DiscoveryConfiguration UseConsulDiscovery(
-            this DiscoveryConfiguration containerConfiguration,
+        public static ServiceDiscoveryConfiguration UseConsulDiscovery(
+            this ServiceDiscoveryConfiguration containerConfiguration,
             Action<ConsulDiscoveryProviderConfiguration> consulConfigureAction)
         {
             //containerConfiguration.ProviderType = typeof(ConsulServiceDiscoveryProvider);

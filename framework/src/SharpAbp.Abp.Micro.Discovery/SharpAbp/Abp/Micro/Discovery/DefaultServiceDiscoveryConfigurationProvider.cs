@@ -12,9 +12,9 @@ namespace SharpAbp.Abp.Micro.Discovery
             Options = options.Value;
         }
 
-        public virtual DiscoveryConfiguration Get(string name)
+        public virtual ServiceDiscoveryConfiguration Get(string name)
         {
-            return Options.Discoverers.GetConfiguration(name);
+            return Options.Configurations.GetConfiguration(name);
         }
 
 

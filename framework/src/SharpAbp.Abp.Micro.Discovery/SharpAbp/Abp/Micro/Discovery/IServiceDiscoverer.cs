@@ -17,7 +17,7 @@ namespace SharpAbp.Abp.Micro.Discovery
         /// Get current discoverer configuration
         /// </summary>
         /// <returns></returns>
-        DiscoveryConfiguration GetConfiguration();
+        ServiceDiscoveryConfiguration GetConfiguration();
 
         /// <summary>
         /// Get service entry list by service name and tags

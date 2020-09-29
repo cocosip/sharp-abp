@@ -18,7 +18,7 @@ namespace SharpAbp.Abp.Micro.Discovery
         {
             Configure<AbpMicroDiscoveryOptions>(options =>
             {
-                options.Discoverers
+                options.Configurations
                     .ConfigureDefault(s => s.UseAddressTableDiscovery(t =>
                     {
                         t.OverrideException = true;

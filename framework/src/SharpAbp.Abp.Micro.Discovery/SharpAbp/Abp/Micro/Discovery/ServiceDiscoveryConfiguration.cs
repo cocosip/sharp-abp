@@ -5,7 +5,7 @@ using Volo.Abp;
 
 namespace SharpAbp.Abp.Micro.Discovery
 {
-    public class DiscoveryConfiguration
+    public class ServiceDiscoveryConfiguration
     {
         /// <summary>
         /// The provider to be used to service discovery
@@ -15,9 +15,9 @@ namespace SharpAbp.Abp.Micro.Discovery
         [NotNull]
         private readonly Dictionary<string, object> _properties;
 
-        private readonly DiscoveryConfiguration _fallbackConfiguration;
+        private readonly ServiceDiscoveryConfiguration _fallbackConfiguration;
 
-        public DiscoveryConfiguration(DiscoveryConfiguration fallbackConfiguration = null)
+        public ServiceDiscoveryConfiguration(ServiceDiscoveryConfiguration fallbackConfiguration = null)
         {
             _fallbackConfiguration = fallbackConfiguration;
             _properties = new Dictionary<string, object>();
@@ -40,7 +40,7 @@ namespace SharpAbp.Abp.Micro.Discovery
 
 
         [NotNull]
-        public DiscoveryConfiguration SetConfiguration([NotNull] string name, [CanBeNull] object value)
+        public ServiceDiscoveryConfiguration SetConfiguration([NotNull] string name, [CanBeNull] object value)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
             Check.NotNull(value, nameof(value));
@@ -51,7 +51,7 @@ namespace SharpAbp.Abp.Micro.Discovery
         }
 
         [NotNull]
-        public DiscoveryConfiguration ClearConfiguration([NotNull] string name)
+        public ServiceDiscoveryConfiguration ClearConfiguration([NotNull] string name)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
 
