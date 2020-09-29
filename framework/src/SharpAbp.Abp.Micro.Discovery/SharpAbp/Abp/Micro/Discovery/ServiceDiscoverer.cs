@@ -19,9 +19,9 @@ namespace SharpAbp.Abp.Micro.Discovery
             return _discoverer.GetConfiguration();
         }
 
-        public Task<List<MicroService>> GetAsync(string tag = "", CancellationToken cancellationToken = default)
+        public Task<List<MicroService>> GetAsync(List<string> tags = default, CancellationToken cancellationToken = default)
         {
-            return _discoverer.GetAsync(tag, cancellationToken);
+            return _discoverer.GetAsync(tags, cancellationToken);
         }
 
     }
@@ -54,13 +54,13 @@ namespace SharpAbp.Abp.Micro.Discovery
             return Configuration;
         }
 
-        public virtual async Task<List<MicroService>> GetAsync(string tag = "", CancellationToken cancellationToken = default)
+        public virtual async Task<List<MicroService>> GetAsync(List<string> tags = default, CancellationToken cancellationToken = default)
         {
             return await Provider.GetAsync(
                 new ServiceDiscoveryProviderGetArgs(
                     Service,
                     Configuration,
-                    tag,
+                    tags,
                     cancellationToken)
                 );
         }

@@ -47,7 +47,7 @@ namespace SharpAbp.Abp.Micro.Discovery
 
             Assert.Equal(2, microServices.Count);
 
-            var microService1 = microServices.FirstOrDefault(x => x.Id == "1");
+            var microService1 = microServices.FirstOrDefault(x => x.ID == "1");
             Assert.NotNull(microService1);
 
             Assert.Equal("192.168.0.100", microService1.Address);

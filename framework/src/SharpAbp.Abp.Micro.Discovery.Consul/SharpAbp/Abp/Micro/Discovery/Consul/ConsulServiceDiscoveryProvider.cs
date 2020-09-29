@@ -31,7 +31,7 @@ namespace SharpAbp.Abp.Micro.Discovery.Consul
             var microServiceCacheItem = await Cache.GetAsync(key);
             if (microServiceCacheItem == null)
             {
-
+                var client = GetConsulClient(args.Configuration);
             }
 
             throw new NotImplementedException();

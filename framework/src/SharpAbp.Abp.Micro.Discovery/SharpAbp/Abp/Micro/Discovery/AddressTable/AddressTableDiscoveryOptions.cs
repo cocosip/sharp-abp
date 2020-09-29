@@ -27,6 +27,7 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
                     {
                         c.Entries.Add(new AddressTableServiceEntry()
                         {
+                            Id = entry.Id,
                             Address = entry.Address,
                             Port = entry.Port,
                             Tags = entry.Tags,

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp;
@@ -23,10 +22,8 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
 
             if (addressTableService != null)
             {
-                var entries = addressTableService.Entries
-                    .WhereIf(!args.Tag.IsNullOrWhiteSpace(), x => TagMatch(args.Tag, x.Tags))
-                    .ToList();
-                if (entries.Any())
+                var entries = FilterByTags(addressTableService.Entries, args.Tags);
+                if (entries != null && entries.Any())
                 {
                     var microServices = entries
                         .Select(x => x.ToMicroService(args.Service))
@@ -38,9 +35,18 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
         }
 
 
-        protected virtual bool TagMatch(string tag, List<string> tags)
+        protected virtual List<AddressTableServiceEntry> FilterByTags(List<AddressTableServiceEntry> entries, List<string> tags)
         {
-            return tags.Any(x => tag.Equals(x, StringComparison.OrdinalIgnoreCase));
+            if (tags == null || !tags.Any())
+            {
+                return entries;
+            }
+
+            if (entries.Any())
+            {
+                return entries.Where(x => tags.All(x.Tags.Contains)).ToList();
+            }
+            return new List<AddressTableServiceEntry>();
         }
 
     }

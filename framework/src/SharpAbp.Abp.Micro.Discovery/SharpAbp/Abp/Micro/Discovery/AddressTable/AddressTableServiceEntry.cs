@@ -47,7 +47,7 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
         {
             var microService = new MicroService()
             {
-                Id = Id,
+                ID = Id,
                 Service = service,
                 Address = Address,
                 Port = Port,

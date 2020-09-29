@@ -2,6 +2,7 @@
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
+using System.Threading;
 using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 
@@ -46,7 +47,7 @@ namespace SharpAbp.Abp.Consul
 
                 lock (SyncObject)
                 {
-                    //Still can't find client
+                    //can't find any client
                     if (!_clientDict.TryGetValue(name, out client))
                     {
                         client = ConsulClientBuilder.CreateClient(configuration);

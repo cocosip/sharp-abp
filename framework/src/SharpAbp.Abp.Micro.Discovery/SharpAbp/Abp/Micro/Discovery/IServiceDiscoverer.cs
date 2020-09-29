@@ -25,7 +25,7 @@ namespace SharpAbp.Abp.Micro.Discovery
         /// <param name="tag">Tag</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<List<MicroService>> GetAsync(string tag = "", CancellationToken cancellationToken = default);
+        Task<List<MicroService>> GetAsync(List<string> tags = default, CancellationToken cancellationToken = default);
 
     }
 }

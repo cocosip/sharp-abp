@@ -15,7 +15,7 @@ namespace SharpAbp.Abp.Micro.Discovery
         [NotNull]
         private readonly Dictionary<string, object> _properties;
 
-        public DiscoveryConfiguration _fallbackConfiguration;
+        private readonly DiscoveryConfiguration _fallbackConfiguration;
 
         public DiscoveryConfiguration(DiscoveryConfiguration fallbackConfiguration = null)
         {

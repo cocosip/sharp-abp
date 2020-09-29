@@ -33,6 +33,7 @@ namespace SharpAbp.Abp.Micro.Discovery
             {
                 options.Configure("service1", s =>
                 {
+                    s.Service = "service1";
                     s.Entries = new List<AddressTableServiceEntry>()
                     {
                         new AddressTableServiceEntry("1","192.168.0.100",10000),
