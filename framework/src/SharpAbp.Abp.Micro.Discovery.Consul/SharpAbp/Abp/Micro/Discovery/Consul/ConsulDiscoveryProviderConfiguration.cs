@@ -1,5 +1,4 @@
-﻿using SharpAbp.Abp.Consul;
-using System;
+﻿using System;
 
 namespace SharpAbp.Abp.Micro.Discovery.Consul
 {
@@ -12,7 +11,7 @@ namespace SharpAbp.Abp.Micro.Discovery.Consul
         public string ConsulName
         {
             get => _discoveryConfiguration.GetConfiguration<string>(ConsulDiscoveryProviderConfigurationNames.ConsulName);
-            set => _discoveryConfiguration.SetConfiguration(ConsulDiscoveryProviderConfigurationNames.ConsulName, value.IsNullOrWhiteSpace() ? DefaultConsul.Name : value);
+            set => _discoveryConfiguration.SetConfiguration(ConsulDiscoveryProviderConfigurationNames.ConsulName, value.IsNullOrWhiteSpace() ? "" : value);
         }
 
         /// <summary>

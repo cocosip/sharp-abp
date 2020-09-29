@@ -15,7 +15,7 @@ namespace SharpAbp.Abp.Micro.Discovery.Consul
             this DiscoveryConfiguration containerConfiguration,
             Action<ConsulDiscoveryProviderConfiguration> consulConfigureAction)
         {
-            containerConfiguration.ProviderType = typeof(ConsulServiceDiscoveryProvider);
+            //containerConfiguration.ProviderType = typeof(ConsulServiceDiscoveryProvider);
 
             consulConfigureAction(new ConsulDiscoveryProviderConfiguration(containerConfiguration));
 
