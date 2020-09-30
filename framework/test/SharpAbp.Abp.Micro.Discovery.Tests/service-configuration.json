@@ -1,0 +1,9 @@
+{
+  "ServiceDiscovery": {
+    "Services": {
+      "micro.service1": "test1",
+      "micro.service2": "test1",
+      "micro.service3": "test1"
+    }
+  }
+}

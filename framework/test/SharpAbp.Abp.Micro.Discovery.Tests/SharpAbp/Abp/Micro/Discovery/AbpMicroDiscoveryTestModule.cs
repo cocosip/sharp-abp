@@ -1,6 +1,5 @@
-﻿using SharpAbp.Abp.Micro.Discovery.AddressTable;
+﻿using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.Micro.Discovery.TestObjects;
-using System.Collections.Generic;
 using Volo.Abp;
 using Volo.Abp.Autofac;
 using Volo.Abp.Modularity;
@@ -14,33 +13,32 @@ namespace SharpAbp.Abp.Micro.Discovery
         )]
     public class AbpMicroDiscoveryTestModule : AbpModule
     {
-        public override void ConfigureServices(ServiceConfigurationContext context)
+        public override void PreConfigureServices(ServiceConfigurationContext context)
         {
             Configure<AbpMicroDiscoveryOptions>(options =>
             {
-                options.Configurations
-                    .ConfigureDefault(s => s.UseAddressTableDiscovery(t =>
-                    {
-                        t.OverrideException = true;
-                    }))
-                    .Configure<TestServiceDiscoverer1>(s => s.UseAddressTableDiscovery(t =>
-                    {
-                    }));
+                options.ProviderNameMappers.SetProvider<Test1ServiceDiscoveryProvider>("test1");
+                options.ProviderNameMappers.SetProvider<Test2ServiceDiscoveryProvider>("test2");
+                options.ProviderNameMappers.SetProvider<Test3ServiceDiscoveryProvider>("test3");
             });
+        }
 
+        public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            context.Services.AddTransient<IServiceDiscoveryProvider, Test1ServiceDiscoveryProvider>();
+            context.Services.AddTransient<IServiceDiscoveryProvider, Test2ServiceDiscoveryProvider>();
 
-            Configure<AddressTableDiscoveryOptions>(options =>
+            Configure<AbpMicroDiscoveryOptions>(options =>
             {
-                options.Configure("service1", s =>
+                options.Configurations.ConfigureDefault(c =>
                 {
-                    s.Service = "service1";
-                    s.Entries = new List<AddressTableServiceEntry>()
-                    {
-                        new AddressTableServiceEntry("1","192.168.0.100",10000),
-                        new AddressTableServiceEntry("2","192.168.0.101",10001)
-                    };
+                    c.ProviderType = typeof(Test1ServiceDiscoveryProvider);
                 });
+
+                options.Configure(context.Services.GetConfiguration().GetSection("Services"));
             });
+
+
 
         }
     }

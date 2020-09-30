@@ -25,17 +25,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\SharpAbp.Abp.Micro.Discovery\SharpAbp.Abp.Micro.Discovery.csproj" />
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.Micro.Discovery.AddressTable\SharpAbp.Abp.Micro.Discovery.AddressTable.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="service-configuration.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
- 
 
 </Project>

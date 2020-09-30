@@ -1,12 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\..\..\common.props" />
   <Import Project="..\..\..\configureawait.props" />
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>SharpAbp.Abp.Micro.Discovery</AssemblyName>
-    <PackageId>SharpAbp.Abp.Micro.Discovery</PackageId>
+    <AssemblyName>SharpAbp.Abp.Micro.Discovery.AddressTable</AssemblyName>
+    <PackageId>SharpAbp.Abp.Micro.Discovery.AddressTable</PackageId>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SharpAbp.Abp.Micro\SharpAbp.Abp.Micro.csproj" />
+    <ProjectReference Include="..\SharpAbp.Abp.Micro.Discovery\SharpAbp.Abp.Micro.Discovery.csproj" />
   </ItemGroup>
 
 </Project>
