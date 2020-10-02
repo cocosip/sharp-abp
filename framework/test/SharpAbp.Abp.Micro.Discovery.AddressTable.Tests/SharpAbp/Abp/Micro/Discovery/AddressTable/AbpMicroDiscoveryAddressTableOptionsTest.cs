@@ -7,9 +7,6 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
 {
     public class AbpMicroDiscoveryAddressTableOptionsTest
     {
-        public AbpMicroDiscoveryAddressTableOptionsTest()
-        {
-        }
 
         [Fact]
         public void Configure_Test()

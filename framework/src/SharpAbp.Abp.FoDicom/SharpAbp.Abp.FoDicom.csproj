@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp" Version="3.1.2" />
+    <PackageReference Include="Volo.Abp" Version="3.2.0" />
     <PackageReference Include="fo-dicom" Version="5.0.0-alpha2" />
   </ItemGroup>
 
