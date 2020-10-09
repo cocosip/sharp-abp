@@ -32,8 +32,9 @@ namespace SharpAbp.Abp.CSRedisCore
         /// <param name="name">name</param>
         /// <returns></returns>
         [NotNull]
-        public virtual CSRedisClient Get(string name = DefaultClient.Name)
+        public virtual CSRedisClient Get([NotNull] string name = DefaultClient.Name)
         {
+            Check.NotNullOrWhiteSpace(name, nameof(name));
 
             if (!_clientDict.TryGetValue(name, out CSRedisClient client))
             {

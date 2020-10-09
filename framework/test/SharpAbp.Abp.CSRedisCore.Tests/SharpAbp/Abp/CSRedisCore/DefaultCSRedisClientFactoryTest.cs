@@ -62,14 +62,14 @@ namespace SharpAbp.Abp.CSRedisCore
         [Fact]
         public void GetNullConfiguration_Test()
         {
-            var mockConfigurationSelector = new Mock<ICSRedisConfigurationProvider>();
+            var mockConfigurationProvider = new Mock<ICSRedisConfigurationProvider>();
 
             CSRedisConfiguration nullConfiguration = null;
-            mockConfigurationSelector.Setup(x => x.Get(It.IsAny<string>())).Returns(nullConfiguration);
+            mockConfigurationProvider.Setup(x => x.Get(It.IsAny<string>())).Returns(nullConfiguration);
 
             var mockClientBuilder = new Mock<ICSRedisClientBuilder>();
 
-            ICSRedisClientFactory redisClientFactory = new DefaultCSRedisClientFactory(_mockLogger.Object, mockConfigurationSelector.Object, mockClientBuilder.Object);
+            ICSRedisClientFactory redisClientFactory = new DefaultCSRedisClientFactory(_mockLogger.Object, mockConfigurationProvider.Object, mockClientBuilder.Object);
 
             Assert.Throws<AbpException>(() =>
             {

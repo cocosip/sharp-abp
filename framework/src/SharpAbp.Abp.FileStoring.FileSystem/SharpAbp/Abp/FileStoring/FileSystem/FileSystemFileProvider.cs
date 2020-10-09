@@ -130,7 +130,7 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
 
         protected virtual string BuildAccessUrl(FileSystemFileProviderConfiguration configuration, string fileId)
         {
-            var accessUrl = $"{configuration.HttpServer.TrimEnd('/')}/{fileId}";
+            var accessUrl = $"{configuration.HttpServer.EnsureEndsWith('/')}/{fileId}";
             return accessUrl;
         }
 

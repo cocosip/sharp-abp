@@ -11,13 +11,13 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Description>SharpAbp Caching CSRedisCore module</Description>
+    <Description>SharpAbp Caching CSRedisCore Module</Description>
     <RootNamespace />
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Caching.CSRedis" Version="3.6.5" />
-    <PackageReference Include="Volo.Abp.Caching" Version="3.1.2" />
+    <PackageReference Include="Volo.Abp.Caching" Version="3.2.1" />
   </ItemGroup>
 
   <ItemGroup>

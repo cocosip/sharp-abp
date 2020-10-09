@@ -11,14 +11,13 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Description>SharpAbp DotCommon module</Description>
+    <Description>SharpAbp DotCommon Module</Description>
     <RootNamespace />
   </PropertyGroup>
 
-
   <ItemGroup>
     <PackageReference Include="DotCommon" Version="4.0.8" />
-    <PackageReference Include="Volo.Abp" Version="3.1.2" />
+    <PackageReference Include="Volo.Abp" Version="3.2.1" />
   </ItemGroup>
 
 </Project>

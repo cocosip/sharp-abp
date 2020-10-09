@@ -12,7 +12,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Description>SharpAbp FastDFS DotNetty module</Description>
+    <Description>SharpAbp FastDFS DotNetty Module</Description>
     <RootNamespace />
   </PropertyGroup>
 

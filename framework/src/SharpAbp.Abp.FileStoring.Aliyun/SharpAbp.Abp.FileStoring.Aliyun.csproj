@@ -11,7 +11,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Description>SharpAbp FileStoring module</Description>
+    <Description>SharpAbp FileStoring Module</Description>
     <RootNamespace />
   </PropertyGroup>
 
@@ -22,7 +22,7 @@
   <ItemGroup>
     <PackageReference Include="aliyun-net-sdk-sts" Version="3.0.4" />
     <PackageReference Include="Aliyun.OSS.SDK.NetCore" Version="2.11.0" />
-    <PackageReference Include="Volo.Abp.Caching" Version="3.1.2" />
+    <PackageReference Include="Volo.Abp.Caching" Version="3.2.1" />
   </ItemGroup>
 
 </Project>

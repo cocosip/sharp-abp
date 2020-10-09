@@ -11,13 +11,13 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Description>SharpAbp CSRedisCore module</Description>
+    <Description>SharpAbp CSRedisCore Module</Description>
     <RootNamespace />
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CSRedisCore" Version="3.6.5" />
-    <PackageReference Include="Volo.Abp" Version="3.1.2" />
+    <PackageReference Include="Volo.Abp" Version="3.2.1" />
   </ItemGroup>
 
 </Project>

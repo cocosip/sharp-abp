@@ -11,13 +11,13 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Description>SharpAbp FluentSocket DotNetty module</Description>
+    <Description>SharpAbp FluentSocket DotNetty Module</Description>
     <RootNamespace />
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentSocket.DotNetty" Version="1.0.0" />
-    <PackageReference Include="Volo.Abp" Version="3.1.2" />
+    <PackageReference Include="Volo.Abp" Version="3.2.1" />
   </ItemGroup>
 
   <ItemGroup>
