@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -45,7 +46,8 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
                     {
                         Id = entry.Id,
                         Service = configuration.Service,
-                        Address = entry.Address,
+                        Scheme = entry.Scheme,
+                        Host = entry.Host,
                         Port = entry.Port,
                         Tags = entry.Tags
                     };
@@ -57,7 +59,12 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
 
         private List<MicroService> FilterByTag(List<MicroService> services, string tag)
         {
-            return services.Where(x => x.Tags.Contains(tag)).ToList();
+            if (!tag.IsNullOrWhiteSpace())
+            {
+                return services.Where(x => x.Tags.Contains(tag)).ToList();
+            }
+
+            return services;
         }
 
     }

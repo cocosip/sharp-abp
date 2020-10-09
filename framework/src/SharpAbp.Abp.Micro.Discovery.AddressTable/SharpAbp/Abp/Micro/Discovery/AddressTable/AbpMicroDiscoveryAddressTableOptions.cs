@@ -21,7 +21,7 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
                 {
                     foreach (var entry in addressTableConfiguration.Entries)
                     {
-                        addressTableConfiguration.AddIfNotContains(entry);
+                        c.AddIfNotContains(entry);
                     }
                 });
             }

@@ -8,26 +8,28 @@ namespace SharpAbp.Abp.Micro
 
         public string Service { get; set; }
 
-        public string Address { get; set; }
+        public string Scheme { get; set; }
+
+        public string Host { get; set; }
 
         public int Port { get; set; }
 
-        public List<string> Tags { get; set; }
+        public string Version { get; set; }
 
-        public Dictionary<string, string> Meta { get; set; }
+        public List<string> Tags { get; set; }
 
         public MicroService()
         {
             Tags = new List<string>();
-            Meta = new Dictionary<string, string>();
         }
 
-        public MicroService(string id, string service, string address, int port) : this()
+        public MicroService(string id, string service, string host, int port, string scheme = "") : this()
         {
             Id = id;
             Service = service;
-            Address = address;
+            Host = host;
             Port = port;
+            Scheme = scheme;
         }
     }
 }

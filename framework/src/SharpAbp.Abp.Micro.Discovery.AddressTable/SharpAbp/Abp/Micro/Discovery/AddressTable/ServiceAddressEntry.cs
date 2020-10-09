@@ -6,7 +6,9 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
     {
         public string Id { get; set; }
 
-        public string Address { get; set; }
+        public string Scheme { get; set; }
+
+        public string Host { get; set; }
 
         public int Port { get; set; }
 

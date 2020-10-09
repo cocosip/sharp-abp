@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
-
-namespace SharpAbp.Abp.Micro.Discovery.Consul
+﻿namespace SharpAbp.Abp.Micro.Discovery.Consul
 {
     public class AbpMicroDiscoveryConsulOptions
     {
@@ -15,14 +12,14 @@ namespace SharpAbp.Abp.Micro.Discovery.Consul
 
         public string Token { get; set; }
 
-        public int WaitSeconds { get; set; } = 600;
+        public int? WaitSeconds { get; set; } = 600;
+
+        public string CachePrefix { get; set; } = "default";
+
+        public int CacheExpired { get; set; } = 120;
+
+        public bool EnablePolling { get; set; } = true;
 
         public int PollingInterval { get; set; } = 60;
-
-
-        public AbpMicroDiscoveryConsulOptions Configure(IConfiguration configuration)
-        {
-            return this;
-        }
     }
 }
