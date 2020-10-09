@@ -30,16 +30,8 @@ namespace SharpAbp.Abp.Micro.Discovery
 
             Configure<AbpMicroDiscoveryOptions>(options =>
             {
-                options.Configurations.ConfigureDefault(c =>
-                {
-                    c.ProviderType = typeof(Test1ServiceDiscoveryProvider);
-                });
-
                 options.Configure(context.Services.GetConfiguration().GetSection("Services"));
             });
-
-
-
         }
     }
 }

@@ -16,10 +16,6 @@ namespace SharpAbp.Abp.Micro.Discovery
             var testProviderType = typeof(Test1ServiceDiscoveryProvider);
 
             var options = new AbpMicroDiscoveryOptions();
-            options.Configurations.ConfigureDefault(c =>
-            {
-                c.ProviderType = typeof(string);
-            });
 
             options.ProviderNameMappers.SetProvider("test1", testProviderType);
 
@@ -33,7 +29,7 @@ namespace SharpAbp.Abp.Micro.Discovery
             Assert.Equal(testProviderType, configuration1.ProviderType);
             Assert.Equal(testProviderType, configuration2.ProviderType);
             Assert.Equal(testProviderType, configuration3.ProviderType);
-            Assert.Equal(typeof(string), configuration4.ProviderType);
+            Assert.Equal(testProviderType, configuration4.ProviderType);
         }
     }
 }

@@ -7,6 +7,12 @@ namespace SharpAbp.Abp.Micro.Discovery.Consul
     )]
     public class AbpMicroDiscoveryConsulModule : AbpModule
     {
-
+        public override void PreConfigureServices(ServiceConfigurationContext context)
+        {
+            Configure<AbpMicroDiscoveryOptions>(c =>
+            {
+                c.ProviderNameMappers.SetProvider(ConsulDiscoveryProviderConfigurationNames.ProviderName, typeof(ConsulServiceDiscoveryProvider));
+            });
+        }
     }
 }

@@ -7,7 +7,7 @@ namespace SharpAbp.Abp.Micro.Discovery
     )]
     public class AbpMicroDiscoveryModule : AbpModule
     {
-        public override void ConfigureServices(ServiceConfigurationContext context)
+        public override void PreConfigureServices(ServiceConfigurationContext context)
         {
             Configure<AbpMicroDiscoveryOptions>(options => { });
         }

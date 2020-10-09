@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using Volo.Abp;
 
@@ -31,10 +32,21 @@ namespace SharpAbp.Abp.Micro.Discovery
                 {
                     throw new AbpException($"Could not find provider type mapper by provider name {kv.Value}.");
                 }
-                Configurations.Configure(kv.Key, c =>
+
+                if (kv.Key.Equals(DefaultDiscovery.Name, StringComparison.OrdinalIgnoreCase))
                 {
-                    c.ProviderType = providerType;
-                });
+                    Configurations.ConfigureDefault(c =>
+                    {
+                        c.ProviderType = providerType;
+                    });
+                }
+                else
+                {
+                    Configurations.Configure(kv.Key, c =>
+                    {
+                        c.ProviderType = providerType;
+                    });
+                }
             }
 
             return this;

@@ -23,7 +23,6 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
                     {
                         addressTableConfiguration.AddIfNotContains(entry);
                     }
-
                 });
             }
 

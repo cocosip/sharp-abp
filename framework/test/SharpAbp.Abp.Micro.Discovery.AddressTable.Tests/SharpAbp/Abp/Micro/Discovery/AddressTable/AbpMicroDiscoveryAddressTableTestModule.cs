@@ -29,15 +29,6 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
 
             Configure<AbpMicroDiscoveryOptions>(options =>
             {
-                options.Configurations.ConfigureDefault(c =>
-                {
-                    c.UseAddressTable();
-                });
-            });
-
-
-            Configure<AbpMicroDiscoveryOptions>(options =>
-            {
                 options.Configure(configuration.GetSection("Services"));
             });
 
