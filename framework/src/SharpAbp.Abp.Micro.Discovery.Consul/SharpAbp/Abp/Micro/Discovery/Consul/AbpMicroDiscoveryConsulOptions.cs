@@ -16,7 +16,7 @@
 
         public string CachePrefix { get; set; } = "default";
 
-        public int CacheExpired { get; set; } = 120;
+        public int CacheExpires { get; set; } = 120;
 
         public bool EnablePolling { get; set; } = true;
 

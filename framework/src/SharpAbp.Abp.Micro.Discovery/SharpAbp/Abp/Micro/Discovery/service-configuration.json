@@ -1,11 +1,9 @@
 {
-  "ServiceDiscovery": {
-    "DefaultProvider": "AddressTable",
-    "ServiceProviders": {
-      "micro.service1": "AddressTable",
-      "micro.service2": "Consul",
-      "micro.service3": "Consul"
-    }
+  "Services": {
+    "default": "Consul",
+    "micro.service1": "AddressTable",
+    "micro.service2": "Consul",
+    "micro.service3": "Consul"
   },
 
   "AddressTable": [
@@ -13,15 +11,17 @@
       "Service": "micro.service1",
       "Entries": [
         {
-          "Id": "micro_service1_1",
-          "Address": "192.168.0.100",
+          "Id": "1",
+          "Scheme": "http",
+          "Host": "192.168.0.100",
           "Port": 10000,
           "Tags": [ "grpc" ]
         },
         {
-          "Id": "micro_service1_2",
-          "Address": "192.168.0.101",
-          "Port": 10000,
+          "Id": "2",
+          "Scheme": "http",
+          "Host": "192.168.0.101",
+          "Port": 10001,
           "Tags": [ "grpc" ]
         }
       ]

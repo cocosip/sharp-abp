@@ -34,6 +34,17 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
 
         }
 
+        [Fact]
+        public async Task Empty_Service_Test()
+        {
+            var provider = _serviceDiscoveryProviderFactory.Get("micro.addresstable.service5");
+            Assert.Equal(typeof(AddressTableServiceDiscoveryProvider), provider.GetType());
+
+            var services = await provider.GetAsync("micro.addresstable.service5");
+            Assert.Empty(services);
+        }
+
+
 
     }
 }

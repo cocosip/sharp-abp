@@ -1,9 +1,11 @@
-﻿using Volo.Abp.Modularity;
+﻿using Volo.Abp.Caching;
+using Volo.Abp.Modularity;
 
 namespace SharpAbp.Abp.Micro.Discovery.Consul
 {
     [DependsOn(
-        typeof(AbpMicroDiscoveryModule)
+        typeof(AbpMicroDiscoveryModule),
+        typeof(AbpCachingModule)
     )]
     public class AbpMicroDiscoveryConsulModule : AbpModule
     {

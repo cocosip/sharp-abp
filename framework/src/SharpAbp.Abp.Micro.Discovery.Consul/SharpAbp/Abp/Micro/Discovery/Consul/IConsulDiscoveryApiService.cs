@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace SharpAbp.Abp.Micro.Discovery.Consul
 {
-    public interface IConsulDiscoverer
+    public interface IConsulDiscoveryApiService
     {
         Task<List<MicroService>> GetAsync([NotNull] string service, CancellationToken cancellationToken = default);
     }

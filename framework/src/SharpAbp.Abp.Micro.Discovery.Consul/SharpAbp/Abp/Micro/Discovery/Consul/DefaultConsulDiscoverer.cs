@@ -1,6 +1,6 @@
-﻿using Consul;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
 
@@ -8,33 +8,17 @@ namespace SharpAbp.Abp.Micro.Discovery.Consul
 {
     public class DefaultConsulDiscoverer : IConsulDiscoverer, ITransientDependency
     {
-        protected IConsulClient Client { get; }
+        protected IConsulDiscoveryApiService ConsulDiscoveryApiService { get; }
 
-        public DefaultConsulDiscoverer(IConsulClientFactory consulClientFactory)
+        public DefaultConsulDiscoverer(IConsulDiscoveryApiService consulDiscoveryApiService)
         {
-            Client = consulClientFactory.Get();
+            ConsulDiscoveryApiService = consulDiscoveryApiService;
         }
 
-        public virtual async Task<List<ServiceEntry>> GetAsync([NotNull] string service)
+        public virtual async Task<List<MicroService>> GetAsync([NotNull] string service, CancellationToken cancellationToken = default)
         {
-            var queryResult = await Client.Health.Service(service, string.Empty, true);
-            var services = new List<ServiceEntry>();
-
-            //foreach (var serviceEntry in queryResult.Response)
-            //{
-            //    var nodes = await Client.Catalog.Nodes();
-            //    if (nodes.Response == null)
-            //    {
-            //        services.Add(BuildService(serviceEntry, null));
-            //    }
-            //    else
-            //    {
-            //        var serviceNode = nodes.Response.FirstOrDefault(n => n.Address == serviceEntry.Service.Address);
-            //        services.Add(BuildService(serviceEntry, serviceNode));
-            //    }
-            //}
-
-            return default;
+            return await ConsulDiscoveryApiService.GetAsync(service, cancellationToken);
         }
+
     }
 }
