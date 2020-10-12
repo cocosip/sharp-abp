@@ -1,6 +1,4 @@
-﻿using JetBrains.Annotations;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -10,18 +8,16 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.Micro.Discovery.Consul
 {
-    public class ConsulServiceDiscoveryProvider : IServiceDiscoveryProvider, ITransientDependency
+    public class ConsulServiceDiscoveryProvider : IServiceDiscoveryProvider, ISingletonDependency
     {
-        protected AbpMicroDiscoveryConsulOptions Options { get; }
         protected IConsulDiscovererFactory ConsulDiscovererFactory { get; }
-        public ConsulServiceDiscoveryProvider(IOptions<AbpMicroDiscoveryConsulOptions> options, IConsulDiscovererFactory consulDiscovererFactory)
+        public ConsulServiceDiscoveryProvider(IConsulDiscovererFactory consulDiscovererFactory)
         {
-            Options = options.Value;
             ConsulDiscovererFactory = consulDiscovererFactory;
         }
 
 
-        public virtual async Task<List<MicroService>> GetAsync([NotNull] string service, string tag = "", CancellationToken cancellationToken = default)
+        public async Task<List<MicroService>> GetServices(string service, string tag = "", CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(service, nameof(service));
 
@@ -32,7 +28,6 @@ namespace SharpAbp.Abp.Micro.Discovery.Consul
             return services;
         }
 
-
         private List<MicroService> FilterByTag(List<MicroService> services, string tag)
         {
             if (!tag.IsNullOrWhiteSpace())
@@ -42,6 +37,5 @@ namespace SharpAbp.Abp.Micro.Discovery.Consul
 
             return services;
         }
-
     }
 }

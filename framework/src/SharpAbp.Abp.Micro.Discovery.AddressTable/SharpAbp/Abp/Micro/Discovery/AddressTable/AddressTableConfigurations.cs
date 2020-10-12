@@ -13,10 +13,9 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
             _configurations = new Dictionary<string, AddressTableConfiguration>();
         }
 
-
         public AddressTableConfigurations Configure(
-           [NotNull] string name,
-           [NotNull] Action<AddressTableConfiguration> configureAction)
+          [NotNull] string name,
+          [NotNull] Action<AddressTableConfiguration> configureAction)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
             Check.NotNull(configureAction, nameof(configureAction));

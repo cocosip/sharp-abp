@@ -7,13 +7,12 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
     )]
     public class AbpMicroDiscoveryAddressTableModule : AbpModule
     {
-        public override void PreConfigureServices(ServiceConfigurationContext context)
+        public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            Configure<AbpMicroDiscoveryOptions>(c =>
+            Configure<AbpMicroDiscoveryAddressTableOptions>(c =>
             {
-                c.ProviderNameMappers.SetProvider(AddressTableDiscoveryProviderConfigurationNames.ProviderName, typeof(AddressTableServiceDiscoveryProvider));
+
             });
         }
-
     }
 }

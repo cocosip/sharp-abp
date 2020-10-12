@@ -15,17 +15,17 @@ namespace SharpAbp.Abp.Micro.Discovery.Consul
         protected PollingConsulDiscovererOption Option { get; }
         protected ILogger Logger { get; }
         protected IDistributedCache<List<MicroService>> ServiceCache { get; }
-        protected IConsulDiscoveryApiService ConsulDiscoveryApiService { get; }
+        protected IConsulDiscoveryService ConsulDiscoveryService { get; }
 
         private Timer _timer = null;
         private bool _polling = false;
 
-        public PollingConsulDiscoverer(PollingConsulDiscovererOption option, ILogger<PollingConsulDiscoverer> logger, IDistributedCache<List<MicroService>> serviceCache, IConsulDiscoveryApiService consulDiscoveryApiService)
+        public PollingConsulDiscoverer(PollingConsulDiscovererOption option, ILogger<PollingConsulDiscoverer> logger, IDistributedCache<List<MicroService>> serviceCache, IConsulDiscoveryService consulDiscoveryService)
         {
             Option = option;
             Logger = logger;
             ServiceCache = serviceCache;
-            ConsulDiscoveryApiService = consulDiscoveryApiService;
+            ConsulDiscoveryService = consulDiscoveryService;
         }
 
         public async Task<List<MicroService>> GetAsync([NotNull] string service, CancellationToken cancellationToken = default)
@@ -68,12 +68,12 @@ namespace SharpAbp.Abp.Micro.Discovery.Consul
 
         private string GetCacheKey()
         {
-            return $"{Option.CachePrefix}{Option.Service}";
+            return $"{Option.Prefix}{Option.Service}";
         }
 
         private async Task Poll()
         {
-            var services = await ConsulDiscoveryApiService.GetAsync(Option.Service);
+            var services = await ConsulDiscoveryService.GetAsync(Option.Service);
             if (services == null)
             {
                 services = new List<MicroService>();
@@ -82,7 +82,7 @@ namespace SharpAbp.Abp.Micro.Discovery.Consul
             var key = GetCacheKey();
             await ServiceCache.SetAsync(key, services, new DistributedCacheEntryOptions()
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(Option.CacheExpires)
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(Option.Expires)
             });
         }
 

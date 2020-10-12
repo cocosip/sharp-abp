@@ -28,4 +28,10 @@
     <ProjectReference Include="..\..\src\SharpAbp.Abp.Micro.Discovery.Consul\SharpAbp.Abp.Micro.Discovery.Consul.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

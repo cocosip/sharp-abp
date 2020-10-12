@@ -19,9 +19,5 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
             Check.NotNullOrWhiteSpace(service, nameof(service));
             return Options.Configurations.GetConfiguration(service);
         }
-
-
-
-
     }
 }

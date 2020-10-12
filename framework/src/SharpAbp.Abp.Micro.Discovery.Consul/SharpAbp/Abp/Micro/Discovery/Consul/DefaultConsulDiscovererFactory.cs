@@ -66,14 +66,14 @@ namespace SharpAbp.Abp.Micro.Discovery.Consul
             {
                 Service = service,
                 PollingInterval = Options.PollingInterval,
-                CachePrefix = Options.CachePrefix,
-                CacheExpires = Options.CacheExpires
+                Prefix = Options.Prefix,
+                Expires = Options.Expires
             };
             var logger = ServiceProvider.GetService<ILogger<PollingConsulDiscoverer>>();
             var cache = ServiceProvider.GetService<IDistributedCache<List<MicroService>>>();
-            var api = ServiceProvider.GetService<IConsulDiscoveryApiService>();
+            var consulService = ServiceProvider.GetService<IConsulDiscoveryService>();
 
-            return new PollingConsulDiscoverer(option, logger, cache, api);
+            return new PollingConsulDiscoverer(option, logger, cache, consulService);
         }
 
     }

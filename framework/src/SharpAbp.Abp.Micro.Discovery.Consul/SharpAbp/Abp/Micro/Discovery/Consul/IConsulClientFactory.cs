@@ -1,4 +1,5 @@
 ﻿using Consul;
+using JetBrains.Annotations;
 
 namespace SharpAbp.Abp.Micro.Discovery.Consul
 {
@@ -8,6 +9,7 @@ namespace SharpAbp.Abp.Micro.Discovery.Consul
         /// Get a consul client
         /// </summary>
         /// <returns></returns>
+        [NotNull]
         IConsulClient Get();
     }
 }

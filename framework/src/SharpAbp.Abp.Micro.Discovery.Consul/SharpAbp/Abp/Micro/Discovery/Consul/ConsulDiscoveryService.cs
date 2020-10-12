@@ -1,6 +1,5 @@
 ﻿using Consul;
 using JetBrains.Annotations;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -10,25 +9,26 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.Micro.Discovery.Consul
 {
-    public class DefaultConsulDiscoveryApiService : IConsulDiscoveryApiService, ITransientDependency
+    public class ConsulDiscoveryService : IConsulDiscoveryService, ITransientDependency
     {
-        protected IConsulClient Client { get; }
-
-        public DefaultConsulDiscoveryApiService(IConsulClientFactory consulClientFactory)
+        protected IConsulClientFactory ConsulClientFactory { get; }
+        public ConsulDiscoveryService(IConsulClientFactory consulClientFactory)
         {
-            Client = consulClientFactory.Get();
+            ConsulClientFactory = consulClientFactory;
         }
 
         public virtual async Task<List<MicroService>> GetAsync([NotNull] string service, CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(service, nameof(service));
+            //Get client
+            var client = ConsulClientFactory.Get();
 
-            var queryResult = await Client.Health.Service(service, string.Empty, true, ct: cancellationToken);
+            var queryResult = await client.Health.Service(service, string.Empty, true, ct: cancellationToken);
             var services = new List<MicroService>();
 
             foreach (var serviceEntry in queryResult.Response)
             {
-                var nodes = await Client.Catalog.Nodes(cancellationToken);
+                var nodes = await client.Catalog.Nodes(cancellationToken);
                 if (nodes.Response == null)
                 {
                     services.Add(BuildService(serviceEntry, null));
@@ -49,18 +49,10 @@ namespace SharpAbp.Abp.Micro.Discovery.Consul
             {
                 Id = serviceEntry.Service.ID,
                 Service = serviceEntry.Service.Service,
-                Host = serviceNode == null ? serviceEntry.Service.Address : serviceNode.Name,
+                Address = serviceNode == null ? serviceEntry.Service.Address : serviceNode.Name,
                 Port = serviceEntry.Service.Port,
-                Tags = serviceEntry.Service.Tags?.ToList() ?? new List<string>(),
-                Version = GetVersionFromStrings(serviceEntry.Service.Tags)
+                Tags = serviceEntry.Service.Tags?.ToList() ?? new List<string>()
             };
-        }
-
-        private string GetVersionFromStrings(IEnumerable<string> strings)
-        {
-            return strings
-                ?.FirstOrDefault(x => x.StartsWith(AbpMicroDiscoveryConsts.VersionPrefix, StringComparison.Ordinal))
-                .TrimStart(AbpMicroDiscoveryConsts.VersionPrefix.ToCharArray());
         }
 
     }

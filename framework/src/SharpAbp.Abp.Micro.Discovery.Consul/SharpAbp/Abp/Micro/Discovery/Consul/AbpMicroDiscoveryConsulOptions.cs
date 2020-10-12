@@ -12,11 +12,13 @@
 
         public string Token { get; set; }
 
+        public int MaxConsulClient { get; set; } = 1;
+
         public int? WaitSeconds { get; set; } = 600;
 
-        public string CachePrefix { get; set; } = "default";
+        public string Prefix { get; set; } = "default";
 
-        public int CacheExpires { get; set; } = 120;
+        public int Expires { get; set; } = 120;
 
         public bool EnablePolling { get; set; } = true;
 

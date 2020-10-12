@@ -1,7 +1,6 @@
 ﻿using JetBrains.Annotations;
 using System.Collections.Generic;
 using System.Linq;
-using Volo.Abp;
 
 namespace SharpAbp.Abp.Micro.Discovery.AddressTable
 {
@@ -9,19 +8,15 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
     {
         public string Service { get; set; }
 
-        public List<ServiceAddressEntry> Entries { get; }
+        public List<AddressTableEntry> Entries { get; set; }
 
         public AddressTableConfiguration()
         {
-            Entries = new List<ServiceAddressEntry>();
+            Entries = new List<AddressTableEntry>();
         }
 
-        public AddressTableConfiguration([NotNull] string service) : this()
-        {
-            Check.NotNullOrWhiteSpace(service, nameof(service));
-        }
 
-        public AddressTableConfiguration AddIfNotContains([NotNull] ServiceAddressEntry entry)
+        public AddressTableConfiguration AddIfNotContains([NotNull] AddressTableEntry entry)
         {
             Entries.AddIfNotContains(x => x.Id == entry.Id, () => entry);
             return this;
@@ -37,7 +32,7 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
             return this;
         }
 
-        public AddressTableConfiguration Remove([NotNull] ServiceAddressEntry entry)
+        public AddressTableConfiguration Remove([NotNull] AddressTableEntry entry)
         {
             Entries.Remove(entry);
             return this;

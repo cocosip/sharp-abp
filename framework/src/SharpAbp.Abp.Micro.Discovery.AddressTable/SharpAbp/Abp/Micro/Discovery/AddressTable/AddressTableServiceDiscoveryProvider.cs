@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +8,7 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.Micro.Discovery.AddressTable
 {
-    public class AddressTableServiceDiscoveryProvider : IServiceDiscoveryProvider, ITransientDependency
+    public class AddressTableServiceDiscoveryProvider : IServiceDiscoveryProvider, ISingletonDependency
     {
         protected ILogger Logger { get; }
         protected IAddressTableConfigurationSelector ConfigurationSelector { get; }
@@ -20,7 +19,8 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
             ConfigurationSelector = configurationSelector;
         }
 
-        public virtual Task<List<MicroService>> GetAsync([NotNull] string service, string tag = "", CancellationToken cancellationToken = default)
+
+        public virtual Task<List<MicroService>> GetServices(string service, string tag = "", CancellationToken cancellationToken = default)
         {
             var configuration = ConfigurationSelector.Get(service);
             if (configuration == null)
@@ -34,7 +34,6 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
             return Task.FromResult(services);
         }
 
-
         private List<MicroService> BuildService(AddressTableConfiguration configuration)
         {
             var services = new List<MicroService>();
@@ -46,11 +45,9 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
                     {
                         Id = entry.Id,
                         Service = configuration.Service,
-                        Scheme = entry.Scheme,
-                        Host = entry.Host,
+                        Address = entry.Address,
                         Port = entry.Port,
-                        Tags = entry.Tags,
-                        Version = GetVersionFromStrings(entry.Tags)
+                        Tags = entry.Tags
                     };
                     services.Add(service);
                 }
@@ -64,16 +61,8 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
             {
                 return services.Where(x => x.Tags.Contains(tag)).ToList();
             }
-
             return services;
         }
 
-
-        private string GetVersionFromStrings(IEnumerable<string> strings)
-        {
-            return strings
-                ?.FirstOrDefault(x => x.StartsWith(AbpMicroDiscoveryConsts.VersionPrefix, StringComparison.Ordinal))
-                .TrimStart(AbpMicroDiscoveryConsts.VersionPrefix.ToCharArray());
-        }
     }
 }

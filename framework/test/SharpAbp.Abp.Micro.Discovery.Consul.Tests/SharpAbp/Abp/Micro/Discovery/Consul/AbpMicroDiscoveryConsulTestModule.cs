@@ -1,4 +1,6 @@
-﻿using Volo.Abp;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Volo.Abp;
 using Volo.Abp.Autofac;
 using Volo.Abp.Modularity;
 
@@ -11,19 +13,15 @@ namespace SharpAbp.Abp.Micro.Discovery.Consul
          )]
     public class AbpMicroDiscoveryConsulTestModule : AbpModule
     {
-        public override void PreConfigureServices(ServiceConfigurationContext context)
-        {
-            Configure<AbpMicroDiscoveryOptions>(options =>
-            {
-
-            });
-        }
-
 
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            base.ConfigureServices(context);
-        }
+            var configuration = context.Services.GetConfiguration();
 
+            Configure<AbpMicroDiscoveryConsulOptions>(configuration.GetSection("ConsulDiscovery"));
+
+            //context.Services.Replace()
+
+        }
     }
 }

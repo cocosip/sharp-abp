@@ -6,8 +6,8 @@
 
         public int PollingInterval { get; set; } = 60;
 
-        public string CachePrefix { get; set; }
+        public string Prefix { get; set; }
 
-        public int CacheExpires { get; set; } = 120;
+        public int Expires { get; set; } = 120;
     }
 }

@@ -2,21 +2,20 @@
 
 namespace SharpAbp.Abp.Micro.Discovery.AddressTable
 {
-    public class ServiceAddressEntry
+    public class AddressTableEntry
     {
         public string Id { get; set; }
 
-        public string Scheme { get; set; }
-
-        public string Host { get; set; }
+        public string Address { get; set; }
 
         public int Port { get; set; }
 
         public List<string> Tags { get; set; }
 
-        public ServiceAddressEntry()
+        public AddressTableEntry()
         {
             Tags = new List<string>();
         }
+
     }
 }

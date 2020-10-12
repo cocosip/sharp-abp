@@ -11,6 +11,7 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
             Configurations = new AddressTableConfigurations();
         }
 
+
         public AbpMicroDiscoveryAddressTableOptions Configure(IConfiguration configuration)
         {
             var configurations = configuration.Get<List<AddressTableConfiguration>>();
