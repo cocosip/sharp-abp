@@ -51,17 +51,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoring.Az
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.CSRedisCore.Tests", "test\SharpAbp.Abp.CSRedisCore.Tests\SharpAbp.Abp.CSRedisCore.Tests.csproj", "{9B200032-5813-459B-AE87-2F261254682A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Micro.Discovery", "src\SharpAbp.Abp.Micro.Discovery\SharpAbp.Abp.Micro.Discovery.csproj", "{8CE919BA-E5C2-484A-8393-E6F558D77213}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Micro.Discovery", "src\SharpAbp.Abp.Micro.Discovery\SharpAbp.Abp.Micro.Discovery.csproj", "{8CE919BA-E5C2-484A-8393-E6F558D77213}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Micro", "src\SharpAbp.Abp.Micro\SharpAbp.Abp.Micro.csproj", "{45FBE3BF-6725-48E8-A1C6-7E97813A7C08}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Micro", "src\SharpAbp.Abp.Micro\SharpAbp.Abp.Micro.csproj", "{45FBE3BF-6725-48E8-A1C6-7E97813A7C08}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Micro.Discovery.AddressTable", "src\SharpAbp.Abp.Micro.Discovery.AddressTable\SharpAbp.Abp.Micro.Discovery.AddressTable.csproj", "{0C88C39A-0628-47B4-B854-5C6BC6252550}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Micro.Discovery.AddressTable", "src\SharpAbp.Abp.Micro.Discovery.AddressTable\SharpAbp.Abp.Micro.Discovery.AddressTable.csproj", "{0C88C39A-0628-47B4-B854-5C6BC6252550}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Micro.Discovery.AddressTable.Tests", "test\SharpAbp.Abp.Micro.Discovery.AddressTable.Tests\SharpAbp.Abp.Micro.Discovery.AddressTable.Tests.csproj", "{F9D499DC-CB11-4574-BA2E-175D19CBEA92}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Micro.Discovery.Consul", "src\SharpAbp.Abp.Micro.Discovery.Consul\SharpAbp.Abp.Micro.Discovery.Consul.csproj", "{24E559DB-8BF3-414F-A1F5-8C13851165CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Micro.Discovery.Consul", "src\SharpAbp.Abp.Micro.Discovery.Consul\SharpAbp.Abp.Micro.Discovery.Consul.csproj", "{24E559DB-8BF3-414F-A1F5-8C13851165CA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Micro.Discovery.Consul.Tests", "test\SharpAbp.Abp.Micro.Discovery.Consul.Tests\SharpAbp.Abp.Micro.Discovery.Consul.Tests.csproj", "{AADCDCE7-7CF8-4CBA-ACA1-3A12D081CD37}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Micro.LoadBalancer", "src\SharpAbp.Abp.Micro.LoadBalancer\SharpAbp.Abp.Micro.LoadBalancer.csproj", "{809536C1-F9AC-4C20-B770-789ACA65FE97}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -409,6 +411,18 @@ Global
 		{AADCDCE7-7CF8-4CBA-ACA1-3A12D081CD37}.Release|x64.Build.0 = Release|Any CPU
 		{AADCDCE7-7CF8-4CBA-ACA1-3A12D081CD37}.Release|x86.ActiveCfg = Release|Any CPU
 		{AADCDCE7-7CF8-4CBA-ACA1-3A12D081CD37}.Release|x86.Build.0 = Release|Any CPU
+		{809536C1-F9AC-4C20-B770-789ACA65FE97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{809536C1-F9AC-4C20-B770-789ACA65FE97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{809536C1-F9AC-4C20-B770-789ACA65FE97}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{809536C1-F9AC-4C20-B770-789ACA65FE97}.Debug|x64.Build.0 = Debug|Any CPU
+		{809536C1-F9AC-4C20-B770-789ACA65FE97}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{809536C1-F9AC-4C20-B770-789ACA65FE97}.Debug|x86.Build.0 = Debug|Any CPU
+		{809536C1-F9AC-4C20-B770-789ACA65FE97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{809536C1-F9AC-4C20-B770-789ACA65FE97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{809536C1-F9AC-4C20-B770-789ACA65FE97}.Release|x64.ActiveCfg = Release|Any CPU
+		{809536C1-F9AC-4C20-B770-789ACA65FE97}.Release|x64.Build.0 = Release|Any CPU
+		{809536C1-F9AC-4C20-B770-789ACA65FE97}.Release|x86.ActiveCfg = Release|Any CPU
+		{809536C1-F9AC-4C20-B770-789ACA65FE97}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -442,6 +456,7 @@ Global
 		{F9D499DC-CB11-4574-BA2E-175D19CBEA92} = {51F9C36E-772F-4E52-A4AC-3EE8F13FDAD3}
 		{24E559DB-8BF3-414F-A1F5-8C13851165CA} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 		{AADCDCE7-7CF8-4CBA-ACA1-3A12D081CD37} = {51F9C36E-772F-4E52-A4AC-3EE8F13FDAD3}
+		{809536C1-F9AC-4C20-B770-789ACA65FE97} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {30432CEA-45F2-4F5A-B44B-790A62AB73F1}
