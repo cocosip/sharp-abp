@@ -30,7 +30,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 
                 b.Property(p => p.Name).IsRequired().HasMaxLength(FileStoringContainerConsts.MaxNameLength);
 
-                b.Property(p => p.ProviderTypeName).IsRequired().HasMaxLength(FileStoringContainerConsts.MaxProviderTypeNameLength);
+                b.Property(p => p.ProviderName).IsRequired().HasMaxLength(FileStoringContainerConsts.MaxProviderNameLength);
 
                 b.Property(p => p.HttpSupport).IsRequired();
 

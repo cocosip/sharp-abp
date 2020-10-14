@@ -1,5 +1,4 @@
-﻿using DotNetty.Common.Utilities;
-using FastDFSCore;
+﻿using FastDFSCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;

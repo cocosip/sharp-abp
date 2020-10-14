@@ -10,7 +10,7 @@
         /// <summary>
         /// Default value: 128.
         /// </summary>
-        public static int MaxProviderTypeNameLength { get; set; } = 128;
+        public static int MaxProviderNameLength { get; set; } = 128;
 
 
         /// <summary>

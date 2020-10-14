@@ -14,14 +14,17 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
     )]
     public class AbpFileStoringFileSystemModule : AbpModule
     {
-        public override void ConfigureServices(ServiceConfigurationContext context)
+        public override void PreConfigureServices(ServiceConfigurationContext context)
         {
             Configure<AbpFileStoringOptions>(c =>
             {
                 var configuration = GetFileProviderConfiguration();
                 c.Providers.TryAdd(configuration);
             });
+        }
 
+        public override void ConfigureServices(ServiceConfigurationContext context)
+        {
             Configure<AbpVirtualFileSystemOptions>(options =>
             {
                 options.FileSets.AddEmbedded<AbpFileStoringFileSystemModule>();
@@ -48,7 +51,7 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
             configuration.DefaultNamingNormalizers.TryAdd<FileSystemFileNamingNormalizer>();
             configuration
                 .SetProperty(FileSystemFileProviderConfigurationNames.BasePath, typeof(string))
-                .SetProperty(FileSystemFileProviderConfigurationNames.AppendContainerNameToBasePath, typeof(string))
+                .SetProperty(FileSystemFileProviderConfigurationNames.AppendContainerNameToBasePath, typeof(bool))
                 .SetProperty(FileSystemFileProviderConfigurationNames.HttpServer, typeof(string));
             return configuration;
         }

@@ -19,16 +19,18 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
       )]
     public class AbpFileStoringFastDFSModule : AbpModule
     {
-        public override void ConfigureServices(ServiceConfigurationContext context)
+        public override void PreConfigureServices(ServiceConfigurationContext context)
         {
-            context.Services.Replace(ServiceDescriptor.Singleton<IClusterSelector, FileConfigurationClusterSelector>());
-
             Configure<AbpFileStoringOptions>(c =>
             {
                 var configuration = GetFileProviderConfiguration();
                 c.Providers.TryAdd(configuration);
             });
+        }
 
+        public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            context.Services.Replace(ServiceDescriptor.Singleton<IClusterSelector, FileConfigurationClusterSelector>());
 
             Configure<AbpVirtualFileSystemOptions>(options =>
             {

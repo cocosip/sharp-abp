@@ -1,0 +1,148 @@
+﻿using SharpAbp.Abp.FileStoring.Aliyun;
+using SharpAbp.Abp.FileStoring.Azure;
+using SharpAbp.Abp.FileStoring.FastDFS;
+using SharpAbp.Abp.FileStoring.FileSystem;
+using SharpAbp.Abp.FileStoring.Minio;
+using SharpAbp.Abp.FileStoring.S3;
+using System;
+using Xunit;
+
+namespace SharpAbp.Abp.FileStoring
+{
+    public class AbpFileStoringOptionsTest : AbpFileStoringAllTestBase
+    {
+        private readonly IFileContainerConfigurationProvider _configurationProvider;
+
+        public AbpFileStoringOptionsTest()
+        {
+            _configurationProvider = GetRequiredService<IFileContainerConfigurationProvider>();
+        }
+
+
+        [Fact]
+        public void Aliyun_Default_Configuration_Test()
+        {
+            var configuration = _configurationProvider.Get<DefaultContainer>();
+            Assert.Equal(typeof(AliyunFileProvider), configuration.ProviderType);
+            Assert.False(configuration.IsMultiTenant);
+            Assert.True(configuration.HttpSupport);
+
+            var aliyunConfiguration = configuration.GetAliyunConfiguration();
+            Assert.Equal("oss-cn-hangzhou", aliyunConfiguration.RegionId);
+            Assert.Equal("oss-cn-hangzhou.aliyuncs.com", aliyunConfiguration.Endpoint);
+            Assert.Equal("aliyun-bucket", aliyunConfiguration.BucketName);
+            Assert.Equal("AccessKeyId", aliyunConfiguration.AccessKeyId);
+            Assert.Equal("AccessKeySecret", aliyunConfiguration.AccessKeySecret);
+            Assert.False(aliyunConfiguration.UseSecurityTokenService);
+            Assert.True(aliyunConfiguration.RoleArn.IsNullOrWhiteSpace());
+            Assert.True(aliyunConfiguration.RoleSessionName.IsNullOrWhiteSpace());
+            Assert.Equal(100, aliyunConfiguration.DurationSeconds);
+            Assert.True(aliyunConfiguration.Policy.IsNullOrWhiteSpace());
+            Assert.True(aliyunConfiguration.CreateContainerIfNotExists);
+            Assert.Equal("key1", aliyunConfiguration.TemporaryCredentialsCacheKey);
+
+        }
+
+        [Fact]
+        public void Azure_Configuration_Test()
+        {
+            var configuration = _configurationProvider.Get("azure-container");
+            Assert.Equal(typeof(AzureFileProvider), configuration.ProviderType);
+            Assert.False(configuration.IsMultiTenant);
+            Assert.False(configuration.HttpSupport);
+
+            var azureConfiguration = configuration.GetAzureConfiguration();
+
+            Assert.Equal("connection1", azureConfiguration.ConnectionString);
+            Assert.Equal("azure-container", azureConfiguration.ContainerName);
+            Assert.False(azureConfiguration.CreateContainerIfNotExists);
+        }
+
+        [Fact]
+        public void FastDFS_Configuration_Test()
+        {
+            var configuration = _configurationProvider.Get("fastdfs-container");
+            Assert.Equal(typeof(FastDFSFileProvider), configuration.ProviderType);
+            Assert.True(configuration.IsMultiTenant);
+            Assert.True(configuration.HttpSupport);
+
+            var fastDFSConfiguration = configuration.GetFastDFSConfiguration();
+
+            Assert.Equal("default", fastDFSConfiguration.ClusterName);
+            Assert.Equal("http://192.168.0.100", fastDFSConfiguration.HttpServer);
+            Assert.Equal("group1", fastDFSConfiguration.GroupName);
+            Assert.True(fastDFSConfiguration.AppendGroupNameToUrl);
+            Assert.Equal("192.168.0.101:22122,192.168.0.102:22122", fastDFSConfiguration.Trackers);
+            Assert.True(fastDFSConfiguration.AntiStealCheckToken);
+            Assert.Equal("123456", fastDFSConfiguration.SecretKey);
+            Assert.Equal("utf-8", fastDFSConfiguration.Charset);
+            Assert.Equal(300, fastDFSConfiguration.ConnectionTimeout);
+            Assert.Equal(600, fastDFSConfiguration.ConnectionLifeTime);
+            Assert.Equal(1, fastDFSConfiguration.ConnectionConcurrentThread);
+            Assert.Equal(100, fastDFSConfiguration.ScanTimeoutConnectionInterval);
+            Assert.Equal(10, fastDFSConfiguration.TrackerMaxConnection);
+            Assert.Equal(30, fastDFSConfiguration.StorageMaxConnection);
+
+        }
+
+        [Fact]
+        public void FileSystem_Configuration_Test()
+        {
+            var configuration = _configurationProvider.Get("filesystem-container");
+            Assert.Equal(typeof(FileSystemFileProvider), configuration.ProviderType);
+            Assert.False(configuration.IsMultiTenant);
+            Assert.False(configuration.HttpSupport);
+
+            var fileSystemConfiguration = configuration.GetFileSystemConfiguration();
+
+            Assert.Equal("/usr/local/file_system", fileSystemConfiguration.BasePath);
+            Assert.True(fileSystemConfiguration.AppendContainerNameToBasePath);
+            Assert.Equal("http://192.168.0.100", fileSystemConfiguration.HttpServer);
+        }
+
+        [Fact]
+        public void Minio_Configuration_Test()
+        {
+            var configuration = _configurationProvider.Get("minio-container");
+            Assert.Equal(typeof(MinioFileProvider), configuration.ProviderType);
+            Assert.True(configuration.IsMultiTenant);
+            Assert.True(configuration.HttpSupport);
+
+            var minioConfiguration = configuration.GetMinioConfiguration();
+
+            Assert.Equal("minio-bucket", minioConfiguration.BucketName);
+            Assert.Equal("endpoint1", minioConfiguration.EndPoint);
+            Assert.Equal("AccessKey", minioConfiguration.AccessKey);
+            Assert.Equal("SecretKey", minioConfiguration.SecretKey);
+            Assert.False(minioConfiguration.WithSSL);
+            Assert.True(minioConfiguration.CreateBucketIfNotExists);
+        }
+
+
+        [Fact]
+        public void S3_Configuration_Test()
+        {
+            var configuration = _configurationProvider.Get("s3-container");
+            Assert.Equal(typeof(S3FileProvider), configuration.ProviderType);
+            Assert.True(configuration.IsMultiTenant);
+            Assert.True(configuration.HttpSupport);
+
+            var s3Configuration = configuration.GetS3Configuration();
+
+            Assert.Equal("s3-bucket", s3Configuration.BucketName);
+            Assert.Equal("http://192.168.0.100", s3Configuration.ServerUrl);
+            Assert.Equal("AccessKeyId", s3Configuration.AccessKeyId);
+            Assert.Equal("SecretAccessKey", s3Configuration.SecretAccessKey);
+            Assert.False(s3Configuration.ForcePathStyle);
+            Assert.False(s3Configuration.UseChunkEncoding);
+            Assert.Equal(0, s3Configuration.Protocol); //0-HTTPS,1-HTTP
+            Assert.Equal(1, s3Configuration.VendorType); //1-Amazon,2-KS3,4-Other
+            Assert.True(s3Configuration.EnableSlice);
+            Assert.Equal(5242880, s3Configuration.SliceSize);
+            Assert.Equal("2.0", s3Configuration.SignatureVersion);
+            Assert.False(s3Configuration.CreateBucketIfNotExists);
+            Assert.Equal(20, s3Configuration.ClientCount);
+        }
+
+    }
+}

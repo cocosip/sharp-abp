@@ -17,9 +17,7 @@ namespace SharpAbp.Abp.FileStoring
 
         public FileProviderConfiguration(Type providerType)
         {
-
             ProviderType = providerType;
-
             DefaultNamingNormalizers = new TypeList<IFileNamingNormalizer>();
             _properties = new Dictionary<string, Type>();
         }
@@ -38,6 +36,7 @@ namespace SharpAbp.Abp.FileStoring
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
             Check.NotNull(property, nameof(property));
+            _properties.Add(name, property);
             return this;
         }
 
@@ -48,7 +47,10 @@ namespace SharpAbp.Abp.FileStoring
             return this;
         }
 
-
+        public Dictionary<string, Type> GetProperties()
+        {
+            return _properties;
+        }
     }
 
 }
