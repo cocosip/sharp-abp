@@ -142,7 +142,6 @@ namespace SharpAbp.Abp.FileStoring
             return Configuration;
         }
 
-
         public virtual async Task<string> SaveAsync(
             string fileId,
             Stream stream,

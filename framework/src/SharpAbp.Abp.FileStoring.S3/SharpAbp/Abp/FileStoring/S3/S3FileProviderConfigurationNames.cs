@@ -15,7 +15,7 @@
         public const string EnableSlice = "S3.EnableSlice";
         public const string SliceSize = "S3.SliceSize";
         public const string SignatureVersion = "S3.SignatureVersion";
-        public const string CreateBucketIfNotExists = "S3.CreateContainerIfNotExists";
+        public const string CreateBucketIfNotExists = "S3.CreateBucketIfNotExists";
 
         public const string ClientCount = "S3.ClientCount";
 

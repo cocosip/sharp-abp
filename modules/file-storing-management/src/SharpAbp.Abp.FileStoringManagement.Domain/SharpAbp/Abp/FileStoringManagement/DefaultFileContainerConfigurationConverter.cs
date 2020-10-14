@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.FileStoring;
 using System;
@@ -27,61 +26,29 @@ namespace SharpAbp.Abp.FileStoringManagement
         [NotNull]
         public virtual FileContainerConfiguration ToConfiguration(FileStoringContainer container)
         {
-            var providerType = Type.GetType(container.ProviderTypeName);
-            Check.NotNull(providerType, nameof(providerType));
+            var fileProviderConfiguration = Options.Providers.GetConfiguration(container.ProviderName);
+            Check.NotNull(fileProviderConfiguration, nameof(fileProviderConfiguration));
 
             var configuration = new FileContainerConfiguration()
             {
-                ProviderType = providerType,
+                ProviderType = fileProviderConfiguration.ProviderType,
                 IsMultiTenant = !container.TenantId.HasValue,
                 HttpSupport = container.HttpSupport
             };
 
             foreach (var item in container.Items)
             {
-                var value = ConvertType(item.Value, item.TypeName);
+                var value = FileStoringUtil.ConvertPrimitiveType(item.Value, item.TypeName);
                 configuration.SetConfiguration(item.Name, value);
             }
 
-            //NamingNormalizers
-            var fileProviderConfiguration = Options.Providers.GetConfiguration(providerType);
-            if (fileProviderConfiguration != null)
+
+            foreach (var namingNormalizer in fileProviderConfiguration.DefaultNamingNormalizers)
             {
-                foreach (var namingNormalizer in fileProviderConfiguration.DefaultNamingNormalizers)
-                {
-                    configuration.NamingNormalizers.Add(namingNormalizer);
-                }
+                configuration.NamingNormalizers.Add(namingNormalizer);
             }
 
             return configuration;
-        }
-
-
-
-        protected virtual object ConvertType(string value, string typeName)
-        {
-            var parameterType = Type.GetType(typeName);
-            if (parameterType == typeof(string))
-            {
-                return value;
-            }
-
-            if (parameterType.IsPrimitive)
-            {
-                return Convert.ChangeType(value, parameterType);
-            }
-
-            var typeConverters = ServiceProvider.GetServices<IFileContainerConfigurationTypeConverter>();
-            foreach (var typeConverter in typeConverters)
-            {
-                if (typeConverter.TargetType == parameterType)
-                {
-                    return typeConverter.ConvertType(value);
-                }
-            }
-
-            throw new UserFriendlyException($"Can't change 'string' to '{parameterType}',because can't find any 'IFileContainerConfigurationTypeConverter'.", "404");
-
         }
 
     }

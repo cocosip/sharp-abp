@@ -34,16 +34,16 @@ namespace SharpAbp.Abp.FileStoring
         public ITypeList<IFileNamingNormalizer> NamingNormalizers { get; }
 
         [NotNull]
-        public Dictionary<string, object> Properties { get; private set; }
+        private readonly Dictionary<string, object> _properties;
 
         [CanBeNull]
-        public FileContainerConfiguration FallbackConfiguration { get; private set; }
+        private readonly FileContainerConfiguration _fallbackConfiguration;
 
         public FileContainerConfiguration(FileContainerConfiguration fallbackConfiguration = null)
         {
             NamingNormalizers = new TypeList<IFileNamingNormalizer>();
-            FallbackConfiguration = fallbackConfiguration;
-            Properties = new Dictionary<string, object>();
+            _fallbackConfiguration = fallbackConfiguration;
+            _properties = new Dictionary<string, object>();
         }
 
         [CanBeNull]
@@ -55,8 +55,8 @@ namespace SharpAbp.Abp.FileStoring
         [CanBeNull]
         public object GetConfigurationOrNull(string name, object defaultValue = null)
         {
-            return Properties.GetOrDefault(name) ??
-                   FallbackConfiguration?.GetConfigurationOrNull(name, defaultValue) ??
+            return _properties.GetOrDefault(name) ??
+                   _fallbackConfiguration?.GetConfigurationOrNull(name, defaultValue) ??
                    defaultValue;
         }
 
@@ -66,7 +66,7 @@ namespace SharpAbp.Abp.FileStoring
             Check.NotNullOrWhiteSpace(name, nameof(name));
             Check.NotNull(value, nameof(value));
 
-            Properties[name] = value;
+            _properties[name] = value;
 
             return this;
         }
@@ -76,7 +76,7 @@ namespace SharpAbp.Abp.FileStoring
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
 
-            Properties.Remove(name);
+            _properties.Remove(name);
 
             return this;
         }

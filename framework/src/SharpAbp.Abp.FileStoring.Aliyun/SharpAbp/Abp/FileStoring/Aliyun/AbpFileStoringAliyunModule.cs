@@ -16,14 +16,18 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
     )]
     public class AbpFileStoringAliyunModule : AbpModule
     {
-        public override void ConfigureServices(ServiceConfigurationContext context)
+        public override void PreConfigureServices(ServiceConfigurationContext context)
         {
             Configure<AbpFileStoringOptions>(c =>
             {
                 var configuration = GetFileProviderConfiguration();
                 c.Providers.TryAdd(configuration);
             });
+        }
 
+
+        public override void ConfigureServices(ServiceConfigurationContext context)
+        {
             Configure<AbpVirtualFileSystemOptions>(options =>
             {
                 options.FileSets.AddEmbedded<AbpFileStoringAliyunModule>();
@@ -53,14 +57,14 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
                 .SetProperty(AliyunFileProviderConfigurationNames.BucketName, typeof(string))
                 .SetProperty(AliyunFileProviderConfigurationNames.AccessKeyId, typeof(string))
                 .SetProperty(AliyunFileProviderConfigurationNames.AccessKeySecret, typeof(string))
-                .SetProperty(AliyunFileProviderConfigurationNames.UseSecurityTokenService, typeof(int))
+                .SetProperty(AliyunFileProviderConfigurationNames.UseSecurityTokenService, typeof(bool))
                 .SetProperty(AliyunFileProviderConfigurationNames.RoleArn, typeof(string))
                 .SetProperty(AliyunFileProviderConfigurationNames.RoleSessionName, typeof(string))
                 .SetProperty(AliyunFileProviderConfigurationNames.DurationSeconds, typeof(int))
                 .SetProperty(AliyunFileProviderConfigurationNames.Policy, typeof(string))
                 .SetProperty(AliyunFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool))
                 .SetProperty(AliyunFileProviderConfigurationNames.TemporaryCredentialsCacheKey, typeof(string));
-            
+
             return configuration;
         }
     }

@@ -10,6 +10,16 @@ namespace SharpAbp.Abp.FileStoring.Database
         )]
     public class FileStoringDatabaseDomainModule : AbpModule
     {
+        public override void PreConfigureServices(ServiceConfigurationContext context)
+        {
+            Configure<AbpFileStoringOptions>(c =>
+            {
+                var configuration = GetFileProviderConfiguration();
+                c.Providers.TryAdd(configuration);
+            });
+        }
+
+
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             Configure<AbpFileStoringOptions>(options =>
@@ -22,6 +32,12 @@ namespace SharpAbp.Abp.FileStoring.Database
                     }
                 });
             });
+        }
+
+        private FileProviderConfiguration GetFileProviderConfiguration()
+        {
+            var configuration = new FileProviderConfiguration(typeof(DatabaseFileProvider));
+            return configuration;
         }
     }
 }

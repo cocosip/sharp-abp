@@ -14,14 +14,17 @@ namespace SharpAbp.Abp.FileStoring.Azure
     )]
     public class AbpFileStoringAzureModule : AbpModule
     {
-        public override void ConfigureServices(ServiceConfigurationContext context)
+        public override void PreConfigureServices(ServiceConfigurationContext context)
         {
             Configure<AbpFileStoringOptions>(c =>
             {
                 var configuration = GetFileProviderConfiguration();
                 c.Providers.TryAdd(configuration);
             });
+        }
 
+        public override void ConfigureServices(ServiceConfigurationContext context)
+        {
             Configure<AbpVirtualFileSystemOptions>(options =>
             {
                 options.FileSets.AddEmbedded<AbpFileStoringAzureModule>();
