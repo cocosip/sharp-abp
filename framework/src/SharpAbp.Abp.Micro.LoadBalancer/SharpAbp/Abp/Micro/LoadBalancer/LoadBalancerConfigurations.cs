@@ -15,7 +15,7 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
         {
             _balancers = new Dictionary<string, LoadBalancerConfiguration>
             {
-                [LoadBalancerNameAttribute.GetLoadBalancerName<DefaultLoadBalancer>()] = new LoadBalancerConfiguration()
+                [ServiceLoadBalancerNameAttribute.GetServiceLoadBalancerName<DefaultLoadBalancer>()] = new LoadBalancerConfiguration()
             };
         }
 
@@ -23,7 +23,7 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
             Action<LoadBalancerConfiguration> configureAction)
         {
             return Configure(
-                LoadBalancerNameAttribute.GetLoadBalancerName<TBalancer>(),
+                ServiceLoadBalancerNameAttribute.GetServiceLoadBalancerName<TBalancer>(),
                 configureAction
             );
         }
@@ -64,7 +64,7 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
         [NotNull]
         public LoadBalancerConfiguration GetConfiguration<TBalancer>()
         {
-            return GetConfiguration(LoadBalancerNameAttribute.GetLoadBalancerName<TBalancer>());
+            return GetConfiguration(ServiceLoadBalancerNameAttribute.GetServiceLoadBalancerName<TBalancer>());
         }
 
         [NotNull]

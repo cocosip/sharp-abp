@@ -1,6 +1,6 @@
 ﻿namespace SharpAbp.Abp.Micro.LoadBalancer
 {
-    [LoadBalancerName(Name)]
+    [ServiceLoadBalancerName(Name)]
     public class DefaultLoadBalancer
     {
         public const string Name = "default";
