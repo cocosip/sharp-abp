@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SharpAbp.Abp.Micro\SharpAbp.Abp.Micro.csproj" />
+    <ProjectReference Include="..\SharpAbp.Abp.Micro.Discovery\SharpAbp.Abp.Micro.Discovery.csproj" />
   </ItemGroup>
 
 </Project>

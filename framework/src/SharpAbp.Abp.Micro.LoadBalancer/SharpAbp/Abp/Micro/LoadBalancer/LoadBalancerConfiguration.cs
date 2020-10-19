@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using System;
 using System.Collections.Generic;
 using Volo.Abp;
 
@@ -7,14 +6,10 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
 {
     public class LoadBalancerConfiguration
     {
-        /// <summary>
-        /// The provider to be used to store FILEs of this container.
-        /// </summary>
-        public Type ProviderType { get; set; }
-
+        public string Type { get; set; }
 
         [NotNull]
-        private Dictionary<string, object> _properties;
+        private readonly Dictionary<string, object> _properties;
 
         [CanBeNull]
         public LoadBalancerConfiguration _fallbackConfiguration;

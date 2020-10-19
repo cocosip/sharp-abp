@@ -5,12 +5,12 @@ using Volo.Abp;
 
 namespace SharpAbp.Abp.Micro.LoadBalancer
 {
-    public class ServiceLoadBalancerNameAttribute : Attribute
+    public class LoadBalancerNameAttribute : Attribute
     {
         [NotNull]
         public string Name { get; }
 
-        public ServiceLoadBalancerNameAttribute([NotNull] string name)
+        public LoadBalancerNameAttribute([NotNull] string name)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
 
@@ -29,7 +29,7 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
 
         public static string GetServiceLoadBalancerName(Type type)
         {
-            var nameAttribute = type.GetCustomAttribute<ServiceLoadBalancerNameAttribute>();
+            var nameAttribute = type.GetCustomAttribute<LoadBalancerNameAttribute>();
 
             if (nameAttribute == null)
             {
