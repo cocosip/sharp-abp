@@ -24,4 +24,9 @@
     <PackageReference Include="Volo.Abp.TestBase" Version="3.2.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.Micro.Discovery.AddressTable\SharpAbp.Abp.Micro.Discovery.AddressTable.csproj" />
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.Micro.LoadBalancer\SharpAbp.Abp.Micro.LoadBalancer.csproj" />
+  </ItemGroup>
+
 </Project>

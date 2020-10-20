@@ -1,16 +1,11 @@
-﻿using System;
-using Volo.Abp;
+﻿using SharpAbp.Abp.Micro.Discovery;
+using System;
+using System.Collections.Generic;
 
 namespace SharpAbp.Abp.Micro.LoadBalancer
 {
     public class WeightRoundRobinLoadBalancerConfiguration
     {
-        public int Step
-        {
-            get => _configuration.GetConfigurationOrDefault(WeightRoundRobinLoadBalancerConfigurationNames.Step, 1);
-            set => _configuration.SetConfiguration(WeightRoundRobinLoadBalancerConfigurationNames.Step, value);
-        }
-
         public string Weights
         {
             get => _configuration.GetConfiguration<string>(WeightRoundRobinLoadBalancerConfigurationNames.Weights);

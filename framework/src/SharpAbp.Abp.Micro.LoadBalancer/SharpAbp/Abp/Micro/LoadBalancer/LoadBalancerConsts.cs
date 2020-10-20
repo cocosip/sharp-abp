@@ -31,8 +31,6 @@
 
     public class WeightRoundRobinLoadBalancerConfigurationNames
     {
-        public const string Step = "WeightRoundRobin.Step";
-
         public const string Weights = "WeightRoundRobin.Weights";
     }
 

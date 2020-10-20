@@ -1,8 +1,6 @@
 ﻿using SharpAbp.Abp.Micro.Discovery;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
@@ -19,16 +17,13 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
         protected IServiceDiscoveryProvider DiscoveryProvider { get; }
 
         private readonly object SyncObject = new object();
-        private int _sequence = 1;
-        private List<MicroService> _lastServices;
-        private List<MicroService> _weightServices;
+        private readonly List<WeightMicroService> _services;
         public WeightRoundRobinLoadBalancer(string service, WeightRoundRobinLoadBalancerConfiguration configuration, IServiceDiscoveryProvider discoveryProvider)
         {
             Service = service;
             Configugration = configuration;
             DiscoveryProvider = discoveryProvider;
-            _lastServices = new List<MicroService>();
-            _weightServices = new List<MicroService>();
+            _services = new List<WeightMicroService>();
         }
 
         public virtual async Task<MicroService> Lease(string tag = "", CancellationToken cancellationToken = default)
@@ -41,27 +36,31 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
 
             lock (SyncObject)
             {
-                BuildWeightServices(services);
-                var sequence = Interlocked.Exchange(ref _sequence, _sequence + Configugration.Step);
-                var index = sequence % _weightServices.Count;
-                return services[index];
+                //Not match,update
+                if (!ServiceMatch(services))
+                {
+                    Initialize(services);
+                }
+
+                var weightService = GetNext();
+
+                return weightService?.Service;
             }
         }
 
-        private void BuildWeightServices(List<MicroService> services)
+        private WeightMicroService GetNext()
         {
-            if (!ServiceMatch(services))
+            var weightService = _services.Max();
+            var totalWeight = _services.Sum(x => x.Weight);
+
+            weightService.CurrentWeight -= totalWeight;
+
+            foreach (var service in _services)
             {
-                _lastServices = services;
+                service.CurrentWeight += service.Weight;
             }
 
-            if (Configugration.Weights.IsNullOrWhiteSpace())
-            {
-                _weightServices = services;
-                return;
-            }
-
-
+            return weightService;
         }
 
 
@@ -69,17 +68,35 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
         {
             foreach (var service in services)
             {
-                if (!services.Contains(service))
+                var weightService = _services.FirstOrDefault(x => x.Service == service);
+                if (weightService == null)
                 {
                     return false;
                 }
             }
 
-            if (_lastServices.Count != services.Count)
+            if (_services.Count != services.Count)
             {
                 return false;
             }
             return true;
+        }
+
+        private void Initialize(List<MicroService> services)
+        {
+            var weightServiceHostAndPorts = LoadBalancerUtil.ParseWeightHostAndPorts(Configugration.Weights);
+
+            var weightServices = new List<WeightMicroService>();
+            foreach (var service in services)
+            {
+                var weightServiceHostAndPort = weightServiceHostAndPorts.FirstOrDefault(x => x.HostAndPort.Host == service.Address && x.HostAndPort.Port == service.Port);
+
+                var weight = weightServiceHostAndPort?.Weight ?? 1;
+                weightServices.Add(new WeightMicroService(weight, service, weight));
+            }
+
+            _services.Clear();
+            _services.AddRange(weightServices);
         }
 
     }
