@@ -50,6 +50,11 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
 
         private WeightMicroService GetNext()
         {
+            if (!_services.Any())
+            {
+                return default;
+            }
+
             var weightService = _services.Max();
             var totalWeight = _services.Sum(x => x.Weight);
 
@@ -57,6 +62,11 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
 
             foreach (var service in _services)
             {
+                //if (service.Service.Id == weightService.Service.Id)
+                //{
+                //    service.CurrentWeight -= totalWeight;
+                //}
+
                 service.CurrentWeight += service.Weight;
             }
 
@@ -68,7 +78,7 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
         {
             foreach (var service in services)
             {
-                var weightService = _services.FirstOrDefault(x => x.Service == service);
+                var weightService = _services.FirstOrDefault(x => x.Service.Id == service.Id);
                 if (weightService == null)
                 {
                     return false;
@@ -90,6 +100,8 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
             foreach (var service in services)
             {
                 var weightHostAndPort = weightHostAndPorts.FirstOrDefault(x => x.HostAndPort.Host == service.Address && x.HostAndPort.Port == service.Port);
+
+                //var weightHostAndPort = weightHostAndPorts.FirstOrDefault(x => x.HostAndPort == new ServiceHostAndPort(service.Address, service.Port));
 
                 var weight = weightHostAndPort?.Weight ?? 1;
                 weightServices.Add(new WeightMicroService(weight, service, weight));

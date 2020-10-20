@@ -76,8 +76,13 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
             var service7 = await loadBalancer.Lease();
 
             Assert.Equal(service1.Id, service7.Id);
-            Assert.Equal(service1.Id, service2.Id);
-            Assert.Equal("3-3", service1.Id);
+            Assert.Equal("3-1", service1.Id);
+            Assert.Equal("3-1", service2.Id);
+            Assert.Equal("3-2", service3.Id);
+            Assert.Equal("3-1", service4.Id);
+            Assert.Equal("3-3", service5.Id);
+            Assert.Equal("3-1", service6.Id);
+            Assert.Equal("3-1", service7.Id);
         }
 
 
