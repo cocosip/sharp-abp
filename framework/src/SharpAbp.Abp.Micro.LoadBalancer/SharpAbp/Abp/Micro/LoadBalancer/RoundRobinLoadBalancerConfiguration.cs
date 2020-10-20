@@ -30,7 +30,7 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
             this LoadBalancerConfiguration configuration,
             Action<RoundRobinLoadBalancerConfiguration> roundRobinConfigureAction)
         {
-            configuration.Type = LoadBalancerConsts.RoundRobin;
+            configuration.BalancerType = LoadBalancerConsts.RoundRobin;
             roundRobinConfigureAction(new RoundRobinLoadBalancerConfiguration(configuration));
 
             return configuration;

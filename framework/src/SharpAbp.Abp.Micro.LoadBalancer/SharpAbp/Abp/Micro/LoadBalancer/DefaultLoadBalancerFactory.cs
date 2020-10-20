@@ -27,10 +27,10 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
             Check.NotNullOrWhiteSpace(service, nameof(service));
 
             var configuration = ConfigurationProvider.Get(service);
-            var applicableCreator = BalancerCreators.SingleOrDefault(c => c.Type == configuration.Type);
+            var applicableCreator = BalancerCreators.SingleOrDefault(c => c.Type == configuration.BalancerType);
             if (applicableCreator == null)
             {
-                throw new AbpException($"Could not find loadbalancer creator by :{service},for type :{configuration?.Type}");
+                throw new AbpException($"Could not find loadbalancer creator by :{service},for type :{configuration?.BalancerType}");
             }
 
             return applicableCreator.Create(configuration, service);

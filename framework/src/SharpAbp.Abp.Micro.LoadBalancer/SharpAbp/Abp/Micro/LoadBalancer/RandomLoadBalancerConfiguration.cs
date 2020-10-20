@@ -31,7 +31,7 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
             this LoadBalancerConfiguration configuration,
             Action<RandomLoadBalancerConfiguration> randomConfigureAction)
         {
-            configuration.Type = LoadBalancerConsts.Random;
+            configuration.BalancerType = LoadBalancerConsts.Random;
 
             randomConfigureAction(new RandomLoadBalancerConfiguration(configuration));
 

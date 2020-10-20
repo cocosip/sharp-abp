@@ -1,4 +1,4 @@
-﻿namespace SharpAbp.Abp.Micro.Discovery
+﻿namespace SharpAbp.Abp.Micro
 {
     public class ServiceHostAndPort
     {

@@ -8,7 +8,7 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
 {
     public class RandomLoadBalancer : ILoadBalancer
     {
-        public string Type => LoadBalancerConsts.Random;
+        public string BalancerType => LoadBalancerConsts.Random;
 
         public string Service { get; }
 
@@ -34,8 +34,8 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
 
             lock (SyncObject)
             {
-                var rd = new Random(Configuration.Seed);
-                var index = rd.Next(0, services.Count - 1);
+                var rd = new Random();
+                var index = rd.Next(services.Count);
                 return services[index];
             }
         }

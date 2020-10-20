@@ -20,7 +20,7 @@ namespace SharpAbp.Abp.FileStoring
 
         public AbpFileStoringOptions Configure(IConfiguration configuration)
         {
-            var providerConfigurationEntries = configuration.Get<Dictionary<string, ProviderConfigurationEntrty>>();
+            var providerConfigurationEntries = configuration.Get<Dictionary<string, ProviderConfigurationEntry>>();
 
             foreach (var kv in providerConfigurationEntries)
             {

@@ -1,6 +1,4 @@
-﻿using SharpAbp.Abp.Micro.Discovery;
-
-namespace SharpAbp.Abp.Micro.LoadBalancer
+﻿namespace SharpAbp.Abp.Micro.LoadBalancer
 {
     public class WeightServiceHostAndPort
     {

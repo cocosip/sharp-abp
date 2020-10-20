@@ -8,7 +8,7 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
         public void ParseWeightHostAndPorts_Test()
         {
             var weights = "127.0.0.1:1000-3,192.168.0.100:10002-5,192.168.100.103:333-2";
-            var weightServiceHostAndPorts = LoadBalancerUtil.ParseWeightHostAndPorts(weights);
+            var weightServiceHostAndPorts = LoadBalancerUtil.ConvertToWeightHostAndPorts(weights);
 
             var v1 = weightServiceHostAndPorts[0];
             Assert.Equal("127.0.0.1", v1.HostAndPort.Host);

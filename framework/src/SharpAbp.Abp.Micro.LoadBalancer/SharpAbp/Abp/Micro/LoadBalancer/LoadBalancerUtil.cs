@@ -8,11 +8,12 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
     {
 
         /// <summary>
-        /// Parse string to WeightServiceHostAndPort list, exp: 127.0.0.1:100-3,127.0.0.2:101-2,127.0.0.3:102-5
+        /// Parse string to WeightServiceHostAndPort list,
+        /// exp: 127.0.0.1:100-3,127.0.0.2:101-2,127.0.0.3:102-5
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static List<WeightServiceHostAndPort> ParseWeightHostAndPorts(string value)
+        public static List<WeightServiceHostAndPort> ConvertToWeightHostAndPorts(string value)
         {
             var weightHostAndPorts = new List<WeightServiceHostAndPort>();
             if (value.IsNullOrWhiteSpace())

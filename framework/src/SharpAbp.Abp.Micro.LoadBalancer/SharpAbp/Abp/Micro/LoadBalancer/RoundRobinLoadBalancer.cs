@@ -7,7 +7,7 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
 {
     public class RoundRobinLoadBalancer : ILoadBalancer
     {
-        public string Type => LoadBalancerConsts.RoundRobin;
+        public string BalancerType => LoadBalancerConsts.RoundRobin;
 
         public string Service { get; }
 
@@ -15,7 +15,7 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
         protected IServiceDiscoveryProvider DiscoveryProvider { get; }
 
         private readonly object SyncObject = new object();
-        private int _sequence = 1;
+        private int _sequence = 0;
 
         public RoundRobinLoadBalancer(string service, RoundRobinLoadBalancerConfiguration configuration, IServiceDiscoveryProvider discoveryProvider)
         {

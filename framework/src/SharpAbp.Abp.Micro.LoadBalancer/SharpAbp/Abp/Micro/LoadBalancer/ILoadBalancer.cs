@@ -5,7 +5,7 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
 {
     public interface ILoadBalancer
     {
-        string Type { get; }
+        string BalancerType { get; }
 
         string Service { get; }
 

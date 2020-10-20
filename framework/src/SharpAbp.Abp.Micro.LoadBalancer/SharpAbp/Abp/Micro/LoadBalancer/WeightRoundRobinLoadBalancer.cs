@@ -9,7 +9,7 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
 {
     public class WeightRoundRobinLoadBalancer : ILoadBalancer
     {
-        public string Type => LoadBalancerConsts.WeightRoundRobin;
+        public string BalancerType => LoadBalancerConsts.WeightRoundRobin;
 
         public string Service { get; }
 
@@ -84,14 +84,14 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
 
         private void Initialize(List<MicroService> services)
         {
-            var weightServiceHostAndPorts = LoadBalancerUtil.ParseWeightHostAndPorts(Configugration.Weights);
+            var weightHostAndPorts = LoadBalancerUtil.ConvertToWeightHostAndPorts(Configugration.Weights);
 
             var weightServices = new List<WeightMicroService>();
             foreach (var service in services)
             {
-                var weightServiceHostAndPort = weightServiceHostAndPorts.FirstOrDefault(x => x.HostAndPort.Host == service.Address && x.HostAndPort.Port == service.Port);
+                var weightHostAndPort = weightHostAndPorts.FirstOrDefault(x => x.HostAndPort.Host == service.Address && x.HostAndPort.Port == service.Port);
 
-                var weight = weightServiceHostAndPort?.Weight ?? 1;
+                var weight = weightHostAndPort?.Weight ?? 1;
                 weightServices.Add(new WeightMicroService(weight, service, weight));
             }
 

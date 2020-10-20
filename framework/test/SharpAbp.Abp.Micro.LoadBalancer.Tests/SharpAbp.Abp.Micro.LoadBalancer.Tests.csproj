@@ -29,4 +29,10 @@
     <ProjectReference Include="..\..\src\SharpAbp.Abp.Micro.LoadBalancer\SharpAbp.Abp.Micro.LoadBalancer.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

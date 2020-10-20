@@ -14,30 +14,28 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
         }
 
 
-        public LoadBalancerProviderConfiguration GetConfiguration([NotNull] string type)
+        public LoadBalancerProviderConfiguration GetConfiguration([NotNull] string balanceType)
         {
-            Check.NotNullOrWhiteSpace(type, nameof(type));
-            return _providers.GetOrDefault(type);
+            Check.NotNullOrWhiteSpace(balanceType, nameof(balanceType));
+            return _providers.GetOrDefault(balanceType);
         }
 
         public bool TryAdd([NotNull] LoadBalancerProviderConfiguration configuration)
         {
             Check.NotNull(configuration, nameof(configuration));
 
-            if (_providers.ContainsKey(configuration.Type))
+            if (_providers.ContainsKey(configuration.BalancerType))
             {
                 return false;
             }
-            _providers.Add(configuration.Type, configuration);
+            _providers.Add(configuration.BalancerType, configuration);
             return true;
         }
 
-
-
-        public bool TryRemove([NotNull] string type)
+        public bool TryRemove([NotNull] string balanceType)
         {
-            Check.NotNull(type, nameof(type));
-            return _providers.Remove(type);
+            Check.NotNull(balanceType, nameof(balanceType));
+            return _providers.Remove(balanceType);
         }
 
     }
