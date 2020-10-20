@@ -9,10 +9,7 @@ namespace SharpAbp.Abp.Micro.Discovery.AddressTable
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            Configure<AbpMicroDiscoveryAddressTableOptions>(c =>
-            {
-
-            });
+            Configure<AbpMicroDiscoveryAddressTableOptions>(c => { });
         }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Volo.Abp;
+using Volo.Abp.Reflection;
 
 namespace SharpAbp.Abp.FileStoring
 {
@@ -47,7 +48,8 @@ namespace SharpAbp.Abp.FileStoring
                     {
                         kv.Value.Properties.TryGetValue(defaultProperty.Key, out string value);
 
-                        var realValue = FileStoringUtil.ConvertPrimitiveType(value, defaultProperty.Value);
+                        var realValue = TypeHelper.ConvertFromString(defaultProperty.Value, value);
+
                         c.SetConfiguration(defaultProperty.Key, realValue);
                     }
 
