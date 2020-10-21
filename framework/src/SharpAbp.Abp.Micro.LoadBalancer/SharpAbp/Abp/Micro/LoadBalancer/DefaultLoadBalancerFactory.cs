@@ -22,7 +22,7 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
             BalancerCreators = balancerCreators;
         }
 
-        public ILoadBalancer Get([NotNull] string service)
+        public virtual ILoadBalancer Get([NotNull] string service)
         {
             Check.NotNullOrWhiteSpace(service, nameof(service));
 

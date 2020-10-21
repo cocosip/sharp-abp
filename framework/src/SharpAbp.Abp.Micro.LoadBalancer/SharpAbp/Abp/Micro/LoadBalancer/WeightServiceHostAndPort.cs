@@ -8,11 +8,6 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
 
         public int Weight { get; set; }
 
-        public WeightServiceHostAndPort()
-        {
-
-        }
-
         public WeightServiceHostAndPort(ServiceHostAndPort hostAndPort, int weight)
         {
             HostAndPort = hostAndPort;
@@ -23,7 +18,6 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
         {
             return HostAndPort == other.HostAndPort && Weight == other.Weight;
         }
-
 
         public override bool Equals(object obj)
         {
@@ -40,6 +34,9 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
             return StringComparer.InvariantCulture.GetHashCode(HostAndPort) | Weight.GetHashCode();
         }
 
-       
+        public static bool operator ==(WeightServiceHostAndPort s1, WeightServiceHostAndPort s2) => s1.Equals(s2);
+
+        public static bool operator !=(WeightServiceHostAndPort s1, WeightServiceHostAndPort s2) => !s1.Equals(s2);
+
     }
 }

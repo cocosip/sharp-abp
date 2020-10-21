@@ -41,6 +41,10 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
 
             Assert.Contains("2-1", ids);
             Assert.Contains("2-2", ids);
+
+            var loadBalancer2 = _loadBalancerHouse.Get("micro.addresstable.service2");
+            Assert.Equal(loadBalancer, loadBalancer2);
+
         }
 
         [Fact]
@@ -58,6 +62,10 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
             Assert.Equal("4-2", service2.Id);
             Assert.Equal("4-1", service3.Id);
             Assert.Equal("4-2", service4.Id);
+
+            var loadBalancer2 = _loadBalancerHouse.Get("micro.addresstable.service4");
+
+            Assert.Equal(loadBalancer, loadBalancer2);
         }
 
 
@@ -83,7 +91,13 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
             Assert.Equal("3-3", service5.Id);
             Assert.Equal("3-1", service6.Id);
             Assert.Equal("3-1", service7.Id);
+
+            var loadBalancer2 = _loadBalancerHouse.Get("micro.addresstable.service3");
+            Assert.Equal(loadBalancer, loadBalancer2);
         }
+
+
+
 
 
 

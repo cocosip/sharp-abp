@@ -1,5 +1,4 @@
-﻿using SharpAbp.Abp.Micro.Discovery;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace SharpAbp.Abp.Micro.LoadBalancer
