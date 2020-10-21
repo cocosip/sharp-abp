@@ -7,6 +7,10 @@ namespace SharpAbp.Abp.Micro.Discovery.Consul
     )]
     public class AbpMicroDiscoveryConsulModule : AbpModule
     {
+        public override void PreConfigureServices(ServiceConfigurationContext context)
+        {
+            Configure<AbpMicroDiscoveryConsulOptions>(options => { });
+        }
 
     }
 }

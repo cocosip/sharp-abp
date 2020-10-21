@@ -2,7 +2,7 @@
 
 namespace SharpAbp.Abp.FileStoring
 {
-    public class ProviderConfigurationEntrty
+    public class ProviderConfigurationEntry
     {
         public string Provider { get; set; }
 
@@ -12,7 +12,7 @@ namespace SharpAbp.Abp.FileStoring
 
         public Dictionary<string, string> Properties { get; set; }
 
-        public ProviderConfigurationEntrty()
+        public ProviderConfigurationEntry()
         {
             Properties = new Dictionary<string, string>();
         }

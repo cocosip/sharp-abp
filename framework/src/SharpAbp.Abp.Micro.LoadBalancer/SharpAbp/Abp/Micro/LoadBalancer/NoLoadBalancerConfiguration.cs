@@ -30,7 +30,7 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
             this LoadBalancerConfiguration configuration,
             Action<NoLoadBalancerConfiguration> noLoadBalancerConfigureAction)
         {
-            configuration.Type = LoadBalancerConsts.NoLoadBalancer;
+            configuration.BalancerType = LoadBalancerConsts.NoLoadBalancer;
 
             noLoadBalancerConfigureAction(new NoLoadBalancerConfiguration(configuration));
 

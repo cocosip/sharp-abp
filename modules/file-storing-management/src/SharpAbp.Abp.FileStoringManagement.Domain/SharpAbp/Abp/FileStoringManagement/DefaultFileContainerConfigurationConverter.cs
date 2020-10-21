@@ -4,6 +4,7 @@ using SharpAbp.Abp.FileStoring;
 using System;
 using Volo.Abp;
 using Volo.Abp.DependencyInjection;
+using Volo.Abp.Reflection;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
@@ -38,7 +39,8 @@ namespace SharpAbp.Abp.FileStoringManagement
 
             foreach (var item in container.Items)
             {
-                var value = FileStoringUtil.ConvertPrimitiveType(item.Value, item.TypeName);
+                var type = Type.GetType(item.TypeName);
+                var value = TypeHelper.ConvertFromString(type, item.Value);
                 configuration.SetConfiguration(item.Name, value);
             }
 

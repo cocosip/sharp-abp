@@ -22,12 +22,12 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
             return Name;
         }
 
-        public static string GetServiceLoadBalancerName<T>()
+        public static string GetLoadBalancerName<T>()
         {
-            return GetServiceLoadBalancerName(typeof(T));
+            return GetLoadBalancerName(typeof(T));
         }
 
-        public static string GetServiceLoadBalancerName(Type type)
+        public static string GetLoadBalancerName(Type type)
         {
             var nameAttribute = type.GetCustomAttribute<LoadBalancerNameAttribute>();
 

@@ -8,7 +8,7 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
 {
     public class NoLoadBalancer : ILoadBalancer
     {
-        public string Type => LoadBalancerConsts.NoLoadBalancer;
+        public string BalancerType => LoadBalancerConsts.NoLoadBalancer;
 
         public string Service { get; }
 

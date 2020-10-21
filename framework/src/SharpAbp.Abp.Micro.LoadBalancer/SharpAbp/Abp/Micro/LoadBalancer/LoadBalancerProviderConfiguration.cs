@@ -7,7 +7,7 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
 {
     public class LoadBalancerProviderConfiguration
     {
-        public string Type { get; set; }
+        public string BalancerType { get; set; }
 
         private readonly Dictionary<string, Type> _properties;
 
@@ -18,7 +18,7 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
 
         public LoadBalancerProviderConfiguration(string type)
         {
-            Type = type;
+            BalancerType = type;
             _properties = new Dictionary<string, Type>();
         }
 

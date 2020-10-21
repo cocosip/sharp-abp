@@ -21,7 +21,7 @@ namespace SharpAbp.Abp.FileStoring
 
         public AbpFileStoringOptions Configure(IConfiguration configuration)
         {
-            var providerConfigurationEntries = configuration.Get<Dictionary<string, ProviderConfigurationEntrty>>();
+            var providerConfigurationEntries = configuration.Get<Dictionary<string, ProviderConfigurationEntry>>();
 
             foreach (var kv in providerConfigurationEntries)
             {
@@ -47,9 +47,7 @@ namespace SharpAbp.Abp.FileStoring
                     foreach (var defaultProperty in defaultProperties)
                     {
                         kv.Value.Properties.TryGetValue(defaultProperty.Key, out string value);
-
                         var realValue = TypeHelper.ConvertFromString(defaultProperty.Value, value);
-
                         c.SetConfiguration(defaultProperty.Key, realValue);
                     }
 

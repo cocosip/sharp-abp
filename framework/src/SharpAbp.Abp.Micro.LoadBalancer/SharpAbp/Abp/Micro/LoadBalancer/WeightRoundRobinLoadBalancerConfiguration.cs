@@ -1,6 +1,4 @@
-﻿using SharpAbp.Abp.Micro.Discovery;
-using System;
-using System.Collections.Generic;
+﻿using System;
 
 namespace SharpAbp.Abp.Micro.LoadBalancer
 {
@@ -25,16 +23,16 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
     public static class WeightRoundRobinLoadBalancerConfigurationExtensions
     {
         public static WeightRoundRobinLoadBalancerConfiguration GetWeightRoundRobinConfiguration(
-          this LoadBalancerConfiguration containerConfiguration)
+          this LoadBalancerConfiguration configuration)
         {
-            return new WeightRoundRobinLoadBalancerConfiguration(containerConfiguration);
+            return new WeightRoundRobinLoadBalancerConfiguration(configuration);
         }
 
         public static LoadBalancerConfiguration UseWeightRoundRobin(
             this LoadBalancerConfiguration configuration,
             Action<WeightRoundRobinLoadBalancerConfiguration> weightRoundRobinConfigureAction)
         {
-            configuration.Type = LoadBalancerConsts.WeightRoundRobin;
+            configuration.BalancerType = LoadBalancerConsts.WeightRoundRobin;
             weightRoundRobinConfigureAction(new WeightRoundRobinLoadBalancerConfiguration(configuration));
 
             return configuration;

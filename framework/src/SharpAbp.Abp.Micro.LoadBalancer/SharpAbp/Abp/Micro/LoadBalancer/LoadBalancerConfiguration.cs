@@ -6,7 +6,7 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
 {
     public class LoadBalancerConfiguration
     {
-        public string Type { get; set; }
+        public string BalancerType { get; set; }
 
         [NotNull]
         private readonly Dictionary<string, object> _properties;
