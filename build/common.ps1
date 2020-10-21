@@ -21,7 +21,7 @@ if ($full -eq "-f")
 #		"../modules/virtual-file-explorer",
 #	) 
 }else{ 
-	Write-host ""
-	Write-host ":::::::::::::: !!! You are in development mode !!! ::::::::::::::" -ForegroundColor red -BackgroundColor  yellow
-	Write-host "" 
+	Write-Host ""
+	Write-Host ":::::::::::::: !!! You are in development mode !!! ::::::::::::::" -ForegroundColor red -BackgroundColor  yellow
+	Write-Host "" 
 } 
