@@ -28,4 +28,5 @@ jobs:
       shell: powershell
 
     - name: Publish
+      working-directory: .\build
       run: dotnet nuget push ..\dest\*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
