@@ -69,7 +69,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoring.Al
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Micro.LoadBalancer.Tests", "test\SharpAbp.Abp.Micro.LoadBalancer.Tests\SharpAbp.Abp.Micro.LoadBalancer.Tests.csproj", "{B901DDA1-3459-4455-8F5F-A1E6358A5D49}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Micro.Tests", "test\SharpAbp.Abp.Micro.Tests\SharpAbp.Abp.Micro.Tests.csproj", "{26D4C027-416F-47E0-B87A-FEE15CB4CB90}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Micro.Tests", "test\SharpAbp.Abp.Micro.Tests\SharpAbp.Abp.Micro.Tests.csproj", "{26D4C027-416F-47E0-B87A-FEE15CB4CB90}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
