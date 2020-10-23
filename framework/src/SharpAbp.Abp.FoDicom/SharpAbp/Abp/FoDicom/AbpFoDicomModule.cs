@@ -13,16 +13,17 @@ namespace SharpAbp.Abp.FoDicom
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
+            Configure<FoDicomOptions>(option => { });
             context.Services
-                .Configure<FoDicomOption>(c => { })
                 .AddFellowOakDicom()
                 .AddLogManager<MicrosoftLogManager>();
+
         }
 
 
         public override void OnApplicationInitialization(ApplicationInitializationContext context)
         {
-            var option = context.ServiceProvider.GetRequiredService<IOptions<FoDicomOption>>().Value;
+            var option = context.ServiceProvider.GetRequiredService<IOptions<FoDicomOptions>>().Value;
             if (!option.TemporaryFilePath.IsNullOrWhiteSpace())
             {
                 TemporaryFile.StoragePath = option.TemporaryFilePath;

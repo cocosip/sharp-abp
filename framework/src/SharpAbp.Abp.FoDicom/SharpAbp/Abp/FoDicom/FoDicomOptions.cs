@@ -2,7 +2,7 @@
 {
     /// <summary>FoDicomOption
     /// </summary>
-    public class FoDicomOption
+    public class FoDicomOptions
     {
         /// <summary>TemporaryFilePath
         /// </summary>
