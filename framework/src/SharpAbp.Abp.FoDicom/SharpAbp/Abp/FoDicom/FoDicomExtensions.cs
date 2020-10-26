@@ -17,42 +17,9 @@ namespace SharpAbp.Abp.FoDicom
         /// <returns></returns>
         public static DateTime? GetDate(this DicomDataset dataset, DicomTag tag, DateTime? defaultValue = null)
         {
-            var dateValue = dataset.GetSingleValueOrDefault(tag, "");
-            return dateValue.ParseAsDicomDate(defaultValue);
+            var value = dataset.GetSingleValueOrDefault(tag, "");
+            return value.ParseAsDicomDate(defaultValue);
         }
-
-        /// <summary>
-        /// Parse dicom string format date as DateTime
-        /// </summary>
-        /// <param name="stringDateValue"></param>
-        /// <param name="defaultValue"></param>
-        /// <returns></returns>
-        public static DateTime? ParseAsDicomDate(this string stringDateValue, DateTime? defaultValue = null)
-        {
-            if (defaultValue == null)
-            {
-                defaultValue = new DateTime(1970, 1, 1);
-            }
-
-            if (stringDateValue.IsNullOrWhiteSpace())
-            {
-                return defaultValue;
-            }
-
-            if (Regex.IsMatch(stringDateValue, @"^[\d]{8}$"))
-            {
-                if (DateTime.TryParseExact(stringDateValue, "yyyyMMdd", CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime d1))
-                {
-                    return d1;
-                }
-            }
-            if (DateTime.TryParse(stringDateValue, out DateTime d2))
-            {
-                return d2;
-            }
-            return defaultValue;
-        }
-
 
         /// <summary>
         /// Get DateTime from DicomDataset
@@ -63,57 +30,21 @@ namespace SharpAbp.Abp.FoDicom
         /// <returns></returns>
         public static DateTime? GetTime(this DicomDataset dataset, DicomTag tag, DateTime? defaultValue = null)
         {
-            var stringTimeValue = dataset.GetSingleValueOrDefault(tag, "");
-            return stringTimeValue.ParseAsDicomTime(defaultValue);
+            var value = dataset.GetSingleValueOrDefault(tag, "");
+            return value.ParseAsDicomTime(defaultValue);
         }
 
         /// <summary>
-        /// Parse dicom string format datetime as DateTime
+        /// Get Age from DicomDataset
         /// </summary>
-        /// <param name="stringTimeValue"></param>
+        /// <param name="dataset"></param>
+        /// <param name="tag"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        public static DateTime? ParseAsDicomTime(this string stringTimeValue, DateTime? defaultValue = null)
+        public static DicomAge GetAge(this DicomDataset dataset, DicomTag tag, DicomAge defaultValue = default)
         {
-            if (defaultValue == null)
-            {
-                defaultValue = new DateTime(1970, 1, 1);
-            }
-
-            if (stringTimeValue.IsNullOrWhiteSpace())
-            {
-                return defaultValue;
-            }
-
-            if (Regex.IsMatch(stringTimeValue, @"^[\d]{6}$"))
-            {
-                if (DateTime.TryParseExact(stringTimeValue, "HHmmss", CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime d1))
-                {
-                    return new DateTime(1970, 1, 1, d1.Hour, d1.Minute, d1.Second);
-                }
-            }
-            else if (Regex.IsMatch(stringTimeValue, @"^[\d]{4}$"))
-            {
-                if (DateTime.TryParseExact(stringTimeValue, "HHmm", CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime d1))
-                {
-                    return new DateTime(1970, 1, 1, d1.Hour, d1.Minute, d1.Second);
-                }
-            }
-            else if (Regex.IsMatch(stringTimeValue, @"^[\d]{6}\.[\d]{1,7}$"))
-            {
-
-                var f = "HHmmss.".PadRight(stringTimeValue.Length, 'f');
-                if (DateTime.TryParseExact(stringTimeValue, f, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime d1))
-                {
-                    return new DateTime(1970, 1, 1, d1.Hour, d1.Minute, d1.Second);
-                }
-            }
-
-            if (DateTime.TryParse(stringTimeValue, out DateTime d2))
-            {
-                return new DateTime(1970, 1, 1, d2.Hour, d2.Minute, d2.Second);
-            }
-            return defaultValue;
+            var value = dataset.GetSingleValueOrDefault(tag, "");
+            return value.ParseAsDicomAge(defaultValue);
         }
 
 
@@ -136,6 +67,139 @@ namespace SharpAbp.Abp.FoDicom
             }
             return string.Empty;
         }
+
+        /// <summary>
+        /// Parse dicom string format date as DateTime
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        public static DateTime? ParseAsDicomDate(this string value, DateTime? defaultValue = null)
+        {
+            if (defaultValue == null)
+            {
+                defaultValue = new DateTime(1970, 1, 1);
+            }
+
+            if (value.IsNullOrWhiteSpace())
+            {
+                return defaultValue;
+            }
+
+            if (Regex.IsMatch(value, @"^[\d]{8}$"))
+            {
+                if (DateTime.TryParseExact(value, "yyyyMMdd", CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime d1))
+                {
+                    return d1;
+                }
+            }
+            if (DateTime.TryParse(value, out DateTime d2))
+            {
+                return d2;
+            }
+            return defaultValue;
+        }
+
+
+        /// <summary>
+        /// Parse dicom string format datetime as DateTime
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        public static DateTime? ParseAsDicomTime(this string value, DateTime? defaultValue = null)
+        {
+            if (defaultValue == null)
+            {
+                defaultValue = new DateTime(1970, 1, 1);
+            }
+
+            if (value.IsNullOrWhiteSpace())
+            {
+                return defaultValue;
+            }
+
+            if (Regex.IsMatch(value, @"^[\d]{6}$"))
+            {
+                if (DateTime.TryParseExact(value, "HHmmss", CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime d1))
+                {
+                    return new DateTime(1970, 1, 1, d1.Hour, d1.Minute, d1.Second);
+                }
+            }
+            else if (Regex.IsMatch(value, @"^[\d]{4}$"))
+            {
+                if (DateTime.TryParseExact(value, "HHmm", CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime d1))
+                {
+                    return new DateTime(1970, 1, 1, d1.Hour, d1.Minute, d1.Second);
+                }
+            }
+            else if (Regex.IsMatch(value, @"^[\d]{6}\.[\d]{1,7}$"))
+            {
+
+                var f = "HHmmss.".PadRight(value.Length, 'f');
+                if (DateTime.TryParseExact(value, f, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime d1))
+                {
+                    return new DateTime(1970, 1, 1, d1.Hour, d1.Minute, d1.Second, d1.Millisecond);
+                }
+            }
+
+            if (DateTime.TryParse(value, out DateTime d2))
+            {
+                return new DateTime(1970, 1, 1, d2.Hour, d2.Minute, d2.Second);
+            }
+            return defaultValue;
+        }
+
+        /// <summary>
+        /// Parse dicom age value as real age
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        public static DicomAge ParseAsDicomAge(this string value, DicomAge defaultValue = default)
+        {
+            //042Y
+            if (Regex.IsMatch(value, "^[\\d]{3}[\\S\\s]{1}$"))
+            {
+                var ageValue = value.Substring(0, 3);
+                if (int.TryParse(ageValue, out int age))
+                {
+                    var p = value.Substring(3, 1);
+                    DicomAgeMode mode;
+                    switch (p)
+                    {
+                        case "D":
+                        case "d":
+                        case "天":
+                            mode = DicomAgeMode.M;
+                            break;
+                        case "W":
+                        case "w":
+                        case "周":
+                            mode = DicomAgeMode.W;
+                            break;
+                        case "M":
+                        case "m":
+                        case "月":
+                            mode = DicomAgeMode.M;
+                            break;
+                        case "Y":
+                        case "y":
+                        case "年":
+                        case "岁":
+                        default:
+                            mode = DicomAgeMode.Y;
+                            break;
+                    }
+
+                    return new DicomAge(age, mode);
+
+                }
+            }
+
+            return defaultValue;
+        }
+
 
         /// <summary>
         /// Parse buffer to dicom encoding string
