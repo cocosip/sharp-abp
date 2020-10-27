@@ -3,7 +3,8 @@ using System;
 
 namespace SharpAbp.Abp.FoDicom.Log
 {
-    /// <summary>微软日志记录器
+    /// <summary>
+    /// Microsoft logger
     /// </summary>
     public class MicrosoftLogger : FellowOakDicom.Log.Logger
     {
@@ -19,9 +20,9 @@ namespace SharpAbp.Abp.FoDicom.Log
         {
             var microsoftLogLevel = GetMicrosoftLogLevel(level);
 
-            if (args.Length >= 1 && args[0] is Exception)
+            if (args.Length >= 1 && args[0] is Exception exception)
             {
-                _microsoftLogger.Log(microsoftLogLevel, (Exception)args[0], msg, args);
+                _microsoftLogger.Log(microsoftLogLevel, exception, msg, args);
             }
             else
             {
@@ -30,7 +31,8 @@ namespace SharpAbp.Abp.FoDicom.Log
         }
 
 
-        /// <summary>转换为微软日志记录级别
+        /// <summary>
+        /// Convert to microsoft logging level
         /// </summary>
         public LogLevel GetMicrosoftLogLevel(FellowOakDicom.Log.LogLevel level)
         {

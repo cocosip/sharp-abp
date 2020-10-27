@@ -2,7 +2,8 @@
 
 namespace SharpAbp.Abp.FoDicom.Log
 {
-    /// <summary>微软日志适配
+    /// <summary>
+    /// Microsoft logging adapter
     /// </summary>
     public class MicrosoftLogManager : FellowOakDicom.Log.LogManager
     {

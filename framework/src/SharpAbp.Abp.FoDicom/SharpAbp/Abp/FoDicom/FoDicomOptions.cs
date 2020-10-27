@@ -1,10 +1,12 @@
 ﻿namespace SharpAbp.Abp.FoDicom
 {
-    /// <summary>FoDicomOption
+    /// <summary>
+    /// FoDicomOptions
     /// </summary>
     public class FoDicomOptions
     {
-        /// <summary>TemporaryFilePath
+        /// <summary>
+        /// Temporary file store path
         /// </summary>
         public string TemporaryFilePath { get; set; }
     }
