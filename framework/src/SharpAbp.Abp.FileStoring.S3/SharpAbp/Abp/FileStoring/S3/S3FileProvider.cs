@@ -1,7 +1,7 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
-using Amazon.S3.Multiplex;
 using AmazonKS3;
+using AutoS3;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -218,17 +218,17 @@ namespace SharpAbp.Abp.FileStoring.S3
 
             var amazonS3 = S3ClientFactory.GetOrAddClient(configuration.AccessKeyId, configuration.SecretAccessKey, () =>
              {
-                 var s3ClientDescriptor = new S3ClientDescriptor()
+                 var s3ClientConfiguration = new S3ClientConfiguration()
                  {
-                     VendorType = (S3VendorType)configuration.VendorType,
+                     Vendor = (S3VendorType)configuration.VendorType,
                      AccessKeyId = configuration.AccessKeyId,
                      SecretAccessKey = configuration.SecretAccessKey,
-                     ClientCount = configuration.ClientCount,
+                     MaxClient = configuration.MaxClient,
                  };
 
                  if (configuration.VendorType == (int)S3VendorType.KS3)
                  {
-                     s3ClientDescriptor.Config = new AmazonS3Config()
+                     s3ClientConfiguration.Config = new AmazonS3Config()
                      {
                          ServiceURL = configuration.ServerUrl,
                          ForcePathStyle = configuration.ForcePathStyle,
@@ -237,7 +237,7 @@ namespace SharpAbp.Abp.FileStoring.S3
                  }
                  else
                  {
-                     s3ClientDescriptor.Config = new AmazonKS3Config()
+                     s3ClientConfiguration.Config = new AmazonKS3Config()
                      {
                          ServiceURL = configuration.ServerUrl,
                          ForcePathStyle = configuration.ForcePathStyle,
@@ -245,7 +245,7 @@ namespace SharpAbp.Abp.FileStoring.S3
                      };
                  }
 
-                 return s3ClientDescriptor;
+                 return s3ClientConfiguration;
              });
 
             return amazonS3;

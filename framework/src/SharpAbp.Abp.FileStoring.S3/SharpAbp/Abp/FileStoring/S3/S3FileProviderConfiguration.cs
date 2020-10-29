@@ -1,4 +1,4 @@
-﻿using Amazon.S3.Multiplex;
+﻿using AutoS3;
 using Volo.Abp;
 
 namespace SharpAbp.Abp.FileStoring.S3
@@ -117,12 +117,12 @@ namespace SharpAbp.Abp.FileStoring.S3
 
 
         /// <summary>
-        /// ClientCount
+        /// MaxClient
         /// </summary>
-        public int ClientCount
+        public int MaxClient
         {
-            get => _containerConfiguration.GetConfigurationOrDefault(S3FileProviderConfigurationNames.ClientCount, 10);
-            set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.ClientCount, value);
+            get => _containerConfiguration.GetConfigurationOrDefault(S3FileProviderConfigurationNames.MaxClient, 10);
+            set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.MaxClient, value);
         }
 
 

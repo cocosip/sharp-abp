@@ -141,7 +141,7 @@ namespace SharpAbp.Abp.FileStoring
             Assert.Equal(5242880, s3Configuration.SliceSize);
             Assert.Equal("2.0", s3Configuration.SignatureVersion);
             Assert.False(s3Configuration.CreateBucketIfNotExists);
-            Assert.Equal(20, s3Configuration.ClientCount);
+            Assert.Equal(20, s3Configuration.MaxClient);
         }
 
     }

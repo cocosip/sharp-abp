@@ -5,22 +5,20 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>SharpAbp.Abp.AmazonS3.KS3</AssemblyName>
-    <PackageId>SharpAbp.Abp.AmazonS3.KS3</PackageId>
+    <AssemblyName>SharpAbp.Abp.AutoS3</AssemblyName>
+    <PackageId>SharpAbp.Abp.AutoS3</PackageId>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Description>SharpAbp AmazonS3 KS3 Module</Description>
+    <Description>SharpAbp AutoS3 Module</Description>
     <RootNamespace />
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AmazonS3.Multiplex.KS3" Version="1.3.6" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\SharpAbp.Abp.AmazonS3\SharpAbp.Abp.AmazonS3.csproj" />
+    <PackageReference Include="AutoS3" Version="1.1.0" />
+    <PackageReference Include="AutoS3.KS3" Version="1.1.0" />
+    <PackageReference Include="Volo.Abp" Version="3.3.0" />
   </ItemGroup>
 
 </Project>

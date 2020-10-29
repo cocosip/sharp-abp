@@ -17,7 +17,7 @@
         public const string SignatureVersion = "S3.SignatureVersion";
         public const string CreateBucketIfNotExists = "S3.CreateBucketIfNotExists";
 
-        public const string ClientCount = "S3.ClientCount";
+        public const string MaxClient = "S3.MaxClient";
 
     }
 }

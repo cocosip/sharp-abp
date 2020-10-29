@@ -1,4 +1,4 @@
-﻿using SharpAbp.Abp.AmazonS3.KS3;
+﻿using SharpAbp.Abp.AutoS3.KS3;
 using SharpAbp.Abp.FileStoring.S3.Localization;
 using Volo.Abp.Localization;
 using Volo.Abp.Localization.ExceptionHandling;
@@ -11,7 +11,7 @@ namespace SharpAbp.Abp.FileStoring.S3
 {
     [DependsOn(
       typeof(AbpFileStoringModule),
-      typeof(AbpAmazonS3KS3Module),
+      typeof(AbpAutoS3KS3Module),
       typeof(AbpValidationModule)
     )]
     public class AbpFileStoringS3Module : AbpModule
@@ -63,7 +63,7 @@ namespace SharpAbp.Abp.FileStoring.S3
                 .SetProperty(S3FileProviderConfigurationNames.SliceSize, typeof(int))
                 .SetProperty(S3FileProviderConfigurationNames.SignatureVersion, typeof(string))
                 .SetProperty(S3FileProviderConfigurationNames.CreateBucketIfNotExists, typeof(bool))
-                .SetProperty(S3FileProviderConfigurationNames.ClientCount, typeof(int));
+                .SetProperty(S3FileProviderConfigurationNames.MaxClient, typeof(int));
 
             return configuration;
         }

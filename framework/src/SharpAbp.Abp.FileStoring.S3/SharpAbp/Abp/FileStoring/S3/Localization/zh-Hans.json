@@ -13,6 +13,6 @@
     "S3.SliceSize": "分片大小",
     "S3.SignatureVersion": "签名版本",
     "S3.CreateBucketIfNotExists": "自动建桶",
-    "S3.ClientCount": "客户端连接数"
+    "S3.MaxClient": "客户端连接数"
   }
 }
