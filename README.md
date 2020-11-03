@@ -12,6 +12,4 @@
 | DotCommon | DotCommon ABP Adapter | [doc](/docs/DotCommon.md) |
 | FastDFS | FastDFS ABP Adapter | [doc](/docs/FastDFS.md) |
 | FileStoring | ABP Store File | [doc](/docs/FileStoring.md) |
-| FoDicom | FoDicom ABP Adapter | [doc](/docs/FoDicom.md) |
-| Spool | Spool ABP Adapter | [doc](docs/Spool.md) |
 | Micro | Micro service modules | [doc](docs/Micro.md) |
