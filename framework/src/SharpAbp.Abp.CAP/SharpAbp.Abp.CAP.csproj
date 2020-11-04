@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\common.props" />
+  <Import Project="..\..\..\configureawait.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>SharpAbp.Abp.CAP</AssemblyName>
+    <PackageId>SharpAbp.Abp.CAP</PackageId>
+    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <Description>SharpAbp CAP Module</Description>
+    <RootNamespace />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetCore.CAP" Version="3.1.1" />
+    <PackageReference Include="Volo.Abp" Version="3.3.1" />
+  </ItemGroup>
+
+</Project>
