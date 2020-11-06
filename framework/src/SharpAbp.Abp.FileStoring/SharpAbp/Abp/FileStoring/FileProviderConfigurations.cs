@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Volo.Abp;
 
 namespace SharpAbp.Abp.FileStoring
@@ -48,6 +49,11 @@ namespace SharpAbp.Abp.FileStoring
         {
             Check.NotNull(providerName, nameof(providerName));
             return _providers.Remove(providerName);
+        }
+
+        public List<FileProviderConfiguration> GetFileProviders()
+        {
+            return _providers.Values.ToList();
         }
 
     }

@@ -1,4 +1,5 @@
-﻿using SharpAbp.Abp.FileStoring.Aliyun;
+﻿using Microsoft.Extensions.Options;
+using SharpAbp.Abp.FileStoring.Aliyun;
 using SharpAbp.Abp.FileStoring.Azure;
 using SharpAbp.Abp.FileStoring.FastDFS;
 using SharpAbp.Abp.FileStoring.FileSystem;
@@ -12,10 +13,11 @@ namespace SharpAbp.Abp.FileStoring
     public class AbpFileStoringOptionsTest : AbpFileStoringAllTestBase
     {
         private readonly IFileContainerConfigurationProvider _configurationProvider;
-
+        private readonly AbpFileStoringOptions _options;
         public AbpFileStoringOptionsTest()
         {
             _configurationProvider = GetRequiredService<IFileContainerConfigurationProvider>();
+            _options = GetRequiredService<IOptions<AbpFileStoringOptions>>().Value;
         }
 
 
@@ -142,6 +144,32 @@ namespace SharpAbp.Abp.FileStoring
             Assert.Equal("2.0", s3Configuration.SignatureVersion);
             Assert.False(s3Configuration.CreateBucketIfNotExists);
             Assert.Equal(20, s3Configuration.MaxClient);
+        }
+
+        [Fact]
+        public void FileProviders_Test()
+        {
+            var fileProviderConfigurations = _options.Providers.GetFileProviders();
+            Assert.Equal(6, fileProviderConfigurations.Count);
+
+            var aliyunProviderConfiguration = _options.Providers.GetConfiguration("Aliyun");
+            Assert.Equal("Aliyun", aliyunProviderConfiguration.Provider);
+
+            var azureProviderConfiguration = _options.Providers.GetConfiguration("Azure");
+            Assert.Equal("Azure", azureProviderConfiguration.Provider);
+
+            var fastDFSProviderConfiguration = _options.Providers.GetConfiguration("FastDFS");
+            Assert.Equal("FastDFS", fastDFSProviderConfiguration.Provider);
+
+            var minioProviderConfiguration = _options.Providers.GetConfiguration("Minio");
+            Assert.Equal("Minio", minioProviderConfiguration.Provider);
+
+            var fileSystemProviderConfiguration = _options.Providers.GetConfiguration("FileSystem");
+            Assert.Equal("FileSystem", fileSystemProviderConfiguration.Provider);
+
+            var s3ProviderConfiguration = _options.Providers.GetConfiguration("S3");
+            Assert.Equal("S3", s3ProviderConfiguration.Provider);
+
         }
 
     }
