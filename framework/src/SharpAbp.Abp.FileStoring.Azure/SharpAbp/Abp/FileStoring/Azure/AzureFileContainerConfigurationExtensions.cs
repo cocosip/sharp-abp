@@ -14,7 +14,7 @@ namespace SharpAbp.Abp.FileStoring.Azure
             this FileContainerConfiguration containerConfiguration,
             Action<AzureFileProviderConfiguration> azureConfigureAction)
         {
-            containerConfiguration.ProviderType = typeof(AzureFileProvider);
+            containerConfiguration.Provider = AzureFileProviderConfigurationNames.ProviderName;
             containerConfiguration.NamingNormalizers.TryAdd<AzureFileNamingNormalizer>();
 
             azureConfigureAction(new AzureFileProviderConfiguration(containerConfiguration));

@@ -49,7 +49,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
 
         private FileProviderConfiguration GetFileProviderConfiguration()
         {
-            var configuration = new FileProviderConfiguration(typeof(AliyunFileProvider));
+            var configuration = new FileProviderConfiguration(AliyunFileProviderConfigurationNames.ProviderName);
             configuration.DefaultNamingNormalizers.TryAdd<AliyunFileNamingNormalizer>();
             configuration
                 .SetProperty(AliyunFileProviderConfigurationNames.RegionId, typeof(string))

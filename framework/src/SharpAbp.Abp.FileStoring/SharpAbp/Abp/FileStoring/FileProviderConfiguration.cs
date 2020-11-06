@@ -8,16 +8,16 @@ namespace SharpAbp.Abp.FileStoring
 {
     public class FileProviderConfiguration
     {
-        public Type ProviderType { get; protected set; }
+        public string Provider { get; }
 
         public ITypeList<IFileNamingNormalizer> DefaultNamingNormalizers { get; }
 
         [NotNull]
         private readonly Dictionary<string, Type> _properties;
 
-        public FileProviderConfiguration(Type providerType)
+        public FileProviderConfiguration([NotNull] string provider)
         {
-            ProviderType = providerType;
+            Provider = provider;
             DefaultNamingNormalizers = new TypeList<IFileNamingNormalizer>();
             _properties = new Dictionary<string, Type>();
         }

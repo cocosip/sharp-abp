@@ -14,7 +14,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
             this FileContainerConfiguration containerConfiguration,
             Action<MinioFileProviderConfiguration> minioConfigureAction)
         {
-            containerConfiguration.ProviderType = typeof(MinioFileProvider);
+            containerConfiguration.Provider = MinioFileProviderConfigurationNames.ProviderName;
             containerConfiguration.NamingNormalizers.TryAdd<MinioFileNamingNormalizer>();
 
             minioConfigureAction(new MinioFileProviderConfiguration(containerConfiguration));

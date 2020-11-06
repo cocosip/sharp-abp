@@ -23,6 +23,8 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             AliyunFileNameCalculator = aliyunFileNameCalculator;
         }
 
+        public override string Provider => AliyunFileProviderConfigurationNames.ProviderName;
+
         protected virtual IOss GetOssClient(FileContainerConfiguration fileContainerConfiguration)
         {
             var aliyunConfig = fileContainerConfiguration.GetAliyunConfiguration();
@@ -124,7 +126,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
 
             var datetime = args.Expires ?? Clock.Now.AddSeconds(3600);
             var uri = ossClient.GeneratePresignedUri(containerName, fileName, datetime);
-            
+
             return Task.FromResult(uri.ToString());
         }
 

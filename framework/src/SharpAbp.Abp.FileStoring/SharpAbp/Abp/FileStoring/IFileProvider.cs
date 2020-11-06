@@ -5,6 +5,8 @@ namespace SharpAbp.Abp.FileStoring
 {
     public interface IFileProvider
     {
+        string Provider { get; }
+
         Task<string> SaveAsync(FileProviderSaveArgs args);
 
         Task<bool> DeleteAsync(FileProviderDeleteArgs args);

@@ -15,6 +15,8 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
         {
             FilePathCalculator = filePathCalculator;
         }
+        
+        public override string Provider => FileSystemFileProviderConfigurationNames.ProviderName;
 
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {

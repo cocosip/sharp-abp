@@ -14,7 +14,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             this FileContainerConfiguration containerConfiguration,
             Action<AliyunFileProviderConfiguration> aliyunConfigureAction)
         {
-            containerConfiguration.ProviderType = typeof(AliyunFileProvider);
+            containerConfiguration.Provider = AliyunFileProviderConfigurationNames.ProviderName;
             containerConfiguration.NamingNormalizers.TryAdd<AliyunFileNamingNormalizer>();
 
             aliyunConfigureAction(new AliyunFileProviderConfiguration(containerConfiguration));

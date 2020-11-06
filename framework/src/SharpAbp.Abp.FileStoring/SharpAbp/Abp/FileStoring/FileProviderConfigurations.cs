@@ -20,21 +20,21 @@ namespace SharpAbp.Abp.FileStoring
             return GetConfiguration(providerType.FullName);
         }
 
-        public FileProviderConfiguration GetConfiguration([NotNull] string providerName)
+        public FileProviderConfiguration GetConfiguration([NotNull] string provider)
         {
-            Check.NotNullOrWhiteSpace(providerName, nameof(providerName));
-            return _providers.GetOrDefault(providerName);
+            Check.NotNullOrWhiteSpace(provider, nameof(provider));
+            return _providers.GetOrDefault(provider);
         }
 
         public bool TryAdd([NotNull] FileProviderConfiguration configuration)
         {
             Check.NotNull(configuration, nameof(configuration));
 
-            if (_providers.ContainsKey(configuration.ProviderType.Name))
+            if (_providers.ContainsKey(configuration.Provider))
             {
                 return false;
             }
-            _providers.Add(configuration.ProviderType.Name, configuration);
+            _providers.Add(configuration.Provider, configuration);
             return true;
         }
 

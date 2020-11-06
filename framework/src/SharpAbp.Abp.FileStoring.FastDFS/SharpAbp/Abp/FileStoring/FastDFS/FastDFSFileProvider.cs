@@ -25,6 +25,8 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
             Client = client;
         }
 
+        public override string Provider => FastDFSFileProviderConfigurationNames.ProviderName;
+
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
             var configuration = args.Configuration.GetFastDFSConfiguration();
