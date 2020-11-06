@@ -14,7 +14,6 @@ namespace SharpAbp.Abp.FileStoring.Database
         protected IGuidGenerator GuidGenerator { get; }
         protected ICurrentTenant CurrentTenant { get; }
 
-
         public DatabaseFileProvider(
            IDatabaseFileRepository databaseFileRepository,
            IDatabaseFileContainerRepository databaseFileContainerRepository,
@@ -27,6 +26,7 @@ namespace SharpAbp.Abp.FileStoring.Database
             CurrentTenant = currentTenant;
         }
 
+        public override string Provider => DatabaseFileProviderConsts.ProviderName;
 
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {

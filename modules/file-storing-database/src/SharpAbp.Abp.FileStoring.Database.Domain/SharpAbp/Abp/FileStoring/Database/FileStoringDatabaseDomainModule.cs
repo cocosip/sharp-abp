@@ -1,4 +1,5 @@
-﻿using Volo.Abp.Domain;
+﻿using System;
+using Volo.Abp.Domain;
 using Volo.Abp.Modularity;
 
 namespace SharpAbp.Abp.FileStoring.Database
@@ -26,7 +27,7 @@ namespace SharpAbp.Abp.FileStoring.Database
             {
                 options.Containers.ConfigureDefault(container =>
                 {
-                    if (container.ProviderType == null)
+                    if (container.Provider.IsNullOrWhiteSpace())
                     {
                         container.UseDatabase();
                     }
@@ -36,7 +37,7 @@ namespace SharpAbp.Abp.FileStoring.Database
 
         private FileProviderConfiguration GetFileProviderConfiguration()
         {
-            var configuration = new FileProviderConfiguration(typeof(DatabaseFileProvider));
+            var configuration = new FileProviderConfiguration(DatabaseFileProviderConsts.ProviderName);
             return configuration;
         }
     }

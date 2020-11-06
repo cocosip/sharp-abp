@@ -32,7 +32,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 
             var configuration = new FileContainerConfiguration()
             {
-                ProviderType = fileProviderConfiguration.ProviderType,
+                Provider = fileProviderConfiguration.Provider,
                 IsMultiTenant = !container.TenantId.HasValue,
                 HttpSupport = container.HttpSupport
             };

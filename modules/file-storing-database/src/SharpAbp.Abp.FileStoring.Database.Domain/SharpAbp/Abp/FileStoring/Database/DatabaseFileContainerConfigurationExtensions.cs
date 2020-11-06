@@ -5,7 +5,7 @@
         public static FileContainerConfiguration UseDatabase(
          this FileContainerConfiguration containerConfiguration)
         {
-            containerConfiguration.ProviderType = typeof(DatabaseFileProvider);
+            containerConfiguration.Provider = DatabaseFileProviderConsts.ProviderName;
             return containerConfiguration;
         }
     }
