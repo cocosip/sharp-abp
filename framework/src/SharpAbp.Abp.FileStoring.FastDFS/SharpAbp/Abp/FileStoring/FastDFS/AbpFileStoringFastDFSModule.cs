@@ -54,7 +54,7 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
 
         private FileProviderConfiguration GetFileProviderConfiguration()
         {
-            var configuration = new FileProviderConfiguration(typeof(FastDFSFileProvider));
+            var configuration = new FileProviderConfiguration(FastDFSFileProviderConfigurationNames.ProviderName);
             configuration.DefaultNamingNormalizers.TryAdd<FastDFSFileNamingNormalizer>();
             configuration
                 .SetProperty(FastDFSFileProviderConfigurationNames.ClusterName, typeof(string))

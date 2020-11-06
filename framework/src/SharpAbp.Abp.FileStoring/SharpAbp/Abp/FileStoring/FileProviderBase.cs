@@ -5,6 +5,8 @@ namespace SharpAbp.Abp.FileStoring
 {
     public abstract class FileProviderBase : IFileProvider
     {
+        public abstract string Provider { get; }
+
         public abstract Task<string> SaveAsync(FileProviderSaveArgs args);
 
         public abstract Task<bool> DeleteAsync(FileProviderDeleteArgs args);

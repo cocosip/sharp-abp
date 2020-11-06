@@ -2,6 +2,8 @@
 {
     public class FastDFSFileProviderConfigurationNames
     {
+        public const string ProviderName = "FastDFS";
+
         public const string ClusterName = "FastDFS.ClusterName";
         public const string HttpServer = "FastDFS.HttpServer";
         public const string GroupName = "FastDFS.GroupName";

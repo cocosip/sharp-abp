@@ -16,6 +16,8 @@ namespace SharpAbp.Abp.FileStoring.Minio
             MinioFileNameCalculator = minioFileNameCalculator;
         }
 
+        public override string Provider => MinioFileProviderConfigurationNames.ProviderName;
+
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
             var fileName = MinioFileNameCalculator.Calculate(args);

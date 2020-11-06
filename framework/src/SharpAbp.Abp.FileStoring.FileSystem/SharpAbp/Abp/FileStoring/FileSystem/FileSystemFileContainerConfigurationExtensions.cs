@@ -14,7 +14,7 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
             this FileContainerConfiguration containerConfiguration,
             Action<FileSystemFileProviderConfiguration> fileSystemConfigureAction)
         {
-            containerConfiguration.ProviderType = typeof(FileSystemFileProvider);
+            containerConfiguration.Provider = FileSystemFileProviderConfigurationNames.ProviderName;
             containerConfiguration.NamingNormalizers.TryAdd<FileSystemFileNamingNormalizer>();
 
             fileSystemConfigureAction(new FileSystemFileProviderConfiguration(containerConfiguration));

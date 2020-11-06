@@ -14,7 +14,7 @@ namespace SharpAbp.Abp.FileStoring.S3
             this FileContainerConfiguration containerConfiguration,
             Action<S3FileProviderConfiguration> s3ConfigureAction)
         {
-            containerConfiguration.ProviderType = typeof(S3FileProvider);
+            containerConfiguration.Provider = S3FileProviderConfigurationNames.ProviderName;
             containerConfiguration.NamingNormalizers.TryAdd<S3FileNamingNormalizer>();
 
             s3ConfigureAction(new S3FileProviderConfiguration(containerConfiguration));

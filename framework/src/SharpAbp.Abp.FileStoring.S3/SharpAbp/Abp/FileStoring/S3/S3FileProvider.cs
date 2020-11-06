@@ -26,6 +26,8 @@ namespace SharpAbp.Abp.FileStoring.S3
             S3ClientFactory = s3ClientFactory;
         }
 
+        public override string Provider => S3FileProviderConfigurationNames.ProviderName;
+
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
             var fileName = S3FileNameCalculator.Calculate(args);

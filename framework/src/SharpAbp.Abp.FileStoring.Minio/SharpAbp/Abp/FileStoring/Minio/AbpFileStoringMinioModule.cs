@@ -46,7 +46,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
 
         private FileProviderConfiguration GetFileProviderConfiguration()
         {
-            var configuration = new FileProviderConfiguration(typeof(MinioFileProvider));
+            var configuration = new FileProviderConfiguration(MinioFileProviderConfigurationNames.ProviderName);
             configuration.DefaultNamingNormalizers.TryAdd<MinioFileNamingNormalizer>();
             configuration
                 .SetProperty(MinioFileProviderConfigurationNames.BucketName, typeof(string))

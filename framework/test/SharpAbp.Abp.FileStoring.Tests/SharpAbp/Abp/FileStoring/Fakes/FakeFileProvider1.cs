@@ -6,6 +6,8 @@ namespace SharpAbp.Abp.FileStoring.Fakes
 {
     public class FakeFileProvider1 : IFileProvider
     {
+        public string Provider => nameof(FakeFileProvider1);
+
         public Task<bool> DeleteAsync(FileProviderDeleteArgs args)
         {
             throw new NotImplementedException();

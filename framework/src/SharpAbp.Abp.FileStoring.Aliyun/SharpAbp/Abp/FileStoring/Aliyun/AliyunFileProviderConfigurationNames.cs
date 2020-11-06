@@ -2,6 +2,8 @@
 {
     public class AliyunFileProviderConfigurationNames
     {
+        public const string ProviderName = "Aliyun";
+
         public const string RegionId = "Aliyun.RegionId";
         public const string Endpoint = "Aliyun.Endpoint";
         public const string BucketName = "Aliyun.BucketName";

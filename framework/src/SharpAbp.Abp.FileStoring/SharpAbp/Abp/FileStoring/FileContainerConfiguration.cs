@@ -1,5 +1,4 @@
 using JetBrains.Annotations;
-using System;
 using System.Collections.Generic;
 using Volo.Abp;
 using Volo.Abp.Collections;
@@ -11,7 +10,7 @@ namespace SharpAbp.Abp.FileStoring
         /// <summary>
         /// The provider to be used to store FILEs of this container.
         /// </summary>
-        public Type ProviderType { get; set; }
+        public string Provider { get; set; }
 
         /// <summary>
         /// Indicates whether this container is multi-tenant or not.

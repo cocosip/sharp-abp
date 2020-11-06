@@ -16,6 +16,8 @@ namespace SharpAbp.Abp.FileStoring.Azure
             AzureFileNameCalculator = azureFileNameCalculator;
         }
 
+        public override string Provider => AzureFileProviderConfigurationNames.ProviderName;
+
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
             var fileName = AzureFileNameCalculator.Calculate(args);

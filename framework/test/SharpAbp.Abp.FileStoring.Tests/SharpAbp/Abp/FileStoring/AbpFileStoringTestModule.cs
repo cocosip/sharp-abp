@@ -25,17 +25,17 @@ namespace SharpAbp.Abp.FileStoring
                     .ConfigureDefault(container =>
                     {
                         container.SetConfiguration("TestConfigDefault", "TestValueDefault");
-                        container.ProviderType = typeof(FakeFileProvider1);
+                        container.Provider = nameof(FakeFileProvider1);
                     })
                     .Configure<TestContainer1>(container =>
                     {
                         container.SetConfiguration("TestConfig1", "TestValue1");
-                        container.ProviderType = typeof(FakeFileProvider1);
+                        container.Provider = nameof(FakeFileProvider1);
                     })
                     .Configure<TestContainer2>(container =>
                     {
                         container.SetConfiguration("TestConfig2", "TestValue2");
-                        container.ProviderType = typeof(FakeFileProvider2);
+                        container.Provider = nameof(FakeFileProvider2);
                     });
             });
         }

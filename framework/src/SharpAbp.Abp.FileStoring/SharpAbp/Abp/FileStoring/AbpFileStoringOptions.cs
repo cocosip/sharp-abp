@@ -33,7 +33,7 @@ namespace SharpAbp.Abp.FileStoring
 
                 Containers.Configure(kv.Key, c =>
                 {
-                    c.ProviderType = fileProviderConfiguration.ProviderType;
+                    c.Provider = fileProviderConfiguration.Provider;
                     c.IsMultiTenant = kv.Value?.IsMultiTenant ?? false;
                     c.HttpSupport = kv.Value?.HttpSupport ?? true;
 
