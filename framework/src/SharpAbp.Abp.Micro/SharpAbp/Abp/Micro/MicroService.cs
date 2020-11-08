@@ -23,6 +23,10 @@ namespace SharpAbp.Abp.Micro
 
         public bool Equals(MicroService other)
         {
+            if (other is null)
+            {
+                return false;
+            }
             return Id == other.Id && Service == other.Service && Address == other.Address && Port == other.Port;
         }
 
@@ -45,8 +49,8 @@ namespace SharpAbp.Abp.Micro
                 | Port.GetHashCode();
         }
 
-        public static bool operator ==(MicroService s1, MicroService s2) => s1.Equals(s2);
+        public static bool operator ==(MicroService s1, MicroService s2) => s1 != null && s2 != null && s1.Equals(s2);
 
-        public static bool operator !=(MicroService s1, MicroService s2) => !s1.Equals(s2);
+        public static bool operator !=(MicroService s1, MicroService s2) => s1 != null && s2 != null && !s1.Equals(s2);
     }
 }
