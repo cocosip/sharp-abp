@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\..\..\common.test.props" />
   <PropertyGroup>
@@ -25,10 +25,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\SharpAbp.Abp.Caching.CSRedisCore\SharpAbp.Abp.Caching.CSRedisCore.csproj" />
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.FreeRedis\SharpAbp.Abp.FreeRedis.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

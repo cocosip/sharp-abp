@@ -7,7 +7,7 @@ namespace SharpAbp.Abp.Caching
     //[DisableConventionalRegistration]
     public class AbpRedisCache : CSRedisCache
     {
-        public AbpRedisCache(IOptions<CSRedisCoreCacheOption> options, ICSRedisClientFactory cSRedisClientFactory) : base(cSRedisClientFactory.Get(options.Value.Name))
+        public AbpRedisCache(IOptions<CSRedisCoreCacheOptions> options, ICSRedisClientFactory cSRedisClientFactory) : base(cSRedisClientFactory.Get(options.Value.Name))
         {
 
         }

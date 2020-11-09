@@ -1,24 +1,24 @@
-﻿using CSRedis;
+﻿using FreeRedis;
 using JetBrains.Annotations;
 using System.Collections.Generic;
 
-namespace SharpAbp.Abp.CSRedisCore
+namespace SharpAbp.Abp.FreeRedis
 {
-    public interface ICSRedisClientFactory
+    public interface IRedisClientFactory
     {
         /// <summary>
-        /// Get redis client by name
+        /// Get csredis client by name
         /// </summary>
         /// <param name="name">name</param>
         /// <returns></returns>
         [NotNull]
-        CSRedisClient Get([NotNull] string name = DefaultClient.Name);
+        RedisClient Get([NotNull] string name = DefaultClient.Name);
 
 
         /// <summary>
-        /// Get all redis client
+        /// Get all csredis client
         /// </summary>
         /// <returns></returns>
-        List<CSRedisClient> GetAll();
+        List<RedisClient> GetAll();
     }
 }

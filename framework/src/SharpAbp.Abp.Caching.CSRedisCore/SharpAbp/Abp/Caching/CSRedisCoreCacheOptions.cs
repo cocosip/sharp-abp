@@ -1,6 +1,6 @@
 ﻿namespace SharpAbp.Abp.Caching
 {
-    public class CSRedisCoreCacheOption
+    public class CSRedisCoreCacheOptions
     {
         public string Name { get; set; } = "default";
     }

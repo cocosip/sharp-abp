@@ -4,12 +4,12 @@ namespace SharpAbp.Abp.CSRedisCore
 {
     public static class CSRedisClientFactoryExtensions
     {
-        public static CSRedisClient Get<TContainer>(
+        public static CSRedisClient Get<TClient>(
             this ICSRedisClientFactory clientFactory
         )
         {
             return clientFactory.Get(
-                  CSRedisClientNameAttribute.GetClientName<TContainer>()
+                  CSRedisClientNameAttribute.GetClientName<TClient>()
             );
         }
     }
