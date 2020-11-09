@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.0" />
     <PackageReference Include="Moq" Version="4.14.7" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
@@ -22,7 +22,7 @@
     </PackageReference>
 
     <PackageReference Include="DotNetCore.CAP.InMemoryStorage" Version="3.1.1" />
-    <PackageReference Include="Savorboard.CAP.InMemoryMessageQueue" Version="3.0.0" />
+    <PackageReference Include="Savorboard.CAP.InMemoryMessageQueue" Version="3.1.1" />
     <PackageReference Include="Volo.Abp.Autofac" Version="3.3.1" />
     <PackageReference Include="Volo.Abp.TestBase" Version="3.3.1" />
   </ItemGroup>
