@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace SharpAbp.Abp.Micro
 {
@@ -49,8 +50,27 @@ namespace SharpAbp.Abp.Micro
                 | Port.GetHashCode();
         }
 
-        public static bool operator ==(MicroService s1, MicroService s2) => s1.Equals(s2);
+        //public static bool operator ==(MicroService s1, MicroService s2) => s1.GetHashCode() == s2.GetHashCode();
 
-        public static bool operator !=(MicroService s1, MicroService s2) => s1.Equals(s2);
+
+        public static bool operator ==(MicroService s1, MicroService s2)
+        {
+            if (s1 is null && s2 is null)
+            {
+                return true;
+            }
+            return s1?.GetHashCode() == s2?.GetHashCode();
+        }
+
+
+
+        public static bool operator !=(MicroService s1, MicroService s2)
+        {
+            if (s1 is null && s2 is null)
+            {
+                return false;
+            }
+            return s1?.GetHashCode() != s2?.GetHashCode();
+        }
     }
 }

@@ -38,8 +38,22 @@ namespace SharpAbp.Abp.Micro
             return StringComparer.InvariantCulture.GetHashCode(Host) | Port.GetHashCode();
         }
 
-        public static bool operator ==(ServiceHostAndPort s1, ServiceHostAndPort s2) => s1.Equals(s2);
+        public static bool operator ==(ServiceHostAndPort s1, ServiceHostAndPort s2)
+        {
+            if (s1 is null && s2 is null)
+            {
+                return true;
+            }
+            return s1?.GetHashCode() == s2?.GetHashCode();
+        }
 
-        public static bool operator !=(ServiceHostAndPort s1, ServiceHostAndPort s2) => !s1.Equals(s2);
+        public static bool operator !=(ServiceHostAndPort s1, ServiceHostAndPort s2)
+        {
+            if (s1 is null && s2 is null)
+            {
+                return false;
+            }
+            return s1?.GetHashCode() != s2?.GetHashCode();
+        }
     }
 }

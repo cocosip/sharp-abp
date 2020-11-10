@@ -38,8 +38,9 @@ namespace SharpAbp.Abp.Micro
 
             Assert.True(service1 == service1_1);
             Assert.True(service1.Equals(service1_1));
+            Assert.True(service2 != null);
 
-            Assert.False(service1 == service2);
+            Assert.True(service1 != service2);
             Assert.False(service1_1 == service2);
         }
 

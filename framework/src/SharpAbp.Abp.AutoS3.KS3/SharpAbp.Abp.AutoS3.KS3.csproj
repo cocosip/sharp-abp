@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoS3.KS3" Version="1.1.0" />
+    <PackageReference Include="AutoS3.KS3" Version="1.1.1" />
   </ItemGroup>
 
   <ItemGroup>
