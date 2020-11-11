@@ -4,7 +4,7 @@
   <Import Project="..\..\..\configureawait.props" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>SharpAbp.Abp.Caching.CSRedisCore</AssemblyName>
     <PackageId>SharpAbp.Abp.Caching.CSRedisCore</PackageId>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
