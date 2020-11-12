@@ -25,7 +25,7 @@ namespace SharpAbp.Abp.FileStoring.Database
                 options.Resources
                     .Add<FileStoringDatabaseResource>("en")
                     .AddBaseTypes(typeof(AbpValidationResource))
-                    .AddVirtualJson("/SharpAbp/Abp/FileStoring/Database/Localization");
+                    .AddVirtualJson("/SharpAbp/Abp/FileStoring/Database/Localization/Resources");
             });
 
             Configure<AbpExceptionLocalizationOptions>(options =>
