@@ -8,7 +8,7 @@ namespace SharpAbp.Abp.FileStoringManagement
     public interface IFileStoringContainerRepository : IBasicRepository<FileStoringContainer, Guid>
     {
         /// <summary>
-        /// Find FileStoringContainer by name
+        /// Find container by name
         /// </summary>
         /// <param name="name">container name</param>
         /// <param name="includeDetails">include details</param>

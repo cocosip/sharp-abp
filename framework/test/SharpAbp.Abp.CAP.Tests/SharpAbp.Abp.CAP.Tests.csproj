@@ -21,10 +21,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
 
-    <PackageReference Include="DotNetCore.CAP.InMemoryStorage" Version="3.1.1" />
+    <PackageReference Include="DotNetCore.CAP.InMemoryStorage" Version="3.1.2-preview-121943182" />
     <PackageReference Include="Savorboard.CAP.InMemoryMessageQueue" Version="3.1.1" />
-    <PackageReference Include="Volo.Abp.Autofac" Version="3.3.1" />
-    <PackageReference Include="Volo.Abp.TestBase" Version="3.3.1" />
+    <PackageReference Include="Volo.Abp.Autofac" Version="4.0.0-rc.1" />
+    <PackageReference Include="Volo.Abp.TestBase" Version="4.0.0-rc.1" />
   </ItemGroup>
 
   <ItemGroup>

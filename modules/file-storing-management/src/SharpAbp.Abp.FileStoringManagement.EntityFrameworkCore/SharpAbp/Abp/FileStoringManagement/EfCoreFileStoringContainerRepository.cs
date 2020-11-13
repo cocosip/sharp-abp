@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using JetBrains.Annotations;
 using System;
-using System.Linq.Dynamic.Core;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -19,14 +18,16 @@ namespace SharpAbp.Abp.FileStoringManagement
         }
 
         /// <summary>
-        /// Find FileStoringContainer by name
+        /// Find container by name
         /// </summary>
         /// <param name="name">container name</param>
         /// <param name="includeDetails">include details</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async virtual Task<FileStoringContainer> FindByNameAsync(string name, bool includeDetails = true, CancellationToken cancellationToken = default)
+        public async virtual Task<FileStoringContainer> FindByNameAsync([NotNull] string name, bool includeDetails = true, CancellationToken cancellationToken = default)
         {
+            Check.NotNullOrWhiteSpace(name, nameof(name));
+
             return await FindAsync(x => x.Name == name, includeDetails, cancellationToken);
         }
 
