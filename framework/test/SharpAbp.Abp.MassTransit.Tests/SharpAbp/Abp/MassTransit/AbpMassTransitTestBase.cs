@@ -1,9 +1,9 @@
 ﻿using Volo.Abp;
 using Volo.Abp.Testing;
 
-namespace SharpAbp.Abp.CAP
+namespace SharpAbp.Abp.MassTransit
 {
-    public abstract class AbpCapTestBase : AbpIntegratedTest<AbpCapTestModule>
+    public abstract class AbpMassTransitTestBase : AbpIntegratedTest<AbpMassTransitTestModule>
     {
         protected override void SetAbpApplicationCreationOptions(AbpApplicationCreationOptions options)
         {
