@@ -5,23 +5,19 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <AssemblyName>SharpAbp.Abp.FluentSocket.DotNetty</AssemblyName>
-    <PackageId>SharpAbp.Abp.FluentSocket.DotNetty</PackageId>
+    <AssemblyName>SharpAbp.Abp.MassTransit</AssemblyName>
+    <PackageId>SharpAbp.Abp.MassTransit</PackageId>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Description>SharpAbp FluentSocket DotNetty Module</Description>
+    <Description>SharpAbp MassTransit Module</Description>
     <RootNamespace />
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentSocket.DotNetty" Version="1.0.0" />
+    <PackageReference Include="MassTransit.AspNetCore" Version="7.0.6" />
     <PackageReference Include="Volo.Abp" Version="4.0.0-rc.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\SharpAbp.Abp.FluentSocket\SharpAbp.Abp.FluentSocket.csproj" />
   </ItemGroup>
 
 </Project>

@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="Caching.CSRedis" Version="3.6.50" />
-    <PackageReference Include="Volo.Abp.Caching" Version="4.0.0-rc.2" />
+    <PackageReference Include="Volo.Abp.Caching" Version="4.0.0-rc.3" />
   </ItemGroup>
 
   <ItemGroup>
