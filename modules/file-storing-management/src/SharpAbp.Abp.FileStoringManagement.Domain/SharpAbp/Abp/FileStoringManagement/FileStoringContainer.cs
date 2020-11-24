@@ -37,5 +37,14 @@ namespace SharpAbp.Abp.FileStoringManagement
         {
             Items = new List<FileStoringContainerItem>();
         }
+
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="id"></param>
+        public FileStoringContainer(Guid id) : this()
+        {
+            Id = id;
+        }
     }
 }

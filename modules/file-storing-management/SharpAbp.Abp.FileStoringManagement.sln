@@ -5,13 +5,17 @@ VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{75AA1786-8B10-4E0A-89F6-79B714F85E34}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.FileStoringManagement.Domain", "src\SharpAbp.Abp.FileStoringManagement.Domain\SharpAbp.Abp.FileStoringManagement.Domain.csproj", "{6703A3EC-E5C3-471D-BCD6-E6CDAF295D54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoringManagement.Domain", "src\SharpAbp.Abp.FileStoringManagement.Domain\SharpAbp.Abp.FileStoringManagement.Domain.csproj", "{6703A3EC-E5C3-471D-BCD6-E6CDAF295D54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.FileStoringManagement.Domain.Shared", "src\SharpAbp.Abp.FileStoringManagement.Domain.Shared\SharpAbp.Abp.FileStoringManagement.Domain.Shared.csproj", "{A7F36DF4-A5AC-4CFB-936E-4F12A443B801}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoringManagement.Domain.Shared", "src\SharpAbp.Abp.FileStoringManagement.Domain.Shared\SharpAbp.Abp.FileStoringManagement.Domain.Shared.csproj", "{A7F36DF4-A5AC-4CFB-936E-4F12A443B801}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore", "src\SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore\SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore.csproj", "{89AA6B54-2FE5-4FE4-839F-A6FCEC4E8608}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore", "src\SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore\SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore.csproj", "{89AA6B54-2FE5-4FE4-839F-A6FCEC4E8608}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.FileStoringManagement.MongoDB", "src\SharpAbp.Abp.FileStoringManagement.MongoDB\SharpAbp.Abp.FileStoringManagement.MongoDB.csproj", "{1FC254FB-1A40-471C-9BD8-6D196B2D7988}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoringManagement.MongoDB", "src\SharpAbp.Abp.FileStoringManagement.MongoDB\SharpAbp.Abp.FileStoringManagement.MongoDB.csproj", "{1FC254FB-1A40-471C-9BD8-6D196B2D7988}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{06678086-FFDA-429B-92D9-99641F15AF8C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore.Tests", "test\SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore.Tests\SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore.Tests.csproj", "{A092279A-44FC-44BC-8278-DE054F580358}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +75,18 @@ Global
 		{1FC254FB-1A40-471C-9BD8-6D196B2D7988}.Release|x64.Build.0 = Release|Any CPU
 		{1FC254FB-1A40-471C-9BD8-6D196B2D7988}.Release|x86.ActiveCfg = Release|Any CPU
 		{1FC254FB-1A40-471C-9BD8-6D196B2D7988}.Release|x86.Build.0 = Release|Any CPU
+		{A092279A-44FC-44BC-8278-DE054F580358}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A092279A-44FC-44BC-8278-DE054F580358}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A092279A-44FC-44BC-8278-DE054F580358}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A092279A-44FC-44BC-8278-DE054F580358}.Debug|x64.Build.0 = Debug|Any CPU
+		{A092279A-44FC-44BC-8278-DE054F580358}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A092279A-44FC-44BC-8278-DE054F580358}.Debug|x86.Build.0 = Debug|Any CPU
+		{A092279A-44FC-44BC-8278-DE054F580358}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A092279A-44FC-44BC-8278-DE054F580358}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A092279A-44FC-44BC-8278-DE054F580358}.Release|x64.ActiveCfg = Release|Any CPU
+		{A092279A-44FC-44BC-8278-DE054F580358}.Release|x64.Build.0 = Release|Any CPU
+		{A092279A-44FC-44BC-8278-DE054F580358}.Release|x86.ActiveCfg = Release|Any CPU
+		{A092279A-44FC-44BC-8278-DE054F580358}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,6 +96,7 @@ Global
 		{A7F36DF4-A5AC-4CFB-936E-4F12A443B801} = {75AA1786-8B10-4E0A-89F6-79B714F85E34}
 		{89AA6B54-2FE5-4FE4-839F-A6FCEC4E8608} = {75AA1786-8B10-4E0A-89F6-79B714F85E34}
 		{1FC254FB-1A40-471C-9BD8-6D196B2D7988} = {75AA1786-8B10-4E0A-89F6-79B714F85E34}
+		{A092279A-44FC-44BC-8278-DE054F580358} = {06678086-FFDA-429B-92D9-99641F15AF8C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B1F6BBC3-F876-4997-B320-49965C56774F}

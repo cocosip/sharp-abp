@@ -5,6 +5,11 @@ using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Dynamic.Core;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
@@ -28,7 +33,9 @@ namespace SharpAbp.Abp.FileStoringManagement
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
 
-            return await FindAsync(x => x.Name == name, includeDetails, cancellationToken);
+            return await DbSet
+                .IncludeDetails(includeDetails)
+                .FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
         }
 
     }
