@@ -213,42 +213,43 @@ namespace SharpAbp.Abp.FileStoring.S3
         }
 
 
-
         protected virtual IAmazonS3 GetS3Client(FileProviderArgs args)
         {
             var configuration = args.Configuration.GetS3Configuration();
 
-            var amazonS3 = S3ClientFactory.GetOrAddClient(configuration.AccessKeyId, configuration.SecretAccessKey, () =>
-             {
-                 var s3ClientConfiguration = new S3ClientConfiguration()
-                 {
-                     Vendor = (S3VendorType)configuration.VendorType,
-                     AccessKeyId = configuration.AccessKeyId,
-                     SecretAccessKey = configuration.SecretAccessKey,
-                     MaxClient = configuration.MaxClient,
-                 };
+            var containerName = GetContainerName(args);
 
-                 if (configuration.VendorType == (int)S3VendorType.KS3)
-                 {
-                     s3ClientConfiguration.Config = new AmazonS3Config()
-                     {
-                         ServiceURL = configuration.ServerUrl,
-                         ForcePathStyle = configuration.ForcePathStyle,
-                         SignatureVersion = configuration.SignatureVersion
-                     };
-                 }
-                 else
-                 {
-                     s3ClientConfiguration.Config = new AmazonKS3Config()
-                     {
-                         ServiceURL = configuration.ServerUrl,
-                         ForcePathStyle = configuration.ForcePathStyle,
-                         SignatureVersion = configuration.SignatureVersion
-                     };
-                 }
+            var amazonS3 = S3ClientFactory.GetOrAdd(containerName, () =>
+            {
+                var s3ClientConfiguration = new S3ClientConfiguration()
+                {
+                    Vendor = (S3VendorType)configuration.VendorType,
+                    AccessKeyId = configuration.AccessKeyId,
+                    SecretAccessKey = configuration.SecretAccessKey,
+                    MaxClient = configuration.MaxClient,
+                };
 
-                 return s3ClientConfiguration;
-             });
+                if (configuration.VendorType == (int)S3VendorType.KS3)
+                {
+                    s3ClientConfiguration.Config = new AmazonS3Config()
+                    {
+                        ServiceURL = configuration.ServerUrl,
+                        ForcePathStyle = configuration.ForcePathStyle,
+                        SignatureVersion = configuration.SignatureVersion
+                    };
+                }
+                else
+                {
+                    s3ClientConfiguration.Config = new AmazonKS3Config()
+                    {
+                        ServiceURL = configuration.ServerUrl,
+                        ForcePathStyle = configuration.ForcePathStyle,
+                        SignatureVersion = configuration.SignatureVersion
+                    };
+                }
+
+                return s3ClientConfiguration;
+            });
 
             return amazonS3;
         }

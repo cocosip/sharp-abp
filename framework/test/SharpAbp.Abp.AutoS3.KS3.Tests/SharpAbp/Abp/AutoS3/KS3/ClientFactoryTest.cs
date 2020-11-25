@@ -18,7 +18,7 @@ namespace SharpAbp.Abp.AutoS3.KS3
         public void Get_Test()
         {
 
-            var client = _s3ClientFactory.GetOrAddClient("123456", "123456", () => new S3ClientConfiguration()
+            var client = _s3ClientFactory.GetOrAdd("default", () => new S3ClientConfiguration()
             {
                 AccessKeyId = "111111",
                 SecretAccessKey = "222222",
