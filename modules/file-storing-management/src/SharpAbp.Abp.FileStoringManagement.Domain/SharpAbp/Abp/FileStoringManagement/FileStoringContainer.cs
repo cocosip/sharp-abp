@@ -31,20 +31,22 @@ namespace SharpAbp.Abp.FileStoringManagement
 
         public virtual string Describe { get; set; }
 
-        public virtual ICollection<FileStoringContainerItem> Items { get; set; }
+        public virtual List<FileStoringContainerItem> Items { get; set; }
 
         public FileStoringContainer()
         {
             Items = new List<FileStoringContainerItem>();
         }
 
-        /// <summary>
-        /// Ctor
-        /// </summary>
-        /// <param name="id"></param>
-        public FileStoringContainer(Guid id) : this()
+        public FileStoringContainer(Guid id) : this(id, null)
+        {
+
+        }
+
+        public FileStoringContainer(Guid id, Guid? tenantId) : this()
         {
             Id = id;
+            TenantId = tenantId;
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Options;
+﻿using JetBrains.Annotations;
+using Microsoft.Extensions.Options;
+using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.FileStoring
@@ -12,8 +14,10 @@ namespace SharpAbp.Abp.FileStoring
             Options = options.Value;
         }
 
-        public virtual FileContainerConfiguration Get(string name)
+        public virtual FileContainerConfiguration Get([NotNull] string name)
         {
+            Check.NotNullOrWhiteSpace(name, nameof(name));
+            
             return Options.Containers.GetConfiguration(name);
         }
 

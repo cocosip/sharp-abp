@@ -32,7 +32,6 @@ namespace SharpAbp.Abp.FileStoringManagement
         public async virtual Task<FileStoringContainer> FindByNameAsync([NotNull] string name, bool includeDetails = true, CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-
             return await DbSet
                 .IncludeDetails(includeDetails)
                 .FirstOrDefaultAsync(t => t.Name == name, cancellationToken);

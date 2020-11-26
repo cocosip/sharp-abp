@@ -1,4 +1,6 @@
-﻿namespace SharpAbp.Abp.FileStoring
+﻿using JetBrains.Annotations;
+
+namespace SharpAbp.Abp.FileStoring
 {
     public interface IFileContainerConfigurationProvider
     {
@@ -7,6 +9,6 @@
         /// </summary>
         /// <param name="name">The name of the container</param>
         /// <returns>The configuration that should be used for the container</returns>
-        FileContainerConfiguration Get(string name);
+        FileContainerConfiguration Get([NotNull] string name);
     }
 }

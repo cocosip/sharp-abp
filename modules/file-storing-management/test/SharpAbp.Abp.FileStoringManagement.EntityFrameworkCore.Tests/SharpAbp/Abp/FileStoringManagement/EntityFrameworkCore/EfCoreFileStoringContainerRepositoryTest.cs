@@ -1,5 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using Volo.Abp.Data;
 using Volo.Abp.Guids;
+using Volo.Abp.MultiTenancy;
 using Volo.Abp.Uow;
 using Xunit;
 
@@ -7,10 +10,14 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
 {
     public class EfCoreFileStoringContainerRepositoryTest : FileStoringManagementEntityFrameworkCoreTestBase
     {
+        private readonly ICurrentTenant _currentTenant;
+        private readonly IDataFilter<IMultiTenant> _dataFilter;
         private readonly IGuidGenerator _guidGenerator;
         private readonly IFileStoringContainerRepository _fileStoringContainerRepository;
         public EfCoreFileStoringContainerRepositoryTest()
         {
+            _currentTenant = GetRequiredService<ICurrentTenant>();
+            _dataFilter = GetRequiredService<IDataFilter<IMultiTenant>>();
             _fileStoringContainerRepository = GetRequiredService<IFileStoringContainerRepository>();
             _guidGenerator = GetRequiredService<IGuidGenerator>();
         }
@@ -18,7 +25,9 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
         [Fact]
         public async Task FindByNameAsync_Test()
         {
-            var container = new FileStoringContainer(_guidGenerator.Create())
+
+            var tenantId = new Guid("446a5211-3d72-4339-9adc-845151f8ada0");
+            var container = new FileStoringContainer(_guidGenerator.Create(), tenantId)
             {
                 Name = "default",
                 Title = "test-container",
@@ -75,12 +84,27 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
                 ContainerId = container.Id
             });
 
-            await _fileStoringContainerRepository.InsertAsync(container, true);
-            var queryContainer = await _fileStoringContainerRepository.FindByNameAsync("default");
-            Assert.Equal(container.Id, queryContainer.Id);
-            Assert.Equal(container.Name, queryContainer.Name);
-            Assert.Equal(container.Items.Count, queryContainer.Items.Count);
+            using (_currentTenant.Change(tenantId))
+            {
+                await _fileStoringContainerRepository.InsertAsync(container, true);
+            }
+
+            using (_currentTenant.Change(null))
+            {
+                var queryContainer1 = await _fileStoringContainerRepository.FindByNameAsync("default");
+                Assert.Null(queryContainer1);
+            }
+
+            using (_dataFilter.Disable())
+            {
+                var queryContainer2 = await _fileStoringContainerRepository.FindByNameAsync("default");
+                Assert.Equal(container.Id, queryContainer2.Id);
+                Assert.Equal(container.Name, queryContainer2.Name);
+                Assert.Equal(container.Items.Count, queryContainer2.Items.Count);
+            }
+
         }
+
 
     }
 }

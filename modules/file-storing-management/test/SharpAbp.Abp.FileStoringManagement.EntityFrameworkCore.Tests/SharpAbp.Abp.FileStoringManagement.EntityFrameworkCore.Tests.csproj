@@ -28,4 +28,10 @@
     <ProjectReference Include="..\..\src\SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore\SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

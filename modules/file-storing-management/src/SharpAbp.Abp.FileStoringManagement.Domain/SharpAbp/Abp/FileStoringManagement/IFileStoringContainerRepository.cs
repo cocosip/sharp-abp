@@ -15,5 +15,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<FileStoringContainer> FindByNameAsync(string name, bool includeDetails = true, CancellationToken cancellationToken = default);
+
+
     }
 }
