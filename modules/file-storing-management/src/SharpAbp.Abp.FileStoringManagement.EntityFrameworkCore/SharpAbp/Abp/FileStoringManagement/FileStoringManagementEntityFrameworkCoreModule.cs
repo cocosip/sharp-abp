@@ -16,7 +16,7 @@ namespace SharpAbp.Abp.FileStoringManagement
             {
                 options.AddRepository<FileStoringContainer, EfCoreFileStoringContainerRepository>();
 
-                options.AddRepository<FileStoringContainerItem, EfCoreFileStoringContainerItemRepository>();
+                //options.AddRepository<FileStoringContainerItem, EfCoreFileStoringContainerItemRepository>();
             });
         }
     }

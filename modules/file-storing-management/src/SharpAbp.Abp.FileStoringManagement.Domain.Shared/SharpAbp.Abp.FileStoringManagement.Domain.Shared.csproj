@@ -15,6 +15,11 @@
     <RootNamespace />
   </PropertyGroup>
 
+    <ItemGroup>
+    <EmbeddedResource Include="SharpAbp\Abp\FileStoringManagement\Localization\Resources\*.json" />
+    <Content Remove="SharpAbp\Abp\FileStoringManagement\Localization\Resources\*.json" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Volo.Abp.Validation" Version="4.0.0-rc.4" />
   </ItemGroup>

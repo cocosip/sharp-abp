@@ -20,12 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="SharpAbp\Abp\FileStoring\Database\Localization\*.json" />
+    <EmbeddedResource Include="SharpAbp\Abp\FileStoring\Database\Localization\Resources\*.json" />
+    <Content Remove="SharpAbp\Abp\FileStoring\Database\Localization\Resources\*.json" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="SharpAbp\Abp\FileStoring\Database\Localization\en.json" />
-  </ItemGroup>
-
 
 </Project>

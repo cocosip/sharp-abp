@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Volo.Abp.Data;
 using Volo.Abp.Guids;
 using Volo.Abp.MultiTenancy;
-using Volo.Abp.Uow;
 using Xunit;
 
 namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
@@ -95,12 +94,20 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
                 Assert.Null(queryContainer1);
             }
 
+            using (_currentTenant.Change(tenantId))
+            {
+                var queryContainer1 = await _fileStoringContainerRepository.FindByNameAsync("default");
+                Assert.Equal(container.Id, queryContainer1.Id);
+                Assert.Equal(container.Name, queryContainer1.Name);
+                Assert.Equal(container.Items.Count, queryContainer1.Items.Count);
+            }
+
             using (_dataFilter.Disable())
             {
-                var queryContainer2 = await _fileStoringContainerRepository.FindByNameAsync("default");
-                Assert.Equal(container.Id, queryContainer2.Id);
-                Assert.Equal(container.Name, queryContainer2.Name);
-                Assert.Equal(container.Items.Count, queryContainer2.Items.Count);
+                var queryContainer1 = await _fileStoringContainerRepository.FindByNameAsync("default");
+                Assert.Equal(container.Id, queryContainer1.Id);
+                Assert.Equal(container.Name, queryContainer1.Name);
+                Assert.Equal(container.Items.Count, queryContainer1.Items.Count);
             }
 
         }

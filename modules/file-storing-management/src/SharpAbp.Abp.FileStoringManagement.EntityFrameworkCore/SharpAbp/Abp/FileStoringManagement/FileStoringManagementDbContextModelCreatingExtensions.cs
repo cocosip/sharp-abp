@@ -41,6 +41,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 b.HasMany(x => x.Items).WithOne().HasForeignKey(p => p.ContainerId).IsRequired();
 
                 b.HasIndex(x => new { x.TenantId, x.Name });
+                //b.HasIndex(x => x.Name);
 
             });
 

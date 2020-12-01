@@ -9,19 +9,15 @@ namespace SharpAbp.Abp.FileStoringManagement
 {
     public class DatabaseFileContainerConfigurationProvider : IFileContainerConfigurationProvider
     {
-        protected IDataFilter<IMultiTenant> DataFilter { get; }
-
         protected IFileContainerConfigurationConverter FileContainerConfigurationConverter { get; }
         protected IDistributedCache<FileContainerConfiguration> ConfigurationCache { get; }
         protected IFileStoringContainerRepository FileStoringContainerRepository { get; }
 
         public DatabaseFileContainerConfigurationProvider(
-            IDataFilter<IMultiTenant> dataFilter,
             IFileContainerConfigurationConverter fileContainerConfigurationConverter,
             IDistributedCache<FileContainerConfiguration> configurationCache,
             IFileStoringContainerRepository fileStoringContainerRepository)
         {
-            DataFilter = dataFilter;
             FileContainerConfigurationConverter = fileContainerConfigurationConverter;
             ConfigurationCache = configurationCache;
             FileStoringContainerRepository = fileStoringContainerRepository;
@@ -45,11 +41,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 var container = await FileStoringContainerRepository.FindByNameAsync(name);
                 if (container != null)
                 {
-                    using (DataFilter.Disable())
-                    {
-                        configuration = FileContainerConfigurationConverter.ToConfiguration(container);
-                    }
-
+                    configuration = FileContainerConfigurationConverter.ToConfiguration(container);
                     await ConfigurationCache.SetAsync(name, configuration);
                 }
             }
