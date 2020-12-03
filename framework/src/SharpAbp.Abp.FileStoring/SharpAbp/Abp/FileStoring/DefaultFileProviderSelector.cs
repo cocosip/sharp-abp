@@ -10,7 +10,6 @@ namespace SharpAbp.Abp.FileStoring
     public class DefaultFileProviderSelector : IFileProviderSelector, ITransientDependency
     {
         protected IEnumerable<IFileProvider> FileProviders { get; }
-
         protected IFileContainerConfigurationProvider ConfigurationProvider { get; }
 
         public DefaultFileProviderSelector(
@@ -25,9 +24,7 @@ namespace SharpAbp.Abp.FileStoring
         public virtual IFileProvider Get([NotNull] string containerName)
         {
             Check.NotNull(containerName, nameof(containerName));
-
             var configuration = ConfigurationProvider.Get(containerName);
-
             if (!FileProviders.Any())
             {
                 throw new AbpException("No FILE Storage provider was registered! At least one provider must be registered to be able to use the Blog Storing System.");

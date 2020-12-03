@@ -8,13 +8,9 @@ namespace SharpAbp.Abp.FileStoring
     public class FileContainerFactory : IFileContainerFactory, ITransientDependency
     {
         protected IFileProviderSelector ProviderSelector { get; }
-
         protected IFileContainerConfigurationProvider ConfigurationProvider { get; }
-
         protected ICurrentTenant CurrentTenant { get; }
-
         protected ICancellationTokenProvider CancellationTokenProvider { get; }
-
         protected IServiceProvider ServiceProvider { get; }
 
         public FileContainerFactory(

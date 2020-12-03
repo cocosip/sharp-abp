@@ -23,23 +23,25 @@ namespace SharpAbp.Abp.FileStoringManagement
             builder.Entity<FileStoringContainer>(b =>
             {
                 b.ToTable(options.TablePrefix + "FileStoringContainers", options.Schema);
-
+                
                 b.ConfigureByConvention();
 
                 b.Property(p => p.Title).IsRequired().HasMaxLength(FileStoringContainerConsts.MaxTitleLength);
-
+                
                 b.Property(p => p.Name).IsRequired().HasMaxLength(FileStoringContainerConsts.MaxNameLength);
-
+                
                 b.Property(p => p.ProviderName).IsRequired().HasMaxLength(FileStoringContainerConsts.MaxProviderNameLength);
-
+                
                 b.Property(p => p.HttpSupport).IsRequired();
-
+                
+                b.Property(p => p.IsMultiTenant).IsRequired();
+                
                 b.Property(p => p.State).IsRequired();
-
+                
                 b.Property(p => p.Describe).HasMaxLength(FileStoringContainerConsts.MaxDescribeLength);
-
+                
                 b.HasMany(x => x.Items).WithOne().HasForeignKey(p => p.ContainerId).IsRequired();
-
+                
                 b.HasIndex(x => new { x.TenantId, x.Name });
                 //b.HasIndex(x => x.Name);
 

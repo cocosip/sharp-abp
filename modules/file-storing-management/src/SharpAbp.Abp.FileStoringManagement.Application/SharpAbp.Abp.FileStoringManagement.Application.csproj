@@ -5,8 +5,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <AssemblyName>SharpAbp.Abp.FileStoringManagement.Domain.Shared</AssemblyName>
-    <PackageId>SharpAbp.Abp.FileStoringManagement.Domain.Shared</PackageId>
+    <AssemblyName>SharpAbp.Abp.FileStoringManagement.Application</AssemblyName>
+    <PackageId>SharpAbp.Abp.FileStoringManagement.Application</PackageId>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -16,13 +16,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="SharpAbp\Abp\FileStoringManagement\Localization\Resources\*.json" />
-    <Content Remove="SharpAbp\Abp\FileStoringManagement\Localization\Resources\*.json" />
+    <PackageReference Include="Volo.Abp.AutoMapper" Version="4.0.0" />
+    <PackageReference Include="Volo.Abp.Ddd.Application" Version="4.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.Validation" Version="4.0.0" />
+    <ProjectReference Include="..\SharpAbp.Abp.FileStoringManagement.Application.Contracts\SharpAbp.Abp.FileStoringManagement.Application.Contracts.csproj" />
+    <ProjectReference Include="..\SharpAbp.Abp.FileStoringManagement.Domain\SharpAbp.Abp.FileStoringManagement.Domain.csproj" />
   </ItemGroup>
-
 
 </Project>

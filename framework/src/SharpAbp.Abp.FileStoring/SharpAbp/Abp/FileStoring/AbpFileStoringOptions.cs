@@ -9,21 +9,19 @@ namespace SharpAbp.Abp.FileStoring
     public class AbpFileStoringOptions
     {
         public FileContainerConfigurations Containers { get; }
-
         public FileProviderConfigurations Providers { get; }
 
         public AbpFileStoringOptions()
         {
             Containers = new FileContainerConfigurations();
-
             Providers = new FileProviderConfigurations();
         }
 
         public AbpFileStoringOptions Configure(IConfiguration configuration)
         {
-            var providerConfigurationEntries = configuration.Get<Dictionary<string, ProviderConfigurationEntry>>();
+            var providerConfigurations = configuration.Get<Dictionary<string, ProviderConfiguration>>();
 
-            foreach (var kv in providerConfigurationEntries)
+            foreach (var kv in providerConfigurations)
             {
                 var fileProviderConfiguration = Providers.GetConfiguration(kv.Value.Provider);
                 if (fileProviderConfiguration == null)

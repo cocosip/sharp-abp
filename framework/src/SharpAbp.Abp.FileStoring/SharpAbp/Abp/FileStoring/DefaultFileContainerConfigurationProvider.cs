@@ -17,7 +17,6 @@ namespace SharpAbp.Abp.FileStoring
         public virtual FileContainerConfiguration Get([NotNull] string name)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            
             return Options.Containers.GetConfiguration(name);
         }
 
