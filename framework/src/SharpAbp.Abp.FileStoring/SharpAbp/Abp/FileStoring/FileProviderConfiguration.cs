@@ -15,6 +15,11 @@ namespace SharpAbp.Abp.FileStoring
         [NotNull]
         private readonly Dictionary<string, Type> _properties;
 
+        public FileProviderConfiguration()
+        {
+
+        }
+
         public FileProviderConfiguration([NotNull] string provider)
         {
             Provider = provider;

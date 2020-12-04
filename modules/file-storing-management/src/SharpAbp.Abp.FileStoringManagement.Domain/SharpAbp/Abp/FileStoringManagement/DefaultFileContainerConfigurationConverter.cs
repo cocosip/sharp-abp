@@ -27,7 +27,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         [NotNull]
         public virtual FileContainerConfiguration ToConfiguration(FileStoringContainer container)
         {
-            var fileProviderConfiguration = Options.Providers.GetConfiguration(container.ProviderName);
+            var fileProviderConfiguration = Options.Providers.GetConfiguration(container.Provider);
             Check.NotNull(fileProviderConfiguration, nameof(fileProviderConfiguration));
 
             var configuration = new FileContainerConfiguration()
@@ -39,7 +39,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 
             foreach (var item in container.Items)
             {
-                var type = Type.GetType(item.TypeName);
+                var type = fileProviderConfiguration.GetProperty(item.Name);
                 var value = TypeHelper.ConvertFromString(type, item.Value);
                 configuration.SetConfiguration(item.Name, value);
             }

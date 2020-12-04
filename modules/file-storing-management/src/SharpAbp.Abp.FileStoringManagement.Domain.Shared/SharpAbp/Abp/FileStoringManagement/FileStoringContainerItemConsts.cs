@@ -12,10 +12,6 @@
         /// </summary>
         public static int MaxValueLength { get; set; } = 1024;
 
-        /// <summary>
-        /// Default value: 256.
-        /// </summary>
-        public static int MaxTypeNameLength { get; set; } = 256;
     }
 
 }

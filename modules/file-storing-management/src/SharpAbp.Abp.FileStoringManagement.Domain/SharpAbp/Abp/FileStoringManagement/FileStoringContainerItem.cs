@@ -12,9 +12,6 @@ namespace SharpAbp.Abp.FileStoringManagement
         [NotNull]
         public virtual string Value { get; set; }
 
-        [NotNull]
-        public virtual string TypeName { get; set; }
-
         public virtual Guid ContainerId { get; set; }
 
 
@@ -28,5 +25,12 @@ namespace SharpAbp.Abp.FileStoringManagement
             Id = id;
         }
 
+
+        public FileStoringContainerItem SetIdAndContainerId(Guid id, Guid containerId)
+        {
+            Id = id;
+            ContainerId = containerId;
+            return this;
+        }
     }
 }

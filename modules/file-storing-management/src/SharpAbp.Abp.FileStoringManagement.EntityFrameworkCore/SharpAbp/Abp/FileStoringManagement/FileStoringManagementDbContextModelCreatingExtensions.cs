@@ -30,15 +30,11 @@ namespace SharpAbp.Abp.FileStoringManagement
                 
                 b.Property(p => p.Name).IsRequired().HasMaxLength(FileStoringContainerConsts.MaxNameLength);
                 
-                b.Property(p => p.ProviderName).IsRequired().HasMaxLength(FileStoringContainerConsts.MaxProviderNameLength);
+                b.Property(p => p.Provider).IsRequired().HasMaxLength(FileStoringContainerConsts.MaxProviderLength);
                 
                 b.Property(p => p.HttpSupport).IsRequired();
                 
                 b.Property(p => p.IsMultiTenant).IsRequired();
-                
-                b.Property(p => p.State).IsRequired();
-                
-                b.Property(p => p.Describe).HasMaxLength(FileStoringContainerConsts.MaxDescribeLength);
                 
                 b.HasMany(x => x.Items).WithOne().HasForeignKey(p => p.ContainerId).IsRequired();
                 
@@ -58,8 +54,6 @@ namespace SharpAbp.Abp.FileStoringManagement
                 b.Property(p => p.Name).IsRequired().HasMaxLength(FileStoringContainerItemConsts.MaxNameLength);
 
                 b.Property(p => p.Value).IsRequired().HasMaxLength(FileStoringContainerItemConsts.MaxValueLength);
-
-                b.Property(p => p.TypeName).IsRequired().HasMaxLength(FileStoringContainerItemConsts.MaxTypeNameLength);
 
                 b.HasIndex(x => new { x.ContainerId, x.Name });
             });

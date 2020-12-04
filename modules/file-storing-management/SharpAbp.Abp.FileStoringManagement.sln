@@ -17,9 +17,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{06678086-F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore.Tests", "test\SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore.Tests\SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore.Tests.csproj", "{A092279A-44FC-44BC-8278-DE054F580358}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.FileStoringManagement.Application.Contracts", "src\SharpAbp.Abp.FileStoringManagement.Application.Contracts\SharpAbp.Abp.FileStoringManagement.Application.Contracts.csproj", "{FB1251C9-894E-4727-9365-94C9445E9728}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoringManagement.Application.Contracts", "src\SharpAbp.Abp.FileStoringManagement.Application.Contracts\SharpAbp.Abp.FileStoringManagement.Application.Contracts.csproj", "{FB1251C9-894E-4727-9365-94C9445E9728}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.FileStoringManagement.Application", "src\SharpAbp.Abp.FileStoringManagement.Application\SharpAbp.Abp.FileStoringManagement.Application.csproj", "{D0D2378E-FCC0-4469-9C00-2B117F8D6D76}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoringManagement.Application", "src\SharpAbp.Abp.FileStoringManagement.Application\SharpAbp.Abp.FileStoringManagement.Application.csproj", "{D0D2378E-FCC0-4469-9C00-2B117F8D6D76}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.FileStoringManagement.Application.Tests", "test\SharpAbp.Abp.FileStoringManagement.Application.Tests\SharpAbp.Abp.FileStoringManagement.Application.Tests.csproj", "{5D674D69-7762-479E-8748-FF0BB06FBBED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -115,6 +117,18 @@ Global
 		{D0D2378E-FCC0-4469-9C00-2B117F8D6D76}.Release|x64.Build.0 = Release|Any CPU
 		{D0D2378E-FCC0-4469-9C00-2B117F8D6D76}.Release|x86.ActiveCfg = Release|Any CPU
 		{D0D2378E-FCC0-4469-9C00-2B117F8D6D76}.Release|x86.Build.0 = Release|Any CPU
+		{5D674D69-7762-479E-8748-FF0BB06FBBED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D674D69-7762-479E-8748-FF0BB06FBBED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D674D69-7762-479E-8748-FF0BB06FBBED}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5D674D69-7762-479E-8748-FF0BB06FBBED}.Debug|x64.Build.0 = Debug|Any CPU
+		{5D674D69-7762-479E-8748-FF0BB06FBBED}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5D674D69-7762-479E-8748-FF0BB06FBBED}.Debug|x86.Build.0 = Debug|Any CPU
+		{5D674D69-7762-479E-8748-FF0BB06FBBED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D674D69-7762-479E-8748-FF0BB06FBBED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D674D69-7762-479E-8748-FF0BB06FBBED}.Release|x64.ActiveCfg = Release|Any CPU
+		{5D674D69-7762-479E-8748-FF0BB06FBBED}.Release|x64.Build.0 = Release|Any CPU
+		{5D674D69-7762-479E-8748-FF0BB06FBBED}.Release|x86.ActiveCfg = Release|Any CPU
+		{5D674D69-7762-479E-8748-FF0BB06FBBED}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -127,6 +141,7 @@ Global
 		{A092279A-44FC-44BC-8278-DE054F580358} = {06678086-FFDA-429B-92D9-99641F15AF8C}
 		{FB1251C9-894E-4727-9365-94C9445E9728} = {75AA1786-8B10-4E0A-89F6-79B714F85E34}
 		{D0D2378E-FCC0-4469-9C00-2B117F8D6D76} = {75AA1786-8B10-4E0A-89F6-79B714F85E34}
+		{5D674D69-7762-479E-8748-FF0BB06FBBED} = {06678086-FFDA-429B-92D9-99641F15AF8C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B1F6BBC3-F876-4997-B320-49965C56774F}

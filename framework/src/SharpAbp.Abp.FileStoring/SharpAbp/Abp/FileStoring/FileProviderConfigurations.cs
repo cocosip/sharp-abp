@@ -15,12 +15,6 @@ namespace SharpAbp.Abp.FileStoring
             _providers = new Dictionary<string, FileProviderConfiguration>();
         }
 
-        public FileProviderConfiguration GetConfiguration([NotNull] Type providerType)
-        {
-            Check.NotNull(providerType, nameof(providerType));
-            return GetConfiguration(providerType.FullName);
-        }
-
         public FileProviderConfiguration GetConfiguration([NotNull] string provider)
         {
             Check.NotNullOrWhiteSpace(provider, nameof(provider));
@@ -39,16 +33,11 @@ namespace SharpAbp.Abp.FileStoring
             return true;
         }
 
-        public bool TryRemove([NotNull] Type providerType)
-        {
-            Check.NotNull(providerType, nameof(providerType));
-            return TryRemove(providerType.Name);
-        }
 
-        public bool TryRemove([NotNull] string providerName)
+        public bool TryRemove([NotNull] string provider)
         {
-            Check.NotNull(providerName, nameof(providerName));
-            return _providers.Remove(providerName);
+            Check.NotNull(provider, nameof(provider));
+            return _providers.Remove(provider);
         }
 
         public List<FileProviderConfiguration> GetFileProviders()

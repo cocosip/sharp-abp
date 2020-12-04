@@ -38,7 +38,7 @@ namespace SharpAbp.Abp.FileStoringManagement
             if (configuration == null)
             {
                 //Read from db
-                var container = await FileStoringContainerRepository.FindByNameAsync(name);
+                var container = await FileStoringContainerRepository.FindAsync(name);
                 if (container != null)
                 {
                     configuration = FileContainerConfigurationConverter.ToConfiguration(container);

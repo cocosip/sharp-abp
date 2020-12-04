@@ -10,31 +10,25 @@ namespace SharpAbp.Abp.FileStoringManagement
     {
         public virtual Guid? TenantId { get; set; }
 
+        /// <summary>
+        /// IsMultiTenant
+        /// </summary>
+        public virtual bool IsMultiTenant { get; set; }
+
+        [NotNull]
+        public virtual string Provider { get; set; }
+
         [NotNull]
         public virtual string Title { get; set; }
 
         [NotNull]
         public virtual string Name { get; set; }
 
-        [NotNull]
-        public virtual string ProviderName { get; set; }
-
-        /// <summary>
-        /// IsMultiTenant
-        /// </summary>
-        public virtual bool IsMultiTenant { get; set; }
-
         /// <summary>
         /// Whether support http access or not
         /// </summary>
         public virtual bool HttpSupport { get; set; }
 
-        /// <summary>
-        /// The state of container
-        /// </summary>
-        public virtual int State { get; set; }
-
-        public virtual string Describe { get; set; }
 
         public virtual List<FileStoringContainerItem> Items { get; set; }
 
@@ -43,9 +37,15 @@ namespace SharpAbp.Abp.FileStoringManagement
             Items = new List<FileStoringContainerItem>();
         }
 
-        public FileStoringContainer(Guid id)
+        public FileStoringContainer(Guid id) : this()
         {
             Id = id;
+        }
+
+        public FileStoringContainer SetId(Guid id)
+        {
+            Id = id;
+            return this;
         }
 
 

@@ -29,17 +29,15 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
             var container = new FileStoringContainer(_guidGenerator.Create())
             {
                 TenantId = tenantId,
+                IsMultiTenant = true,
                 Name = "default",
                 Title = "test-container",
-                ProviderName = "Minio",
+                Provider = "Minio",
                 HttpSupport = true,
-                State = 1,
-                Describe = ""
             };
             container.Items.Add(new FileStoringContainerItem(_guidGenerator.Create())
             {
                 Name = "Minio.BucketName",
-                TypeName = typeof(string).FullName,
                 Value = "bucket1",
                 ContainerId = container.Id
             });
@@ -47,7 +45,6 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
             container.Items.Add(new FileStoringContainerItem(_guidGenerator.Create())
             {
                 Name = "Minio.EndPoint",
-                TypeName = typeof(string).FullName,
                 Value = "http://127.0.0.1:9094",
                 ContainerId = container.Id
             });
@@ -55,7 +52,6 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
             container.Items.Add(new FileStoringContainerItem(_guidGenerator.Create())
             {
                 Name = "Minio.AccessKey",
-                TypeName = typeof(string).FullName,
                 Value = "minioadmin",
                 ContainerId = container.Id
             });
@@ -63,7 +59,6 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
             container.Items.Add(new FileStoringContainerItem(_guidGenerator.Create())
             {
                 Name = "Minio.SecretKey",
-                TypeName = typeof(string).FullName,
                 Value = "minioadmin",
                 ContainerId = container.Id
             });
@@ -71,7 +66,6 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
             container.Items.Add(new FileStoringContainerItem(_guidGenerator.Create())
             {
                 Name = "Minio.WithSSL",
-                TypeName = typeof(bool).FullName,
                 Value = "true",
                 ContainerId = container.Id
             });
@@ -79,7 +73,6 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
             container.Items.Add(new FileStoringContainerItem(_guidGenerator.Create())
             {
                 Name = "Minio.CreateBucketIfNotExists",
-                TypeName = typeof(bool).FullName,
                 Value = "true",
                 ContainerId = container.Id
             });
@@ -91,21 +84,26 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
 
             using (_currentTenant.Change(null))
             {
-                var queryContainer1 = await _fileStoringContainerRepository.FindByNameAsync("default");
+                var queryContainer1 = await _fileStoringContainerRepository.FindAsync("default");
                 Assert.Null(queryContainer1);
             }
 
             using (_currentTenant.Change(tenantId))
             {
-                var queryContainer1 = await _fileStoringContainerRepository.FindByNameAsync("default");
+                var queryContainer1 = await _fileStoringContainerRepository.FindAsync("default");
                 Assert.Equal(container.Id, queryContainer1.Id);
                 Assert.Equal(container.Name, queryContainer1.Name);
                 Assert.Equal(container.Items.Count, queryContainer1.Items.Count);
+
+                var queryContainer2 = await _fileStoringContainerRepository.GetAsync(container.Id, includeDetails: true);
+                Assert.NotNull(queryContainer2);
+                Assert.Equal(container.Items.Count, queryContainer2.Items.Count);
+
             }
 
             using (_dataFilter.Disable())
             {
-                var queryContainer1 = await _fileStoringContainerRepository.FindByNameAsync("default");
+                var queryContainer1 = await _fileStoringContainerRepository.FindAsync("default");
                 Assert.Equal(container.Id, queryContainer1.Id);
                 Assert.Equal(container.Name, queryContainer1.Name);
                 Assert.Equal(container.Items.Count, queryContainer1.Items.Count);
