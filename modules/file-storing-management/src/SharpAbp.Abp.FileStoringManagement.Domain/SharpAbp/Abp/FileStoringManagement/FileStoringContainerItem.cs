@@ -20,17 +20,18 @@ namespace SharpAbp.Abp.FileStoringManagement
 
         }
 
-        public FileStoringContainerItem(Guid id)
+        public FileStoringContainerItem(Guid id, string name, string value, Guid containerId)
         {
             Id = id;
+            Name = name;
+            Value = value;
+            ContainerId = containerId;
         }
 
-
-        public FileStoringContainerItem SetIdAndContainerId(Guid id, Guid containerId)
+        public virtual void SetIdAndContainerId(Guid id, Guid containerId)
         {
             Id = id;
             ContainerId = containerId;
-            return this;
         }
     }
 }

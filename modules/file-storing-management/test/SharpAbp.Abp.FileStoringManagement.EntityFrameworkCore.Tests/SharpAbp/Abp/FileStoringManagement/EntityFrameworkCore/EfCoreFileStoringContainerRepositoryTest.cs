@@ -26,56 +26,50 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
         {
 
             var tenantId = new Guid("446a5211-3d72-4339-9adc-845151f8ada0");
-            var container = new FileStoringContainer(_guidGenerator.Create())
-            {
-                TenantId = tenantId,
-                IsMultiTenant = true,
-                Name = "default",
-                Title = "test-container",
-                Provider = "Minio",
-                HttpSupport = true,
-            };
-            container.Items.Add(new FileStoringContainerItem(_guidGenerator.Create())
-            {
-                Name = "Minio.BucketName",
-                Value = "bucket1",
-                ContainerId = container.Id
-            });
+            var container = new FileStoringContainer(
+                _guidGenerator.Create(),
+                null,
+                true,
+                "Minio",
+                "default",
+                "test-container",
+                true);
 
-            container.Items.Add(new FileStoringContainerItem(_guidGenerator.Create())
-            {
-                Name = "Minio.EndPoint",
-                Value = "http://127.0.0.1:9094",
-                ContainerId = container.Id
-            });
+            container.Items.Add(new FileStoringContainerItem(
+                _guidGenerator.Create(),
+                "Minio.BucketName",
+                "bucket1",
+                container.Id));
 
-            container.Items.Add(new FileStoringContainerItem(_guidGenerator.Create())
-            {
-                Name = "Minio.AccessKey",
-                Value = "minioadmin",
-                ContainerId = container.Id
-            });
+            container.Items.Add(new FileStoringContainerItem(
+                _guidGenerator.Create(),
+                "Minio.EndPoint",
+                "http://127.0.0.1:9094",
+                container.Id));
 
-            container.Items.Add(new FileStoringContainerItem(_guidGenerator.Create())
-            {
-                Name = "Minio.SecretKey",
-                Value = "minioadmin",
-                ContainerId = container.Id
-            });
+            container.Items.Add(new FileStoringContainerItem(
+                _guidGenerator.Create(),
+                "Minio.AccessKey",
+                "minioadmin",
+                container.Id));
 
-            container.Items.Add(new FileStoringContainerItem(_guidGenerator.Create())
-            {
-                Name = "Minio.WithSSL",
-                Value = "true",
-                ContainerId = container.Id
-            });
+            container.Items.Add(new FileStoringContainerItem(
+                _guidGenerator.Create(),
+                "Minio.SecretKey",
+                "minioadmin",
+                container.Id));
 
-            container.Items.Add(new FileStoringContainerItem(_guidGenerator.Create())
-            {
-                Name = "Minio.CreateBucketIfNotExists",
-                Value = "true",
-                ContainerId = container.Id
-            });
+            container.Items.Add(new FileStoringContainerItem(
+                _guidGenerator.Create(), 
+                "Minio.WithSSL", 
+                "true", 
+                container.Id));
+
+            container.Items.Add(new FileStoringContainerItem(
+                _guidGenerator.Create(), 
+                "Minio.CreateBucketIfNotExists",
+                "true",
+                container.Id));
 
             using (_currentTenant.Change(tenantId))
             {

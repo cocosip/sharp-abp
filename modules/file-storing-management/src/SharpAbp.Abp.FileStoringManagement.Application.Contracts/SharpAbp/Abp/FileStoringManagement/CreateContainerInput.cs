@@ -24,9 +24,18 @@ namespace SharpAbp.Abp.FileStoringManagement
         [DynamicStringLength(typeof(FileStoringContainerItemConsts), nameof(FileStoringContainerItemConsts.MaxNameLength))]
         public string Name { get; set; }
 
-        [Required]
         [DynamicStringLength(typeof(FileStoringContainerItemConsts), nameof(FileStoringContainerItemConsts.MaxValueLength))]
         public string Value { get; set; }
 
+        public CreateContainerItemInput()
+        {
+
+        }
+
+        public CreateContainerItemInput(string name, string value)
+        {
+            Name = name;
+            Value = value;
+        }
     }
 }

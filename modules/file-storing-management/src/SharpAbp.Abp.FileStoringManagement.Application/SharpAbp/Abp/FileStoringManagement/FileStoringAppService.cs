@@ -8,6 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Data;
+using Volo.Abp.MultiTenancy;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
@@ -15,11 +17,13 @@ namespace SharpAbp.Abp.FileStoringManagement
     {
         protected AbpFileStoringOptions Options { get; }
         protected IFileStoringContainerRepository FileStoringContainerRepository { get; }
+        protected IDataFilter DataFilter { get; }
 
-        public FileStoringAppService(IOptions<AbpFileStoringOptions> options, IFileStoringContainerRepository fileStoringContainerRepository)
+        public FileStoringAppService(IOptions<AbpFileStoringOptions> options, IFileStoringContainerRepository fileStoringContainerRepository, IDataFilter dataFilter)
         {
             Options = options.Value;
             FileStoringContainerRepository = fileStoringContainerRepository;
+            DataFilter = dataFilter;
         }
 
 
@@ -75,12 +79,13 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<FileStoringContainerDto> GetAsync(Guid id, bool includeDetails = true, CancellationToken cancellationToken = default)
+        public async Task<ContainerDto> GetAsync(Guid id, bool includeDetails = true, CancellationToken cancellationToken = default)
         {
-
-            var fileStoringContainer = await FileStoringContainerRepository.GetAsync(id, includeDetails, cancellationToken);
-
-            return ObjectMapper.Map<FileStoringContainer, FileStoringContainerDto>(fileStoringContainer);
+            using (DataFilter.Disable<IMultiTenant>())
+            {
+                var fileStoringContainer = await FileStoringContainerRepository.GetAsync(id, includeDetails, cancellationToken);
+                return ObjectMapper.Map<FileStoringContainer, ContainerDto>(fileStoringContainer);
+            }
         }
 
         /// <summary>
@@ -90,12 +95,12 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<FileStoringContainerDto> GetByNameAsync([NotNull] string name, bool includeDetails = true, CancellationToken cancellationToken = default)
+        public async Task<ContainerDto> GetByNameAsync([NotNull] string name, bool includeDetails = true, CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
 
             var fileStoringContainer = await FileStoringContainerRepository.FindAsync(name, includeDetails, cancellationToken);
-            return ObjectMapper.Map<FileStoringContainer, FileStoringContainerDto>(fileStoringContainer);
+            return ObjectMapper.Map<FileStoringContainer, ContainerDto>(fileStoringContainer);
         }
 
         /// <summary>
@@ -105,7 +110,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<PagedResultDto<FileStoringContainerDto>> GetPagedListAsync(FileStoringContainerPagedRequestDto input, bool includeDetails = true, CancellationToken cancellationToken = default)
+        public async Task<PagedResultDto<ContainerDto>> GetPagedListAsync(FileStoringContainerPagedRequestDto input, bool includeDetails = true, CancellationToken cancellationToken = default)
         {
             var count = await FileStoringContainerRepository.GetCountAsync(input.Name, input.Provider);
             var fileStoringContainers = await FileStoringContainerRepository.GetListAsync(
@@ -117,9 +122,9 @@ namespace SharpAbp.Abp.FileStoringManagement
                 input.Provider,
                 cancellationToken);
 
-            return new PagedResultDto<FileStoringContainerDto>(
+            return new PagedResultDto<ContainerDto>(
               count,
-              ObjectMapper.Map<List<FileStoringContainer>, List<FileStoringContainerDto>>(fileStoringContainers)
+              ObjectMapper.Map<List<FileStoringContainer>, List<ContainerDto>>(fileStoringContainers)
               );
         }
 
@@ -132,7 +137,10 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <returns></returns>
         public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            await FileStoringContainerRepository.DeleteAsync(id, cancellationToken: cancellationToken);
+            using (DataFilter.Disable<IMultiTenant>())
+            {
+                await FileStoringContainerRepository.DeleteAsync(id, cancellationToken: cancellationToken);
+            }
         }
 
         /// <summary>
@@ -143,18 +151,27 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <returns></returns>
         public async Task<Guid> CreateAsync(CreateContainerInput input, CancellationToken cancellationToken = default)
         {
-            var fileStoringContainer = ObjectMapper.Map<CreateContainerInput, FileStoringContainer>(input);
-            //Set id
-            fileStoringContainer.SetId(GuidGenerator.Create());
+            var container = new FileStoringContainer(
+              GuidGenerator.Create(),
+              input.TenantId,
+              input.IsMultiTenant,
+              input.Provider,
+              input.Name,
+              input.Title,
+              input.HttpAccess);
 
-            foreach (var item in fileStoringContainer.Items)
+            foreach (var item in input.Items)
             {
-                item.SetIdAndContainerId(GuidGenerator.Create(), fileStoringContainer.Id);
+                container.Items.Add(new FileStoringContainerItem(
+                    GuidGenerator.Create(),
+                    item.Name,
+                    item.Value,
+                    container.Id));
             }
 
-            await FileStoringContainerRepository.InsertAsync(fileStoringContainer, cancellationToken: cancellationToken);
+            await FileStoringContainerRepository.InsertAsync(container, cancellationToken: cancellationToken);
 
-            return fileStoringContainer.Id;
+            return container.Id;
         }
 
         /// <summary>
@@ -165,50 +182,52 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <returns></returns>
         public async Task UpdateAsync(UpdateContainerInput input, CancellationToken cancellationToken = default)
         {
-            var fileStoringContainer = await FileStoringContainerRepository.GetAsync(input.Id, true);
-
-            if (fileStoringContainer == null)
+            using (DataFilter.Disable<IMultiTenant>())
             {
-                throw new AbpException($"Could not find Container when update by id:'{input.Id}'.");
-            }
+                var container = await FileStoringContainerRepository.GetAsync(input.Id.Value, true);
 
-            fileStoringContainer.Title = input.Title;
-            fileStoringContainer.Name = input.Name;
-            fileStoringContainer.Provider = input.Provider;
-            fileStoringContainer.IsMultiTenant = input.IsMultiTenant;
-
-            var removeItems = new List<FileStoringContainerItem>();
-
-            foreach (var item in fileStoringContainer.Items)
-            {
-                var inputItem = input.Items.FirstOrDefault(x => x.Id == item.Id);
-                if (inputItem != null)
+                if (container == null)
                 {
-                    //Update
-                    item.Name = inputItem.Name;
-                    item.Value = inputItem.Value;
-                }
-                else
-                {
-                    //Delete
-                    removeItems.Add(item);
-                }
-            }
-            //Remove
-            fileStoringContainer.Items.RemoveAll(removeItems);
-
-            //Create
-            var createInputItems = input.Items.Where(x => !x.Id.HasValue).ToList();
-            if (createInputItems.Any())
-            {
-                var containerItems = ObjectMapper.Map<List<UpdateContainerItemInput>, List<FileStoringContainerItem>>(createInputItems);
-
-                foreach (var item in containerItems)
-                {
-                    item.SetIdAndContainerId(GuidGenerator.Create(), fileStoringContainer.Id);
+                    throw new AbpException($"Could not find Container when update by id:'{input.Id}'.");
                 }
 
-                fileStoringContainer.Items.AddRange(containerItems);
+                //Update
+                container.Update(input.IsMultiTenant, input.Provider, input.Name, input.Title, input.HttpAccess);
+
+                var removeItems = new List<FileStoringContainerItem>();
+
+                foreach (var item in container.Items)
+                {
+                    var inputItem = input.Items.FirstOrDefault(x => x.Id == item.Id);
+                    if (inputItem != null)
+                    {
+                        //Update
+                        item.Name = inputItem.Name;
+                        item.Value = inputItem.Value;
+                    }
+                    else
+                    {
+                        //Delete
+                        removeItems.Add(item);
+                    }
+                }
+
+                //Remove
+                container.Items.RemoveAll(removeItems);
+
+                //Create
+                var createInputItems = input.Items.Where(x => !x.Id.HasValue).ToList();
+                if (createInputItems.Any())
+                {
+                    var containerItems = ObjectMapper.Map<List<UpdateContainerItemInput>, List<FileStoringContainerItem>>(createInputItems);
+
+                    foreach (var item in containerItems)
+                    {
+                        item.SetIdAndContainerId(GuidGenerator.Create(), container.Id);
+                    }
+
+                    container.Items.AddRange(containerItems);
+                }
             }
         }
 

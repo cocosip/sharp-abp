@@ -3,14 +3,14 @@
     public static class FileStoringContainerItemConsts
     {
         /// <summary>
-        /// Default value: 64.
+        /// Default value: 128.
         /// </summary>
-        public static int MaxNameLength { get; set; } = 64;
+        public static int MaxNameLength { get; set; } = 128;
 
         /// <summary>
         /// Default value: 1024.
         /// </summary>
-        public static int MaxValueLength { get; set; } = 1024;
+        public static int MaxValueLength { get; set; } = 2048;
 
     }
 

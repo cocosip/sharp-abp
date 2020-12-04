@@ -4,7 +4,7 @@ using Volo.Abp.Application.Dtos;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
-    public class FileStoringContainerDto : EntityDto<Guid>
+    public class ContainerDto : EntityDto<Guid>
     {
         public Guid? TenantId { get; set; }
 
@@ -16,24 +16,20 @@ namespace SharpAbp.Abp.FileStoringManagement
 
         public string Provider { get; set; }
 
-        public bool HttpSupport { get; set; }
+        public bool HttpAccess { get; set; }
 
-        public List<FileStoringContainerItemDto> Items { get; set; }
+        public List<ContainerItemDto> Items { get; set; }
 
-        public FileStoringContainerDto()
+        public ContainerDto()
         {
-            Items = new List<FileStoringContainerItemDto>();
+            Items = new List<ContainerItemDto>();
         }
     }
 
-    public class FileStoringContainerItemDto : EntityDto<Guid>
+    public class ContainerItemDto : EntityDto<Guid>
     {
         public string Name { get; set; }
-
         public string Value { get; set; }
-
-        public string TypeName { get; set; }
-
         public Guid ContainerId { get; set; }
     }
 }

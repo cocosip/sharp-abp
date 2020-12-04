@@ -6,6 +6,9 @@ namespace SharpAbp.Abp.FileStoringManagement
     public abstract class ContainerInputBase
     {
         [Required]
+        public bool IsMultiTenant { get; set; }
+
+        [Required]
         [DynamicStringLength(typeof(FileStoringContainerConsts), nameof(FileStoringContainerConsts.MaxTitleLength))]
         public string Title { get; set; }
 
@@ -18,10 +21,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         public string Provider { get; set; }
 
         [Required]
-        public bool IsMultiTenant { get; set; }
-
-        [Required]
-        public bool HttpSupport { get; set; }
+        public bool HttpAccess { get; set; }
 
     }
 }
