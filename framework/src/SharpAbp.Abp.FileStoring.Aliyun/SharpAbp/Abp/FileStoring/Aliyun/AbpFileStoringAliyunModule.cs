@@ -52,18 +52,18 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             var configuration = new FileProviderConfiguration(AliyunFileProviderConfigurationNames.ProviderName);
             configuration.DefaultNamingNormalizers.TryAdd<AliyunFileNamingNormalizer>();
             configuration
-                .SetProperty(AliyunFileProviderConfigurationNames.RegionId, typeof(string))
-                .SetProperty(AliyunFileProviderConfigurationNames.Endpoint, typeof(string))
-                .SetProperty(AliyunFileProviderConfigurationNames.BucketName, typeof(string))
-                .SetProperty(AliyunFileProviderConfigurationNames.AccessKeyId, typeof(string))
-                .SetProperty(AliyunFileProviderConfigurationNames.AccessKeySecret, typeof(string))
-                .SetProperty(AliyunFileProviderConfigurationNames.UseSecurityTokenService, typeof(bool))
-                .SetProperty(AliyunFileProviderConfigurationNames.RoleArn, typeof(string))
-                .SetProperty(AliyunFileProviderConfigurationNames.RoleSessionName, typeof(string))
-                .SetProperty(AliyunFileProviderConfigurationNames.DurationSeconds, typeof(int))
-                .SetProperty(AliyunFileProviderConfigurationNames.Policy, typeof(string))
-                .SetProperty(AliyunFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool))
-                .SetProperty(AliyunFileProviderConfigurationNames.TemporaryCredentialsCacheKey, typeof(string));
+                .SetValue(AliyunFileProviderConfigurationNames.RegionId, typeof(string))
+                .SetValue(AliyunFileProviderConfigurationNames.Endpoint, typeof(string))
+                .SetValue(AliyunFileProviderConfigurationNames.BucketName, typeof(string))
+                .SetValue(AliyunFileProviderConfigurationNames.AccessKeyId, typeof(string))
+                .SetValue(AliyunFileProviderConfigurationNames.AccessKeySecret, typeof(string))
+                .SetValue(AliyunFileProviderConfigurationNames.UseSecurityTokenService, typeof(bool))
+                .SetValue(AliyunFileProviderConfigurationNames.RoleArn, typeof(string))
+                .SetValue(AliyunFileProviderConfigurationNames.RoleSessionName, typeof(string))
+                .SetValue(AliyunFileProviderConfigurationNames.DurationSeconds, typeof(int))
+                .SetValue(AliyunFileProviderConfigurationNames.Policy, typeof(string))
+                .SetValue(AliyunFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool))
+                .SetValue(AliyunFileProviderConfigurationNames.TemporaryCredentialsCacheKey, typeof(string));
 
             return configuration;
         }

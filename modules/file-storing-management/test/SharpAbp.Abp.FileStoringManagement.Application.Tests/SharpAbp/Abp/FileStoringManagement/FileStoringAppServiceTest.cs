@@ -38,7 +38,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         {
             var providerOptions = _fileStoringAppService.GetProviderOptions(MinioFileProviderConfigurationNames.ProviderName);
             Assert.Equal(MinioFileProviderConfigurationNames.ProviderName, providerOptions.Provider);
-            Assert.Equal(6, providerOptions.Properties.Count);
+            Assert.Equal(6, providerOptions.Values.Count);
         }
 
         [Fact]

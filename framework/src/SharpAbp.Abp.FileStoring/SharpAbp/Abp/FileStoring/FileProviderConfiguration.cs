@@ -13,48 +13,54 @@ namespace SharpAbp.Abp.FileStoring
         public ITypeList<IFileNamingNormalizer> DefaultNamingNormalizers { get; }
 
         [NotNull]
-        private readonly Dictionary<string, Type> _properties;
+        private readonly Dictionary<string, FileProviderValue> _values;
 
         public FileProviderConfiguration()
         {
-
+            DefaultNamingNormalizers = new TypeList<IFileNamingNormalizer>();
+            _values = new Dictionary<string, FileProviderValue>();
         }
 
-        public FileProviderConfiguration([NotNull] string provider)
+        public FileProviderConfiguration([NotNull] string provider) : this()
         {
             Provider = provider;
-            DefaultNamingNormalizers = new TypeList<IFileNamingNormalizer>();
-            _properties = new Dictionary<string, Type>();
         }
 
-        public Type GetProperty([NotNull] string name)
+        public FileProviderValue GetValue([NotNull] string name)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
 
-            _properties.TryGetValue(name, out Type property);
+            _values.TryGetValue(name, out FileProviderValue value);
 
-            return property;
+            return value;
         }
 
 
-        public FileProviderConfiguration SetProperty([NotNull] string name, [NotNull] Type property)
+        public FileProviderConfiguration SetValue([NotNull] string name, [NotNull] FileProviderValue value)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            Check.NotNull(property, nameof(property));
-            _properties.Add(name, property);
+            Check.NotNull(value, nameof(value));
+            _values.Add(name, value);
             return this;
         }
 
-        public FileProviderConfiguration ClearProperty([NotNull] string name)
+        public FileProviderConfiguration SetValue([NotNull] string name, [NotNull] Type type, string note = "")
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            _properties.Remove(name);
+            _values.Add(name, new FileProviderValue(type, note));
             return this;
         }
 
-        public Dictionary<string, Type> GetProperties()
+        public FileProviderConfiguration ClearValue([NotNull] string name)
         {
-            return _properties;
+            Check.NotNullOrWhiteSpace(name, nameof(name));
+            _values.Remove(name);
+            return this;
+        }
+
+        public Dictionary<string, FileProviderValue> GetValues()
+        {
+            return _values;
         }
     }
 

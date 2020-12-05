@@ -28,7 +28,7 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
             var tenantId = new Guid("446a5211-3d72-4339-9adc-845151f8ada0");
             var container = new FileStoringContainer(
                 _guidGenerator.Create(),
-                null,
+                tenantId,
                 true,
                 "Minio",
                 "default",

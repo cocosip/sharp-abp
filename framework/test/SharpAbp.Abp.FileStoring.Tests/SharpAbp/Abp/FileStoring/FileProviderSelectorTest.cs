@@ -1,6 +1,5 @@
 ﻿using SharpAbp.Abp.FileStoring.Fakes;
 using SharpAbp.Abp.FileStoring.TestObjects;
-using System;
 using Xunit;
 
 namespace SharpAbp.Abp.FileStoring

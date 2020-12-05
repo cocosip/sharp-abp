@@ -39,12 +39,12 @@ namespace SharpAbp.Abp.FileStoring
                         c.NamingNormalizers.Add(defaultNamingNormalizer);
                     }
 
-                    var defaultProperties = fileProviderConfiguration.GetProperties();
+                    var defaultProperties = fileProviderConfiguration.GetValues();
 
                     foreach (var defaultProperty in defaultProperties)
                     {
                         kv.Value.Properties.TryGetValue(defaultProperty.Key, out string value);
-                        var realValue = TypeHelper.ConvertFromString(defaultProperty.Value, value);
+                        var realValue = TypeHelper.ConvertFromString(defaultProperty.Value.Type, value);
                         c.SetConfiguration(defaultProperty.Key, realValue);
                     }
 

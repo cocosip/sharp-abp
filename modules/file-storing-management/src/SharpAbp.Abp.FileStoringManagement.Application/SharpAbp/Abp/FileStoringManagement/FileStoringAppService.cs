@@ -10,18 +10,25 @@ using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Data;
 using Volo.Abp.MultiTenancy;
+using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
     public class FileStoringAppService : FileStoringManagementAppServiceBase, IFileStoringAppService
     {
         protected AbpFileStoringOptions Options { get; }
+        protected IEnumerable<IFileProviderValuesValidator> ProviderValuesValidators { get; }
         protected IFileStoringContainerRepository FileStoringContainerRepository { get; }
         protected IDataFilter DataFilter { get; }
 
-        public FileStoringAppService(IOptions<AbpFileStoringOptions> options, IFileStoringContainerRepository fileStoringContainerRepository, IDataFilter dataFilter)
+        public FileStoringAppService(
+            IOptions<AbpFileStoringOptions> options,
+            IEnumerable<IFileProviderValuesValidator> providerValuesValidators,
+            IFileStoringContainerRepository fileStoringContainerRepository,
+            IDataFilter dataFilter)
         {
             Options = options.Value;
+            ProviderValuesValidators = providerValuesValidators;
             FileStoringContainerRepository = fileStoringContainerRepository;
             DataFilter = dataFilter;
         }
@@ -60,12 +67,12 @@ namespace SharpAbp.Abp.FileStoringManagement
             Check.NotNullOrWhiteSpace(provider, nameof(provider));
 
             var fileProviderConfiguration = Options.Providers.GetConfiguration(provider);
-            var properties = fileProviderConfiguration.GetProperties();
+            var values = fileProviderConfiguration.GetValues();
             var providerOptions = new ProviderOptionsDto(provider);
 
-            foreach (var property in properties)
+            foreach (var kv in values)
             {
-                providerOptions.Properties.Add(new ProviderPropertyDto(property.Key, L[property.Key], property.Value));
+                providerOptions.Values.Add(new ProviderValueDto(kv.Key, L[kv.Key], kv.Value.Type, kv.Value.Note));
             }
 
             return providerOptions;
@@ -151,6 +158,15 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <returns></returns>
         public async Task<Guid> CreateAsync(CreateContainerInput input, CancellationToken cancellationToken = default)
         {
+            var valuesValidator = GetFileProviderValuesValidator(input.Provider);
+            
+            var dict = input.Items.ToDictionary(x => x.Name, y => y.Value);
+            var result = valuesValidator.Validate(dict);
+            if (result.Errors.Any())
+            {
+                throw new AbpValidationException("Create Container validate failed.", result.Errors);
+            }
+
             var container = new FileStoringContainer(
               GuidGenerator.Create(),
               input.TenantId,
@@ -182,6 +198,15 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <returns></returns>
         public async Task UpdateAsync(UpdateContainerInput input, CancellationToken cancellationToken = default)
         {
+            var valuesValidator = GetFileProviderValuesValidator(input.Provider);
+            
+            var dict = input.Items.ToDictionary(x => x.Name, y => y.Value);
+            var result = valuesValidator.Validate(dict);
+            if (result.Errors.Any())
+            {
+                throw new AbpValidationException("Create Container validate failed.", result.Errors);
+            }
+
             using (DataFilter.Disable<IMultiTenant>())
             {
                 var container = await FileStoringContainerRepository.GetAsync(input.Id.Value, true);
@@ -231,6 +256,19 @@ namespace SharpAbp.Abp.FileStoringManagement
             }
         }
 
+        protected virtual IFileProviderValuesValidator GetFileProviderValuesValidator([NotNull] string provider)
+        {
+            Check.NotNullOrWhiteSpace(provider, nameof(provider));
+
+            foreach (var providerValuesValidator in ProviderValuesValidators)
+            {
+                if (providerValuesValidator.Provider == provider)
+                {
+                    return providerValuesValidator;
+                }
+            }
+            throw new AbpException($"Could not find any 'IFileProviderValuesValidator' for provider '{provider}' .");
+        }
 
     }
 }

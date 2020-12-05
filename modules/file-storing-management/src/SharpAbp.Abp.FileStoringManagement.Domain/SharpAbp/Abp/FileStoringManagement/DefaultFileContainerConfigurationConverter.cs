@@ -33,13 +33,13 @@ namespace SharpAbp.Abp.FileStoringManagement
             var configuration = new FileContainerConfiguration()
             {
                 Provider = fileProviderConfiguration.Provider,
-                IsMultiTenant = !container.TenantId.HasValue,
+                IsMultiTenant = container.IsMultiTenant,
                 HttpSupport = container.HttpAccess
             };
 
             foreach (var item in container.Items)
             {
-                var type = fileProviderConfiguration.GetProperty(item.Name);
+                var type = fileProviderConfiguration.GetValue(item.Name).Type;
                 var value = TypeHelper.ConvertFromString(type, item.Value);
                 configuration.SetConfiguration(item.Name, value);
             }

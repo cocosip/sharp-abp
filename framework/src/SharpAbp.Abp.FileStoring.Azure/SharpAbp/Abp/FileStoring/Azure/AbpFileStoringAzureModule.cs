@@ -49,9 +49,9 @@ namespace SharpAbp.Abp.FileStoring.Azure
             var configuration = new FileProviderConfiguration(AzureFileProviderConfigurationNames.ProviderName);
             configuration.DefaultNamingNormalizers.TryAdd<AzureFileNamingNormalizer>();
             configuration
-                .SetProperty(AzureFileProviderConfigurationNames.ConnectionString, typeof(string))
-                .SetProperty(AzureFileProviderConfigurationNames.ContainerName, typeof(string))
-                .SetProperty(AzureFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool));
+                .SetValue(AzureFileProviderConfigurationNames.ConnectionString, typeof(string))
+                .SetValue(AzureFileProviderConfigurationNames.ContainerName, typeof(string))
+                .SetValue(AzureFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool));
             return configuration;
         }
     }

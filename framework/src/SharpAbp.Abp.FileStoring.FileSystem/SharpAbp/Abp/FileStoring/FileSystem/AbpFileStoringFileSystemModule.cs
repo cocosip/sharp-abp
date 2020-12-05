@@ -50,9 +50,9 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
             var configuration = new FileProviderConfiguration(FileSystemFileProviderConfigurationNames.ProviderName);
             configuration.DefaultNamingNormalizers.TryAdd<FileSystemFileNamingNormalizer>();
             configuration
-                .SetProperty(FileSystemFileProviderConfigurationNames.BasePath, typeof(string))
-                .SetProperty(FileSystemFileProviderConfigurationNames.AppendContainerNameToBasePath, typeof(bool))
-                .SetProperty(FileSystemFileProviderConfigurationNames.HttpServer, typeof(string));
+                .SetValue(FileSystemFileProviderConfigurationNames.BasePath, typeof(string))
+                .SetValue(FileSystemFileProviderConfigurationNames.AppendContainerNameToBasePath, typeof(bool))
+                .SetValue(FileSystemFileProviderConfigurationNames.HttpServer, typeof(string));
             return configuration;
         }
     }

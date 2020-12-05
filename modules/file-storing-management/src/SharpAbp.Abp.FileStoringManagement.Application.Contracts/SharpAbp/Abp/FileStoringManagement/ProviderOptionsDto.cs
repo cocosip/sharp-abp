@@ -8,17 +8,17 @@ namespace SharpAbp.Abp.FileStoringManagement
     {
         public string Provider { get; set; }
 
-        public List<ProviderPropertyDto> Properties { get; set; }
+        public List<ProviderValueDto> Values { get; set; }
 
         public ProviderOptionsDto(string provider)
         {
             Provider = provider;
-            Properties = new List<ProviderPropertyDto>();
+            Values = new List<ProviderValueDto>();
         }
 
     }
 
-    public class ProviderPropertyDto
+    public class ProviderValueDto
     {
 
         public string Name { get; set; }
@@ -33,16 +33,19 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// </summary>
         public Type Type { get; set; }
 
-        public ProviderPropertyDto()
+        public string Note { get; set; }
+
+        public ProviderValueDto()
         {
 
         }
 
-        public ProviderPropertyDto(string name, string localizationValue, Type type)
+        public ProviderValueDto(string name, string localizationValue, Type type, string note)
         {
             Name = name;
             LocalizationValue = localizationValue;
             Type = type;
+            Note = note;
         }
     }
 }
