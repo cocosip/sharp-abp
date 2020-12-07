@@ -28,7 +28,7 @@ namespace SharpAbp.Abp.FileStoring
         /// Whether the container support use http url to access object
         /// Default: true
         /// </summary>
-        public bool HttpSupport { get; set; } = true;
+        public bool HttpAccess { get; set; } = true;
 
         public ITypeList<IFileNamingNormalizer> NamingNormalizers { get; }
 

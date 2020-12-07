@@ -32,7 +32,7 @@ namespace SharpAbp.Abp.FileStoring
                 {
                     c.Provider = fileProviderConfiguration.Provider;
                     c.IsMultiTenant = kv.Value?.IsMultiTenant ?? false;
-                    c.HttpSupport = kv.Value?.HttpSupport ?? true;
+                    c.HttpAccess = kv.Value?.HttpAccess ?? true;
 
                     foreach (var defaultNamingNormalizer in fileProviderConfiguration.DefaultNamingNormalizers)
                     {

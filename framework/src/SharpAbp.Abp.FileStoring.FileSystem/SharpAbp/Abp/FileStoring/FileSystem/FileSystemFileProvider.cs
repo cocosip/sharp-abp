@@ -111,7 +111,7 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
 
         public override Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)
         {
-            if (!args.Configuration.HttpSupport)
+            if (!args.Configuration.HttpAccess)
             {
                 return Task.FromResult(string.Empty);
             }

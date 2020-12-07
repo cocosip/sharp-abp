@@ -27,7 +27,7 @@ namespace SharpAbp.Abp.FileStoring
             var configuration = _configurationProvider.Get<DefaultContainer>();
             Assert.Equal("Aliyun", configuration.Provider);
             Assert.False(configuration.IsMultiTenant);
-            Assert.True(configuration.HttpSupport);
+            Assert.True(configuration.HttpAccess);
 
             var aliyunConfiguration = configuration.GetAliyunConfiguration();
             Assert.Equal("oss-cn-hangzhou", aliyunConfiguration.RegionId);
@@ -51,7 +51,7 @@ namespace SharpAbp.Abp.FileStoring
             var configuration = _configurationProvider.Get("azure-container");
             Assert.Equal("Azure", configuration.Provider);
             Assert.False(configuration.IsMultiTenant);
-            Assert.False(configuration.HttpSupport);
+            Assert.False(configuration.HttpAccess);
 
             var azureConfiguration = configuration.GetAzureConfiguration();
 
@@ -66,7 +66,7 @@ namespace SharpAbp.Abp.FileStoring
             var configuration = _configurationProvider.Get("fastdfs-container");
             Assert.Equal("FastDFS", configuration.Provider);
             Assert.True(configuration.IsMultiTenant);
-            Assert.True(configuration.HttpSupport);
+            Assert.True(configuration.HttpAccess);
 
             var fastDFSConfiguration = configuration.GetFastDFSConfiguration();
 
@@ -93,7 +93,7 @@ namespace SharpAbp.Abp.FileStoring
             var configuration = _configurationProvider.Get("filesystem-container");
             Assert.Equal("FileSystem", configuration.Provider);
             Assert.False(configuration.IsMultiTenant);
-            Assert.False(configuration.HttpSupport);
+            Assert.False(configuration.HttpAccess);
 
             var fileSystemConfiguration = configuration.GetFileSystemConfiguration();
 
@@ -108,7 +108,7 @@ namespace SharpAbp.Abp.FileStoring
             var configuration = _configurationProvider.Get("minio-container");
             Assert.Equal("Minio", configuration.Provider);
             Assert.True(configuration.IsMultiTenant);
-            Assert.True(configuration.HttpSupport);
+            Assert.True(configuration.HttpAccess);
 
             var minioConfiguration = configuration.GetMinioConfiguration();
 
@@ -127,7 +127,7 @@ namespace SharpAbp.Abp.FileStoring
             var configuration = _configurationProvider.Get("s3-container");
             Assert.Equal("S3", configuration.Provider);
             Assert.True(configuration.IsMultiTenant);
-            Assert.True(configuration.HttpSupport);
+            Assert.True(configuration.HttpAccess);
 
             var s3Configuration = configuration.GetS3Configuration();
 
