@@ -69,6 +69,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
                 .WhereIf(!provider.IsNullOrWhiteSpace(), item => item.Provider == provider)
                 .OrderBy(sorting ?? nameof(FileStoringContainer.Name))
+                .Skip(skipCount)
                 .Take(maxResultCount)
                 .ToListAsync(cancellationToken);
         }
