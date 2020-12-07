@@ -18,34 +18,34 @@ namespace SharpAbp.Abp.FileStoring
 
         public AbpFileStoringOptions Configure(IConfiguration configuration)
         {
-            var providerConfigurations = configuration.Get<Dictionary<string, ProviderConfiguration>>();
+            var entries = configuration.Get<Dictionary<string, FileContainerConfigurationEntry>>();
 
-            foreach (var kv in providerConfigurations)
+            foreach (var entryKv in entries)
             {
-                var fileProviderConfiguration = Providers.GetConfiguration(kv.Value.Provider);
+                var fileProviderConfiguration = Providers.GetConfiguration(entryKv.Value.Provider);
                 if (fileProviderConfiguration == null)
                 {
-                    throw new AbpException($"Could not find any provider configuration for '{kv.Key}' container, provider:'{kv.Value.Provider}'");
+                    throw new AbpException($"Could not find any provider configuration for '{entryKv.Key}' container, provider:'{entryKv.Value.Provider}'");
                 }
 
-                Containers.Configure(kv.Key, c =>
+                Containers.Configure(entryKv.Key, c =>
                 {
                     c.Provider = fileProviderConfiguration.Provider;
-                    c.IsMultiTenant = kv.Value?.IsMultiTenant ?? false;
-                    c.HttpAccess = kv.Value?.HttpAccess ?? true;
+                    c.IsMultiTenant = entryKv.Value?.IsMultiTenant ?? false;
+                    c.HttpAccess = entryKv.Value?.HttpAccess ?? true;
 
                     foreach (var defaultNamingNormalizer in fileProviderConfiguration.DefaultNamingNormalizers)
                     {
                         c.NamingNormalizers.Add(defaultNamingNormalizer);
                     }
 
-                    var defaultProperties = fileProviderConfiguration.GetValues();
+                    var fileProviderValues = fileProviderConfiguration.GetValues();
 
-                    foreach (var defaultProperty in defaultProperties)
+                    foreach (var providerValueKv in fileProviderValues)
                     {
-                        kv.Value.Properties.TryGetValue(defaultProperty.Key, out string value);
-                        var realValue = TypeHelper.ConvertFromString(defaultProperty.Value.Type, value);
-                        c.SetConfiguration(defaultProperty.Key, realValue);
+                        entryKv.Value.Properties.TryGetValue(providerValueKv.Key, out string value);
+                        var realValue = TypeHelper.ConvertFromString(providerValueKv.Value.Type, value);
+                        c.SetConfiguration(providerValueKv.Key, realValue);
                     }
 
                 });

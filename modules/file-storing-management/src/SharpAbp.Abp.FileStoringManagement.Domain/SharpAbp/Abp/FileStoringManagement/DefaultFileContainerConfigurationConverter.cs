@@ -34,7 +34,7 @@ namespace SharpAbp.Abp.FileStoringManagement
             {
                 Provider = fileProviderConfiguration.Provider,
                 IsMultiTenant = container.IsMultiTenant,
-                HttpSupport = container.HttpAccess
+                HttpAccess = container.HttpAccess
             };
 
             foreach (var item in container.Items)
