@@ -219,7 +219,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 //Update
                 container.Update(input.IsMultiTenant, input.Provider, input.Name, input.Title, input.HttpAccess);
 
-                var removeItems = new List<FileStoringContainerItem>();
+                var deleteItems = new List<FileStoringContainerItem>();
 
                 foreach (var item in container.Items)
                 {
@@ -233,25 +233,19 @@ namespace SharpAbp.Abp.FileStoringManagement
                     else
                     {
                         //Delete
-                        removeItems.Add(item);
+                        deleteItems.Add(item);
                     }
                 }
 
                 //Remove
-                container.Items.RemoveAll(removeItems);
+                container.Items.RemoveAll(deleteItems);
 
                 //Create
                 var createInputItems = input.Items.Where(x => !x.Id.HasValue).ToList();
-                if (createInputItems.Any())
+                foreach (var item in createInputItems)
                 {
-                    var containerItems = ObjectMapper.Map<List<ContainerItemInput>, List<FileStoringContainerItem>>(createInputItems);
-
-                    foreach (var item in containerItems)
-                    {
-                        item.SetIdAndContainerId(GuidGenerator.Create(), container.Id);
-                    }
-
-                    container.Items.AddRange(containerItems);
+                    var containerItem = new FileStoringContainerItem(GuidGenerator.Create(), item.Name, item.Value, container.Id);
+                    container.Items.Add(containerItem);
                 }
             }
         }
