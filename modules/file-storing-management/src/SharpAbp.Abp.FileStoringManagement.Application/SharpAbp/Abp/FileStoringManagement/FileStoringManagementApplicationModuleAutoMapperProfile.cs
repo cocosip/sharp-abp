@@ -13,10 +13,9 @@ namespace SharpAbp.Abp.FileStoringManagement
             CreateMap<FileStoringContainerItem, ContainerItemDto>();
 
             CreateMap<CreateContainerInput, FileStoringContainer>();
-            CreateMap<CreateContainerItemInput, FileStoringContainerItem>();
-
             CreateMap<UpdateContainerInput, FileStoringContainer>();
-            CreateMap<UpdateContainerItemInput, FileStoringContainerItem>();
+            
+            CreateMap<ContainerItemInput, FileStoringContainerItem>();
         }
     }
 }

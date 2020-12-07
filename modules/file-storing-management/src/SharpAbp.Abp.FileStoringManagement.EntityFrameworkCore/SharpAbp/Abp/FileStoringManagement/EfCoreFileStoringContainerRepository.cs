@@ -1,14 +1,14 @@
 ﻿using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Dynamic.Core;
-using Microsoft.EntityFrameworkCore;
 
 
 namespace SharpAbp.Abp.FileStoringManagement
@@ -88,8 +88,6 @@ namespace SharpAbp.Abp.FileStoringManagement
                   .WhereIf(!provider.IsNullOrWhiteSpace(), item => item.Provider == provider)
                   .CountAsync(cancellationToken);
         }
-
-
 
     }
 }

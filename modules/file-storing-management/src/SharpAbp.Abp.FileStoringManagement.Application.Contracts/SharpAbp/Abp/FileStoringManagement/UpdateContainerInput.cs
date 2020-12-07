@@ -5,46 +5,35 @@ using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
-    public class UpdateContainerInput : ContainerInputBase
-    {
-        public Guid? Id { get; set; }
-
-        public List<UpdateContainerItemInput> Items { get; set; }
-
-        public UpdateContainerInput()
-        {
-            Items = new List<UpdateContainerItemInput>();
-        }
-
-    }
-
-    public class UpdateContainerItemInput
+    public class UpdateContainerInput
     {
         public Guid? Id { get; set; }
 
         [Required]
-        [DynamicStringLength(typeof(FileStoringContainerItemConsts), nameof(FileStoringContainerItemConsts.MaxNameLength))]
+        public bool IsMultiTenant { get; set; }
+
+        [Required]
+        [DynamicStringLength(typeof(FileStoringContainerConsts), nameof(FileStoringContainerConsts.MaxTitleLength))]
+        public string Title { get; set; }
+
+        [Required]
+        [DynamicStringLength(typeof(FileStoringContainerConsts), nameof(FileStoringContainerConsts.MaxNameLength))]
         public string Name { get; set; }
 
-        [DynamicStringLength(typeof(FileStoringContainerItemConsts), nameof(FileStoringContainerItemConsts.MaxValueLength))]
-        public string Value { get; set; }
+        [Required]
+        [DynamicStringLength(typeof(FileStoringContainerConsts), nameof(FileStoringContainerConsts.MaxProviderLength))]
+        public string Provider { get; set; }
 
-        public UpdateContainerItemInput()
+        [Required]
+        public bool HttpAccess { get; set; }
+
+        public List<ContainerItemInput> Items { get; set; }
+
+        public UpdateContainerInput()
         {
-
+            Items = new List<ContainerItemInput>();
         }
 
-        public UpdateContainerItemInput(Guid? id, string name, string value)
-        {
-            Id = id;
-            Name = name;
-            Value = value;
-        }
-
-        public UpdateContainerItemInput(string name, string value)
-        {
-            Name = name;
-            Value = value;
-        }
     }
+
 }

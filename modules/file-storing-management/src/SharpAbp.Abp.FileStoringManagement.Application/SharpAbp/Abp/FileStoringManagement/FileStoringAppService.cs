@@ -244,7 +244,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 var createInputItems = input.Items.Where(x => !x.Id.HasValue).ToList();
                 if (createInputItems.Any())
                 {
-                    var containerItems = ObjectMapper.Map<List<UpdateContainerItemInput>, List<FileStoringContainerItem>>(createInputItems);
+                    var containerItems = ObjectMapper.Map<List<ContainerItemInput>, List<FileStoringContainerItem>>(createInputItems);
 
                     foreach (var item in containerItems)
                     {
