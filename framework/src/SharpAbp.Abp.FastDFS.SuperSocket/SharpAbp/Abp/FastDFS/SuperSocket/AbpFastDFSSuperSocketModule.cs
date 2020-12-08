@@ -5,7 +5,7 @@ namespace SharpAbp.Abp.FastDFS.SuperSocket
 {
     [DependsOn(
         typeof(AbpFastDFSModule)
-    )]
+        )]
     public class AbpFastDFSSuperSocketModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)

@@ -8,7 +8,7 @@ namespace SharpAbp.Abp.Caching.FreeRedis
 {
     [DependsOn(
         typeof(AbpFreeRedisModule)
-    )]
+        )]
     public class AbpCachingFreeRedisModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)

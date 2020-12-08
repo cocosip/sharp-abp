@@ -9,10 +9,10 @@ namespace SharpAbp.Abp.FileStoringManagement
 {
     [DependsOn(
         typeof(AbpDddDomainModule),
+        typeof(AbpCachingModule),
         typeof(AbpFileStoringModule),
-        typeof(FileStoringManagementDomainSharedModule),
-        typeof(AbpCachingModule)
-    )]
+        typeof(FileStoringManagementDomainSharedModule)
+        )]
     public class FileStoringManagementDomainModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)

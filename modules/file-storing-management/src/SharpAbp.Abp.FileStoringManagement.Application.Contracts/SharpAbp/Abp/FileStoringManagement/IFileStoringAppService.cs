@@ -70,7 +70,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="input"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<Guid> CreateAsync(CreateContainerInput input, CancellationToken cancellationToken = default);
+        Task<Guid> CreateAsync(CreateContainerDto input, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Update FileStoringContainer
@@ -78,6 +78,6 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="input"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task UpdateAsync(UpdateContainerInput input, CancellationToken cancellationToken = default);
+        Task UpdateAsync(UpdateContainerDto input, CancellationToken cancellationToken = default);
     }
 }

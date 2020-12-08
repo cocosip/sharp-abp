@@ -45,7 +45,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         public async Task CreateAsync_UpdateAsync_Test()
         {
             var tenantId = new Guid("42645233-3d72-4339-9adc-845321f8ada3");
-            var id = await _fileStoringAppService.CreateAsync(new CreateContainerInput()
+            var id = await _fileStoringAppService.CreateAsync(new CreateContainerDto()
             {
                 Provider = MinioFileProviderConfigurationNames.ProviderName,
                 Name = "default1",
@@ -53,14 +53,14 @@ namespace SharpAbp.Abp.FileStoringManagement
                 IsMultiTenant = true,
                 HttpAccess = true,
                 Title = "test-container1",
-                Items = new List<ContainerItemInput>()
+                Items = new List<CreateOrUpdateContainerItemDto>()
                 {
-                    new ContainerItemInput(MinioFileProviderConfigurationNames.BucketName,"bucket1"),
-                    new ContainerItemInput(MinioFileProviderConfigurationNames.EndPoint,"http://192.168.0.4:9000"),
-                    new ContainerItemInput(MinioFileProviderConfigurationNames.AccessKey,"minioadmin"),
-                    new ContainerItemInput(MinioFileProviderConfigurationNames.SecretKey,"minioadmin"),
-                    new ContainerItemInput(MinioFileProviderConfigurationNames.WithSSL,"false"),
-                    new ContainerItemInput(MinioFileProviderConfigurationNames.CreateBucketIfNotExists,"false")
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.BucketName,"bucket1"),
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.EndPoint,"http://192.168.0.4:9000"),
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.AccessKey,"minioadmin"),
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.SecretKey,"minioadmin"),
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.WithSSL,"false"),
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.CreateBucketIfNotExists,"false")
                 }
             });
 
@@ -73,7 +73,7 @@ namespace SharpAbp.Abp.FileStoringManagement
             Assert.Equal("test-container1", container2.Title);
             Assert.Equal(6, container2.Items.Count);
 
-            await _fileStoringAppService.UpdateAsync(new UpdateContainerInput()
+            await _fileStoringAppService.UpdateAsync(new UpdateContainerDto()
             {
                 Id = id,
                 Provider = "FileSystem",
@@ -81,11 +81,11 @@ namespace SharpAbp.Abp.FileStoringManagement
                 IsMultiTenant = false,
                 HttpAccess = false,
                 Title = "test-container2",
-                Items = new List<ContainerItemInput>()
+                Items = new List<CreateOrUpdateContainerItemDto>()
                 {
-                    new ContainerItemInput(FileSystemFileProviderConfigurationNames.BasePath,"D:\\files"),
-                    new ContainerItemInput(FileSystemFileProviderConfigurationNames.AppendContainerNameToBasePath,"true"),
-                    new ContainerItemInput(FileSystemFileProviderConfigurationNames.HttpServer,"")
+                    new CreateOrUpdateContainerItemDto(FileSystemFileProviderConfigurationNames.BasePath,"D:\\files"),
+                    new CreateOrUpdateContainerItemDto(FileSystemFileProviderConfigurationNames.AppendContainerNameToBasePath,"true"),
+                    new CreateOrUpdateContainerItemDto(FileSystemFileProviderConfigurationNames.HttpServer,"")
                 }
             });
 
@@ -106,7 +106,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         public async Task Create_Delete_Test()
         {
             var tenantId = new Guid("42124112-3d72-4339-9adc-845321f8a2a0");
-            var id = await _fileStoringAppService.CreateAsync(new CreateContainerInput()
+            var id = await _fileStoringAppService.CreateAsync(new CreateContainerDto()
             {
                 Provider = MinioFileProviderConfigurationNames.ProviderName,
                 Name = "default22",
@@ -114,14 +114,14 @@ namespace SharpAbp.Abp.FileStoringManagement
                 IsMultiTenant = true,
                 HttpAccess = true,
                 Title = "test-container22",
-                Items = new List<ContainerItemInput>()
+                Items = new List<CreateOrUpdateContainerItemDto>()
                 {
-                    new ContainerItemInput(MinioFileProviderConfigurationNames.BucketName,"bucket22"),
-                    new ContainerItemInput(MinioFileProviderConfigurationNames.EndPoint,"http://192.168.0.4:9000"),
-                    new ContainerItemInput(MinioFileProviderConfigurationNames.AccessKey,"minioadmin"),
-                    new ContainerItemInput(MinioFileProviderConfigurationNames.SecretKey,"minioadmin"),
-                    new ContainerItemInput(MinioFileProviderConfigurationNames.WithSSL,"false"),
-                    new ContainerItemInput(MinioFileProviderConfigurationNames.CreateBucketIfNotExists,"false")
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.BucketName,"bucket22"),
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.EndPoint,"http://192.168.0.4:9000"),
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.AccessKey,"minioadmin"),
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.SecretKey,"minioadmin"),
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.WithSSL,"false"),
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.CreateBucketIfNotExists,"false")
                 }
             });
 

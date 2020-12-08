@@ -11,7 +11,6 @@ namespace SharpAbp.Abp.MassTransit
     /// </summary>
     public class AbpMassTransitModule : AbpModule
     {
-
         public override void OnApplicationShutdown(ApplicationShutdownContext context)
         {
             var busControl = context.ServiceProvider.GetService<IBusControl>();

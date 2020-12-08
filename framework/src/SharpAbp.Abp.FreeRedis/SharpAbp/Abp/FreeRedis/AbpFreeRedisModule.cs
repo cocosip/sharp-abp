@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Volo.Abp.Modularity;
+﻿using Volo.Abp.Modularity;
 
 namespace SharpAbp.Abp.FreeRedis
 {
@@ -9,7 +6,7 @@ namespace SharpAbp.Abp.FreeRedis
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-
+            Configure<AbpFreeRedisOptions>(options => { });
         }
     }
 }

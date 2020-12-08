@@ -5,7 +5,7 @@ using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
-    public class CreateContainerInput
+    public class CreateContainerDto
     {
         public Guid? TenantId { get; set; }
 
@@ -27,11 +27,11 @@ namespace SharpAbp.Abp.FileStoringManagement
         [Required]
         public bool HttpAccess { get; set; }
 
-        public List<ContainerItemInput> Items { get; set; }
+        public List<CreateOrUpdateContainerItemDto> Items { get; set; }
 
-        public CreateContainerInput()
+        public CreateContainerDto()
         {
-            Items = new List<ContainerItemInput>();
+            Items = new List<CreateOrUpdateContainerItemDto>();
         }
 
     }

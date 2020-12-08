@@ -2,12 +2,14 @@
 using Volo.Abp.Modularity;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.Threading;
+using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoring
 {
     [DependsOn(
         typeof(AbpMultiTenancyModule),
-        typeof(AbpThreadingModule)
+        typeof(AbpThreadingModule),
+        typeof(AbpValidationModule)
         )]
     public class AbpFileStoringModule : AbpModule
     {

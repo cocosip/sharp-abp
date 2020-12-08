@@ -9,9 +9,8 @@ using Volo.Abp.VirtualFileSystem;
 namespace SharpAbp.Abp.FileStoring.Azure
 {
     [DependsOn(
-        typeof(AbpFileStoringModule),
-        typeof(AbpValidationModule)
-    )]
+        typeof(AbpFileStoringModule)
+        )]
     public class AbpFileStoringAzureModule : AbpModule
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)

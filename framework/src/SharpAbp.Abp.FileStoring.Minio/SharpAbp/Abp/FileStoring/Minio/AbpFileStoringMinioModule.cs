@@ -2,16 +2,14 @@
 using Volo.Abp.Localization;
 using Volo.Abp.Localization.ExceptionHandling;
 using Volo.Abp.Modularity;
-using Volo.Abp.Validation;
 using Volo.Abp.Validation.Localization;
 using Volo.Abp.VirtualFileSystem;
 
 namespace SharpAbp.Abp.FileStoring.Minio
 {
     [DependsOn(
-        typeof(AbpFileStoringModule),
-        typeof(AbpValidationModule)
-    )]
+        typeof(AbpFileStoringModule)
+        )]
     public class AbpFileStoringMinioModule : AbpModule
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)

@@ -10,10 +10,9 @@ using Volo.Abp.VirtualFileSystem;
 namespace SharpAbp.Abp.FileStoring.S3
 {
     [DependsOn(
-      typeof(AbpFileStoringModule),
-      typeof(AbpAutoS3KS3Module),
-      typeof(AbpValidationModule)
-    )]
+        typeof(AbpFileStoringModule),
+        typeof(AbpAutoS3KS3Module)
+        )]
     public class AbpFileStoringS3Module : AbpModule
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)

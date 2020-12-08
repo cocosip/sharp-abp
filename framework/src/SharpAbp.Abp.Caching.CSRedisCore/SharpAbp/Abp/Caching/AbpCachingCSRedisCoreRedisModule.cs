@@ -6,7 +6,9 @@ using Volo.Abp.Modularity;
 
 namespace SharpAbp.Abp.Caching
 {
-    [DependsOn(typeof(AbpCSRedisCoreModule))]
+    [DependsOn(
+        typeof(AbpCSRedisCoreModule)
+        )]
     public class AbpCachingCSRedisCoreRedisModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)

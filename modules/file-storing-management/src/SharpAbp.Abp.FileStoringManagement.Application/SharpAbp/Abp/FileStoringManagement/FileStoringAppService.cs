@@ -156,7 +156,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="input"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<Guid> CreateAsync(CreateContainerInput input, CancellationToken cancellationToken = default)
+        public async Task<Guid> CreateAsync(CreateContainerDto input, CancellationToken cancellationToken = default)
         {
             var valuesValidator = GetFileProviderValuesValidator(input.Provider);
             
@@ -196,7 +196,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="input"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task UpdateAsync(UpdateContainerInput input, CancellationToken cancellationToken = default)
+        public async Task UpdateAsync(UpdateContainerDto input, CancellationToken cancellationToken = default)
         {
             var valuesValidator = GetFileProviderValuesValidator(input.Provider);
             
@@ -209,7 +209,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 
             using (DataFilter.Disable<IMultiTenant>())
             {
-                var container = await FileStoringContainerRepository.GetAsync(input.Id.Value, true);
+                var container = await FileStoringContainerRepository.GetAsync(input.Id, true);
 
                 if (container == null)
                 {

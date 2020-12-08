@@ -4,7 +4,7 @@ namespace SharpAbp.Abp.Micro.LoadBalancer
 {
     [DependsOn(
         typeof(AbpMicroModule)
-    )]
+        )]
     public class AbpMicroLoadBalancerModule : AbpModule
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)

@@ -4,7 +4,7 @@ using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
-    public class ContainerItemInput
+    public class CreateOrUpdateContainerItemDto
     {
         public Guid? Id { get; set; }
 
@@ -15,19 +15,19 @@ namespace SharpAbp.Abp.FileStoringManagement
         [DynamicStringLength(typeof(FileStoringContainerItemConsts), nameof(FileStoringContainerItemConsts.MaxValueLength))]
         public string Value { get; set; }
 
-        public ContainerItemInput()
+        public CreateOrUpdateContainerItemDto()
         {
 
         }
 
-        public ContainerItemInput(Guid? id, string name, string value)
+        public CreateOrUpdateContainerItemDto(Guid? id, string name, string value)
         {
             Id = id;
             Name = name;
             Value = value;
         }
 
-        public ContainerItemInput(string name, string value)
+        public CreateOrUpdateContainerItemDto(string name, string value)
         {
             Name = name;
             Value = value;

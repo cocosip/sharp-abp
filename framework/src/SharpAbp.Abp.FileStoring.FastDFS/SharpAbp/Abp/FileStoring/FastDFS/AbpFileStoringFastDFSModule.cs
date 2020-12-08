@@ -13,10 +13,9 @@ using Volo.Abp.VirtualFileSystem;
 namespace SharpAbp.Abp.FileStoring.FastDFS
 {
     [DependsOn(
-      typeof(AbpFileStoringModule),
-      typeof(AbpFastDFSDotNettyModule),
-      typeof(AbpValidationModule)
-      )]
+        typeof(AbpFileStoringModule),
+        typeof(AbpFastDFSDotNettyModule)
+        )]
     public class AbpFileStoringFastDFSModule : AbpModule
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
