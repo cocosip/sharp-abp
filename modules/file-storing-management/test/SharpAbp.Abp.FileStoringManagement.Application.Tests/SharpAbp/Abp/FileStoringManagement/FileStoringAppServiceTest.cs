@@ -64,33 +64,33 @@ namespace SharpAbp.Abp.FileStoringManagement
                 }
             });
 
-            var container2 = await _fileStoringAppService.GetAsync(id, true);
-            Assert.Equal("default1", container2.Name);
-            Assert.Equal("Minio", container2.Provider);
-            Assert.Equal(tenantId, container2.TenantId);
-            Assert.True(container2.IsMultiTenant);
-            Assert.True(container2.HttpAccess);
-            Assert.Equal("test-container1", container2.Title);
-            Assert.Equal(6, container2.Items.Count);
-
-            await _fileStoringAppService.UpdateAsync(new UpdateContainerDto()
-            {
-                Id = id,
-                Provider = "FileSystem",
-                Name = "default2",
-                IsMultiTenant = false,
-                HttpAccess = false,
-                Title = "test-container2",
-                Items = new List<CreateOrUpdateContainerItemDto>()
-                {
-                    new CreateOrUpdateContainerItemDto(FileSystemFileProviderConfigurationNames.BasePath,"D:\\files"),
-                    new CreateOrUpdateContainerItemDto(FileSystemFileProviderConfigurationNames.AppendContainerNameToBasePath,"true"),
-                    new CreateOrUpdateContainerItemDto(FileSystemFileProviderConfigurationNames.HttpServer,"")
-                }
-            });
-
             using (_currentTenant.Change(tenantId))
             {
+                var container2 = await _fileStoringAppService.GetAsync(id, true);
+                Assert.Equal("default1", container2.Name);
+                Assert.Equal("Minio", container2.Provider);
+                Assert.Equal(tenantId, container2.TenantId);
+                Assert.True(container2.IsMultiTenant);
+                Assert.True(container2.HttpAccess);
+                Assert.Equal("test-container1", container2.Title);
+                Assert.Equal(6, container2.Items.Count);
+
+                await _fileStoringAppService.UpdateAsync(new UpdateContainerDto()
+                {
+                    Id = id,
+                    Provider = "FileSystem",
+                    Name = "default2",
+                    IsMultiTenant = false,
+                    HttpAccess = false,
+                    Title = "test-container2",
+                    Items = new List<CreateOrUpdateContainerItemDto>()
+                    {
+                        new CreateOrUpdateContainerItemDto(FileSystemFileProviderConfigurationNames.BasePath,"D:\\files"),
+                        new CreateOrUpdateContainerItemDto(FileSystemFileProviderConfigurationNames.AppendContainerNameToBasePath,"true"),
+                        new CreateOrUpdateContainerItemDto(FileSystemFileProviderConfigurationNames.HttpServer,"")
+                    }
+                });
+
                 var container3 = await _fileStoringAppService.GetAsync(id, true);
                 Assert.Equal("default2", container3.Name);
                 Assert.Equal("FileSystem", container3.Provider);
@@ -125,22 +125,23 @@ namespace SharpAbp.Abp.FileStoringManagement
                 }
             });
 
+            var container = await _fileStoringAppService.GetAsync(id);
+            Assert.Null(container);
+
             using (_currentTenant.Change(tenantId))
             {
-                var container = await _fileStoringAppService.GetByNameAsync("default22");
-                Assert.NotNull(container);
+                var container1 = await _fileStoringAppService.GetByNameAsync("default22");
+                Assert.NotNull(container1);
+
+                var container2 = await _fileStoringAppService.GetAsync(id);
+                Assert.NotNull(container2);
+
+                await _fileStoringAppService.DeleteAsync(id);
+
+                var container3 = await _fileStoringAppService.GetAsync(id);
+                Assert.Null(container3);
             }
-
-            var container2 = await _fileStoringAppService.GetAsync(id);
-            Assert.NotNull(container2);
-
-            await _fileStoringAppService.DeleteAsync(id);
-
-            var container3 = await _fileStoringAppService.GetAsync(id);
-            Assert.Null(container3);
         }
-
-
 
     }
 }
