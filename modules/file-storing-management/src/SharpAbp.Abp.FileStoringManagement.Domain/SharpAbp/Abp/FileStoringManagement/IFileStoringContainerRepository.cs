@@ -18,6 +18,17 @@ namespace SharpAbp.Abp.FileStoringManagement
         Task<FileStoringContainer> FindAsync(string name, bool includeDetails = true, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Find container by name
+        /// </summary>
+        /// <param name="tenantId"></param>
+        /// <param name="name"></param>
+        /// <param name="exceptId"></param>
+        /// <param name="includeDetails"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<FileStoringContainer> FindAsync(Guid? tenantId, string name, Guid? exceptId = null, bool includeDetails = false, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Get List
         /// </summary>
         /// <param name="skipCount"></param>
@@ -39,6 +50,8 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<int> GetCountAsync(string name = "", string provider = "", CancellationToken cancellationToken = default);
+
+
 
     }
 }

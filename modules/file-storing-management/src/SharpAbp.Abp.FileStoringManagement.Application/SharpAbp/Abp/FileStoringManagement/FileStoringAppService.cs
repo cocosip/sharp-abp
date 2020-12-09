@@ -159,13 +159,15 @@ namespace SharpAbp.Abp.FileStoringManagement
         public async Task<Guid> CreateAsync(CreateContainerDto input, CancellationToken cancellationToken = default)
         {
             var valuesValidator = GetFileProviderValuesValidator(input.Provider);
-            
+
             var dict = input.Items.ToDictionary(x => x.Name, y => y.Value);
             var result = valuesValidator.Validate(dict);
             if (result.Errors.Any())
             {
                 throw new AbpValidationException("Create Container validate failed.", result.Errors);
             }
+
+            await CheckContainer(input.TenantId, input.Name, null, cancellationToken);
 
             var container = new FileStoringContainer(
               GuidGenerator.Create(),
@@ -199,13 +201,14 @@ namespace SharpAbp.Abp.FileStoringManagement
         public async Task UpdateAsync(UpdateContainerDto input, CancellationToken cancellationToken = default)
         {
             var valuesValidator = GetFileProviderValuesValidator(input.Provider);
-            
+
             var dict = input.Items.ToDictionary(x => x.Name, y => y.Value);
             var result = valuesValidator.Validate(dict);
             if (result.Errors.Any())
             {
                 throw new AbpValidationException("Create Container validate failed.", result.Errors);
             }
+
 
             using (DataFilter.Disable<IMultiTenant>())
             {
@@ -215,6 +218,8 @@ namespace SharpAbp.Abp.FileStoringManagement
                 {
                     throw new AbpException($"Could not find Container when update by id:'{input.Id}'.");
                 }
+
+                await CheckContainer(container.TenantId, input.Name, container.Id, cancellationToken);
 
                 //Update
                 container.Update(input.IsMultiTenant, input.Provider, input.Name, input.Title, input.HttpAccess);
@@ -262,6 +267,15 @@ namespace SharpAbp.Abp.FileStoringManagement
                 }
             }
             throw new AbpException($"Could not find any 'IFileProviderValuesValidator' for provider '{provider}' .");
+        }
+
+        protected virtual async Task CheckContainer(Guid? tenantId, string name, Guid? currentId = null, CancellationToken cancellationToken = default)
+        {
+            var container = await FileStoringContainerRepository.FindAsync(tenantId, name, currentId, false, cancellationToken);
+            if (container != null)
+            {
+                throw new AbpException($"The container was exist in current tenant! {tenantId}-{name},current id {currentId}");
+            }
         }
 
     }

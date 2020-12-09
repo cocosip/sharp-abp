@@ -1,14 +1,14 @@
 ﻿using JetBrains.Annotations;
+using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Repositories.MongoDB;
 using Volo.Abp.MongoDB;
-using System.Linq.Dynamic.Core;
-using MongoDB.Driver;
 
 
 namespace SharpAbp.Abp.FileStoringManagement.MongoDB
@@ -22,7 +22,7 @@ namespace SharpAbp.Abp.FileStoringManagement.MongoDB
         }
 
         /// <summary>
-        /// Find FileStoringContainer by name
+        /// Find container by name
         /// </summary>
         /// <param name="name">container name</param>
         /// <param name="includeDetails">include details</param>
@@ -31,6 +31,25 @@ namespace SharpAbp.Abp.FileStoringManagement.MongoDB
         public virtual async Task<FileStoringContainer> FindAsync([NotNull] string name, bool includeDetails = true, CancellationToken cancellationToken = default)
         {
             return await FindAsync(x => x.Name == name, includeDetails, cancellationToken);
+        }
+
+        /// <summary>
+        /// Find container by name
+        /// </summary>
+        /// <param name="tenantId"></param>
+        /// <param name="name"></param>
+        /// <param name="exceptId"></param>
+        /// <param name="includeDetails"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<FileStoringContainer> FindAsync(Guid? tenantId, string name, Guid? exceptId = null, bool includeDetails = false, CancellationToken cancellationToken = default)
+        {
+            return await GetMongoQueryable()
+                .WhereIf(tenantId.HasValue, x => x.TenantId == tenantId.Value)
+                .WhereIf(!name.IsNullOrWhiteSpace(), x => x.Name == name)
+                .WhereIf(exceptId.HasValue, x => x.Id != exceptId.Value)
+                .As<IMongoQueryable<FileStoringContainer>>()
+                .FirstOrDefaultAsync();
         }
 
         /// <summary>

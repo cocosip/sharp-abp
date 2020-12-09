@@ -38,6 +38,25 @@ namespace SharpAbp.Abp.FileStoringManagement
         }
 
         /// <summary>
+        /// Find container by name
+        /// </summary>
+        /// <param name="tenantId"></param>
+        /// <param name="name"></param>
+        /// <param name="exceptId"></param>
+        /// <param name="includeDetails"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<FileStoringContainer> FindAsync(Guid? tenantId, string name, Guid? exceptId = null, bool includeDetails = false, CancellationToken cancellationToken = default)
+        {
+            return await DbSet
+                .IncludeDetails(includeDetails)
+                .WhereIf(tenantId.HasValue, x => x.TenantId == tenantId.Value)
+                .WhereIf(!name.IsNullOrWhiteSpace(), x => x.Name == name)
+                .WhereIf(exceptId.HasValue, x => x.Id != exceptId.Value)
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        /// <summary>
         /// Override GetAsync
         /// </summary>
         /// <param name="id"></param>
