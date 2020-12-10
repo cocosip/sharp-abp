@@ -1,4 +1,5 @@
-﻿using SharpAbp.Abp.FileStoring.Aliyun;
+﻿using SharpAbp.Abp.FileStoring;
+using SharpAbp.Abp.FileStoring.Aliyun;
 using SharpAbp.Abp.FileStoring.FileSystem;
 using SharpAbp.Abp.FileStoring.Minio;
 using System;
@@ -13,10 +14,12 @@ namespace SharpAbp.Abp.FileStoringManagement
     {
         private readonly ICurrentTenant _currentTenant;
         private readonly IFileStoringAppService _fileStoringAppService;
+        private readonly IFileContainerFactory _fileContainerFactory;
         public FileStoringAppServiceTest()
         {
             _currentTenant = GetRequiredService<ICurrentTenant>();
             _fileStoringAppService = GetRequiredService<IFileStoringAppService>();
+            _fileContainerFactory = GetRequiredService<IFileContainerFactory>();
         }
 
         [Fact]
@@ -103,7 +106,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         }
 
         [Fact]
-        public async Task Create_Delete_Test()
+        public async Task CreateAsync_DeleteAsync_Test()
         {
             var tenantId = new Guid("42124112-3d72-4339-9adc-845321f8a2a0");
             var id = await _fileStoringAppService.CreateAsync(new CreateContainerDto()
@@ -140,6 +143,44 @@ namespace SharpAbp.Abp.FileStoringManagement
 
                 var container3 = await _fileStoringAppService.GetAsync(id);
                 Assert.Null(container3);
+            }
+        }
+
+        [Fact]
+        public async Task Get_Container_Test()
+        {
+            var tenantId = new Guid("42124112-3d72-2232-85a3-845321f8a2a0");
+            var id = await _fileStoringAppService.CreateAsync(new CreateContainerDto()
+            {
+                Provider = MinioFileProviderConfigurationNames.ProviderName,
+                Name = "default22",
+                TenantId = tenantId,
+                IsMultiTenant = false,
+                HttpAccess = true,
+                Title = "test-container22",
+                Items = new List<CreateOrUpdateContainerItemDto>()
+                {
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.BucketName,"bucket22"),
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.EndPoint,"http://192.168.0.4:9000"),
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.AccessKey,"minioadmin"),
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.SecretKey,"minioadmin"),
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.WithSSL,"false"),
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.CreateBucketIfNotExists,"false")
+                }
+            });
+
+            using (_currentTenant.Change(tenantId))
+            {
+
+                var container = _fileContainerFactory.Create("default22");
+
+                var configuration = container.GetConfiguration();
+                var minioConfiguration = configuration.GetMinioConfiguration();
+                Assert.Equal("bucket22", minioConfiguration.BucketName);
+                Assert.Equal("minioadmin", minioConfiguration.AccessKey);
+                Assert.Equal("minioadmin", minioConfiguration.SecretKey);
+                Assert.False(minioConfiguration.WithSSL);
+                Assert.False(minioConfiguration.CreateBucketIfNotExists);
             }
         }
 
