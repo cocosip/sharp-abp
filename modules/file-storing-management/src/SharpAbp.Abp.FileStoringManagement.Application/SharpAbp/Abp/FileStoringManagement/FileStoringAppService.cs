@@ -76,7 +76,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 
 
         /// <summary>
-        /// Get FileStoringContainer 
+        /// Get container 
         /// </summary>
         /// <param name="id"></param>
         /// <param name="includeDetails"></param>
@@ -89,7 +89,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         }
 
         /// <summary>
-        /// Get FileStoringContainer by name 
+        /// Get container by name 
         /// </summary>
         /// <param name="name"></param>
         /// <param name="includeDetails"></param>
@@ -130,7 +130,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 
 
         /// <summary>
-        /// Delete FileStoringContainer
+        /// Delete container
         /// </summary>
         /// <param name="id"></param>
         /// <param name="cancellationToken"></param>
@@ -141,7 +141,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         }
 
         /// <summary>
-        /// Create FileStoringContainer
+        /// Create container
         /// </summary>
         /// <param name="input"></param>
         /// <param name="cancellationToken"></param>
@@ -183,7 +183,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         }
 
         /// <summary>
-        /// Update FileStoringContainer
+        /// Update container
         /// </summary>
         /// <param name="input"></param>
         /// <param name="cancellationToken"></param>

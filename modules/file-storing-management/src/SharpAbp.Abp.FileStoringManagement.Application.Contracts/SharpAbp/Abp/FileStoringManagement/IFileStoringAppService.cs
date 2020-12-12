@@ -31,15 +31,16 @@ namespace SharpAbp.Abp.FileStoringManagement
         ProviderOptionsDto GetProviderOptions([NotNull] string provider);
 
         /// <summary>
-        /// Get FileStoringContainer 
+        /// Get container
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<ContainerDto> GetAsync(Guid id, bool includeDetails = true, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Get FileStoringContainer by name 
+        /// Get container by name 
         /// </summary>
         /// <param name="name"></param>
         /// <param name="includeDetails"></param>
@@ -57,7 +58,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         Task<PagedResultDto<ContainerDto>> GetPagedListAsync(FileStoringContainerPagedRequestDto input, bool includeDetails = true, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Delete FileStoringContainer
+        /// Delete container
         /// </summary>
         /// <param name="id"></param>
         /// <param name="cancellationToken"></param>
@@ -65,7 +66,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Create FileStoringContainer
+        /// Create container
         /// </summary>
         /// <param name="input"></param>
         /// <param name="cancellationToken"></param>
@@ -73,7 +74,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         Task<Guid> CreateAsync(CreateContainerDto input, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Update FileStoringContainer
+        /// Update container
         /// </summary>
         /// <param name="input"></param>
         /// <param name="cancellationToken"></param>
