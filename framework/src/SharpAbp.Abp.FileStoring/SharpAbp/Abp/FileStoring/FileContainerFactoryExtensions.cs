@@ -6,7 +6,6 @@
         /// Gets a named container.
         /// </summary>
         /// <param name="fileContainerFactory">The file container manager</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>
         /// The container object.
         /// </returns>

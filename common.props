@@ -3,7 +3,7 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <Version>0.8.6</Version>
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <NoWarn>$(NoWarn);CS1591;CS0436</NoWarn>
     <Authors>virtual</Authors>
     <Product>sharp-abp</Product>
     <PackageProjectUrl>https://github.com/cocosip/sharp-abp</PackageProjectUrl>
@@ -11,10 +11,17 @@
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/cocosip/sharp-abp</RepositoryUrl>
     <PackageTags>Abp,Abp-vNext, Abp modules</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- https://github.com/dotnet/sourcelink -->
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SourceLink.Create.CommandLine" Version="2.8.3" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.0-beta-20204-02">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>
