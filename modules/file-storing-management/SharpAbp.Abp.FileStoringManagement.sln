@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoringMan
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoringManagement.Application", "src\SharpAbp.Abp.FileStoringManagement.Application\SharpAbp.Abp.FileStoringManagement.Application.csproj", "{D0D2378E-FCC0-4469-9C00-2B117F8D6D76}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.FileStoringManagement.Application.Tests", "test\SharpAbp.Abp.FileStoringManagement.Application.Tests\SharpAbp.Abp.FileStoringManagement.Application.Tests.csproj", "{5D674D69-7762-479E-8748-FF0BB06FBBED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoringManagement.Application.Tests", "test\SharpAbp.Abp.FileStoringManagement.Application.Tests\SharpAbp.Abp.FileStoringManagement.Application.Tests.csproj", "{5D674D69-7762-479E-8748-FF0BB06FBBED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
