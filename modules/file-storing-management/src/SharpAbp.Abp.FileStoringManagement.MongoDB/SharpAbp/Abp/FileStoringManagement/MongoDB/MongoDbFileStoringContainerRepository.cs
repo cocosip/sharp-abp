@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Domain.Repositories.MongoDB;
 using Volo.Abp.MongoDB;
 
@@ -30,6 +31,7 @@ namespace SharpAbp.Abp.FileStoringManagement.MongoDB
         /// <returns></returns>
         public virtual async Task<FileStoringContainer> FindAsync([NotNull] string name, bool includeDetails = true, CancellationToken cancellationToken = default)
         {
+            Check.NotNullOrWhiteSpace(name, nameof(name));
             return await FindAsync(x => x.Name == name, includeDetails, cancellationToken);
         }
 
@@ -50,6 +52,22 @@ namespace SharpAbp.Abp.FileStoringManagement.MongoDB
                 .WhereIf(exceptId.HasValue, x => x.Id != exceptId.Value)
                 .As<IMongoQueryable<FileStoringContainer>>()
                 .FirstOrDefaultAsync();
+        }
+
+        /// <summary>
+        /// Find container by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="includeDetails"></param>
+        /// <returns></returns>
+        public FileStoringContainer Find([NotNull] string name, bool includeDetails = true)
+        {
+            Check.NotNullOrWhiteSpace(name, nameof(name));
+
+            return GetMongoQueryable()
+                .WhereIf(!name.IsNullOrWhiteSpace(), x => x.Name == name)
+                .As<IMongoQueryable<FileStoringContainer>>()
+                .FirstOrDefault();
         }
 
         /// <summary>

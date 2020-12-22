@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="includeDetails">include details</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<FileStoringContainer> FindAsync(string name, bool includeDetails = true, CancellationToken cancellationToken = default);
+        Task<FileStoringContainer> FindAsync([NotNull] string name, bool includeDetails = true, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Find container by name
@@ -27,6 +28,14 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<FileStoringContainer> FindAsync(Guid? tenantId, string name, Guid? exceptId = null, bool includeDetails = false, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Find container by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="includeDetails"></param>
+        /// <returns></returns>
+        FileStoringContainer Find([NotNull] string name, bool includeDetails = true);
 
         /// <summary>
         /// Get List

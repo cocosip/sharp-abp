@@ -57,6 +57,19 @@ namespace SharpAbp.Abp.FileStoringManagement
         }
 
         /// <summary>
+        /// Find container by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="includeDetails"></param>
+        /// <returns></returns>
+        public virtual FileStoringContainer Find([NotNull] string name, bool includeDetails = true)
+        {
+            return DbSet
+                .IncludeDetails(includeDetails)
+                .FirstOrDefault(x => x.Name == name);
+        }
+
+        /// <summary>
         /// Override GetAsync
         /// </summary>
         /// <param name="id"></param>
