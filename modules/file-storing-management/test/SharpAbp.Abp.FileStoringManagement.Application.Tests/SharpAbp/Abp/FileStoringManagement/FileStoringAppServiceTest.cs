@@ -171,7 +171,6 @@ namespace SharpAbp.Abp.FileStoringManagement
 
             using (_currentTenant.Change(tenantId))
             {
-
                 var container = _fileContainerFactory.Create("default22");
 
                 var configuration = container.GetConfiguration();
@@ -181,6 +180,9 @@ namespace SharpAbp.Abp.FileStoringManagement
                 Assert.Equal("minioadmin", minioConfiguration.SecretKey);
                 Assert.False(minioConfiguration.WithSSL);
                 Assert.False(minioConfiguration.CreateBucketIfNotExists);
+
+                var container2 = _fileContainerFactory.Create("default22");
+                var configuration2 = container2.GetConfiguration();
             }
         }
 

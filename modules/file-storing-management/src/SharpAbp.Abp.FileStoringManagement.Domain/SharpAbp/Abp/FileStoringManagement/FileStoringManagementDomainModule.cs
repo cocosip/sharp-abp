@@ -17,7 +17,7 @@ namespace SharpAbp.Abp.FileStoringManagement
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            context.Services.Replace(ServiceDescriptor.Singleton<IFileContainerConfigurationProvider, DatabaseFileContainerConfigurationProvider>());
+            context.Services.Replace(ServiceDescriptor.Transient<IFileContainerConfigurationProvider, DatabaseFileContainerConfigurationProvider>());
         }
 
     }
