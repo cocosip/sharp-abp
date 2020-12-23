@@ -8,7 +8,7 @@
 | Name | Description | Base module
 | ---- | ----------- | ----------- |
 | AutoS3 Module | AWSSDK.S3 Adapter | [doc](/docs/AutoS3.md) |
-| FreeRedis Module | CSRedis ABP Adapter | [doc](/docs/FreeRedis.md) |
+| FreeRedis Module | FreeRedis ABP Adapter | [doc](/docs/FreeRedis.md) |
 | DotCommon | DotCommon ABP Adapter | [doc](/docs/DotCommon.md) |
 | FastDFS | FastDFS ABP Adapter | [doc](/docs/FastDFS.md) |
 | FileStoring | ABP Store File | [doc](/docs/FileStoring.md) |
