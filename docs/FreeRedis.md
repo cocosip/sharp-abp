@@ -5,5 +5,4 @@
 ## Modules
 
 - `SharpAbp.Abp.FreeRedis`
-- `SharpAbp.Abp.Caching.FreeRedis`
   - ABP Caching use `FreeRedis` sdk in redis

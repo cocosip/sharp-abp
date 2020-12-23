@@ -8,7 +8,6 @@
 | Name | Description | Base module
 | ---- | ----------- | ----------- |
 | AutoS3 Module | AWSSDK.S3 Adapter | [doc](/docs/AutoS3.md) |
-| CSRedis Module | CSRedis ABP Adapter | [doc](/docs/CSRedis.md) |
 | FreeRedis Module | CSRedis ABP Adapter | [doc](/docs/FreeRedis.md) |
 | DotCommon | DotCommon ABP Adapter | [doc](/docs/DotCommon.md) |
 | FastDFS | FastDFS ABP Adapter | [doc](/docs/FastDFS.md) |
@@ -31,12 +30,8 @@
 | **AutoS3** | - | - | 
 | `SharpAbp.Abp.AutoS3` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.AutoS3.svg)](https://www.nuget.org/packages/SharpAbp.Abp.AutoS3) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.AutoS3.svg)|
 | `SharpAbp.Abp.AutoS3.KS3` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.AutoS3.KS3.svg)](https://www.nuget.org/packages/SharpAbp.Abp.AutoS3.KS3) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.AutoS3.KS3.svg)|
-| **CSRedis** | - | - |
-| `SharpAbp.Abp.CSRedisCore` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.CSRedisCore.svg)](https://www.nuget.org/packages/SharpAbp.Abp.CSRedisCore) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.CSRedisCore.svg)|
-| `SharpAbp.Abp.Caching.CSRedisCore` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Caching.CSRedisCore.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Caching.CSRedisCore) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Caching.CSRedisCore.svg)|
 | **FreeRedis** | - | - |
 | `SharpAbp.Abp.FreeRedis` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FreeRedis.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FreeRedis) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FreeRedis.svg)|
-| `SharpAbp.Abp.Caching.FreeRedis` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Caching.FreeRedis.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Caching.FreeRedis) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Caching.FreeRedis.svg)|
 | **FastDFS** | - | - |
 | `SharpAbp.Abp.FastDFS` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FastDFS.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FastDFS) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FastDFS.svg)|
 | `SharpAbp.Abp.FastDFS.DotNetty` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FastDFS.DotNetty.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FastDFS.DotNetty) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FastDFS.DotNetty.svg)|
