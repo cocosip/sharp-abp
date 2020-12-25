@@ -169,7 +169,7 @@ namespace SharpAbp.Abp.FileStoring.Database
                 return string.Empty;
             }
 
-            if (!container.HttpSupport)
+            if (!container.HttpAccess)
             {
                 return string.Empty;
             }

@@ -28,7 +28,7 @@ namespace SharpAbp.Abp.FileStoring.Database
 
                 b.Property(p => p.Name).IsRequired().HasMaxLength(DatabaseContainerConsts.MaxNameLength);
 
-                b.Property(p => p.HttpSupport).IsRequired();
+                b.Property(p => p.HttpAccess).IsRequired();
 
                 b.Property(p => p.IncludeContainer).IsRequired();
 

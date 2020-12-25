@@ -1,4 +1,5 @@
-﻿using SharpAbp.Abp.FileStoring;
+﻿using JetBrains.Annotations;
+using SharpAbp.Abp.FileStoring;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
@@ -10,6 +11,10 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// </summary>
         /// <param name="container"></param>
         /// <returns></returns>
+        [NotNull]
         FileContainerConfiguration ToConfiguration(FileStoringContainer container);
+
+        [NotNull]
+        FileContainerConfiguration ToConfiguration(FileStoringContainerCacheItem cacheItem);
     }
 }

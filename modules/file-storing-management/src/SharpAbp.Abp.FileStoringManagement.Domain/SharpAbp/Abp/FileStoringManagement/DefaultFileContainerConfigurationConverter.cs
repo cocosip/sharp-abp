@@ -53,5 +53,33 @@ namespace SharpAbp.Abp.FileStoringManagement
             return configuration;
         }
 
+        [NotNull]
+        public virtual FileContainerConfiguration ToConfiguration(FileStoringContainerCacheItem cacheItem)
+        {
+            var fileProviderConfiguration = Options.Providers.GetConfiguration(cacheItem.Provider);
+            Check.NotNull(fileProviderConfiguration, nameof(fileProviderConfiguration));
+
+            var configuration = new FileContainerConfiguration()
+            {
+                Provider = fileProviderConfiguration.Provider,
+                IsMultiTenant = cacheItem.IsMultiTenant,
+                HttpAccess = cacheItem.HttpAccess
+            };
+
+            foreach (var item in cacheItem.Items)
+            {
+                var type = fileProviderConfiguration.GetValue(item.Name).Type;
+                var value = TypeHelper.ConvertFromString(type, item.Value);
+                configuration.SetConfiguration(item.Name, value);
+            }
+
+
+            foreach (var namingNormalizer in fileProviderConfiguration.DefaultNamingNormalizers)
+            {
+                configuration.NamingNormalizers.Add(namingNormalizer);
+            }
+
+            return configuration;
+        }
     }
 }

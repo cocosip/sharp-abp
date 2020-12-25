@@ -29,7 +29,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// </summary>
         public virtual bool HttpAccess { get; set; }
 
-        public virtual List<FileStoringContainerItem> Items { get; set; }
+        public virtual ICollection<FileStoringContainerItem> Items { get; protected set; }
 
         public FileStoringContainer()
         {

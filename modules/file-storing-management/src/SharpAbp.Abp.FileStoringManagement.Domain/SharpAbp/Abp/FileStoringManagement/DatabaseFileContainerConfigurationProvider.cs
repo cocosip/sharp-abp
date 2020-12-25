@@ -1,4 +1,5 @@
-﻿using SharpAbp.Abp.FileStoring;
+﻿using JetBrains.Annotations;
+using SharpAbp.Abp.FileStoring;
 using Volo.Abp;
 using Volo.Abp.Caching;
 
@@ -7,12 +8,12 @@ namespace SharpAbp.Abp.FileStoringManagement
     public class DatabaseFileContainerConfigurationProvider : IFileContainerConfigurationProvider
     {
         protected IFileContainerConfigurationConverter FileContainerConfigurationConverter { get; }
-        protected IDistributedCache<FileStoringContainer> ContainerCache { get; }
+        protected IDistributedCache<FileStoringContainerCacheItem> ContainerCache { get; }
         protected IFileStoringContainerRepository FileStoringContainerRepository { get; }
 
         public DatabaseFileContainerConfigurationProvider(
             IFileContainerConfigurationConverter fileContainerConfigurationConverter,
-            IDistributedCache<FileStoringContainer> containerCache,
+            IDistributedCache<FileStoringContainerCacheItem> containerCache,
             IFileStoringContainerRepository fileStoringContainerRepository)
         {
             FileContainerConfigurationConverter = fileContainerConfigurationConverter;
@@ -21,7 +22,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         }
 
 
-        public FileContainerConfiguration Get(string name)
+        public FileContainerConfiguration Get([NotNull] string name)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
             return GetConfigurationInternal(name);
@@ -29,17 +30,17 @@ namespace SharpAbp.Abp.FileStoringManagement
 
         protected virtual FileContainerConfiguration GetConfigurationInternal(string name)
         {
-            var container = ContainerCache.GetOrAdd(
+            var cacheItem = ContainerCache.GetOrAdd(
                 name,
                 () =>
                 {
-                    return FileStoringContainerRepository.Find(name, true);
+                    return FileStoringContainerRepository.Find(name, true).AsCacheItem();
                 },
                 hideErrors: false);
 
-            if (container != null)
+            if (cacheItem != null)
             {
-                return FileContainerConfigurationConverter.ToConfiguration(container);
+                return FileContainerConfigurationConverter.ToConfiguration(cacheItem);
             }
 
             return default;
