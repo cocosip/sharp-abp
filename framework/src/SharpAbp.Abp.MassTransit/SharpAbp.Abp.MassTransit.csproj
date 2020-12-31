@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MassTransit.AspNetCore" Version="7.1.1" />
+    <PackageReference Include="MassTransit.AspNetCore" Version="7.1.2-develop.3171" />
     <PackageReference Include="Volo.Abp" Version="4.0.2" />
   </ItemGroup>
 
