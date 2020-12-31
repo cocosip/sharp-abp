@@ -1,8 +1,4 @@
-﻿using MassTransit;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using Volo.Abp;
-using Volo.Abp.Modularity;
+﻿using Volo.Abp.Modularity;
 
 namespace SharpAbp.Abp.MassTransit
 {
@@ -11,10 +7,7 @@ namespace SharpAbp.Abp.MassTransit
     /// </summary>
     public class AbpMassTransitModule : AbpModule
     {
-        public override void OnApplicationShutdown(ApplicationShutdownContext context)
-        {
-            var busControl = context.ServiceProvider.GetService<IBusControl>();
-            busControl.Stop(TimeSpan.FromSeconds(10));
-        }
+      
+
     }
 }
