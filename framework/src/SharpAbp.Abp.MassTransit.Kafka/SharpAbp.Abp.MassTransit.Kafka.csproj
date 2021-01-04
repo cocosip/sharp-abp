@@ -5,8 +5,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <AssemblyName>SharpAbp.Abp.MassTransit</AssemblyName>
-    <PackageId>SharpAbp.Abp.MassTransit</PackageId>
+    <AssemblyName>SharpAbp.Abp.MassTransit.Kafka</AssemblyName>
+    <PackageId>SharpAbp.Abp.MassTransit.Kafka</PackageId>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -16,8 +16,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MassTransit.AspNetCore" Version="7.1.2" />
-    <PackageReference Include="Volo.Abp" Version="4.0.2" />
+    <PackageReference Include="MassTransit.Kafka" Version="7.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SharpAbp.Abp.MassTransit\SharpAbp.Abp.MassTransit.csproj" />
   </ItemGroup>
 
 </Project>
