@@ -12,7 +12,8 @@
     <RepositoryUrl>https://github.com/cocosip/sharp-abp</RepositoryUrl>
     <PackageTags>Abp,Abp-vNext, Abp modules</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <!-- https://github.com/dotnet/sourcelink -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
