@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.Timing" Version="4.0.2" />
+    <PackageReference Include="Volo.Abp.Timing" Version="4.1.0" />
   </ItemGroup>
 
 </Project>

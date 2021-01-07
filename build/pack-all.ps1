@@ -2,10 +2,6 @@
 
 # Build all solutions
 
-$rootPath = (Get-Item -Path "..")
-
-Write-Host("Path:"+$rootPath)
-
 foreach ($solutionPath in $solutionPaths) {    
     $solutionAbsPath = (Join-Path $rootFolder $solutionPath)
     Set-Location $solutionAbsPath

@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.EntityFrameworkCore" Version="4.0.2" />
+    <PackageReference Include="Volo.Abp.EntityFrameworkCore" Version="4.1.0" />
   </ItemGroup>
 
   <ItemGroup>

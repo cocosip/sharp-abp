@@ -4,6 +4,11 @@ $full = $args[0]
 
 $rootFolder = (Get-Item -Path "./" -Verbose).FullName
 
+$rootPath = (Get-Item -Path "..")
+
+Write-Host("rootFolder:"+$rootFolder)
+Write-Host("rootPath:"+$rootPath)
+
 # List of solutions used only in development mode
 $solutionPaths = @(
 		"../framework"
