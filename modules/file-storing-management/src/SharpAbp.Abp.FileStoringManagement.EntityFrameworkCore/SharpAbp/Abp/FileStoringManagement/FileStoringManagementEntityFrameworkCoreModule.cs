@@ -7,7 +7,7 @@ namespace SharpAbp.Abp.FileStoringManagement
     [DependsOn(
         typeof(FileStoringManagementDomainModule),
         typeof(AbpEntityFrameworkCoreModule)
-    )]
+        )]
     public class FileStoringManagementEntityFrameworkCoreModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)

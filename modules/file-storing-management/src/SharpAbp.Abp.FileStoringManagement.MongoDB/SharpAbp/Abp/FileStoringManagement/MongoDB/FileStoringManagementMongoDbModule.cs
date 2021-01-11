@@ -15,9 +15,7 @@ namespace SharpAbp.Abp.FileStoringManagement.MongoDB
             context.Services.AddMongoDbContext<FileStoringManagementMongoDbContext>(options =>
             {
                 options.AddDefaultRepositories<IFileStoringManagementMongoDbContext>();
-
                 options.AddRepository<FileStoringContainer, MongoDbFileStoringContainerRepository>();
-
             });
         }
     }

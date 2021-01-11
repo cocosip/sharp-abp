@@ -11,10 +11,13 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// </summary>
         /// <param name="container"></param>
         /// <returns></returns>
-        [NotNull]
         FileContainerConfiguration ToConfiguration(FileStoringContainer container);
 
-        [NotNull]
+        /// <summary>
+        /// Convert 'FileStoringContainerCacheItem' to 'FileContainerConfiguration'
+        /// </summary>
+        /// <param name="cacheItem"></param>
+        /// <returns></returns>
         FileContainerConfiguration ToConfiguration(FileStoringContainerCacheItem cacheItem);
     }
 }

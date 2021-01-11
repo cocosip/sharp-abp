@@ -1,7 +1,9 @@
 ﻿using JetBrains.Annotations;
 using SharpAbp.Abp.FileStoring;
+using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Caching;
+using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
@@ -25,27 +27,25 @@ namespace SharpAbp.Abp.FileStoringManagement
         public FileContainerConfiguration Get([NotNull] string name)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            return GetConfigurationInternal(name);
+            return AsyncHelper.RunSync(() =>
+            {
+                return GetConfigurationAsync(name);
+            });
         }
 
-        protected virtual FileContainerConfiguration GetConfigurationInternal(string name)
+        protected virtual async Task<FileContainerConfiguration> GetConfigurationAsync(string name)
         {
-            var cacheItem = ContainerCache.GetOrAdd(
+            var cacheItem = await ContainerCache.GetOrAddAsync(
                 name,
-                () =>
+                async () =>
                 {
-                    return FileStoringContainerRepository.Find(name, true).AsCacheItem();
+                    var container = await FileStoringContainerRepository.FindAsync(name, true);
+                    return container?.AsCacheItem();
                 },
                 hideErrors: false);
 
-            if (cacheItem != null)
-            {
-                return FileContainerConfigurationConverter.ToConfiguration(cacheItem);
-            }
-
-            return default;
+            return cacheItem == null ? null : FileContainerConfigurationConverter.ToConfiguration(cacheItem);
         }
-
 
     }
 }
