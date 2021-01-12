@@ -31,6 +31,3 @@ jobs:
       working-directory: .\build
       run: dotnet nuget push ..\dest\*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://www.nuget.org --skip-duplicate
 
-    - name: Publish symbols
-      working-directory: .\build
-      run: dotnet nuget push ..\dest\*.snupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
