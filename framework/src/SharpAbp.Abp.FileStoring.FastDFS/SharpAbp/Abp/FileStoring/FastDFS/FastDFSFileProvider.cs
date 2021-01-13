@@ -12,15 +12,20 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
     {
         protected ILogger Logger { get; }
         protected IClock Clock { get; }
-        protected IFastDFSFileNameCalculator FastDFSFileNameCalculator { get; }
+        protected IFastDFSFileNameCalculator FileNameCalculator { get; }
         protected IFastDFSFileProviderConfigurationFactory ConfigurationFactory { get; }
         protected IFastDFSClient Client { get; }
 
-        public FastDFSFileProvider(ILogger<FastDFSFileProvider> logger, IClock clock, IFastDFSFileNameCalculator fastDFSFileNameCalculator, IFastDFSFileProviderConfigurationFactory configurationFactory, IFastDFSClient client)
+        public FastDFSFileProvider(
+            ILogger<FastDFSFileProvider> logger,
+            IClock clock,
+            IFastDFSFileNameCalculator fileNameCalculator,
+            IFastDFSFileProviderConfigurationFactory configurationFactory,
+            IFastDFSClient client)
         {
             Logger = logger;
             Clock = clock;
-            FastDFSFileNameCalculator = fastDFSFileNameCalculator;
+            FileNameCalculator = fileNameCalculator;
             ConfigurationFactory = configurationFactory;
             Client = client;
         }
@@ -45,7 +50,7 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
 
             ConfigurationFactory.AddIfNotContains(configuration);
 
-            var fileId = FastDFSFileNameCalculator.Calculate(args);
+            var fileId = FileNameCalculator.Calculate(args);
             var containerName = GetContainerName(configuration, args);
             return await Client.RemoveFileAsync(containerName, fileId, configuration.ClusterName);
         }
@@ -56,7 +61,7 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
 
             ConfigurationFactory.AddIfNotContains(configuration);
 
-            var fileId = FastDFSFileNameCalculator.Calculate(args);
+            var fileId = FileNameCalculator.Calculate(args);
             var containerName = GetContainerName(configuration, args);
 
             var storageNode = await Client.GetStorageNodeAsync(containerName, configuration.ClusterName);
@@ -64,14 +69,13 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
             return fileInfo != null;
         }
 
-
         public override async Task<bool> DownloadAsync(FileProviderDownloadArgs args)
         {
             var configuration = args.Configuration.GetFastDFSConfiguration();
 
             ConfigurationFactory.AddIfNotContains(configuration);
 
-            var fileId = FastDFSFileNameCalculator.Calculate(args);
+            var fileId = FileNameCalculator.Calculate(args);
             var containerName = GetContainerName(configuration, args);
             var storageNode = await Client.GetStorageNodeAsync(containerName, configuration.ClusterName);
             try
@@ -92,7 +96,7 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
 
             ConfigurationFactory.AddIfNotContains(configuration);
 
-            var fileId = FastDFSFileNameCalculator.Calculate(args);
+            var fileId = FileNameCalculator.Calculate(args);
             var containerName = GetContainerName(configuration, args);
             var storageNode = await Client.GetStorageNodeAsync(containerName, configuration.ClusterName);
 
@@ -108,25 +112,23 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
             }
         }
 
-
         public override Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)
         {
             if (!args.Configuration.HttpAccess)
             {
-                return Task.FromResult("");
+                return Task.FromResult(string.Empty);
             }
 
             var configuration = args.Configuration.GetFastDFSConfiguration();
 
             ConfigurationFactory.AddIfNotContains(configuration);
 
-            var fileId = FastDFSFileNameCalculator.Calculate(args);
+            var fileId = FileNameCalculator.Calculate(args);
             var containerName = GetContainerName(configuration, args);
 
             var accessUrl = BuildAccessUrl(configuration, containerName, fileId);
             return Task.FromResult(accessUrl);
         }
-
 
         private static string GetContainerName(FastDFSFileProviderConfiguration configuration, FileProviderArgs args)
         {
@@ -135,12 +137,13 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
                 : configuration.GroupName;
         }
 
-
-        protected virtual string BuildAccessUrl(FastDFSFileProviderConfiguration configuration, string containerName, string fileId)
+        protected virtual string BuildAccessUrl(
+            FastDFSFileProviderConfiguration configuration,
+            string containerName,
+            string fileId)
         {
             if (configuration.AntiStealCheckToken)
             {
-
                 return $"{configuration.HttpServer.EnsureEndsWith('/')}/{containerName}/{fileId}";
             }
             else
@@ -150,7 +153,6 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
                 return $"{configuration.HttpServer.EnsureEndsWith('/')}/{containerName}/{fileId}?token={token}&ts={timestamp}";
             }
         }
-
 
         /// <summary>Convert time to int32 timestamp(from 1970-01-01 00:00:00)
         /// </summary>

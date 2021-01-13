@@ -37,15 +37,13 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
                 .WaitAndRetryAsync(2, retryCount => TimeSpan.FromSeconds(retryCount))
                 .ExecuteAsync(async () =>
                 {
-                    using (var fileStream = File.Open(filePath, fileMode, FileAccess.Write))
-                    {
-                        await args.FileStream.CopyToAsync(
-                            fileStream,
-                            args.CancellationToken
-                        );
+                    using var fileStream = File.Open(filePath, fileMode, FileAccess.Write);
+                    await args.FileStream.CopyToAsync(
+                        fileStream,
+                        args.CancellationToken
+                    );
 
-                        await fileStream.FlushAsync();
-                    }
+                    await fileStream.FlushAsync();
                 });
             return filePath;
         }
@@ -75,14 +73,10 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
                 .WaitAndRetryAsync(2, retryCount => TimeSpan.FromSeconds(retryCount))
                 .ExecuteAsync(async () =>
                 {
-                    using (var fileStream = File.OpenRead(filePath))
-                    {
-                        using (var ts = new FileStream("", FileMode.OpenOrCreate, FileAccess.ReadWrite))
-                        {
-                            await fileStream.CopyToAsync(ts, args.CancellationToken);
-                            return true;
-                        }
-                    }
+                    using var fileStream = File.OpenRead(filePath);
+                    using var ts = new FileStream("", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                    await fileStream.CopyToAsync(ts, args.CancellationToken);
+                    return true;
                 });
         }
 
@@ -100,12 +94,10 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
                 .WaitAndRetryAsync(2, retryCount => TimeSpan.FromSeconds(retryCount))
                 .ExecuteAsync(async () =>
                 {
-                    using (var fileStream = File.OpenRead(filePath))
-                    {
-                        var memoryStream = new MemoryStream();
-                        await fileStream.CopyToAsync(memoryStream, args.CancellationToken);
-                        return memoryStream;
-                    }
+                    using var fileStream = File.OpenRead(filePath);
+                    var memoryStream = new MemoryStream();
+                    await fileStream.CopyToAsync(memoryStream, args.CancellationToken);
+                    return memoryStream;
                 });
         }
 

@@ -16,21 +16,25 @@ namespace SharpAbp.Abp.FileStoring.S3
     public class S3FileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }
-        protected IS3FileNameCalculator S3FileNameCalculator { get; }
-        protected IS3ClientFactory S3ClientFactory { get; }
+        protected IS3FileNameCalculator FileNameCalculator { get; }
+        protected IS3ClientFactory ClientFactory { get; }
 
-        public S3FileProvider(ILogger<S3FileProvider> logger, IS3FileNameCalculator s3FileNameCalculator, IS3ClientFactory s3ClientFactory)
+        public S3FileProvider(
+            ILogger<S3FileProvider> logger,
+            IS3FileNameCalculator fileNameCalculator,
+            IS3ClientFactory clientFactory
+            )
         {
             Logger = logger;
-            S3FileNameCalculator = s3FileNameCalculator;
-            S3ClientFactory = s3ClientFactory;
+            FileNameCalculator = fileNameCalculator;
+            ClientFactory = clientFactory;
         }
 
         public override string Provider => S3FileProviderConfigurationNames.ProviderName;
 
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
-            var fileName = S3FileNameCalculator.Calculate(args);
+            var fileName = FileNameCalculator.Calculate(args);
             var configuration = args.Configuration.GetS3Configuration();
             var client = GetS3Client(args);
             var containerName = GetContainerName(args);
@@ -47,11 +51,11 @@ namespace SharpAbp.Abp.FileStoring.S3
 
             if (configuration.EnableSlice && (args.FileStream.Length > configuration.SliceSize))
             {
-                await MultipartUploadInternal(client, containerName, fileName, args.FileStream, configuration.UseChunkEncoding, configuration.SliceSize);
+                await MultipartUploadAsync(client, containerName, fileName, args.FileStream, configuration.UseChunkEncoding, configuration.SliceSize);
             }
             else
             {
-                await SingleUploadInternal(client, containerName, fileName, args.FileStream, configuration.UseChunkEncoding);
+                await SingleUploadAsync(client, containerName, fileName, args.FileStream, configuration.UseChunkEncoding);
             }
 
             args.FileStream?.Dispose();
@@ -61,7 +65,7 @@ namespace SharpAbp.Abp.FileStoring.S3
 
         public override async Task<bool> DeleteAsync(FileProviderDeleteArgs args)
         {
-            var fileName = S3FileNameCalculator.Calculate(args);
+            var fileName = FileNameCalculator.Calculate(args);
             var client = GetS3Client(args);
             var containerName = GetContainerName(args);
 
@@ -76,7 +80,7 @@ namespace SharpAbp.Abp.FileStoring.S3
 
         public override async Task<bool> ExistsAsync(FileProviderExistsArgs args)
         {
-            var fileName = S3FileNameCalculator.Calculate(args);
+            var fileName = FileNameCalculator.Calculate(args);
             var client = GetS3Client(args);
             var containerName = GetContainerName(args);
 
@@ -85,7 +89,7 @@ namespace SharpAbp.Abp.FileStoring.S3
 
         public override async Task<bool> DownloadAsync(FileProviderDownloadArgs args)
         {
-            var fileName = S3FileNameCalculator.Calculate(args);
+            var fileName = FileNameCalculator.Calculate(args);
             var client = GetS3Client(args);
             var containerName = GetContainerName(args);
 
@@ -96,7 +100,7 @@ namespace SharpAbp.Abp.FileStoring.S3
 
         public override async Task<Stream> GetOrNullAsync(FileProviderGetArgs args)
         {
-            var fileName = S3FileNameCalculator.Calculate(args);
+            var fileName = FileNameCalculator.Calculate(args);
             var client = GetS3Client(args);
             var containerName = GetContainerName(args);
 
@@ -117,7 +121,7 @@ namespace SharpAbp.Abp.FileStoring.S3
 
         public override Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)
         {
-            var fileName = S3FileNameCalculator.Calculate(args);
+            var fileName = FileNameCalculator.Calculate(args);
             var client = GetS3Client(args);
             var containerName = GetContainerName(args);
 
@@ -143,7 +147,13 @@ namespace SharpAbp.Abp.FileStoring.S3
 
         /// <summary>单文件上传
         /// </summary>
-        private async Task<PutObjectResponse> SingleUploadInternal(IAmazonS3 client, string bucketName, string fileName, Stream stream, bool useChunkEncoding)
+        protected virtual async Task<PutObjectResponse> SingleUploadAsync(
+            IAmazonS3 client,
+            string bucketName,
+            string fileName,
+            Stream stream,
+            bool useChunkEncoding
+            )
         {
             var putObjectRequest = new PutObjectRequest()
             {
@@ -157,7 +167,14 @@ namespace SharpAbp.Abp.FileStoring.S3
             return putObjectResponse;
         }
 
-        private async Task<CompleteMultipartUploadResponse> MultipartUploadInternal(IAmazonS3 client, string bucketName, string fileName, Stream stream, bool useChunkEncoding, int sliceSize)
+        protected virtual async Task<CompleteMultipartUploadResponse> MultipartUploadAsync(
+            IAmazonS3 client,
+            string bucketName,
+            string fileName,
+            Stream stream,
+            bool useChunkEncoding,
+            int sliceSize
+            )
         {
             var initiateMultipartUploadResponse = await client.InitiateMultipartUploadAsync(bucketName, fileName);
             //UploadId
@@ -199,17 +216,16 @@ namespace SharpAbp.Abp.FileStoring.S3
                 Logger.LogDebug("Upload part file ,key:{0},UploadId:{1},Complete {2}/{3}", fileName, uploadId, partETags.Count, partCount);
             }
 
-
             //完成上传分片
-            var completeMultipartUploadResponse = await client.CompleteMultipartUploadAsync(new CompleteMultipartUploadRequest()
+            var completeMultipartUploadRequest = new CompleteMultipartUploadRequest()
             {
                 BucketName = bucketName,
                 Key = fileName,
                 UploadId = uploadId,
                 PartETags = partETags
-            });
+            };
 
-            return completeMultipartUploadResponse;
+            return await client.CompleteMultipartUploadAsync(completeMultipartUploadRequest);
         }
 
 
@@ -219,7 +235,7 @@ namespace SharpAbp.Abp.FileStoring.S3
 
             var containerName = GetContainerName(args);
 
-            var amazonS3 = S3ClientFactory.GetOrAdd(containerName, () =>
+            var amazonS3 = ClientFactory.GetOrAdd(containerName, () =>
             {
                 var s3ClientConfiguration = new S3ClientConfiguration()
                 {
