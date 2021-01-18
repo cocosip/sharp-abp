@@ -67,9 +67,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.MassTransit", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.MassTransit.Tests", "test\SharpAbp.Abp.MassTransit.Tests\SharpAbp.Abp.MassTransit.Tests.csproj", "{D1BE66AA-25C1-49C8-9A20-5CC9036CEDFD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.MassTransit.Kafka", "src\SharpAbp.Abp.MassTransit.Kafka\SharpAbp.Abp.MassTransit.Kafka.csproj", "{9ABF927A-EA57-4474-9CAD-A7C3B4B8F0F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.MassTransit.Kafka", "src\SharpAbp.Abp.MassTransit.Kafka\SharpAbp.Abp.MassTransit.Kafka.csproj", "{9ABF927A-EA57-4474-9CAD-A7C3B4B8F0F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.MassTransit.RabbitMQ", "src\SharpAbp.Abp.MassTransit.RabbitMQ\SharpAbp.Abp.MassTransit.RabbitMQ.csproj", "{2E3A7C17-0CCB-44D5-A593-CB4F30773689}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.MassTransit.RabbitMQ", "src\SharpAbp.Abp.MassTransit.RabbitMQ\SharpAbp.Abp.MassTransit.RabbitMQ.csproj", "{2E3A7C17-0CCB-44D5-A593-CB4F30773689}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
