@@ -30,14 +30,6 @@ namespace SharpAbp.Abp.FileStoringManagement
         Task<FileStoringContainer> FindAsync(Guid? tenantId, string name, Guid? exceptId = null, bool includeDetails = false, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Find container by name
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="includeDetails"></param>
-        /// <returns></returns>
-        FileStoringContainer Find([NotNull] string name, bool includeDetails = true);
-
-        /// <summary>
         /// Get List
         /// </summary>
         /// <param name="skipCount"></param>

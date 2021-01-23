@@ -26,7 +26,7 @@ namespace SharpAbp.Abp.FileStoringManagement
        typeof(AbpFileStoringS3Module),
        typeof(AbpTestBaseModule),
        typeof(AbpAutofacModule)
-    )]
+       )]
     public class FileStoringManagementApplicationTestModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)

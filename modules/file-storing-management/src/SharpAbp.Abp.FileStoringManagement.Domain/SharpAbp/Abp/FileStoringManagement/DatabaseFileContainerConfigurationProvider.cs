@@ -24,7 +24,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         }
 
 
-        public FileContainerConfiguration Get([NotNull] string name)
+        public virtual FileContainerConfiguration Get([NotNull] string name)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
             return AsyncHelper.RunSync(() =>

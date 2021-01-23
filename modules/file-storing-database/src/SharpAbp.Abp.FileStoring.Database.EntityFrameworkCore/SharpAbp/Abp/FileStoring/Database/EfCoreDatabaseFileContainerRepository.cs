@@ -17,7 +17,7 @@ namespace SharpAbp.Abp.FileStoring.Database
 
         public virtual async Task<DatabaseFileContainer> FindAsync(string name, CancellationToken cancellationToken = default)
         {
-            return await DbSet.FirstOrDefaultAsync(x => x.Name == name, GetCancellationToken(cancellationToken));
+            return await (await GetDbSetAsync()).FirstOrDefaultAsync(x => x.Name == name, GetCancellationToken(cancellationToken));
         }
     }
 }

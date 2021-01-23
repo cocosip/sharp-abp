@@ -20,6 +20,7 @@
 | Package  | Version | Downloads|
 | -------- | ------- | -------- |
 | `SharpAbp.Abp.DotCommon` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.DotCommon.svg)](https://www.nuget.org/packages/SharpAbp.Abp.DotCommon) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.DotCommon.svg)|
+| `SharpAbp.Abp.FreeSql` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FreeSql.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FreeSql) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FreeSql.svg)|
 | **MassTransit** | - | - |
 | `SharpAbp.Abp.MassTransit` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.MassTransit.svg)](https://www.nuget.org/packages/SharpAbp.Abp.MassTransit) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.MassTransit.svg)|
 | `SharpAbp.Abp.MassTransit.Kafka` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.MassTransit.Kafka.svg)](https://www.nuget.org/packages/SharpAbp.Abp.MassTransit.Kafka) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.MassTransit.Kafka.svg)|

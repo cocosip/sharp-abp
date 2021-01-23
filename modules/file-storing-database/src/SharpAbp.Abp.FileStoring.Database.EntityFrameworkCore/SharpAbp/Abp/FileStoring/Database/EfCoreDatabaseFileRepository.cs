@@ -20,7 +20,7 @@ namespace SharpAbp.Abp.FileStoring.Database
             string name,
             CancellationToken cancellationToken = default)
         {
-            return await DbSet.FirstOrDefaultAsync(
+            return await (await GetDbSetAsync()).FirstOrDefaultAsync(
                 x => x.ContainerId == containerId && x.Name == name,
                 GetCancellationToken(cancellationToken)
             );
@@ -31,7 +31,7 @@ namespace SharpAbp.Abp.FileStoring.Database
             string name,
             CancellationToken cancellationToken = default)
         {
-            return await DbSet.AnyAsync(
+            return await (await GetDbSetAsync()).AnyAsync(
                 x => x.ContainerId == containerId && x.Name == name,
                 GetCancellationToken(cancellationToken));
         }

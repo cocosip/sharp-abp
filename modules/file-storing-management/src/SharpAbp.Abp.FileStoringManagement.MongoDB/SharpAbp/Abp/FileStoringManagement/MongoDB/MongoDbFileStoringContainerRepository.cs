@@ -46,28 +46,12 @@ namespace SharpAbp.Abp.FileStoringManagement.MongoDB
         /// <returns></returns>
         public async Task<FileStoringContainer> FindAsync(Guid? tenantId, string name, Guid? exceptId = null, bool includeDetails = false, CancellationToken cancellationToken = default)
         {
-            return await GetMongoQueryable()
+            return await (await GetMongoQueryableAsync())
                 .WhereIf(tenantId.HasValue, x => x.TenantId == tenantId.Value)
                 .WhereIf(!name.IsNullOrWhiteSpace(), x => x.Name == name)
                 .WhereIf(exceptId.HasValue, x => x.Id != exceptId.Value)
                 .As<IMongoQueryable<FileStoringContainer>>()
                 .FirstOrDefaultAsync();
-        }
-
-        /// <summary>
-        /// Find container by name
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="includeDetails"></param>
-        /// <returns></returns>
-        public FileStoringContainer Find([NotNull] string name, bool includeDetails = true)
-        {
-            Check.NotNullOrWhiteSpace(name, nameof(name));
-
-            return GetMongoQueryable()
-                .WhereIf(!name.IsNullOrWhiteSpace(), x => x.Name == name)
-                .As<IMongoQueryable<FileStoringContainer>>()
-                .FirstOrDefault();
         }
 
         /// <summary>
@@ -83,7 +67,7 @@ namespace SharpAbp.Abp.FileStoringManagement.MongoDB
         /// <returns></returns>
         public async Task<List<FileStoringContainer>> GetListAsync(int skipCount, int maxResultCount, string sorting = "", bool includeDetails = true, string name = "", string provider = "", CancellationToken cancellationToken = default)
         {
-            return await GetMongoQueryable()
+            return await (await GetMongoQueryableAsync())
                 .WhereIf<FileStoringContainer, IMongoQueryable<FileStoringContainer>>(!name.IsNullOrWhiteSpace(), item => item.Name == name)
                 .WhereIf<FileStoringContainer, IMongoQueryable<FileStoringContainer>>(!provider.IsNullOrWhiteSpace(), item => item.Provider == provider)
                 .OrderBy(sorting ?? nameof(FileStoringContainer.Name))
@@ -102,7 +86,7 @@ namespace SharpAbp.Abp.FileStoringManagement.MongoDB
         /// <returns></returns>
         public async Task<int> GetCountAsync(string name = "", string provider = "", CancellationToken cancellationToken = default)
         {
-            return await GetMongoQueryable()
+            return await (await GetMongoQueryableAsync())
                 .WhereIf<FileStoringContainer, IMongoQueryable<FileStoringContainer>>(!name.IsNullOrWhiteSpace(), item => item.Name == name)
                 .WhereIf<FileStoringContainer, IMongoQueryable<FileStoringContainer>>(!provider.IsNullOrWhiteSpace(), item => item.Provider == provider)
                 .As<IMongoQueryable<FileStoringContainer>>()

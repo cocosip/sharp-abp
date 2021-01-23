@@ -16,7 +16,7 @@ namespace SharpAbp.Abp.FileStoring.Database.MongoDB
 
         public virtual async Task<DatabaseFile> FindAsync(Guid containerId, string name, CancellationToken cancellationToken = default)
         {
-            return await GetMongoQueryable().FirstOrDefaultAsync(
+            return await (await GetMongoQueryableAsync()).FirstOrDefaultAsync(
                     x => x.ContainerId == containerId &&
                          x.Name == name,
                     GetCancellationToken(cancellationToken));
@@ -24,7 +24,7 @@ namespace SharpAbp.Abp.FileStoring.Database.MongoDB
 
         public virtual async Task<bool> ExistsAsync(Guid containerId, string name, CancellationToken cancellationToken = default)
         {
-            return await GetMongoQueryable().AnyAsync(
+            return await (await GetMongoQueryableAsync()).AnyAsync(
                 x => x.ContainerId == containerId &&
                      x.Name == name,
                 GetCancellationToken(cancellationToken));

@@ -32,7 +32,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         public virtual async Task<FileStoringContainer> FindAsync([NotNull] string name, bool includeDetails = true, CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            return await DbSet
+            return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
                 .FirstOrDefaultAsync(x => x.Name == name, cancellationToken);
         }
@@ -48,7 +48,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <returns></returns>
         public virtual async Task<FileStoringContainer> FindAsync(Guid? tenantId, string name, Guid? exceptId = null, bool includeDetails = false, CancellationToken cancellationToken = default)
         {
-            return await DbSet
+            return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
                 .WhereIf(tenantId.HasValue, x => x.TenantId == tenantId.Value)
                 .WhereIf(!name.IsNullOrWhiteSpace(), x => x.Name == name)
@@ -56,18 +56,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
-        /// <summary>
-        /// Find container by name
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="includeDetails"></param>
-        /// <returns></returns>
-        public virtual FileStoringContainer Find([NotNull] string name, bool includeDetails = true)
-        {
-            return DbSet
-                .IncludeDetails(includeDetails)
-                .FirstOrDefault(x => x.Name == name);
-        }
+
 
         /// <summary>
         /// Override GetAsync
@@ -78,7 +67,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <returns></returns>
         public override async Task<FileStoringContainer> GetAsync(Guid id, bool includeDetails = true, CancellationToken cancellationToken = default)
         {
-            return await DbSet
+            return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
                 .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
@@ -96,7 +85,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <returns></returns>
         public async Task<List<FileStoringContainer>> GetListAsync(int skipCount, int maxResultCount, string sorting = null, bool includeDetails = true, string name = "", string provider = "", CancellationToken cancellationToken = default)
         {
-            return await DbSet
+            return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
                 .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
                 .WhereIf(!provider.IsNullOrWhiteSpace(), item => item.Provider == provider)
@@ -115,7 +104,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <returns></returns>
         public async Task<int> GetCountAsync(string name = "", string provider = "", CancellationToken cancellationToken = default)
         {
-            return await DbSet
+            return await (await GetDbSetAsync())
                   .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
                   .WhereIf(!provider.IsNullOrWhiteSpace(), item => item.Provider == provider)
                   .CountAsync(cancellationToken);
