@@ -36,9 +36,9 @@ namespace SharpAbp.Abp.FileStoringManagement
 
                 b.Property(p => p.IsMultiTenant).IsRequired();
 
-                b.HasMany(x => x.Items).WithOne().HasForeignKey(p => p.ContainerId).IsRequired();
+                b.HasMany(p => p.Items).WithOne().HasForeignKey(p => p.ContainerId).IsRequired();
 
-                b.HasIndex(x => new { x.TenantId, x.Name }).IsUnique();
+                b.HasIndex(p => new { p.TenantId, p.Name }).IsUnique();
 
             });
 
@@ -48,13 +48,13 @@ namespace SharpAbp.Abp.FileStoringManagement
 
                 b.ConfigureByConvention();
 
-                b.Property(p => p.ContainerId).IsRequired(); //TODO: Foreign key!
+                b.Property(p => p.ContainerId).IsRequired(); 
 
                 b.Property(p => p.Name).IsRequired().HasMaxLength(FileStoringContainerItemConsts.MaxNameLength);
 
                 b.Property(p => p.Value).IsRequired().HasMaxLength(FileStoringContainerItemConsts.MaxValueLength);
 
-                b.HasIndex(x => new { x.ContainerId, x.Name });
+                b.HasIndex(p => new { p.ContainerId, p.Name });
             });
         }
     }
