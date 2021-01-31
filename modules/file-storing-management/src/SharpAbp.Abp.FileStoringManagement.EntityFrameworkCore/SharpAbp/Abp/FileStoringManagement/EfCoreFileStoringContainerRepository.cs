@@ -13,8 +13,7 @@ using Volo.Abp.EntityFrameworkCore;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
-    public class EfCoreFileStoringContainerRepository : EfCoreRepository<IFileStoringManagementDbContext, FileStoringContainer, Guid>,
-         IFileStoringContainerRepository
+    public class EfCoreFileStoringContainerRepository : EfCoreRepository<IFileStoringManagementDbContext, FileStoringContainer, Guid>, IFileStoringContainerRepository
     {
         public EfCoreFileStoringContainerRepository(IDbContextProvider<IFileStoringManagementDbContext> dbContextProvider)
             : base(dbContextProvider)
@@ -29,7 +28,10 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="includeDetails">include details</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<FileStoringContainer> FindAsync([NotNull] string name, bool includeDetails = true, CancellationToken cancellationToken = default)
+        public virtual async Task<FileStoringContainer> FindAsync(
+            [NotNull] string name,
+            bool includeDetails = true, 
+            CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
             return await (await GetDbSetAsync())
@@ -46,7 +48,12 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<FileStoringContainer> FindAsync(Guid? tenantId, string name, Guid? exceptId = null, bool includeDetails = false, CancellationToken cancellationToken = default)
+        public virtual async Task<FileStoringContainer> FindAsync(
+            Guid? tenantId, 
+            string name, 
+            Guid? exceptId = null,
+            bool includeDetails = false, 
+            CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
@@ -65,7 +72,10 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public override async Task<FileStoringContainer> GetAsync(Guid id, bool includeDetails = true, CancellationToken cancellationToken = default)
+        public override async Task<FileStoringContainer> GetAsync(
+            Guid id, 
+            bool includeDetails = true,
+            CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
@@ -83,7 +93,14 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="provider"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<List<FileStoringContainer>> GetListAsync(int skipCount, int maxResultCount, string sorting = null, bool includeDetails = true, string name = "", string provider = "", CancellationToken cancellationToken = default)
+        public async Task<List<FileStoringContainer>> GetListAsync(
+            int skipCount, 
+            int maxResultCount, 
+            string sorting = null, 
+            bool includeDetails = true, 
+            string name = "", 
+            string provider = "", 
+            CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
