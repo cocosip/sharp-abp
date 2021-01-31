@@ -36,7 +36,7 @@ namespace SharpAbp.Abp.FileStoring.Database
 
                 b.HasMany<DatabaseFile>().WithOne().HasForeignKey(p => p.ContainerId);
 
-                b.HasIndex(x => new { x.TenantId, x.Name });
+                b.HasIndex(p => new { p.TenantId, p.Name });
             });
 
             builder.Entity<DatabaseFile>(b =>
@@ -51,7 +51,7 @@ namespace SharpAbp.Abp.FileStoring.Database
 
                 b.HasOne<DatabaseFileContainer>().WithMany().HasForeignKey(p => p.ContainerId);
 
-                b.HasIndex(x => new { x.TenantId, x.ContainerId, x.Name });
+                b.HasIndex(p => new { p.TenantId, p.ContainerId, p.Name });
             });
         }
     }
