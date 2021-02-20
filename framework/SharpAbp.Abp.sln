@@ -73,9 +73,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.MassTransit.Ra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FreeSql", "src\SharpAbp.Abp.FreeSql\SharpAbp.Abp.FreeSql.csproj", "{79B3C976-9B3B-4779-9A9C-96DB35575417}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Core", "src\SharpAbp.Abp.Core\SharpAbp.Abp.Core.csproj", "{D397A83F-16C1-4A77-BF9F-1B80E516635C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Core", "src\SharpAbp.Abp.Core\SharpAbp.Abp.Core.csproj", "{D397A83F-16C1-4A77-BF9F-1B80E516635C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Core.Tests", "test\SharpAbp.Abp.Core.Tests\SharpAbp.Abp.Core.Tests.csproj", "{A5A526F3-561D-4E6D-9953-42DCED5FDBF3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Core.Tests", "test\SharpAbp.Abp.Core.Tests\SharpAbp.Abp.Core.Tests.csproj", "{A5A526F3-561D-4E6D-9953-42DCED5FDBF3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
