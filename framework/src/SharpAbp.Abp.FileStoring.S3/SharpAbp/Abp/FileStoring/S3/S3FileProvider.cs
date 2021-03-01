@@ -17,16 +17,18 @@ namespace SharpAbp.Abp.FileStoring.S3
     {
         protected ILogger Logger { get; }
         protected IS3FileNameCalculator FileNameCalculator { get; }
+        protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
         protected IS3ClientFactory ClientFactory { get; }
 
         public S3FileProvider(
             ILogger<S3FileProvider> logger,
             IS3FileNameCalculator fileNameCalculator,
-            IS3ClientFactory clientFactory
-            )
+            IFileNormalizeNamingService fileNormalizeNamingService,
+            IS3ClientFactory clientFactory)
         {
             Logger = logger;
             FileNameCalculator = fileNameCalculator;
+            FileNormalizeNamingService = fileNormalizeNamingService;
             ClientFactory = clientFactory;
         }
 
@@ -300,13 +302,13 @@ namespace SharpAbp.Abp.FileStoring.S3
             return false;
         }
 
-        private static string GetContainerName(FileProviderArgs args)
+        private string GetContainerName(FileProviderArgs args)
         {
             var configuration = args.Configuration.GetS3Configuration();
 
             return configuration.BucketName.IsNullOrWhiteSpace()
                 ? args.ContainerName
-                : configuration.BucketName;
+                : FileNormalizeNamingService.NormalizeContainerName(args.Configuration, args.ContainerName);
         }
     }
 }

@@ -10,10 +10,13 @@ namespace SharpAbp.Abp.FileStoring.Minio
     public class MinioFileProvider : FileProviderBase, ITransientDependency
     {
         protected IMinioFileNameCalculator MinioFileNameCalculator { get; }
-
-        public MinioFileProvider(IMinioFileNameCalculator minioFileNameCalculator)
+        protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
+        public MinioFileProvider(
+            IMinioFileNameCalculator minioFileNameCalculator,
+            IFileNormalizeNamingService fileNormalizeNamingService)
         {
             MinioFileNameCalculator = minioFileNameCalculator;
+            FileNormalizeNamingService = fileNormalizeNamingService;
         }
 
         public override string Provider => MinioFileProviderConfigurationNames.ProviderName;
@@ -169,17 +172,14 @@ namespace SharpAbp.Abp.FileStoring.Minio
             return false;
         }
 
-        private static string GetContainerName(FileProviderArgs args)
+        private string GetContainerName(FileProviderArgs args)
         {
             var configuration = args.Configuration.GetMinioConfiguration();
 
             return configuration.BucketName.IsNullOrWhiteSpace()
                 ? args.ContainerName
-                : configuration.BucketName;
+                : FileNormalizeNamingService.NormalizeContainerName(args.Configuration, args.ContainerName);
         }
-
-
-
-
+    
     }
 }

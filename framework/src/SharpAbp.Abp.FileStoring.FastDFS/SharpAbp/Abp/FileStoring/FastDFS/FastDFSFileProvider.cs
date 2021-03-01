@@ -13,19 +13,21 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
         protected ILogger Logger { get; }
         protected IClock Clock { get; }
         protected IFastDFSFileNameCalculator FileNameCalculator { get; }
+        protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
         protected IFastDFSFileProviderConfigurationFactory ConfigurationFactory { get; }
         protected IFastDFSClient Client { get; }
-
         public FastDFSFileProvider(
             ILogger<FastDFSFileProvider> logger,
             IClock clock,
             IFastDFSFileNameCalculator fileNameCalculator,
+            IFileNormalizeNamingService fileNormalizeNamingService,
             IFastDFSFileProviderConfigurationFactory configurationFactory,
             IFastDFSClient client)
         {
             Logger = logger;
             Clock = clock;
             FileNameCalculator = fileNameCalculator;
+            FileNormalizeNamingService = fileNormalizeNamingService;
             ConfigurationFactory = configurationFactory;
             Client = client;
         }
@@ -130,11 +132,11 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
             return Task.FromResult(accessUrl);
         }
 
-        private static string GetContainerName(FastDFSFileProviderConfiguration configuration, FileProviderArgs args)
+        private string GetContainerName(FastDFSFileProviderConfiguration configuration, FileProviderArgs args)
         {
             return configuration.GroupName.IsNullOrWhiteSpace()
                 ? args.ContainerName
-                : configuration.GroupName;
+                : FileNormalizeNamingService.NormalizeContainerName(args.Configuration, args.ContainerName);
         }
 
         protected virtual string BuildAccessUrl(

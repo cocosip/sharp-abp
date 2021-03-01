@@ -12,15 +12,18 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
         protected IClock Clock { get; }
         protected IOssClientFactory OssClientFactory { get; }
         protected IAliyunFileNameCalculator AliyunFileNameCalculator { get; }
+        protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
 
         public AliyunFileProvider(
             IClock clock,
             IOssClientFactory ossClientFactory,
-            IAliyunFileNameCalculator aliyunFileNameCalculator)
+            IAliyunFileNameCalculator aliyunFileNameCalculator,
+            IFileNormalizeNamingService fileNormalizeNamingService)
         {
             Clock = clock;
             OssClientFactory = ossClientFactory;
             AliyunFileNameCalculator = aliyunFileNameCalculator;
+            FileNormalizeNamingService = fileNormalizeNamingService;
         }
 
         public override string Provider => AliyunFileProviderConfigurationNames.ProviderName;
@@ -136,7 +139,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             var configuration = args.Configuration.GetAliyunConfiguration();
             return configuration.BucketName.IsNullOrWhiteSpace()
                 ? args.ContainerName
-                : configuration.BucketName;
+                : FileNormalizeNamingService.NormalizeContainerName(args.Configuration, args.ContainerName);
         }
 
         private bool FileExistsAsync(IOss ossClient, string containerName, string fileName)

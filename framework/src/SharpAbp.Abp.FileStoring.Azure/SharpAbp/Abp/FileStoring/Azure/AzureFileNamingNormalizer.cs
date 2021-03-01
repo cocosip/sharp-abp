@@ -7,6 +7,7 @@ namespace SharpAbp.Abp.FileStoring.Azure
 {
     public class AzureFileNamingNormalizer : IFileNamingNormalizer, ITransientDependency
     {
+
         /// <summary>
         ///https://docs.microsoft.com/en-us/rest/api/storageservices/naming-and-referencing-containers--blobs--and-metadata#container-names
         /// </summary>

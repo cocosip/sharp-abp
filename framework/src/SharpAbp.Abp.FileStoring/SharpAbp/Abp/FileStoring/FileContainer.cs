@@ -110,23 +110,19 @@ namespace SharpAbp.Abp.FileStoring
     public class FileContainer : IFileContainer
     {
         protected string ContainerName { get; }
-
         protected FileContainerConfiguration Configuration { get; }
-
         protected IFileProvider Provider { get; }
-
         protected ICurrentTenant CurrentTenant { get; }
-
         protected ICancellationTokenProvider CancellationTokenProvider { get; }
-
         protected IServiceProvider ServiceProvider { get; }
-
+        protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
         public FileContainer(
             string containerName,
             FileContainerConfiguration configuration,
             IFileProvider provider,
             ICurrentTenant currentTenant,
             ICancellationTokenProvider cancellationTokenProvider,
+            IFileNormalizeNamingService fileNormalizeNamingService,
             IServiceProvider serviceProvider)
         {
             ContainerName = containerName;
@@ -134,6 +130,7 @@ namespace SharpAbp.Abp.FileStoring
             Provider = provider;
             CurrentTenant = currentTenant;
             CancellationTokenProvider = cancellationTokenProvider;
+            FileNormalizeNamingService = fileNormalizeNamingService;
             ServiceProvider = serviceProvider;
         }
 
@@ -151,13 +148,13 @@ namespace SharpAbp.Abp.FileStoring
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
             {
-                var (normalizedContainerName, normalizedFileName) = NormalizeNaming(ContainerName, fileId);
+                var fileNormalizeNaming = FileNormalizeNamingService.NormalizeNaming(Configuration, ContainerName, fileId);
 
                 return await Provider.SaveAsync(
                       new FileProviderSaveArgs(
-                          normalizedContainerName,
+                          fileNormalizeNaming.ContainerName,
                           Configuration,
-                          normalizedFileName,
+                          fileNormalizeNaming.FileName,
                           stream,
                           ext,
                           overrideExisting,
@@ -173,14 +170,13 @@ namespace SharpAbp.Abp.FileStoring
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
             {
-                var (normalizedContainerName, normalizedFileName) =
-                    NormalizeNaming(ContainerName, fileId);
+                var fileNormalizeNaming = FileNormalizeNamingService.NormalizeNaming(Configuration, ContainerName, fileId);
 
                 return await Provider.DeleteAsync(
                     new FileProviderDeleteArgs(
-                        normalizedContainerName,
+                        fileNormalizeNaming.ContainerName,
                         Configuration,
-                        normalizedFileName,
+                        fileNormalizeNaming.FileName,
                         CancellationTokenProvider.FallbackToProvider(cancellationToken)
                     )
                 );
@@ -193,14 +189,13 @@ namespace SharpAbp.Abp.FileStoring
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
             {
-                var (normalizedContainerName, normalizedFileName) =
-                    NormalizeNaming(ContainerName, fileId);
+                var fileNormalizeNaming = FileNormalizeNamingService.NormalizeNaming(Configuration, ContainerName, fileId);
 
                 return await Provider.ExistsAsync(
                     new FileProviderExistsArgs(
-                        normalizedContainerName,
+                        fileNormalizeNaming.ContainerName,
                         Configuration,
-                        normalizedFileName,
+                        fileNormalizeNaming.FileName,
                         CancellationTokenProvider.FallbackToProvider(cancellationToken)
                     )
                 );
@@ -215,14 +210,13 @@ namespace SharpAbp.Abp.FileStoring
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
             {
-                var (normalizedContainerName, normalizedFileName) =
-                    NormalizeNaming(ContainerName, fileId);
+                var fileNormalizeNaming = FileNormalizeNamingService.NormalizeNaming(Configuration, ContainerName, fileId);
 
                 return await Provider.DownloadAsync(
                      new FileProviderDownloadArgs(
-                         normalizedContainerName,
+                         fileNormalizeNaming.ContainerName,
                          Configuration,
-                         normalizedFileName,
+                         fileNormalizeNaming.FileName,
                          path,
                          CancellationTokenProvider.FallbackToProvider(cancellationToken)
                      )
@@ -254,14 +248,13 @@ namespace SharpAbp.Abp.FileStoring
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
             {
-                var (normalizedContainerName, normalizedFileName) =
-                    NormalizeNaming(ContainerName, fileId);
+                var fileNormalizeNaming = FileNormalizeNamingService.NormalizeNaming(Configuration, ContainerName, fileId);
 
                 return await Provider.GetOrNullAsync(
                     new FileProviderGetArgs(
-                        normalizedContainerName,
+                        fileNormalizeNaming.ContainerName,
                         Configuration,
-                        normalizedFileName,
+                        fileNormalizeNaming.FileName,
                         CancellationTokenProvider.FallbackToProvider(cancellationToken)
                     )
                 );
@@ -275,14 +268,13 @@ namespace SharpAbp.Abp.FileStoring
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
             {
-                var (normalizedContainerName, normalizedFileName) =
-                    NormalizeNaming(ContainerName, fileId);
+                var fileNormalizeNaming = FileNormalizeNamingService.NormalizeNaming(Configuration, ContainerName, fileId);
 
                 return await Provider.GetAccessUrlAsync(
                     new FileProviderAccessArgs(
-                        normalizedContainerName,
+                        fileNormalizeNaming.ContainerName,
                         Configuration,
-                        normalizedFileName,
+                        fileNormalizeNaming.FileName,
                         expires,
                         CancellationTokenProvider.FallbackToProvider(cancellationToken)
                     )
@@ -300,28 +292,7 @@ namespace SharpAbp.Abp.FileStoring
             return CurrentTenant.Id;
         }
 
-        protected virtual (string, string) NormalizeNaming(string containerName, string fileId)
-        {
-            if (!Configuration.NamingNormalizers.Any())
-            {
-                return (containerName, fileId);
-            }
-
-            using (var scope = ServiceProvider.CreateScope())
-            {
-                foreach (var normalizerType in Configuration.NamingNormalizers)
-                {
-                    var normalizer = scope.ServiceProvider
-                        .GetRequiredService(normalizerType)
-                        .As<IFileNamingNormalizer>();
-
-                    containerName = normalizer.NormalizeContainerName(containerName);
-                    fileId = normalizer.NormalizeFileName(fileId);
-                }
-
-                return (containerName, fileId);
-            }
-        }
+    
 
 
     }

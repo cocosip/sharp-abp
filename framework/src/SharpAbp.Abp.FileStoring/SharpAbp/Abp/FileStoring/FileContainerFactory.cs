@@ -12,19 +12,22 @@ namespace SharpAbp.Abp.FileStoring
         protected ICurrentTenant CurrentTenant { get; }
         protected ICancellationTokenProvider CancellationTokenProvider { get; }
         protected IServiceProvider ServiceProvider { get; }
+        protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
 
         public FileContainerFactory(
             IFileContainerConfigurationProvider configurationProvider,
             ICurrentTenant currentTenant,
             ICancellationTokenProvider cancellationTokenProvider,
             IFileProviderSelector providerSelector,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            IFileNormalizeNamingService fileNormalizeNamingService)
         {
             ConfigurationProvider = configurationProvider;
             CurrentTenant = currentTenant;
             CancellationTokenProvider = cancellationTokenProvider;
             ProviderSelector = providerSelector;
             ServiceProvider = serviceProvider;
+            FileNormalizeNamingService = fileNormalizeNamingService;
         }
 
         public virtual IFileContainer Create(string name)
@@ -37,6 +40,7 @@ namespace SharpAbp.Abp.FileStoring
                 ProviderSelector.Get(name),
                 CurrentTenant,
                 CancellationTokenProvider,
+                FileNormalizeNamingService,
                 ServiceProvider
             );
         }

@@ -10,10 +10,13 @@ namespace SharpAbp.Abp.FileStoring.Azure
     public class AzureFileProvider : FileProviderBase, ITransientDependency
     {
         protected IAzureFileNameCalculator AzureFileNameCalculator { get; }
-
-        public AzureFileProvider(IAzureFileNameCalculator azureFileNameCalculator)
+        protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
+        public AzureFileProvider(
+            IAzureFileNameCalculator azureFileNameCalculator,
+            IFileNormalizeNamingService fileNormalizeNamingService)
         {
             AzureFileNameCalculator = azureFileNameCalculator;
+            FileNormalizeNamingService = fileNormalizeNamingService;
         }
 
         public override string Provider => AzureFileProviderConfigurationNames.ProviderName;
@@ -120,7 +123,7 @@ namespace SharpAbp.Abp.FileStoring.Azure
             var configuration = args.Configuration.GetAzureConfiguration();
             return configuration.ContainerName.IsNullOrWhiteSpace()
                 ? args.ContainerName
-                : configuration.ContainerName;
+                : FileNormalizeNamingService.NormalizeContainerName(args.Configuration, args.ContainerName);
         }
 
         private async Task<bool> ContainerExistsAsync(BlobContainerClient blobContainerClient)
