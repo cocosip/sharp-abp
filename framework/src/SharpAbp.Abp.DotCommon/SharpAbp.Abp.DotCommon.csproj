@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotCommon" Version="4.2.3" />
+    <PackageReference Include="DotCommon" Version="4.2.4" />
     <PackageReference Include="Volo.Abp" Version="4.2.1" />
   </ItemGroup>
 
