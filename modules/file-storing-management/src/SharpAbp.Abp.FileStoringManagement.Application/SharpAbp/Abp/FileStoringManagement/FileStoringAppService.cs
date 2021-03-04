@@ -82,7 +82,10 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<ContainerDto> GetAsync(Guid id, bool includeDetails = true, CancellationToken cancellationToken = default)
+        public virtual async Task<ContainerDto> GetAsync(
+            Guid id, 
+            bool includeDetails = true,
+            CancellationToken cancellationToken = default)
         {
             var fileStoringContainer = await FileStoringContainerRepository.GetAsync(id, includeDetails, cancellationToken);
             return ObjectMapper.Map<FileStoringContainer, ContainerDto>(fileStoringContainer);
@@ -95,7 +98,10 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<ContainerDto> GetByNameAsync([NotNull] string name, bool includeDetails = true, CancellationToken cancellationToken = default)
+        public virtual async Task<ContainerDto> GetByNameAsync(
+            [NotNull] string name, 
+            bool includeDetails = true, 
+            CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
 
@@ -110,7 +116,10 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<PagedResultDto<ContainerDto>> GetPagedListAsync(FileStoringContainerPagedRequestDto input, bool includeDetails = true, CancellationToken cancellationToken = default)
+        public virtual async Task<PagedResultDto<ContainerDto>> GetPagedListAsync(
+            FileStoringContainerPagedRequestDto input,
+            bool includeDetails = true, 
+            CancellationToken cancellationToken = default)
         {
             var count = await FileStoringContainerRepository.GetCountAsync(input.Name, input.Provider);
             var fileStoringContainers = await FileStoringContainerRepository.GetListAsync(
@@ -135,7 +144,9 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="id"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+        public virtual async Task DeleteAsync(
+            Guid id,
+            CancellationToken cancellationToken = default)
         {
             await FileStoringContainerRepository.DeleteAsync(id, cancellationToken: cancellationToken);
         }
@@ -146,7 +157,9 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="input"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<Guid> CreateAsync(CreateContainerDto input, CancellationToken cancellationToken = default)
+        public virtual async Task<Guid> CreateAsync(
+            CreateContainerDto input,
+            CancellationToken cancellationToken = default)
         {
             var valuesValidator = GetFileProviderValuesValidator(input.Provider);
 
@@ -188,7 +201,9 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="input"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task UpdateAsync(UpdateContainerDto input, CancellationToken cancellationToken = default)
+        public virtual async Task UpdateAsync(
+            UpdateContainerDto input, 
+            CancellationToken cancellationToken = default)
         {
             var valuesValidator = GetFileProviderValuesValidator(input.Provider);
 

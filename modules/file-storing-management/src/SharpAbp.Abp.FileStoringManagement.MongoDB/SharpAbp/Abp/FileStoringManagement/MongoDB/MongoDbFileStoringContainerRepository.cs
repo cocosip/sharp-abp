@@ -93,6 +93,30 @@ namespace SharpAbp.Abp.FileStoringManagement.MongoDB
         }
 
         /// <summary>
+        /// Get List
+        /// </summary>
+        /// <param name="sorting"></param>
+        /// <param name="includeDetails"></param>
+        /// <param name="name"></param>
+        /// <param name="provider"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<List<FileStoringContainer>> GetListAsync(
+          string sorting = null,
+          bool includeDetails = true,
+          string name = "",
+          string provider = "",
+          CancellationToken cancellationToken = default)
+        {
+            return await (await GetMongoQueryableAsync())
+               .WhereIf<FileStoringContainer, IMongoQueryable<FileStoringContainer>>(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+               .WhereIf<FileStoringContainer, IMongoQueryable<FileStoringContainer>>(!provider.IsNullOrWhiteSpace(), item => item.Provider == provider)
+               .OrderBy(sorting ?? nameof(FileStoringContainer.Name))
+               .As<IMongoQueryable<FileStoringContainer>>()
+               .ToListAsync(GetCancellationToken(cancellationToken));
+        }
+
+        /// <summary>
         /// Get count
         /// </summary>
         /// <param name="name"></param>

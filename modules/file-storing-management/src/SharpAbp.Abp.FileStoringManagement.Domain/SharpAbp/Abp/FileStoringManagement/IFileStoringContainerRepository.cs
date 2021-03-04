@@ -42,6 +42,16 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <returns></returns>
         Task<List<FileStoringContainer>> GetListAsync(int skipCount, int maxResultCount, string sorting = null, bool includeDetails = true, string name = "", string provider = "", CancellationToken cancellationToken = default);
 
+        /// <summary>
+        /// Get List
+        /// </summary>
+        /// <param name="sorting"></param>
+        /// <param name="includeDetails"></param>
+        /// <param name="name"></param>
+        /// <param name="provider"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<List<FileStoringContainer>> GetListAsync(string sorting = null, bool includeDetails = true, string name = "", string provider = "", CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get count async
@@ -51,8 +61,6 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<int> GetCountAsync(string name = "", string provider = "", CancellationToken cancellationToken = default);
-
-
 
     }
 }
