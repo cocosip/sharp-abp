@@ -1,21 +1,26 @@
 ﻿using Polly;
 using System;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.IO;
+using Volo.Abp.MultiTenancy;
 
 namespace SharpAbp.Abp.FileStoring.FileSystem
 {
     public class FileSystemFileProvider : FileProviderBase, ITransientDependency
     {
+        protected ICurrentTenant CurrentTenant { get; }
         protected IFilePathCalculator FilePathCalculator { get; }
-
-        public FileSystemFileProvider(IFilePathCalculator filePathCalculator)
+        public FileSystemFileProvider(
+            ICurrentTenant currentTenant,
+            IFilePathCalculator filePathCalculator)
         {
+            CurrentTenant = currentTenant;
             FilePathCalculator = filePathCalculator;
         }
-        
+
         public override string Provider => FileSystemFileProviderConfigurationNames.ProviderName;
 
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
@@ -74,7 +79,7 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
                 .ExecuteAsync(async () =>
                 {
                     using var fileStream = File.OpenRead(filePath);
-                    using var ts = new FileStream("", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                    using var ts = new FileStream(args.Path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                     await fileStream.CopyToAsync(ts, args.CancellationToken);
                     return true;
                 });
@@ -109,9 +114,9 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
             }
 
             var configuration = args.Configuration.GetFileSystemConfiguration();
-            var fileId = FilePathCalculator.Calculate(args);
+            var relativePath = CalculateRelativePath(args);
 
-            var accessUrl = BuildAccessUrl(configuration, fileId);
+            var accessUrl = BuildAccessUrl(configuration, relativePath);
             return Task.FromResult(accessUrl);
         }
 
@@ -122,12 +127,33 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
         }
 
 
-        protected virtual string BuildAccessUrl(FileSystemFileProviderConfiguration configuration, string fileId)
+        protected virtual string BuildAccessUrl(FileSystemFileProviderConfiguration configuration, string relativePath)
         {
-            var accessUrl = $"{configuration.HttpServer.EnsureEndsWith('/')}/{fileId}";
+            var accessUrl = $"{configuration.HttpServer.EnsureEndsWith('/')}{relativePath.TrimStart('/')}";
             return accessUrl;
         }
 
+        protected virtual string CalculateRelativePath(FileProviderArgs args)
+        {
+            var fileSystemConfiguration = args.Configuration.GetFileSystemConfiguration();
+            var relativePathBuilder = new StringBuilder();
 
+            if (CurrentTenant.Id == null)
+            {
+                relativePathBuilder.Append("/host");
+            }
+            else
+            {
+                relativePathBuilder.Append($"/tenants/{CurrentTenant.Id.Value.ToString("D")}");
+            }
+
+            if (fileSystemConfiguration.AppendContainerNameToBasePath)
+            {
+                relativePathBuilder.Append($"/{args.ContainerName}");
+            }
+
+            relativePathBuilder.Append($"/{args.FileId}");
+            return relativePathBuilder.ToString();
+        }
     }
 }

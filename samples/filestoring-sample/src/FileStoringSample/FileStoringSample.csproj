@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="..\..\common.props" />
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net5.0</TargetFramework>
+        <UserSecretsId>19de992f-048f-403d-9ea8-5239a0baf9a1</UserSecretsId>
+    </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.FileStoring.Aliyun\SharpAbp.Abp.FileStoring.Aliyun.csproj" />
+    <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.FileStoring.Azure\SharpAbp.Abp.FileStoring.Azure.csproj" />
+    <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.FileStoring.FastDFS\SharpAbp.Abp.FileStoring.FastDFS.csproj" />
+    <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.FileStoring.FileSystem\SharpAbp.Abp.FileStoring.FileSystem.csproj" />
+    <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.FileStoring.Minio\SharpAbp.Abp.FileStoring.Minio.csproj" />
+    <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.FileStoring.S3\SharpAbp.Abp.FileStoring.S3.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+      <PackageReference Include="Volo.Abp.Autofac" Version="4.2.2" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.*" />
+      <PackageReference Include="Serilog.Extensions.Hosting" Version="4.1.2" />
+      <PackageReference Include="Serilog.Sinks.Async" Version="1.4.0" />
+      <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+      <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="appsettings.json">
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="files\" />
+      <Folder Include="files\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="files\test.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+</Project>

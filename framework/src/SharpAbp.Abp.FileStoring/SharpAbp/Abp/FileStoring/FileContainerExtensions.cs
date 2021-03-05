@@ -6,25 +6,43 @@ namespace SharpAbp.Abp.FileStoring
 {
     public static class FileContainerExtensions
     {
-        public static async Task SaveAsync(
+        public static async Task<string> SaveAsync(
             this IFileContainer container,
             string fileId,
             byte[] bytes,
             string ext,
             bool overrideExisting = false,
-            CancellationToken cancellationToken = default
-        )
+            CancellationToken cancellationToken = default)
         {
-            using (var memoryStream = new MemoryStream(bytes))
-            {
-                await container.SaveAsync(
-                    fileId,
-                    memoryStream,
-                    ext,
-                    overrideExisting,
-                    cancellationToken
-                );
-            }
+            using var memoryStream = new MemoryStream(bytes);
+            await container.SaveAsync(
+                fileId,
+                memoryStream,
+                ext,
+                overrideExisting,
+                cancellationToken
+            );
+            return fileId;
+        }
+
+        public static async Task<string> SaveAsync(
+            this IFileContainer container,
+            string fileId,
+            string path,
+            bool overrideExisting = false,
+            CancellationToken cancellationToken = default)
+        {
+
+            using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
+            await container.SaveAsync(
+                fileId,
+                fileStream,
+                Path.GetExtension(path),
+                overrideExisting,
+                cancellationToken
+            );
+
+            return fileId;
         }
 
         public static async Task<byte[]> GetAllBytesAsync(
