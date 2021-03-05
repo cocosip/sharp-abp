@@ -1,6 +1,13 @@
 {
   "culture": "zh-Hant",
   "texts": {
-    "ManageYourProfile":  "管理個人資料" 
+    "FileStoring": "文件存儲",
+    "FileStoringManagement": "圖像存儲管理",
+    "Permission:FileStoring_Container_List": "查詢容器列表",
+    "Permission:FileStoring_Container_Create": "創建容器",
+    "Permission:FileStoring_Container_Update": "修改容器",
+    "Permission:FileStoring_Container_Delete": "刪除容器",
+    "Permission:FileStoring_Provider_List": "查詢存儲類型列表",
+    "Permission:FileStoring_Provider_Options": "查詢存儲配置"
   }
 }

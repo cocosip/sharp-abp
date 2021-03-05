@@ -1,6 +1,13 @@
 {
   "culture": "zh-Hans",
   "texts": {
-    "ManageYourProfile":  "管理个人资料" 
+    "FileStoring": "文件存储",
+    "FileStoringManagement": "图像存储管理",
+    "Permission:FileStoring_Container_List": "查询容器列表",
+    "Permission:FileStoring_Container_Create": "创建容器",
+    "Permission:FileStoring_Container_Update": "修改容器",
+    "Permission:FileStoring_Container_Delete": "删除容器",
+    "Permission:FileStoring_Provider_List": "查询存储类型列表",
+    "Permission:FileStoring_Provider_Options": "查询存储配置"
   }
 }

@@ -17,7 +17,5 @@
         /// Default value: 64.
         /// </summary>
         public static int MaxTitleLength { get; set; } = 64;
-
-
     }
 }

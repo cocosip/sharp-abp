@@ -1,6 +1,13 @@
 {
   "culture": "en",
   "texts": {
-    "ManageYourProfile": "Manage your profile"
+    "FileStoring": "File storing",
+    "FileStoringManagement": "File storing management",
+    "Permission:FileStoring_Container_List": "Query container list",
+    "Permission:FileStoring_Container_Create": "Create container",
+    "Permission:FileStoring_Container_Update": "Update container",
+    "Permission:FileStoring_Container_Delete": "Delete container",
+    "Permission:FileStoring_Provider_List": "Query provider list",
+    "Permission:FileStoring_Provider_Options": "Get provider options"
   }
 }
