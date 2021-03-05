@@ -136,7 +136,7 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
         {
             return configuration.GroupName.IsNullOrWhiteSpace()
                 ? args.ContainerName
-                : FileNormalizeNamingService.NormalizeContainerName(args.Configuration, args.ContainerName);
+                : FileNormalizeNamingService.NormalizeContainerName(args.Configuration, configuration.GroupName);
         }
 
         protected virtual string BuildAccessUrl(

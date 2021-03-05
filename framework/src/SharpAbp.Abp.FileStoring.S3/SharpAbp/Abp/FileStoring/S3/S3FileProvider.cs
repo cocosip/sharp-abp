@@ -10,23 +10,27 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
+using Volo.Abp.Timing;
 
 namespace SharpAbp.Abp.FileStoring.S3
 {
     public class S3FileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }
+        protected IClock Clock { get; }
         protected IS3FileNameCalculator FileNameCalculator { get; }
         protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
         protected IS3ClientFactory ClientFactory { get; }
 
         public S3FileProvider(
             ILogger<S3FileProvider> logger,
+            IClock clock,
             IS3FileNameCalculator fileNameCalculator,
             IFileNormalizeNamingService fileNormalizeNamingService,
             IS3ClientFactory clientFactory)
         {
             Logger = logger;
+            Clock = clock;
             FileNameCalculator = fileNameCalculator;
             FileNormalizeNamingService = fileNormalizeNamingService;
             ClientFactory = clientFactory;
@@ -136,10 +140,7 @@ namespace SharpAbp.Abp.FileStoring.S3
                 Protocol = (Protocol)configuration.Protocol
             };
 
-            if (args.Expires.HasValue)
-            {
-                preSignedUrlRequest.Expires = args.Expires.Value;
-            }
+            preSignedUrlRequest.Expires = args.Expires ?? Clock.Now.AddSeconds(600);
 
             var accessUrl = client.GetPreSignedURL(preSignedUrlRequest);
 
@@ -308,7 +309,7 @@ namespace SharpAbp.Abp.FileStoring.S3
 
             return configuration.BucketName.IsNullOrWhiteSpace()
                 ? args.ContainerName
-                : FileNormalizeNamingService.NormalizeContainerName(args.Configuration, args.ContainerName);
+                : FileNormalizeNamingService.NormalizeContainerName(args.Configuration, configuration.BucketName);
         }
     }
 }

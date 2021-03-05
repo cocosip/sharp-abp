@@ -127,7 +127,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
                 return Task.FromResult(string.Empty);
             }
 
-            var datetime = args.Expires ?? Clock.Now.AddSeconds(3600);
+            var datetime = args.Expires ?? Clock.Now.AddSeconds(600);
             var uri = ossClient.GeneratePresignedUri(containerName, fileName, datetime);
 
             return Task.FromResult(uri.ToString());
@@ -139,7 +139,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             var configuration = args.Configuration.GetAliyunConfiguration();
             return configuration.BucketName.IsNullOrWhiteSpace()
                 ? args.ContainerName
-                : FileNormalizeNamingService.NormalizeContainerName(args.Configuration, args.ContainerName);
+                : FileNormalizeNamingService.NormalizeContainerName(args.Configuration, configuration.BucketName);
         }
 
         private bool FileExistsAsync(IOss ossClient, string containerName, string fileName)

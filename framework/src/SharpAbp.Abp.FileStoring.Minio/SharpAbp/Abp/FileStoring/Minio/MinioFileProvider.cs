@@ -4,17 +4,21 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
+using Volo.Abp.Timing;
 
 namespace SharpAbp.Abp.FileStoring.Minio
 {
     public class MinioFileProvider : FileProviderBase, ITransientDependency
     {
+        protected IClock Clock { get; }
         protected IMinioFileNameCalculator MinioFileNameCalculator { get; }
         protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
         public MinioFileProvider(
+            IClock clock,
             IMinioFileNameCalculator minioFileNameCalculator,
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
+            Clock = clock;
             MinioFileNameCalculator = minioFileNameCalculator;
             FileNormalizeNamingService = fileNormalizeNamingService;
         }
@@ -96,7 +100,6 @@ namespace SharpAbp.Abp.FileStoring.Minio
 
         public override async Task<bool> DownloadAsync(FileProviderDownloadArgs args)
         {
-
             var fileName = MinioFileNameCalculator.Calculate(args);
             var client = GetMinioClient(args);
             var containerName = GetContainerName(args);
@@ -122,7 +125,12 @@ namespace SharpAbp.Abp.FileStoring.Minio
                 return string.Empty;
             }
 
-            return await client.PresignedGetObjectAsync(containerName, fileName, args.Expires?.Second ?? 3600);
+            var expiresInt = 600;
+            if (args.Expires.HasValue && args.Expires > Clock.Now)
+            {
+                expiresInt = Convert.ToInt32((args.Expires.Value - Clock.Now).TotalSeconds);
+            }
+            return await client.PresignedGetObjectAsync(containerName, fileName, expiresInt);
         }
 
 
@@ -130,7 +138,6 @@ namespace SharpAbp.Abp.FileStoring.Minio
         {
             var configuration = args.Configuration.GetMinioConfiguration();
             var client = new MinioClient(configuration.EndPoint, configuration.AccessKey, configuration.SecretKey);
-
             if (configuration.WithSSL)
             {
                 client.WithSSL();
@@ -178,8 +185,8 @@ namespace SharpAbp.Abp.FileStoring.Minio
 
             return configuration.BucketName.IsNullOrWhiteSpace()
                 ? args.ContainerName
-                : FileNormalizeNamingService.NormalizeContainerName(args.Configuration, args.ContainerName);
+                : FileNormalizeNamingService.NormalizeContainerName(args.Configuration, configuration.BucketName);
         }
-    
+
     }
 }

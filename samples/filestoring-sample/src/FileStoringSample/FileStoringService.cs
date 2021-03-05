@@ -17,7 +17,7 @@ namespace FileStoringSample
             //"aliyun-container",
             "filesystem-container",
             "minio-container",
-            //"s3-container"
+            "s3-container"
         };
 
         private readonly ILogger _logger;
@@ -30,6 +30,7 @@ namespace FileStoringSample
 
         public async Task RunContainers()
         {
+
             await Task.Run(async () =>
             {
                 foreach (var name in _containers)
@@ -48,8 +49,6 @@ namespace FileStoringSample
 
         private async Task RunContainerTest(string name)
         {
-            var container = _fileContainerFactory.Create(name);
-
             var fileId = await UploadAsync(name);
             await GetAccessUrlAsync(name, fileId);
             var downloadPath = await DownloadAsync(name, fileId);
@@ -62,7 +61,7 @@ namespace FileStoringSample
             {
                 var filePath = Path.Combine(AppContext.BaseDirectory, "files", "test.txt");
                 var container = _fileContainerFactory.Create(name);
-                var fileId = await container.SaveAsync($"/{Guid.NewGuid()}.txt", filePath);
+                var fileId = await container.SaveAsync($"000/{Guid.NewGuid()}.txt", filePath);
                 _logger.LogDebug("[{0}] Upload fileId:{1}", name, fileId);
                 return fileId;
             }
@@ -78,10 +77,16 @@ namespace FileStoringSample
         {
             try
             {
+                var dir = Path.Combine(AppContext.BaseDirectory, "test");
+                if (!Directory.Exists(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
+
                 var container = _fileContainerFactory.Create(name);
-                var downloadPath = Path.Combine(AppContext.BaseDirectory, $"test/{Guid.NewGuid()}.txt");
+                var downloadPath = Path.Combine(dir, $"{Guid.NewGuid()}.txt");
                 var downloadResult = await container.DownloadAsync(fileId, downloadPath);
-                _logger.LogDebug("[{0}] Download save at:'{1}',result:{2}", name, downloadPath, downloadResult);
+                _logger.LogDebug("[{0}] Download fileId:{1} save at:'{2}',result:{3}", name, fileId, downloadPath, downloadResult);
                 return downloadPath;
             }
             catch (Exception ex)

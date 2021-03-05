@@ -123,7 +123,7 @@ namespace SharpAbp.Abp.FileStoring.Azure
             var configuration = args.Configuration.GetAzureConfiguration();
             return configuration.ContainerName.IsNullOrWhiteSpace()
                 ? args.ContainerName
-                : FileNormalizeNamingService.NormalizeContainerName(args.Configuration, args.ContainerName);
+                : FileNormalizeNamingService.NormalizeContainerName(args.Configuration, configuration.ContainerName);
         }
 
         private async Task<bool> ContainerExistsAsync(BlobContainerClient blobContainerClient)
