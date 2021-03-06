@@ -50,7 +50,8 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
 
                     await fileStream.FlushAsync();
                 });
-            return filePath;
+
+            return args.FileId;
         }
 
         public override Task<bool> DeleteAsync(FileProviderDeleteArgs args)

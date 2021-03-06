@@ -3,8 +3,6 @@ using SharpAbp.Abp.FileStoring;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
 
@@ -53,6 +51,11 @@ namespace FileStoringSample
             await GetAccessUrlAsync(name, fileId);
             var downloadPath = await DownloadAsync(name, fileId);
             await DeleteAsync(name, fileId);
+
+            if (File.Exists(downloadPath))
+            {
+                File.Delete(downloadPath);
+            }
         }
 
         private async Task<string> UploadAsync(string name)

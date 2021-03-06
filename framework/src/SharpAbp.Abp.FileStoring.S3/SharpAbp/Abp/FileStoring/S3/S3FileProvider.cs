@@ -66,7 +66,7 @@ namespace SharpAbp.Abp.FileStoring.S3
 
             args.FileStream?.Dispose();
 
-            return fileName;
+            return args.FileId;
         }
 
         public override async Task<bool> DeleteAsync(FileProviderDeleteArgs args)
@@ -127,10 +127,14 @@ namespace SharpAbp.Abp.FileStoring.S3
 
         public override Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)
         {
+            if (!args.Configuration.HttpAccess)
+            {
+                return Task.FromResult(string.Empty);
+            }
+
             var fileName = FileNameCalculator.Calculate(args);
             var client = GetS3Client(args);
             var containerName = GetContainerName(args);
-
             var configuration = args.Configuration.GetS3Configuration();
 
             var preSignedUrlRequest = new GetPreSignedUrlRequest()

@@ -59,7 +59,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             }
 
             ossClient.PutObject(containerName, fileName, args.FileStream);
-            return Task.FromResult(fileName);
+            return Task.FromResult(args.FileId);
         }
 
         public override Task<bool> DeleteAsync(FileProviderDeleteArgs args)
@@ -119,9 +119,15 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
 
         public override Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)
         {
+            if (!args.Configuration.HttpAccess)
+            {
+                return Task.FromResult(string.Empty);
+            }
+
             var containerName = GetContainerName(args);
             var fileName = AliyunFileNameCalculator.Calculate(args);
             var ossClient = GetOssClient(args.Configuration);
+            
             if (!FileExistsAsync(ossClient, containerName, fileName))
             {
                 return Task.FromResult(string.Empty);

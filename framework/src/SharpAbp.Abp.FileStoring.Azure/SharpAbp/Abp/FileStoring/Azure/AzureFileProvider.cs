@@ -37,7 +37,7 @@ namespace SharpAbp.Abp.FileStoring.Azure
             }
 
             await GetBlobClient(args, fileName).UploadAsync(args.FileStream, true);
-            return fileName;
+            return args.FileId;
         }
 
         public override async Task<bool> DeleteAsync(FileProviderDeleteArgs args)

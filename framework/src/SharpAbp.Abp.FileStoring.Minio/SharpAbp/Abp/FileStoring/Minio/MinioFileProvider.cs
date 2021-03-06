@@ -1,4 +1,5 @@
-﻿using Minio;
+﻿using Microsoft.Extensions.Logging;
+using Minio;
 using Minio.Exceptions;
 using System;
 using System.IO;
@@ -10,14 +11,17 @@ namespace SharpAbp.Abp.FileStoring.Minio
 {
     public class MinioFileProvider : FileProviderBase, ITransientDependency
     {
+        protected ILogger Logger { get; }
         protected IClock Clock { get; }
         protected IMinioFileNameCalculator MinioFileNameCalculator { get; }
         protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
         public MinioFileProvider(
+            ILogger<MinioFileProvider> logger,
             IClock clock,
             IMinioFileNameCalculator minioFileNameCalculator,
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
+            Logger = logger;
             Clock = clock;
             MinioFileNameCalculator = minioFileNameCalculator;
             FileNormalizeNamingService = fileNormalizeNamingService;
@@ -43,8 +47,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
             }
 
             await client.PutObjectAsync(containerName, fileName, args.FileStream, args.FileStream.Length);
-
-            return fileName;
+            return args.FileId;
         }
 
         public override async Task<bool> DeleteAsync(FileProviderDeleteArgs args)
@@ -116,10 +119,15 @@ namespace SharpAbp.Abp.FileStoring.Minio
 
         public override async Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)
         {
+            if (!args.Configuration.HttpAccess)
+            {
+                return string.Empty;
+            }
 
             var fileName = MinioFileNameCalculator.Calculate(args);
             var client = GetMinioClient(args);
             var containerName = GetContainerName(args);
+            
             if (!await FileExistsAsync(client, containerName, fileName))
             {
                 return string.Empty;

@@ -1,7 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
@@ -205,8 +203,7 @@ namespace SharpAbp.Abp.FileStoring
         public virtual async Task<bool> DownloadAsync(
             string fileId,
             string path,
-            CancellationToken cancellationToken = default
-        )
+            CancellationToken cancellationToken = default)
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
             {
@@ -291,9 +288,6 @@ namespace SharpAbp.Abp.FileStoring
 
             return CurrentTenant.Id;
         }
-
-    
-
 
     }
 }
