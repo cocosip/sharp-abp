@@ -159,8 +159,7 @@ namespace SharpAbp.Abp.FileStoring.S3
             string bucketName,
             string fileName,
             Stream stream,
-            bool useChunkEncoding
-            )
+            bool useChunkEncoding)
         {
             var putObjectRequest = new PutObjectRequest()
             {
@@ -180,8 +179,7 @@ namespace SharpAbp.Abp.FileStoring.S3
             string fileName,
             Stream stream,
             bool useChunkEncoding,
-            int sliceSize
-            )
+            int sliceSize)
         {
             var initiateMultipartUploadResponse = await client.InitiateMultipartUploadAsync(bucketName, fileName);
             //UploadId
@@ -217,7 +215,7 @@ namespace SharpAbp.Abp.FileStoring.S3
                     InputStream = new MemoryStream(buffer),
                     PartSize = size,
                     PartNumber = i + 1,
-                    UseChunkEncoding = useChunkEncoding
+                    //UseChunkEncoding = useChunkEncoding
                 });
                 partETags.Add(new PartETag(uploadPartResponse.PartNumber, uploadPartResponse.ETag));
                 Logger.LogDebug("Upload part file ,key:{0},UploadId:{1},Complete {2}/{3}", fileName, uploadId, partETags.Count, partCount);
