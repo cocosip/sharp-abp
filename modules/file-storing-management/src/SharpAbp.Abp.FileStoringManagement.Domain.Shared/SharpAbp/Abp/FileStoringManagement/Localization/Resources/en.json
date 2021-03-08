@@ -2,7 +2,7 @@
   "culture": "en",
   "texts": {
     "FileStoring": "File storing",
-    "FileStoringManagement": "File storing management",
+    "Permission:FileStoringManagement": "File storing management",
     "Permission:FileStoring_Container_List": "Query container list",
     "Permission:FileStoring_Container_Create": "Create container",
     "Permission:FileStoring_Container_Update": "Update container",

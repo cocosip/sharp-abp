@@ -2,7 +2,7 @@
   "culture": "zh-Hans",
   "texts": {
     "FileStoring": "文件存储",
-    "FileStoringManagement": "图像存储管理",
+    "Permission:FileStoringManagement": "图像存储管理",
     "Permission:FileStoring_Container_List": "查询容器列表",
     "Permission:FileStoring_Container_Create": "创建容器",
     "Permission:FileStoring_Container_Update": "修改容器",

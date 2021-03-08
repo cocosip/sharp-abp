@@ -2,7 +2,7 @@
   "culture": "zh-Hant",
   "texts": {
     "FileStoring": "文件存儲",
-    "FileStoringManagement": "圖像存儲管理",
+    "Permission:FileStoringManagement": "圖像存儲管理",
     "Permission:FileStoring_Container_List": "查詢容器列表",
     "Permission:FileStoring_Container_Create": "創建容器",
     "Permission:FileStoring_Container_Update": "修改容器",
