@@ -8,7 +8,7 @@ using Volo.Abp.AspNetCore.Mvc;
 namespace SharpAbp.Abp.FileStoringManagement
 {
     //[RemoteService(Name = FileStoringRemoteServiceConsts.RemoteServiceName)]
-    [Area("container")]
+    [Area("file-storing")]
     [Route("api/container")]
     [Authorize(FileStoringPermissionConsts.FileStoringManagement)]
     public class ContainerController : AbpController

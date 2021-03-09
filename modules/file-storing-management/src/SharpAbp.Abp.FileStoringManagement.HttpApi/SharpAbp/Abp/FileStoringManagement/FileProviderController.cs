@@ -5,7 +5,7 @@ using Volo.Abp.AspNetCore.Mvc;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
-    [Area("file-provider")]
+    [Area("file-storing")]
     [Route("api/file-provider")]
     [Authorize(FileStoringPermissionConsts.FileStoringManagement)]
     public class FileProviderController : AbpController
