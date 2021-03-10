@@ -17,7 +17,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.103
+        dotnet-version: 5.0.201
 
     - name: Build All
       run: .\build-all-release.ps1 -f
