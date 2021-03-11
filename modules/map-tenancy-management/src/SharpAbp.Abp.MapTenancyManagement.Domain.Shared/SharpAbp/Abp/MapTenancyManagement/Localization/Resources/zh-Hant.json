@@ -1,0 +1,11 @@
+{
+  "culture": "zh-Hant",
+  "texts": {
+    "MapTenancyManagement": "映射租户管理",
+    "Permission:MapTenancyManagement": "映射租户管理",
+    "Permission:MapTenancyManagement_MapTenant_List": "查询映射租户列表",
+    "Permission:MapTenancyManagement_MapTenant_Create": "创建映射租户",
+    "Permission:MapTenancyManagement_MapTenant_Update": "修改映射租户",
+    "Permission:MapTenancyManagement_MapTenant_Delete": "删除映射租户"
+  }
+}

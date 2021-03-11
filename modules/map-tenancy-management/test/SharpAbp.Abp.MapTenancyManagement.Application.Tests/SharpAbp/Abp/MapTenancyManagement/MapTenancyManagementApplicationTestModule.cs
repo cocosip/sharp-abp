@@ -1,12 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using SharpAbp.Abp.FileStoring.Aliyun;
-using SharpAbp.Abp.FileStoring.Azure;
-using SharpAbp.Abp.FileStoring.FastDFS;
-using SharpAbp.Abp.FileStoring.FileSystem;
-using SharpAbp.Abp.FileStoring.Minio;
-using SharpAbp.Abp.FileStoring.S3;
-using SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore;
+using SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore;
 using System;
 using Volo.Abp;
 using Volo.Abp.Autofac;
@@ -14,21 +8,15 @@ using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.Modularity;
 using Volo.Abp.Uow;
 
-namespace SharpAbp.Abp.FileStoringManagement
+namespace SharpAbp.Abp.MapTenancyManagement
 {
     [DependsOn(
-       typeof(FileStoringManagementApplicationModule),
-       typeof(FileStoringManagementEntityFrameworkCoreModule),
-       typeof(AbpFileStoringAliyunModule),
-       typeof(AbpFileStoringAzureModule),
-       typeof(AbpFileStoringFastDFSModule),
-       typeof(AbpFileStoringFileSystemModule),
-       typeof(AbpFileStoringMinioModule),
-       typeof(AbpFileStoringS3Module),
-       typeof(AbpTestBaseModule),
-       typeof(AbpAutofacModule)
-       )]
-    public class FileStoringManagementApplicationTestModule : AbpModule
+        typeof(MapTenancyManagementApplicationModule),
+        typeof(MapTenancyManagementEntityFrameworkCoreModule),
+        typeof(AbpTestBaseModule),
+        typeof(AbpAutofacModule)
+        )]
+    public class MapTenancyManagementApplicationTestModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
@@ -48,8 +36,6 @@ namespace SharpAbp.Abp.FileStoringManagement
             {
                 options.TransactionBehavior = UnitOfWorkTransactionBehavior.Disabled; //EF in-memory database does not support transactions
             });
-
-
         }
     }
 }

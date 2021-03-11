@@ -1,0 +1,11 @@
+{
+  "culture": "en",
+  "texts": {
+    "MapTenancyManagement": "Management map tenancy",
+    "Permission:MapTenancyManagement": "Management map tenancy",
+    "Permission:MapTenancyManagement_MapTenant_List": "Query map tenant list",
+    "Permission:MapTenancyManagement_MapTenant_Create": "Create map tenant",
+    "Permission:MapTenancyManagement_MapTenant_Update": "Updarte map tenant",
+    "Permission:MapTenancyManagement_MapTenant_Delete": "Delete map tenant"
+  }
+}

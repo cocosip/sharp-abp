@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\..\common.props" />
+  <Import Project="..\..\..\..\configureawait.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>SharpAbp.Abp.MapTenancyManagement.Application</AssemblyName>
+    <PackageId>SharpAbp.Abp.MapTenancyManagement.Application</PackageId>
+    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <Description>SharpAbp MapTenancy Management module</Description>
+    <RootNamespace />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.AutoMapper" Version="4.2.2" />
+    <PackageReference Include="Volo.Abp.Ddd.Application" Version="4.2.2" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\SharpAbp.Abp.MapTenancyManagement.Application.Contracts\SharpAbp.Abp.MapTenancyManagement.Application.Contracts.csproj" />
+    <ProjectReference Include="..\SharpAbp.Abp.MapTenancyManagement.Domain\SharpAbp.Abp.MapTenancyManagement.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
