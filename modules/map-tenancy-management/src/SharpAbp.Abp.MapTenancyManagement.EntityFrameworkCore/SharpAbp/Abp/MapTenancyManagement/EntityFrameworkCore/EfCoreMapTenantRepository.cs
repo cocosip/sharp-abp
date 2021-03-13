@@ -14,9 +14,9 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
 {
     public class EfCoreMapTenantRepository : EfCoreRepository<IMapTenancyManagementDbContext, MapTenant, Guid>, IMapTenantRepository
     {
-        public EfCoreMapTenantRepository(IDbContextProvider<IMapTenancyManagementDbContext> dbContextProvider) : base(dbContextProvider)
+        public EfCoreMapTenantRepository(IDbContextProvider<IMapTenancyManagementDbContext> dbContextProvider)
+            : base(dbContextProvider)
         {
-
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         {
             Check.NotNullOrWhiteSpace(code, nameof(code));
             return await (await GetDbSetAsync())
-                .FirstOrDefaultAsync(x => x.Code == code, cancellationToken);
+                .FirstOrDefaultAsync(x => x.Code == code, GetCancellationToken(cancellationToken));
         }
 
         /// <summary>
@@ -42,14 +42,14 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<MapTenant> FindAsync(
-            [NotNull] string code, 
-            Guid? exceptId = null, 
+            [NotNull] string code,
+            Guid? exceptId = null,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .WhereIf(!code.IsNullOrWhiteSpace(), x => x.Code == code)
                 .WhereIf(exceptId.HasValue, x => x.Id != exceptId.Value)
-                .FirstOrDefaultAsync(cancellationToken);
+                .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
                 .OrderBy(sorting ?? nameof(MapTenant.Code))
                 .Skip(skipCount)
                 .Take(maxResultCount)
-                .ToListAsync(cancellationToken);
+                .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
                 .WhereIf(!code.IsNullOrWhiteSpace(), item => item.Code == code)
                 .WhereIf(tenantId.HasValue, item => item.TenantId == tenantId.Value)
                 .WhereIf(!mapCode.IsNullOrWhiteSpace(), item => item.MapCode == mapCode)
-                .CountAsync(cancellationToken);
+                .CountAsync(GetCancellationToken(cancellationToken));
         }
     }
 }

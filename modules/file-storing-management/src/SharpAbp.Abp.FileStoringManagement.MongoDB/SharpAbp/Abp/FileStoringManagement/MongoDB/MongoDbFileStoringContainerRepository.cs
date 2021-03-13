@@ -31,11 +31,11 @@ namespace SharpAbp.Abp.FileStoringManagement.MongoDB
         /// <returns></returns>
         public virtual async Task<FileStoringContainer> FindAsync(
             [NotNull] string name,
-            bool includeDetails = true, 
+            bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            return await FindAsync(x => x.Name == name, includeDetails, cancellationToken);
+            return await FindAsync(x => x.Name == name, includeDetails, GetCancellationToken(cancellationToken));
         }
 
         /// <summary>
@@ -48,9 +48,9 @@ namespace SharpAbp.Abp.FileStoringManagement.MongoDB
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public async Task<FileStoringContainer> FindAsync(
-            Guid? tenantId, 
-            string name, 
-            Guid? exceptId = null, 
+            Guid? tenantId,
+            string name,
+            Guid? exceptId = null,
             bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
@@ -59,7 +59,7 @@ namespace SharpAbp.Abp.FileStoringManagement.MongoDB
                 .WhereIf(!name.IsNullOrWhiteSpace(), x => x.Name == name)
                 .WhereIf(exceptId.HasValue, x => x.Id != exceptId.Value)
                 .As<IMongoQueryable<FileStoringContainer>>()
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace SharpAbp.Abp.FileStoringManagement.MongoDB
             int maxResultCount,
             string sorting = "",
             bool includeDetails = true,
-            string name = "", 
+            string name = "",
             string provider = "",
             CancellationToken cancellationToken = default)
         {
@@ -124,7 +124,7 @@ namespace SharpAbp.Abp.FileStoringManagement.MongoDB
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public async Task<int> GetCountAsync(
-            string name = "", 
+            string name = "",
             string provider = "",
             CancellationToken cancellationToken = default)
         {
