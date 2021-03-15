@@ -47,7 +47,7 @@ namespace SharpAbp.Abp.FileStoringManagement
             await _fileStoringAppService.UpdateAsync(input);
         }
 
-        [HttpPatch]
+        [HttpDelete]
         [Route("{id}")]
         [Authorize(FileStoringPermissionConsts.DeleteContainer)]
         public async Task DeleteAsync(Guid id)

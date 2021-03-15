@@ -46,7 +46,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
             await _mapTenantAppService.UpdateAsync(input);
         }
 
-        [HttpPatch]
+        [HttpDelete]
         [Route("{id}")]
         [Authorize(MapTenancyPermissionConsts.DeleteMapTenant)]
         public async Task DeleteAsync(Guid id)
