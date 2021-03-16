@@ -5,6 +5,7 @@ using SharpAbp.Abp.FileStoring.Minio;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Volo.Abp.Data;
 using Volo.Abp.MultiTenancy;
 using Xunit;
 
@@ -13,11 +14,13 @@ namespace SharpAbp.Abp.FileStoringManagement
     public class FileStoringAppServiceTest : FileStoringManagementApplicationTestBase
     {
         private readonly ICurrentTenant _currentTenant;
+        private readonly IDataFilter<IMultiTenant> _dataFilter;
         private readonly IFileStoringAppService _fileStoringAppService;
         private readonly IFileContainerFactory _fileContainerFactory;
         public FileStoringAppServiceTest()
         {
             _currentTenant = GetRequiredService<ICurrentTenant>();
+            _dataFilter = GetRequiredService<IDataFilter<IMultiTenant>>();
             _fileStoringAppService = GetRequiredService<IFileStoringAppService>();
             _fileContainerFactory = GetRequiredService<IFileContainerFactory>();
         }
@@ -48,6 +51,8 @@ namespace SharpAbp.Abp.FileStoringManagement
         public async Task CreateAsync_UpdateAsync_Test()
         {
             var tenantId = new Guid("42645233-3d72-4339-9adc-845321f8ada3");
+            var tenantId2 = new Guid("d0ad04d5-2839-2c2a-1078-6b253678dceb");
+
             var id = await _fileStoringAppService.CreateAsync(new CreateContainerDto()
             {
                 Provider = MinioFileProviderConfigurationNames.ProviderName,
@@ -67,8 +72,47 @@ namespace SharpAbp.Abp.FileStoringManagement
                 }
             });
 
+            var id2 = await _fileStoringAppService.CreateAsync(new CreateContainerDto()
+            {
+                Provider = MinioFileProviderConfigurationNames.ProviderName,
+                Name = "default2",
+                TenantId = tenantId2,
+                IsMultiTenant = true,
+                HttpAccess = true,
+                Title = "test-container2",
+                Items = new List<CreateOrUpdateContainerItemDto>()
+                {
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.BucketName,"bucket2"),
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.EndPoint,"http://192.168.0.4:9000"),
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.AccessKey,"minioadmin"),
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.SecretKey,"minioadmin"),
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.WithSSL,"false"),
+                    new CreateOrUpdateContainerItemDto(MinioFileProviderConfigurationNames.CreateBucketIfNotExists,"false")
+                }
+            });
+
+            using (_dataFilter.Disable())
+            {
+                var pagedContainers = await _fileStoringAppService.GetPagedListAsync(new FileStoringContainerPagedRequestDto()
+                {
+                    SkipCount = 0,
+                    MaxResultCount = 10
+                });
+
+                Assert.Equal(2, pagedContainers.TotalCount);
+            }
+
             using (_currentTenant.Change(tenantId))
             {
+                var pagedContainers = await _fileStoringAppService.GetPagedListAsync(new FileStoringContainerPagedRequestDto()
+                {
+                    SkipCount = 0,
+                    MaxResultCount = 10
+                });
+
+                Assert.Equal(1, pagedContainers.TotalCount);
+
+
                 var container2 = await _fileStoringAppService.GetAsync(id, true);
                 Assert.Equal("default1", container2.Name);
                 Assert.Equal("Minio", container2.Provider);
