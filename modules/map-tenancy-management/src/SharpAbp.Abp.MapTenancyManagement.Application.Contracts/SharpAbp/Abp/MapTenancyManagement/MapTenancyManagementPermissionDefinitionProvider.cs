@@ -9,27 +9,23 @@ namespace SharpAbp.Abp.MapTenancyManagement
     {
         public override void Define(IPermissionDefinitionContext context)
         {
-            var mapTenancyGroup = context.AddGroup(MapTenancyManagementPermissions.GroupName, L($"Permission:{MapTenancyManagementPermissions.MapTenants.Default}"));
+            var mapTenancyGroup = context.AddGroup(MapTenancyManagementPermissions.GroupName, L(MapTenancyManagementPermissions.GroupName));
 
             var mapTenantPermission = mapTenancyGroup.AddPermission(
                 MapTenancyManagementPermissions.MapTenants.Default,
-                L($"Permission:{MapTenancyManagementPermissions.MapTenants.Default}"),
-                MultiTenancySides.Both);
+                L($"Permission:{MapTenancyManagementPermissions.MapTenants.Default}"));
 
             mapTenantPermission.AddChild(
                 MapTenancyManagementPermissions.MapTenants.Create,
-                L($"Permission:{MapTenancyManagementPermissions.MapTenants.Create}"),
-                MultiTenancySides.Both);
+                L($"Permission:{MapTenancyManagementPermissions.MapTenants.Create}"));
 
             mapTenantPermission.AddChild(
                 MapTenancyManagementPermissions.MapTenants.Update,
-                L($"Permission:{MapTenancyManagementPermissions.MapTenants.Update}"),
-                MultiTenancySides.Both);
+                L($"Permission:{MapTenancyManagementPermissions.MapTenants.Update}"));
 
             mapTenantPermission.AddChild(
                 MapTenancyManagementPermissions.MapTenants.Delete,
-                L($"Permission:{MapTenancyManagementPermissions.MapTenants.Delete}"),
-                MultiTenancySides.Both);
+                L($"Permission:{MapTenancyManagementPermissions.MapTenants.Delete}"));
         }
 
         private static LocalizableString L(string name)
