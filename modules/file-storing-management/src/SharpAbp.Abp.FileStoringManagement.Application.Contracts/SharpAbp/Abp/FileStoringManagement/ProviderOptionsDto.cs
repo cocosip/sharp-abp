@@ -31,7 +31,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <summary>
         /// Parameter type
         /// </summary>
-        public Type Type { get; set; }
+        public string Type { get; set; }
 
         public string Note { get; set; }
 
@@ -40,7 +40,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 
         }
 
-        public ProviderValueDto(string name, string localizationValue, Type type, string note)
+        public ProviderValueDto(string name, string localizationValue, string type, string note)
         {
             Name = name;
             LocalizationValue = localizationValue;

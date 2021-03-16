@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Reflection;
 using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoringManagement
@@ -67,7 +68,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 
             foreach (var kv in values)
             {
-                providerOptions.Values.Add(new ProviderValueDto(kv.Key, L[kv.Key], kv.Value.Type, kv.Value.Note));
+                providerOptions.Values.Add(new ProviderValueDto(kv.Key, L[kv.Key], TypeHelper.GetFullNameHandlingNullableAndGenerics(kv.Value.Type), kv.Value.Note));
             }
 
             return providerOptions;
@@ -82,7 +83,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<ContainerDto> GetAsync(
-            Guid id, 
+            Guid id,
             bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
@@ -98,8 +99,8 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<ContainerDto> GetByNameAsync(
-            [NotNull] string name, 
-            bool includeDetails = true, 
+            [NotNull] string name,
+            bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
@@ -117,7 +118,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <returns></returns>
         public virtual async Task<PagedResultDto<ContainerDto>> GetPagedListAsync(
             FileStoringContainerPagedRequestDto input,
-            bool includeDetails = true, 
+            bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
             var count = await FileStoringContainerRepository.GetCountAsync(input.Name, input.Provider);
@@ -201,7 +202,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task UpdateAsync(
-            UpdateContainerDto input, 
+            UpdateContainerDto input,
             CancellationToken cancellationToken = default)
         {
             var valuesValidator = GetFileProviderValuesValidator(input.Provider);
