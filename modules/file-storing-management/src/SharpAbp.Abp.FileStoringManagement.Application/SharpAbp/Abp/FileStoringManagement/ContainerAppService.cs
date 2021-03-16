@@ -1,125 +1,68 @@
 ﻿using JetBrains.Annotations;
-using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authorization;
 using SharpAbp.Abp.FileStoring;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
-using Volo.Abp.Reflection;
 using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
-    public class FileStoringAppService : FileStoringManagementAppServiceBase, IFileStoringAppService
+    [Authorize(FileStoringManagementPermissions.Containers.Default)]
+    public class ContainerAppService : FileStoringManagementAppServiceBase, IContainerAppService
     {
-        protected AbpFileStoringOptions Options { get; }
         protected IEnumerable<IFileProviderValuesValidator> ProviderValuesValidators { get; }
         protected IFileStoringContainerRepository FileStoringContainerRepository { get; }
 
-        public FileStoringAppService(
-            IOptions<AbpFileStoringOptions> options,
+        public ContainerAppService(
             IEnumerable<IFileProviderValuesValidator> providerValuesValidators,
             IFileStoringContainerRepository fileStoringContainerRepository)
         {
-            Options = options.Value;
             ProviderValuesValidators = providerValuesValidators;
             FileStoringContainerRepository = fileStoringContainerRepository;
         }
 
-
         /// <summary>
-        /// Get all providers
-        /// </summary>
-        /// <returns></returns>
-        public virtual List<ProviderDto> GetProviders()
-        {
-            var providers = ObjectMapper.Map<List<FileProviderConfiguration>, List<ProviderDto>>(Options.Providers.GetFileProviders());
-            return providers;
-        }
-
-        /// <summary>
-        /// Whether contain this provider
-        /// </summary>
-        /// <param name="provider"></param>
-        /// <returns></returns>
-        public virtual bool HasProvider([NotNull] string provider)
-        {
-            Check.NotNullOrWhiteSpace(provider, nameof(provider));
-
-            var configuration = Options.Providers.GetConfiguration(provider);
-            return configuration != null;
-        }
-
-        /// <summary>
-        /// Get provider configuration options 
-        /// </summary>
-        /// <param name="provider"></param>
-        /// <returns></returns>
-        public virtual ProviderOptionsDto GetProviderOptions([NotNull] string provider)
-        {
-            Check.NotNullOrWhiteSpace(provider, nameof(provider));
-
-            var fileProviderConfiguration = Options.Providers.GetConfiguration(provider);
-            var values = fileProviderConfiguration.GetValues();
-            var providerOptions = new ProviderOptionsDto(provider);
-
-            foreach (var kv in values)
-            {
-                providerOptions.Values.Add(new ProviderValueDto(kv.Key, L[kv.Key], TypeHelper.GetFullNameHandlingNullableAndGenerics(kv.Value.Type), kv.Value.Note));
-            }
-
-            return providerOptions;
-        }
-
-
-        /// <summary>
-        /// Get container 
+        /// Get container by id
         /// </summary>
         /// <param name="id"></param>
         /// <param name="includeDetails"></param>
-        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<ContainerDto> GetAsync(
-            Guid id,
-            bool includeDetails = true,
-            CancellationToken cancellationToken = default)
+        [Authorize(FileStoringManagementPermissions.Containers.Default)]
+        public virtual async Task<ContainerDto> GetAsync(Guid id, bool includeDetails = true)
         {
-            var fileStoringContainer = await FileStoringContainerRepository.GetAsync(id, includeDetails, cancellationToken);
+            var fileStoringContainer = await FileStoringContainerRepository.GetAsync(id, includeDetails);
             return ObjectMapper.Map<FileStoringContainer, ContainerDto>(fileStoringContainer);
         }
 
         /// <summary>
-        /// Get container by name 
+        /// Get container by name
         /// </summary>
         /// <param name="name"></param>
         /// <param name="includeDetails"></param>
-        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<ContainerDto> GetByNameAsync(
-            [NotNull] string name,
-            bool includeDetails = true,
-            CancellationToken cancellationToken = default)
+        [Authorize(FileStoringManagementPermissions.Containers.Default)]
+        public virtual async Task<ContainerDto> GetByNameAsync([NotNull] string name, bool includeDetails = true)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
 
-            var fileStoringContainer = await FileStoringContainerRepository.FindAsync(name, includeDetails, cancellationToken);
+            var fileStoringContainer = await FileStoringContainerRepository.FindAsync(name, includeDetails);
             return ObjectMapper.Map<FileStoringContainer, ContainerDto>(fileStoringContainer);
         }
 
         /// <summary>
-        /// Get Paged List
+        /// Get container page list
         /// </summary>
         /// <param name="input"></param>
         /// <param name="includeDetails"></param>
-        /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [Authorize(FileStoringManagementPermissions.Containers.Default)]
         public virtual async Task<PagedResultDto<ContainerDto>> GetPagedListAsync(
             FileStoringContainerPagedRequestDto input,
-            bool includeDetails = true,
-            CancellationToken cancellationToken = default)
+            bool includeDetails = true)
         {
             var count = await FileStoringContainerRepository.GetCountAsync(input.Name, input.Provider);
             var fileStoringContainers = await FileStoringContainerRepository.GetListAsync(
@@ -128,8 +71,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 input.Sorting,
                 includeDetails,
                 input.Name,
-                input.Provider,
-                cancellationToken);
+                input.Provider);
 
             return new PagedResultDto<ContainerDto>(
               count,
@@ -137,29 +79,13 @@ namespace SharpAbp.Abp.FileStoringManagement
               );
         }
 
-
-        /// <summary>
-        /// Delete container
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public virtual async Task DeleteAsync(
-            Guid id,
-            CancellationToken cancellationToken = default)
-        {
-            await FileStoringContainerRepository.DeleteAsync(id, cancellationToken: cancellationToken);
-        }
-
         /// <summary>
         /// Create container
         /// </summary>
         /// <param name="input"></param>
-        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<Guid> CreateAsync(
-            CreateContainerDto input,
-            CancellationToken cancellationToken = default)
+        [Authorize(FileStoringManagementPermissions.Containers.Create)]
+        public virtual async Task<Guid> CreateAsync(CreateContainerDto input)
         {
             var valuesValidator = GetFileProviderValuesValidator(input.Provider);
 
@@ -170,7 +96,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 throw new AbpValidationException("Create Container validate failed.", result.Errors);
             }
 
-            await CheckContainer(input.TenantId, input.Name, null, cancellationToken);
+            await CheckContainer(input.TenantId, input.Name, null);
 
             var container = new FileStoringContainer(
               GuidGenerator.Create(),
@@ -190,7 +116,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                     container.Id));
             }
 
-            await FileStoringContainerRepository.InsertAsync(container, cancellationToken: cancellationToken);
+            await FileStoringContainerRepository.InsertAsync(container);
 
             return container.Id;
         }
@@ -199,11 +125,9 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// Update container
         /// </summary>
         /// <param name="input"></param>
-        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task UpdateAsync(
-            UpdateContainerDto input,
-            CancellationToken cancellationToken = default)
+        [Authorize(FileStoringManagementPermissions.Containers.Update)]
+        public virtual async Task UpdateAsync(UpdateContainerDto input)
         {
             var valuesValidator = GetFileProviderValuesValidator(input.Provider);
 
@@ -214,7 +138,6 @@ namespace SharpAbp.Abp.FileStoringManagement
                 throw new AbpValidationException("Create Container validate failed.", result.Errors);
             }
 
-
             var container = await FileStoringContainerRepository.GetAsync(input.Id, true);
 
             if (container == null)
@@ -222,7 +145,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 throw new AbpException($"Could not find Container when update by id:'{input.Id}'.");
             }
 
-            await CheckContainer(container.TenantId, input.Name, container.Id, cancellationToken);
+            await CheckContainer(container.TenantId, input.Name, container.Id);
 
             //Update
             container.Update(input.IsMultiTenant, input.Provider, input.Name, input.Title, input.HttpAccess);
@@ -257,6 +180,17 @@ namespace SharpAbp.Abp.FileStoringManagement
             }
         }
 
+        /// <summary>
+        /// Delete container
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Authorize(FileStoringManagementPermissions.Containers.Delete)]
+        public virtual async Task DeleteAsync(Guid id)
+        {
+            await FileStoringContainerRepository.DeleteAsync(id);
+        }
+
         protected virtual IFileProviderValuesValidator GetFileProviderValuesValidator([NotNull] string provider)
         {
             Check.NotNullOrWhiteSpace(provider, nameof(provider));
@@ -271,9 +205,9 @@ namespace SharpAbp.Abp.FileStoringManagement
             throw new AbpException($"Could not find any 'IFileProviderValuesValidator' for provider '{provider}' .");
         }
 
-        protected virtual async Task CheckContainer(Guid? tenantId, string name, Guid? currentId = null, CancellationToken cancellationToken = default)
+        protected virtual async Task CheckContainer(Guid? tenantId, string name, Guid? currentId = null)
         {
-            var container = await FileStoringContainerRepository.FindAsync(tenantId, name, currentId, false, cancellationToken);
+            var container = await FileStoringContainerRepository.FindAsync(tenantId, name, currentId, false);
             if (container != null)
             {
                 throw new AbpException($"The container was exist in current tenant! {tenantId}-{name},current id {currentId}");

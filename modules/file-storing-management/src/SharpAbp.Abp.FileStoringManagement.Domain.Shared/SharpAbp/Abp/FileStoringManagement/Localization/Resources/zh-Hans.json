@@ -1,13 +1,12 @@
 {
   "culture": "zh-Hans",
   "texts": {
-    "FileStoring": "文件存储",
-    "Permission:FileStoringManagement": "图像存储管理",
-    "Permission:FileStoring_Container_List": "查询容器列表",
-    "Permission:FileStoring_Container_Create": "创建容器",
-    "Permission:FileStoring_Container_Update": "修改容器",
-    "Permission:FileStoring_Container_Delete": "删除容器",
-    "Permission:FileStoring_Provider_List": "查询存储类型列表",
-    "Permission:FileStoring_Provider_Options": "查询存储配置"
+    "FileStoringManagement": "文件存储管理",
+    "Permission:FileStoringManagement.Containers": "文件容器管理",
+    "Permission:FileStoringManagement.Containers.Create": "创建文件容器",
+    "Permission:FileStoringManagement.Containers.Update": "修改文件容器",
+    "Permission:FileStoringManagement.Containers.Delete": "删除文件容器",
+    "Permission:FileStoringManagement.Providers": "文件供应商管理",
+    "Permission:FileStoringManagement.Providers.Options": "文件供应商配置"
   }
 }

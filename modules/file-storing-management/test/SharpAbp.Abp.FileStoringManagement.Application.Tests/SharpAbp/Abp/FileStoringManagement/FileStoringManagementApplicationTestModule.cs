@@ -32,6 +32,8 @@ namespace SharpAbp.Abp.FileStoringManagement
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
+            context.Services.AddAlwaysAllowAuthorization();
+
             context.Services.AddEntityFrameworkInMemoryDatabase();
 
             var databaseName = Guid.NewGuid().ToString();

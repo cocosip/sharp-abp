@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using Volo.Abp.AspNetCore.Mvc;
 
@@ -7,28 +6,32 @@ namespace SharpAbp.Abp.FileStoringManagement
 {
     [Area("file-storing")]
     [Route("api/file-provider")]
-    [Authorize(FileStoringPermissionConsts.FileStoringManagement)]
     public class FileProviderController : AbpController
     {
-        private readonly IFileStoringAppService _fileStoringAppService;
-        public FileProviderController(IFileStoringAppService fileStoringAppService)
+        private readonly IFileProviderAppService _fileProviderAppService;
+        public FileProviderController(IFileProviderAppService fileProviderAppService)
         {
-            _fileStoringAppService = fileStoringAppService;
+            _fileProviderAppService = fileProviderAppService;
         }
 
         [HttpGet]
-        [Authorize(FileStoringPermissionConsts.ListProvider)]
-        public List<ProviderDto> GetList()
+        public List<ProviderDto> GetProviders()
         {
-            return _fileStoringAppService.GetProviders();
+            return _fileProviderAppService.GetProviders();
+        }
+
+        [HttpGet]
+        [Route("has-provider/{provider}")]
+        public bool HasProvider(string provider)
+        {
+            return _fileProviderAppService.HasProvider(provider);
         }
 
         [HttpGet]
         [Route("{provider}")]
-        [Authorize(FileStoringPermissionConsts.GetProvierOptions)]
-        public ProviderOptionsDto GetProviderOptions(string provider)
+        public ProviderOptionsDto GetOptions(string provider)
         {
-            return _fileStoringAppService.GetProviderOptions(provider);
+            return _fileProviderAppService.GetOptions(provider);
         }
 
     }

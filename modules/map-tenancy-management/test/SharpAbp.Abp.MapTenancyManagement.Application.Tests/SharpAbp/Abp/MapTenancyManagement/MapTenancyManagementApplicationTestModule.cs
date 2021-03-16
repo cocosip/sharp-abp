@@ -20,6 +20,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
+            context.Services.AddAlwaysAllowAuthorization();
             context.Services.AddEntityFrameworkInMemoryDatabase();
 
             var databaseName = Guid.NewGuid().ToString();

@@ -1,11 +1,10 @@
 {
   "culture": "en",
   "texts": {
-    "MapTenancyManagement": "Management map tenancy",
-    "Permission:MapTenancyManagement": "Management map tenancy",
-    "Permission:MapTenancyManagement_MapTenant_List": "Query map tenant list",
-    "Permission:MapTenancyManagement_MapTenant_Create": "Create map tenant",
-    "Permission:MapTenancyManagement_MapTenant_Update": "Updarte map tenant",
-    "Permission:MapTenancyManagement_MapTenant_Delete": "Delete map tenant"
+    "MapTenancyManagement": "Map tenancy management",
+    "Permission:MapTenancyManagement.MapTenants": "Map tenancy management",
+    "Permission:MapTenancyManagement.MapTenants.Create": "Create map tenant",
+    "Permission:MapTenancyManagement.MapTenants.Update": "Update map tenant",
+    "Permission:MapTenancyManagement.MapTenants.Delete": "Delete map tenant"
   }
 }

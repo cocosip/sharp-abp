@@ -1,13 +1,12 @@
 {
   "culture": "en",
   "texts": {
-    "FileStoring": "File storing",
-    "Permission:FileStoringManagement": "File storing management",
-    "Permission:FileStoring_Container_List": "Query container list",
-    "Permission:FileStoring_Container_Create": "Create container",
-    "Permission:FileStoring_Container_Update": "Update container",
-    "Permission:FileStoring_Container_Delete": "Delete container",
-    "Permission:FileStoring_Provider_List": "Query provider list",
-    "Permission:FileStoring_Provider_Options": "Get provider options"
+    "FileStoringManagement": "File storing management",
+    "Permission:FileStoringManagement.Containers": "File container management",
+    "Permission:FileStoringManagement.Containers.Create": "Create file container",
+    "Permission:FileStoringManagement.Containers.Update": "Update file container",
+    "Permission:FileStoringManagement.Containers.Delete": "Delete file container",
+    "Permission:FileStoringManagement.Providers": "File provider management",
+    "Permission:FileStoringManagement.Providers.Options": "File provider options"
   }
 }

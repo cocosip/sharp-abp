@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
@@ -10,49 +9,52 @@ namespace SharpAbp.Abp.FileStoringManagement
     //[RemoteService(Name = FileStoringRemoteServiceConsts.RemoteServiceName)]
     [Area("file-storing")]
     [Route("api/container")]
-    [Authorize(FileStoringPermissionConsts.FileStoringManagement)]
     public class ContainerController : AbpController
     {
-        private readonly IFileStoringAppService _fileStoringAppService;
-        public ContainerController(IFileStoringAppService fileStoringAppService)
+        private readonly IContainerAppService _containerAppService;
+        public ContainerController(IContainerAppService containerAppService)
         {
-            _fileStoringAppService = fileStoringAppService;
+            _containerAppService = containerAppService;
         }
 
         [HttpGet]
         [Route("{id}")]
         public async Task<ContainerDto> GetAsync(Guid id)
         {
-            return await _fileStoringAppService.GetAsync(id, true);
+            return await _containerAppService.GetAsync(id, true);
         }
 
         [HttpGet]
-        [Authorize(FileStoringPermissionConsts.ListContainer)]
+        [Route("get-by-name/{name}")]
+        public virtual async Task<ContainerDto> GetByNameAsync(string name)
+        {
+            return await _containerAppService.GetByNameAsync(name, true);
+        }
+
+
+        [HttpGet]
         public async Task<PagedResultDto<ContainerDto>> GetPagedListAsync(FileStoringContainerPagedRequestDto input)
         {
-            return await _fileStoringAppService.GetPagedListAsync(input, true);
+            return await _containerAppService.GetPagedListAsync(input, true);
         }
 
         [HttpPost]
-        [Authorize(FileStoringPermissionConsts.CreateContainer)]
         public async Task<Guid> CreateAsync(CreateContainerDto input)
         {
-            return await _fileStoringAppService.CreateAsync(input);
+            return await _containerAppService.CreateAsync(input);
         }
 
         [HttpPut]
-        [Authorize(FileStoringPermissionConsts.UpdateContainer)]
         public async Task UpdateAsync(UpdateContainerDto input)
         {
-            await _fileStoringAppService.UpdateAsync(input);
+            await _containerAppService.UpdateAsync(input);
         }
 
         [HttpDelete]
         [Route("{id}")]
-        [Authorize(FileStoringPermissionConsts.DeleteContainer)]
         public async Task DeleteAsync(Guid id)
         {
-            await _fileStoringAppService.DeleteAsync(id);
+            await _containerAppService.DeleteAsync(id);
         }
 
     }

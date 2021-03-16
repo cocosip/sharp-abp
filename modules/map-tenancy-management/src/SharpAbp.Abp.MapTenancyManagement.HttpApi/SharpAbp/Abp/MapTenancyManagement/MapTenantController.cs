@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
@@ -9,7 +8,6 @@ namespace SharpAbp.Abp.MapTenancyManagement
 {
     [Area("map-tenancy")]
     [Route("api/map-tenant")]
-    [Authorize(MapTenancyPermissionConsts.MapTenancyManagement)]
     public class MapTenantController : AbpController
     {
         private readonly IMapTenantAppService _mapTenantAppService;
@@ -26,21 +24,25 @@ namespace SharpAbp.Abp.MapTenancyManagement
         }
 
         [HttpGet]
-        [Authorize(MapTenancyPermissionConsts.ListMapTenant)]
+        [Route("get-by-code/{code}")]
+        public async Task<MapTenantDto> GetAsync(string code)
+        {
+            return await _mapTenantAppService.GetByCodeAsync(code);
+        }
+
+        [HttpGet]
         public async Task<PagedResultDto<MapTenantDto>> GetPagedListAsync(MapTenantPagedRequestDto input)
         {
             return await _mapTenantAppService.GetPagedListAsync(input);
         }
 
         [HttpPost]
-        [Authorize(MapTenancyPermissionConsts.CreateMapTenant)]
         public async Task<Guid> CreateAsync(CreateMapTenantDto input)
         {
             return await _mapTenantAppService.CreateAsync(input);
         }
 
         [HttpPut]
-        [Authorize(MapTenancyPermissionConsts.UpdateMapTenant)]
         public async Task UpdateAsync(UpdateMapTenantDto input)
         {
             await _mapTenantAppService.UpdateAsync(input);
@@ -48,7 +50,6 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
         [HttpDelete]
         [Route("{id}")]
-        [Authorize(MapTenancyPermissionConsts.DeleteMapTenant)]
         public async Task DeleteAsync(Guid id)
         {
             await _mapTenantAppService.DeleteAsync(id);
