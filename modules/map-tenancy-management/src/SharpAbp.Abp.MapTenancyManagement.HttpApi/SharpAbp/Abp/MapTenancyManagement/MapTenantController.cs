@@ -37,13 +37,13 @@ namespace SharpAbp.Abp.MapTenancyManagement
         }
 
         [HttpPost]
-        public async Task<Guid> CreateAsync(CreateMapTenantDto input)
+        public async Task<Guid> CreateAsync([FromBody]CreateMapTenantDto input)
         {
             return await _mapTenantAppService.CreateAsync(input);
         }
 
         [HttpPut]
-        public async Task UpdateAsync(UpdateMapTenantDto input)
+        public async Task UpdateAsync([FromBody]UpdateMapTenantDto input)
         {
             await _mapTenantAppService.UpdateAsync(input);
         }

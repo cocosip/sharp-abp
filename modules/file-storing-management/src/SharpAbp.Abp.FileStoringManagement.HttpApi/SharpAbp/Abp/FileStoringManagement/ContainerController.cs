@@ -39,13 +39,13 @@ namespace SharpAbp.Abp.FileStoringManagement
         }
 
         [HttpPost]
-        public async Task<Guid> CreateAsync(CreateContainerDto input)
+        public async Task<Guid> CreateAsync([FromBody] CreateContainerDto input)
         {
             return await _containerAppService.CreateAsync(input);
         }
 
         [HttpPut]
-        public async Task UpdateAsync(UpdateContainerDto input)
+        public async Task UpdateAsync([FromBody] UpdateContainerDto input)
         {
             await _containerAppService.UpdateAsync(input);
         }

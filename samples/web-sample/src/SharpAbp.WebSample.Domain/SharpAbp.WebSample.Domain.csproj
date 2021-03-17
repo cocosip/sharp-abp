@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>SharpAbp.WebSample</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SharpAbp.WebSample.Domain.Shared\SharpAbp.WebSample.Domain.Shared.csproj" />
+    <ProjectReference Include="..\..\..\..\modules\file-storing-management\src\SharpAbp.Abp.FileStoringManagement.Domain\SharpAbp.Abp.FileStoringManagement.Domain.csproj" />
+    <ProjectReference Include="..\..\..\..\modules\map-tenancy-management\src\SharpAbp.Abp.MapTenancyManagement.Domain\SharpAbp.Abp.MapTenancyManagement.Domain.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Emailing" Version="4.2.2" />
+    <PackageReference Include="Volo.Abp.Identity.Domain" Version="4.2.2" />
+    <PackageReference Include="Volo.Abp.PermissionManagement.Domain.Identity" Version="4.2.2" />
+    <PackageReference Include="Volo.Abp.IdentityServer.Domain" Version="4.2.2" />
+    <PackageReference Include="Volo.Abp.PermissionManagement.Domain.IdentityServer" Version="4.2.2" />
+    <PackageReference Include="Volo.Abp.BackgroundJobs.Domain" Version="4.2.2" />
+    <PackageReference Include="Volo.Abp.AuditLogging.Domain" Version="4.2.2" />
+    <PackageReference Include="Volo.Abp.TenantManagement.Domain" Version="4.2.2" />
+    <PackageReference Include="Volo.Abp.FeatureManagement.Domain" Version="4.2.2" />
+    <PackageReference Include="Volo.Abp.SettingManagement.Domain" Version="4.2.2" />
+  </ItemGroup>
+
+</Project>

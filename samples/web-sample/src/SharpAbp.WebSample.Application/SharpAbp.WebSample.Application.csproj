@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>SharpAbp.WebSample</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SharpAbp.WebSample.Domain\SharpAbp.WebSample.Domain.csproj" />
+    <ProjectReference Include="..\SharpAbp.WebSample.Application.Contracts\SharpAbp.WebSample.Application.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\..\modules\file-storing-management\src\SharpAbp.Abp.FileStoringManagement.Application\SharpAbp.Abp.FileStoringManagement.Application.csproj" />
+    <ProjectReference Include="..\..\..\..\modules\map-tenancy-management\src\SharpAbp.Abp.MapTenancyManagement.Application\SharpAbp.Abp.MapTenancyManagement.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Account.Application" Version="4.2.2" />
+    <PackageReference Include="Volo.Abp.Identity.Application" Version="4.2.2" />
+    <PackageReference Include="Volo.Abp.PermissionManagement.Application" Version="4.2.2" />
+    <PackageReference Include="Volo.Abp.TenantManagement.Application" Version="4.2.2" />
+    <PackageReference Include="Volo.Abp.FeatureManagement.Application" Version="4.2.2" />
+  </ItemGroup>
+
+</Project>

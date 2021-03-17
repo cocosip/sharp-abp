@@ -172,8 +172,7 @@ namespace SharpAbp.Abp.FileStoringManagement
             container.Items.RemoveAll(deleteItems);
 
             //Create
-            var createInputItems = input.Items.Where(x => !x.Id.HasValue).ToList();
-            foreach (var item in createInputItems)
+            foreach (var item in input.Items)
             {
                 var containerItem = new FileStoringContainerItem(GuidGenerator.Create(), item.Name, item.Value, container.Id);
                 container.Items.Add(containerItem);

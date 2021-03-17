@@ -28,11 +28,11 @@ namespace SharpAbp.Abp.FileStoringManagement
         [Required]
         public bool HttpAccess { get; set; }
 
-        public List<CreateOrUpdateContainerItemDto> Items { get; set; }
+        public List<UpdateContainerItemDto> Items { get; set; }
 
         public UpdateContainerDto()
         {
-            Items = new List<CreateOrUpdateContainerItemDto>();
+            Items = new List<UpdateContainerItemDto>();
         }
 
     }
