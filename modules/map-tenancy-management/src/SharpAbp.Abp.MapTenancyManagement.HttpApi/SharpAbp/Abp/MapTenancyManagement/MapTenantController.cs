@@ -2,13 +2,12 @@
 using System;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
-using Volo.Abp.AspNetCore.Mvc;
 
 namespace SharpAbp.Abp.MapTenancyManagement
 {
     [Area("map-tenancy")]
     [Route("api/map-tenant")]
-    public class MapTenantController : AbpController
+    public class MapTenantController : MapTenancyController
     {
         private readonly IMapTenantAppService _mapTenantAppService;
         public MapTenantController(IMapTenantAppService mapTenantAppService)

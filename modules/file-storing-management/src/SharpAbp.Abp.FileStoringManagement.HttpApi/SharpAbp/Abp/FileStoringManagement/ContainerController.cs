@@ -2,14 +2,13 @@
 using System;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
-using Volo.Abp.AspNetCore.Mvc;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
     //[RemoteService(Name = FileStoringRemoteServiceConsts.RemoteServiceName)]
     [Area("file-storing")]
     [Route("api/container")]
-    public class ContainerController : AbpController
+    public class ContainerController : FileStoringController
     {
         private readonly IContainerAppService _containerAppService;
         public ContainerController(IContainerAppService containerAppService)

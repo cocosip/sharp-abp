@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using Volo.Abp.AspNetCore.Mvc;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
     [Area("file-storing")]
     [Route("api/file-provider")]
-    public class FileProviderController : AbpController
+    public class FileProviderController : FileStoringController
     {
         private readonly IFileProviderAppService _fileProviderAppService;
         public FileProviderController(IFileProviderAppService fileProviderAppService)
