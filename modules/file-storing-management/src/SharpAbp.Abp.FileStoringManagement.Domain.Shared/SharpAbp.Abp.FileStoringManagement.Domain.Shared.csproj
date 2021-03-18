@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <PackageReference Include="Volo.Abp.Validation" Version="4.2.2" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="$(MicrosoftPackageVersion)" />
   </ItemGroup>
 
 
