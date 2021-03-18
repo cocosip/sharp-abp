@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.FileStoringManagement.Localization;
 using Volo.Abp.AspNetCore.Mvc;
-using Volo.Abp.Identity;
 using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
 
@@ -10,7 +9,6 @@ namespace SharpAbp.Abp.FileStoringManagement
 {
     [DependsOn(
         typeof(FileStoringManagementApplicationContractsModule),
-        typeof(AbpIdentityHttpApiModule),
         typeof(AbpAspNetCoreMvcModule)
         )]
     public class FileStoringManagementHttpApiModule : AbpModule
