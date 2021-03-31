@@ -77,9 +77,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Core", "src\Sh
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Core.Tests", "test\SharpAbp.Abp.Core.Tests\SharpAbp.Abp.Core.Tests.csproj", "{A5A526F3-561D-4E6D-9953-42DCED5FDBF3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.MapTenancy", "src\SharpAbp.Abp.MapTenancy\SharpAbp.Abp.MapTenancy.csproj", "{4090259B-B6B9-460A-82CD-1B844103C177}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.MapTenancy", "src\SharpAbp.Abp.MapTenancy\SharpAbp.Abp.MapTenancy.csproj", "{4090259B-B6B9-460A-82CD-1B844103C177}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.AspNetCore.MapTenancy", "src\SharpAbp.Abp.AspNetCore.MapTenancy\SharpAbp.Abp.AspNetCore.MapTenancy.csproj", "{B4A0FC6B-876D-4539-B147-1A2C4955E54D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.AspNetCore.MapTenancy", "src\SharpAbp.Abp.AspNetCore.MapTenancy\SharpAbp.Abp.AspNetCore.MapTenancy.csproj", "{B4A0FC6B-876D-4539-B147-1A2C4955E54D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
