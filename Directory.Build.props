@@ -1,17 +1,23 @@
 <Project>
   <PropertyGroup>
 
+    <!--Volo ABP packages-->
+    <VoloAbpPackageVersion>4.2.2</VoloAbpPackageVersion>
+
     <!-- All Microsoft packages -->
     <MicrosoftPackageVersion>5.0.*</MicrosoftPackageVersion>
 
     <!-- Microsoft.NET.Test.Sdk https://www.nuget.org/packages/Microsoft.NET.Test.Sdk -->
-    <MicrosoftNETTestSdkPackageVersion>16.8.3</MicrosoftNETTestSdkPackageVersion>
+    <MicrosoftNETTestSdkPackageVersion>16.9.4</MicrosoftNETTestSdkPackageVersion>
 
     <!-- NSubstitute  https://www.nuget.org/packages/NSubstitute -->
     <NSubstitutePackageVersion>4.2.2</NSubstitutePackageVersion>
 
     <!-- Shouldly https://www.nuget.org/packages/Shouldly -->
     <ShouldlyPackageVersion>4.0.1</ShouldlyPackageVersion>
+
+    <!-- Moq package-->
+    <MoqPackageVersion>4.16.1</MoqPackageVersion>
 
     <!-- xunit https://www.nuget.org/packages/xUnit -->
     <xUnitPackageVersion>2.4.1</xUnitPackageVersion>
@@ -21,6 +27,9 @@
 
     <!-- xunit.runner.visualstudio https://www.nuget.org/packages/xunit.runner.visualstudio -->
     <xUnitRunnerVisualstudioPackageVersion>2.4.3</xUnitRunnerVisualstudioPackageVersion>
+
+    <!--coverlet.collector-->
+    <CoverletCollectorPackageVersion>3.0.3</CoverletCollectorPackageVersion>
 
     <!-- Mongo2Go https://www.nuget.org/packages/Mongo2Go -->
     <Mongo2GoPackageVersion>2.2.14</Mongo2GoPackageVersion>

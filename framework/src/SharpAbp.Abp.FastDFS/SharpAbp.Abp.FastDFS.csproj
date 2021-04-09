@@ -17,8 +17,8 @@
 
 
   <ItemGroup>
-    <PackageReference Include="FastDFSCore" Version="1.5.1" />
-    <PackageReference Include="Volo.Abp" Version="4.2.2" />
+    <PackageReference Include="FastDFSCore" Version="1.5.2" />
+    <PackageReference Include="Volo.Abp" Version="$(VoloAbpPackageVersion)" />
   </ItemGroup>
 
 </Project>
