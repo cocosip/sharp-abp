@@ -15,6 +15,7 @@ $solutionPaths = @(
 		"../modules/file-storing-database"
 		"../modules/file-storing-management",
 		"../modules/map-tenancy-management"
+#		"../modules/identity"
 #		"../modules/permission-management",
 	)
 
