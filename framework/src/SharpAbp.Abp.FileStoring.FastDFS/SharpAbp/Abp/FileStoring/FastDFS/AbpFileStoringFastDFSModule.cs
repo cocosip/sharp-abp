@@ -1,7 +1,7 @@
 ﻿using FastDFSCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using SharpAbp.Abp.FastDFS.DotNetty;
+using SharpAbp.Abp.FastDFS.SuperSocket;
 using SharpAbp.Abp.FileStoring.FastDFS.Localization;
 using Volo.Abp.Localization;
 using Volo.Abp.Localization.ExceptionHandling;
@@ -13,7 +13,7 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
 {
     [DependsOn(
         typeof(AbpFileStoringModule),
-        typeof(AbpFastDFSDotNettyModule)
+        typeof(AbpFastDFSSuperSocketModule)
         )]
     public class AbpFileStoringFastDFSModule : AbpModule
     {

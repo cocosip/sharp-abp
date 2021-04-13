@@ -6,6 +6,8 @@ using Volo.Abp;
 using Volo.Abp.Autofac;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.Modularity;
+using Volo.Abp.TenantManagement.EntityFrameworkCore;
+using Volo.Abp.Threading;
 using Volo.Abp.Uow;
 
 namespace SharpAbp.Abp.MapTenancyManagement
@@ -13,6 +15,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
     [DependsOn(
         typeof(MapTenancyManagementApplicationModule),
         typeof(MapTenancyManagementEntityFrameworkCoreModule),
+        typeof(AbpTenantManagementEntityFrameworkCoreModule),
         typeof(AbpTestBaseModule),
         typeof(AbpAutofacModule)
         )]
@@ -33,10 +36,26 @@ namespace SharpAbp.Abp.MapTenancyManagement
                 });
             });
 
+
+
             Configure<AbpUnitOfWorkDefaultOptions>(options =>
             {
                 options.TransactionBehavior = UnitOfWorkTransactionBehavior.Disabled; //EF in-memory database does not support transactions
             });
+        }
+        public override void OnApplicationInitialization(ApplicationInitializationContext context)
+        {
+            SeedTestData(context);
+        }
+
+        private static void SeedTestData(ApplicationInitializationContext context)
+        {
+            using (var scope = context.ServiceProvider.CreateScope())
+            {
+                AsyncHelper.RunSync(() => scope.ServiceProvider
+                    .GetRequiredService<MapTenancyManagementTestDataBuilder>()
+                    .BuildAsync());
+            }
         }
     }
 }

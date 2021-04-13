@@ -2,15 +2,15 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SharpAbp.Abp.MapTenancy;
 using Volo.Abp.Caching;
-using Volo.Abp.Domain;
 using Volo.Abp.Modularity;
+using Volo.Abp.TenantManagement;
 
 namespace SharpAbp.Abp.MapTenancyManagement
 {
     [DependsOn(
-        typeof(AbpDddDomainModule),
         typeof(AbpCachingModule),
         typeof(AbpMapTenancyModule),
+        typeof(AbpTenantManagementDomainModule),
         typeof(MapTenancyManagementDomainSharedModule)
         )]
     public class MapTenancyManagementDomainModule : AbpModule

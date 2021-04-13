@@ -11,9 +11,13 @@ namespace SharpAbp.Abp.MapTenancyManagement
     [Authorize(MapTenancyManagementPermissions.MapTenants.Default)]
     public class MapTenantAppService : MapTenancyManagementAppServiceBase, IMapTenantAppService
     {
+        protected MapTenantManager MapTenantManager { get; }
         protected IMapTenantRepository MapTenantRepository { get; }
-        public MapTenantAppService(IMapTenantRepository mapTenantRepository)
+        public MapTenantAppService(
+            MapTenantManager mapTenantManager,
+            IMapTenantRepository mapTenantRepository)
         {
+            MapTenantManager = mapTenantManager;
             MapTenantRepository = mapTenantRepository;
         }
 
@@ -74,15 +78,13 @@ namespace SharpAbp.Abp.MapTenancyManagement
         [Authorize(MapTenancyManagementPermissions.MapTenants.Create)]
         public virtual async Task<Guid> CreateAsync(CreateMapTenantDto input)
         {
-            await CheckMapTenantAsync(input.Code, null);
-
             var mapTenant = new MapTenant(
                 GuidGenerator.Create(),
                 input.Code,
                 input.TenantId,
                 input.MapCode);
 
-            await MapTenantRepository.InsertAsync(mapTenant);
+            await MapTenantManager.CreateAsync(mapTenant);
             return mapTenant.Id;
         }
 
@@ -100,7 +102,9 @@ namespace SharpAbp.Abp.MapTenancyManagement
                 throw new AbpException($"Could not find MapTenant by id :{input.Id}.");
             }
 
-            await CheckMapTenantAsync(input.Code, mapTenant.Id);
+            //Check
+            await MapTenantManager.ValidateCodeAsync(input.Code, mapTenant.Id);
+
             mapTenant.Update(input.Code, input.TenantId, input.MapCode);
         }
 
@@ -115,13 +119,5 @@ namespace SharpAbp.Abp.MapTenancyManagement
             await MapTenantRepository.DeleteAsync(id);
         }
 
-        protected virtual async Task CheckMapTenantAsync(string code, Guid? currentId = null)
-        {
-            var mapTenant = await MapTenantRepository.FindAsync(code, currentId);
-            if (mapTenant != null)
-            {
-                throw new AbpException($"The 'MapTenant' was exist! Code:{code}.");
-            }
-        }
     }
 }

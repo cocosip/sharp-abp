@@ -6,7 +6,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
     public class MapTenant : AggregateRoot<Guid>
     {
         public virtual string Code { get; set; }
-        public virtual Guid? TenantId { get; set; }
+        public virtual Guid TenantId { get; set; }
         public virtual string MapCode { get; set; }
 
         public MapTenant()
@@ -14,7 +14,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
         }
 
-        public MapTenant(Guid id, string code, Guid? tenantId, string mapCode)
+        public MapTenant(Guid id, string code, Guid tenantId, string mapCode)
         {
             Id = id;
             Code = code;
@@ -22,7 +22,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
             MapCode = mapCode;
         }
 
-        public void Update(string code, Guid? tenantId, string mapCode)
+        public void Update(string code, Guid tenantId, string mapCode)
         {
             Code = code;
             TenantId = tenantId;

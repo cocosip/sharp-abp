@@ -14,14 +14,14 @@ namespace SharpAbp.Abp.FileStoringManagement
     [Authorize(FileStoringManagementPermissions.Containers.Default)]
     public class ContainerAppService : FileStoringManagementAppServiceBase, IContainerAppService
     {
-        protected IEnumerable<IFileProviderValuesValidator> ProviderValuesValidators { get; }
+        protected ContainerManager ContainerManager { get; }
         protected IFileStoringContainerRepository FileStoringContainerRepository { get; }
 
         public ContainerAppService(
-            IEnumerable<IFileProviderValuesValidator> providerValuesValidators,
+            ContainerManager containerManager,
             IFileStoringContainerRepository fileStoringContainerRepository)
         {
-            ProviderValuesValidators = providerValuesValidators;
+            ContainerManager = containerManager;
             FileStoringContainerRepository = fileStoringContainerRepository;
         }
 
@@ -87,16 +87,12 @@ namespace SharpAbp.Abp.FileStoringManagement
         [Authorize(FileStoringManagementPermissions.Containers.Create)]
         public virtual async Task<Guid> CreateAsync(CreateContainerDto input)
         {
-            var valuesValidator = GetFileProviderValuesValidator(input.Provider);
+            //Validate provider values
+            var keyValuePairs = input.Items.ToDictionary(x => x.Name, y => y.Value);
+            ContainerManager.ValidateProviderValues(input.Provider, keyValuePairs);
 
-            var dict = input.Items.ToDictionary(x => x.Name, y => y.Value);
-            var result = valuesValidator.Validate(dict);
-            if (result.Errors.Any())
-            {
-                throw new AbpValidationException("Create Container validate failed.", result.Errors);
-            }
-
-            await CheckContainer(input.TenantId, input.Name, null);
+            //Validate name
+            await ContainerManager.ValidateNameAsync(input.TenantId, input.Name, null);
 
             var container = new FileStoringContainer(
               GuidGenerator.Create(),
@@ -129,23 +125,17 @@ namespace SharpAbp.Abp.FileStoringManagement
         [Authorize(FileStoringManagementPermissions.Containers.Update)]
         public virtual async Task UpdateAsync(UpdateContainerDto input)
         {
-            var valuesValidator = GetFileProviderValuesValidator(input.Provider);
-
-            var dict = input.Items.ToDictionary(x => x.Name, y => y.Value);
-            var result = valuesValidator.Validate(dict);
-            if (result.Errors.Any())
-            {
-                throw new AbpValidationException("Create Container validate failed.", result.Errors);
-            }
+            var keyValuePairs = input.Items.ToDictionary(x => x.Name, y => y.Value);
+            ContainerManager.ValidateProviderValues(input.Provider, keyValuePairs);
 
             var container = await FileStoringContainerRepository.GetAsync(input.Id, true);
-
             if (container == null)
             {
                 throw new AbpException($"Could not find Container when update by id:'{input.Id}'.");
             }
 
-            await CheckContainer(container.TenantId, input.Name, container.Id);
+            //Validate name
+            await ContainerManager.ValidateNameAsync(container.TenantId, input.Name, container.Id);
 
             //Update
             container.Update(input.IsMultiTenant, input.Provider, input.Name, input.Title, input.HttpAccess);
@@ -189,29 +179,5 @@ namespace SharpAbp.Abp.FileStoringManagement
         {
             await FileStoringContainerRepository.DeleteAsync(id);
         }
-
-        protected virtual IFileProviderValuesValidator GetFileProviderValuesValidator([NotNull] string provider)
-        {
-            Check.NotNullOrWhiteSpace(provider, nameof(provider));
-
-            foreach (var providerValuesValidator in ProviderValuesValidators)
-            {
-                if (providerValuesValidator.Provider == provider)
-                {
-                    return providerValuesValidator;
-                }
-            }
-            throw new AbpException($"Could not find any 'IFileProviderValuesValidator' for provider '{provider}' .");
-        }
-
-        protected virtual async Task CheckContainer(Guid? tenantId, string name, Guid? currentId = null)
-        {
-            var container = await FileStoringContainerRepository.FindAsync(tenantId, name, currentId, false);
-            if (container != null)
-            {
-                throw new AbpException($"The container was exist in current tenant! {tenantId}-{name},current id {currentId}");
-            }
-        }
-
     }
 }

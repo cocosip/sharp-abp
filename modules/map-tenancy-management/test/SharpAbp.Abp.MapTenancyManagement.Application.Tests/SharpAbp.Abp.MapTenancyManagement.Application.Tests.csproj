@@ -22,6 +22,7 @@
 
     <PackageReference Include="Volo.Abp.Autofac" Version="$(VoloAbpPackageVersion)" />
     <PackageReference Include="Volo.Abp.TestBase" Version="$(VoloAbpPackageVersion)" />
+    <PackageReference Include="Volo.Abp.TenantManagement.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
   </ItemGroup>
   
   <ItemGroup>
