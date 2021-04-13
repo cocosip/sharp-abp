@@ -16,18 +16,17 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="includeDetails">include details</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<FileStoringContainer> FindAsync([NotNull] string name, bool includeDetails = true, CancellationToken cancellationToken = default);
+        Task<FileStoringContainer> FindByNameAsync([NotNull] string name, bool includeDetails = true, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Find container by name
         /// </summary>
-        /// <param name="tenantId"></param>
         /// <param name="name"></param>
-        /// <param name="exceptId"></param>
+        /// <param name="expectedId"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<FileStoringContainer> FindAsync(Guid? tenantId, string name, Guid? exceptId = null, bool includeDetails = false, CancellationToken cancellationToken = default);
+        Task<FileStoringContainer> FindExpectedAsync(string name, Guid? expectedId = null, bool includeDetails = false, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get List

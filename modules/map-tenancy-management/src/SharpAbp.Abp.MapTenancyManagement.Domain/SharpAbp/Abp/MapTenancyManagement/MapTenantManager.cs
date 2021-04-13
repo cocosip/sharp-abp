@@ -19,21 +19,17 @@ namespace SharpAbp.Abp.MapTenancyManagement
         }
 
         /// <summary>
-        /// Create mapTenant
+        /// Validate tenant
         /// </summary>
-        /// <param name="mapTenant"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        public virtual async Task CreateAsync(MapTenant mapTenant)
+        public virtual async Task ValidateTenantAsync(Guid id)
         {
-            //Check tenant exist
-            var tenant = await TenantRepository.FindAsync(mapTenant.TenantId, false);
+            var tenant = await TenantRepository.FindAsync(id, false);
             if (tenant == null)
             {
-                throw new AbpException($"Tenant '{mapTenant.TenantId}' is not exist.");
+                throw new AbpException($"MapTenant tenant {id} was not exist.");
             }
-            //Check code
-            await ValidateCodeAsync(mapTenant.Code);
-            await MapTenantRepository.InsertAsync(mapTenant);
         }
 
         /// <summary>
@@ -44,12 +40,13 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <returns></returns>
         public virtual async Task ValidateCodeAsync(string code, Guid? expectedId = null)
         {
-            var mapTenant = await MapTenantRepository.FindAsync(code, expectedId);
+            var mapTenant = await MapTenantRepository.FindExpectedAsync(code, expectedId);
             if (mapTenant != null)
             {
-                throw new AbpException($"The 'MapTenant' was exist! Code:{code}.");
+                throw new AbpException($"The 'MapTenant' code was exist! Code:{code}.");
             }
         }
+
 
     }
 }

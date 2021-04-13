@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Domain.Services;
+using Volo.Abp.MultiTenancy;
 using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoringManagement
@@ -47,14 +48,15 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <returns></returns>
         public virtual async Task ValidateNameAsync(Guid? tenantId, string name, Guid? expectedId = null)
         {
-            var container = await FileStoringContainerRepository.FindAsync(tenantId, name, expectedId, false);
-            if (container != null)
+            using (CurrentTenant.Change(tenantId))
             {
-                throw new AbpException($"The container was exist in current tenant! {tenantId}-{name},expectedId '{expectedId}'.");
+                var container = await FileStoringContainerRepository.FindExpectedAsync(name, expectedId, false);
+                if (container != null)
+                {
+                    throw new AbpException($"Duplicate container name '{name}' in tenant '{tenantId}'.");
+                }
             }
         }
-
-
 
         protected virtual IFileProviderValuesValidator GetFileProviderValuesValidator([NotNull] string provider)
         {

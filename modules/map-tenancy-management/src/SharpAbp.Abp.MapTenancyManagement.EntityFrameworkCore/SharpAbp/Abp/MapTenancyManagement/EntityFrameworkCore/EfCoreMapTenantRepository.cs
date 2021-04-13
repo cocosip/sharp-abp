@@ -25,7 +25,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         /// <param name="code"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<MapTenant> FindAsync(
+        public virtual async Task<MapTenant> FindByCodeAsync(
             [NotNull] string code,
             CancellationToken cancellationToken = default)
         {
@@ -38,17 +38,17 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         /// Find MapTenant
         /// </summary>
         /// <param name="code"></param>
-        /// <param name="exceptId"></param>
+        /// <param name="expectedId"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<MapTenant> FindAsync(
+        public virtual async Task<MapTenant> FindExpectedAsync(
             [NotNull] string code,
-            Guid? exceptId = null,
+            Guid? expectedId = null,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .WhereIf(!code.IsNullOrWhiteSpace(), x => x.Code == code)
-                .WhereIf(exceptId.HasValue, x => x.Id != exceptId.Value)
+                .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 

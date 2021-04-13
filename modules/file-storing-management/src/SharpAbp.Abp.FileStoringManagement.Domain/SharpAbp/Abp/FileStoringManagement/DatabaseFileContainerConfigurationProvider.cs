@@ -39,7 +39,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 name,
                 async () =>
                 {
-                    var container = await FileStoringContainerRepository.FindAsync(name, true);
+                    var container = await FileStoringContainerRepository.FindByNameAsync(name, true);
                     return container?.AsCacheItem();
                 },
                 hideErrors: false);

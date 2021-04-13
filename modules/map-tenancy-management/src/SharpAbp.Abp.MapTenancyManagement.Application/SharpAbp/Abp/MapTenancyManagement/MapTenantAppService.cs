@@ -42,7 +42,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         public virtual async Task<MapTenantDto> GetByCodeAsync([NotNull] string code)
         {
             Check.NotNullOrWhiteSpace(code, nameof(code));
-            var mapTenant = await MapTenantRepository.FindAsync(code, cancellationToken: default);
+            var mapTenant = await MapTenantRepository.FindByCodeAsync(code, cancellationToken: default);
             return ObjectMapper.Map<MapTenant, MapTenantDto>(mapTenant);
         }
 
@@ -78,13 +78,18 @@ namespace SharpAbp.Abp.MapTenancyManagement
         [Authorize(MapTenancyManagementPermissions.MapTenants.Create)]
         public virtual async Task<Guid> CreateAsync(CreateMapTenantDto input)
         {
+            //Validate tenant
+            await MapTenantManager.ValidateTenantAsync(input.TenantId);
+            //Validate code
+            await MapTenantManager.ValidateCodeAsync(input.Code);
+
             var mapTenant = new MapTenant(
                 GuidGenerator.Create(),
                 input.Code,
                 input.TenantId,
                 input.MapCode);
 
-            await MapTenantManager.CreateAsync(mapTenant);
+            await MapTenantRepository.InsertAsync(mapTenant);
             return mapTenant.Id;
         }
 
@@ -102,7 +107,9 @@ namespace SharpAbp.Abp.MapTenancyManagement
                 throw new AbpException($"Could not find MapTenant by id :{input.Id}.");
             }
 
-            //Check
+            //Validate tenant
+            await MapTenantManager.ValidateTenantAsync(input.TenantId);
+            //Validate code
             await MapTenantManager.ValidateCodeAsync(input.Code, mapTenant.Id);
 
             mapTenant.Update(input.Code, input.TenantId, input.MapCode);

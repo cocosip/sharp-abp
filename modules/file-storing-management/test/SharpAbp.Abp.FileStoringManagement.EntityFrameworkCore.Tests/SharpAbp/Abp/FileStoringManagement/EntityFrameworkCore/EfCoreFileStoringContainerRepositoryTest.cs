@@ -78,13 +78,13 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
 
             using (_currentTenant.Change(null))
             {
-                var queryContainer1 = await _fileStoringContainerRepository.FindAsync("default");
+                var queryContainer1 = await _fileStoringContainerRepository.FindByNameAsync("default");
                 Assert.Null(queryContainer1);
             }
 
             using (_currentTenant.Change(tenantId))
             {
-                var queryContainer1 = await _fileStoringContainerRepository.FindAsync("default");
+                var queryContainer1 = await _fileStoringContainerRepository.FindByNameAsync("default");
                 Assert.Equal(container.Id, queryContainer1.Id);
                 Assert.Equal(container.Name, queryContainer1.Name);
                 Assert.Equal(container.Items.Count, queryContainer1.Items.Count);
@@ -97,7 +97,7 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
 
             using (_dataFilter.Disable())
             {
-                var queryContainer1 = await _fileStoringContainerRepository.FindAsync("default");
+                var queryContainer1 = await _fileStoringContainerRepository.FindByNameAsync("default");
                 Assert.Equal(container.Id, queryContainer1.Id);
                 Assert.Equal(container.Name, queryContainer1.Name);
                 Assert.Equal(container.Items.Count, queryContainer1.Items.Count);

@@ -15,16 +15,16 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <param name="code"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<MapTenant> FindAsync([NotNull] string code, CancellationToken cancellationToken = default);
+        Task<MapTenant> FindByCodeAsync([NotNull] string code, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Find MapTenant
         /// </summary>
         /// <param name="code"></param>
-        /// <param name="exceptId"></param>
+        /// <param name="expectedId"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<MapTenant> FindAsync([NotNull] string code, Guid? exceptId = null, CancellationToken cancellationToken = default);
+        Task<MapTenant> FindExpectedAsync([NotNull] string code, Guid? expectedId = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get List

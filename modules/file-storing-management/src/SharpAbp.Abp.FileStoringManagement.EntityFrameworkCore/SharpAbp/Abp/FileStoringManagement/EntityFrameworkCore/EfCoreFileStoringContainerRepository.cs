@@ -28,7 +28,7 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
         /// <param name="includeDetails">include details</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<FileStoringContainer> FindAsync(
+        public virtual async Task<FileStoringContainer> FindByNameAsync(
             [NotNull] string name,
             bool includeDetails = true,
             CancellationToken cancellationToken = default)
@@ -42,24 +42,21 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
         /// <summary>
         /// Find container by name
         /// </summary>
-        /// <param name="tenantId"></param>
         /// <param name="name"></param>
-        /// <param name="exceptId"></param>
+        /// <param name="expectedId"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<FileStoringContainer> FindAsync(
-            Guid? tenantId,
+        public virtual async Task<FileStoringContainer> FindExpectedAsync(
             string name,
-            Guid? exceptId = null,
+            Guid? expectedId = null,
             bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
-                .WhereIf(tenantId.HasValue, x => x.TenantId == tenantId.Value)
                 .WhereIf(!name.IsNullOrWhiteSpace(), x => x.Name == name)
-                .WhereIf(exceptId.HasValue, x => x.Id != exceptId.Value)
+                .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 

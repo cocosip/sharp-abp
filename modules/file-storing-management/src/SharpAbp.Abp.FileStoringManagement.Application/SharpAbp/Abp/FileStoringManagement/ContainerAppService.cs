@@ -49,7 +49,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
 
-            var fileStoringContainer = await FileStoringContainerRepository.FindAsync(name, includeDetails);
+            var fileStoringContainer = await FileStoringContainerRepository.FindByNameAsync(name, includeDetails);
             return ObjectMapper.Map<FileStoringContainer, ContainerDto>(fileStoringContainer);
         }
 

@@ -28,7 +28,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
                 code,
                 async () =>
                 {
-                    var mapTenant = await MapTenantRepository.FindAsync(code, cancellationToken: default);
+                    var mapTenant = await MapTenantRepository.FindByCodeAsync(code, cancellationToken: default);
                     return mapTenant.AsCacheItem();
                 },
                 hideErrors: false);

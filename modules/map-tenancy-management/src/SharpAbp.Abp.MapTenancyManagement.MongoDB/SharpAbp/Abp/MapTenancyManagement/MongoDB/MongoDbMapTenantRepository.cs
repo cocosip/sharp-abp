@@ -27,7 +27,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
         /// <param name="code"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<MapTenant> FindAsync(
+        public virtual async Task<MapTenant> FindByCodeAsync(
             [NotNull] string code,
             CancellationToken cancellationToken = default)
         {
@@ -39,17 +39,17 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
         /// Find MapTenant by code
         /// </summary>
         /// <param name="code"></param>
-        /// <param name="exceptId"></param>
+        /// <param name="expectedId"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<MapTenant> FindAsync(
+        public virtual async Task<MapTenant> FindExpectedAsync(
             [NotNull] string code,
-            Guid? exceptId = null,
+            Guid? expectedId = null,
             CancellationToken cancellationToken = default)
         {
             return await (await GetMongoQueryableAsync())
                 .WhereIf(!code.IsNullOrWhiteSpace(), x => x.Code == code)
-                .WhereIf(exceptId.HasValue, x => x.Id != exceptId.Value)
+                .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
                 .As<IMongoQueryable<MapTenant>>()
                 .FirstOrDefaultAsync();
         }
