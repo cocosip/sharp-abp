@@ -4,7 +4,6 @@ namespace SharpAbp.Abp.MassTransit
 {
     public class AbpMassTransitModule : AbpModule
     {
-      
 
     }
 }
