@@ -47,7 +47,7 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<FileStoringContainer> FindExpectedAsync(
+        public virtual async Task<FileStoringContainer> FindExpectedByNameAsync(
             string name,
             Guid? expectedId = null,
             bool includeDetails = false,

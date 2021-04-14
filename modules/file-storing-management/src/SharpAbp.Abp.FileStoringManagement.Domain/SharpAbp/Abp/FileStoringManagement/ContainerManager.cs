@@ -50,7 +50,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         {
             using (CurrentTenant.Change(tenantId))
             {
-                var container = await FileStoringContainerRepository.FindExpectedAsync(name, expectedId, false);
+                var container = await FileStoringContainerRepository.FindExpectedByNameAsync(name, expectedId, false);
                 if (container != null)
                 {
                     throw new AbpException($"Duplicate container name '{name}' in tenant '{tenantId}'.");

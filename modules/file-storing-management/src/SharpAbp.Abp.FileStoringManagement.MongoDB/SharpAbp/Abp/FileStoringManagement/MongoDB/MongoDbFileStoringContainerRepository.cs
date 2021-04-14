@@ -46,7 +46,7 @@ namespace SharpAbp.Abp.FileStoringManagement.MongoDB
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<FileStoringContainer> FindExpectedAsync(
+        public async Task<FileStoringContainer> FindExpectedByNameAsync(
             string name,
             Guid? expectedId = null,
             bool includeDetails = false,

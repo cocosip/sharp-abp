@@ -26,7 +26,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<FileStoringContainer> FindExpectedAsync(string name, Guid? expectedId = null, bool includeDetails = false, CancellationToken cancellationToken = default);
+        Task<FileStoringContainer> FindExpectedByNameAsync(string name, Guid? expectedId = null, bool includeDetails = false, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get List
