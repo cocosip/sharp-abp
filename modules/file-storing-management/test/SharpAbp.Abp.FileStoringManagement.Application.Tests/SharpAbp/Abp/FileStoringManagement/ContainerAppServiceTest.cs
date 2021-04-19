@@ -24,7 +24,7 @@ namespace SharpAbp.Abp.FileStoringManagement
             _containerAppService = GetRequiredService<IContainerAppService>();
             _fileContainerFactory = GetRequiredService<IFileContainerFactory>();
         }
- 
+
 
         [Fact]
         public async Task CreateAsync_UpdateAsync_Test()
@@ -32,15 +32,17 @@ namespace SharpAbp.Abp.FileStoringManagement
             var tenantId = new Guid("42645233-3d72-4339-9adc-845321f8ada3");
             var tenantId2 = new Guid("d0ad04d5-2839-2c2a-1078-6b253678dceb");
 
-            var id = await _containerAppService.CreateAsync(new CreateContainerDto()
+            Guid id;
+            using (_currentTenant.Change(tenantId))
             {
-                Provider = MinioFileProviderConfigurationNames.ProviderName,
-                Name = "default1",
-                TenantId = tenantId,
-                IsMultiTenant = true,
-                HttpAccess = true,
-                Title = "test-container1",
-                Items = new List<CreateContainerItemDto>()
+                id = await _containerAppService.CreateAsync(new CreateContainerDto()
+                {
+                    Provider = MinioFileProviderConfigurationNames.ProviderName,
+                    Name = "default1",
+                    IsMultiTenant = true,
+                    HttpAccess = true,
+                    Title = "test-container1",
+                    Items = new List<CreateContainerItemDto>()
                 {
                     new CreateContainerItemDto(MinioFileProviderConfigurationNames.BucketName,"bucket1"),
                     new CreateContainerItemDto(MinioFileProviderConfigurationNames.EndPoint,"http://192.168.0.4:9000"),
@@ -49,17 +51,20 @@ namespace SharpAbp.Abp.FileStoringManagement
                     new CreateContainerItemDto(MinioFileProviderConfigurationNames.WithSSL,"false"),
                     new CreateContainerItemDto(MinioFileProviderConfigurationNames.CreateBucketIfNotExists,"false")
                 }
-            });
+                });
+            }
 
-            var id2 = await _containerAppService.CreateAsync(new CreateContainerDto()
+            Guid id2;
+            using (_currentTenant.Change(tenantId2))
             {
-                Provider = MinioFileProviderConfigurationNames.ProviderName,
-                Name = "default2",
-                TenantId = tenantId2,
-                IsMultiTenant = true,
-                HttpAccess = true,
-                Title = "test-container2",
-                Items = new List<CreateContainerItemDto>()
+                id2 = await _containerAppService.CreateAsync(new CreateContainerDto()
+                {
+                    Provider = MinioFileProviderConfigurationNames.ProviderName,
+                    Name = "default2",
+                    IsMultiTenant = true,
+                    HttpAccess = true,
+                    Title = "test-container2",
+                    Items = new List<CreateContainerItemDto>()
                 {
                     new CreateContainerItemDto(MinioFileProviderConfigurationNames.BucketName,"bucket2"),
                     new CreateContainerItemDto(MinioFileProviderConfigurationNames.EndPoint,"http://192.168.0.4:9000"),
@@ -68,7 +73,8 @@ namespace SharpAbp.Abp.FileStoringManagement
                     new CreateContainerItemDto(MinioFileProviderConfigurationNames.WithSSL,"false"),
                     new CreateContainerItemDto(MinioFileProviderConfigurationNames.CreateBucketIfNotExists,"false")
                 }
-            });
+                });
+            }
 
             using (_dataFilter.Disable())
             {
@@ -117,9 +123,6 @@ namespace SharpAbp.Abp.FileStoringManagement
                     }
                 });
 
-
-
-
                 var container3 = await _containerAppService.GetAsync(id, true);
                 Assert.Equal("default2", container3.Name);
                 Assert.Equal("FileSystem", container3.Provider);
@@ -135,15 +138,17 @@ namespace SharpAbp.Abp.FileStoringManagement
         public async Task CreateAsync_DeleteAsync_Test()
         {
             var tenantId = new Guid("42124112-3d72-4339-9adc-845321f8a2a0");
-            var id = await _containerAppService.CreateAsync(new CreateContainerDto()
+            Guid id;
+            using (_currentTenant.Change(tenantId))
             {
-                Provider = MinioFileProviderConfigurationNames.ProviderName,
-                Name = "default22",
-                TenantId = tenantId,
-                IsMultiTenant = true,
-                HttpAccess = true,
-                Title = "test-container22",
-                Items = new List<CreateContainerItemDto>()
+                id = await _containerAppService.CreateAsync(new CreateContainerDto()
+                {
+                    Provider = MinioFileProviderConfigurationNames.ProviderName,
+                    Name = "default22",
+                    IsMultiTenant = true,
+                    HttpAccess = true,
+                    Title = "test-container22",
+                    Items = new List<CreateContainerItemDto>()
                 {
                     new CreateContainerItemDto(MinioFileProviderConfigurationNames.BucketName,"bucket22"),
                     new CreateContainerItemDto(MinioFileProviderConfigurationNames.EndPoint,"http://192.168.0.4:9000"),
@@ -152,11 +157,12 @@ namespace SharpAbp.Abp.FileStoringManagement
                     new CreateContainerItemDto(MinioFileProviderConfigurationNames.WithSSL,"false"),
                     new CreateContainerItemDto(MinioFileProviderConfigurationNames.CreateBucketIfNotExists,"false")
                 }
-            });
+                });
+            }
 
             var container = await _containerAppService.GetAsync(id);
             Assert.Null(container);
-
+            
             using (_currentTenant.Change(tenantId))
             {
                 var container1 = await _containerAppService.GetByNameAsync("default22");
@@ -176,15 +182,16 @@ namespace SharpAbp.Abp.FileStoringManagement
         public async Task Get_Container_Test()
         {
             var tenantId = new Guid("42124112-3d72-2232-85a3-845321f8a2a0");
-            var id = await _containerAppService.CreateAsync(new CreateContainerDto()
+            using (_currentTenant.Change(tenantId))
             {
-                Provider = MinioFileProviderConfigurationNames.ProviderName,
-                Name = "default22",
-                TenantId = tenantId,
-                IsMultiTenant = false,
-                HttpAccess = true,
-                Title = "test-container22",
-                Items = new List<CreateContainerItemDto>()
+                var id = await _containerAppService.CreateAsync(new CreateContainerDto()
+                {
+                    Provider = MinioFileProviderConfigurationNames.ProviderName,
+                    Name = "default22",
+                    IsMultiTenant = false,
+                    HttpAccess = true,
+                    Title = "test-container22",
+                    Items = new List<CreateContainerItemDto>()
                 {
                     new CreateContainerItemDto(MinioFileProviderConfigurationNames.BucketName,"bucket22"),
                     new CreateContainerItemDto(MinioFileProviderConfigurationNames.EndPoint,"http://192.168.0.4:9000"),
@@ -193,10 +200,8 @@ namespace SharpAbp.Abp.FileStoringManagement
                     new CreateContainerItemDto(MinioFileProviderConfigurationNames.WithSSL,"false"),
                     new CreateContainerItemDto(MinioFileProviderConfigurationNames.CreateBucketIfNotExists,"false")
                 }
-            });
+                });
 
-            using (_currentTenant.Change(tenantId))
-            {
                 var container = _fileContainerFactory.Create("default22");
 
                 var configuration = container.GetConfiguration();
@@ -216,6 +221,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 Assert.False(minioConfiguration2.WithSSL);
                 Assert.False(minioConfiguration2.CreateBucketIfNotExists);
             }
+ 
         }
 
     }

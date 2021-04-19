@@ -92,11 +92,11 @@ namespace SharpAbp.Abp.FileStoringManagement
             ContainerManager.ValidateProviderValues(input.Provider, keyValuePairs);
 
             //Validate name
-            await ContainerManager.ValidateNameAsync(input.TenantId, input.Name, null);
+            await ContainerManager.ValidateNameAsync(CurrentTenant.Id, input.Name, null);
 
             var container = new FileStoringContainer(
               GuidGenerator.Create(),
-              input.TenantId,
+              CurrentTenant.Id,
               input.IsMultiTenant,
               input.Provider,
               input.Name,

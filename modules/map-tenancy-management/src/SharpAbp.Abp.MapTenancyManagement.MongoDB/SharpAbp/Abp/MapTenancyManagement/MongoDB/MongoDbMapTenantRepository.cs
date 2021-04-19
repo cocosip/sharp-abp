@@ -32,7 +32,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
             CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(code, nameof(code));
-            return await FindAsync(x => x.Code == code, true, cancellationToken);
+            return await FindAsync(x => x.Code == code, true, GetCancellationToken(cancellationToken));
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
         /// <param name="expectedId"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<MapTenant> FindExpectedAsync(
+        public virtual async Task<MapTenant> FindExpectedCodeAsync(
             [NotNull] string code,
             Guid? expectedId = null,
             CancellationToken cancellationToken = default)
@@ -51,7 +51,41 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
                 .WhereIf(!code.IsNullOrWhiteSpace(), x => x.Code == code)
                 .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
                 .As<IMongoQueryable<MapTenant>>()
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
+        }
+
+        /// <summary>
+        /// Find MapTenant
+        /// </summary>
+        /// <param name="tenantId"></param>
+        /// <param name="expectedId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<MapTenant> FindExpectedTenantIdAsync(
+            Guid tenantId,
+            Guid? expectedId = null,
+            CancellationToken cancellationToken = default)
+        {
+            return await (await GetMongoQueryableAsync())
+                .Where(x => x.TenantId == tenantId)
+                .As<IMongoQueryable<MapTenant>>()
+                .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
+        }
+
+        /// <summary>
+        /// Get list by tenant id
+        /// </summary>
+        /// <param name="tenantId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<List<MapTenant>> GetListByTenantIdAsync(
+            Guid tenantId,
+            CancellationToken cancellationToken = default)
+        {
+            return await (await GetMongoQueryableAsync())
+                .Where(x => x.TenantId == tenantId)
+               .As<IMongoQueryable<MapTenant>>()
+               .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
         /// <summary>
@@ -93,7 +127,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<int> GetCountAsync(
-            string code = "", 
+            string code = "",
             Guid? tenantId = null,
             string mapCode = "",
             CancellationToken cancellationToken = default)

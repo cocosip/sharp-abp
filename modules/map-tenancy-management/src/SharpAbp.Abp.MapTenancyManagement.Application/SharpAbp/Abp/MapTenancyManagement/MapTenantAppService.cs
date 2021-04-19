@@ -79,7 +79,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         public virtual async Task<Guid> CreateAsync(CreateMapTenantDto input)
         {
             //Validate tenant
-            await MapTenantManager.ValidateTenantAsync(input.TenantId);
+            await MapTenantManager.ValidateTenantAsync(input.TenantId, null);
             //Validate code
             await MapTenantManager.ValidateCodeAsync(input.Code);
 
@@ -108,7 +108,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
             }
 
             //Validate tenant
-            await MapTenantManager.ValidateTenantAsync(input.TenantId);
+            await MapTenantManager.ValidateTenantAsync(input.TenantId, input.Id);
             //Validate code
             await MapTenantManager.ValidateCodeAsync(input.Code, mapTenant.Id);
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Domain.Services;
@@ -21,14 +22,21 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <summary>
         /// Validate tenant
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="tenantId"></param>
+        /// <param name="expectedId"></param>
         /// <returns></returns>
-        public virtual async Task ValidateTenantAsync(Guid id)
+        public virtual async Task ValidateTenantAsync(Guid tenantId, Guid? expectedId = null)
         {
-            var tenant = await TenantRepository.FindAsync(id, false);
+            var tenant = await TenantRepository.FindAsync(tenantId, false);
             if (tenant == null)
             {
-                throw new AbpException($"MapTenant tenant {id} was not exist.");
+                throw new AbpException($"MapTenant tenant: {tenantId} was not exist.");
+            }
+
+            var mapTenant = await MapTenantRepository.FindExpectedTenantIdAsync(tenantId, expectedId);
+            if (mapTenant != null)
+            {
+                throw new AbpException($"Duplicate tenant id: {tenantId}.");
             }
         }
 
@@ -40,13 +48,12 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <returns></returns>
         public virtual async Task ValidateCodeAsync(string code, Guid? expectedId = null)
         {
-            var mapTenant = await MapTenantRepository.FindExpectedAsync(code, expectedId);
+            var mapTenant = await MapTenantRepository.FindExpectedCodeAsync(code, expectedId);
             if (mapTenant != null)
             {
                 throw new AbpException($"The 'MapTenant' code was exist! Code:{code}.");
             }
         }
-
 
     }
 }

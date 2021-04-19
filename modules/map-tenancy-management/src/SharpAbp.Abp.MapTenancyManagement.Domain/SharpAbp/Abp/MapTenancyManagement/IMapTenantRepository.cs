@@ -24,7 +24,24 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <param name="expectedId"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<MapTenant> FindExpectedAsync([NotNull] string code, Guid? expectedId = null, CancellationToken cancellationToken = default);
+        Task<MapTenant> FindExpectedCodeAsync([NotNull] string code, Guid? expectedId = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Find MapTenant
+        /// </summary>
+        /// <param name="tenantId"></param>
+        /// <param name="expectedId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<MapTenant> FindExpectedTenantIdAsync(Guid tenantId, Guid? expectedId = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get list by tenant id
+        /// </summary>
+        /// <param name="tenantId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<List<MapTenant>> GetListByTenantIdAsync(Guid tenantId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get List

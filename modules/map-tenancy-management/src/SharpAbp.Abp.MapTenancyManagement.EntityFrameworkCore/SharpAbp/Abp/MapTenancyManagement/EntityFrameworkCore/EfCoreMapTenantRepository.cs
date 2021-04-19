@@ -41,7 +41,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         /// <param name="expectedId"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<MapTenant> FindExpectedAsync(
+        public virtual async Task<MapTenant> FindExpectedCodeAsync(
             [NotNull] string code,
             Guid? expectedId = null,
             CancellationToken cancellationToken = default)
@@ -53,7 +53,39 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         }
 
         /// <summary>
-        /// Get List
+        /// Find MapTenant
+        /// </summary>
+        /// <param name="tenantId"></param>
+        /// <param name="expectedId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<MapTenant> FindExpectedTenantIdAsync(
+            Guid tenantId, 
+            Guid? expectedId = null,
+            CancellationToken cancellationToken = default)
+        {
+            return await (await GetDbSetAsync())
+                .Where(x => x.TenantId == tenantId)
+                .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
+        }
+
+        /// <summary>
+        /// Get list by tenant id
+        /// </summary>
+        /// <param name="tenantId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<List<MapTenant>> GetListByTenantIdAsync(
+            Guid tenantId,
+            CancellationToken cancellationToken = default)
+        {
+            return await (await GetDbSetAsync())
+                .Where(x => x.TenantId == tenantId)
+                .ToListAsync(GetCancellationToken(cancellationToken));
+        }
+
+        /// <summary>
+        /// Get list
         /// </summary>
         /// <param name="skipCount"></param>
         /// <param name="maxResultCount"></param>
