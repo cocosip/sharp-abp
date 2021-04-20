@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using Volo.Abp.DependencyInjection;
-using Volo.Abp.MultiTenancy;
-using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.FileStoring
 {
@@ -9,40 +8,40 @@ namespace SharpAbp.Abp.FileStoring
     {
         protected IFileProviderSelector ProviderSelector { get; }
         protected IFileContainerConfigurationProvider ConfigurationProvider { get; }
-        protected ICurrentTenant CurrentTenant { get; }
-        protected ICancellationTokenProvider CancellationTokenProvider { get; }
         protected IServiceProvider ServiceProvider { get; }
-        protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
 
         public FileContainerFactory(
             IFileContainerConfigurationProvider configurationProvider,
-            ICurrentTenant currentTenant,
-            ICancellationTokenProvider cancellationTokenProvider,
             IFileProviderSelector providerSelector,
-            IServiceProvider serviceProvider,
-            IFileNormalizeNamingService fileNormalizeNamingService)
+            IServiceProvider serviceProvider)
         {
             ConfigurationProvider = configurationProvider;
-            CurrentTenant = currentTenant;
-            CancellationTokenProvider = cancellationTokenProvider;
             ProviderSelector = providerSelector;
             ServiceProvider = serviceProvider;
-            FileNormalizeNamingService = fileNormalizeNamingService;
         }
 
         public virtual IFileContainer Create(string name)
         {
             var configuration = ConfigurationProvider.Get(name);
+            var fileProvider = ProviderSelector.Get(name);
 
-            return new FileContainer(
+            var fileContainer = ActivatorUtilities.CreateInstance<FileContainer>(
+                ServiceProvider,
                 name,
                 configuration,
-                ProviderSelector.Get(name),
-                CurrentTenant,
-                CancellationTokenProvider,
-                FileNormalizeNamingService,
-                ServiceProvider
-            );
+                fileProvider);
+
+            return fileContainer;
+
+            //return new FileContainer(
+            //    name,
+            //    configuration,
+            //    ProviderSelector.Get(name),
+            //    CurrentTenant,
+            //    CancellationTokenProvider,
+            //    FileNormalizeNamingService,
+            //    ServiceProvider
+            //);
         }
     }
 }
