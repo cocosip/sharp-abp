@@ -4,7 +4,7 @@
   <Import Project="..\..\..\configureawait.props" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>SharpAbp.Abp.FileStoring.Aliyun</AssemblyName>
     <PackageId>SharpAbp.Abp.FileStoring.Aliyun</PackageId>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>

@@ -4,7 +4,7 @@
   <Import Project="..\..\..\configureawait.props" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>SharpAbp.Abp.Micro.Discovery.Consul</AssemblyName>
     <PackageId>SharpAbp.Abp.Micro.Discovery.Consul</PackageId>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>

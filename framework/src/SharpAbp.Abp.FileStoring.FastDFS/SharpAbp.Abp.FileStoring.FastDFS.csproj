@@ -4,7 +4,7 @@
   <Import Project="..\..\..\configureawait.props" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>SharpAbp.Abp.FileStoring.FastDFS</AssemblyName>
     <PackageId>SharpAbp.Abp.FileStoring.FastDFS</PackageId>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SharpAbp.Abp.FastDFS.SuperSocket\SharpAbp.Abp.FastDFS.SuperSocket.csproj" />
+    <ProjectReference Include="..\SharpAbp.Abp.FastDFS.DotNetty\SharpAbp.Abp.FastDFS.DotNetty.csproj" />
     <ProjectReference Include="..\SharpAbp.Abp.FileStoring\SharpAbp.Abp.FileStoring.csproj" />
   </ItemGroup>
 
