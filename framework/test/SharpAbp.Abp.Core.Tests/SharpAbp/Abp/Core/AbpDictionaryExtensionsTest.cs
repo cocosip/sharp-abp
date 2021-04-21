@@ -62,7 +62,7 @@ namespace SharpAbp.Abp.Core
         }
 
         [Fact]
-        public void ConvertDictionary_Test()
+        public void ToDictionary_Test()
         {
             var dict = new System.Collections.Generic.Dictionary<int, string>()
             {
@@ -71,7 +71,7 @@ namespace SharpAbp.Abp.Core
                 {3,"33" }
             };
 
-            var newDict = dict.ConvertDictionary<int, string, string, string>(x => x.ToString(), v => v);
+            var newDict = dict.ToDictionary<int, string, string, string>(x => x.ToString(), v => v);
 
             Assert.Equal(3, newDict.Count);
             Assert.True(newDict.ContainsKey("1"));
