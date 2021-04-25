@@ -24,10 +24,10 @@ namespace SharpAbp.Abp.FileStoringManagement
         }
 
         [HttpGet]
-        [Route("get-by-name/{name}")]
-        public virtual async Task<ContainerDto> GetByNameAsync(string name)
+        [Route("find-by-name/{name}")]
+        public virtual async Task<ContainerDto> FindByNameAsync(string name)
         {
-            return await _containerAppService.GetByNameAsync(name, true);
+            return await _containerAppService.FindByNameAsync(name, true);
         }
 
 

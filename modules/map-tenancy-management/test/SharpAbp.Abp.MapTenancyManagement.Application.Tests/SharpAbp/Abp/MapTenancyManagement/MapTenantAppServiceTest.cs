@@ -26,7 +26,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
             var id = await _mapTenantAppService.CreateAsync(new CreateMapTenantDto("100", tenant1.Id, "200"));
             var mapTenant1 = await _mapTenantAppService.GetAsync(id);
-            var mapTenant2 = await _mapTenantAppService.GetByCodeAsync("100");
+            var mapTenant2 = await _mapTenantAppService.FindByCodeAsync("100");
             Assert.Equal(mapTenant1.Code, mapTenant2.Code);
             Assert.Equal(mapTenant1.TenantId, mapTenant2.TenantId);
             Assert.Equal(mapTenant1.MapCode, mapTenant2.MapCode);
@@ -34,7 +34,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
             await _mapTenantAppService.UpdateAsync(new UpdateMapTenantDto(id, "300", tenant1.Id, "400"));
 
-            var mapTenant3 = await _mapTenantAppService.GetByCodeAsync("300");
+            var mapTenant3 = await _mapTenantAppService.FindByCodeAsync("300");
             Assert.Equal("300", mapTenant3.Code);
             Assert.Equal("400", mapTenant3.MapCode);
             Assert.Equal(tenant1.Id, mapTenant3.TenantId);
@@ -49,7 +49,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
             await _mapTenantAppService.DeleteAsync(id);
 
-            var mapTenant5 = await _mapTenantAppService.GetByCodeAsync("300");
+            var mapTenant5 = await _mapTenantAppService.FindByCodeAsync("300");
             Assert.Null(mapTenant5);
 
         }

@@ -22,7 +22,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="name"></param>
         /// <param name="includeDetails"></param>
         /// <returns></returns>
-        Task<ContainerDto> GetByNameAsync([NotNull] string name, bool includeDetails = true);
+        Task<ContainerDto> FindByNameAsync([NotNull] string name, bool includeDetails = true);
 
         /// <summary>
         /// Get container page list

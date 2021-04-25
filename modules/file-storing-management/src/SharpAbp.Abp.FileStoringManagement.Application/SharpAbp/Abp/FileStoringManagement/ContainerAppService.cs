@@ -45,7 +45,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="includeDetails"></param>
         /// <returns></returns>
         [Authorize(FileStoringManagementPermissions.Containers.Default)]
-        public virtual async Task<ContainerDto> GetByNameAsync([NotNull] string name, bool includeDetails = true)
+        public virtual async Task<ContainerDto> FindByNameAsync([NotNull] string name, bool includeDetails = true)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
 

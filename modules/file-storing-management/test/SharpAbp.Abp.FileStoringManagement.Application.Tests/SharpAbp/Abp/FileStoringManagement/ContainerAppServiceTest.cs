@@ -165,7 +165,7 @@ namespace SharpAbp.Abp.FileStoringManagement
             
             using (_currentTenant.Change(tenantId))
             {
-                var container1 = await _containerAppService.GetByNameAsync("default22");
+                var container1 = await _containerAppService.FindByNameAsync("default22");
                 Assert.NotNull(container1);
 
                 var container2 = await _containerAppService.GetAsync(id);

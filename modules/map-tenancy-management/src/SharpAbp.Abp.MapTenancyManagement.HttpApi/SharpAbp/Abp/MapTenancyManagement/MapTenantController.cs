@@ -23,10 +23,10 @@ namespace SharpAbp.Abp.MapTenancyManagement
         }
 
         [HttpGet]
-        [Route("get-by-code/{code}")]
-        public async Task<MapTenantDto> GetAsync(string code)
+        [Route("find-by-code/{code}")]
+        public async Task<MapTenantDto> FindByCodeAsync(string code)
         {
-            return await _mapTenantAppService.GetByCodeAsync(code);
+            return await _mapTenantAppService.FindByCodeAsync(code);
         }
 
         [HttpGet]
