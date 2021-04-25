@@ -60,12 +60,13 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<MapTenant> FindExpectedTenantIdAsync(
-            Guid tenantId, 
+            Guid tenantId,
             Guid? expectedId = null,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .Where(x => x.TenantId == tenantId)
+                .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 

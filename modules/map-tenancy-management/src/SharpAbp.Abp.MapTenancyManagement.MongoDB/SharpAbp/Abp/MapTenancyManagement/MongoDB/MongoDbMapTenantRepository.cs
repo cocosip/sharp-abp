@@ -68,6 +68,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
         {
             return await (await GetMongoQueryableAsync())
                 .Where(x => x.TenantId == tenantId)
+                .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
                 .As<IMongoQueryable<MapTenant>>()
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
@@ -84,8 +85,8 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
         {
             return await (await GetMongoQueryableAsync())
                 .Where(x => x.TenantId == tenantId)
-               .As<IMongoQueryable<MapTenant>>()
-               .ToListAsync(GetCancellationToken(cancellationToken));
+                .As<IMongoQueryable<MapTenant>>()
+                .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
         /// <summary>
