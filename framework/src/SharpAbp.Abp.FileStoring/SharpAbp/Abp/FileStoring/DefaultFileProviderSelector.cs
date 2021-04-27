@@ -25,9 +25,14 @@ namespace SharpAbp.Abp.FileStoring
         {
             Check.NotNull(containerName, nameof(containerName));
             var configuration = ConfigurationProvider.Get(containerName);
+            if (configuration == null)
+            {
+                throw new AbpException($"Could not find container configuration by name '{containerName}'.");
+            }
+
             if (!FileProviders.Any())
             {
-                throw new AbpException("No FILE Storage provider was registered! At least one provider must be registered to be able to use the Blog Storing System.");
+                throw new AbpException("No FILE Storage provider was registered! At least one provider must be registered to be able to use the File Storing System.");
             }
 
             foreach (var provider in FileProviders)

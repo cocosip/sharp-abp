@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Domain.Services;
-using Volo.Abp.MultiTenancy;
 using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoringManagement
@@ -53,7 +52,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 var container = await FileStoringContainerRepository.FindExpectedByNameAsync(name, expectedId, false);
                 if (container != null)
                 {
-                    throw new AbpException($"Duplicate container name '{name}' in tenant '{tenantId}'.");
+                    throw new UserFriendlyException($"Duplicate container name '{name}' in tenant '{tenantId}'.");
                 }
             }
         }
@@ -69,7 +68,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                     return providerValuesValidator;
                 }
             }
-            throw new AbpException($"Could not find any 'IFileProviderValuesValidator' for provider '{provider}' .");
+            throw new UserFriendlyException($"Could not find any 'IFileProviderValuesValidator' for provider '{provider}' .");
         }
 
     }

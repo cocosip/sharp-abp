@@ -104,7 +104,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
             var mapTenant = await MapTenantRepository.GetAsync(input.Id, true);
             if (mapTenant == null)
             {
-                throw new AbpException($"Could not find MapTenant by id :{input.Id}.");
+                throw new UserFriendlyException($"Can't find MapTenant by id :{input.Id}.");
             }
 
             //Validate tenant

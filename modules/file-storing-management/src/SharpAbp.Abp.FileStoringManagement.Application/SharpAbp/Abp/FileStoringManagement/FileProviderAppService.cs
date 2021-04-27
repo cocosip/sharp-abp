@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.FileStoring;
 using System.Collections.Generic;
+using System.Linq;
 using Volo.Abp;
 using Volo.Abp.Reflection;
 
@@ -52,6 +53,11 @@ namespace SharpAbp.Abp.FileStoringManagement
             Check.NotNullOrWhiteSpace(provider, nameof(provider));
 
             var fileProviderConfiguration = Options.Providers.GetConfiguration(provider);
+            if (fileProviderConfiguration == null)
+            {
+                throw new UserFriendlyException($"Could not get provider configuration by name '{provider}'.");
+            }
+
             var values = fileProviderConfiguration.GetValues();
             var providerOptions = new ProviderOptionsDto(provider);
 

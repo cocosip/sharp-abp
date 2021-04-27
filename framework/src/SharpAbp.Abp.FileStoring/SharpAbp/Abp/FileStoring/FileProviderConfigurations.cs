@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Volo.Abp;
@@ -15,6 +14,7 @@ namespace SharpAbp.Abp.FileStoring
             _providers = new Dictionary<string, FileProviderConfiguration>();
         }
 
+        [NotNull]
         public FileProviderConfiguration GetConfiguration([NotNull] string provider)
         {
             Check.NotNullOrWhiteSpace(provider, nameof(provider));

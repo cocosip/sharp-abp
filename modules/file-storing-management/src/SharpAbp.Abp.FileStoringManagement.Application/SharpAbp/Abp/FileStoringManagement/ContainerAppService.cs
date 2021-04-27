@@ -1,13 +1,11 @@
 ﻿using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
-using SharpAbp.Abp.FileStoring;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
-using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
@@ -131,7 +129,7 @@ namespace SharpAbp.Abp.FileStoringManagement
             var container = await FileStoringContainerRepository.GetAsync(input.Id, true);
             if (container == null)
             {
-                throw new AbpException($"Could not find Container when update by id:'{input.Id}'.");
+                throw new UserFriendlyException($"Could not find Container when update by id:'{input.Id}'.");
             }
 
             //Validate name

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Domain.Services;
@@ -30,13 +29,13 @@ namespace SharpAbp.Abp.MapTenancyManagement
             var tenant = await TenantRepository.FindAsync(tenantId, false);
             if (tenant == null)
             {
-                throw new AbpException($"MapTenant tenant: {tenantId} was not exist.");
+                throw new UserFriendlyException($"Can't find any tenant by '{tenantId}'.");
             }
 
             var mapTenant = await MapTenantRepository.FindExpectedTenantIdAsync(tenantId, expectedId);
             if (mapTenant != null)
             {
-                throw new AbpException($"Duplicate tenant id: {tenantId}.");
+                throw new UserFriendlyException($"Duplicate tenantId: '{tenantId}'.");
             }
         }
 
@@ -51,7 +50,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
             var mapTenant = await MapTenantRepository.FindExpectedCodeAsync(code, expectedId);
             if (mapTenant != null)
             {
-                throw new AbpException($"The 'MapTenant' code was exist! Code:{code}.");
+                throw new UserFriendlyException($"The 'MapTenant' code was exist! Code:{code}.");
             }
         }
 
