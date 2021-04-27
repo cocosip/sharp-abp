@@ -76,6 +76,20 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
         {
             return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
+                .SingleOrDefaultAsync(x => x.Id == id, GetCancellationToken(cancellationToken));
+        }
+
+        /// <summary>
+        /// FindAsync
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="includeDetails"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public override async Task<FileStoringContainer> FindAsync(Guid id, bool includeDetails = true, CancellationToken cancellationToken = default)
+        {
+            return await (await GetDbSetAsync())
+                .IncludeDetails(includeDetails)
                 .FirstOrDefaultAsync(x => x.Id == id, GetCancellationToken(cancellationToken));
         }
 

@@ -126,7 +126,7 @@ namespace SharpAbp.Abp.FileStoringManagement
             var keyValuePairs = input.Items.ToDictionary(x => x.Name, y => y.Value);
             ContainerManager.ValidateProviderValues(input.Provider, keyValuePairs);
 
-            var container = await FileStoringContainerRepository.GetAsync(input.Id, true);
+            var container = await FileStoringContainerRepository.FindAsync(input.Id, true);
             if (container == null)
             {
                 throw new UserFriendlyException($"Could not find Container when update by id:'{input.Id}'.");
