@@ -96,19 +96,20 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <summary>
         /// Update MapTenant
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="input"></param>
         /// <returns></returns>
         [Authorize(MapTenancyManagementPermissions.MapTenants.Update)]
-        public virtual async Task UpdateAsync(UpdateMapTenantDto input)
+        public virtual async Task UpdateAsync(Guid id, UpdateMapTenantDto input)
         {
-            var mapTenant = await MapTenantRepository.GetAsync(input.Id, true);
+            var mapTenant = await MapTenantRepository.GetAsync(id, true);
             if (mapTenant == null)
             {
-                throw new UserFriendlyException($"Can't find MapTenant by id :{input.Id}.");
+                throw new UserFriendlyException($"Can't find MapTenant by id :{id}.");
             }
 
             //Validate tenant
-            await MapTenantManager.ValidateTenantAsync(input.TenantId, input.Id);
+            await MapTenantManager.ValidateTenantAsync(input.TenantId, id);
             //Validate code
             await MapTenantManager.ValidateCodeAsync(input.Code, mapTenant.Id);
 

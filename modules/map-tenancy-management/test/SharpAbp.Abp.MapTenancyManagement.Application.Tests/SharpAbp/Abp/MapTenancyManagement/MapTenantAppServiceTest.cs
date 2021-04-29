@@ -32,7 +32,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
             Assert.Equal(mapTenant1.MapCode, mapTenant2.MapCode);
             Assert.Equal("200", mapTenant1.MapCode);
 
-            await _mapTenantAppService.UpdateAsync(new UpdateMapTenantDto(id, "300", tenant1.Id, "400"));
+            await _mapTenantAppService.UpdateAsync(id, new UpdateMapTenantDto("300", tenant1.Id, "400"));
 
             var mapTenant3 = await _mapTenantAppService.FindByCodeAsync("300");
             Assert.Equal("300", mapTenant3.Code);
@@ -40,7 +40,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
             Assert.Equal(tenant1.Id, mapTenant3.TenantId);
 
             //Update code
-            await _mapTenantAppService.UpdateAsync(new UpdateMapTenantDto(id, "300", tenant2.Id, "400"));
+            await _mapTenantAppService.UpdateAsync(id, new UpdateMapTenantDto("300", tenant2.Id, "400"));
             var mapTenant4 = await _mapTenantAppService.GetAsync(id);
 
 

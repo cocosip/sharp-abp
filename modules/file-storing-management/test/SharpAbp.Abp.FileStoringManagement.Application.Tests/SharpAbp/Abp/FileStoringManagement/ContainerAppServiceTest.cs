@@ -107,9 +107,8 @@ namespace SharpAbp.Abp.FileStoringManagement
                 Assert.Equal("test-container1", container2.Title);
                 Assert.Equal(6, container2.Items.Count);
 
-                await _containerAppService.UpdateAsync(new UpdateContainerDto()
+                await _containerAppService.UpdateAsync(id, new UpdateContainerDto()
                 {
-                    Id = id,
                     Provider = "FileSystem",
                     Name = "default2",
                     IsMultiTenant = false,
@@ -162,7 +161,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 
             var container = await _containerAppService.GetAsync(id);
             Assert.Null(container);
-            
+
             using (_currentTenant.Change(tenantId))
             {
                 var container1 = await _containerAppService.FindByNameAsync("default22");
@@ -221,7 +220,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 Assert.False(minioConfiguration2.WithSSL);
                 Assert.False(minioConfiguration2.CreateBucketIfNotExists);
             }
- 
+
         }
 
     }

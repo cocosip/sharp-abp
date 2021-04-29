@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using Volo.Abp;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
+    [RemoteService(Name = FileStoringManagementRemoteServiceConsts.RemoteServiceName)]
     [Area("file-storing")]
     [Route("api/file-provider")]
-    public class FileProviderController : FileStoringController
+    public class FileProviderController : FileStoringController, IFileProviderAppService
     {
         private readonly IFileProviderAppService _fileProviderAppService;
         public FileProviderController(IFileProviderAppService fileProviderAppService)

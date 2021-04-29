@@ -20,7 +20,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// </summary>
         /// <param name="code"></param>
         /// <returns></returns>
-        Task<MapTenantDto> FindByCodeAsync([NotNull] string code);
+        Task<MapTenantDto> FindByCodeAsync(string code);
 
         /// <summary>
         /// Get Paged List
@@ -39,9 +39,10 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <summary>
         /// Update MapTenant
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        Task UpdateAsync(UpdateMapTenantDto input);
+        Task UpdateAsync(Guid id, UpdateMapTenantDto input);
 
         /// <summary>
         /// Delete MapTenant

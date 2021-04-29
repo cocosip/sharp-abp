@@ -12,11 +12,11 @@ namespace SharpAbp.Abp.FileStoringManagement
     [Authorize(FileStoringManagementPermissions.Containers.Default)]
     public class ContainerAppService : FileStoringManagementAppServiceBase, IContainerAppService
     {
-        protected ContainerManager ContainerManager { get; }
+        protected IContainerManager ContainerManager { get; }
         protected IFileStoringContainerRepository FileStoringContainerRepository { get; }
 
         public ContainerAppService(
-            ContainerManager containerManager,
+            IContainerManager containerManager,
             IFileStoringContainerRepository fileStoringContainerRepository)
         {
             ContainerManager = containerManager;
@@ -43,7 +43,9 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="includeDetails"></param>
         /// <returns></returns>
         [Authorize(FileStoringManagementPermissions.Containers.Default)]
-        public virtual async Task<ContainerDto> FindByNameAsync([NotNull] string name, bool includeDetails = true)
+        public virtual async Task<ContainerDto> FindByNameAsync(
+            [NotNull] string name,
+            bool includeDetails = true)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
 
@@ -118,18 +120,19 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <summary>
         /// Update container
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="input"></param>
         /// <returns></returns>
         [Authorize(FileStoringManagementPermissions.Containers.Update)]
-        public virtual async Task UpdateAsync(UpdateContainerDto input)
+        public virtual async Task UpdateAsync(Guid id, UpdateContainerDto input)
         {
             var keyValuePairs = input.Items.ToDictionary(x => x.Name, y => y.Value);
             ContainerManager.ValidateProviderValues(input.Provider, keyValuePairs);
 
-            var container = await FileStoringContainerRepository.FindAsync(input.Id, true);
+            var container = await FileStoringContainerRepository.FindAsync(id, true);
             if (container == null)
             {
-                throw new UserFriendlyException($"Could not find Container when update by id:'{input.Id}'.");
+                throw new UserFriendlyException($"Could not find Container when update by id:'{id}'.");
             }
 
             //Validate name

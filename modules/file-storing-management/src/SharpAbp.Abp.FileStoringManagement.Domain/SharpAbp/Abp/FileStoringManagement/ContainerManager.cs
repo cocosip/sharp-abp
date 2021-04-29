@@ -10,7 +10,7 @@ using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
-    public class ContainerManager : DomainService
+    public class ContainerManager : DomainService, IContainerManager
     {
         protected IEnumerable<IFileProviderValuesValidator> ProviderValuesValidators { get; }
         protected IFileStoringContainerRepository FileStoringContainerRepository { get; }
@@ -45,7 +45,10 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="name"></param>
         /// <param name="expectedId"></param>
         /// <returns></returns>
-        public virtual async Task ValidateNameAsync(Guid? tenantId, string name, Guid? expectedId = null)
+        public virtual async Task ValidateNameAsync(
+            Guid? tenantId, 
+            string name, 
+            Guid? expectedId = null)
         {
             using (CurrentTenant.Change(tenantId))
             {

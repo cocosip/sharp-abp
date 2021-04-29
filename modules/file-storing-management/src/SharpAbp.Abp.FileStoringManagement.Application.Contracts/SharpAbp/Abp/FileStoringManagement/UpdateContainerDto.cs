@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Volo.Abp.Validation;
 
@@ -7,8 +6,6 @@ namespace SharpAbp.Abp.FileStoringManagement
 {
     public class UpdateContainerDto
     {
-        [Required]
-        public Guid Id { get; set; }
 
         [Required]
         public bool IsMultiTenant { get; set; }

@@ -7,7 +7,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
 {
     [Area("map-tenancy")]
     [Route("api/map-tenant")]
-    public class MapTenantController : MapTenancyController
+    public class MapTenantController : MapTenancyController, IMapTenantAppService
     {
         private readonly IMapTenantAppService _mapTenantAppService;
         public MapTenantController(IMapTenantAppService mapTenantAppService)
@@ -36,15 +36,15 @@ namespace SharpAbp.Abp.MapTenancyManagement
         }
 
         [HttpPost]
-        public async Task<Guid> CreateAsync([FromBody]CreateMapTenantDto input)
+        public async Task<Guid> CreateAsync([FromBody] CreateMapTenantDto input)
         {
             return await _mapTenantAppService.CreateAsync(input);
         }
 
         [HttpPut]
-        public async Task UpdateAsync([FromBody]UpdateMapTenantDto input)
+        public async Task UpdateAsync(Guid id, UpdateMapTenantDto input)
         {
-            await _mapTenantAppService.UpdateAsync(input);
+            await _mapTenantAppService.UpdateAsync(id, input);
         }
 
         [HttpDelete]
@@ -53,5 +53,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         {
             await _mapTenantAppService.DeleteAsync(id);
         }
+
+
     }
 }
