@@ -11,10 +11,10 @@ namespace SharpAbp.Abp.MapTenancyManagement
     [Authorize(MapTenancyManagementPermissions.MapTenants.Default)]
     public class MapTenantAppService : MapTenancyManagementAppServiceBase, IMapTenantAppService
     {
-        protected MapTenantManager MapTenantManager { get; }
+        protected IMapTenantManager MapTenantManager { get; }
         protected IMapTenantRepository MapTenantRepository { get; }
         public MapTenantAppService(
-            MapTenantManager mapTenantManager,
+            IMapTenantManager mapTenantManager,
             IMapTenantRepository mapTenantRepository)
         {
             MapTenantManager = mapTenantManager;

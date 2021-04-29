@@ -6,7 +6,7 @@ using Volo.Abp.TenantManagement;
 
 namespace SharpAbp.Abp.MapTenancyManagement
 {
-    public class MapTenantManager : DomainService
+    public class MapTenantManager : DomainService, IMapTenantManager
     {
         protected ITenantRepository TenantRepository { get; }
         protected IMapTenantRepository MapTenantRepository { get; }
