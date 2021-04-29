@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 
 namespace SharpAbp.Abp.MapTenancyManagement
 {
+    [RemoteService(Name = MapTenancyManagementRemoteServiceConsts.RemoteServiceName)]
     [Area("map-tenancy")]
     [Route("api/map-tenant")]
     public class MapTenantController : MapTenancyController, IMapTenantAppService
