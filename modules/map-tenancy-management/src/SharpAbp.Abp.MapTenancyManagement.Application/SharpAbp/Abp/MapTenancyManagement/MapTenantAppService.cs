@@ -42,7 +42,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         public virtual async Task<MapTenantDto> FindByCodeAsync([NotNull] string code)
         {
             Check.NotNullOrWhiteSpace(code, nameof(code));
-            var mapTenant = await MapTenantRepository.FindByCodeAsync(code, cancellationToken: default);
+            var mapTenant = await MapTenantRepository.FindByCodeAsync(code);
             return ObjectMapper.Map<MapTenant, MapTenantDto>(mapTenant);
         }
 
