@@ -32,6 +32,13 @@ namespace SharpAbp.Abp.MapTenancyManagement
         }
 
         [HttpGet]
+        [Route("find-by-tenantId/{tenantId}")]
+        public async Task<MapTenantDto> FindByTenantIdAsync(Guid tenantId)
+        {
+            return await _mapTenantAppService.FindByTenantIdAsync(tenantId);
+        }
+
+        [HttpGet]
         public async Task<PagedResultDto<MapTenantDto>> GetPagedListAsync(MapTenantPagedRequestDto input)
         {
             return await _mapTenantAppService.GetPagedListAsync(input);
@@ -57,6 +64,6 @@ namespace SharpAbp.Abp.MapTenancyManagement
             await _mapTenantAppService.DeleteAsync(id);
         }
 
-
+  
     }
 }

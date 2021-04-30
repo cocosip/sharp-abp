@@ -35,6 +35,19 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         }
 
         /// <summary>
+        /// Find MapTenant by tenantId
+        /// </summary>
+        /// <param name="tenantId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<MapTenant> FindByTenantIdAsync(Guid tenantId, CancellationToken cancellationToken = default)
+        {
+            return await (await GetDbSetAsync())
+                .FirstOrDefaultAsync(x => x.TenantId == tenantId, GetCancellationToken(cancellationToken));
+        }
+
+
+        /// <summary>
         /// Find MapTenant
         /// </summary>
         /// <param name="code"></param>

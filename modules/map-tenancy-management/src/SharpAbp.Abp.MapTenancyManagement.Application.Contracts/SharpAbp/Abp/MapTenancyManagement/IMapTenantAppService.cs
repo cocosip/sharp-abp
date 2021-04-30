@@ -16,11 +16,18 @@ namespace SharpAbp.Abp.MapTenancyManagement
         Task<MapTenantDto> GetAsync(Guid id);
 
         /// <summary>
-        /// Get MapTenant by code
+        /// Find MapTenant by code
         /// </summary>
         /// <param name="code"></param>
         /// <returns></returns>
         Task<MapTenantDto> FindByCodeAsync(string code);
+
+        /// <summary>
+        /// Find MapTenant by tenantId
+        /// </summary>
+        /// <param name="tenantId"></param>
+        /// <returns></returns>
+        Task<MapTenantDto> FindByTenantIdAsync(Guid tenantId);
 
         /// <summary>
         /// Get Paged List

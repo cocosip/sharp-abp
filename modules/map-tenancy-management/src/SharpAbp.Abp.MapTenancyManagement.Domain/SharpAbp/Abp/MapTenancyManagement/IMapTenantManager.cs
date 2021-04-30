@@ -7,19 +7,21 @@ namespace SharpAbp.Abp.MapTenancyManagement
     public interface IMapTenantManager : IDomainService
     {
         /// <summary>
-        /// Validate tenant
+        /// Create MapTenant
         /// </summary>
-        /// <param name="tenantId"></param>
-        /// <param name="expectedId"></param>
+        /// <param name="mapTenant"></param>
         /// <returns></returns>
-        Task ValidateTenantAsync(Guid tenantId, Guid? expectedId = null);
+        Task CreateAsync(MapTenant mapTenant);
 
         /// <summary>
-        /// Validate code
+        /// Update MapTenant
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="code"></param>
-        /// <param name="expectedId"></param>
+        /// <param name="tenantId"></param>
+        /// <param name="mapCode"></param>
         /// <returns></returns>
-        Task ValidateCodeAsync(string code, Guid? expectedId = null);
+        Task UpdateAsync(Guid id, string code, Guid tenantId, string mapCode);
+
     }
 }

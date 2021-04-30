@@ -36,6 +36,20 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
         }
 
         /// <summary>
+        /// Find MapTenant by tenantId
+        /// </summary>
+        /// <param name="tenantId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<MapTenant> FindByTenantIdAsync(
+            Guid tenantId, 
+            CancellationToken cancellationToken = default)
+        {
+            return await FindAsync(x => x.TenantId == tenantId, true, GetCancellationToken(cancellationToken));
+        }
+
+
+        /// <summary>
         /// Find MapTenant by code
         /// </summary>
         /// <param name="code"></param>

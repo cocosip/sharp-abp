@@ -34,7 +34,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         }
 
         /// <summary>
-        /// Get MapTenant by code
+        /// Find MapTenant by code
         /// </summary>
         /// <param name="code"></param>
         /// <returns></returns>
@@ -43,6 +43,18 @@ namespace SharpAbp.Abp.MapTenancyManagement
         {
             Check.NotNullOrWhiteSpace(code, nameof(code));
             var mapTenant = await MapTenantRepository.FindByCodeAsync(code);
+            return ObjectMapper.Map<MapTenant, MapTenantDto>(mapTenant);
+        }
+
+        /// <summary>
+        /// Find MapTenant by tenantId
+        /// </summary>
+        /// <param name="tenantId"></param>
+        /// <returns></returns>
+        [Authorize(MapTenancyManagementPermissions.MapTenants.Default)]
+        public virtual async Task<MapTenantDto> FindByTenantIdAsync(Guid tenantId)
+        {
+            var mapTenant = await MapTenantRepository.FindByTenantIdAsync(tenantId);
             return ObjectMapper.Map<MapTenant, MapTenantDto>(mapTenant);
         }
 
@@ -78,18 +90,13 @@ namespace SharpAbp.Abp.MapTenancyManagement
         [Authorize(MapTenancyManagementPermissions.MapTenants.Create)]
         public virtual async Task<Guid> CreateAsync(CreateMapTenantDto input)
         {
-            //Validate tenant
-            await MapTenantManager.ValidateTenantAsync(input.TenantId, null);
-            //Validate code
-            await MapTenantManager.ValidateCodeAsync(input.Code);
-
             var mapTenant = new MapTenant(
                 GuidGenerator.Create(),
                 input.Code,
                 input.TenantId,
                 input.MapCode);
 
-            await MapTenantRepository.InsertAsync(mapTenant);
+            await MapTenantManager.CreateAsync(mapTenant);
             return mapTenant.Id;
         }
 
@@ -102,18 +109,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         [Authorize(MapTenancyManagementPermissions.MapTenants.Update)]
         public virtual async Task UpdateAsync(Guid id, UpdateMapTenantDto input)
         {
-            var mapTenant = await MapTenantRepository.GetAsync(id, true);
-            if (mapTenant == null)
-            {
-                throw new UserFriendlyException($"Can't find MapTenant by id :{id}.");
-            }
-
-            //Validate tenant
-            await MapTenantManager.ValidateTenantAsync(input.TenantId, id);
-            //Validate code
-            await MapTenantManager.ValidateCodeAsync(input.Code, mapTenant.Id);
-
-            mapTenant.Update(input.Code, input.TenantId, input.MapCode);
+            await MapTenantManager.UpdateAsync(id, input.Code, input.TenantId, input.MapCode);
         }
 
         /// <summary>
