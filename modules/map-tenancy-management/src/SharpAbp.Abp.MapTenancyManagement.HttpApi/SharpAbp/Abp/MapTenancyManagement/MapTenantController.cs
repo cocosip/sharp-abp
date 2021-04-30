@@ -44,6 +44,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         }
 
         [HttpPut]
+        [Route("{id}")]
         public async Task UpdateAsync(Guid id, UpdateMapTenantDto input)
         {
             await _mapTenantAppService.UpdateAsync(id, input);
