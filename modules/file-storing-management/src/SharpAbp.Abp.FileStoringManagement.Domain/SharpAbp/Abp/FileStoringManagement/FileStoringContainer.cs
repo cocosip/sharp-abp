@@ -36,7 +36,14 @@ namespace SharpAbp.Abp.FileStoringManagement
             Items = new List<FileStoringContainerItem>();
         }
 
-        public FileStoringContainer(Guid id, Guid? tenantId, bool isMultiTenant, string provider, string name, string title, bool httpAccess) : this()
+        public FileStoringContainer(
+            Guid id,
+            Guid? tenantId,
+            bool isMultiTenant,
+            string provider, 
+            string name, 
+            string title,
+            bool httpAccess) : this()
         {
             Id = id;
             TenantId = tenantId;
@@ -47,7 +54,12 @@ namespace SharpAbp.Abp.FileStoringManagement
             HttpAccess = httpAccess;
         }
 
-        public void Update(bool isMultiTenant, string provider, string name, string title, bool httpAccess)
+        public void Update(
+            bool isMultiTenant, 
+            string provider, 
+            string name,
+            string title,
+            bool httpAccess)
         {
             IsMultiTenant = isMultiTenant;
             Provider = provider;
