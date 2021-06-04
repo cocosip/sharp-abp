@@ -64,7 +64,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         public FileStoringContainerItemCacheItem(
             Guid id,
             string name,
-            string value, 
+            string value,
             Guid containerId)
         {
             Id = id;
