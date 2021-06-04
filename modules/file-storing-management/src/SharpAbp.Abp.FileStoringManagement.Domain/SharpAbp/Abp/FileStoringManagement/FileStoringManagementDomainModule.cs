@@ -17,7 +17,7 @@ namespace SharpAbp.Abp.FileStoringManagement
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            Configure<FileContainerCacheOptions>(options => { });
+            Configure<FileStoringCacheOptions>(options => { });
 
             context.Services.Replace(ServiceDescriptor.Transient<IFileContainerConfigurationProvider, DatabaseFileContainerConfigurationProvider>());
         }

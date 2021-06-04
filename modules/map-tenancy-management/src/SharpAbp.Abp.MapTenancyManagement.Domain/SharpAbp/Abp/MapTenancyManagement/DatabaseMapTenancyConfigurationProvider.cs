@@ -11,13 +11,13 @@ namespace SharpAbp.Abp.MapTenancyManagement
 {
     public class DatabaseMapTenancyConfigurationProvider : IMapTenancyConfigurationProvider
     {
-        protected MapTenantCacheOptions CacheOptions { get; }
+        protected MapTenancyCacheOptions CacheOptions { get; }
         protected IClock Clock { get; }
         protected IDistributedCache<MapTenantCacheItem> MapTenantCache { get; }
         protected IMapTenantRepository MapTenantRepository { get; }
 
         public DatabaseMapTenancyConfigurationProvider(
-            IOptions<MapTenantCacheOptions> options,
+            IOptions<MapTenancyCacheOptions> options,
             IClock clock,
             IDistributedCache<MapTenantCacheItem> mapTenantCache,
             IMapTenantRepository mapTenantRepository)
@@ -44,7 +44,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
                 {
                     return new DistributedCacheEntryOptions()
                     {
-                        AbsoluteExpiration = Clock.Now.AddSeconds(CacheOptions.ExpiresSeconds)
+                        AbsoluteExpiration = Clock.Now.AddSeconds(CacheOptions.MapTenantExpiresSeconds)
                     };
                 },
                 hideErrors: false);

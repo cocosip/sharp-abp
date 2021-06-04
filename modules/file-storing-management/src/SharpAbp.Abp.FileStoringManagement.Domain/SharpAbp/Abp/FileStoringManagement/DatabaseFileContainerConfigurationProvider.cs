@@ -12,14 +12,14 @@ namespace SharpAbp.Abp.FileStoringManagement
 {
     public class DatabaseFileContainerConfigurationProvider : IFileContainerConfigurationProvider
     {
-        protected FileContainerCacheOptions CacheOptions { get; }
+        protected FileStoringCacheOptions CacheOptions { get; }
         protected IClock Clock { get; }
         protected IFileContainerConfigurationConverter FileContainerConfigurationConverter { get; }
         protected IDistributedCache<FileStoringContainerCacheItem> ContainerCache { get; }
         protected IFileStoringContainerRepository FileStoringContainerRepository { get; }
 
         public DatabaseFileContainerConfigurationProvider(
-            IOptions<FileContainerCacheOptions> options,
+            IOptions<FileStoringCacheOptions> options,
             IClock clock,
             IFileContainerConfigurationConverter fileContainerConfigurationConverter,
             IDistributedCache<FileStoringContainerCacheItem> containerCache,
@@ -55,7 +55,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 {
                     return new DistributedCacheEntryOptions()
                     {
-                        AbsoluteExpiration = Clock.Now.AddSeconds(CacheOptions.ExpiresSeconds)
+                        AbsoluteExpiration = Clock.Now.AddSeconds(CacheOptions.FileContainerExpiresSeconds)
                     };
                 },
                 hideErrors: false);

@@ -1,10 +1,10 @@
 ﻿namespace SharpAbp.Abp.MapTenancyManagement
 {
-    public class MapTenantCacheOptions
+    public class MapTenancyCacheOptions
     {
         /// <summary>
         /// Expires seconds
         /// </summary>
-        public int ExpiresSeconds { get; set; } = 600;
+        public int MapTenantExpiresSeconds { get; set; } = 600;
     }
 }

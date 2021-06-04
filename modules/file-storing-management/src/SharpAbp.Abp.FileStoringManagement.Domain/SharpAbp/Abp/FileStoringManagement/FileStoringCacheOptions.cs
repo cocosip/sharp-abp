@@ -1,10 +1,10 @@
 ﻿namespace SharpAbp.Abp.FileStoringManagement
 {
-    public class FileContainerCacheOptions
+    public class FileStoringCacheOptions
     {
         /// <summary>
         /// Expires seconds
         /// </summary>
-        public int ExpiresSeconds { get; set; } = 600;
+        public int FileContainerExpiresSeconds { get; set; } = 600;
     }
 }
