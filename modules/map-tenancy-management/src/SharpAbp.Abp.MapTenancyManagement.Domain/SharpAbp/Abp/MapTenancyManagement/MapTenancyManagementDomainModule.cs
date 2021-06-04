@@ -17,6 +17,8 @@ namespace SharpAbp.Abp.MapTenancyManagement
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
+            Configure<MapTenantCacheOptions>(options => { });
+
             context.Services.Replace(ServiceDescriptor.Transient<IMapTenancyConfigurationProvider, DatabaseMapTenancyConfigurationProvider>());
         }
     }
