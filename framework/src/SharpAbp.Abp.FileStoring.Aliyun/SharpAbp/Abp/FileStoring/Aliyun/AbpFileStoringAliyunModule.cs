@@ -16,10 +16,10 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
-            Configure<AbpFileStoringOptions>(c =>
+            Configure<AbpFileStoringOptions>(options =>
             {
                 var configuration = GetFileProviderConfiguration();
-                c.Providers.TryAdd(configuration);
+                options.Providers.TryAdd(configuration);
             });
         }
 
