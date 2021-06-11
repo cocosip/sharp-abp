@@ -13,12 +13,12 @@ namespace SharpAbp.Abp.FileStoring
         public ITypeList<IFileNamingNormalizer> DefaultNamingNormalizers { get; }
 
         [NotNull]
-        private readonly Dictionary<string, FileProviderValue> _values;
+        private readonly Dictionary<string, Type> _valueTypes;
 
         public FileProviderConfiguration()
         {
             DefaultNamingNormalizers = new TypeList<IFileNamingNormalizer>();
-            _values = new Dictionary<string, FileProviderValue>();
+            _valueTypes = new Dictionary<string, Type>();
         }
 
         public FileProviderConfiguration([NotNull] string provider) : this()
@@ -26,41 +26,31 @@ namespace SharpAbp.Abp.FileStoring
             Provider = provider;
         }
 
-        public FileProviderValue GetValue([NotNull] string name)
+        public Type GetValueType([NotNull] string name)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-
-            _values.TryGetValue(name, out FileProviderValue value);
-
-            return value;
+            _valueTypes.TryGetValue(name, out Type type);
+            return type;
         }
 
-
-        public FileProviderConfiguration SetValue([NotNull] string name, [NotNull] FileProviderValue value)
+        public FileProviderConfiguration SetValueType([NotNull] string name, [NotNull] Type type)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            Check.NotNull(value, nameof(value));
-            _values.Add(name, value);
+            Check.NotNull(type, nameof(type));
+            _valueTypes.Add(name, type);
             return this;
         }
 
-        public FileProviderConfiguration SetValue([NotNull] string name, [NotNull] Type type, string note = "")
+        public FileProviderConfiguration ClearValueType([NotNull] string name)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            _values.Add(name, new FileProviderValue(type, note));
+            _valueTypes.Remove(name);
             return this;
         }
 
-        public FileProviderConfiguration ClearValue([NotNull] string name)
+        public Dictionary<string, Type> GetValueTypes()
         {
-            Check.NotNullOrWhiteSpace(name, nameof(name));
-            _values.Remove(name);
-            return this;
-        }
-
-        public Dictionary<string, FileProviderValue> GetValues()
-        {
-            return _values;
+            return _valueTypes;
         }
     }
 

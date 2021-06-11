@@ -58,15 +58,14 @@ namespace SharpAbp.Abp.FileStoringManagement
                 throw new UserFriendlyException($"Could not get provider configuration by name '{provider}'.");
             }
 
-            var values = fileProviderConfiguration.GetValues();
+            var values = fileProviderConfiguration.GetValueTypes();
             var providerOptions = new ProviderOptionsDto(provider);
 
             foreach (var kv in values)
             {
                 var providerValue = new ProviderValueDto(
                     kv.Key, L[kv.Key],
-                    TypeHelper.GetFullNameHandlingNullableAndGenerics(kv.Value.Type),
-                    kv.Value.Note);
+                    TypeHelper.GetFullNameHandlingNullableAndGenerics(kv.Value));
 
                 providerOptions.Values.Add(providerValue);
             }

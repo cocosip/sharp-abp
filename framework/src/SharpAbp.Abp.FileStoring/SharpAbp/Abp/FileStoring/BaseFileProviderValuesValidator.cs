@@ -26,11 +26,11 @@ namespace SharpAbp.Abp.FileStoring
                 throw new AbpException($"Could not find any provider configuration for provider '{Provider}'.");
             }
 
-            foreach (var providerValueKv in providerConfiguration.GetValues())
+            foreach (var valueTypeKv in providerConfiguration.GetValueTypes())
             {
-                if (!keyValuePairs.ContainsKey(providerValueKv.Key))
+                if (!keyValuePairs.ContainsKey(valueTypeKv.Key))
                 {
-                    result.Errors.Add(new ValidationResult($"[{Provider}-{providerValueKv.Key}] is missing."));
+                    result.Errors.Add(new ValidationResult($"[{Provider}-{valueTypeKv.Key}] is missing."));
                 }
             }
         }

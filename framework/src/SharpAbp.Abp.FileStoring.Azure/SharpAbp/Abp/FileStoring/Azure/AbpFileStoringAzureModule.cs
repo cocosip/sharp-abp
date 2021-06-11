@@ -2,7 +2,6 @@
 using Volo.Abp.Localization;
 using Volo.Abp.Localization.ExceptionHandling;
 using Volo.Abp.Modularity;
-using Volo.Abp.Validation;
 using Volo.Abp.Validation.Localization;
 using Volo.Abp.VirtualFileSystem;
 
@@ -48,9 +47,9 @@ namespace SharpAbp.Abp.FileStoring.Azure
             var configuration = new FileProviderConfiguration(AzureFileProviderConfigurationNames.ProviderName);
             configuration.DefaultNamingNormalizers.TryAdd<AzureFileNamingNormalizer>();
             configuration
-                .SetValue(AzureFileProviderConfigurationNames.ConnectionString, typeof(string))
-                .SetValue(AzureFileProviderConfigurationNames.ContainerName, typeof(string))
-                .SetValue(AzureFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool));
+                .SetValueType(AzureFileProviderConfigurationNames.ConnectionString, typeof(string))
+                .SetValueType(AzureFileProviderConfigurationNames.ContainerName, typeof(string))
+                .SetValueType(AzureFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool));
             return configuration;
         }
     }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
@@ -33,19 +32,16 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// </summary>
         public string Type { get; set; }
 
-        public string Note { get; set; }
-
         public ProviderValueDto()
         {
 
         }
 
-        public ProviderValueDto(string name, string localizationValue, string type, string note)
+        public ProviderValueDto(string name, string localizationValue, string type)
         {
             Name = name;
             LocalizationValue = localizationValue;
             Type = type;
-            Note = note;
         }
     }
 }

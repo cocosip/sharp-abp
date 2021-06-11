@@ -49,19 +49,19 @@ namespace SharpAbp.Abp.FileStoring.S3
             var configuration = new FileProviderConfiguration(S3FileProviderConfigurationNames.ProviderName);
             configuration.DefaultNamingNormalizers.TryAdd<S3FileNamingNormalizer>();
             configuration
-                .SetValue(S3FileProviderConfigurationNames.BucketName, typeof(string))
-                .SetValue(S3FileProviderConfigurationNames.ServerUrl, typeof(string))
-                .SetValue(S3FileProviderConfigurationNames.AccessKeyId, typeof(string))
-                .SetValue(S3FileProviderConfigurationNames.SecretAccessKey, typeof(string))
-                .SetValue(S3FileProviderConfigurationNames.ForcePathStyle, typeof(bool))
-                .SetValue(S3FileProviderConfigurationNames.UseChunkEncoding, typeof(bool))
-                .SetValue(S3FileProviderConfigurationNames.Protocol, typeof(int))
-                .SetValue(S3FileProviderConfigurationNames.VendorType, typeof(int))
-                .SetValue(S3FileProviderConfigurationNames.EnableSlice, typeof(bool))
-                .SetValue(S3FileProviderConfigurationNames.SliceSize, typeof(int))
-                .SetValue(S3FileProviderConfigurationNames.SignatureVersion, typeof(string))
-                .SetValue(S3FileProviderConfigurationNames.CreateBucketIfNotExists, typeof(bool))
-                .SetValue(S3FileProviderConfigurationNames.MaxClient, typeof(int));
+                .SetValueType(S3FileProviderConfigurationNames.BucketName, typeof(string))
+                .SetValueType(S3FileProviderConfigurationNames.ServerUrl, typeof(string))
+                .SetValueType(S3FileProviderConfigurationNames.AccessKeyId, typeof(string))
+                .SetValueType(S3FileProviderConfigurationNames.SecretAccessKey, typeof(string))
+                .SetValueType(S3FileProviderConfigurationNames.ForcePathStyle, typeof(bool))
+                .SetValueType(S3FileProviderConfigurationNames.UseChunkEncoding, typeof(bool))
+                .SetValueType(S3FileProviderConfigurationNames.Protocol, typeof(int))
+                .SetValueType(S3FileProviderConfigurationNames.VendorType, typeof(int))
+                .SetValueType(S3FileProviderConfigurationNames.EnableSlice, typeof(bool))
+                .SetValueType(S3FileProviderConfigurationNames.SliceSize, typeof(int))
+                .SetValueType(S3FileProviderConfigurationNames.SignatureVersion, typeof(string))
+                .SetValueType(S3FileProviderConfigurationNames.CreateBucketIfNotExists, typeof(bool))
+                .SetValueType(S3FileProviderConfigurationNames.MaxClient, typeof(int));
 
             return configuration;
         }

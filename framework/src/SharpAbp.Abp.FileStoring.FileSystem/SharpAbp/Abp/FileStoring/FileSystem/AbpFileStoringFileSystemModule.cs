@@ -2,7 +2,6 @@
 using Volo.Abp.Localization;
 using Volo.Abp.Localization.ExceptionHandling;
 using Volo.Abp.Modularity;
-using Volo.Abp.Validation;
 using Volo.Abp.Validation.Localization;
 using Volo.Abp.VirtualFileSystem;
 
@@ -49,9 +48,9 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
             var configuration = new FileProviderConfiguration(FileSystemFileProviderConfigurationNames.ProviderName);
             configuration.DefaultNamingNormalizers.TryAdd<FileSystemFileNamingNormalizer>();
             configuration
-                .SetValue(FileSystemFileProviderConfigurationNames.BasePath, typeof(string))
-                .SetValue(FileSystemFileProviderConfigurationNames.AppendContainerNameToBasePath, typeof(bool))
-                .SetValue(FileSystemFileProviderConfigurationNames.HttpServer, typeof(string));
+                .SetValueType(FileSystemFileProviderConfigurationNames.BasePath, typeof(string))
+                .SetValueType(FileSystemFileProviderConfigurationNames.AppendContainerNameToBasePath, typeof(bool))
+                .SetValueType(FileSystemFileProviderConfigurationNames.HttpServer, typeof(string));
             return configuration;
         }
     }
