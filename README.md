@@ -20,6 +20,7 @@
 | Package  | Version | Downloads|
 | -------- | ------- | -------- |
 | `SharpAbp.Abp.DotCommon` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.DotCommon.svg)](https://www.nuget.org/packages/SharpAbp.Abp.DotCommon) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.DotCommon.svg)|
+| `SharpAbp.Abp.Snowflakes` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Snowflakes.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Snowflakes) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Snowflakes.svg)|
 | `SharpAbp.Abp.FreeSql` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FreeSql.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FreeSql) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FreeSql.svg)|
 | `SharpAbp.Abp.FreeRedis` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FreeRedis.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FreeRedis) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FreeRedis.svg)|
 | **MassTransit** | - | - |
