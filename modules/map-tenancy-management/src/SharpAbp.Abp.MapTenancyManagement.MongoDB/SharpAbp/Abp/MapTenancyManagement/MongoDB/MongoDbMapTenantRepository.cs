@@ -42,7 +42,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<MapTenant> FindByTenantIdAsync(
-            Guid tenantId, 
+            Guid tenantId,
             CancellationToken cancellationToken = default)
         {
             return await FindAsync(x => x.TenantId == tenantId, true, GetCancellationToken(cancellationToken));
@@ -104,6 +104,22 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
         }
 
         /// <summary>
+        /// Get list by codes
+        /// </summary>
+        /// <param name="codes"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<List<MapTenant>> GetListByCodesAsync(
+            List<string> codes,
+            CancellationToken cancellationToken = default)
+        {
+            return await (await GetMongoQueryableAsync())
+                .Where(x => codes.Contains(x.Code))
+                .As<IMongoQueryable<MapTenant>>()
+                .ToListAsync(GetCancellationToken(cancellationToken));
+        }
+
+        /// <summary>
         /// Get List
         /// </summary>
         /// <param name="skipCount"></param>
@@ -154,5 +170,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
                .As<IMongoQueryable<MapTenant>>()
                .CountAsync(GetCancellationToken(cancellationToken));
         }
+
+
     }
 }

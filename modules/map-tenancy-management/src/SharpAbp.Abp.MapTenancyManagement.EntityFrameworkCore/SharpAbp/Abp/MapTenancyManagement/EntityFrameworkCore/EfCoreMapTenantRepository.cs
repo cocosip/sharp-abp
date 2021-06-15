@@ -99,6 +99,21 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         }
 
         /// <summary>
+        /// Get list by codes
+        /// </summary>
+        /// <param name="codes"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<List<MapTenant>> GetListByCodesAsync(
+            List<string> codes, 
+            CancellationToken cancellationToken = default)
+        {
+            return await (await GetDbSetAsync())
+                .Where(x => codes.Contains(x.Code))
+                .ToListAsync(GetCancellationToken(cancellationToken));
+        }
+
+        /// <summary>
         /// Get list
         /// </summary>
         /// <param name="skipCount"></param>
