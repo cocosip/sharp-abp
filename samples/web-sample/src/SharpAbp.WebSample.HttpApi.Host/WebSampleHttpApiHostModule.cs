@@ -76,14 +76,6 @@ namespace SharpAbp.WebSample
                 options.IsEnabled = false;
             });
         }
-        private void ConfigureAlwaysAllowPermission()
-        {
-            Configure<AbpPermissionOptions>(options =>
-            {
-                options.ValueProviders.Add<FileStoringManagementAlwaysAllowPermissionValueProvider>();
-                options.ValueProviders.Add<MapTenancyManagementAlwaysAllowPermissionValueProvider>();
-            });
-        }
 
         private void ConfigureBundles()
         {
@@ -228,7 +220,7 @@ namespace SharpAbp.WebSample
             }
 
             app.UseCorrelationId();
-            app.UseVirtualFiles();
+            app.UseStaticFiles();
             app.UseRouting();
             app.UseCors(DefaultCorsPolicyName);
             app.UseAuthentication();
