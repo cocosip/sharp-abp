@@ -2,6 +2,7 @@
 using SharpAbp.Abp.DbConnections;
 using System;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
 
@@ -22,20 +23,20 @@ namespace SharpAbp.Abp.DbConnectionsManagement
             DatabaseConnectionInfoRepository = databaseConnectionInfoRepository;
         }
 
-        public Task<DbConnectionInfo> ResolveAsync(string dbConnectionName)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected virtual async Task<DbConnectionInfo> GetDbConnectionInfoAsync(string name)
+        public virtual async Task<DbConnectionInfo> ResolveAsync(string dbConnectionName)
         {
             var cacheItem = await ConnectionInfoCache.GetOrAddAsync(
-                name,
+                dbConnectionName,
                 async () =>
                 {
-                    var databaseConnectionInfo = await DatabaseConnectionInfoRepository.FindByNameAsync(name);
+                    var databaseConnectionInfo = await DatabaseConnectionInfoRepository.FindByNameAsync(dbConnectionName);
                     return databaseConnectionInfo?.AsCacheItem();
                 });
+
+            if (cacheItem == null)
+            {
+                throw new AbpException($"Could not find dbConnectionInfo by dbConnectionName '{dbConnectionName}'.");
+            }
 
             return cacheItem == null ? null : ConvertToDbConnection(cacheItem);
         }

@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
@@ -72,11 +71,49 @@ namespace SharpAbp.Abp.DbConnectionsManagement
               );
         }
 
-
+        /// <summary>
+        /// Create
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         [Authorize(DbConnectionsManagementPermissions.DatabaseConnectionInfos.Create)]
         public virtual async Task<Guid> CreateAsync(CreateDatabaseConnectionInfoDto input)
         {
-            return default;
+            var databaseConnectionInfo = new DatabaseConnectionInfo(
+                GuidGenerator.Create(),
+                input.Name,
+                input.DatabaseProvider,
+                input.ConnectionString);
+
+            await DatabaseConnectionInfoManager.CreateAsync(databaseConnectionInfo);
+            return databaseConnectionInfo.Id;
+        }
+
+        /// <summary>
+        /// Update
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [Authorize(DbConnectionsManagementPermissions.DatabaseConnectionInfos.Update)]
+        public virtual async Task UpdateAsync(Guid id, UpdateDatabaseConnectionInfoDto input)
+        {
+            await DatabaseConnectionInfoManager.UpdateAsync(
+                id,
+                input.Name,
+                input.DatabaseProvider,
+                input.ConnectionString);
+        }
+
+        /// <summary>
+        /// Delete
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Authorize(DbConnectionsManagementPermissions.DatabaseConnectionInfos.Delete)]
+        public virtual async Task DeleteAsync(Guid id)
+        {
+            await DatabaseConnectionInfoRepository.DeleteAsync(id);
         }
     }
 }

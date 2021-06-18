@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
@@ -29,5 +28,27 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         /// <returns></returns>
         Task<PagedResultDto<DatabaseConnectionInfoDto>> GetPagedListAsync(
           DatabaseConnectionInfoPagedRequestDto input);
+
+        /// <summary>
+        /// Create
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        Task<Guid> CreateAsync(CreateDatabaseConnectionInfoDto input);
+
+        /// <summary>
+        /// Update
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        Task UpdateAsync(Guid id, UpdateDatabaseConnectionInfoDto input);
+
+        /// <summary>
+        /// Delete
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task DeleteAsync(Guid id);
     }
 }

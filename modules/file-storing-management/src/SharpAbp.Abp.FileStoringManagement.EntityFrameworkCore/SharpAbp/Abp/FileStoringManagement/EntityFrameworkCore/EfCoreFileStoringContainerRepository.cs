@@ -104,7 +104,7 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
         /// <param name="provider"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<List<FileStoringContainer>> GetListAsync(
+        public virtual async Task<List<FileStoringContainer>> GetListAsync(
             int skipCount,
             int maxResultCount,
             string sorting = null,
@@ -132,12 +132,12 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
         /// <param name="provider"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<List<FileStoringContainer>> GetListAsync(
-          string sorting = null,
-          bool includeDetails = true,
-          string name = "",
-          string provider = "",
-          CancellationToken cancellationToken = default)
+        public virtual async Task<List<FileStoringContainer>> GetListAsync(
+            string sorting = null,
+            bool includeDetails = true,
+            string name = "",
+            string provider = "",
+            CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
@@ -154,7 +154,7 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
         /// <param name="provider"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<int> GetCountAsync(
+        public virtual async Task<int> GetCountAsync(
             string name = "",
             string provider = "",
             CancellationToken cancellationToken = default)

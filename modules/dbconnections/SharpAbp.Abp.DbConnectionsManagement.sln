@@ -7,17 +7,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0D56501B-3D7
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{E7A7F980-6097-4D8D-89DB-7E11E2355CCD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.DbConnectionsManagement.Application.Contracts", "src\SharpAbp.Abp.DbConnectionsManagement.Application.Contracts\SharpAbp.Abp.DbConnectionsManagement.Application.Contracts.csproj", "{B0E2D4B4-8EB6-43E5-A460-4483DFC13679}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.DbConnectionsManagement.Application.Contracts", "src\SharpAbp.Abp.DbConnectionsManagement.Application.Contracts\SharpAbp.Abp.DbConnectionsManagement.Application.Contracts.csproj", "{B0E2D4B4-8EB6-43E5-A460-4483DFC13679}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.DbConnectionsManagement.Domain.Shared", "src\SharpAbp.Abp.DbConnectionsManagement.Domain.Shared\SharpAbp.Abp.DbConnectionsManagement.Domain.Shared.csproj", "{1D209DC0-7389-427D-906A-B35A9E4EA795}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.DbConnectionsManagement.Domain.Shared", "src\SharpAbp.Abp.DbConnectionsManagement.Domain.Shared\SharpAbp.Abp.DbConnectionsManagement.Domain.Shared.csproj", "{1D209DC0-7389-427D-906A-B35A9E4EA795}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.DbConnectionsManagement.Domain", "src\SharpAbp.Abp.DbConnectionsManagement.Domain\SharpAbp.Abp.DbConnectionsManagement.Domain.csproj", "{D73B6454-2E8E-4B40-AF42-8BAFA24C88FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.DbConnectionsManagement.Domain", "src\SharpAbp.Abp.DbConnectionsManagement.Domain\SharpAbp.Abp.DbConnectionsManagement.Domain.csproj", "{D73B6454-2E8E-4B40-AF42-8BAFA24C88FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore", "src\SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore\SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore.csproj", "{F38E3595-B6D0-4F9C-BA5B-77FB412482B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore", "src\SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore\SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore.csproj", "{F38E3595-B6D0-4F9C-BA5B-77FB412482B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.DbConnectionsManagement.Application", "src\SharpAbp.Abp.DbConnectionsManagement.Application\SharpAbp.Abp.DbConnectionsManagement.Application.csproj", "{717CE6CF-CEB6-45F1-BBE3-DADFB3FCE049}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.DbConnectionsManagement.Application", "src\SharpAbp.Abp.DbConnectionsManagement.Application\SharpAbp.Abp.DbConnectionsManagement.Application.csproj", "{717CE6CF-CEB6-45F1-BBE3-DADFB3FCE049}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.DbConnectionsManagement.MongoDB", "src\SharpAbp.Abp.DbConnectionsManagement.MongoDB\SharpAbp.Abp.DbConnectionsManagement.MongoDB.csproj", "{9CC89DA1-4A27-4220-8221-4DDD6D3CCB02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.DbConnectionsManagement.MongoDB", "src\SharpAbp.Abp.DbConnectionsManagement.MongoDB\SharpAbp.Abp.DbConnectionsManagement.MongoDB.csproj", "{9CC89DA1-4A27-4220-8221-4DDD6D3CCB02}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.DbConnectionsManagement.HttpApi", "src\SharpAbp.Abp.DbConnectionsManagement.HttpApi\SharpAbp.Abp.DbConnectionsManagement.HttpApi.csproj", "{10DC66FF-B108-4B2B-8DA5-19B5E13EBF2B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.DbConnectionsManagement.Tests", "test\SharpAbp.Abp.DbConnectionsManagement.Tests\SharpAbp.Abp.DbConnectionsManagement.Tests.csproj", "{BDBAD9C4-9800-4DD6-9703-0F1B51BE10A4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,6 +105,30 @@ Global
 		{9CC89DA1-4A27-4220-8221-4DDD6D3CCB02}.Release|x64.Build.0 = Release|Any CPU
 		{9CC89DA1-4A27-4220-8221-4DDD6D3CCB02}.Release|x86.ActiveCfg = Release|Any CPU
 		{9CC89DA1-4A27-4220-8221-4DDD6D3CCB02}.Release|x86.Build.0 = Release|Any CPU
+		{10DC66FF-B108-4B2B-8DA5-19B5E13EBF2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10DC66FF-B108-4B2B-8DA5-19B5E13EBF2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10DC66FF-B108-4B2B-8DA5-19B5E13EBF2B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{10DC66FF-B108-4B2B-8DA5-19B5E13EBF2B}.Debug|x64.Build.0 = Debug|Any CPU
+		{10DC66FF-B108-4B2B-8DA5-19B5E13EBF2B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{10DC66FF-B108-4B2B-8DA5-19B5E13EBF2B}.Debug|x86.Build.0 = Debug|Any CPU
+		{10DC66FF-B108-4B2B-8DA5-19B5E13EBF2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10DC66FF-B108-4B2B-8DA5-19B5E13EBF2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10DC66FF-B108-4B2B-8DA5-19B5E13EBF2B}.Release|x64.ActiveCfg = Release|Any CPU
+		{10DC66FF-B108-4B2B-8DA5-19B5E13EBF2B}.Release|x64.Build.0 = Release|Any CPU
+		{10DC66FF-B108-4B2B-8DA5-19B5E13EBF2B}.Release|x86.ActiveCfg = Release|Any CPU
+		{10DC66FF-B108-4B2B-8DA5-19B5E13EBF2B}.Release|x86.Build.0 = Release|Any CPU
+		{BDBAD9C4-9800-4DD6-9703-0F1B51BE10A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDBAD9C4-9800-4DD6-9703-0F1B51BE10A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDBAD9C4-9800-4DD6-9703-0F1B51BE10A4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BDBAD9C4-9800-4DD6-9703-0F1B51BE10A4}.Debug|x64.Build.0 = Debug|Any CPU
+		{BDBAD9C4-9800-4DD6-9703-0F1B51BE10A4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BDBAD9C4-9800-4DD6-9703-0F1B51BE10A4}.Debug|x86.Build.0 = Debug|Any CPU
+		{BDBAD9C4-9800-4DD6-9703-0F1B51BE10A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDBAD9C4-9800-4DD6-9703-0F1B51BE10A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDBAD9C4-9800-4DD6-9703-0F1B51BE10A4}.Release|x64.ActiveCfg = Release|Any CPU
+		{BDBAD9C4-9800-4DD6-9703-0F1B51BE10A4}.Release|x64.Build.0 = Release|Any CPU
+		{BDBAD9C4-9800-4DD6-9703-0F1B51BE10A4}.Release|x86.ActiveCfg = Release|Any CPU
+		{BDBAD9C4-9800-4DD6-9703-0F1B51BE10A4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -112,6 +140,8 @@ Global
 		{F38E3595-B6D0-4F9C-BA5B-77FB412482B6} = {0D56501B-3D77-4E3C-BD45-33A8D0329DE4}
 		{717CE6CF-CEB6-45F1-BBE3-DADFB3FCE049} = {0D56501B-3D77-4E3C-BD45-33A8D0329DE4}
 		{9CC89DA1-4A27-4220-8221-4DDD6D3CCB02} = {0D56501B-3D77-4E3C-BD45-33A8D0329DE4}
+		{10DC66FF-B108-4B2B-8DA5-19B5E13EBF2B} = {0D56501B-3D77-4E3C-BD45-33A8D0329DE4}
+		{BDBAD9C4-9800-4DD6-9703-0F1B51BE10A4} = {E7A7F980-6097-4D8D-89DB-7E11E2355CCD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {46B59D22-94D1-4CCB-8FB9-7E0F4B2A7FD7}

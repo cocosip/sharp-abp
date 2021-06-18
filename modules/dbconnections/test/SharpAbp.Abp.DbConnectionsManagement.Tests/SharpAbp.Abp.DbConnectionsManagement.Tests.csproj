@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\..\common.test.props" />
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <RootNamespace />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(MicrosoftPackageVersion)" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkPackageVersion)" />
+    <PackageReference Include="xunit" Version="$(xUnitPackageVersion)" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="$(xUnitRunnerVisualstudioPackageVersion)">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector" Version="$(CoverletCollectorPackageVersion)">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+
+    <PackageReference Include="Volo.Abp.Autofac" Version="$(VoloAbpPackageVersion)" />
+    <PackageReference Include="Volo.Abp.TestBase" Version="$(VoloAbpPackageVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.DbConnections.MySQL\SharpAbp.Abp.DbConnections.MySQL.csproj" />
+    <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.DbConnections.PostgreSql\SharpAbp.Abp.DbConnections.PostgreSql.csproj" />
+    <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.DbConnections.SqlServer\SharpAbp.Abp.DbConnections.SqlServer.csproj" />
+    <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.DbConnections.Oracle.Devart\SharpAbp.Abp.DbConnections.Oracle.Devart.csproj" />
+    <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.DbConnections.Sqlite\SharpAbp.Abp.DbConnections.Sqlite.csproj" />
+
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.DbConnectionsManagement.Application\SharpAbp.Abp.DbConnectionsManagement.Application.csproj" />
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore\SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore.csproj" />
+  </ItemGroup>
+  
+  
+
+</Project>

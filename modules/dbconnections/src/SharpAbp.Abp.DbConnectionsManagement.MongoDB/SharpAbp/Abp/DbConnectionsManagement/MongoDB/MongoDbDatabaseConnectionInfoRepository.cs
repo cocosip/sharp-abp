@@ -1,23 +1,23 @@
 ﻿using JetBrains.Annotations;
-using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
-using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
-using Volo.Abp.EntityFrameworkCore;
-using System.Linq.Dynamic.Core;
+using Volo.Abp.Domain.Repositories.MongoDB;
+using Volo.Abp.MongoDB;
 
-namespace SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore
+namespace SharpAbp.Abp.DbConnectionsManagement.MongoDB
 {
-    public class EfCoreDatabaseConnectionInfoRepository : EfCoreRepository<IDbConnectionsManagementDbContext, DatabaseConnectionInfo, Guid>, IDatabaseConnectionInfoRepository
+    public class MongoDbDatabaseConnectionInfoRepository : MongoDbRepository<IDbConnectionsManagementMongoDbContext, DatabaseConnectionInfo, Guid>, IDatabaseConnectionInfoRepository
     {
-        public EfCoreDatabaseConnectionInfoRepository(IDbContextProvider<IDbConnectionsManagementDbContext> dbContextProvider)
+        public MongoDbDatabaseConnectionInfoRepository(IMongoDbContextProvider<IDbConnectionsManagementMongoDbContext> dbContextProvider)
             : base(dbContextProvider)
         {
-
         }
 
         /// <summary>
@@ -31,8 +31,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore
             CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            return await (await GetDbSetAsync())
-                .FirstOrDefaultAsync(x => x.Name == name, GetCancellationToken(cancellationToken));
+            return await FindAsync(x => x.Name == name, cancellationToken: GetCancellationToken(cancellationToken));
         }
 
         /// <summary>
@@ -47,12 +46,12 @@ namespace SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore
             Guid? expectedId = null,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetDbSetAsync())
+            return await (await GetMongoQueryableAsync())
                 .WhereIf(!name.IsNullOrWhiteSpace(), x => x.Name == name)
                 .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
+                .As<IMongoQueryable<DatabaseConnectionInfo>>()
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
-
 
         /// <summary>
         /// Get list
@@ -72,12 +71,12 @@ namespace SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore
             string databaseProvider = "",
             CancellationToken cancellationToken = default)
         {
-            return await (await GetDbSetAsync())
-                .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
-                .WhereIf(!databaseProvider.IsNullOrWhiteSpace(), item => item.DatabaseProvider == databaseProvider)
+            return await (await GetMongoQueryableAsync())
+                .WhereIf<DatabaseConnectionInfo, IMongoQueryable<DatabaseConnectionInfo>>(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+                .WhereIf<DatabaseConnectionInfo, IMongoQueryable<DatabaseConnectionInfo>>(!databaseProvider.IsNullOrWhiteSpace(), item => item.DatabaseProvider == databaseProvider)
                 .OrderBy(sorting ?? nameof(DatabaseConnectionInfo.Name))
-                .Skip(skipCount)
-                .Take(maxResultCount)
+                .As<IMongoQueryable<DatabaseConnectionInfo>>()
+                .PageBy<DatabaseConnectionInfo, IMongoQueryable<DatabaseConnectionInfo>>(skipCount, maxResultCount)
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -90,13 +89,16 @@ namespace SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore
         /// <returns></returns>
         public virtual async Task<int> GetCountAsync(
             string name = "", 
-            string databaseProvider = "",
+            string databaseProvider = "", 
             CancellationToken cancellationToken = default)
         {
-            return await (await GetDbSetAsync())
-                .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
-                .WhereIf(!databaseProvider.IsNullOrWhiteSpace(), item => item.DatabaseProvider == databaseProvider)
+            return await (await GetMongoQueryableAsync())
+                .WhereIf<DatabaseConnectionInfo, IMongoQueryable<DatabaseConnectionInfo>>(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+                .WhereIf<DatabaseConnectionInfo, IMongoQueryable<DatabaseConnectionInfo>>(!databaseProvider.IsNullOrWhiteSpace(), item => item.DatabaseProvider == databaseProvider)
+                .As<IMongoQueryable<DatabaseConnectionInfo>>()
                 .CountAsync(GetCancellationToken(cancellationToken));
         }
+
+
     }
 }

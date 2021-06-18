@@ -14,11 +14,7 @@
     <Description>SharpAbp DbConnections Management Module</Description>
     <RootNamespace />
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="SharpAbp\Abp\DbConnectionsManagement\DatabaseConnectionInfoCacheItem.cs~RF2a876910.TMP" />
-  </ItemGroup>
-
+ 
   <ItemGroup>
     <PackageReference Include="Volo.Abp.Ddd.Domain" Version="$(VoloAbpPackageVersion)" />
     <PackageReference Include="Volo.Abp.Caching" Version="$(VoloAbpPackageVersion)" />
