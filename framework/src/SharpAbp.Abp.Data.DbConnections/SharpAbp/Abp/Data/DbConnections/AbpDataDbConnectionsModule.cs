@@ -8,6 +8,7 @@ namespace SharpAbp.Abp.Data.DbConnections
         {
             Configure<AbpDataDbConnectionsOptions>(options =>
             {
+
             });
         }
     }

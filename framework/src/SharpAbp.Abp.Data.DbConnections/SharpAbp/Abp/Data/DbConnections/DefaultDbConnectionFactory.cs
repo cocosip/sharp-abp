@@ -31,7 +31,18 @@ namespace SharpAbp.Abp.Data.DbConnections
         }
 
         /// <summary>
-        /// Get IDbConnection
+        /// Get DbConnectionInfo
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public virtual async Task<DbConnectionInfo> GetDbConnectionInfoAsync<T>()
+        {
+            var dbConnectionName = DbConnectionNameAttribute.GetDbConnectionName<T>();
+            return await GetDbConnectionInfoAsync(dbConnectionName);
+        }
+
+        /// <summary>
+        /// Get DbConnection
         /// </summary>
         /// <param name="dbConnectionName"></param>
         /// <returns></returns>
@@ -40,6 +51,17 @@ namespace SharpAbp.Abp.Data.DbConnections
         {
             Check.NotNullOrWhiteSpace(dbConnectionName, nameof(dbConnectionName));
             return await DbConnectionCreateService.CreateAsync(dbConnectionName);
+        }
+
+        /// <summary>
+        /// Get DbConnection
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public virtual async Task<IDbConnection> GetDbConnectionAsync<T>()
+        {
+            var dbConnectionName = DbConnectionNameAttribute.GetDbConnectionName<T>();
+            return await GetDbConnectionAsync(dbConnectionName);
         }
     }
 }

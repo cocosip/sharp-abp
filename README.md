@@ -12,6 +12,7 @@
 | DotCommon | DotCommon ABP Adapter | [doc](/docs/DotCommon.md) |
 | FastDFS | FastDFS ABP Adapter | [doc](/docs/FastDFS.md) |
 | FileStoring | ABP Store File | [doc](/docs/FileStoring.md) |
+| DbConnections | DbConnections Manager | [doc](/docs/DbConnections.md) |
 | Micro | Micro service modules | [doc](docs/Micro.md) |
 
 
@@ -67,3 +68,11 @@
 | `SharpAbp.Abp.MapTenancyManagement.Application.Contracts` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.MapTenancyManagement.Application.Contracts.svg)](https://www.nuget.org/packages/SharpAbp.Abp.MapTenancyManagement.Application.Contracts) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.MapTenancyManagement.Application.Contracts.svg)|
 | `SharpAbp.Abp.MapTenancyManagement.Application` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.MapTenancyManagement.Application.svg)](https://www.nuget.org/packages/SharpAbp.Abp.MapTenancyManagement.Application) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.MapTenancyManagement.Application.svg)|
 | `SharpAbp.Abp.MapTenancyManagement.HttpApi` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.MapTenancyManagement.HttpApi.svg)](https://www.nuget.org/packages/SharpAbp.Abp.MapTenancyManagement.HttpApi) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.MapTenancyManagement.HttpApi.svg)|
+| **DbConnections** | - | - |
+| `SharpAbp.Abp.Data.DbConnections` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Data.DbConnections.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Data.DbConnections) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Data.DbConnections.svg)|
+| `SharpAbp.Abp.Data.DbConnections.MySQL` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Data.DbConnections.MySQL.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Data.DbConnections.MySQL) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Data.DbConnections.MySQL.svg)|
+| `SharpAbp.Abp.Data.DbConnections.PostgreSql` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Data.DbConnections.PostgreSql.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Data.DbConnections.PostgreSql) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Data.DbConnections.PostgreSql.svg)|
+| `SharpAbp.Abp.Data.DbConnections.SqlServer` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Data.DbConnections.SqlServer.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Data.DbConnections.SqlServer) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Data.DbConnections.SqlServer.svg)|
+| `SharpAbp.Abp.Data.DbConnections.Oracle` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Data.DbConnections.Oracle.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Data.DbConnections.Oracle) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Data.DbConnections.Oracle.svg)|
+| `SharpAbp.Abp.Data.DbConnections.Oracle.Devart` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Data.DbConnections.Oracle.Devart.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Data.DbConnections.Oracle.Devart) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Data.DbConnections.Oracle.Devart.svg)|
+| `SharpAbp.Abp.Data.DbConnections.Sqlite` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Data.DbConnections.Sqlite.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Data.DbConnections.Sqlite) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Data.DbConnections.Sqlite.svg)|

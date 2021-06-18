@@ -85,19 +85,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Snowflakes", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Snowflakes.Tests", "test\SharpAbp.Abp.Snowflakes.Tests\SharpAbp.Abp.Snowflakes.Tests.csproj", "{E34D5673-84D3-4BE3-B175-216A87584E00}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Data.DbConnections", "src\SharpAbp.Abp.Data.DbConnections\SharpAbp.Abp.Data.DbConnections.csproj", "{8C7C714D-DD95-4921-98BB-B9B87C4F5F28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Data.DbConnections", "src\SharpAbp.Abp.Data.DbConnections\SharpAbp.Abp.Data.DbConnections.csproj", "{8C7C714D-DD95-4921-98BB-B9B87C4F5F28}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Data.DbConnections.MySQL", "src\SharpAbp.Abp.Data.DbConnections.MySQL\SharpAbp.Abp.Data.DbConnections.MySQL.csproj", "{E998361E-EE23-4CAA-B75E-D65D851388E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Data.DbConnections.MySQL", "src\SharpAbp.Abp.Data.DbConnections.MySQL\SharpAbp.Abp.Data.DbConnections.MySQL.csproj", "{E998361E-EE23-4CAA-B75E-D65D851388E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Data.DbConnections.PostgreSql", "src\SharpAbp.Abp.Data.DbConnections.PostgreSql\SharpAbp.Abp.Data.DbConnections.PostgreSql.csproj", "{2A74100B-BBB0-49E0-89D0-194B19480AF1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Data.DbConnections.PostgreSql", "src\SharpAbp.Abp.Data.DbConnections.PostgreSql\SharpAbp.Abp.Data.DbConnections.PostgreSql.csproj", "{2A74100B-BBB0-49E0-89D0-194B19480AF1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Data.DbConnections.Sqlite", "src\SharpAbp.Abp.Data.DbConnections.Sqlite\SharpAbp.Abp.Data.DbConnections.Sqlite.csproj", "{BA2C5B3C-D448-4FA8-B6E4-A868B69C7B95}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Data.DbConnections.Sqlite", "src\SharpAbp.Abp.Data.DbConnections.Sqlite\SharpAbp.Abp.Data.DbConnections.Sqlite.csproj", "{BA2C5B3C-D448-4FA8-B6E4-A868B69C7B95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Data.DbConnections.SqlServer", "src\SharpAbp.Abp.Data.DbConnections.SqlServer\SharpAbp.Abp.Data.DbConnections.SqlServer.csproj", "{9CF7FA13-16A5-4A03-ABBF-58420119E0DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Data.DbConnections.SqlServer", "src\SharpAbp.Abp.Data.DbConnections.SqlServer\SharpAbp.Abp.Data.DbConnections.SqlServer.csproj", "{9CF7FA13-16A5-4A03-ABBF-58420119E0DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Data.DbConnections.Oracle", "src\SharpAbp.Abp.Data.DbConnections.Oracle\SharpAbp.Abp.Data.DbConnections.Oracle.csproj", "{0939AA0A-3AE8-4DB8-8547-BA1844C8B6CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Data.DbConnections.Oracle", "src\SharpAbp.Abp.Data.DbConnections.Oracle\SharpAbp.Abp.Data.DbConnections.Oracle.csproj", "{0939AA0A-3AE8-4DB8-8547-BA1844C8B6CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Data.DbConnections.Oracle.Devart", "src\SharpAbp.Abp.Data.DbConnections.Oracle.Devart\SharpAbp.Abp.Data.DbConnections.Oracle.Devart.csproj", "{76E98A69-A5CE-48D1-9D79-CA220FCDEECE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Data.DbConnections.Oracle.Devart", "src\SharpAbp.Abp.Data.DbConnections.Oracle.Devart\SharpAbp.Abp.Data.DbConnections.Oracle.Devart.csproj", "{76E98A69-A5CE-48D1-9D79-CA220FCDEECE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Data.DbConnections.Tests", "test\SharpAbp.Abp.Data.DbConnections.Tests\SharpAbp.Abp.Data.DbConnections.Tests.csproj", "{6CEEF667-8418-446A-94FB-977F27786B39}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -661,6 +663,18 @@ Global
 		{76E98A69-A5CE-48D1-9D79-CA220FCDEECE}.Release|x64.Build.0 = Release|Any CPU
 		{76E98A69-A5CE-48D1-9D79-CA220FCDEECE}.Release|x86.ActiveCfg = Release|Any CPU
 		{76E98A69-A5CE-48D1-9D79-CA220FCDEECE}.Release|x86.Build.0 = Release|Any CPU
+		{6CEEF667-8418-446A-94FB-977F27786B39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CEEF667-8418-446A-94FB-977F27786B39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CEEF667-8418-446A-94FB-977F27786B39}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6CEEF667-8418-446A-94FB-977F27786B39}.Debug|x64.Build.0 = Debug|Any CPU
+		{6CEEF667-8418-446A-94FB-977F27786B39}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6CEEF667-8418-446A-94FB-977F27786B39}.Debug|x86.Build.0 = Debug|Any CPU
+		{6CEEF667-8418-446A-94FB-977F27786B39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CEEF667-8418-446A-94FB-977F27786B39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CEEF667-8418-446A-94FB-977F27786B39}.Release|x64.ActiveCfg = Release|Any CPU
+		{6CEEF667-8418-446A-94FB-977F27786B39}.Release|x64.Build.0 = Release|Any CPU
+		{6CEEF667-8418-446A-94FB-977F27786B39}.Release|x86.ActiveCfg = Release|Any CPU
+		{6CEEF667-8418-446A-94FB-977F27786B39}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -712,6 +726,7 @@ Global
 		{9CF7FA13-16A5-4A03-ABBF-58420119E0DB} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 		{0939AA0A-3AE8-4DB8-8547-BA1844C8B6CE} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 		{76E98A69-A5CE-48D1-9D79-CA220FCDEECE} = {16E4EB45-D029-4743-99CD-D125C72AE383}
+		{6CEEF667-8418-446A-94FB-977F27786B39} = {51F9C36E-772F-4E52-A4AC-3EE8F13FDAD3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {30432CEA-45F2-4F5A-B44B-790A62AB73F1}
