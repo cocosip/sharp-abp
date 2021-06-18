@@ -1,0 +1,12 @@
+{
+  "culture": "zh-Hans",
+  "texts": {
+    "FileStoringManagement": "文件存储管理",
+    "Permission:FileStoringManagement.Containers": "文件容器管理",
+    "Permission:FileStoringManagement.Containers.Create": "创建文件容器",
+    "Permission:FileStoringManagement.Containers.Update": "修改文件容器",
+    "Permission:FileStoringManagement.Containers.Delete": "删除文件容器",
+    "Permission:FileStoringManagement.Providers": "文件供应商管理",
+    "Permission:FileStoringManagement.Providers.Options": "文件供应商配置"
+  }
+}

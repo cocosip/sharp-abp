@@ -4,9 +4,12 @@ using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Caching;
 using Volo.Abp.Threading;
-
+using Volo.Abp.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 namespace SharpAbp.Abp.FileStoringManagement
 {
+    [Dependency(ServiceLifetime.Transient, ReplaceServices = true)]
+    [ExposeServices(typeof(IFileContainerConfigurationProvider))]
     public class DatabaseFileContainerConfigurationProvider : IFileContainerConfigurationProvider
     {
         protected IFileContainerConfigurationConverter FileContainerConfigurationConverter { get; }

@@ -34,7 +34,6 @@ namespace SharpAbp.Abp.FileStoringManagement
                 });
             });
 
-            context.Services.Replace(ServiceDescriptor.Transient<IFileContainerConfigurationProvider, DatabaseFileContainerConfigurationProvider>());
         }
 
     }

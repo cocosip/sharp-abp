@@ -1,0 +1,12 @@
+{
+  "culture": "en",
+  "texts": {
+    "FileStoringManagement": "File storing management",
+    "Permission:FileStoringManagement.Containers": "File container management",
+    "Permission:FileStoringManagement.Containers.Create": "Create file container",
+    "Permission:FileStoringManagement.Containers.Update": "Update file container",
+    "Permission:FileStoringManagement.Containers.Delete": "Delete file container",
+    "Permission:FileStoringManagement.Providers": "File provider management",
+    "Permission:FileStoringManagement.Providers.Options": "File provider options"
+  }
+}

@@ -10,7 +10,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 {
     [DependsOn(
         typeof(AbpValidationModule)
-    )]
+        )]
     public class FileStoringManagementDomainSharedModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
