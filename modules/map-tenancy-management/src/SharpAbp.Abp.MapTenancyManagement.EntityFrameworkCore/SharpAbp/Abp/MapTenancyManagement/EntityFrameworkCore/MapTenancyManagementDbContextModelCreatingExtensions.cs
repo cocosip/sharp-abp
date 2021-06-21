@@ -28,8 +28,9 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
 
                 b.Property(p => p.Code).IsRequired().HasMaxLength(MapTenantConsts.MaxCodeLength);
 
-                b.Property(p => p.MapCode).HasMaxLength(MapTenantConsts.MaxMapCodeLength);
+                b.Property(p => p.MapCode).IsRequired().HasMaxLength(MapTenantConsts.MaxMapCodeLength);
 
+                b.HasIndex(p => new { p.Code }).IsUnique();
                 b.HasIndex(p => new { p.MapCode }).IsUnique();
             });
         }

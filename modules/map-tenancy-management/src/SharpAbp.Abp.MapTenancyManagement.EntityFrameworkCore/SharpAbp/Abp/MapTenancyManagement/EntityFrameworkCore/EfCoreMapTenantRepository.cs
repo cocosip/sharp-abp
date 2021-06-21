@@ -35,6 +35,19 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         }
 
         /// <summary>
+        /// Find MapTenant by mapCode
+        /// </summary>
+        /// <param name="mapCode"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<MapTenant> FindByMapCodeAsync([NotNull] string mapCode, CancellationToken cancellationToken = default)
+        {
+            Check.NotNullOrWhiteSpace(mapCode, nameof(mapCode));
+            return await (await GetDbSetAsync())
+                .FirstOrDefaultAsync(x => x.MapCode == mapCode, GetCancellationToken(cancellationToken));
+        }
+
+        /// <summary>
         /// Find MapTenant by tenantId
         /// </summary>
         /// <param name="tenantId"></param>
@@ -61,6 +74,24 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         {
             return await (await GetDbSetAsync())
                 .WhereIf(!code.IsNullOrWhiteSpace(), x => x.Code == code)
+                .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
+                .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
+        }
+
+        /// <summary>
+        /// Find MapTenant
+        /// </summary>
+        /// <param name="mapCode"></param>
+        /// <param name="expectedId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<MapTenant> FindExpectedMapCodeAsync(
+           [NotNull] string mapCode,
+           Guid? expectedId = null,
+           CancellationToken cancellationToken = default)
+        {
+            return await (await GetDbSetAsync())
+                .WhereIf(!mapCode.IsNullOrWhiteSpace(), x => x.Code == mapCode)
                 .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
@@ -105,11 +136,26 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<List<MapTenant>> GetListByCodesAsync(
-            List<string> codes, 
+            List<string> codes,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .Where(x => codes.Contains(x.Code))
+                .ToListAsync(GetCancellationToken(cancellationToken));
+        }
+
+        /// <summary>
+        /// Get list by mapCode
+        /// </summary>
+        /// <param name="mapCodes"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<List<MapTenant>> GetListByMapCodesAsync(
+           List<string> mapCodes,
+           CancellationToken cancellationToken = default)
+        {
+            return await (await GetDbSetAsync())
+                .Where(x => mapCodes.Contains(x.MapCode))
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 

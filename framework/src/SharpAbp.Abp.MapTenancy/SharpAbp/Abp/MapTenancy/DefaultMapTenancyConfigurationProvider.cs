@@ -18,5 +18,11 @@ namespace SharpAbp.Abp.MapTenancy
         {
             return Task.FromResult(Options.Mappers.GetConfiguration(code));
         }
+
+        [NotNull]
+        public virtual Task<MapTenancyConfiguration> GetByMapCodeAsync([NotNull] string mapCode)
+        {
+            return Task.FromResult(Options.Mappers.GetConfigurationByMapCode(mapCode));
+        }
     }
 }

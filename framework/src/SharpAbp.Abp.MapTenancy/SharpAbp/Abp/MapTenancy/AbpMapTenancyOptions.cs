@@ -15,12 +15,13 @@ namespace SharpAbp.Abp.MapTenancy
         public AbpMapTenancyOptions Configure(IConfiguration configuration)
         {
             var mapTenancyConfigurations = configuration.Get<Dictionary<string, MapTenancyConfiguration>>();
-            foreach (var kv in mapTenancyConfigurations)
+            foreach (var mapTenancyKv in mapTenancyConfigurations)
             {
-                Mappers.Configure(kv.Key, c =>
+                Mappers.Configure(mapTenancyKv.Key, c =>
                 {
-                    c.TenantId = kv.Value.TenantId;
-                    c.MapCode = kv.Value.MapCode;
+                    c.TenantId = mapTenancyKv.Value.TenantId;
+                    c.Code = mapTenancyKv.Value.Code;
+                    c.MapCode = mapTenancyKv.Value.MapCode;
                 });
             }
             return this;

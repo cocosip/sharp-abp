@@ -23,6 +23,13 @@ namespace SharpAbp.Abp.MapTenancyManagement
         Task<MapTenantDto> FindByCodeAsync(string code);
 
         /// <summary>
+        /// Find MapTenant by mapCode
+        /// </summary>
+        /// <param name="mapCode"></param>
+        /// <returns></returns>
+        Task<MapTenantDto> FindByMapCodeAsync(string mapCode);
+
+        /// <summary>
         /// Find MapTenant by tenantId
         /// </summary>
         /// <param name="tenantId"></param>

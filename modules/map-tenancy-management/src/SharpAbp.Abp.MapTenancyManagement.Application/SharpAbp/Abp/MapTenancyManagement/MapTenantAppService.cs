@@ -47,6 +47,19 @@ namespace SharpAbp.Abp.MapTenancyManagement
         }
 
         /// <summary>
+        /// Find MapTenant by mapCode
+        /// </summary>
+        /// <param name="mapCode"></param>
+        /// <returns></returns>
+        [Authorize(MapTenancyManagementPermissions.MapTenants.Default)]
+        public virtual async Task<MapTenantDto> FindByMapCodeAsync([NotNull] string mapCode)
+        {
+            Check.NotNullOrWhiteSpace(mapCode, nameof(mapCode));
+            var mapTenant = await MapTenantRepository.FindByMapCodeAsync(mapCode);
+            return ObjectMapper.Map<MapTenant, MapTenantDto>(mapTenant);
+        }
+
+        /// <summary>
         /// Find MapTenant by tenantId
         /// </summary>
         /// <param name="tenantId"></param>

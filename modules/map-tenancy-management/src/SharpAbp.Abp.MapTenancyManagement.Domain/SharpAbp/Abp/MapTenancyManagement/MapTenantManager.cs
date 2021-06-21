@@ -28,6 +28,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
             //Validate
             await ValidateTenantAsync(mapTenant.TenantId);
             await ValidateCodeAsync(mapTenant.Code);
+            await ValidateMapCodeAsync(mapTenant.MapCode);
 
             await MapTenantRepository.InsertAsync(mapTenant);
         }
@@ -45,11 +46,12 @@ namespace SharpAbp.Abp.MapTenancyManagement
             var mapTenant = await MapTenantRepository.FindAsync(id);
             if (mapTenant == null)
             {
-                throw new UserFriendlyException($"Could not find 'MapTenant' by id '{id}'.");
+                throw new AbpException($"Could not find 'MapTenant' by id '{id}'.");
             }
             //Validate
             await ValidateTenantAsync(tenantId, id);
             await ValidateCodeAsync(code, id);
+            await ValidateMapCodeAsync(mapCode, id);
 
             mapTenant.Update(code, tenantId, mapCode);
 
@@ -68,13 +70,13 @@ namespace SharpAbp.Abp.MapTenancyManagement
             var tenant = await TenantRepository.FindAsync(tenantId, false);
             if (tenant == null)
             {
-                throw new UserFriendlyException($"Can't find any tenant by '{tenantId}'.");
+                throw new AbpException($"Can't find any tenant by '{tenantId}'.");
             }
 
             var mapTenant = await MapTenantRepository.FindExpectedTenantIdAsync(tenantId, expectedId);
             if (mapTenant != null)
             {
-                throw new UserFriendlyException($"Duplicate 'MapTenant' tenantId: '{tenantId}'.");
+                throw new AbpException($"Duplicate 'MapTenant' tenantId: '{tenantId}'.");
             }
         }
 
@@ -89,7 +91,16 @@ namespace SharpAbp.Abp.MapTenancyManagement
             var mapTenant = await MapTenantRepository.FindExpectedCodeAsync(code, expectedId);
             if (mapTenant != null)
             {
-                throw new UserFriendlyException($"Duplicate 'MapTenant' code:'{code}'.");
+                throw new AbpException($"Duplicate 'MapTenant' code:'{code}'.");
+            }
+        }
+
+        protected virtual async Task ValidateMapCodeAsync(string mapCode, Guid? expectedId = null)
+        {
+            var mapTenant = await MapTenantRepository.FindExpectedCodeAsync(mapCode, expectedId);
+            if (mapTenant != null)
+            {
+                throw new AbpException($"Duplicate 'MapTenant' mapCode:'{mapCode}'.");
             }
         }
 

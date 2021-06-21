@@ -18,6 +18,14 @@ namespace SharpAbp.Abp.MapTenancyManagement
         Task<MapTenant> FindByCodeAsync([NotNull] string code, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Find MapTenant by mapCode
+        /// </summary>
+        /// <param name="mapCode"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<MapTenant> FindByMapCodeAsync([NotNull] string mapCode, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Find MapTenant by tenantId
         /// </summary>
         /// <param name="tenantId"></param>
@@ -33,6 +41,15 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<MapTenant> FindExpectedCodeAsync([NotNull] string code, Guid? expectedId = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Find MapTenant
+        /// </summary>
+        /// <param name="mapCode"></param>
+        /// <param name="expectedId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<MapTenant> FindExpectedMapCodeAsync([NotNull] string mapCode, Guid? expectedId = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Find MapTenant
@@ -58,6 +75,14 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<List<MapTenant>> GetListByCodesAsync(List<string> codes, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get list by mapCode
+        /// </summary>
+        /// <param name="mapCodes"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<List<MapTenant>> GetListByMapCodesAsync(List<string> mapCodes, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get List

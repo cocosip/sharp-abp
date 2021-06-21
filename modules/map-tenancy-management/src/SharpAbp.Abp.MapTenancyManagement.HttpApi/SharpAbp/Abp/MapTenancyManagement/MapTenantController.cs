@@ -32,6 +32,13 @@ namespace SharpAbp.Abp.MapTenancyManagement
         }
 
         [HttpGet]
+        [Route("find-by-mapCode/{mapCode}")]
+        public async Task<MapTenantDto> FindByMapCodeAsync(string mapCode)
+        {
+            return await _mapTenantAppService.FindByMapCodeAsync(mapCode);
+        }
+
+        [HttpGet]
         [Route("find-by-tenantId/{tenantId}")]
         public async Task<MapTenantDto> FindByTenantIdAsync(Guid tenantId)
         {
@@ -64,6 +71,6 @@ namespace SharpAbp.Abp.MapTenancyManagement
             await _mapTenantAppService.DeleteAsync(id);
         }
 
-  
+
     }
 }

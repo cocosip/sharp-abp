@@ -23,7 +23,6 @@ namespace SharpAbp.Abp.MapTenancyManagement
         public virtual async Task<MapTenancyConfiguration> GetAsync([NotNull] string code)
         {
             Check.NotNullOrWhiteSpace(code, nameof(code));
-
             var cacheItem = await MapTenantCache.GetOrAddAsync(
                 code,
                 async () =>
@@ -32,7 +31,12 @@ namespace SharpAbp.Abp.MapTenancyManagement
                     return mapTenant.AsCacheItem();
                 });
 
-            return cacheItem == null ? null : new MapTenancyConfiguration(cacheItem.TenantId, cacheItem.MapCode);
+            return cacheItem == null ? null : new MapTenancyConfiguration(cacheItem.TenantId, cacheItem.Code, cacheItem.MapCode);
+        }
+
+        public Task<MapTenancyConfiguration> GetByMapCodeAsync(string mapCode)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

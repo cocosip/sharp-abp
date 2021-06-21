@@ -1,13 +1,14 @@
 ﻿using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Volo.Abp;
 
 namespace SharpAbp.Abp.MapTenancy
 {
     public class MapTenancyConfigurations
     {
-        private MapTenancyConfiguration Default => new(null, "");
+        private MapTenancyConfiguration Default => new(null, "", "");
         private readonly Dictionary<string, MapTenancyConfiguration> _mappers;
 
         public MapTenancyConfigurations()
@@ -25,8 +26,7 @@ namespace SharpAbp.Abp.MapTenancy
             configureAction(
                 _mappers.GetOrAdd(
                     code,
-                    () => new MapTenancyConfiguration()
-                    )
+                    () => new MapTenancyConfiguration())
                 );
             return this;
         }
@@ -47,6 +47,13 @@ namespace SharpAbp.Abp.MapTenancy
             Check.NotNullOrWhiteSpace(code, nameof(code));
             return _mappers.GetOrDefault(code) ??
                    Default;
+        }
+
+        [NotNull]
+        public MapTenancyConfiguration GetConfigurationByMapCode([NotNull] string mapCode)
+        {
+            Check.NotNullOrWhiteSpace(mapCode, nameof(mapCode));
+            return _mappers.Where(x => x.Value.MapCode == mapCode).FirstOrDefault().Value ?? Default;
         }
 
     }
