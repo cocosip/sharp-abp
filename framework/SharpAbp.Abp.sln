@@ -99,7 +99,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.DbConnections.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.DbConnections.SqlServer", "src\SharpAbp.Abp.DbConnections.SqlServer\SharpAbp.Abp.DbConnections.SqlServer.csproj", "{0ED91014-2A6C-42C6-93FF-585EE10A9D3A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.DbConnections.Tests", "test\SharpAbp.Abp.DbConnections.Tests\SharpAbp.Abp.DbConnections.Tests.csproj", "{6469ACB2-5E64-484E-956B-920E296D4E5F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.DbConnections.Tests", "test\SharpAbp.Abp.DbConnections.Tests\SharpAbp.Abp.DbConnections.Tests.csproj", "{6469ACB2-5E64-484E-956B-920E296D4E5F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
