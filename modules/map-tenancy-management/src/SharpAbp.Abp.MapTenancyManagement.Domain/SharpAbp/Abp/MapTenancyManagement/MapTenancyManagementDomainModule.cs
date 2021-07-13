@@ -34,7 +34,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
                 });
             });
 
-            context.Services.Replace(ServiceDescriptor.Transient<IMapTenancyConfigurationProvider, DatabaseMapTenancyConfigurationProvider>());
+            // context.Services.Replace(ServiceDescriptor.Transient<IMapTenancyConfigurationProvider, DatabaseMapTenancyConfigurationProvider>());
         }
     }
 }

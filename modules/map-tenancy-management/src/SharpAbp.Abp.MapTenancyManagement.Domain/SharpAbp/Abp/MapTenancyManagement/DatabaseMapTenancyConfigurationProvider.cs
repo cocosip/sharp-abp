@@ -1,11 +1,16 @@
-﻿using JetBrains.Annotations;
+﻿using System.Threading.Tasks;
+using JetBrains.Annotations;
+using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.MapTenancy;
-using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Caching;
+using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.MapTenancyManagement
 {
+
+    [Dependency(ServiceLifetime.Transient, ReplaceServices = true)]
+    [ExposeServices(typeof(IMapTenancyConfigurationProvider))]
     public class DatabaseMapTenancyConfigurationProvider : IMapTenancyConfigurationProvider
     {
         protected IDistributedCache<MapTenantCacheItem> MapTenantCache { get; }
@@ -34,9 +39,11 @@ namespace SharpAbp.Abp.MapTenancyManagement
             return cacheItem == null ? null : new MapTenancyConfiguration(cacheItem.TenantId, cacheItem.Code, cacheItem.MapCode);
         }
 
-        public Task<MapTenancyConfiguration> GetByMapCodeAsync(string mapCode)
+        public virtual async Task<MapTenancyConfiguration> GetByMapCodeAsync(string mapCode)
         {
-            throw new System.NotImplementedException();
+            Check.NotNullOrWhiteSpace(mapCode, nameof(mapCode));
+            var mapTenant = await MapTenantRepository.FindByMapCodeAsync(mapCode, cancellationToken: default);
+            return mapTenant == null ? null : new MapTenancyConfiguration(mapTenant.TenantId, mapTenant.Code, mapTenant.MapCode);
         }
     }
 }
