@@ -19,28 +19,22 @@ namespace SharpAbp.Abp.FileStoringManagement
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<ContainerDto> GetAsync(
-            Guid id,
-            bool includeDetails = true)
+        public async Task<ContainerDto> GetAsync(Guid id)
         {
-            return await _containerAppService.GetAsync(id, includeDetails);
+            return await _containerAppService.GetAsync(id);
         }
 
         [HttpGet]
-        public async Task<PagedResultDto<ContainerDto>> GetPagedListAsync(
-            FileStoringContainerPagedRequestDto input,
-            bool includeDetails = true)
+        public async Task<PagedResultDto<ContainerDto>> GetPagedListAsync( FileStoringContainerPagedRequestDto input)
         {
-            return await _containerAppService.GetPagedListAsync(input, includeDetails);
+            return await _containerAppService.GetPagedListAsync(input);
         }
 
         [HttpGet]
         [Route("find-by-name/{name}")]
-        public async Task<ContainerDto> FindByNameAsync(
-            string name,
-            bool includeDetails = true)
+        public async Task<ContainerDto> FindByNameAsync(string name)
         {
-            return await _containerAppService.FindByNameAsync(name, includeDetails);
+            return await _containerAppService.FindByNameAsync(name);
         }
 
         [HttpPost]

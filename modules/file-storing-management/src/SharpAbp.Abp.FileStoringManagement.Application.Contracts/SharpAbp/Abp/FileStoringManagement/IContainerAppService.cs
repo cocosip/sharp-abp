@@ -11,25 +11,22 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// Get container by id
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="includeDetails"></param>
         /// <returns></returns>
-        Task<ContainerDto> GetAsync(Guid id, bool includeDetails = true);
+        Task<ContainerDto> GetAsync(Guid id);
 
         /// <summary>
         /// Get container by name
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="includeDetails"></param>
         /// <returns></returns>
-        Task<ContainerDto> FindByNameAsync(string name, bool includeDetails = true);
+        Task<ContainerDto> FindByNameAsync(string name);
 
         /// <summary>
         /// Get container page list
         /// </summary>
         /// <param name="input"></param>
-        /// <param name="includeDetails"></param>
         /// <returns></returns>
-        Task<PagedResultDto<ContainerDto>> GetPagedListAsync(FileStoringContainerPagedRequestDto input, bool includeDetails = true);
+        Task<PagedResultDto<ContainerDto>> GetPagedListAsync(FileStoringContainerPagedRequestDto input);
 
         /// <summary>
         /// Create container

@@ -27,12 +27,11 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// Get container by id
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="includeDetails"></param>
         /// <returns></returns>
         [Authorize(FileStoringManagementPermissions.Containers.Default)]
-        public virtual async Task<ContainerDto> GetAsync(Guid id, bool includeDetails = true)
+        public virtual async Task<ContainerDto> GetAsync(Guid id)
         {
-            var fileStoringContainer = await FileStoringContainerRepository.GetAsync(id, includeDetails);
+            var fileStoringContainer = await FileStoringContainerRepository.GetAsync(id, true);
             return ObjectMapper.Map<FileStoringContainer, ContainerDto>(fileStoringContainer);
         }
 
@@ -40,16 +39,13 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// Get container by name
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="includeDetails"></param>
         /// <returns></returns>
         [Authorize(FileStoringManagementPermissions.Containers.Default)]
-        public virtual async Task<ContainerDto> FindByNameAsync(
-            [NotNull] string name,
-            bool includeDetails = true)
+        public virtual async Task<ContainerDto> FindByNameAsync([NotNull] string name)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
 
-            var fileStoringContainer = await FileStoringContainerRepository.FindByNameAsync(name, includeDetails);
+            var fileStoringContainer = await FileStoringContainerRepository.FindByNameAsync(name, true);
             return ObjectMapper.Map<FileStoringContainer, ContainerDto>(fileStoringContainer);
         }
 
@@ -60,16 +56,14 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="includeDetails"></param>
         /// <returns></returns>
         [Authorize(FileStoringManagementPermissions.Containers.Default)]
-        public virtual async Task<PagedResultDto<ContainerDto>> GetPagedListAsync(
-            FileStoringContainerPagedRequestDto input,
-            bool includeDetails = true)
+        public virtual async Task<PagedResultDto<ContainerDto>> GetPagedListAsync(FileStoringContainerPagedRequestDto input)
         {
             var count = await FileStoringContainerRepository.GetCountAsync(input.Name, input.Provider);
             var fileStoringContainers = await FileStoringContainerRepository.GetListAsync(
                 input.SkipCount,
                 input.MaxResultCount,
                 input.Sorting,
-                includeDetails,
+                false,
                 input.Name,
                 input.Provider);
 

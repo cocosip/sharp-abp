@@ -98,7 +98,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 Assert.Equal(1, pagedContainers.TotalCount);
 
 
-                var container2 = await _containerAppService.GetAsync(id, true);
+                var container2 = await _containerAppService.GetAsync(id);
                 Assert.Equal("default1", container2.Name);
                 Assert.Equal("Minio", container2.Provider);
                 Assert.Equal(tenantId, container2.TenantId);
@@ -122,7 +122,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                     }
                 });
 
-                var container3 = await _containerAppService.GetAsync(id, true);
+                var container3 = await _containerAppService.GetAsync(id);
                 Assert.Equal("default2", container3.Name);
                 Assert.Equal("FileSystem", container3.Provider);
                 Assert.Equal(tenantId, container3.TenantId);
