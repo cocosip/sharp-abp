@@ -36,7 +36,7 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
 
                 b.Property(p => p.IsMultiTenant).IsRequired();
 
-                b.HasMany(p => p.Items).WithOne().HasForeignKey(p => p.ContainerId).IsRequired();
+                b.HasMany(p => p.Items).WithOne().HasForeignKey(p => p.ContainerId).IsRequired().OnDelete(DeleteBehavior.Cascade);
 
                 b.HasIndex(p => new { p.TenantId, p.Name }).IsUnique();
 
