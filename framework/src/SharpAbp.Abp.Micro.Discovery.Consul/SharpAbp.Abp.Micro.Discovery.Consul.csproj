@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Consul" Version="1.6.10.1" />
+    <PackageReference Include="Consul" Version="1.6.10.2" />
     <PackageReference Include="Volo.Abp.Caching" Version="$(VoloAbpPackageVersion)" />
   </ItemGroup>
 
