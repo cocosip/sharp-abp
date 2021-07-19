@@ -53,7 +53,6 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// Get container page list
         /// </summary>
         /// <param name="input"></param>
-        /// <param name="includeDetails"></param>
         /// <returns></returns>
         [Authorize(FileStoringManagementPermissions.Containers.Default)]
         public virtual async Task<PagedResultDto<ContainerDto>> GetPagedListAsync(FileStoringContainerPagedRequestDto input)

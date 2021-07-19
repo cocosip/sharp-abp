@@ -1,29 +1,26 @@
 ﻿using JetBrains.Annotations;
+using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.FileStoring;
 using System.Threading.Tasks;
 using Volo.Abp;
-using Volo.Abp.Caching;
-using Volo.Abp.Threading;
 using Volo.Abp.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
+using Volo.Abp.Threading;
+
 namespace SharpAbp.Abp.FileStoringManagement
 {
     [Dependency(ServiceLifetime.Transient, ReplaceServices = true)]
     [ExposeServices(typeof(IFileContainerConfigurationProvider))]
     public class DatabaseFileContainerConfigurationProvider : IFileContainerConfigurationProvider
     {
-        protected IFileContainerConfigurationConverter FileContainerConfigurationConverter { get; }
-        protected IDistributedCache<FileStoringContainerCacheItem> ContainerCache { get; }
-        protected IFileStoringContainerRepository FileStoringContainerRepository { get; }
+        protected IFileContainerConfigurationConverter ConfigurationConverter { get; }
+        protected IFileStoringContainerCacheManager ContainerCacheManager { get; }
 
         public DatabaseFileContainerConfigurationProvider(
-            IFileContainerConfigurationConverter fileContainerConfigurationConverter,
-            IDistributedCache<FileStoringContainerCacheItem> containerCache,
-            IFileStoringContainerRepository fileStoringContainerRepository)
+            IFileContainerConfigurationConverter configurationConverter,
+            IFileStoringContainerCacheManager containerCacheManager)
         {
-            FileContainerConfigurationConverter = fileContainerConfigurationConverter;
-            ContainerCache = containerCache;
-            FileStoringContainerRepository = fileStoringContainerRepository;
+            ConfigurationConverter = configurationConverter;
+            ContainerCacheManager = containerCacheManager;
         }
 
 
@@ -38,15 +35,8 @@ namespace SharpAbp.Abp.FileStoringManagement
 
         protected virtual async Task<FileContainerConfiguration> GetConfigurationAsync(string name)
         {
-            var cacheItem = await ContainerCache.GetOrAddAsync(
-                name,
-                async () =>
-                {
-                    var container = await FileStoringContainerRepository.FindByNameAsync(name, true);
-                    return container?.AsCacheItem();
-                });
-
-            return cacheItem == null ? null : FileContainerConfigurationConverter.ToConfiguration(cacheItem);
+            var cacheItem = await ContainerCacheManager.GetAsync(name);
+            return cacheItem == null ? null : ConfigurationConverter.ToConfiguration(cacheItem);
         }
 
     }
