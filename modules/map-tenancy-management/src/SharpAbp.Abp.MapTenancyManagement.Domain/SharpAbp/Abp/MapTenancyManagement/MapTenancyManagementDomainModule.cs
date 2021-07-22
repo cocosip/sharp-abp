@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using SharpAbp.Abp.MapTenancy;
 using System;
 using Volo.Abp.Caching;
+using Volo.Abp.Domain.Entities.Events.Distributed;
 using Volo.Abp.Modularity;
 using Volo.Abp.TenantManagement;
 
@@ -27,14 +26,18 @@ namespace SharpAbp.Abp.MapTenancyManagement
                     {
                         return new DistributedCacheEntryOptions()
                         {
-                            AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(600)
+                            AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(7200)
                         };
                     }
                     return null;
                 });
             });
 
-            // context.Services.Replace(ServiceDescriptor.Transient<IMapTenancyConfigurationProvider, DatabaseMapTenancyConfigurationProvider>());
+            Configure<AbpDistributedEntityEventOptions>(options =>
+            {
+                options.AutoEventSelectors.Add<MapTenant>();
+                options.EtoMappings.Add<MapTenant, MapTenantEto>();
+            });
         }
     }
 }

@@ -52,6 +52,5 @@ namespace SharpAbp.Abp.FileStoringManagement
             var cacheItem = container?.AsCacheItem();
             await ContainerCache.SetAsync(container.Name, cacheItem);
         }
-
     }
 }

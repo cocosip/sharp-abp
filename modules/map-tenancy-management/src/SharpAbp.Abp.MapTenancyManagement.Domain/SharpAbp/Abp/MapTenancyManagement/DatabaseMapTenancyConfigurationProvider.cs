@@ -13,14 +13,14 @@ namespace SharpAbp.Abp.MapTenancyManagement
     [ExposeServices(typeof(IMapTenancyConfigurationProvider))]
     public class DatabaseMapTenancyConfigurationProvider : IMapTenancyConfigurationProvider
     {
-        protected IDistributedCache<MapTenantCacheItem> MapTenantCache { get; }
+        protected IMapTenantCacheManager MapTenantCacheManager { get; }
         protected IMapTenantRepository MapTenantRepository { get; }
 
         public DatabaseMapTenancyConfigurationProvider(
-            IDistributedCache<MapTenantCacheItem> mapTenantCache,
-            IMapTenantRepository mapTenantRepository)
+            IMapTenantCacheManager mapTenantCacheManager,
+             IMapTenantRepository mapTenantRepository)
         {
-            MapTenantCache = mapTenantCache;
+            MapTenantCacheManager = mapTenantCacheManager;
             MapTenantRepository = mapTenantRepository;
         }
 
@@ -28,14 +28,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         public virtual async Task<MapTenancyConfiguration> GetAsync([NotNull] string code)
         {
             Check.NotNullOrWhiteSpace(code, nameof(code));
-            var cacheItem = await MapTenantCache.GetOrAddAsync(
-                code,
-                async () =>
-                {
-                    var mapTenant = await MapTenantRepository.FindByCodeAsync(code, cancellationToken: default);
-                    return mapTenant.AsCacheItem();
-                });
-
+            var cacheItem = await MapTenantCacheManager.GetAsync(code);
             return cacheItem == null ? null : new MapTenancyConfiguration(cacheItem.TenantId, cacheItem.Code, cacheItem.MapCode);
         }
 

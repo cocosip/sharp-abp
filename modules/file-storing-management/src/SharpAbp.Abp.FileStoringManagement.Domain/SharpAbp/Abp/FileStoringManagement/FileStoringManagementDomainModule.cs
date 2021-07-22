@@ -5,6 +5,7 @@ using SharpAbp.Abp.FileStoring;
 using System;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain;
+using Volo.Abp.Domain.Entities.Events.Distributed;
 using Volo.Abp.Modularity;
 
 namespace SharpAbp.Abp.FileStoringManagement
@@ -27,13 +28,18 @@ namespace SharpAbp.Abp.FileStoringManagement
                     {
                         return new DistributedCacheEntryOptions()
                         {
-                            AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(600)
+                            AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(7200)
                         };
                     }
                     return null;
                 });
             });
 
+            Configure<AbpDistributedEntityEventOptions>(options =>
+            {
+                options.AutoEventSelectors.Add<FileStoringContainer>();
+                options.EtoMappings.Add<FileStoringContainer, FileStoringContainerEto>();
+            });
         }
 
     }
