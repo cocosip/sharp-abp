@@ -8,9 +8,7 @@ using Volo.Abp.MultiTenancy;
 namespace SharpAbp.Abp.FileStoringManagement
 {
     public class FileStoringHandler :
-        IDistributedEventHandler<EntityCreatedEto<FileStoringContainerEto>>,
         IDistributedEventHandler<EntityUpdatedEto<FileStoringContainerEto>>,
-        IDistributedEventHandler<EntityDeletedEto<FileStoringContainerEto>>,
         ITransientDependency
     {
         private readonly ICurrentTenant _currentTenant;
@@ -22,17 +20,8 @@ namespace SharpAbp.Abp.FileStoringManagement
             _currentTenant = currentTenant;
             _containerCacheManager = containerCacheManager;
         }
-        public async Task HandleEventAsync(EntityCreatedEto<FileStoringContainerEto> eventData)
-        {
-            eventData.IsMultiTenant(out Guid? tenantId);
-            await UpdateCacheAsync(tenantId, eventData.Entity.Id);
-        }
+
         public async Task HandleEventAsync(EntityUpdatedEto<FileStoringContainerEto> eventData)
-        {
-            eventData.IsMultiTenant(out Guid? tenantId);
-            await UpdateCacheAsync(tenantId, eventData.Entity.Id);
-        }
-        public async Task HandleEventAsync(EntityDeletedEto<FileStoringContainerEto> eventData)
         {
             eventData.IsMultiTenant(out Guid? tenantId);
             await UpdateCacheAsync(tenantId, eventData.Entity.Id);
