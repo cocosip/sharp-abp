@@ -42,7 +42,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         {
             using (_currentTenant.Change(tenantId))
             {
-                await _containerCacheManager.UpdateAsync(id);
+                await _containerCacheManager.UpdateCacheAsync(id);
             }
         }
     }

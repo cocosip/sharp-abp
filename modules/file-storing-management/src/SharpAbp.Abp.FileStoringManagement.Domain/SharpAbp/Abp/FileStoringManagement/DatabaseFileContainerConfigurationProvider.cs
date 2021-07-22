@@ -35,7 +35,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 
         protected virtual async Task<FileContainerConfiguration> GetConfigurationAsync(string name)
         {
-            var cacheItem = await ContainerCacheManager.GetAsync(name);
+            var cacheItem = await ContainerCacheManager.GetCacheAsync(name);
             return cacheItem == null ? null : ConfigurationConverter.ToConfiguration(cacheItem);
         }
 

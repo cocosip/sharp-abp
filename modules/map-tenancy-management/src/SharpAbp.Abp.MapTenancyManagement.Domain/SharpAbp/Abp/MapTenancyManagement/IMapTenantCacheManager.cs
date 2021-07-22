@@ -11,14 +11,14 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// </summary>
         /// <param name="code"></param>
         /// <returns></returns>
-        Task<MapTenantCacheItem> GetAsync([NotNull] string code);
+        Task<MapTenantCacheItem> GetCacheAsync([NotNull] string code);
 
         /// <summary>
         /// Update cache by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task UpdateAsync(Guid id);
+        Task UpdateCacheAsync(Guid id);
 
     }
 }

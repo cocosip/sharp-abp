@@ -11,13 +11,13 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        Task<FileStoringContainerCacheItem> GetAsync([NotNull] string name);
+        Task<FileStoringContainerCacheItem> GetCacheAsync([NotNull] string name);
 
         /// <summary>
         /// Update container cache
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task UpdateAsync(Guid id);
+        Task UpdateCacheAsync(Guid id);
     }
 }

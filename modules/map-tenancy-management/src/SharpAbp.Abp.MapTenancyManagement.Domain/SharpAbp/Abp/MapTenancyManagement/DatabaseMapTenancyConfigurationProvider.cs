@@ -3,7 +3,6 @@ using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.MapTenancy;
 using Volo.Abp;
-using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.MapTenancyManagement
@@ -24,11 +23,10 @@ namespace SharpAbp.Abp.MapTenancyManagement
             MapTenantRepository = mapTenantRepository;
         }
 
-
         public virtual async Task<MapTenancyConfiguration> GetAsync([NotNull] string code)
         {
             Check.NotNullOrWhiteSpace(code, nameof(code));
-            var cacheItem = await MapTenantCacheManager.GetAsync(code);
+            var cacheItem = await MapTenantCacheManager.GetCacheAsync(code);
             return cacheItem == null ? null : new MapTenancyConfiguration(cacheItem.TenantId, cacheItem.Code, cacheItem.MapCode);
         }
 

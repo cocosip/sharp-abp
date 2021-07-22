@@ -27,7 +27,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public virtual async Task<FileStoringContainerCacheItem> GetAsync([NotNull] string name)
+        public virtual async Task<FileStoringContainerCacheItem> GetCacheAsync([NotNull] string name)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
             var cacheItem = await ContainerCache.GetOrAddAsync(
@@ -46,7 +46,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public virtual async Task UpdateAsync(Guid id)
+        public virtual async Task UpdateCacheAsync(Guid id)
         {
             var container = await ContainerRepository.GetAsync(id, true);
             var cacheItem = container?.AsCacheItem();

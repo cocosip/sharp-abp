@@ -19,17 +19,17 @@ namespace SharpAbp.Abp.MapTenancyManagement
         }
         public async Task HandleEventAsync(EntityCreatedEto<MapTenantEto> eventData)
         {
-            await _mapTenantCacheManager.UpdateAsync(eventData.Entity.Id);
+            await _mapTenantCacheManager.UpdateCacheAsync(eventData.Entity.Id);
         }
 
         public async Task HandleEventAsync(EntityUpdatedEto<MapTenantEto> eventData)
         {
-            await _mapTenantCacheManager.UpdateAsync(eventData.Entity.Id);
+            await _mapTenantCacheManager.UpdateCacheAsync(eventData.Entity.Id);
         }
 
         public async Task HandleEventAsync(EntityDeletedEto<MapTenantEto> eventData)
         {
-            await _mapTenantCacheManager.UpdateAsync(eventData.Entity.Id);
+            await _mapTenantCacheManager.UpdateCacheAsync(eventData.Entity.Id);
         }
 
     }
