@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.MapTenancy;
+using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 
@@ -17,7 +17,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
         public DatabaseMapTenancyConfigurationProvider(
             IMapTenantCacheManager mapTenantCacheManager,
-             IMapTenantRepository mapTenantRepository)
+            IMapTenantRepository mapTenantRepository)
         {
             MapTenantCacheManager = mapTenantCacheManager;
             MapTenantRepository = mapTenantRepository;
@@ -27,14 +27,28 @@ namespace SharpAbp.Abp.MapTenancyManagement
         {
             Check.NotNullOrWhiteSpace(code, nameof(code));
             var cacheItem = await MapTenantCacheManager.GetCacheAsync(code);
-            return cacheItem == null ? null : new MapTenancyConfiguration(cacheItem.TenantId, cacheItem.Code, cacheItem.MapCode);
+            if (cacheItem != null)
+            {
+                return new MapTenancyConfiguration(
+                    cacheItem.TenantId,
+                    cacheItem.Code,
+                    cacheItem.MapCode);
+            }
+            return null;
         }
 
         public virtual async Task<MapTenancyConfiguration> GetByMapCodeAsync(string mapCode)
         {
             Check.NotNullOrWhiteSpace(mapCode, nameof(mapCode));
-            var mapTenant = await MapTenantRepository.FindByMapCodeAsync(mapCode, cancellationToken: default);
-            return mapTenant == null ? null : new MapTenancyConfiguration(mapTenant.TenantId, mapTenant.Code, mapTenant.MapCode);
+            var mapCodeCacheItem = await MapTenantCacheManager.GetMapCodeCacheAsync(mapCode);
+            if (mapCodeCacheItem != null)
+            {
+                return new MapTenancyConfiguration(
+                    mapCodeCacheItem.TenantId,
+                    mapCodeCacheItem.Code,
+                    mapCodeCacheItem.MapCode);
+            }
+            return null;
         }
     }
 }

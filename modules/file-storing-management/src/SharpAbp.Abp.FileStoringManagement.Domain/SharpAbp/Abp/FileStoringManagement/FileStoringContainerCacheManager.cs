@@ -37,7 +37,6 @@ namespace SharpAbp.Abp.FileStoringManagement
                     var container = await ContainerRepository.FindByNameAsync(name, true);
                     return container?.AsCacheItem();
                 });
-
             return cacheItem;
         }
 
@@ -49,8 +48,11 @@ namespace SharpAbp.Abp.FileStoringManagement
         public virtual async Task UpdateCacheAsync(Guid id)
         {
             var container = await ContainerRepository.GetAsync(id, true);
-            var cacheItem = container?.AsCacheItem();
-            await ContainerCache.SetAsync(container.Name, cacheItem);
+            if (container != null)
+            {
+                var cacheItem = container?.AsCacheItem();
+                await ContainerCache.SetAsync(container.Name, cacheItem);
+            }
         }
     }
 }

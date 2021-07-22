@@ -43,14 +43,14 @@ namespace SharpAbp.Abp.FileStoringManagement
                     HttpAccess = true,
                     Title = "test-container1",
                     Items = new List<CreateContainerItemDto>()
-                {
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.BucketName,"bucket1"),
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.EndPoint,"http://192.168.0.4:9000"),
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.AccessKey,"minioadmin"),
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.SecretKey,"minioadmin"),
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.WithSSL,"false"),
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.CreateBucketIfNotExists,"false")
-                }
+                    {
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.BucketName,"bucket1"),
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.EndPoint,"http://192.168.0.4:9000"),
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.AccessKey,"minioadmin"),
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.SecretKey,"minioadmin"),
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.WithSSL,"false"),
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.CreateBucketIfNotExists,"false")
+                    }
                 });
             }
 
@@ -65,14 +65,14 @@ namespace SharpAbp.Abp.FileStoringManagement
                     HttpAccess = true,
                     Title = "test-container2",
                     Items = new List<CreateContainerItemDto>()
-                {
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.BucketName,"bucket2"),
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.EndPoint,"http://192.168.0.4:9000"),
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.AccessKey,"minioadmin"),
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.SecretKey,"minioadmin"),
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.WithSSL,"false"),
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.CreateBucketIfNotExists,"false")
-                }
+                    {
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.BucketName,"bucket2"),
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.EndPoint,"http://192.168.0.4:9000"),
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.AccessKey,"minioadmin"),
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.SecretKey,"minioadmin"),
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.WithSSL,"false"),
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.CreateBucketIfNotExists,"false")
+                    }
                 });
             }
 
@@ -148,14 +148,14 @@ namespace SharpAbp.Abp.FileStoringManagement
                     HttpAccess = true,
                     Title = "test-container22",
                     Items = new List<CreateContainerItemDto>()
-                {
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.BucketName,"bucket22"),
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.EndPoint,"http://192.168.0.4:9000"),
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.AccessKey,"minioadmin"),
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.SecretKey,"minioadmin"),
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.WithSSL,"false"),
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.CreateBucketIfNotExists,"false")
-                }
+                    {
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.BucketName,"bucket22"),
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.EndPoint,"http://192.168.0.4:9000"),
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.AccessKey,"minioadmin"),
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.SecretKey,"minioadmin"),
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.WithSSL,"false"),
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.CreateBucketIfNotExists,"false")
+                    }
                 });
             }
 
@@ -191,14 +191,14 @@ namespace SharpAbp.Abp.FileStoringManagement
                     HttpAccess = true,
                     Title = "test-container22",
                     Items = new List<CreateContainerItemDto>()
-                {
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.BucketName,"bucket22"),
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.EndPoint,"http://192.168.0.4:9000"),
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.AccessKey,"minioadmin"),
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.SecretKey,"minioadmin"),
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.WithSSL,"false"),
-                    new CreateContainerItemDto(MinioFileProviderConfigurationNames.CreateBucketIfNotExists,"false")
-                }
+                    {
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.BucketName,"bucket22"),
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.EndPoint,"http://192.168.0.4:9000"),
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.AccessKey,"minioadmin"),
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.SecretKey,"minioadmin"),
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.WithSSL,"false"),
+                        new CreateContainerItemDto(MinioFileProviderConfigurationNames.CreateBucketIfNotExists,"false")
+                    }
                 });
 
                 var container = _fileContainerFactory.Create("default22");

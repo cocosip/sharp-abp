@@ -1,6 +1,6 @@
-﻿using Volo.Abp.DependencyInjection;
+﻿using System;
+using Volo.Abp.DependencyInjection;
 using Volo.Abp.ObjectMapping;
-using System;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
@@ -20,7 +20,6 @@ namespace SharpAbp.Abp.FileStoringManagement
                 Name = source.Name,
             };
         }
-
         public FileStoringContainerEto Map(FileStoringContainer source, FileStoringContainerEto destination)
         {
             if (destination == null)
@@ -41,9 +40,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 {
                     destination.Name = source.Name;
                 }
-      
             }
-
             return destination;
         }
     }

@@ -1,6 +1,6 @@
+using JetBrains.Annotations;
 using System;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using Volo.Abp;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
@@ -9,15 +9,16 @@ namespace SharpAbp.Abp.MapTenancyManagement
 {
     public class MapTenantCacheManager : IMapTenantCacheManager, ITransientDependency
     {
-
         protected IDistributedCache<MapTenantCacheItem> MapTenantCache { get; }
+        protected IDistributedCache<MapTenantMapCodeCacheItem> MapTenantMapCodeCache { get; }
         protected IMapTenantRepository MapTenantRepository { get; }
-
         public MapTenantCacheManager(
             IDistributedCache<MapTenantCacheItem> mapTenantCache,
-             IMapTenantRepository mapTenantRepository)
+            IDistributedCache<MapTenantMapCodeCacheItem> mapTenantMapCodeCache,
+            IMapTenantRepository mapTenantRepository)
         {
             MapTenantCache = mapTenantCache;
+            MapTenantMapCodeCache = mapTenantMapCodeCache;
             MapTenantRepository = mapTenantRepository;
         }
 
@@ -41,6 +42,25 @@ namespace SharpAbp.Abp.MapTenancyManagement
         }
 
         /// <summary>
+        /// Get mapCode cache by mapCode
+        /// </summary>
+        /// <param name="mapCode"></param>
+        /// <returns></returns>
+        public virtual async Task<MapTenantMapCodeCacheItem> GetMapCodeCacheAsync([NotNull] string mapCode)
+        {
+            Check.NotNullOrWhiteSpace(mapCode, nameof(mapCode));
+            var mapCodeCacheItem = await MapTenantMapCodeCache.GetOrAddAsync(
+                mapCode,
+                async () =>
+                {
+                    var mapTenant = await MapTenantRepository.FindByMapCodeAsync(mapCode, default);
+                    return mapTenant?.AsMapCodeCacheItem();
+                });
+
+            return mapCodeCacheItem;
+        }
+
+        /// <summary>
         /// Update cache by id
         /// </summary>
         /// <param name="id"></param>
@@ -48,8 +68,14 @@ namespace SharpAbp.Abp.MapTenancyManagement
         public virtual async Task UpdateCacheAsync(Guid id)
         {
             var mapTenant = await MapTenantRepository.GetAsync(id, true);
-            var cacheItem = mapTenant?.AsCacheItem();
-            await MapTenantCache.SetAsync(mapTenant.Code, cacheItem);
+            if (mapTenant != null)
+            {
+                var cacheItem = mapTenant.AsCacheItem();
+                await MapTenantCache.SetAsync(mapTenant.Code, cacheItem);
+
+                var mapCodeCacheItem = mapTenant.AsMapCodeCacheItem();
+                await MapTenantMapCodeCache.SetAsync(mapTenant.MapCode, mapCodeCacheItem);
+            }
         }
     }
 }
