@@ -12,11 +12,10 @@ Write-Host("rootPath:"+$rootPath)
 # List of solutions used only in development mode
 $solutionPaths = @(
 		"../framework"
-		"../modules/file-storing-database"
+		"../modules/file-storing-database",
 		"../modules/file-storing-management",
-		"../modules/map-tenancy-management"
+		"../modules/map-tenancy-management",
 		"../modules/dbconnections"
-#		"../modules/permission-management",
 	)
 
 if ($full -eq "-f")

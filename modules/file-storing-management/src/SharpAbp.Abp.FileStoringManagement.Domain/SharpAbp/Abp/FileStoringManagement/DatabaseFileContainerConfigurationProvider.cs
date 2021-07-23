@@ -36,7 +36,12 @@ namespace SharpAbp.Abp.FileStoringManagement
         protected virtual async Task<FileContainerConfiguration> GetConfigurationAsync(string name)
         {
             var cacheItem = await ContainerCacheManager.GetCacheAsync(name);
-            return cacheItem == null ? null : ConfigurationConverter.ToConfiguration(cacheItem);
+            if (cacheItem != null)
+            {
+                return ConfigurationConverter.ToConfiguration(cacheItem);
+            }
+
+            throw new AbpException($"Could not find FileContainerConfiguration by name '{name}'.");
         }
 
     }

@@ -34,10 +34,10 @@ namespace SharpAbp.Abp.MapTenancyManagement
                     cacheItem.Code,
                     cacheItem.MapCode);
             }
-            return null;
+            throw new AbpException($"Could not find MapTenancyConfiguration by code '{code}'.");
         }
 
-        public virtual async Task<MapTenancyConfiguration> GetByMapCodeAsync(string mapCode)
+        public virtual async Task<MapTenancyConfiguration> GetByMapCodeAsync([NotNull] string mapCode)
         {
             Check.NotNullOrWhiteSpace(mapCode, nameof(mapCode));
             var mapCodeCacheItem = await MapTenantCacheManager.GetMapCodeCacheAsync(mapCode);
@@ -48,7 +48,8 @@ namespace SharpAbp.Abp.MapTenancyManagement
                     mapCodeCacheItem.Code,
                     mapCodeCacheItem.MapCode);
             }
-            return null;
+
+            throw new AbpException($"Could not find MapTenancyConfiguration by mapCode '{mapCode}'.");
         }
     }
 }
