@@ -28,12 +28,6 @@
 | `SharpAbp.Abp.MassTransit` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.MassTransit.svg)](https://www.nuget.org/packages/SharpAbp.Abp.MassTransit) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.MassTransit.svg)|
 | `SharpAbp.Abp.MassTransit.Kafka` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.MassTransit.Kafka.svg)](https://www.nuget.org/packages/SharpAbp.Abp.MassTransit.Kafka) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.MassTransit.Kafka.svg)|
 | `SharpAbp.Abp.MassTransit.RabbitMQ` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.MassTransit.RabbitMQ.svg)](https://www.nuget.org/packages/SharpAbp.Abp.MassTransit.RabbitMQ) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.MassTransit.RabbitMQ.svg)|
-| **Micro** | - | - |
-| `SharpAbp.Abp.Micro` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Micro.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Micro) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Micro.svg)|
-| `SharpAbp.Abp.Micro.Discovery` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Micro.Discovery.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Micro.Discovery) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Micro.Discovery.svg)|
-| `SharpAbp.Abp.Micro.Discovery.AddressTable` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Micro.Discovery.AddressTable.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Micro.Discovery.AddressTable) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Micro.Discovery.AddressTable.svg)|
-| `SharpAbp.Abp.Micro.Discovery.Consul` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Micro.Discovery.Consul.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Micro.Discovery.Consul) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Micro.Discovery.Consul.svg)|
-| `SharpAbp.Abp.Micro.LoadBalancer` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Micro.LoadBalancer.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Micro.LoadBalancer) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Micro.LoadBalancer.svg)|
 | **AutoS3** | - | - | 
 | `SharpAbp.Abp.AutoS3` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.AutoS3.svg)](https://www.nuget.org/packages/SharpAbp.Abp.AutoS3) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.AutoS3.svg)|
 | `SharpAbp.Abp.AutoS3.KS3` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.AutoS3.KS3.svg)](https://www.nuget.org/packages/SharpAbp.Abp.AutoS3.KS3) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.AutoS3.KS3.svg)|
