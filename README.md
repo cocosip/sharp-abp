@@ -13,7 +13,6 @@
 | FastDFS | FastDFS ABP Adapter | [doc](/docs/FastDFS.md) |
 | FileStoring | ABP Store File | [doc](/docs/FileStoring.md) |
 | DbConnections | DbConnections Manager | [doc](/docs/DbConnections.md) |
-| Micro | Micro service modules | [doc](docs/Micro.md) |
 
 
 ## Packages
