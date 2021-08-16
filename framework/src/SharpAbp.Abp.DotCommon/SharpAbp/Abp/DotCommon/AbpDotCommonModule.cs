@@ -1,4 +1,7 @@
 ﻿using DotCommon.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using SharpAbp.Abp.DotCommon.Performance;
+using Volo.Abp;
 using Volo.Abp.Modularity;
 
 namespace SharpAbp.Abp.DotCommon
@@ -8,11 +11,22 @@ namespace SharpAbp.Abp.DotCommon
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             context.Services.AddDotCommon();
-            Configure<SnowflakeIdOptions>(options =>
+
+            Configure<AbpPerformanceOptions>(options =>
             {
-                options.WorkerId = 1L;
-                options.DatacenterId = 1L;
+                options.Configurations.Configure("default", c =>
+                {
+                    c.LogContextTexts.TryAdd<DefaultLogContextTextService>();
+                    c.PerformanceInfoHandlers.TryAdd<DefaultPerformanceInfoHandlerService>();
+                });
             });
+
+        }
+
+        public override void OnApplicationShutdown(ApplicationShutdownContext context)
+        {
+            var performanceServiceFactory = context.ServiceProvider.GetService<IPerformanceServiceFactory>();
+            performanceServiceFactory.StopAll();
         }
 
     }
