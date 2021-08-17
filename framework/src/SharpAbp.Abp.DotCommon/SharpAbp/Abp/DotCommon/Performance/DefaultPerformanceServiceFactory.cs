@@ -59,6 +59,11 @@ namespace SharpAbp.Abp.DotCommon.Performance
                 }
             }
 
+            if (performanceService == null)
+            {
+                throw new AbpException($"Could not find performanceService by name '{name}'.");
+            }
+
             return performanceService;
         }
 
