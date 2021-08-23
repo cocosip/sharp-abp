@@ -54,7 +54,7 @@ namespace SharpAbp.Abp.Core.Extensions
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <returns></returns>
-        public static bool Remove<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, out TValue value)
+        public static bool TryRemove<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, out TValue value)
         {
             if (dictionary.TryGetValue(key, out value))
             {
@@ -118,7 +118,7 @@ namespace SharpAbp.Abp.Core.Extensions
         /// <returns></returns>
         public static IDictionary<TKey, DValue> ToDictionary<TKey, TValue, DValue>(
             this IDictionary<TKey, TValue> dictionary,
-             Func<TValue, DValue> valueSelector)
+            Func<TValue, DValue> valueSelector)
         {
             var destination = new Dictionary<TKey, DValue>();
             foreach (var keyValuePair in dictionary)

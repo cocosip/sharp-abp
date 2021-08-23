@@ -18,6 +18,11 @@ namespace SharpAbp.Abp.Snowflakes
         [Fact]
         public void Snowflake_Id_Test()
         {
+
+            var defaultSnowflake = _snowflakeFactory.GetDefault();
+            Assert.True(defaultSnowflake.NextId() > 0);
+
+
             var snowflake1 = _snowflakeFactory.Get("snowflake1");
             var id1_1 = snowflake1.NextId();
             var id1_2 = snowflake1.NextId();
@@ -27,6 +32,8 @@ namespace SharpAbp.Abp.Snowflakes
             var id2_1 = snowflake2.NextId();
             var id2_2 = snowflake2.NextId();
             Assert.True(id2_1 != id2_2);
+
+
         }
 
     }

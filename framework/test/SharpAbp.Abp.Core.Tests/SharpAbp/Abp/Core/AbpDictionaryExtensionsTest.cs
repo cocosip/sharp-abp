@@ -1,4 +1,5 @@
 ﻿using SharpAbp.Abp.Core.Extensions;
+using System.Linq;
 using Xunit;
 
 namespace SharpAbp.Abp.Core
@@ -14,9 +15,9 @@ namespace SharpAbp.Abp.Core
                 {"2","lisi" }
             };
 
-            dict.TryAdd<string, string>("3", "wangwu");
+            Assert.True(dict.TryAdd<string, string>("3", "wangwu"));
             Assert.Equal(3, dict.Count);
-            dict.TryAdd<string, string>("2", "lisi2");
+            Assert.False(dict.TryAdd<string, string>("2", "lisi2"));
             Assert.Equal(3, dict.Count);
             Assert.Equal("lisi", dict["2"]);
         }
@@ -51,11 +52,11 @@ namespace SharpAbp.Abp.Core
                 {3,"789" }
             };
 
-            var r1 = dict.Remove(1, out string v1);
+            var r1 = dict.TryRemove(1, out string v1);
             Assert.True(r1);
             Assert.Equal("123", v1);
 
-            var r2 = dict.Remove(4, out string v2);
+            var r2 = dict.TryRemove(4, out string v2);
             Assert.False(r2);
             Assert.Null(v2);
 
@@ -76,6 +77,21 @@ namespace SharpAbp.Abp.Core
             Assert.Equal(3, newDict.Count);
             Assert.True(newDict.ContainsKey("1"));
             Assert.True(newDict.ContainsKey("2"));
+
+
+            var newDict2 = dict.ToDictionary(v => $"{v}_");
+            Assert.Equal(3, newDict2.Count);
+            Assert.Equal("11_", newDict2[1]);
+            Assert.Equal("22_", newDict2[2]);
+            Assert.Equal("33_", newDict2[3]);
+
+            var keyValuePairs = dict.ToList();
+
+            var newDict3 = keyValuePairs.AsDictionary();
+
+            Assert.Equal(3, newDict3.Count);
+            Assert.True(newDict3.ContainsKey(1));
+            Assert.True(newDict3.ContainsKey(2));
         }
 
     }

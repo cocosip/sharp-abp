@@ -9,8 +9,8 @@ namespace SharpAbp.Abp.Core
     {
         [ContractAnnotation("number: not positive => halt")]
         public static int Positive(
-          int number,
-          [InvokerParameterName][NotNull] string parameterName)
+            int number,
+            [InvokerParameterName][NotNull] string parameterName)
         {
             if (number <= 0)
             {
@@ -21,8 +21,8 @@ namespace SharpAbp.Abp.Core
 
         [ContractAnnotation("number: not positive => halt")]
         public static long Positive(
-          long number,
-          [InvokerParameterName][NotNull] string parameterName)
+            long number,
+            [InvokerParameterName][NotNull] string parameterName)
         {
             if (number <= 0)
             {
@@ -33,8 +33,8 @@ namespace SharpAbp.Abp.Core
 
         [ContractAnnotation("number: negative => halt")]
         public static int Nonnegative(
-         int number,
-         [InvokerParameterName][NotNull] string parameterName)
+            int number,
+            [InvokerParameterName][NotNull] string parameterName)
         {
             if (number < 0)
             {
@@ -45,8 +45,8 @@ namespace SharpAbp.Abp.Core
 
         [ContractAnnotation("number: negative => halt")]
         public static long Nonnegative(
-         long number,
-         [InvokerParameterName][NotNull] string parameterName)
+            long number,
+            [InvokerParameterName][NotNull] string parameterName)
         {
             if (number < 0)
             {

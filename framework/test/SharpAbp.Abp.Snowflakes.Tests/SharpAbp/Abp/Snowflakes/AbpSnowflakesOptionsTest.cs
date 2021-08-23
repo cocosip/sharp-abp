@@ -16,8 +16,8 @@ namespace SharpAbp.Abp.Snowflakes
         {
             var defaultSnowflakeConfiguration = _options.Snowflakes.GetConfiguration(DefaultSnowflake.Name);
 
-            Assert.Equal(1, defaultSnowflakeConfiguration.WorkerId);
-            Assert.Equal(1, defaultSnowflakeConfiguration.DatacenterId);
+            Assert.Equal(3, defaultSnowflakeConfiguration.WorkerId);
+            Assert.Equal(3, defaultSnowflakeConfiguration.DatacenterId);
        
 
             var snowflakeConfiguration1 = _options.Snowflakes.GetConfiguration("snowflake1");

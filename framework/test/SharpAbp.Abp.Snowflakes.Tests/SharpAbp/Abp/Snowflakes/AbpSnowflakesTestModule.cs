@@ -18,7 +18,15 @@ namespace SharpAbp.Abp.Snowflakes
             Configure<AbpSnowflakesOptions>(options =>
             {
                 options.Configure(configuration);
+
+                options.Snowflakes.Configure<DefaultSnowflake>(c =>
+                {
+                    c.DatacenterId = 3;
+                    c.WorkerId = 3;
+                });
             });
+
+
         }
     }
 }
