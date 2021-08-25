@@ -53,7 +53,7 @@ namespace SharpAbp.Abp.MapTenancy
         public MapTenancyConfiguration GetConfigurationByMapCode([NotNull] string mapCode)
         {
             Check.NotNullOrWhiteSpace(mapCode, nameof(mapCode));
-            return _mappers.Where(x => x.Value.MapCode == mapCode).FirstOrDefault().Value ?? Default;
+            return _mappers.Where(x => x.Value.MapCode == mapCode).FirstOrDefault().Value ;
         }
 
     }
