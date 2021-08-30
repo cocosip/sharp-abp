@@ -41,7 +41,6 @@ namespace SharpAbp.Abp.MapTenancy
             return this;
         }
 
-        [NotNull]
         public MapTenancyConfiguration GetConfiguration([NotNull] string code)
         {
             Check.NotNullOrWhiteSpace(code, nameof(code));
@@ -49,7 +48,6 @@ namespace SharpAbp.Abp.MapTenancy
                    Default;
         }
 
-        [NotNull]
         public MapTenancyConfiguration GetConfigurationByMapCode([NotNull] string mapCode)
         {
             Check.NotNullOrWhiteSpace(mapCode, nameof(mapCode));
