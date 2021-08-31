@@ -6,20 +6,13 @@ using Volo.Abp.DependencyInjection;
 
 namespace PerformanceSample
 {
-    public class HelloWorldService : ITransientDependency
+    public class PerformanceService : ITransientDependency
     {
         protected IPerformanceServiceFactory PerformanceServiceFactory { get; }
-        public HelloWorldService(IPerformanceServiceFactory performanceServiceFactory)
+        public PerformanceService(IPerformanceServiceFactory performanceServiceFactory)
         {
             PerformanceServiceFactory = performanceServiceFactory;
         }
-
-        public void SayHello()
-        {
-            Console.WriteLine("\tHello World!");
-            RunPerformance();
-        }
-
 
         public void RunPerformance()
         {

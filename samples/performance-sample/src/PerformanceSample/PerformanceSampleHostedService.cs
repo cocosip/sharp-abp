@@ -10,23 +10,23 @@ namespace PerformanceSample
     {
         private readonly IAbpApplicationWithExternalServiceProvider _application;
         private readonly IServiceProvider _serviceProvider;
-        private readonly HelloWorldService _helloWorldService;
+        private readonly PerformanceService _performanceService;
 
         public PerformanceSampleHostedService(
             IAbpApplicationWithExternalServiceProvider application,
             IServiceProvider serviceProvider,
-            HelloWorldService helloWorldService)
+            PerformanceService performanceService)
         {
             _application = application;
             _serviceProvider = serviceProvider;
-            _helloWorldService = helloWorldService;
+            _performanceService = performanceService;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _application.Initialize(_serviceProvider);
 
-            _helloWorldService.SayHello();
+            _performanceService.RunPerformance();
 
             return Task.CompletedTask;
         }
