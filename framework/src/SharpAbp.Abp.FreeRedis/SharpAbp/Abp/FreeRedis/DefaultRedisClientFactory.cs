@@ -11,13 +11,15 @@ namespace SharpAbp.Abp.FreeRedis
 {
     public class DefaultRedisClientFactory : IRedisClientFactory, ISingletonDependency
     {
-        private readonly object _sync = new object();
         private readonly ConcurrentDictionary<string, RedisClient> _clientDict;
 
         protected ILogger Logger { get; }
         protected IRedisConfigurationProvider ConfigurationSelector { get; }
         protected IRedisClientBuilder ClientBuilder { get; }
-        public DefaultRedisClientFactory(ILogger<DefaultRedisClientFactory> logger, IRedisConfigurationProvider configurationSelector, IRedisClientBuilder clientBuilder)
+        public DefaultRedisClientFactory(
+            ILogger<DefaultRedisClientFactory> logger,
+            IRedisConfigurationProvider configurationSelector,
+            IRedisClientBuilder clientBuilder)
         {
             Logger = logger;
             ConfigurationSelector = configurationSelector;
@@ -36,31 +38,15 @@ namespace SharpAbp.Abp.FreeRedis
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
 
-            if (!_clientDict.TryGetValue(name, out RedisClient client))
+            var client = _clientDict.GetOrAdd(name, n =>
             {
                 var configuration = ConfigurationSelector.Get(name);
                 if (configuration == null)
                 {
                     throw new AbpException($"Could not find configuration by name '{name}'");
                 }
-
-                lock (_sync)
-                {
-                    //Still can't find client
-                    if (!_clientDict.TryGetValue(name, out client))
-                    {
-                        client = ClientBuilder.CreateClient(configuration);
-                        if (_clientDict.TryAdd(name, client))
-                        {
-                            Logger.LogInformation("Create and add redis client '{0}',ConnectionString:'{1}',Mode:'{2}'.", name, configuration.ConnectionString, configuration.Mode);
-                        }
-                        else
-                        {
-                            Logger.LogWarning("Add client to dict fail! client name:{0}", name);
-                        }
-                    }
-                }
-            }
+                return ClientBuilder.CreateClient(configuration);
+            });
 
             return client;
         }

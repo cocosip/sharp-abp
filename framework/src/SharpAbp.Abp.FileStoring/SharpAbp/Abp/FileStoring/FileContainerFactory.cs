@@ -32,16 +32,6 @@ namespace SharpAbp.Abp.FileStoring
                 fileProvider);
 
             return fileContainer;
-
-            //return new FileContainer(
-            //    name,
-            //    configuration,
-            //    ProviderSelector.Get(name),
-            //    CurrentTenant,
-            //    CancellationTokenProvider,
-            //    FileNormalizeNamingService,
-            //    ServiceProvider
-            //);
         }
     }
 }

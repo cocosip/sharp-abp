@@ -15,7 +15,7 @@ namespace SharpAbp.Abp.Snowflakes
         {
             _snowflakes = new Dictionary<string, SnowflakeConfiguration>
             {
-                //Add default container
+                //Add default snowflake
                 [SnowflakeNameAttribute.GetSnowflakeName<DefaultSnowflake>()] = new SnowflakeConfiguration()
             };
         }

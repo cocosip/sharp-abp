@@ -8,9 +8,8 @@ namespace SharpAbp.Abp.Snowflakes
 {
     public class DefaultSnowflakeFactory : ISnowflakeFactory, ISingletonDependency
     {
-        private readonly object _sync = new();
-        private ConcurrentDictionary<string, Snowflake> _snowflakes;
-
+        private readonly ConcurrentDictionary<string, Snowflake> _snowflakes;
+        
         protected ILogger Logger { get; }
         protected ISnowflakeConfigurationProvider ConfigurationProvider { get; }
         public DefaultSnowflakeFactory(
@@ -32,22 +31,8 @@ namespace SharpAbp.Abp.Snowflakes
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
 
-            if (!_snowflakes.TryGetValue(name, out Snowflake snowflake))
-            {
-                lock (_sync)
-                {
-                    if (!_snowflakes.TryGetValue(name, out snowflake))
-                    {
-                        snowflake = Create(name);
-                        if (!_snowflakes.TryAdd(name, snowflake))
-                        {
-                            Logger.LogDebug("Add snowflake '{0}' to dict failed.", name);
-                            snowflake = null;
-                        }
-                    }
-                }
-            }
-
+            var snowflake = _snowflakes.GetOrAdd(name, n => Create(n));
+            
             if (snowflake == null)
             {
                 throw new AbpException($"Could not find snowflake by name '{name}'.");

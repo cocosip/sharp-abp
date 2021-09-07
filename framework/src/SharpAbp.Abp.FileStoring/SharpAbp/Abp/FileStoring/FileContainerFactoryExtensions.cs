@@ -9,9 +9,7 @@
         /// <returns>
         /// The container object.
         /// </returns>
-        public static IFileContainer Create<TContainer>(
-            this IFileContainerFactory fileContainerFactory
-        )
+        public static IFileContainer Create<TContainer>(this IFileContainerFactory fileContainerFactory)
         {
             return fileContainerFactory.Create(
                 FileContainerNameAttribute.GetContainerName<TContainer>()
