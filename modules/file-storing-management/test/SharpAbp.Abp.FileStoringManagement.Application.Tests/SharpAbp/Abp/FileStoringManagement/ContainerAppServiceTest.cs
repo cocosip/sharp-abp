@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Data;
+using Volo.Abp.Domain.Entities;
 using Volo.Abp.MultiTenancy;
 using Xunit;
 
@@ -159,8 +160,11 @@ namespace SharpAbp.Abp.FileStoringManagement
                 });
             }
 
-            var container = await _containerAppService.GetAsync(id);
-            Assert.Null(container);
+            await Assert.ThrowsAsync<EntityNotFoundException>(() =>
+            {
+                return _containerAppService.GetAsync(id);
+            });
+
 
             using (_currentTenant.Change(tenantId))
             {
@@ -172,8 +176,10 @@ namespace SharpAbp.Abp.FileStoringManagement
 
                 await _containerAppService.DeleteAsync(id);
 
-                var container3 = await _containerAppService.GetAsync(id);
-                Assert.Null(container3);
+                await Assert.ThrowsAsync<EntityNotFoundException>(() =>
+                {
+                    return _containerAppService.GetAsync(id);
+                });
             }
         }
 

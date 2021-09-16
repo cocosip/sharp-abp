@@ -7,6 +7,8 @@
     "Permission:FileStoringManagement.Containers.Update": "修改文件容器",
     "Permission:FileStoringManagement.Containers.Delete": "刪除文件容器",
     "Permission:FileStoringManagement.Providers": "文件供應商管理",
-    "Permission:FileStoringManagement.Providers.Options": "文件供應商配置"
+    "Permission:FileStoringManagement.Providers.Options": "文件供應商配置",
+    "FileStoringManagement.DuplicateContainerName": "重複的容器名稱 '{0}'.",
+    "FileStoringManagement.ValidateContainerFailed": "管道 '{0}' 容器校驗失敗!"
   }
 }

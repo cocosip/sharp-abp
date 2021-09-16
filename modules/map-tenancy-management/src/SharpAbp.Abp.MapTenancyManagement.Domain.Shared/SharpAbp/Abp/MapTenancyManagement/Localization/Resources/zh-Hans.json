@@ -5,6 +5,9 @@
     "Permission:MapTenancyManagement.MapTenants": "映射租户管理",
     "Permission:MapTenancyManagement.MapTenants.Create": "创建映射租户",
     "Permission:MapTenancyManagement.MapTenants.Update": "修改映射租户",
-    "Permission:MapTenancyManagement.MapTenants.Delete": "删除映射租户"
+    "Permission:MapTenancyManagement.MapTenants.Delete": "删除映射租户",
+    "MapTenancyManagement.DuplicateTenantId": "重复的租户 '{0}'.",
+    "MapTenancyManagement.DuplicateCode": "重复的租户编码'{0}'.",
+    "MapTenancyManagement.DuplicateMapCode": "重复的租户映射编码'{0}'."
   }
 }

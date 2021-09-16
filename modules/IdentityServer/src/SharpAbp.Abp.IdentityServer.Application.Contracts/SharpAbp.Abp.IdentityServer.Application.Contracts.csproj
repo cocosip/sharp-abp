@@ -16,9 +16,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Volo.Abp.IdentityServer.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
 		<PackageReference Include="Volo.Abp.Ddd.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
 		<PackageReference Include="Volo.Abp.Authorization" Version="$(VoloAbpPackageVersion)" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\SharpAbp.Abp.IdentityServer.Domain.Shared\SharpAbp.Abp.IdentityServer.Domain.Shared.csproj" />
 	</ItemGroup>
 
 </Project>

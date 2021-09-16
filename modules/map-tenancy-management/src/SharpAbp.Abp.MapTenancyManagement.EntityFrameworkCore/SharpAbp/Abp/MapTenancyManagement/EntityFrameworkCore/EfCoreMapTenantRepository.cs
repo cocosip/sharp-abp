@@ -40,7 +40,9 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         /// <param name="mapCode"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<MapTenant> FindByMapCodeAsync([NotNull] string mapCode, CancellationToken cancellationToken = default)
+        public virtual async Task<MapTenant> FindByMapCodeAsync(
+            [NotNull] string mapCode,
+            CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(mapCode, nameof(mapCode));
             return await (await GetDbSetAsync())
@@ -53,7 +55,9 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         /// <param name="tenantId"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<MapTenant> FindByTenantIdAsync(Guid tenantId, CancellationToken cancellationToken = default)
+        public virtual async Task<MapTenant> FindByTenantIdAsync(
+            Guid tenantId,
+            CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .FirstOrDefaultAsync(x => x.TenantId == tenantId, GetCancellationToken(cancellationToken));
@@ -72,6 +76,8 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
             Guid? expectedId = null,
             CancellationToken cancellationToken = default)
         {
+            Check.NotNullOrWhiteSpace(code, nameof(code));
+            
             return await (await GetDbSetAsync())
                 .WhereIf(!code.IsNullOrWhiteSpace(), x => x.Code == code)
                 .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
@@ -90,6 +96,8 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
            Guid? expectedId = null,
            CancellationToken cancellationToken = default)
         {
+            Check.NotNullOrWhiteSpace(mapCode, nameof(mapCode));
+
             return await (await GetDbSetAsync())
                 .WhereIf(!mapCode.IsNullOrWhiteSpace(), x => x.Code == mapCode)
                 .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)

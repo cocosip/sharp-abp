@@ -60,39 +60,6 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
-
-
-        /// <summary>
-        /// Override GetAsync
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="includeDetails"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public override async Task<FileStoringContainer> GetAsync(
-            Guid id,
-            bool includeDetails = true,
-            CancellationToken cancellationToken = default)
-        {
-            return await (await GetDbSetAsync())
-                .IncludeDetails(includeDetails)
-                .SingleOrDefaultAsync(x => x.Id == id, GetCancellationToken(cancellationToken));
-        }
-
-        /// <summary>
-        /// FindAsync
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="includeDetails"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public override async Task<FileStoringContainer> FindAsync(Guid id, bool includeDetails = true, CancellationToken cancellationToken = default)
-        {
-            return await (await GetDbSetAsync())
-                .IncludeDetails(includeDetails)
-                .FirstOrDefaultAsync(x => x.Id == id, GetCancellationToken(cancellationToken));
-        }
-
         /// <summary>
         /// Get List
         /// </summary>
@@ -163,6 +130,11 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
                   .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
                   .WhereIf(!provider.IsNullOrWhiteSpace(), item => item.Provider == provider)
                   .CountAsync(GetCancellationToken(cancellationToken));
+        }
+
+        public override async Task<IQueryable<FileStoringContainer>> WithDetailsAsync()
+        {
+            return (await GetQueryableAsync()).IncludeDetails();
         }
 
     }

@@ -122,17 +122,18 @@ namespace SharpAbp.Abp.FileStoringManagement
             var keyValuePairs = input.Items.ToDictionary(x => x.Name, y => y.Value);
             ContainerManager.ValidateProviderValues(input.Provider, keyValuePairs);
 
-            var container = await FileStoringContainerRepository.FindAsync(id, true);
-            if (container == null)
-            {
-                throw new UserFriendlyException($"Could not find Container when update by id:'{id}'.");
-            }
+            var container = await FileStoringContainerRepository.GetAsync(id, true);
 
             //Validate name
             await ContainerManager.ValidateNameAsync(container.TenantId, input.Name, container.Id);
 
             //Update
-            container.Update(input.IsMultiTenant, input.Provider, input.Name, input.Title, input.HttpAccess);
+            container.Update(
+                input.IsMultiTenant, 
+                input.Provider, 
+                input.Name, 
+                input.Title, 
+                input.HttpAccess);
 
             var deleteItems = new List<FileStoringContainerItem>();
 
@@ -158,7 +159,11 @@ namespace SharpAbp.Abp.FileStoringManagement
             //Create
             foreach (var item in input.Items)
             {
-                var containerItem = new FileStoringContainerItem(GuidGenerator.Create(), item.Name, item.Value, container.Id);
+                var containerItem = new FileStoringContainerItem(
+                    GuidGenerator.Create(), 
+                    item.Name, 
+                    item.Value, 
+                    container.Id);
                 container.Items.Add(containerItem);
             }
         }

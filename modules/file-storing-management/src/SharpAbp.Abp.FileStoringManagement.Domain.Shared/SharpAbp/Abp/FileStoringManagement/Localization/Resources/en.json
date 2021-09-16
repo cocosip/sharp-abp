@@ -7,6 +7,8 @@
     "Permission:FileStoringManagement.Containers.Update": "Update file container",
     "Permission:FileStoringManagement.Containers.Delete": "Delete file container",
     "Permission:FileStoringManagement.Providers": "File provider management",
-    "Permission:FileStoringManagement.Providers.Options": "File provider options"
+    "Permission:FileStoringManagement.Providers.Options": "File provider options",
+    "FileStoringManagement.DuplicateContainerName": "Duplicate container name '{0}'.",
+    "FileStoringManagement.ValidateContainerFailed": "Provider '{0}' container validate failed!"
   }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Localization;
+using SharpAbp.Abp.MapTenancyManagement.Localization;
 using Volo.Abp;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.TenantManagement;
@@ -8,12 +10,15 @@ namespace SharpAbp.Abp.MapTenancyManagement
 {
     public class MapTenantManager : DomainService, IMapTenantManager
     {
+        protected IStringLocalizer<MapTenancyManagementResource> Localizer { get; }
         protected ITenantRepository TenantRepository { get; }
         protected IMapTenantRepository MapTenantRepository { get; }
         public MapTenantManager(
+            IStringLocalizer<MapTenancyManagementResource> localizer,
             ITenantRepository tenantRepository,
             IMapTenantRepository mapTenantRepository)
         {
+            Localizer = localizer;
             TenantRepository = tenantRepository;
             MapTenantRepository = mapTenantRepository;
         }
@@ -43,11 +48,8 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <returns></returns>
         public virtual async Task UpdateAsync(Guid id, string code, Guid tenantId, string mapCode)
         {
-            var mapTenant = await MapTenantRepository.FindAsync(id);
-            if (mapTenant == null)
-            {
-                throw new AbpException($"Could not find 'MapTenant' by id '{id}'.");
-            }
+            var mapTenant = await MapTenantRepository.GetAsync(id);
+
             //Validate
             await ValidateTenantAsync(tenantId, id);
             await ValidateCodeAsync(code, id);
@@ -65,18 +67,13 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <param name="tenantId"></param>
         /// <param name="expectedId"></param>
         /// <returns></returns>
-        protected virtual async Task ValidateTenantAsync(Guid tenantId, Guid? expectedId = null)
+        public virtual async Task ValidateTenantAsync(Guid tenantId, Guid? expectedId = null)
         {
-            var tenant = await TenantRepository.FindAsync(tenantId, false);
-            if (tenant == null)
-            {
-                throw new AbpException($"Can't find any tenant by '{tenantId}'.");
-            }
-
+            var tenant = await TenantRepository.GetAsync(tenantId, false);
             var mapTenant = await MapTenantRepository.FindExpectedTenantIdAsync(tenantId, expectedId);
             if (mapTenant != null)
             {
-                throw new AbpException($"Duplicate 'MapTenant' tenantId: '{tenantId}'.");
+                throw new UserFriendlyException(Localizer["MapTenancyManagement.DuplicateTenantId", tenantId]);
             }
         }
 
@@ -86,21 +83,27 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <param name="code"></param>
         /// <param name="expectedId"></param>
         /// <returns></returns>
-        protected virtual async Task ValidateCodeAsync(string code, Guid? expectedId = null)
+        public virtual async Task ValidateCodeAsync(string code, Guid? expectedId = null)
         {
             var mapTenant = await MapTenantRepository.FindExpectedCodeAsync(code, expectedId);
             if (mapTenant != null)
             {
-                throw new AbpException($"Duplicate 'MapTenant' code:'{code}'.");
+                throw new UserFriendlyException(Localizer["MapTenancyManagement.DuplicateCode", code]);
             }
         }
 
-        protected virtual async Task ValidateMapCodeAsync(string mapCode, Guid? expectedId = null)
+        /// <summary>
+        /// Validate mapCode
+        /// </summary>
+        /// <param name="mapCode"></param>
+        /// <param name="expectedId"></param>
+        /// <returns></returns>
+        public virtual async Task ValidateMapCodeAsync(string mapCode, Guid? expectedId = null)
         {
             var mapTenant = await MapTenantRepository.FindExpectedCodeAsync(mapCode, expectedId);
             if (mapTenant != null)
             {
-                throw new AbpException($"Duplicate 'MapTenant' mapCode:'{mapCode}'.");
+                throw new UserFriendlyException(Localizer["MapTenancyManagement.DuplicateMapCode", mapCode]);
             }
         }
 

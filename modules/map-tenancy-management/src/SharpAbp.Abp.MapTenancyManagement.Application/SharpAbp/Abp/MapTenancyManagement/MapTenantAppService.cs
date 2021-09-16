@@ -122,7 +122,11 @@ namespace SharpAbp.Abp.MapTenancyManagement
         [Authorize(MapTenancyManagementPermissions.MapTenants.Update)]
         public virtual async Task UpdateAsync(Guid id, UpdateMapTenantDto input)
         {
-            await MapTenantManager.UpdateAsync(id, input.Code, input.TenantId, input.MapCode);
+            await MapTenantManager.UpdateAsync(
+                id, 
+                input.Code, 
+                input.TenantId, 
+                input.MapCode);
         }
 
         /// <summary>

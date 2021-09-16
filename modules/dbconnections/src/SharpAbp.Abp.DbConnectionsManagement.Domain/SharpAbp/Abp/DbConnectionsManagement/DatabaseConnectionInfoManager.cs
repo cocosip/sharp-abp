@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Localization;
+using SharpAbp.Abp.DbConnectionsManagement.Localization;
 using Volo.Abp;
 using Volo.Abp.Domain.Services;
 
@@ -7,9 +9,13 @@ namespace SharpAbp.Abp.DbConnectionsManagement
 {
     public class DatabaseConnectionInfoManager : DomainService, IDatabaseConnectionInfoManager
     {
+        protected IStringLocalizer<DbConnectionsManagementResource> Localizer { get; }
         protected IDatabaseConnectionInfoRepository DatabaseConnectionInfoRepository { get; }
-        public DatabaseConnectionInfoManager(IDatabaseConnectionInfoRepository databaseConnectionInfoRepository)
+        public DatabaseConnectionInfoManager(
+            IStringLocalizer<DbConnectionsManagementResource> localizer,
+            IDatabaseConnectionInfoRepository databaseConnectionInfoRepository)
         {
+            Localizer = localizer;
             DatabaseConnectionInfoRepository = databaseConnectionInfoRepository;
         }
 
@@ -23,7 +29,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
             var queryDatabaseConnectionInfo = await DatabaseConnectionInfoRepository.FindExpectedByNameAsync(databaseConnectionInfo.Name);
             if (queryDatabaseConnectionInfo != null)
             {
-                throw new AbpException($"Duplicate dbConnection name '{databaseConnectionInfo.Name}'.");
+                throw new UserFriendlyException(Localizer["DbConnectionsManagement.DuplicateName", databaseConnectionInfo.Name]);
             }
 
             await DatabaseConnectionInfoRepository.InsertAsync(databaseConnectionInfo);
@@ -44,7 +50,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
             var queryDatabaseConnectionInfo = await DatabaseConnectionInfoRepository.FindExpectedByNameAsync(name, id);
             if (queryDatabaseConnectionInfo != null)
             {
-                throw new AbpException($"Duplicate dbConnection name '{name}'.");
+                throw new UserFriendlyException(Localizer["DbConnectionsManagement.DuplicateName", databaseConnectionInfo.Name]);
             }
 
             databaseConnectionInfo.Update(name, databaseProvider, connectionString);

@@ -1,5 +1,7 @@
 ﻿using JetBrains.Annotations;
+using Microsoft.Extensions.Localization;
 using SharpAbp.Abp.FileStoring;
+using SharpAbp.Abp.FileStoringManagement.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,12 +14,15 @@ namespace SharpAbp.Abp.FileStoringManagement
 {
     public class ContainerManager : DomainService, IContainerManager
     {
+        protected IStringLocalizer<FileStoringManagementResource> Localizer { get; }
         protected IEnumerable<IFileProviderValuesValidator> ProviderValuesValidators { get; }
         protected IFileStoringContainerRepository FileStoringContainerRepository { get; }
         public ContainerManager(
+            IStringLocalizer<FileStoringManagementResource> localizer,
             IEnumerable<IFileProviderValuesValidator> providerValuesValidators,
             IFileStoringContainerRepository fileStoringContainerRepository)
         {
+            Localizer = localizer;
             ProviderValuesValidators = providerValuesValidators;
             FileStoringContainerRepository = fileStoringContainerRepository;
         }
@@ -30,11 +35,13 @@ namespace SharpAbp.Abp.FileStoringManagement
         public virtual void ValidateProviderValues(string provider, Dictionary<string, string> keyValuePairs)
         {
             var valuesValidator = GetFileProviderValuesValidator(provider);
-
-            var result = valuesValidator.Validate(keyValuePairs);
-            if (result.Errors.Any())
+            if (valuesValidator != null)
             {
-                throw new AbpValidationException("Create Container validate failed.", result.Errors);
+                var result = valuesValidator.Validate(keyValuePairs);
+                if (result.Errors.Any())
+                {
+                    throw new AbpValidationException(Localizer["FileStoringManagement.ValidateContainerFailed",provider], result.Errors);
+                }
             }
         }
 
@@ -46,8 +53,8 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="expectedId"></param>
         /// <returns></returns>
         public virtual async Task ValidateNameAsync(
-            Guid? tenantId, 
-            string name, 
+            Guid? tenantId,
+            string name,
             Guid? expectedId = null)
         {
             using (CurrentTenant.Change(tenantId))
@@ -55,7 +62,8 @@ namespace SharpAbp.Abp.FileStoringManagement
                 var container = await FileStoringContainerRepository.FindExpectedByNameAsync(name, expectedId, false);
                 if (container != null)
                 {
-                    throw new UserFriendlyException($"Duplicate container name '{name}' in tenant '{tenantId}'.");
+
+                    throw new UserFriendlyException(Localizer["FileStoringManagement.DuplicateContainerName", name]);
                 }
             }
         }
@@ -71,7 +79,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                     return providerValuesValidator;
                 }
             }
-            throw new UserFriendlyException($"Could not find any 'IFileProviderValuesValidator' for provider '{provider}' .");
+            return null;
         }
 
     }

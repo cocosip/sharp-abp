@@ -1,12 +1,11 @@
 {
   "culture": "en",
   "texts": {
-    "FileStoringManagement": "File storing management",
-    "Permission:FileStoringManagement.Containers": "File container management",
-    "Permission:FileStoringManagement.Containers.Create": "Create file container",
-    "Permission:FileStoringManagement.Containers.Update": "Update file container",
-    "Permission:FileStoringManagement.Containers.Delete": "Delete file container",
-    "Permission:FileStoringManagement.Providers": "File provider management",
-    "Permission:FileStoringManagement.Providers.Options": "File provider options"
+    "DbConnectionsManagement": "Database connection management",
+    "Permission:DbConnectionsManagement.DatabaseConnectionInfos": "Database connection info",
+    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Create": "Create database connection info",
+    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Update": "Update database connection info",
+    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Delete": "Delete database connection info",
+    "DbConnectionsManagement.DuplicateName": "Dumplicate database connection name '{0}'."
   }
 }

@@ -16,11 +16,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Volo.Abp.AutoMapper" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.Ddd.Application" Version="$(VoloAbpPackageVersion)" />
 		<PackageReference Include="Volo.Abp.IdentityServer.Domain" Version="$(VoloAbpPackageVersion)" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\SharpAbp.Abp.IdentityServer.Application.Contracts\SharpAbp.Abp.IdentityServer.Application.Contracts.csproj" />
+		<ProjectReference Include="..\SharpAbp.Abp.IdentityServer.Application.Contracts\SharpAbp.Abp.IdentityServer.Application.Contracts.csproj" />
+		<ProjectReference Include="..\SharpAbp.Abp.IdentityServer.Domain\SharpAbp.Abp.IdentityServer.Domain.csproj" />
 	</ItemGroup>
-	
+
 </Project>

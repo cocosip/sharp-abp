@@ -1,0 +1,23 @@
+{
+  "culture": "zh-Hans",
+  "texts": {
+    "IdentityServer": "IdentityServer管理",
+    "Permission:IdentityServer.ApiResources": "IdentityServer Api资源管理",
+    "Permission:IdentityServer.ApiResources.Create": "创建IdentityServer Api资源",
+    "Permission:IdentityServer.ApiResources.Update": "修改IdentityServer Api资源",
+    "Permission:IdentityServer.ApiResources.Delete": "删除IdentityServer Api资源",
+    "Permission:IdentityServer.ApiScopes": "IdentityServer Api范围",
+    "Permission:IdentityServer.ApiScopes.Create": "创建IdentityServer Api范围",
+    "Permission:IdentityServer.ApiScopes.Update": "修改IdentityServer Api范围",
+    "Permission:IdentityServer.ApiScopes.Delete": "删除IdentityServer Api范围",
+    "Permission:IdentityServer.IdentityResources": "IdentityServer Identity资源管理",
+    "Permission:IdentityServer.IdentityResources.Create": "创建IdentityServer Identity资源",
+    "Permission:IdentityServer.IdentityResources.Update": "修改IdentityServer Identity资源",
+    "Permission:IdentityServer.IdentityResources.Delete": "删除IdentityServer Identity资源",
+    "Permission:IdentityServer.Clients": "IdentityServer客户端管理",
+    "Permission:IdentityServer.Clients.Create": "创建IdentityServer客户端",
+    "Permission:IdentityServer.Clients.Update": "修改IdentityServer客户端",
+    "Permission:IdentityServer.Clients.Delete": "删除IdentityServer客户端",
+    "IdentityServer.DumplicateApiResourceName": "重复的ApiResource名称'{0}'."
+  }
+}

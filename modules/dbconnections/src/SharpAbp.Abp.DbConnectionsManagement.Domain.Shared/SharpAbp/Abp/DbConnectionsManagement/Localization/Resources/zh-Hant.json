@@ -1,12 +1,11 @@
 {
   "culture": "zh-Hant",
   "texts": {
-    "FileStoringManagement": "文件存儲管理",
-    "Permission:FileStoringManagement.Containers": "文件容器管理",
-    "Permission:FileStoringManagement.Containers.Create": "創建文件容器",
-    "Permission:FileStoringManagement.Containers.Update": "修改文件容器",
-    "Permission:FileStoringManagement.Containers.Delete": "刪除文件容器",
-    "Permission:FileStoringManagement.Providers": "文件供應商管理",
-    "Permission:FileStoringManagement.Providers.Options": "文件供應商配置"
+    "DbConnectionsManagement": "數據庫連接管理",
+    "Permission:DbConnectionsManagement.DatabaseConnectionInfos": "數據庫連接信息管理",
+    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Create": "創建數據庫連接信息",
+    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Update": "修改數據庫連接信息",
+    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Delete": "刪除數據庫連接信息",
+    "DbConnectionsManagement.DuplicateName": "重複的數據庫連接名稱 '{0}'."
   }
 }

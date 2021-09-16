@@ -6,8 +6,6 @@ namespace SharpAbp.Abp.MapTenancyManagement
     {
         public const string GroupName = "MapTenancyManagement";
 
-        public const string AlwaysAllow = "MapTenancyAlwaysAllow";
-
         public static class MapTenants
         {
             public const string Default = GroupName + ".MapTenants";

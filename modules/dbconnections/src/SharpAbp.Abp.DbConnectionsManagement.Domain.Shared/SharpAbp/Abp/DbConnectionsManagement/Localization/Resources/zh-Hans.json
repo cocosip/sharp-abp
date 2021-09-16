@@ -1,12 +1,11 @@
 {
   "culture": "zh-Hans",
   "texts": {
-    "FileStoringManagement": "文件存储管理",
-    "Permission:FileStoringManagement.Containers": "文件容器管理",
-    "Permission:FileStoringManagement.Containers.Create": "创建文件容器",
-    "Permission:FileStoringManagement.Containers.Update": "修改文件容器",
-    "Permission:FileStoringManagement.Containers.Delete": "删除文件容器",
-    "Permission:FileStoringManagement.Providers": "文件供应商管理",
-    "Permission:FileStoringManagement.Providers.Options": "文件供应商配置"
+    "DbConnectionsManagement": "数据库连接管理",
+    "Permission:DbConnectionsManagement.DatabaseConnectionInfos": "数据库连接信息管理",
+    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Create": "创建数据库连接信息",
+    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Update": "修改数据库连接信息",
+    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Delete": "删除数据库连接信息",
+    "DbConnectionsManagement.DuplicateName": "重复的数据库连接名称 '{0}'."
   }
 }
