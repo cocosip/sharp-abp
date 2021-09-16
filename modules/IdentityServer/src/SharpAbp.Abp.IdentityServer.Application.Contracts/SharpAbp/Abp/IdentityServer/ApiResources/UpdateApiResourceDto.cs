@@ -7,7 +7,7 @@ using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.IdentityServer.ApiResources
 {
-    public class UpdateApiResourceDto : ExtensibleEntityDto<Guid>
+    public class UpdateApiResourceDto : ExtensibleEntityDto
     {
         /// <summary>
         /// Name

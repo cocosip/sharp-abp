@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Authorization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.IdentityServer.ApiResources;
 
@@ -13,13 +13,10 @@ namespace SharpAbp.Abp.IdentityServer.ApiResources
     public class ApiResourceAppService : IdentityServerAppServiceBase, IApiResourceAppService
     {
         protected IApiResourceRepository ApiResourceRepository { get; }
-        protected IApiResourceManager ApiResourceManager { get; }
         public ApiResourceAppService(
-            IApiResourceRepository apiResourceRepository,
-            IApiResourceManager apiResourceManager)
+            IApiResourceRepository apiResourceRepository)
         {
             ApiResourceRepository = apiResourceRepository;
-            ApiResourceManager = apiResourceManager;
         }
 
         /// <summary>
@@ -87,6 +84,8 @@ namespace SharpAbp.Abp.IdentityServer.ApiResources
         [Authorize(IdentityServerPermissions.ApiResources.Create)]
         public virtual async Task<Guid> CreateAsync(CreateApiResourceDto input)
         {
+            await CheckNameExistAsync(input.Name);
+
             var apiResource = new ApiResource(
                 GuidGenerator.Create(),
                 input.Name,
@@ -105,20 +104,22 @@ namespace SharpAbp.Abp.IdentityServer.ApiResources
                 apiResource.AddUserClaim(userClaim.Type);
             }
 
-            await ApiResourceManager.CreateAsync(apiResource);
+            await ApiResourceRepository.InsertAsync(apiResource);
             return apiResource.Id;
         }
 
         /// <summary>
         /// Update
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="input"></param>
         /// <returns></returns>
         [Authorize(IdentityServerPermissions.ApiResources.Update)]
-        public virtual async Task UpdateAsync(UpdateApiResourceDto input)
+        public virtual async Task UpdateAsync(Guid id, UpdateApiResourceDto input)
         {
-            var apiResource = await ApiResourceRepository.GetAsync(input.Id);
+            await CheckNameExistAsync(input.Name, id);
 
+            var apiResource = await ApiResourceRepository.GetAsync(id);
             apiResource.DisplayName = input.DisplayName;
             apiResource.Description = input.Description;
             apiResource.Enabled = input.Enabled;
@@ -127,12 +128,12 @@ namespace SharpAbp.Abp.IdentityServer.ApiResources
             //scope 
 
             //user claim
-            foreach (var createUserClaim in input.UserClaims)
+            foreach (var createClaim in input.UserClaims)
             {
-                var userClaim = apiResource.FindClaim(createUserClaim.Type);
-                if (userClaim == null)
+                var apiResourceClaim = apiResource.FindClaim(createClaim.Type);
+                if (apiResourceClaim == null)
                 {
-                    apiResource.AddUserClaim(createUserClaim.Type);
+                    apiResource.AddUserClaim(createClaim.Type);
                 }
             }
 
@@ -159,9 +160,10 @@ namespace SharpAbp.Abp.IdentityServer.ApiResources
             var removeSecrets = apiResource.Secrets.Select(x => (x.Value, x.Type))
                 .Except(input.Secrets.Select(y => (y.Value, y.Type)))
                 .ToList();
-            foreach (var removeSecret in removeSecrets)
+
+            foreach (var secret in removeSecrets)
             {
-                apiResource.RemoveSecret(removeSecret.Value, removeSecret.Type);
+                apiResource.RemoveSecret(secret.Value, secret.Type);
             }
 
             //properties
@@ -183,6 +185,26 @@ namespace SharpAbp.Abp.IdentityServer.ApiResources
             }
 
             await ApiResourceRepository.UpdateAsync(apiResource);
+        }
+
+        /// <summary>
+        /// Delete
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Authorize(IdentityServerPermissions.ApiResources.Delete)]
+        public virtual async Task DeleteAsync(Guid id)
+        {
+            await ApiResourceRepository.DeleteAsync(id);
+        }
+
+
+        protected virtual async Task CheckNameExistAsync(string name, Guid? expectedId = null)
+        {
+            if (await ApiResourceRepository.CheckNameExistAsync(name, expectedId))
+            {
+                throw new UserFriendlyException(L["IdentityServer.DumplicateApiResourceName", "name"]);
+            }
         }
 
 

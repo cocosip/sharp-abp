@@ -18,6 +18,8 @@
     "Permission:IdentityServer.Clients.Create": "创建IdentityServer客户端",
     "Permission:IdentityServer.Clients.Update": "修改IdentityServer客户端",
     "Permission:IdentityServer.Clients.Delete": "删除IdentityServer客户端",
-    "IdentityServer.DumplicateApiResourceName": "重复的ApiResource名称'{0}'."
+    "IdentityServer.DumplicateApiResourceName": "重复的ApiResource名称'{0}'.",
+    "IdentityServer.DumplicateIdentityResourceName": "重复的IdentityResource名称'{0}'.",
+    "IdentityServer.DumplicateApiScopeName": "重复的ApiScope名称'{0}'."
   }
 }

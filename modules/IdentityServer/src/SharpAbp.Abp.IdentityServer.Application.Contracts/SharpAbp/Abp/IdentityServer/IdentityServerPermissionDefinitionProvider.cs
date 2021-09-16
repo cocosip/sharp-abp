@@ -10,6 +10,23 @@ namespace SharpAbp.Abp.IdentityServer
         {
             var identityServerGroup = context.AddGroup(IdentityServerPermissions.GroupName, L(IdentityServerPermissions.GroupName));
 
+            //identityResources
+            var identityResourcePermission = identityServerGroup.AddPermission(
+                IdentityServerPermissions.IdentityResources.Default,
+                L($"Permission:{IdentityServerPermissions.IdentityResources.Default}"));
+
+            identityResourcePermission.AddChild(
+                IdentityServerPermissions.IdentityResources.Create,
+                L($"Permission:{IdentityServerPermissions.IdentityResources.Create}"));
+
+            identityResourcePermission.AddChild(
+                IdentityServerPermissions.IdentityResources.Update,
+                L($"Permission:{IdentityServerPermissions.IdentityResources.Update}"));
+
+            identityResourcePermission.AddChild(
+                IdentityServerPermissions.IdentityResources.Delete,
+                L($"Permission:{IdentityServerPermissions.IdentityResources.Delete}"));
+
             //apiResource
             var apiResourcePermission = identityServerGroup.AddPermission(
                 IdentityServerPermissions.ApiResources.Default,

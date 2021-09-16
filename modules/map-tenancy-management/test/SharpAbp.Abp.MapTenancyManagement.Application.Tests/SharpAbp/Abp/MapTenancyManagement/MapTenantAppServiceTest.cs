@@ -56,7 +56,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
             await _mapTenantAppService.UpdateAsync(id, new UpdateMapTenantDto("300", tenant2.Id, "500"));
             var mapTenant3 = await _mapTenantAppService.GetAsync(id);
 
-            await Assert.ThrowsAsync<AbpException>(() =>
+            await Assert.ThrowsAsync<UserFriendlyException>(() =>
             {
                 return _mapTenantAppService.CreateAsync(new CreateMapTenantDto("3001", tenant2.Id, "500"));
             });

@@ -4,44 +4,44 @@ using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 
-namespace SharpAbp.Abp.IdentityServer.ApiResources
+namespace SharpAbp.Abp.IdentityServer.IdentityResources
 {
-    public interface IApiResourceAppService : IApplicationService
+    public interface IIdentityResourceAppService : IApplicationService
     {
         /// <summary>
-        /// Get apiResource
+        /// Get by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<ApiResourceDto> GetAsync(Guid id);
+        Task<IdentityResourceDto> GetAsync(Guid id);
 
         /// <summary>
-        /// Find by apiSourceName
+        /// Find by name
         /// </summary>
-        /// <param name="apiResourceName"></param>
+        /// <param name="name"></param>
         /// <returns></returns>
-        Task<ApiResourceDto> FindByNameAsync(string apiResourceName);
+        Task<IdentityResourceDto> FindByNameAsync(string name);
 
         /// <summary>
         /// Get paged list
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        Task<PagedResultDto<ApiResourceDto>> GetPagedListAsync(ApiResourcePagedRequestDto input);
+        Task<PagedResultDto<IdentityResourceDto>> GetPagedListAsync(IdentityResourcePagedRequestDto input);
 
         /// <summary>
-        /// Get list by scopeNames
+        /// Get list by scope name
         /// </summary>
         /// <param name="scopeNames"></param>
         /// <returns></returns>
-        Task<List<ApiResourceDto>> GetListByScopesAsync(string[] scopeNames);
+        Task<List<IdentityResourceDto>> GetListByScopeNameAsync(string[] scopeNames);
 
         /// <summary>
         /// Create
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        Task<Guid> CreateAsync(CreateApiResourceDto input);
+        Task<Guid> CreateAsync(CreateIdentityResourceDto input);
 
         /// <summary>
         /// Update
@@ -49,7 +49,7 @@ namespace SharpAbp.Abp.IdentityServer.ApiResources
         /// <param name="id"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        Task UpdateAsync(Guid id, UpdateApiResourceDto input);
+        Task UpdateAsync(Guid id, UpdateIdentityResourceDto input);
 
         /// <summary>
         /// Delete
@@ -57,7 +57,7 @@ namespace SharpAbp.Abp.IdentityServer.ApiResources
         /// <param name="id"></param>
         /// <returns></returns>
         Task DeleteAsync(Guid id);
-
+    
 
     }
 }
