@@ -1,17 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<Import Project="..\..\..\..\common.props" />
 	<Import Project="..\..\..\..\configureawait.props" />
 
 	<PropertyGroup>
 		<TargetFramework>net5.0</TargetFramework>
-		<AssemblyName>SharpAbp.Abp.IdentityServer.Application</AssemblyName>
-		<PackageId>SharpAbp.Abp.IdentityServer.Application</PackageId>
+		<AssemblyName>SharpAbp.Abp.Identity.Application</AssemblyName>
+		<PackageId>SharpAbp.Abp.Identity.Application</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
 		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-		<Description>SharpAbp IdentityServer Module</Description>
+		<Description>SharpAbp Identity Module</Description>
 		<RootNamespace />
 	</PropertyGroup>
 
@@ -21,8 +21,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\SharpAbp.Abp.IdentityServer.Application.Contracts\SharpAbp.Abp.IdentityServer.Application.Contracts.csproj" />
-		<ProjectReference Include="..\SharpAbp.Abp.IdentityServer.Domain\SharpAbp.Abp.IdentityServer.Domain.csproj" />
+	  <ProjectReference Include="..\SharpAbp.Abp.Identity.Application.Contracts\SharpAbp.Abp.Identity.Application.Contracts.csproj" />
+	  <ProjectReference Include="..\SharpAbp.Abp.Identity.Domain\SharpAbp.Abp.Identity.Domain.csproj" />
 	</ItemGroup>
+
 
 </Project>

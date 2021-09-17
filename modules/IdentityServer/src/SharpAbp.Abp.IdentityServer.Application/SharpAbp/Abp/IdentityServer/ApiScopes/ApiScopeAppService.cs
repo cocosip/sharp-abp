@@ -174,7 +174,6 @@ namespace SharpAbp.Abp.IdentityServer.ApiScopes
             await ApiScopeRepository.DeleteAsync(id);
         }
 
-
         protected virtual async Task CheckNameExistAsync(string name, Guid? expectedId = null)
         {
             if (await ApiScopeRepository.CheckNameExistAsync(name, expectedId))

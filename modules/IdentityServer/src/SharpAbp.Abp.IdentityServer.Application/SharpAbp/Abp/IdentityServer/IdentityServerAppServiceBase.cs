@@ -1,4 +1,5 @@
-﻿using Volo.Abp.Application.Services;
+﻿using SharpAbp.Abp.IdentityServer.Localization;
+using Volo.Abp.Application.Services;
 
 namespace SharpAbp.Abp.IdentityServer
 {
@@ -7,7 +8,7 @@ namespace SharpAbp.Abp.IdentityServer
         protected IdentityServerAppServiceBase()
         {
             ObjectMapperContext = typeof(AbpIdentityServerApplicationModule);
-            //LocalizationResource = typeof(FileStoringPolicyResource);
+            LocalizationResource = typeof(IdentityServerResource);
         }
     }
 }

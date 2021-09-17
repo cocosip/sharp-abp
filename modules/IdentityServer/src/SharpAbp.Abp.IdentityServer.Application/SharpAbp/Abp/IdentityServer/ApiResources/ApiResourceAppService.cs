@@ -147,13 +147,14 @@ namespace SharpAbp.Abp.IdentityServer.ApiResources
             }
 
             //secret
-            //TODO x509
             foreach (var createSecret in input.Secrets)
             {
                 var secret = apiResource.FindSecret(createSecret.Value, createSecret.Type);
                 if (secret == null)
                 {
-                    apiResource.AddSecret(createSecret.Value, createSecret.Expiration, createSecret.Type, createSecret.Description);
+                    var secretValue = IdentityServer4.Models.HashExtensions.Sha256(createSecret.Value);
+
+                    apiResource.AddSecret(secretValue, createSecret.Expiration, createSecret.Type, createSecret.Description);
                 }
             }
 

@@ -104,8 +104,6 @@ namespace SharpAbp.Abp.IdentityServer.Clients
 
         public ClientDto()
         {
-
-
             AllowedScopes = new List<ClientScopeDto>();
             ClientSecrets = new List<ClientSecretDto>();
             AllowedGrantTypes = new List<ClientGrantTypeDto>();

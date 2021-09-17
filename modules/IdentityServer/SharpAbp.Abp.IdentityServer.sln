@@ -9,9 +9,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.IdentityServer
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.IdentityServer.Application", "src\SharpAbp.Abp.IdentityServer.Application\SharpAbp.Abp.IdentityServer.Application.csproj", "{384A1446-DF18-470B-B04A-41BB24E6AA65}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.IdentityServer.Domain.Shared", "src\SharpAbp.Abp.IdentityServer.Domain.Shared\SharpAbp.Abp.IdentityServer.Domain.Shared.csproj", "{1E53A884-456A-4983-881C-18EC1DE52AD3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.IdentityServer.Domain.Shared", "src\SharpAbp.Abp.IdentityServer.Domain.Shared\SharpAbp.Abp.IdentityServer.Domain.Shared.csproj", "{1E53A884-456A-4983-881C-18EC1DE52AD3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.IdentityServer.Domain", "src\SharpAbp.Abp.IdentityServer.Domain\SharpAbp.Abp.IdentityServer.Domain.csproj", "{BB147819-7033-4568-8C77-E032F72F07E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.IdentityServer.Domain", "src\SharpAbp.Abp.IdentityServer.Domain\SharpAbp.Abp.IdentityServer.Domain.csproj", "{BB147819-7033-4568-8C77-E032F72F07E3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{02681802-F3FA-4F40-BF25-DC4E44CB02E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.IdentityServer.Application.Tests", "test\SharpAbp.Abp.IdentityServer.Application.Tests\SharpAbp.Abp.IdentityServer.Application.Tests.csproj", "{E62CAFC8-2996-41E2-8A43-A251CC7B4FBD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +75,18 @@ Global
 		{BB147819-7033-4568-8C77-E032F72F07E3}.Release|x64.Build.0 = Release|Any CPU
 		{BB147819-7033-4568-8C77-E032F72F07E3}.Release|x86.ActiveCfg = Release|Any CPU
 		{BB147819-7033-4568-8C77-E032F72F07E3}.Release|x86.Build.0 = Release|Any CPU
+		{E62CAFC8-2996-41E2-8A43-A251CC7B4FBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E62CAFC8-2996-41E2-8A43-A251CC7B4FBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E62CAFC8-2996-41E2-8A43-A251CC7B4FBD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E62CAFC8-2996-41E2-8A43-A251CC7B4FBD}.Debug|x64.Build.0 = Debug|Any CPU
+		{E62CAFC8-2996-41E2-8A43-A251CC7B4FBD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E62CAFC8-2996-41E2-8A43-A251CC7B4FBD}.Debug|x86.Build.0 = Debug|Any CPU
+		{E62CAFC8-2996-41E2-8A43-A251CC7B4FBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E62CAFC8-2996-41E2-8A43-A251CC7B4FBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E62CAFC8-2996-41E2-8A43-A251CC7B4FBD}.Release|x64.ActiveCfg = Release|Any CPU
+		{E62CAFC8-2996-41E2-8A43-A251CC7B4FBD}.Release|x64.Build.0 = Release|Any CPU
+		{E62CAFC8-2996-41E2-8A43-A251CC7B4FBD}.Release|x86.ActiveCfg = Release|Any CPU
+		{E62CAFC8-2996-41E2-8A43-A251CC7B4FBD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,6 +96,7 @@ Global
 		{384A1446-DF18-470B-B04A-41BB24E6AA65} = {DD8F9441-775C-4E7C-A6D6-683C8F01F122}
 		{1E53A884-456A-4983-881C-18EC1DE52AD3} = {DD8F9441-775C-4E7C-A6D6-683C8F01F122}
 		{BB147819-7033-4568-8C77-E032F72F07E3} = {DD8F9441-775C-4E7C-A6D6-683C8F01F122}
+		{E62CAFC8-2996-41E2-8A43-A251CC7B4FBD} = {02681802-F3FA-4F40-BF25-DC4E44CB02E4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {49946637-DDAF-40F4-AD5B-9516CDE1EDE7}
