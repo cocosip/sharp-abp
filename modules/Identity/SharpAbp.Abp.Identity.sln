@@ -7,13 +7,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9840BF94-88B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{1A855256-798C-47CC-8FAD-32182D9FC4AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Identity.Domain.Shared", "src\SharpAbp.Abp.Identity.Domain.Shared\SharpAbp.Abp.Identity.Domain.Shared.csproj", "{92E24C8E-2A1E-483B-8693-142C010B32A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Identity.Domain.Shared", "src\SharpAbp.Abp.Identity.Domain.Shared\SharpAbp.Abp.Identity.Domain.Shared.csproj", "{92E24C8E-2A1E-483B-8693-142C010B32A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Identity.Domain", "src\SharpAbp.Abp.Identity.Domain\SharpAbp.Abp.Identity.Domain.csproj", "{EE26E218-5BAD-4398-A613-9006CABFBEF6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Identity.Domain", "src\SharpAbp.Abp.Identity.Domain\SharpAbp.Abp.Identity.Domain.csproj", "{EE26E218-5BAD-4398-A613-9006CABFBEF6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Identity.Application.Contracts", "src\SharpAbp.Abp.Identity.Application.Contracts\SharpAbp.Abp.Identity.Application.Contracts.csproj", "{11E10A3E-D5A0-48EB-AD3F-3B84E20A7E1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Identity.Application.Contracts", "src\SharpAbp.Abp.Identity.Application.Contracts\SharpAbp.Abp.Identity.Application.Contracts.csproj", "{11E10A3E-D5A0-48EB-AD3F-3B84E20A7E1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Identity.Application", "src\SharpAbp.Abp.Identity.Application\SharpAbp.Abp.Identity.Application.csproj", "{1F204A8F-BC8B-49B9-9E65-33C2BCC37D56}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Identity.Application", "src\SharpAbp.Abp.Identity.Application\SharpAbp.Abp.Identity.Application.csproj", "{1F204A8F-BC8B-49B9-9E65-33C2BCC37D56}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Identity.HttpApi", "src\SharpAbp.Abp.Identity.HttpApi\SharpAbp.Abp.Identity.HttpApi.csproj", "{CC70D7DD-362F-4AF6-8F72-A2860BD72B74}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,6 +75,18 @@ Global
 		{1F204A8F-BC8B-49B9-9E65-33C2BCC37D56}.Release|x64.Build.0 = Release|Any CPU
 		{1F204A8F-BC8B-49B9-9E65-33C2BCC37D56}.Release|x86.ActiveCfg = Release|Any CPU
 		{1F204A8F-BC8B-49B9-9E65-33C2BCC37D56}.Release|x86.Build.0 = Release|Any CPU
+		{CC70D7DD-362F-4AF6-8F72-A2860BD72B74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC70D7DD-362F-4AF6-8F72-A2860BD72B74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC70D7DD-362F-4AF6-8F72-A2860BD72B74}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CC70D7DD-362F-4AF6-8F72-A2860BD72B74}.Debug|x64.Build.0 = Debug|Any CPU
+		{CC70D7DD-362F-4AF6-8F72-A2860BD72B74}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CC70D7DD-362F-4AF6-8F72-A2860BD72B74}.Debug|x86.Build.0 = Debug|Any CPU
+		{CC70D7DD-362F-4AF6-8F72-A2860BD72B74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC70D7DD-362F-4AF6-8F72-A2860BD72B74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC70D7DD-362F-4AF6-8F72-A2860BD72B74}.Release|x64.ActiveCfg = Release|Any CPU
+		{CC70D7DD-362F-4AF6-8F72-A2860BD72B74}.Release|x64.Build.0 = Release|Any CPU
+		{CC70D7DD-362F-4AF6-8F72-A2860BD72B74}.Release|x86.ActiveCfg = Release|Any CPU
+		{CC70D7DD-362F-4AF6-8F72-A2860BD72B74}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,6 +96,7 @@ Global
 		{EE26E218-5BAD-4398-A613-9006CABFBEF6} = {9840BF94-88B6-4A65-AE53-6D4D2DF6FBFC}
 		{11E10A3E-D5A0-48EB-AD3F-3B84E20A7E1B} = {9840BF94-88B6-4A65-AE53-6D4D2DF6FBFC}
 		{1F204A8F-BC8B-49B9-9E65-33C2BCC37D56} = {9840BF94-88B6-4A65-AE53-6D4D2DF6FBFC}
+		{CC70D7DD-362F-4AF6-8F72-A2860BD72B74} = {9840BF94-88B6-4A65-AE53-6D4D2DF6FBFC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C4125CB8-7853-4390-964A-2EDE386015CC}

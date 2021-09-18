@@ -12,13 +12,27 @@ namespace SharpAbp.Abp.Identity
     public class IdentityRoleAppService : IdentityAppServiceBase, IIdentityRoleAppService
     {
         protected IIdentityRoleRepository IdentityRoleRepository { get; }
+        protected IIdentityClaimTypeRepository IdentityClaimTypeRepository { get; }
         protected IdentityRoleManager IdentityRoleManager { get; }
         public IdentityRoleAppService(
             IIdentityRoleRepository identityRoleRepository,
+            IIdentityClaimTypeRepository identityClaimTypeRepository,
             IdentityRoleManager identityRoleManager)
         {
             IdentityRoleRepository = identityRoleRepository;
+            IdentityClaimTypeRepository = identityClaimTypeRepository;
             IdentityRoleManager = identityRoleManager;
+        }
+
+        /// <summary>
+        /// Get all claimTypes
+        /// </summary>
+        /// <returns></returns>
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Roles.Default)]
+        public virtual async Task<List<IdentityClaimTypeDto>> GetAllClaimTypes()
+        {
+            var identityClaimTypes = await IdentityClaimTypeRepository.GetListAsync(false, default);
+            return ObjectMapper.Map<List<IdentityClaimType>, List<IdentityClaimTypeDto>>(identityClaimTypes);
         }
 
         /// <summary>

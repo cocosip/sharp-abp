@@ -15,14 +15,6 @@ namespace SharpAbp.Abp.Identity
         Task<IdentityClaimTypeDto> GetAsync(Guid id);
 
         /// <summary>
-        /// Any
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="ignoredId"></param>
-        /// <returns></returns>
-        Task<bool> AnyAsync(string name, Guid? ignoredId = null);
-
-        /// <summary>
         /// Get paged list
         /// </summary>
         /// <param name="input"></param>

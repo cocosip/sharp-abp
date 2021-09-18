@@ -7,6 +7,11 @@ namespace SharpAbp.Abp.Identity
 {
     public interface IIdentityRoleAppService : IApplicationService
     {
+        /// <summary>
+        /// Get all claimTypes
+        /// </summary>
+        /// <returns></returns>
+        Task<List<IdentityClaimTypeDto>> GetAllClaimTypes();
 
         /// <summary>
         /// Get role claims
@@ -22,6 +27,6 @@ namespace SharpAbp.Abp.Identity
         /// <param name="roleClaims"></param>
         /// <returns></returns>
         Task CreateOrUpdateClaimsAsync(Guid id, List<CreateOrUpdateIdentityRoleClaimDto> roleClaims);
-    
+
     }
 }
