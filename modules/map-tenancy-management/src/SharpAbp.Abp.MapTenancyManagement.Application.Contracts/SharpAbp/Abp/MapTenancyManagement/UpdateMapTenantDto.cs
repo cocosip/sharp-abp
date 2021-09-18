@@ -1,10 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Volo.Abp.Application.Dtos;
 using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.MapTenancyManagement
 {
-    public class UpdateMapTenantDto
+    public class UpdateMapTenantDto : ExtensibleEntityDto
     {
         [Required]
         [DynamicStringLength(typeof(MapTenantConsts), nameof(MapTenantConsts.MaxCodeLength))]

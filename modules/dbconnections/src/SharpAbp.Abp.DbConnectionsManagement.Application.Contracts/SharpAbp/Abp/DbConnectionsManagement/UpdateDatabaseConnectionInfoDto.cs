@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Volo.Abp.Application.Dtos;
 using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.DbConnectionsManagement
 {
-    public class UpdateDatabaseConnectionInfoDto
+    public class UpdateDatabaseConnectionInfoDto : ExtensibleEntityDto
     {
         /// <summary>
         /// DbConnection name

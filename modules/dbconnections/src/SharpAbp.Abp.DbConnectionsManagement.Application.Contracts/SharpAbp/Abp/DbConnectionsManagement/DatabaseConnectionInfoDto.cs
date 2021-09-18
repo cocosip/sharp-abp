@@ -3,7 +3,7 @@ using Volo.Abp.Application.Dtos;
 
 namespace SharpAbp.Abp.DbConnectionsManagement
 {
-    public class DatabaseConnectionInfoDto : EntityDto<Guid>
+    public class DatabaseConnectionInfoDto : ExtensibleEntityDto<Guid>
     {
         /// <summary>
         /// DbConnection name

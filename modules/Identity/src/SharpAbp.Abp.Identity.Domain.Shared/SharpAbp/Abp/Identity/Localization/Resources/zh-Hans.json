@@ -1,0 +1,14 @@
+{
+  "culture": "zh-Hans",
+  "texts": {
+    "Identity": "Identity管理",
+    "Permission:Identity.IdentityClaimTypes": "IdentityClaimType 管理",
+    "Permission:Identity.IdentityClaimTypes.Create": "创建IdentityClaimType",
+    "Permission:Identity.IdentityClaimTypes.Update": "修改IdentityClaimType",
+    "Permission:Identity.IdentityClaimTypes.Delete": "删除IdentityClaimType",
+    "Permission:Identity.IdentitySecurityLogs": "IdentitySecurityLog 管理",
+    "Permission:Identity.IdentitySecurityLogs.Create": "创建IdentitySecurityLogs",
+    "Permission:Identity.IdentitySecurityLogs.Update": "修改IdentitySecurityLogs",
+    "Permission:Identity.IdentitySecurityLogs.Delete": "删除IdentitySecurityLogs"
+  }
+}

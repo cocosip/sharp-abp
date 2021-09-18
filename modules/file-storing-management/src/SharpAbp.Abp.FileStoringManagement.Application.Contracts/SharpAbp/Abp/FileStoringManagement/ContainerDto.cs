@@ -4,7 +4,7 @@ using Volo.Abp.Application.Dtos;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
-    public class ContainerDto : EntityDto<Guid>
+    public class ContainerDto : ExtensibleEntityDto<Guid>
     {
         public Guid? TenantId { get; set; }
 

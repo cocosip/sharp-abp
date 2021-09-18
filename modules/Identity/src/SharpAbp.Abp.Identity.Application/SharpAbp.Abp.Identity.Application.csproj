@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<Import Project="..\..\..\..\common.props" />
 	<Import Project="..\..\..\..\configureawait.props" />
@@ -18,11 +18,12 @@
 	<ItemGroup>
 		<PackageReference Include="Volo.Abp.AutoMapper" Version="$(VoloAbpPackageVersion)" />
 		<PackageReference Include="Volo.Abp.Ddd.Application" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.PermissionManagement.Application" Version="$(VoloAbpPackageVersion)" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\SharpAbp.Abp.Identity.Application.Contracts\SharpAbp.Abp.Identity.Application.Contracts.csproj" />
-	  <ProjectReference Include="..\SharpAbp.Abp.Identity.Domain\SharpAbp.Abp.Identity.Domain.csproj" />
+		<ProjectReference Include="..\SharpAbp.Abp.Identity.Application.Contracts\SharpAbp.Abp.Identity.Application.Contracts.csproj" />
+		<ProjectReference Include="..\SharpAbp.Abp.Identity.Domain\SharpAbp.Abp.Identity.Domain.csproj" />
 	</ItemGroup>
 
 
