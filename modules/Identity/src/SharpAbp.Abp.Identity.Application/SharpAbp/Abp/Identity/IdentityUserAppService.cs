@@ -3,38 +3,49 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Identity;
 using Volo.Abp.ObjectExtending;
-using VoloIdentity = Volo.Abp.Identity;
-using Volo.Abp.Data;
-using Volo.Abp;
 
 namespace SharpAbp.Abp.Identity
 {
-    [Authorize(VoloIdentity.IdentityPermissions.Users.Default)]
+    [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Default)]
     public class IdentityUserAppService : IdentityAppServiceBase, IIdentityUserAppService
     {
         protected IdentityUserManager UserManager { get; }
         protected IIdentityUserRepository UserRepository { get; }
         protected IIdentityRoleRepository RoleRepository { get; }
+        protected IOrganizationUnitRepository OrganizationUnitRepository { get; }
+        protected IIdentityClaimTypeRepository IdentityClaimTypeRepository { get; }
         protected IOptions<IdentityOptions> IdentityOptions { get; }
 
         public IdentityUserAppService(
             IdentityUserManager userManager,
             IIdentityUserRepository userRepository,
             IIdentityRoleRepository roleRepository,
+            IOrganizationUnitRepository organizationUnitRepository,
+            IIdentityClaimTypeRepository identityClaimTypeRepository,
             IOptions<IdentityOptions> identityOptions)
         {
             UserManager = userManager;
             UserRepository = userRepository;
             RoleRepository = roleRepository;
+            OrganizationUnitRepository = organizationUnitRepository;
+            IdentityClaimTypeRepository = identityClaimTypeRepository;
             IdentityOptions = identityOptions;
         }
 
+        /// <summary>
+        /// Get user by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         //TODO: [Authorize(IdentityPermissions.Users.Default)] should go the IdentityUserAppService class.
-        [Authorize(VoloIdentity.IdentityPermissions.Users.Default)]
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Default)]
         public virtual async Task<IdentityUserDto> GetAsync(Guid id)
         {
             return ObjectMapper.Map<IdentityUser, IdentityUserDto>(
@@ -42,7 +53,39 @@ namespace SharpAbp.Abp.Identity
             );
         }
 
-        [Authorize(VoloIdentity.IdentityPermissions.Users.Default)]
+        /// <summary>
+        /// Find by userName
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <returns></returns>
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Default)]
+        public virtual async Task<IdentityUserDto> FindByUsernameAsync(string userName)
+        {
+            return ObjectMapper.Map<IdentityUser, IdentityUserDto>(
+                await UserManager.FindByNameAsync(userName)
+            );
+        }
+
+
+        /// <summary>
+        /// Find by email
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Default)]
+        public virtual async Task<IdentityUserDto> FindByEmailAsync(string email)
+        {
+            return ObjectMapper.Map<IdentityUser, IdentityUserDto>(
+                await UserManager.FindByEmailAsync(email)
+            );
+        }
+
+        /// <summary>
+        /// Get paged list
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Default)]
         public virtual async Task<PagedResultDto<IdentityUserDto>> GetListAsync(GetIdentityUsersInput input)
         {
             var count = await UserRepository.GetCountAsync(input.Filter);
@@ -54,7 +97,23 @@ namespace SharpAbp.Abp.Identity
             );
         }
 
-        [Authorize(VoloIdentity.IdentityPermissions.Users.Default)]
+        /// <summary>
+        /// Get all claimTypes
+        /// </summary>
+        /// <returns></returns>
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Default)]
+        public virtual async Task<List<IdentityClaimTypeDto>> GetAllClaimTypes()
+        {
+            var identityClaimTypes = await IdentityClaimTypeRepository.GetListAsync(false, default);
+            return ObjectMapper.Map<List<IdentityClaimType>, List<IdentityClaimTypeDto>>(identityClaimTypes);
+        }
+
+        /// <summary>
+        /// Get user roles
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Default)]
         public virtual async Task<ListResultDto<IdentityRoleDto>> GetRolesAsync(Guid id)
         {
             //TODO: Should also include roles of the related OUs.
@@ -66,7 +125,11 @@ namespace SharpAbp.Abp.Identity
             );
         }
 
-        [Authorize(VoloIdentity.IdentityPermissions.Users.Default)]
+        /// <summary>
+        /// Get assignable roles
+        /// </summary>
+        /// <returns></returns>
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Default)]
         public virtual async Task<ListResultDto<IdentityRoleDto>> GetAssignableRolesAsync()
         {
             var list = await RoleRepository.GetListAsync();
@@ -74,8 +137,51 @@ namespace SharpAbp.Abp.Identity
                 ObjectMapper.Map<List<IdentityRole>, List<IdentityRoleDto>>(list));
         }
 
-        [Authorize(VoloIdentity.IdentityPermissions.Users.Create)]
-        public virtual async Task<IdentityUserDto> CreateAsync(IdentityUserCreateDto input)
+        /// <summary>
+        /// Get organizationUnits
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Default)]
+        public virtual async Task<List<OrganizationUnitDto>> GetOrganizationUnitsAsync(Guid id)
+        {
+            var organizationUnits = await UserRepository.GetOrganizationUnitsAsync(id);
+            return ObjectMapper.Map<List<OrganizationUnit>, List<OrganizationUnitDto>>(organizationUnits);
+        }
+
+        /// <summary>
+        /// Get available organizationUnits
+        /// </summary>
+        /// <returns></returns>
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Default)]
+        public virtual async Task<ListResultDto<OrganizationUnitDto>> GetAvailableOrganizationUnitsAsync()
+        {
+            var organizationUnits = await OrganizationUnitRepository.GetListAsync(true, default);
+            return new ListResultDto<OrganizationUnitDto>(
+                ObjectMapper.Map<List<OrganizationUnit>, List<OrganizationUnitDto>>(organizationUnits)
+                );
+        }
+
+        /// <summary>
+        /// Get claims
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Default)]
+        public virtual async Task<List<IdentityUserClaimDto>> GetClaimsAsync(Guid id)
+        {
+            var user = await UserRepository.GetAsync(id);
+            return ObjectMapper.Map<List<IdentityUserClaim>, List<IdentityUserClaimDto>>(user.Claims.ToList());
+        }
+
+
+        /// <summary>
+        /// Create user
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Create)]
+        public virtual async Task<IdentityUserDto> CreateAsync(NewIdentityUserCreateDto input)
         {
             await IdentityOptions.SetAsync();
 
@@ -90,6 +196,10 @@ namespace SharpAbp.Abp.Identity
 
             (await UserManager.CreateAsync(user, input.Password)).CheckErrors();
             await UpdateUserByInput(user, input);
+
+            //Update organizationUnits
+            await UpdateUserOrganizationUnits(user, input.OrganizationUnitIds);
+
             (await UserManager.UpdateAsync(user)).CheckErrors();
 
             await CurrentUnitOfWork.SaveChangesAsync();
@@ -97,8 +207,14 @@ namespace SharpAbp.Abp.Identity
             return ObjectMapper.Map<IdentityUser, IdentityUserDto>(user);
         }
 
-        [Authorize(VoloIdentity.IdentityPermissions.Users.Update)]
-        public virtual async Task<IdentityUserDto> UpdateAsync(Guid id, IdentityUserUpdateDto input)
+        /// <summary>
+        /// Update user
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Update)]
+        public virtual async Task<IdentityUserDto> UpdateAsync(Guid id, NewIdentityUserUpdateDto input)
         {
             await IdentityOptions.SetAsync();
 
@@ -110,6 +226,10 @@ namespace SharpAbp.Abp.Identity
             (await UserManager.SetUserNameAsync(user, input.UserName)).CheckErrors();
 
             await UpdateUserByInput(user, input);
+
+            //Update organizationUnits
+            await UpdateUserOrganizationUnits(user, input.OrganizationUnitIds);
+
             input.MapExtraPropertiesTo(user);
 
             (await UserManager.UpdateAsync(user)).CheckErrors();
@@ -125,7 +245,12 @@ namespace SharpAbp.Abp.Identity
             return ObjectMapper.Map<IdentityUser, IdentityUserDto>(user);
         }
 
-        [Authorize(VoloIdentity.IdentityPermissions.Users.Delete)]
+        /// <summary>
+        /// Delete user
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {
             if (CurrentUser.Id == id)
@@ -142,7 +267,13 @@ namespace SharpAbp.Abp.Identity
             (await UserManager.DeleteAsync(user)).CheckErrors();
         }
 
-        [Authorize(VoloIdentity.IdentityPermissions.Users.Update)]
+        /// <summary>
+        /// Update roles
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Update)]
         public virtual async Task UpdateRolesAsync(Guid id, IdentityUserUpdateRolesDto input)
         {
             var user = await UserManager.GetByIdAsync(id);
@@ -150,21 +281,104 @@ namespace SharpAbp.Abp.Identity
             await UserRepository.UpdateAsync(user);
         }
 
-        [Authorize(VoloIdentity.IdentityPermissions.Users.Default)]
-        public virtual async Task<IdentityUserDto> FindByUsernameAsync(string userName)
+        /// <summary>
+        /// Update claims
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="identityUserClaims"></param>
+        /// <returns></returns>
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Update)]
+        public virtual async Task UpdateClaimsAsync(Guid id, List<CreateOrUpdateIdentityUserClaimDto> identityUserClaims)
         {
-            return ObjectMapper.Map<IdentityUser, IdentityUserDto>(
-                await UserManager.FindByNameAsync(userName)
-            );
+            var user = await UserRepository.GetAsync(id);
+
+            var claims = identityUserClaims.Select(x => new Claim(x.ClaimType, x.ClaimValue)).ToList();
+
+            foreach (var addClaim in claims)
+            {
+                var claim = user.FindClaim(addClaim);
+                if (claim == null)
+                {
+                    user.AddClaim(GuidGenerator, addClaim);
+                }
+            }
+
+            var removeClaims = user.Claims.Select(x => new Claim(x.ClaimType, x.ClaimValue))
+             .Except(claims)
+             .ToList();
+            user.RemoveClaims(removeClaims);
+
+            await UserRepository.UpdateAsync(user);
         }
 
-        [Authorize(VoloIdentity.IdentityPermissions.Users.Default)]
-        public virtual async Task<IdentityUserDto> FindByEmailAsync(string email)
+        /// <summary>
+        /// Lock user
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="seconds"></param>
+        /// <returns></returns>
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Update)]
+        public virtual async Task LockAsync(Guid id, int seconds)
         {
-            return ObjectMapper.Map<IdentityUser, IdentityUserDto>(
-                await UserManager.FindByEmailAsync(email)
-            );
+            var user = await UserRepository.GetAsync(id);
+            await UserManager.SetLockoutEnabledAsync(user, true);
+            await UserManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now.AddSeconds(seconds));
         }
+
+        /// <summary>
+        /// Unlock user
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Update)]
+        public virtual async Task UnLockAsync(Guid id)
+        {
+            var user = await UserRepository.GetAsync(id);
+            await UserManager.SetLockoutEnabledAsync(user, false);
+        }
+
+        /// <summary>
+        /// Set password
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Update)]
+        public virtual async Task SetPasswordAsync(Guid id, SetPasswordDto input)
+        {
+            var user = await UserRepository.GetAsync(id);
+            if (!input.NewPassword.IsNullOrEmpty())
+            {
+                (await UserManager.RemovePasswordAsync(user)).CheckErrors();
+                (await UserManager.AddPasswordAsync(user, input.NewPassword)).CheckErrors();
+            }
+        }
+
+        /// <summary>
+        /// two-factor enabled
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Default)]
+        public virtual async Task<bool> TwoFactorEnableAsync(Guid id)
+        {
+            var user = await UserRepository.GetAsync(id);
+            return user.TwoFactorEnabled;
+        }
+
+        /// <summary>
+        /// Set two-factor
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="enabled"></param>
+        /// <returns></returns>
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Update)]
+        public virtual async Task SetTwoFactorAsync(Guid id, bool enabled)
+        {
+            var user = await UserRepository.GetAsync(id);
+            await UserManager.SetTwoFactorEnabledAsync(user, enabled);
+        }
+
 
         protected virtual async Task UpdateUserByInput(IdentityUser user, IdentityUserCreateOrUpdateDtoBase input)
         {
@@ -187,6 +401,14 @@ namespace SharpAbp.Abp.Identity
             if (input.RoleNames != null)
             {
                 (await UserManager.SetRolesAsync(user, input.RoleNames)).CheckErrors();
+            }
+        }
+
+        protected virtual async Task UpdateUserOrganizationUnits(IdentityUser user, params Guid[] organizationUnitIds)
+        {
+            if (organizationUnitIds != null && organizationUnitIds.Any())
+            {
+                await UserManager.SetOrganizationUnitsAsync(user, organizationUnitIds);
             }
         }
     }

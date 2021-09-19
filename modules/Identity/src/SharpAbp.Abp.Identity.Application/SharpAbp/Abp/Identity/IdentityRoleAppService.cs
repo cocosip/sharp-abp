@@ -81,6 +81,5 @@ namespace SharpAbp.Abp.Identity
             await IdentityRoleRepository.UpdateAsync(identityRole);
         }
 
-
     }
 }
