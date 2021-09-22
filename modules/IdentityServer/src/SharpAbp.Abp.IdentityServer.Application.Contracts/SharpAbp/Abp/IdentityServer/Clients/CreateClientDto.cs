@@ -24,19 +24,21 @@ namespace SharpAbp.Abp.IdentityServer.Clients
         [DynamicStringLength(typeof(ClientConsts), nameof(ClientConsts.LogoUriMaxLength))]
         public string LogoUri { get; set; }
 
+        [Required]
         public bool RequireConsent { get; set; }
 
         public string LogoutUrl { get; set; }
 
         public string CallbackUrl { get; set; }
 
-        public List<CreateOrUpdateClientScopeDto> AllowedScopes { get; set; }
-        public List<CreateOrUpdateClientSecretDto> ClientSecrets { get; set; }
+        public string[] Scopes { get; set; }
+
+        public List<CreateOrUpdateClientSecretDto> Secrets { get; set; }
 
         public CreateClientDto()
         {
-            AllowedScopes = new List<CreateOrUpdateClientScopeDto>();
-            ClientSecrets = new List<CreateOrUpdateClientSecretDto>();
+            Secrets = new List<CreateOrUpdateClientSecretDto>();
         }
+
     }
 }

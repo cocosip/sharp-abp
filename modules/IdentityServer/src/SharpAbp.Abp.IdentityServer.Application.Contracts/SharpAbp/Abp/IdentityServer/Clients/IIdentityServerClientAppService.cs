@@ -6,7 +6,7 @@ using Volo.Abp.Application.Services;
 
 namespace SharpAbp.Abp.IdentityServer.Clients
 {
-    public interface IClientAppService : IApplicationService
+    public interface IIdentityServerClientAppService : IApplicationService
     {
         /// <summary>
         /// Get by id
@@ -34,6 +34,14 @@ namespace SharpAbp.Abp.IdentityServer.Clients
         /// </summary>
         /// <returns></returns>
         Task<List<string>> GetAllDistinctAllowedCorsOriginsAsync();
+
+        /// <summary>
+        /// Create
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        Task<Guid> CreateAsync(CreateClientDto input);
     
+
     }
 }

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.IdentityServer.Clients;
 using Volo.Abp.Validation;
@@ -10,9 +8,9 @@ namespace SharpAbp.Abp.IdentityServer.Clients
 {
     public class UpdateClientDto : ExtensibleEntityDto
     {
-        [Required]
-        [DynamicStringLength(typeof(ClientConsts), nameof(ClientConsts.ClientIdMaxLength))]
-        public string ClientId { get; set; }
+        /*
+         * Detail
+         */
 
         [Required]
         [DynamicStringLength(typeof(ClientConsts), nameof(ClientConsts.ClientNameMaxLength))]
@@ -26,32 +24,14 @@ namespace SharpAbp.Abp.IdentityServer.Clients
 
         [DynamicStringLength(typeof(ClientConsts), nameof(ClientConsts.LogoUriMaxLength))]
         public string LogoUri { get; set; }
-
-        public bool Enabled { get; set; }
-
-        [Required]
-        [DynamicStringLength(typeof(ClientConsts), nameof(ClientConsts.ProtocolTypeMaxLength))]
-        public string ProtocolType { get; set; }
-
-        public bool RequireClientSecret { get; set; }
-
         public bool RequireConsent { get; set; }
-
-        public bool AllowRememberConsent { get; set; }
-
-        public bool AlwaysIncludeUserClaimsInIdToken { get; set; }
-
-        public bool RequirePkce { get; set; }
-
-        public bool AllowPlainTextPkce { get; set; }
-
         public bool RequireRequestObject { get; set; }
-
-        public bool AllowAccessTokensViaBrowser { get; set; }
+        public bool AllowRememberConsent { get; set; }
+        public bool Enabled { get; set; }
+        public bool AllowOfflineAccess { get; set; }
 
         [DynamicStringLength(typeof(ClientConsts), nameof(ClientConsts.FrontChannelLogoutUriMaxLength))]
         public string FrontChannelLogoutUri { get; set; }
-
         public bool FrontChannelLogoutSessionRequired { get; set; }
 
         [DynamicStringLength(typeof(ClientConsts), nameof(ClientConsts.BackChannelLogoutUriMaxLength))]
@@ -59,69 +39,54 @@ namespace SharpAbp.Abp.IdentityServer.Clients
 
         public bool BackChannelLogoutSessionRequired { get; set; }
 
-        public bool AllowOfflineAccess { get; set; }
-
-        public int IdentityTokenLifetime { get; set; }
-
         [DynamicStringLength(typeof(ClientConsts), nameof(ClientConsts.AllowedIdentityTokenSigningAlgorithms))]
         public string AllowedIdentityTokenSigningAlgorithms { get; set; }
 
+        /*
+         * Token
+         */
+        [Required]
         public int AccessTokenLifetime { get; set; }
 
-        public int AuthorizationCodeLifetime { get; set; }
+        [Required]
+        public int AccessTokenType { get; set; }
 
         public int? ConsentLifetime { get; set; }
 
-        public int AbsoluteRefreshTokenLifetime { get; set; }
-
-        public int SlidingRefreshTokenLifetime { get; set; }
-
-        public int RefreshTokenUsage { get; set; }
-
-        public bool UpdateAccessTokenClaimsOnRefresh { get; set; }
-
-        public int RefreshTokenExpiration { get; set; }
-
-        public int AccessTokenType { get; set; }
-
-        public bool EnableLocalLogin { get; set; }
-
-        public bool IncludeJwtId { get; set; }
-
-        public bool AlwaysSendClientClaims { get; set; }
-
-        [DynamicStringLength(typeof(ClientConsts), nameof(ClientConsts.ClientClaimsPrefixMaxLength))]
-        public string ClientClaimsPrefix { get; set; }
-
+        [DynamicStringLength(typeof(ClientConsts), nameof(ClientConsts.PairWiseSubjectSaltMaxLength))]
         public string PairWiseSubjectSalt { get; set; }
 
+        public bool IncludeJwtId { get; set; }
         public int? UserSsoLifetime { get; set; }
 
         [DynamicStringLength(typeof(ClientConsts), nameof(ClientConsts.UserCodeTypeMaxLength))]
         public string UserCodeType { get; set; }
 
         public int DeviceCodeLifetime { get; set; }
+        public bool RequirePkce { get; set; }
+        public bool RequireClientSecret { get; set; }
 
-        public List<CreateOrUpdateClientScopeDto> AllowedScopes { get; set; }
-        public List<CreateOrUpdateClientSecretDto> ClientSecrets { get; set; }
-        public List<CreateOrUpdateClientGrantTypeDto> AllowedGrantTypes { get; set; }
-        public List<CreateOrUpdateClientCorsOriginDto> AllowedCorsOrigins { get; set; }
-        public List<CreateOrUpdateClientRedirectUriDto> RedirectUris { get; set; }
-        public List<CreateOrUpdateClientPostLogoutRedirectUriDto> PostLogoutRedirectUris { get; set; }
-        public List<CreateOrUpdateClientIdPRestrictionDto> IdentityProviderRestrictions { get; set; }
+
+        public string[] AllowedCorsOrigins { get; set; }
+        public string[] AllowedGrantTypes { get; set; }
         public List<CreateOrUpdateClientClaimDto> Claims { get; set; }
+        public List<CreateOrUpdateClientSecretDto> ClientSecrets { get; set; }
+        public string[] IdentityProviderRestrictions { get; set; }
+        public string[] PostLogoutRedirectUris { get; set; }
         public List<CreateOrUpdateClientPropertyDto> Properties { get; set; }
+        public string[] RedirectUris { get; set; }
+        public string[] Scopes { get; set; }
+
+        //IdenityResources
+        //{displayName: "Your user identifier", name: "openid", left: true}
+
+        //ApiResources
+        //{displayName: "AbpCommercialDemo API", name: "AbpCommercialDemo", left: true}
 
         public UpdateClientDto()
         {
-            AllowedScopes = new List<CreateOrUpdateClientScopeDto>();
-            ClientSecrets = new List<CreateOrUpdateClientSecretDto>();
-            AllowedGrantTypes = new List<CreateOrUpdateClientGrantTypeDto>();
-            AllowedCorsOrigins = new List<CreateOrUpdateClientCorsOriginDto>();
-            RedirectUris = new List<CreateOrUpdateClientRedirectUriDto>();
-            PostLogoutRedirectUris = new List<CreateOrUpdateClientPostLogoutRedirectUriDto>();
-            IdentityProviderRestrictions = new List<CreateOrUpdateClientIdPRestrictionDto>();
             Claims = new List<CreateOrUpdateClientClaimDto>();
+            ClientSecrets = new List<CreateOrUpdateClientSecretDto>();
             Properties = new List<CreateOrUpdateClientPropertyDto>();
         }
     }

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 
 namespace SharpAbp.Abp.IdentityServer.ApiScopes
 {
-    public interface IApiScopeAppService : IApplicationService
+    public interface IIdentityServerApiScopeAppService : IApplicationService
     {
         /// <summary>
         /// Get by id
@@ -45,11 +44,19 @@ namespace SharpAbp.Abp.IdentityServer.ApiScopes
         Task<Guid> CreateAsync(CreateApiScopeDto input);
 
         /// <summary>
+        /// Update
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        Task UpdateAsync(Guid id, UpdateApiScopeDto input);
+
+        /// <summary>
         /// Delete
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task DeleteAsync(Guid id);
-    
+
     }
 }

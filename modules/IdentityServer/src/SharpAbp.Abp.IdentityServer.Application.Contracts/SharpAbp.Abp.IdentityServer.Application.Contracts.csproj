@@ -21,7 +21,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\SharpAbp.Abp.IdentityServer.Domain.Shared\SharpAbp.Abp.IdentityServer.Domain.Shared.csproj" />
+		<ProjectReference Include="..\SharpAbp.Abp.IdentityServer.Domain.Shared\SharpAbp.Abp.IdentityServer.Domain.Shared.csproj" />
+		<ProjectReference Include="..\..\..\Identity\src\SharpAbp.Abp.Identity.Application.Contracts\SharpAbp.Abp.Identity.Application.Contracts.csproj" />
 	</ItemGroup>
 
 </Project>

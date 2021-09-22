@@ -12,7 +12,6 @@ namespace SharpAbp.Abp.IdentityServer.IdentityResources
     [Authorize(IdentityServerPermissions.IdentityResources.Default)]
     public class IdentityResourceAppService : IdentityServerAppServiceBase, IIdentityResourceAppService
     {
-
         protected IIdentityResourceRepository IdentityResourceRepository { get; }
         public IdentityResourceAppService(IIdentityResourceRepository identityResourceRepository)
         {
@@ -41,6 +40,17 @@ namespace SharpAbp.Abp.IdentityServer.IdentityResources
         {
             var identityResource = await IdentityResourceRepository.FindByNameAsync(name);
             return ObjectMapper.Map<IdentityResource, IdentityResourceDto>(identityResource);
+        }
+
+        /// <summary>
+        /// Get all
+        /// </summary>
+        /// <returns></returns>
+        [Authorize(IdentityServerPermissions.IdentityResources.Default)]
+        public virtual async Task<List<IdentityResourceDto>> GetAllAsync()
+        {
+            var identityResources = await IdentityResourceRepository.GetListAsync(false, default);
+            return ObjectMapper.Map<List<IdentityResource>, List<IdentityResourceDto>>(identityResources);
         }
 
         /// <summary>

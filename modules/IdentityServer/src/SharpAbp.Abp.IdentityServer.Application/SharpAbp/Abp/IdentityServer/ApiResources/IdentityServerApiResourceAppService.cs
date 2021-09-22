@@ -10,10 +10,10 @@ using Volo.Abp.IdentityServer.ApiResources;
 namespace SharpAbp.Abp.IdentityServer.ApiResources
 {
     [Authorize(IdentityServerPermissions.ApiResources.Default)]
-    public class ApiResourceAppService : IdentityServerAppServiceBase, IApiResourceAppService
+    public class IdentityServerApiResourceAppService : IdentityServerAppServiceBase, IIdentityServerApiResourceAppService
     {
         protected IApiResourceRepository ApiResourceRepository { get; }
-        public ApiResourceAppService(
+        public IdentityServerApiResourceAppService(
             IApiResourceRepository apiResourceRepository)
         {
             ApiResourceRepository = apiResourceRepository;
@@ -42,6 +42,18 @@ namespace SharpAbp.Abp.IdentityServer.ApiResources
             var apiResource = await ApiResourceRepository.FindByNameAsync(apiResourceName);
             return ObjectMapper.Map<ApiResource, ApiResourceDto>(apiResource);
         }
+
+        /// <summary>
+        /// Get all
+        /// </summary>
+        /// <returns></returns>
+        [Authorize(IdentityServerPermissions.ApiResources.Default)]
+        public virtual async Task<List<ApiResourceDto>> GetAllAsync()
+        {
+            var apiResources = await ApiResourceRepository.GetListAsync(false, default);
+            return ObjectMapper.Map<List<ApiResource>, List<ApiResourceDto>>(apiResources);
+        }
+
 
         /// <summary>
         /// Get paged list

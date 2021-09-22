@@ -1,4 +1,5 @@
-﻿using Volo.Abp.Application;
+﻿using SharpAbp.Abp.Identity;
+using Volo.Abp.Application;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Modularity;
 
@@ -8,7 +9,8 @@ namespace SharpAbp.Abp.IdentityServer
         typeof(AbpDddApplicationModule),
         typeof(AbpAutoMapperModule),
         typeof(IdentityServerApplicationContractsModule),
-        typeof(IdentityServerDomainModule)
+        typeof(IdentityServerDomainModule),
+        typeof(IdentityApplicationModule)
         )]
     public class AbpIdentityServerApplicationModule : AbpModule
     {

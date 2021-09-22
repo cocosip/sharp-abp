@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
@@ -11,10 +10,10 @@ using Volo.Abp.IdentityServer.ApiScopes;
 namespace SharpAbp.Abp.IdentityServer.ApiScopes
 {
     [Authorize(IdentityServerPermissions.ApiScopes.Default)]
-    public class ApiScopeAppService : IdentityServerAppServiceBase, IApiScopeAppService
+    public class IdentityServerApiScopeAppService : IdentityServerAppServiceBase, IIdentityServerApiScopeAppService
     {
         protected IApiScopeRepository ApiScopeRepository { get; }
-        public ApiScopeAppService(IApiScopeRepository apiScopeRepository)
+        public IdentityServerApiScopeAppService(IApiScopeRepository apiScopeRepository)
         {
             ApiScopeRepository = apiScopeRepository;
         }

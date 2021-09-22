@@ -6,7 +6,7 @@ using Volo.Abp.Application.Services;
 
 namespace SharpAbp.Abp.IdentityServer.ApiResources
 {
-    public interface IApiResourceAppService : IApplicationService
+    public interface IIdentityServerApiResourceAppService : IApplicationService
     {
         /// <summary>
         /// Get apiResource
@@ -21,6 +21,12 @@ namespace SharpAbp.Abp.IdentityServer.ApiResources
         /// <param name="apiResourceName"></param>
         /// <returns></returns>
         Task<ApiResourceDto> FindByNameAsync(string apiResourceName);
+
+        /// <summary>
+        /// Get all
+        /// </summary>
+        /// <returns></returns>
+        Task<List<ApiResourceDto>> GetAllAsync();
 
         /// <summary>
         /// Get paged list

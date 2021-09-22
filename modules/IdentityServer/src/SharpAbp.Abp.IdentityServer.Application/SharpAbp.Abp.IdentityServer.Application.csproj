@@ -23,6 +23,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\SharpAbp.Abp.IdentityServer.Application.Contracts\SharpAbp.Abp.IdentityServer.Application.Contracts.csproj" />
 		<ProjectReference Include="..\SharpAbp.Abp.IdentityServer.Domain\SharpAbp.Abp.IdentityServer.Domain.csproj" />
+		<ProjectReference Include="..\..\..\Identity\src\SharpAbp.Abp.Identity.Application\SharpAbp.Abp.Identity.Application.csproj" />
 	</ItemGroup>
 
 </Project>

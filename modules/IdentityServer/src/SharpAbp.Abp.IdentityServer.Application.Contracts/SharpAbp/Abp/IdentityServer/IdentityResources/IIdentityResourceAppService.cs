@@ -23,6 +23,12 @@ namespace SharpAbp.Abp.IdentityServer.IdentityResources
         Task<IdentityResourceDto> FindByNameAsync(string name);
 
         /// <summary>
+        /// Get all
+        /// </summary>
+        /// <returns></returns>
+        Task<List<IdentityResourceDto>> GetAllAsync();
+
+        /// <summary>
         /// Get paged list
         /// </summary>
         /// <param name="input"></param>
@@ -57,7 +63,7 @@ namespace SharpAbp.Abp.IdentityServer.IdentityResources
         /// <param name="id"></param>
         /// <returns></returns>
         Task DeleteAsync(Guid id);
-    
+
 
     }
 }
