@@ -29,7 +29,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         }
 
         [HttpGet]
-        [Route("{provider}")]
+        [Route("get-options/{provider}")]
         public ProviderOptionsDto GetOptions(string provider)
         {
             return _fileProviderAppService.GetOptions(provider);

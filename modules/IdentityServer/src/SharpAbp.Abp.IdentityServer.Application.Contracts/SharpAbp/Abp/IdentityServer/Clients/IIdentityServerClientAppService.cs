@@ -41,7 +41,20 @@ namespace SharpAbp.Abp.IdentityServer.Clients
         /// <param name="input"></param>
         /// <returns></returns>
         Task<Guid> CreateAsync(CreateClientDto input);
-    
 
+        /// <summary>
+        /// Update
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        Task UpdateAsync(Guid id, UpdateClientDto input);
+
+        /// <summary>
+        /// Delete
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task DeleteAsync(Guid id);
     }
 }

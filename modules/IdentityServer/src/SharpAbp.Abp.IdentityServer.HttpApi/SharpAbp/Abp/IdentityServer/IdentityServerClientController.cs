@@ -10,7 +10,7 @@ namespace SharpAbp.Abp.IdentityServer
 {
     [RemoteService(Name = IdentityServerRemoteServiceConsts.RemoteServiceName)]
     [Area("identity-server")]
-    [Route("api/identity/api-resources")]
+    [Route("api/identity-server/api-resources")]
     public class IdentityServerClientController : IdentityServerController, IIdentityServerClientAppService
     {
         private readonly IIdentityServerClientAppService _identityServerClientAppService;
@@ -76,7 +76,29 @@ namespace SharpAbp.Abp.IdentityServer
             return await _identityServerClientAppService.CreateAsync(input);
         }
 
+        /// <summary>
+        /// Update
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("{id}")]
+        public async Task UpdateAsync(Guid id, UpdateClientDto input)
+        {
+            await _identityServerClientAppService.UpdateAsync(id, input);
+        }
 
-
+        /// <summary>
+        /// Delete
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task DeleteAsync(Guid id)
+        {
+            await _identityServerClientAppService.DeleteAsync(id);
+        }
     }
 }

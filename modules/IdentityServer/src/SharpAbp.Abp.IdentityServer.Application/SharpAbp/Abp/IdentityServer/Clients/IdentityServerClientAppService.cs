@@ -128,6 +128,12 @@ namespace SharpAbp.Abp.IdentityServer.Clients
             return client.Id;
         }
 
+        /// <summary>
+        /// Update
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="input"></param>
+        /// <returns></returns>
         [Authorize(IdentityServerPermissions.Clients.Update)]
         public virtual async Task UpdateAsync(Guid id, UpdateClientDto input)
         {
@@ -186,7 +192,7 @@ namespace SharpAbp.Abp.IdentityServer.Clients
             foreach (var claim in claims)
             {
                 var clientClaim = client.FindClaim(claim.Value, claim.Type);
-                if (clientClaim != null)
+                if (clientClaim == null)
                 {
                     client.AddClaim(claim.Value, claim.Type);
                 }
@@ -206,20 +212,92 @@ namespace SharpAbp.Abp.IdentityServer.Clients
             foreach (var clientSecret in input.ClientSecrets)
             {
                 var secret = client.FindSecret(clientSecret.Value, clientSecret.Type);
-                if (secret != null)
+                if (secret == null)
                 {
                     var value = clientSecret.Type == "SharedSecret" ? clientSecret.Value : IdentityServer4.Models.HashExtensions.Sha256(secret.Value);
                     client.AddSecret(value, clientSecret.Expiration, clientSecret.Type, clientSecret.Description);
                 }
             }
 
-            //var removeSecrets = client.ClientSecrets.Select(x=>new )
+            var removeSecrets = client.ClientSecrets.Select(x => (x.Value, x.Type))
+                .Except(input.ClientSecrets.Select(y => (y.Value, y.Type)))
+                .ToList();
+            foreach (var removeSecret in removeSecrets)
+            {
+                client.RemoveSecret(removeSecret.Value, removeSecret.Type);
+            }
 
+            //IdentityProviderRestrictions
+            if (input.IdentityProviderRestrictions != null)
+            {
+                client.RemoveAllIdentityProviderRestrictions();
+                foreach (var identityProviderRestriction in input.IdentityProviderRestrictions)
+                {
+                    client.AddIdentityProviderRestriction(identityProviderRestriction);
+                }
+            }
 
+            //PostLogoutRedirectUris
+            if (input.PostLogoutRedirectUris != null)
+            {
+                client.RemoveAllPostLogoutRedirectUris();
+                foreach (var postLogoutRedirectUri in input.PostLogoutRedirectUris)
+                {
+                    client.AddPostLogoutRedirectUri(postLogoutRedirectUri);
+                }
+            }
 
+            //Properties
+            foreach (var property in input.Properties)
+            {
+                var clientProperty = client.FindProperty(property.Key, property.Value);
+                if (clientProperty == null)
+                {
+                    client.AddProperty(property.Key, property.Value);
+                }
+            }
+
+            var removeProperties = client.Properties.Select(x => (x.Key, x.Value))
+                .Except(input.Properties.Select(y => (y.Key, y.Value)))
+                .ToList();
+
+            foreach (var removeProperty in removeProperties)
+            {
+                client.RemoveProperty(removeProperty.Key, removeProperty.Value);
+            }
+
+            //RedirectUris
+            if (input.RedirectUris != null)
+            {
+                client.RemoveAllRedirectUris();
+                foreach (var redirectUri in input.RedirectUris)
+                {
+                    client.AddRedirectUri(redirectUri);
+                }
+            }
+
+            //Scopes
+            if (input.Scopes != null)
+            {
+                client.RemoveAllScopes();
+                foreach (var scope in input.Scopes)
+                {
+                    client.AddScope(scope);
+                }
+            }
 
             await ClientRepository.UpdateAsync(client);
+        }
 
+        /// <summary>
+        /// Delete
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Authorize(IdentityServerPermissions.Clients.Delete)]
+        public virtual async Task DeleteAsync(Guid id)
+        {
+            await ClientRepository.DeleteAsync(id);
         }
 
     }
