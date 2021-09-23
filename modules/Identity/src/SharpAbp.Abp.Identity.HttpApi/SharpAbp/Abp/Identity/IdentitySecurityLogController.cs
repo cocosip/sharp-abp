@@ -38,8 +38,13 @@ namespace SharpAbp.Abp.Identity
             await _identitySecurityLogAppService.DeleteAsync(id);
         }
 
-
-
+        [HttpGet]
+        [Route("my")]
+        public async Task<PagedResultDto<IdentitySecurityLogDto>> GetMyListAsync(IdentitySecurityLogPagedRequestDto input)
+        {
+            input.UserId=CurrentTenant.Id;
+            return await _identitySecurityLogAppService.GetPagedListAsync(input);
+        }
 
     }
 }

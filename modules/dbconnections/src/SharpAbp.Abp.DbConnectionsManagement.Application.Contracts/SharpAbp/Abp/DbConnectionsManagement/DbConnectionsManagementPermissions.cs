@@ -9,8 +9,6 @@ namespace SharpAbp.Abp.DbConnectionsManagement
     {
         public const string GroupName = "DbConnectionsManagement";
 
-        public const string AlwaysAllow = "DbConnectionsAlwaysAllow";
-
         public static class DatabaseConnectionInfos
         {
             public const string Default = GroupName + ".DatabaseConnectionInfos";
