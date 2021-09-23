@@ -180,7 +180,42 @@ namespace SharpAbp.Abp.IdentityServer.Clients
                 }
             }
 
-            //
+            //Claims
+            var claims = input.Claims.Select(x => new System.Security.Claims.Claim(x.Type, x.Value)).ToList();
+
+            foreach (var claim in claims)
+            {
+                var clientClaim = client.FindClaim(claim.Value, claim.Type);
+                if (clientClaim != null)
+                {
+                    client.AddClaim(claim.Value, claim.Type);
+                }
+            }
+
+            var removeClaims = client.Claims.Select(x => new System.Security.Claims.Claim(x.Type, x.Value))
+                .Except(claims)
+                .ToList();
+
+            foreach (var removeClaim in removeClaims)
+            {
+                client.RemoveClaim(removeClaim.Value, removeClaim.Type);
+            }
+
+            //ClientSecrets
+
+            foreach (var clientSecret in input.ClientSecrets)
+            {
+                var secret = client.FindSecret(clientSecret.Value, clientSecret.Type);
+                if (secret != null)
+                {
+                    var value = clientSecret.Type == "SharedSecret" ? clientSecret.Value : IdentityServer4.Models.HashExtensions.Sha256(secret.Value);
+                    client.AddSecret(value, clientSecret.Expiration, clientSecret.Type, clientSecret.Description);
+                }
+            }
+
+            //var removeSecrets = client.ClientSecrets.Select(x=>new )
+
+
 
 
             await ClientRepository.UpdateAsync(client);
