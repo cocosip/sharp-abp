@@ -8,7 +8,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 {
     [RemoteService(Name = FileStoringManagementRemoteServiceConsts.RemoteServiceName)]
     [Area("file-storing")]
-    [Route("api/container")]
+    [Route("api/file-storing/containers")]
     public class ContainerController : FileStoringController, IContainerAppService
     {
         private readonly IContainerAppService _containerAppService;
@@ -25,7 +25,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         }
 
         [HttpGet]
-        public async Task<PagedResultDto<ContainerDto>> GetPagedListAsync( FileStoringContainerPagedRequestDto input)
+        public async Task<PagedResultDto<ContainerDto>> GetPagedListAsync(FileStoringContainerPagedRequestDto input)
         {
             return await _containerAppService.GetPagedListAsync(input);
         }

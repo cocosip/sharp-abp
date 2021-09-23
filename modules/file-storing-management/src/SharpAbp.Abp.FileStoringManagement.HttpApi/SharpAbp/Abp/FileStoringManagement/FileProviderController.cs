@@ -6,7 +6,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 {
     [RemoteService(Name = FileStoringManagementRemoteServiceConsts.RemoteServiceName)]
     [Area("file-storing")]
-    [Route("api/file-provider")]
+    [Route("api/file-storing/file-providers")]
     public class FileProviderController : FileStoringController, IFileProviderAppService
     {
         private readonly IFileProviderAppService _fileProviderAppService;

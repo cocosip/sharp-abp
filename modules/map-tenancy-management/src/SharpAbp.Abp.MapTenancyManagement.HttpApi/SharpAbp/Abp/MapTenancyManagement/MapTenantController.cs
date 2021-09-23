@@ -8,7 +8,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
 {
     [RemoteService(Name = MapTenancyManagementRemoteServiceConsts.RemoteServiceName)]
     [Area("map-tenancy")]
-    [Route("api/map-tenant")]
+    [Route("api/map-tenancy/map-tenants")]
     public class MapTenantController : MapTenancyController, IMapTenantAppService
     {
         private readonly IMapTenantAppService _mapTenantAppService;
