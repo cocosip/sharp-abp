@@ -55,8 +55,8 @@ namespace SharpAbp.Abp.Identity
             var count = await IdentityClaimTypeRepository.GetCountAsync(input.Filter);
             var identityClaimTypes = await IdentityClaimTypeRepository.GetListAsync(
                 input.Sorting,
-                input.SkipCount,
                 input.MaxResultCount,
+                input.SkipCount,
                 input.Filter);
 
             return new PagedResultDto<IdentityClaimTypeDto>(
@@ -73,7 +73,6 @@ namespace SharpAbp.Abp.Identity
         [Authorize(IdentityPermissions.IdentityClaimTypes.Create)]
         public virtual async Task<Guid> CreateAsync(CreateIdentityClaimTypeDto input)
         {
-
             var identityClaimType = new IdentityClaimType(
                 GuidGenerator.Create(),
                 input.Name,
@@ -115,6 +114,6 @@ namespace SharpAbp.Abp.Identity
         {
             await IdentityClaimTypeRepository.DeleteAsync(id);
         }
- 
+
     }
 }

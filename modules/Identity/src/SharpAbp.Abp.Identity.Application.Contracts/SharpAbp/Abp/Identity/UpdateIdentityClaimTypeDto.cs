@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Volo.Abp.Application.Dtos;
+﻿using Volo.Abp.Application.Dtos;
 using Volo.Abp.Identity;
 using Volo.Abp.Validation;
 
@@ -7,9 +6,9 @@ namespace SharpAbp.Abp.Identity
 {
     public class UpdateIdentityClaimTypeDto : ExtensibleEntityDto
     {
-        [Required]
-        [DynamicStringLength(typeof(IdentityClaimTypeConsts), nameof(IdentityClaimTypeConsts.MaxNameLength))]
-        public string Name { get; set; }
+        //[Required]
+        //[DynamicStringLength(typeof(IdentityClaimTypeConsts), nameof(IdentityClaimTypeConsts.MaxNameLength))]
+        //public string Name { get; set; }
 
         public bool Required { get; set; }
 
@@ -24,6 +23,6 @@ namespace SharpAbp.Abp.Identity
         [DynamicStringLength(typeof(IdentityClaimTypeConsts), nameof(IdentityClaimTypeConsts.MaxDescriptionLength))]
         public string Description { get; set; }
 
-        public IdentityClaimValueType ValueType { get; set; } = IdentityClaimValueType.String;
+        //public IdentityClaimValueType ValueType { get; set; } = IdentityClaimValueType.String;
     }
 }

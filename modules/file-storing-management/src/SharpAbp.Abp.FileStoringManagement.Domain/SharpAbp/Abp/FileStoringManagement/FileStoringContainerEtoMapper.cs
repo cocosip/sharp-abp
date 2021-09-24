@@ -8,18 +8,19 @@ namespace SharpAbp.Abp.FileStoringManagement
     {
         public FileStoringContainerEto Map(FileStoringContainer source)
         {
-            if (source == null)
+            if (source != null)
             {
-                return null;
+                return new FileStoringContainerEto()
+                {
+                    Id = source.Id,
+                    TenantId = source.TenantId,
+                    Provider = source.Provider,
+                    Name = source.Name,
+                };
             }
-            return new FileStoringContainerEto()
-            {
-                Id = source.Id,
-                TenantId = source.TenantId,
-                Provider = source.Provider,
-                Name = source.Name,
-            };
+            return null;
         }
+        
         public FileStoringContainerEto Map(FileStoringContainer source, FileStoringContainerEto destination)
         {
             if (destination == null)

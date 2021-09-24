@@ -8,17 +8,18 @@ namespace SharpAbp.Abp.MapTenancyManagement
     {
         public MapTenantEto Map(MapTenant source)
         {
-            if (source == null)
+            if (source != null)
             {
-                return null;
+                return new MapTenantEto()
+                {
+                    Id = source.Id,
+                    TenantId = source.TenantId,
+                    Code = source.Code,
+                    MapCode = source.MapCode
+                };
             }
-            return new MapTenantEto()
-            {
-                Id = source.Id,
-                TenantId = source.TenantId,
-                Code = source.Code,
-                MapCode = source.MapCode
-            };
+
+            return null;
         }
 
         public MapTenantEto Map(MapTenant source, MapTenantEto destination)
