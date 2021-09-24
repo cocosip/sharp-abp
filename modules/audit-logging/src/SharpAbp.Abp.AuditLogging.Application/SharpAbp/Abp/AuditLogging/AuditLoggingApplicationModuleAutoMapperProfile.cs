@@ -11,6 +11,7 @@ namespace SharpAbp.Abp.AuditLogging
             CreateMap<EntityChange, EntityChangeDto>();
             CreateMap<EntityPropertyChange, EntityPropertyChangeDto>();
             CreateMap<AuditLogAction, AuditLogActionDto>();
+            CreateMap<EntityChangeWithUsername, EntityChangeWithUsernameDto>();
         }
     }
 }

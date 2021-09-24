@@ -17,7 +17,8 @@ $solutionPaths = @(
 		"../modules/map-tenancy-management",
 		"../modules/dbconnections",
 		"../modules/Identity",
-		"../modules/IdentityServer"
+		"../modules/IdentityServer",
+		"../modules/audit-logging"
 	)
 
 if ($full -eq "-f")

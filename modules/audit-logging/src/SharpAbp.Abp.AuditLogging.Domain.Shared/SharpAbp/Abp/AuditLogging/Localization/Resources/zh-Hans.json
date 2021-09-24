@@ -1,0 +1,10 @@
+{
+  "culture": "zh-Hans",
+  "texts": {
+    "SharpAbpAuditLogging": "审计日志管理",
+    "Permission:SharpAbpAuditLogging.AuditLogs": "审计日志管理",
+    "Permission:SharpAbpAuditLogging.AuditLogs.Create": "创建审计日志",
+    "Permission:SharpAbpAuditLogging.AuditLogs.Update": "修改审计日志",
+    "Permission:SharpAbpAuditLogging.AuditLogs.Delete": "删除审计日志"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "culture": "en",
+  "texts": {
+    "SharpAbpAuditLogging": "AuditLogging",
+    "Permission:SharpAbpAuditLogging.AuditLogs": "AuditLog",
+    "Permission:SharpAbpAuditLogging.AuditLogs.Create": "Create auditLog",
+    "Permission:SharpAbpAuditLogging.AuditLogs.Update": "Update auditLog",
+    "Permission:SharpAbpAuditLogging.AuditLogs.Delete": "Delete auditLog"
+  }
+}

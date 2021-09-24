@@ -1,0 +1,10 @@
+{
+  "culture": "zh-Hant",
+  "texts": {
+    "SharpAbpAuditLogging": "審計日誌管理",
+    "Permission:SharpAbpAuditLogging.AuditLogs": "審計日誌管理",
+    "Permission:SharpAbpAuditLogging.AuditLogs.Create": "創建審計日誌",
+    "Permission:SharpAbpAuditLogging.AuditLogs.Update": "修改審計日誌",
+    "Permission:SharpAbpAuditLogging.AuditLogs.Delete": "刪除審計日誌"
+  }
+}
