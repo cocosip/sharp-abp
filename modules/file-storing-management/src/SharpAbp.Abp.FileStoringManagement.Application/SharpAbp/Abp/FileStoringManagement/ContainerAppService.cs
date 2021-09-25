@@ -12,15 +12,15 @@ namespace SharpAbp.Abp.FileStoringManagement
     [Authorize(FileStoringManagementPermissions.Containers.Default)]
     public class ContainerAppService : FileStoringManagementAppServiceBase, IContainerAppService
     {
-        protected IContainerManager ContainerManager { get; }
-        protected IFileStoringContainerRepository FileStoringContainerRepository { get; }
+        protected ContainerManager ContainerManager { get; }
+        protected IFileStoringContainerRepository ContainerRepository { get; }
 
         public ContainerAppService(
-            IContainerManager containerManager,
+            ContainerManager containerManager,
             IFileStoringContainerRepository fileStoringContainerRepository)
         {
             ContainerManager = containerManager;
-            FileStoringContainerRepository = fileStoringContainerRepository;
+            ContainerRepository = fileStoringContainerRepository;
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         [Authorize(FileStoringManagementPermissions.Containers.Default)]
         public virtual async Task<ContainerDto> GetAsync(Guid id)
         {
-            var fileStoringContainer = await FileStoringContainerRepository.GetAsync(id, true);
+            var fileStoringContainer = await ContainerRepository.GetAsync(id, true);
             return ObjectMapper.Map<FileStoringContainer, ContainerDto>(fileStoringContainer);
         }
 
@@ -45,7 +45,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
 
-            var fileStoringContainer = await FileStoringContainerRepository.FindByNameAsync(name, true);
+            var fileStoringContainer = await ContainerRepository.FindByNameAsync(name, true);
             return ObjectMapper.Map<FileStoringContainer, ContainerDto>(fileStoringContainer);
         }
 
@@ -57,8 +57,8 @@ namespace SharpAbp.Abp.FileStoringManagement
         [Authorize(FileStoringManagementPermissions.Containers.Default)]
         public virtual async Task<PagedResultDto<ContainerDto>> GetPagedListAsync(FileStoringContainerPagedRequestDto input)
         {
-            var count = await FileStoringContainerRepository.GetCountAsync(input.Name, input.Provider);
-            var fileStoringContainers = await FileStoringContainerRepository.GetListAsync(
+            var count = await ContainerRepository.GetCountAsync(input.Name, input.Provider);
+            var fileStoringContainers = await ContainerRepository.GetListAsync(
                 input.SkipCount,
                 input.MaxResultCount,
                 input.Sorting,
@@ -98,14 +98,13 @@ namespace SharpAbp.Abp.FileStoringManagement
 
             foreach (var item in input.Items)
             {
-                container.Items.Add(new FileStoringContainerItem(
+                container.AddItem(
                     GuidGenerator.Create(),
                     item.Name,
-                    item.Value,
-                    container.Id));
+                    item.Value);
             }
 
-            await FileStoringContainerRepository.InsertAsync(container);
+            await ContainerRepository.InsertAsync(container);
 
             return container.Id;
         }
@@ -122,49 +121,24 @@ namespace SharpAbp.Abp.FileStoringManagement
             var keyValuePairs = input.Items.ToDictionary(x => x.Name, y => y.Value);
             ContainerManager.ValidateProviderValues(input.Provider, keyValuePairs);
 
-            var container = await FileStoringContainerRepository.GetAsync(id, true);
+            var container = await ContainerRepository.GetAsync(id, true);
 
-            //Validate name
-            await ContainerManager.ValidateNameAsync(container.TenantId, input.Name, container.Id);
+            //Update container
+            container.IsMultiTenant = input.IsMultiTenant;
+            container.Provider = input.Provider;
+            container.Title = input.Title;
+            container.HttpAccess = input.HttpAccess;
 
-            //Update
-            container.Update(
-                input.IsMultiTenant, 
-                input.Provider, 
-                input.Name, 
-                input.Title, 
-                input.HttpAccess);
-
-            var deleteItems = new List<FileStoringContainerItem>();
-
-            foreach (var item in container.Items)
-            {
-                var inputItem = input.Items.FirstOrDefault(x => x.Id == item.Id);
-                if (inputItem != null)
-                {
-                    //Update
-                    item.Name = inputItem.Name;
-                    item.Value = inputItem.Value;
-                }
-                else
-                {
-                    //Delete
-                    deleteItems.Add(item);
-                }
-            }
-
-            //Remove
-            container.Items.RemoveAll(deleteItems);
+            //Remove all items
+            container.RemoveAllItems();
 
             //Create
             foreach (var item in input.Items)
             {
-                var containerItem = new FileStoringContainerItem(
-                    GuidGenerator.Create(), 
-                    item.Name, 
-                    item.Value, 
-                    container.Id);
-                container.Items.Add(containerItem);
+                container.AddItem(
+                    GuidGenerator.Create(),
+                    item.Name,
+                    item.Value);
             }
         }
 
@@ -176,7 +150,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         [Authorize(FileStoringManagementPermissions.Containers.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {
-            await FileStoringContainerRepository.DeleteAsync(id);
+            await ContainerRepository.DeleteAsync(id);
         }
     }
 }

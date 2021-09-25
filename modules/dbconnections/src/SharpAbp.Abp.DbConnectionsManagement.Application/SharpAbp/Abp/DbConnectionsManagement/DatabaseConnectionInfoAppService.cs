@@ -11,14 +11,14 @@ namespace SharpAbp.Abp.DbConnectionsManagement
     [Authorize(DbConnectionsManagementPermissions.DatabaseConnectionInfos.Default)]
     public class DatabaseConnectionInfoAppService : DbConnectionsManagementAppServiceBase, IDatabaseConnectionInfoAppService
     {
-        protected IDatabaseConnectionInfoManager DatabaseConnectionInfoManager { get; }
-        protected IDatabaseConnectionInfoRepository DatabaseConnectionInfoRepository { get; }
+        protected DatabaseConnectionInfoManager ConnectionInfoManager { get; }
+        protected IDatabaseConnectionInfoRepository ConnectionInfoRepository { get; }
         public DatabaseConnectionInfoAppService(
-            IDatabaseConnectionInfoManager databaseConnectionInfoManager,
-            IDatabaseConnectionInfoRepository databaseConnectionInfoRepository)
+            DatabaseConnectionInfoManager connectionInfoManager,
+            IDatabaseConnectionInfoRepository connectionInfoRepository)
         {
-            DatabaseConnectionInfoManager = databaseConnectionInfoManager;
-            DatabaseConnectionInfoRepository = databaseConnectionInfoRepository;
+            ConnectionInfoManager = connectionInfoManager;
+            ConnectionInfoRepository = connectionInfoRepository;
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         [Authorize(DbConnectionsManagementPermissions.DatabaseConnectionInfos.Default)]
         public virtual async Task<DatabaseConnectionInfoDto> GetAsync(Guid id)
         {
-            var databaseConnectionInfo = await DatabaseConnectionInfoRepository.GetAsync(id);
+            var databaseConnectionInfo = await ConnectionInfoRepository.GetAsync(id);
             return ObjectMapper.Map<DatabaseConnectionInfo, DatabaseConnectionInfoDto>(databaseConnectionInfo);
         }
 
@@ -43,7 +43,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
 
-            var databaseConnectionInfo = await DatabaseConnectionInfoRepository.FindByNameAsync(name);
+            var databaseConnectionInfo = await ConnectionInfoRepository.FindByNameAsync(name);
             return ObjectMapper.Map<DatabaseConnectionInfo, DatabaseConnectionInfoDto>(databaseConnectionInfo);
         }
 
@@ -56,9 +56,9 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         public virtual async Task<PagedResultDto<DatabaseConnectionInfoDto>> GetPagedListAsync(
             DatabaseConnectionInfoPagedRequestDto input)
         {
-            var count = await DatabaseConnectionInfoRepository.GetCountAsync(input.Name, input.DatabaseProvider);
+            var count = await ConnectionInfoRepository.GetCountAsync(input.Name, input.DatabaseProvider);
 
-            var databaseConnectionInfos = await DatabaseConnectionInfoRepository.GetListAsync(
+            var databaseConnectionInfos = await ConnectionInfoRepository.GetListAsync(
                 input.SkipCount,
                 input.MaxResultCount,
                 input.Sorting,
@@ -85,7 +85,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
                 input.DatabaseProvider,
                 input.ConnectionString);
 
-            await DatabaseConnectionInfoManager.CreateAsync(databaseConnectionInfo);
+            await ConnectionInfoManager.CreateAsync(databaseConnectionInfo);
             return databaseConnectionInfo.Id;
         }
 
@@ -98,7 +98,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         [Authorize(DbConnectionsManagementPermissions.DatabaseConnectionInfos.Update)]
         public virtual async Task UpdateAsync(Guid id, UpdateDatabaseConnectionInfoDto input)
         {
-            await DatabaseConnectionInfoManager.UpdateAsync(
+            await ConnectionInfoManager.UpdateAsync(
                 id,
                 input.Name,
                 input.DatabaseProvider,
@@ -113,7 +113,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         [Authorize(DbConnectionsManagementPermissions.DatabaseConnectionInfos.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {
-            await DatabaseConnectionInfoRepository.DeleteAsync(id);
+            await ConnectionInfoRepository.DeleteAsync(id);
         }
     }
 }

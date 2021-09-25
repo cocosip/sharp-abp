@@ -1,5 +1,4 @@
 ﻿using SharpAbp.Abp.FileStoring;
-using SharpAbp.Abp.FileStoring.Aliyun;
 using SharpAbp.Abp.FileStoring.FileSystem;
 using SharpAbp.Abp.FileStoring.Minio;
 using System;
@@ -111,7 +110,6 @@ namespace SharpAbp.Abp.FileStoringManagement
                 await _containerAppService.UpdateAsync(id, new UpdateContainerDto()
                 {
                     Provider = "FileSystem",
-                    Name = "default2",
                     IsMultiTenant = false,
                     HttpAccess = false,
                     Title = "test-container2",
@@ -124,7 +122,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 });
 
                 var container3 = await _containerAppService.GetAsync(id);
-                Assert.Equal("default2", container3.Name);
+                Assert.Equal("default1", container3.Name);
                 Assert.Equal("FileSystem", container3.Provider);
                 Assert.Equal(tenantId, container3.TenantId);
                 Assert.False(container3.IsMultiTenant);

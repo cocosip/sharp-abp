@@ -1,14 +1,14 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Localization;
+﻿using Microsoft.Extensions.Localization;
 using SharpAbp.Abp.MapTenancyManagement.Localization;
+using System;
+using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.TenantManagement;
 
 namespace SharpAbp.Abp.MapTenancyManagement
 {
-    public class MapTenantManager : DomainService, IMapTenantManager
+    public class MapTenantManager : DomainService
     {
         protected IStringLocalizer<MapTenancyManagementResource> Localizer { get; }
         protected ITenantRepository TenantRepository { get; }

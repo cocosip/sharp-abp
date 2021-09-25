@@ -27,11 +27,5 @@ namespace SharpAbp.Abp.FileStoringManagement
             Value = value;
             ContainerId = containerId;
         }
-
-        public virtual void SetIdAndContainerId(Guid id, Guid containerId)
-        {
-            Id = id;
-            ContainerId = containerId;
-        }
     }
 }

@@ -12,19 +12,19 @@ using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
-    public class ContainerManager : DomainService, IContainerManager
+    public class ContainerManager : DomainService
     {
         protected IStringLocalizer<FileStoringManagementResource> Localizer { get; }
         protected IEnumerable<IFileProviderValuesValidator> ProviderValuesValidators { get; }
-        protected IFileStoringContainerRepository FileStoringContainerRepository { get; }
+        protected IFileStoringContainerRepository ContainerRepository { get; }
         public ContainerManager(
             IStringLocalizer<FileStoringManagementResource> localizer,
             IEnumerable<IFileProviderValuesValidator> providerValuesValidators,
-            IFileStoringContainerRepository fileStoringContainerRepository)
+            IFileStoringContainerRepository containerRepository)
         {
             Localizer = localizer;
             ProviderValuesValidators = providerValuesValidators;
-            FileStoringContainerRepository = fileStoringContainerRepository;
+            ContainerRepository = containerRepository;
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 var result = valuesValidator.Validate(keyValuePairs);
                 if (result.Errors.Any())
                 {
-                    throw new AbpValidationException(Localizer["FileStoringManagement.ValidateContainerFailed",provider], result.Errors);
+                    throw new AbpValidationException(Localizer["FileStoringManagement.ValidateContainerFailed", provider], result.Errors);
                 }
             }
         }
@@ -59,10 +59,9 @@ namespace SharpAbp.Abp.FileStoringManagement
         {
             using (CurrentTenant.Change(tenantId))
             {
-                var container = await FileStoringContainerRepository.FindExpectedByNameAsync(name, expectedId, false);
+                var container = await ContainerRepository.FindExpectedByNameAsync(name, expectedId, false);
                 if (container != null)
                 {
-
                     throw new UserFriendlyException(Localizer["FileStoringManagement.DuplicateContainerName", name]);
                 }
             }

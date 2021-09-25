@@ -1,22 +1,22 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Localization;
+﻿using Microsoft.Extensions.Localization;
 using SharpAbp.Abp.DbConnectionsManagement.Localization;
+using System;
+using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Domain.Services;
 
 namespace SharpAbp.Abp.DbConnectionsManagement
 {
-    public class DatabaseConnectionInfoManager : DomainService, IDatabaseConnectionInfoManager
+    public class DatabaseConnectionInfoManager : DomainService
     {
         protected IStringLocalizer<DbConnectionsManagementResource> Localizer { get; }
-        protected IDatabaseConnectionInfoRepository DatabaseConnectionInfoRepository { get; }
+        protected IDatabaseConnectionInfoRepository ConnectionInfoRepository { get; }
         public DatabaseConnectionInfoManager(
             IStringLocalizer<DbConnectionsManagementResource> localizer,
-            IDatabaseConnectionInfoRepository databaseConnectionInfoRepository)
+            IDatabaseConnectionInfoRepository connectionInfoRepository)
         {
             Localizer = localizer;
-            DatabaseConnectionInfoRepository = databaseConnectionInfoRepository;
+            ConnectionInfoRepository = connectionInfoRepository;
         }
 
         /// <summary>
@@ -26,13 +26,13 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         /// <returns></returns>
         public virtual async Task CreateAsync(DatabaseConnectionInfo databaseConnectionInfo)
         {
-            var queryDatabaseConnectionInfo = await DatabaseConnectionInfoRepository.FindExpectedByNameAsync(databaseConnectionInfo.Name);
+            var queryDatabaseConnectionInfo = await ConnectionInfoRepository.FindExpectedByNameAsync(databaseConnectionInfo.Name);
             if (queryDatabaseConnectionInfo != null)
             {
                 throw new UserFriendlyException(Localizer["DbConnectionsManagement.DuplicateName", databaseConnectionInfo.Name]);
             }
 
-            await DatabaseConnectionInfoRepository.InsertAsync(databaseConnectionInfo);
+            await ConnectionInfoRepository.InsertAsync(databaseConnectionInfo);
         }
 
         /// <summary>
@@ -45,9 +45,9 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         /// <returns></returns>
         public virtual async Task UpdateAsync(Guid id, string name, string databaseProvider, string connectionString)
         {
-            var databaseConnectionInfo = await DatabaseConnectionInfoRepository.GetAsync(id);
+            var databaseConnectionInfo = await ConnectionInfoRepository.GetAsync(id);
 
-            var queryDatabaseConnectionInfo = await DatabaseConnectionInfoRepository.FindExpectedByNameAsync(name, id);
+            var queryDatabaseConnectionInfo = await ConnectionInfoRepository.FindExpectedByNameAsync(name, id);
             if (queryDatabaseConnectionInfo != null)
             {
                 throw new UserFriendlyException(Localizer["DbConnectionsManagement.DuplicateName", databaseConnectionInfo.Name]);
@@ -55,7 +55,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
 
             databaseConnectionInfo.Update(name, databaseProvider, connectionString);
 
-            await DatabaseConnectionInfoRepository.UpdateAsync(databaseConnectionInfo);
+            await ConnectionInfoRepository.UpdateAsync(databaseConnectionInfo);
         }
     }
 }
