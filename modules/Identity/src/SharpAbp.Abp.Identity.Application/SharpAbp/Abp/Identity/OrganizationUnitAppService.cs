@@ -57,8 +57,8 @@ namespace SharpAbp.Abp.Identity
             var count = await OrganizationUnitRepository.GetCountAsync();
             var organizationUnits = await OrganizationUnitRepository.GetListAsync(
                 input.Sorting,
-                input.SkipCount,
-                input.MaxResultCount);
+                input.MaxResultCount,
+                input.SkipCount);
 
             return new PagedResultDto<OrganizationUnitDto>(
               count,
@@ -154,8 +154,8 @@ namespace SharpAbp.Abp.Identity
             var identityRoles = await OrganizationUnitRepository.GetUnaddedRolesAsync(
                 organizationUnit,
                 input.Sorting,
-                input.SkipCount,
                 input.MaxResultCount,
+                input.SkipCount,
                 input.Filter);
 
             return new PagedResultDto<IdentityRoleDto>(
@@ -179,8 +179,8 @@ namespace SharpAbp.Abp.Identity
             var identityUsers = await OrganizationUnitRepository.GetMembersAsync(
                 organizationUnit,
                 input.Sorting,
-                input.SkipCount,
                 input.MaxResultCount,
+                input.SkipCount,
                 input.Filter);
 
             return new PagedResultDto<IdentityUserDto>(
@@ -204,8 +204,8 @@ namespace SharpAbp.Abp.Identity
             var identityUsers = await OrganizationUnitRepository.GetUnaddedUsersAsync(
                 organizationUnit,
                 input.Sorting,
-                input.SkipCount,
                 input.MaxResultCount,
+                input.SkipCount,
                 input.Filter);
 
             return new PagedResultDto<IdentityUserDto>(
