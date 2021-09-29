@@ -6,6 +6,7 @@ using Volo.Abp.Autofac;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.Identity.EntityFrameworkCore;
 using Volo.Abp.Modularity;
+using Volo.Abp.SecurityLog;
 using Volo.Abp.Uow;
 
 namespace SharpAbp.Abp.Identity
@@ -37,6 +38,13 @@ namespace SharpAbp.Abp.Identity
             {
                 options.TransactionBehavior = UnitOfWorkTransactionBehavior.Disabled; //EF in-memory database does not support transactions
             });
+
+            Configure<AbpSecurityLogOptions>(options =>
+            {
+                options.IsEnabled = true;
+                options.ApplicationName = "App1";
+            });
+
         }
 
 

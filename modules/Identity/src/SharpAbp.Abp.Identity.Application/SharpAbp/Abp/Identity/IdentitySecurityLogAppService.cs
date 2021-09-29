@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Identity;
@@ -51,8 +49,8 @@ namespace SharpAbp.Abp.Identity
 
             var identitySecurityLogs = await IdentitySecurityLogRepository.GetListAsync(
                 input.Sorting,
-                input.SkipCount,
                 input.MaxResultCount,
+                input.SkipCount,
                 input.StartTime,
                 input.EndTime,
                 input.ApplicationName,
