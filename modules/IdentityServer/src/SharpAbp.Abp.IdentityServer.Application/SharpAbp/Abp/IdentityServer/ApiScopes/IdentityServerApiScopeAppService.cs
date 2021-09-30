@@ -123,6 +123,10 @@ namespace SharpAbp.Abp.IdentityServer.ApiScopes
             apiScope.ShowInDiscoveryDocument = input.ShowInDiscoveryDocument;
 
             //claim
+            var removeClaimTypes = apiScope.UserClaims.Select(x => x.Type)
+                .Except(input.UserClaims.Select(y => y.Type))
+                .ToList();
+
             foreach (var createClaim in input.UserClaims)
             {
                 var claim = apiScope.FindClaim(createClaim.Type);
@@ -132,16 +136,16 @@ namespace SharpAbp.Abp.IdentityServer.ApiScopes
                 }
             }
 
-            var removeClaimTypes = apiScope.UserClaims.Select(x => x.Type)
-                .Except(input.UserClaims.Select(y => y.Type))
-                .ToList();
-
             foreach (var claimType in removeClaimTypes)
             {
                 apiScope.RemoveClaim(claimType);
             }
 
             //property
+            var removePropertyKeys = apiScope.Properties.Select(x => x.Key)
+                .Except(input.Properties.Select(y => y.Key))
+                .ToList();
+
             foreach (var createProperty in input.Properties)
             {
                 var property = apiScope.FindProperty(createProperty.Key);
@@ -151,9 +155,6 @@ namespace SharpAbp.Abp.IdentityServer.ApiScopes
                 }
             }
 
-            var removePropertyKeys = apiScope.Properties.Select(x => x.Key)
-                .Except(input.Properties.Select(y => y.Key))
-                .ToList();
             foreach (var propertyKey in removePropertyKeys)
             {
                 apiScope.RemoveProperty(propertyKey);

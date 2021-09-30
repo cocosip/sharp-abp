@@ -140,6 +140,10 @@ namespace SharpAbp.Abp.IdentityServer.ApiResources
             //scope 
 
             //user claim
+            var removeClaimTypes = apiResource.UserClaims.Select(x => x.Type)
+                .Except(input.UserClaims.Select(y => y.Type))
+                .ToList();
+
             foreach (var createClaim in input.UserClaims)
             {
                 var apiResourceClaim = apiResource.FindClaim(createClaim.Type);
@@ -149,16 +153,16 @@ namespace SharpAbp.Abp.IdentityServer.ApiResources
                 }
             }
 
-            var removeClaimTypes = apiResource.UserClaims.Select(x => x.Type)
-                .Except(input.UserClaims.Select(y => y.Type))
-                .ToList();
-
             foreach (var claimType in removeClaimTypes)
             {
                 apiResource.RemoveClaim(claimType);
             }
 
             //secret
+            var removeSecrets = apiResource.Secrets.Select(x => (x.Value, x.Type))
+                .Except(input.Secrets.Select(y => (y.Value, y.Type)))
+                .ToList();
+
             foreach (var createSecret in input.Secrets)
             {
                 var secret = apiResource.FindSecret(createSecret.Value, createSecret.Type);
@@ -170,16 +174,16 @@ namespace SharpAbp.Abp.IdentityServer.ApiResources
                 }
             }
 
-            var removeSecrets = apiResource.Secrets.Select(x => (x.Value, x.Type))
-                .Except(input.Secrets.Select(y => (y.Value, y.Type)))
-                .ToList();
-
             foreach (var secret in removeSecrets)
             {
                 apiResource.RemoveSecret(secret.Value, secret.Type);
             }
 
             //properties
+            var removePropertyKeys = apiResource.Properties.Select(x => x.Key)
+                .Except(input.Properties.Select(y => y.Key))
+                .ToList();
+
             foreach (var createProperty in input.Properties)
             {
                 var property = apiResource.FindProperty(createProperty.Key);
@@ -189,9 +193,6 @@ namespace SharpAbp.Abp.IdentityServer.ApiResources
                 }
             }
 
-            var removePropertyKeys = apiResource.Properties.Select(x => x.Key)
-                .Except(input.Properties.Select(y => y.Key))
-                .ToList();
             foreach (var propertyKey in removePropertyKeys)
             {
                 apiResource.RemoveProperty(propertyKey);

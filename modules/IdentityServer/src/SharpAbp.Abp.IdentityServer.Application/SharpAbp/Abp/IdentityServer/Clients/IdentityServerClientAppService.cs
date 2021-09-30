@@ -188,6 +188,10 @@ namespace SharpAbp.Abp.IdentityServer.Clients
 
             //Claims
             var claims = input.Claims.Select(x => new System.Security.Claims.Claim(x.Type, x.Value)).ToList();
+            
+            var removeClaims = client.Claims.Select(x => new System.Security.Claims.Claim(x.Type, x.Value))
+                .Except(claims)
+                .ToList();
 
             foreach (var claim in claims)
             {
@@ -198,16 +202,15 @@ namespace SharpAbp.Abp.IdentityServer.Clients
                 }
             }
 
-            var removeClaims = client.Claims.Select(x => new System.Security.Claims.Claim(x.Type, x.Value))
-                .Except(claims)
-                .ToList();
-
             foreach (var removeClaim in removeClaims)
             {
                 client.RemoveClaim(removeClaim.Value, removeClaim.Type);
             }
 
             //ClientSecrets
+            var removeSecrets = client.ClientSecrets.Select(x => (x.Value, x.Type))
+                .Except(input.ClientSecrets.Select(y => (y.Value, y.Type)))
+                .ToList();
 
             foreach (var clientSecret in input.ClientSecrets)
             {
@@ -219,9 +222,6 @@ namespace SharpAbp.Abp.IdentityServer.Clients
                 }
             }
 
-            var removeSecrets = client.ClientSecrets.Select(x => (x.Value, x.Type))
-                .Except(input.ClientSecrets.Select(y => (y.Value, y.Type)))
-                .ToList();
             foreach (var removeSecret in removeSecrets)
             {
                 client.RemoveSecret(removeSecret.Value, removeSecret.Type);
@@ -248,6 +248,10 @@ namespace SharpAbp.Abp.IdentityServer.Clients
             }
 
             //Properties
+            var removeProperties = client.Properties.Select(x => (x.Key, x.Value))
+                .Except(input.Properties.Select(y => (y.Key, y.Value)))
+                .ToList();
+
             foreach (var property in input.Properties)
             {
                 var clientProperty = client.FindProperty(property.Key, property.Value);
@@ -256,10 +260,6 @@ namespace SharpAbp.Abp.IdentityServer.Clients
                     client.AddProperty(property.Key, property.Value);
                 }
             }
-
-            var removeProperties = client.Properties.Select(x => (x.Key, x.Value))
-                .Except(input.Properties.Select(y => (y.Key, y.Value)))
-                .ToList();
 
             foreach (var removeProperty in removeProperties)
             {

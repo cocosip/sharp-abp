@@ -136,6 +136,10 @@ namespace SharpAbp.Abp.IdentityServer.IdentityResources
             identityResource.ShowInDiscoveryDocument = input.ShowInDiscoveryDocument;
 
             //claim
+            var removeClaimTypes = identityResource.UserClaims.Select(x => x.Type)
+                .Except(input.UserClaims.Select(y => y.Type))
+                .ToList();
+
             foreach (var createClaim in input.UserClaims)
             {
                 var claim = identityResource.FindUserClaim(createClaim.Type);
@@ -145,16 +149,16 @@ namespace SharpAbp.Abp.IdentityServer.IdentityResources
                 }
             }
 
-            var removeClaimTypes = identityResource.UserClaims.Select(x => x.Type)
-                .Except(input.UserClaims.Select(y => y.Type))
-                .ToList();
-
             foreach (var claimType in removeClaimTypes)
             {
                 identityResource.RemoveUserClaim(claimType);
             }
 
             //property
+            var removePropertyKeys = identityResource.Properties.Select(x => x.Key)
+                .Except(input.Properties.Select(y => y.Key))
+                .ToList();
+
             foreach (var createProperty in input.Properties)
             {
                 var property = identityResource.FindProperty(createProperty.Key);
@@ -164,9 +168,6 @@ namespace SharpAbp.Abp.IdentityServer.IdentityResources
                 }
             }
 
-            var removePropertyKeys = identityResource.Properties.Select(x => x.Key)
-                .Except(input.Properties.Select(y => y.Key))
-                .ToList();
             foreach (var propertyKey in removePropertyKeys)
             {
                 identityResource.RemoveProperty(propertyKey);
@@ -185,7 +186,7 @@ namespace SharpAbp.Abp.IdentityServer.IdentityResources
         {
             await IdentityResourceRepository.DeleteAsync(id);
         }
-
+        
         protected virtual async Task CheckNameExistAsync(string name, Guid? expectedId = null)
         {
             if (await IdentityResourceRepository.CheckNameExistAsync(name, expectedId))

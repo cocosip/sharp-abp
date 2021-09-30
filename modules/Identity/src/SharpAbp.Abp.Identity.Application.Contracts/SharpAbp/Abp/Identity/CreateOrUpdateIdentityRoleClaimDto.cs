@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Volo.Abp.Identity;
 using Volo.Abp.Validation;
 
@@ -7,8 +6,8 @@ namespace SharpAbp.Abp.Identity
 {
     public class CreateOrUpdateIdentityRoleClaimDto
     {
-        [Required]
-        public Guid RoleId { get; set; }
+        //[Required]
+        //public Guid? RoleId { get; set; }
 
         [Required]
         [DynamicStringLength(typeof(IdentityRoleClaimConsts), nameof(IdentityRoleClaimConsts.MaxClaimTypeLength))]

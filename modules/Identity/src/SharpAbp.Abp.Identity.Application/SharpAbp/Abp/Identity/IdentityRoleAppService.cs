@@ -60,6 +60,10 @@ namespace SharpAbp.Abp.Identity
 
             var claims = roleClaims.Select(x => new Claim(x.ClaimType, x.Value)).ToList();
 
+            var removeClaims = identityRole.Claims.Select(x => new Claim(x.ClaimType, x.ClaimValue))
+                .Except(claims)
+                .ToList();
+
             foreach (var addClaim in claims)
             {
                 var claim = identityRole.FindClaim(addClaim);
@@ -68,10 +72,6 @@ namespace SharpAbp.Abp.Identity
                     identityRole.AddClaim(GuidGenerator, addClaim);
                 }
             }
-
-            var removeClaims = identityRole.Claims.Select(x => new Claim(x.ClaimType, x.ClaimValue))
-                .Except(claims)
-                .ToList();
 
             foreach (var claim in removeClaims)
             {
