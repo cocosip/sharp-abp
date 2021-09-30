@@ -19,9 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.DbConnectionsM
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.DbConnectionsManagement.MongoDB", "src\SharpAbp.Abp.DbConnectionsManagement.MongoDB\SharpAbp.Abp.DbConnectionsManagement.MongoDB.csproj", "{9CC89DA1-4A27-4220-8221-4DDD6D3CCB02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.DbConnectionsManagement.HttpApi", "src\SharpAbp.Abp.DbConnectionsManagement.HttpApi\SharpAbp.Abp.DbConnectionsManagement.HttpApi.csproj", "{10DC66FF-B108-4B2B-8DA5-19B5E13EBF2B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.DbConnectionsManagement.HttpApi", "src\SharpAbp.Abp.DbConnectionsManagement.HttpApi\SharpAbp.Abp.DbConnectionsManagement.HttpApi.csproj", "{10DC66FF-B108-4B2B-8DA5-19B5E13EBF2B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.DbConnectionsManagement.Tests", "test\SharpAbp.Abp.DbConnectionsManagement.Tests\SharpAbp.Abp.DbConnectionsManagement.Tests.csproj", "{BDBAD9C4-9800-4DD6-9703-0F1B51BE10A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.DbConnectionsManagement.Tests", "test\SharpAbp.Abp.DbConnectionsManagement.Tests\SharpAbp.Abp.DbConnectionsManagement.Tests.csproj", "{BDBAD9C4-9800-4DD6-9703-0F1B51BE10A4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
