@@ -89,7 +89,11 @@ namespace SharpAbp.Abp.Identity
         public virtual async Task<PagedResultDto<IdentityUserDto>> GetListAsync(GetIdentityUsersInput input)
         {
             var count = await UserRepository.GetCountAsync(input.Filter);
-            var list = await UserRepository.GetListAsync(input.Sorting, input.MaxResultCount, input.SkipCount, input.Filter);
+            var list = await UserRepository.GetListAsync(
+                input.Sorting, 
+                input.MaxResultCount, 
+                input.SkipCount, 
+                input.Filter);
 
             return new PagedResultDto<IdentityUserDto>(
                 count,

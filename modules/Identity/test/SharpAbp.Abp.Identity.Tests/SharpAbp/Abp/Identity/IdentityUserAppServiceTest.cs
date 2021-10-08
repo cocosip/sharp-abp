@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Xunit;
 
 namespace SharpAbp.Abp.Identity
@@ -30,6 +26,26 @@ namespace SharpAbp.Abp.Identity
 
             Assert.Equal("zhangsan", user.UserName);
             Assert.Equal("admin1", user.Name);
+
+            var user1 = await _identityUserAppService.FindByEmailAsync("123@qq.com");
+            Assert.Equal("123@qq.com", user1.Email);
+            Assert.Equal("admin1", user1.Name);
+
+            await _identityUserAppService.LockAsync(user1.Id, 30);
+
+            await _identityUserAppService.UnLockAsync(user1.Id);
+
+            await _identityUserAppService.UpdateAsync(user.Id, new NewIdentityUserUpdateDto()
+            {
+                Password = "123Qwe*",
+                LockoutEnabled = false,
+                PhoneNumber = "18688888888",
+                Name = "admin1",
+                UserName = "zhangsan",
+                Email = "123@qq.com",
+            });
+
+            await _identityUserAppService.DeleteAsync(user.Id);
 
         }
 
