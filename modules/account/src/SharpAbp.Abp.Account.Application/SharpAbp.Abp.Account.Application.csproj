@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\..\..\..\common.props" />
+	<Import Project="..\..\..\..\configureawait.props" />
+
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+		<AssemblyName>SharpAbp.Abp.Account.Application</AssemblyName>
+		<PackageId>SharpAbp.Abp.Account.Application</PackageId>
+		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<Description>SharpAbp Account Module</Description>
+		<RootNamespace />
+	</PropertyGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="SharpAbp\Abp\Account\Emailing\Templates\*.tpl" />
+		<None Remove="SharpAbp\Abp\Account\Emailing\Templates\*.tpl" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SharpAbp.Abp.Account.Application.Contracts\SharpAbp.Abp.Account.Application.Contracts.csproj" />
+		<ProjectReference Include="..\..\..\Identity\src\SharpAbp.Abp.Identity.Application\SharpAbp.Abp.Identity.Application.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.UI.Navigation" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.Emailing" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="System.Text.Encodings.Web" Version="$(MicrosoftPackageVersion)" />
+		<PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="$(MicrosoftPackageVersion)" />
+	</ItemGroup>
+
+
+</Project>

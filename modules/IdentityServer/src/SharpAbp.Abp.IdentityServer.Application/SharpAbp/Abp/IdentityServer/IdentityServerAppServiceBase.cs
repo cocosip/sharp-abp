@@ -7,7 +7,7 @@ namespace SharpAbp.Abp.IdentityServer
     {
         protected IdentityServerAppServiceBase()
         {
-            ObjectMapperContext = typeof(AbpIdentityServerApplicationModule);
+            ObjectMapperContext = typeof(IdentityServerApplicationModule);
             LocalizationResource = typeof(IdentityServerResource);
         }
     }

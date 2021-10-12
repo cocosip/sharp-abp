@@ -12,7 +12,7 @@ namespace SharpAbp.Abp.IdentityServer
         typeof(IdentityServerDomainModule),
         typeof(IdentityApplicationModule)
         )]
-    public class AbpIdentityServerApplicationModule : AbpModule
+    public class IdentityServerApplicationModule : AbpModule
     {
 
     }

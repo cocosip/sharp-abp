@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\..\..\..\common.props" />
+	<Import Project="..\..\..\..\configureawait.props" />
+
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+		<AssemblyName>SharpAbp.Abp.Account.HttpApi</AssemblyName>
+		<PackageId>SharpAbp.Abp.Account.HttpApi</PackageId>
+		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<Description>SharpAbp Account Module</Description>
+		<RootNamespace>SharpAbp.Abp.Account.Web</RootNamespace>
+		<IsPackable>true</IsPackable>
+		<OutputType>Library</OutputType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SharpAbp.Abp.Account.Application.Contracts\SharpAbp.Abp.Account.Application.Contracts.csproj" />
+		<ProjectReference Include="..\..\..\Identity\src\SharpAbp.Abp.Identity.HttpApi\SharpAbp.Abp.Identity.HttpApi.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="$(VoloAbpPackageVersion)" />
+	</ItemGroup>
+
+</Project>
