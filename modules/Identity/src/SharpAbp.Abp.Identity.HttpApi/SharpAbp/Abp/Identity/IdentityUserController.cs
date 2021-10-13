@@ -10,14 +10,21 @@ namespace SharpAbp.Abp.Identity
 {
     [RemoteService(Name = IdentityRemoteServiceConsts.RemoteServiceName)]
     [Area("identity")]
+    [ControllerName("User")]
     [Route("api/identity/users")]
     public class IdentityUserController : IdentityController, IIdentityUserAppService
     {
         private readonly IIdentityUserAppService _identityUserAppService;
-        public IdentityUserController(IIdentityUserAppService identityUserAppService)
+        private readonly Volo.Abp.Identity.IIdentityUserAppService _userAppService;
+        public IdentityUserController(
+            IIdentityUserAppService identityUserAppService,
+            Volo.Abp.Identity.IIdentityUserAppService userAppService)
         {
             _identityUserAppService = identityUserAppService;
+            _userAppService = userAppService;
         }
+
+
 
         /// <summary>
         /// Get by id
@@ -261,6 +268,7 @@ namespace SharpAbp.Abp.Identity
         {
             await _identityUserAppService.SetTwoFactorAsync(id, enabled);
         }
+
 
     }
 }
