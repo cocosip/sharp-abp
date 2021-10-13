@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.Account.Localization;
 using SharpAbp.Abp.Account.Web.Pages.Account;
 using SharpAbp.Abp.Account.Web.ProfileManagement;
-using Volo.Abp.Account.Web.Pages.Account;
 using Volo.Abp.AspNetCore.Mvc.Localization;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
@@ -24,18 +23,18 @@ namespace SharpAbp.Abp.Account.Web
         typeof(AbpAspNetCoreMvcUiThemeSharedModule),
         typeof(AbpExceptionHandlingModule)
         )]
-    public class AbpAccountWebModule : AbpModule
+    public class AccountWebModule : AbpModule
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
             context.Services.PreConfigure<AbpMvcDataAnnotationsLocalizationOptions>(options =>
             {
-                options.AddAssemblyResource(typeof(AccountResource), typeof(AbpAccountWebModule).Assembly);
+                options.AddAssemblyResource(typeof(AccountResource), typeof(AccountWebModule).Assembly);
             });
 
             PreConfigure<IMvcBuilder>(mvcBuilder =>
             {
-                mvcBuilder.AddApplicationPartIfNotExists(typeof(AbpAccountWebModule).Assembly);
+                mvcBuilder.AddApplicationPartIfNotExists(typeof(AccountWebModule).Assembly);
             });
         }
 
@@ -43,7 +42,7 @@ namespace SharpAbp.Abp.Account.Web
         {
             Configure<AbpVirtualFileSystemOptions>(options =>
             {
-                options.FileSets.AddEmbedded<AbpAccountWebModule>();
+                options.FileSets.AddEmbedded<AccountWebModule>();
             });
 
             Configure<AbpNavigationOptions>(options =>
@@ -58,7 +57,7 @@ namespace SharpAbp.Abp.Account.Web
 
             ConfigureProfileManagementPage();
 
-            context.Services.AddAutoMapperObjectMapper<AbpAccountWebModule>();
+            context.Services.AddAutoMapperObjectMapper<AccountWebModule>();
             Configure<AbpAutoMapperOptions>(options =>
             {
                 options.AddProfile<AbpAccountWebAutoMapperProfile>(validate: true);

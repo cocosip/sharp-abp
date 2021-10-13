@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 using Volo.Abp.Identity;
 
-namespace Volo.Abp.Account.Web.Pages.Account
+namespace SharpAbp.Abp.Account.Web.Pages.Account
 {
     public class LogoutModel : AccountPageModel
     {

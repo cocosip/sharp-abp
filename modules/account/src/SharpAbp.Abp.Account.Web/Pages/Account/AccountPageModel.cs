@@ -25,7 +25,7 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
         protected AccountPageModel()
         {
             LocalizationResourceType = typeof(AccountResource);
-            ObjectMapperContext = typeof(AbpAccountWebModule);
+            ObjectMapperContext = typeof(AccountWebModule);
         }
 
         protected virtual void CheckCurrentTenant(Guid? tenantId)

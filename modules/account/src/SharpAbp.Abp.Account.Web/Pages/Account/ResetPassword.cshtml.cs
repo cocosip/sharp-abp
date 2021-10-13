@@ -1,12 +1,12 @@
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Volo.Abp.Auditing;
 using Volo.Abp.Identity;
 using Volo.Abp.Validation;
 
-namespace Volo.Abp.Account.Web.Pages.Account
+namespace SharpAbp.Abp.Account.Web.Pages.Account
 {
     //TODO: Implement live password complexity check on the razor view!
     public class ResetPasswordModel : AccountPageModel

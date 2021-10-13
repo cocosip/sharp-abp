@@ -13,7 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Account.Applic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Account.HttpApi", "src\SharpAbp.Abp.Account.HttpApi\SharpAbp.Abp.Account.HttpApi.csproj", "{F6EB6275-429E-4D54-84F7-7CFC6864437B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Account.Web", "src\SharpAbp.Abp.Account.Web\SharpAbp.Abp.Account.Web.csproj", "{A51BA17C-8E71-4164-BA5A-F7B5EFC73145}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Account.Web", "src\SharpAbp.Abp.Account.Web\SharpAbp.Abp.Account.Web.csproj", "{A51BA17C-8E71-4164-BA5A-F7B5EFC73145}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Account.Web.IdentityServer", "src\SharpAbp.Abp.Account.Web.IdentityServer\SharpAbp.Abp.Account.Web.IdentityServer.csproj", "{59A5D222-62D0-446A-AC31-0821F55C562F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Account.Application.Tests", "test\SharpAbp.Abp.Account.Application.Tests\SharpAbp.Abp.Account.Application.Tests.csproj", "{9AF9E1F3-ECC2-4903-8C4B-E90226DFE96D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,6 +77,30 @@ Global
 		{A51BA17C-8E71-4164-BA5A-F7B5EFC73145}.Release|x64.Build.0 = Release|Any CPU
 		{A51BA17C-8E71-4164-BA5A-F7B5EFC73145}.Release|x86.ActiveCfg = Release|Any CPU
 		{A51BA17C-8E71-4164-BA5A-F7B5EFC73145}.Release|x86.Build.0 = Release|Any CPU
+		{59A5D222-62D0-446A-AC31-0821F55C562F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59A5D222-62D0-446A-AC31-0821F55C562F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59A5D222-62D0-446A-AC31-0821F55C562F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{59A5D222-62D0-446A-AC31-0821F55C562F}.Debug|x64.Build.0 = Debug|Any CPU
+		{59A5D222-62D0-446A-AC31-0821F55C562F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{59A5D222-62D0-446A-AC31-0821F55C562F}.Debug|x86.Build.0 = Debug|Any CPU
+		{59A5D222-62D0-446A-AC31-0821F55C562F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59A5D222-62D0-446A-AC31-0821F55C562F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59A5D222-62D0-446A-AC31-0821F55C562F}.Release|x64.ActiveCfg = Release|Any CPU
+		{59A5D222-62D0-446A-AC31-0821F55C562F}.Release|x64.Build.0 = Release|Any CPU
+		{59A5D222-62D0-446A-AC31-0821F55C562F}.Release|x86.ActiveCfg = Release|Any CPU
+		{59A5D222-62D0-446A-AC31-0821F55C562F}.Release|x86.Build.0 = Release|Any CPU
+		{9AF9E1F3-ECC2-4903-8C4B-E90226DFE96D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AF9E1F3-ECC2-4903-8C4B-E90226DFE96D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AF9E1F3-ECC2-4903-8C4B-E90226DFE96D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9AF9E1F3-ECC2-4903-8C4B-E90226DFE96D}.Debug|x64.Build.0 = Debug|Any CPU
+		{9AF9E1F3-ECC2-4903-8C4B-E90226DFE96D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9AF9E1F3-ECC2-4903-8C4B-E90226DFE96D}.Debug|x86.Build.0 = Debug|Any CPU
+		{9AF9E1F3-ECC2-4903-8C4B-E90226DFE96D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AF9E1F3-ECC2-4903-8C4B-E90226DFE96D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AF9E1F3-ECC2-4903-8C4B-E90226DFE96D}.Release|x64.ActiveCfg = Release|Any CPU
+		{9AF9E1F3-ECC2-4903-8C4B-E90226DFE96D}.Release|x64.Build.0 = Release|Any CPU
+		{9AF9E1F3-ECC2-4903-8C4B-E90226DFE96D}.Release|x86.ActiveCfg = Release|Any CPU
+		{9AF9E1F3-ECC2-4903-8C4B-E90226DFE96D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,6 +110,8 @@ Global
 		{298DFDBA-8321-47FA-8ABD-EC39C5AD33C8} = {F366A72E-66AC-46BA-9B84-D4C27BBAAB0A}
 		{F6EB6275-429E-4D54-84F7-7CFC6864437B} = {F366A72E-66AC-46BA-9B84-D4C27BBAAB0A}
 		{A51BA17C-8E71-4164-BA5A-F7B5EFC73145} = {F366A72E-66AC-46BA-9B84-D4C27BBAAB0A}
+		{59A5D222-62D0-446A-AC31-0821F55C562F} = {F366A72E-66AC-46BA-9B84-D4C27BBAAB0A}
+		{9AF9E1F3-ECC2-4903-8C4B-E90226DFE96D} = {B6FF22D7-6AA9-4866-B456-0AEC253153DF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4A83A1A0-B51A-40D7-894B-F9DB60C44444}

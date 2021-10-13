@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
-namespace Volo.Abp.Account.Web.Pages.Account
+namespace SharpAbp.Abp.Account.Web.Pages.Account
 {
     public class AccessDeniedModel : AccountPageModel
     {

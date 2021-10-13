@@ -1,7 +1,7 @@
 ﻿@page
 @using Microsoft.AspNetCore.Mvc.Localization
-@using Volo.Abp.Account.Localization
-@using Volo.Abp.Account.Web.Pages.Account
+@using SharpAbp.Abp.Account.Localization
+@using SharpAbp.Abp.Account.Web.Pages.Account
 @using Volo.Abp.AspNetCore.Mvc.UI.Theming
 @inject IThemeManager ThemeManager
 @inject IHtmlLocalizer<AccountResource> L
@@ -10,7 +10,7 @@
     Layout = ThemeManager.CurrentTheme.GetApplicationLayout();
 }
 @section scripts {
-    <abp-script-bundle name="@typeof(ManageModel).FullName"/>
+    <abp-script-bundle name="@typeof(ManageModel).FullName" />
 }
 
 @if (!Model.ReturnUrl.IsNullOrWhiteSpace())

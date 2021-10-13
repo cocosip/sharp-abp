@@ -1,9 +1,9 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using SharpAbp.Abp.Account.Localization;
 using SharpAbp.Abp.Account.Web.Pages.Account.Components.ProfileManagementGroup.Password;
 using SharpAbp.Abp.Account.Web.Pages.Account.Components.ProfileManagementGroup.PersonalInfo;
+using System.Threading.Tasks;
 using Volo.Abp.Identity;
 using Volo.Abp.Users;
 

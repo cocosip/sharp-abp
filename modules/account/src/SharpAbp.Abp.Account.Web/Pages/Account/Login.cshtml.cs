@@ -51,7 +51,7 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
 
         protected IAuthenticationSchemeProvider SchemeProvider { get; }
         protected AbpAccountOptions AccountOptions { get; }
-        protected IOptions<IdentityOptions> IdentityOptions { get; }
+        //protected IOptions<IdentityOptions> IdentityOptions { get; }
 
         public bool ShowCancelButton { get; set; }
 

@@ -1,4 +1,5 @@
-﻿using Volo.Abp.Emailing;
+﻿using SharpAbp.Abp.Identity;
+using Volo.Abp.Emailing;
 using Volo.Abp.Identity;
 using Volo.Abp.Modularity;
 using Volo.Abp.UI.Navigation;
@@ -9,22 +10,22 @@ namespace SharpAbp.Abp.Account
 {
     [DependsOn(
         typeof(AccountApplicationContractsModule),
-        //typeof(SharpAbp.Abp.Identity.IdentityApplicationModule),
+        typeof(IdentityApplicationModule),
         typeof(AbpUiNavigationModule),
         typeof(AbpEmailingModule)
     )]
-    public class AbpAccountApplicationModule : AbpModule
+    public class AccountApplicationModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             Configure<AbpVirtualFileSystemOptions>(options =>
             {
-                options.FileSets.AddEmbedded<AbpAccountApplicationModule>();
+                options.FileSets.AddEmbedded<AccountApplicationModule>();
             });
 
             Configure<AppUrlOptions>(options =>
             {
-                //options.Applications["MVC"].Urls[AccountUrlNames.PasswordReset] = "Account/ResetPassword";
+                options.Applications["MVC"].Urls[AccountUrlNames.PasswordReset] = "Account/ResetPassword";
             });
         }
     }

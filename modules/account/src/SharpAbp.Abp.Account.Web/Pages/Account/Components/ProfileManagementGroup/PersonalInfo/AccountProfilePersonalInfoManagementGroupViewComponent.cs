@@ -17,7 +17,7 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account.Components.ProfileManagementGro
         {
             _profileAppService = profileAppService;
 
-            ObjectMapperContext = typeof(AbpAccountWebModule);
+            ObjectMapperContext = typeof(AccountWebModule);
         }
 
         public async Task<IViewComponentResult> InvokeAsync()

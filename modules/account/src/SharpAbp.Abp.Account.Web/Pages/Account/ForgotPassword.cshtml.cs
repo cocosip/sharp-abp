@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+using Volo.Abp;
 using Volo.Abp.Identity;
 using Volo.Abp.Validation;
 
-namespace Volo.Abp.Account.Web.Pages.Account
+namespace SharpAbp.Abp.Account.Web.Pages.Account
 {
     public class ForgotPasswordModel : AccountPageModel
     {

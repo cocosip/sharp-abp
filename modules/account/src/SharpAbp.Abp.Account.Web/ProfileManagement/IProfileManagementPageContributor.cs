@@ -1,6 +1,6 @@
-﻿﻿using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
- namespace SharpAbp.Abp.Account.Web.ProfileManagement
+namespace SharpAbp.Abp.Account.Web.ProfileManagement
 {
     public interface IProfileManagementPageContributor
     {

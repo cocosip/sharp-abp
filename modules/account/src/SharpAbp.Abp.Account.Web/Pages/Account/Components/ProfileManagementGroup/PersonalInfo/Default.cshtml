@@ -1,4 +1,4 @@
-﻿@using Volo.Abp.Account.Localization
+﻿@using SharpAbp.Abp.Account.Localization
 @using Volo.Abp.Users
 @using Microsoft.AspNetCore.Mvc.Localization
 @using Volo.Abp.AspNetCore.Mvc.UI.Theming
@@ -8,7 +8,7 @@
 @inject ICurrentUser CurrentUser
 @inject ISettingProvider SettingManager
 @inject IThemeManager ThemeManager
-@model Volo.Abp.Account.Web.Pages.Account.Components.ProfileManagementGroup.PersonalInfo.AccountProfilePersonalInfoManagementGroupViewComponent.PersonalInfoModel
+@model SharpAbp.Abp.Account.Web.Pages.Account.Components.ProfileManagementGroup.PersonalInfo.AccountProfilePersonalInfoManagementGroupViewComponent.PersonalInfoModel
 @{
     var isUserNameUpdateEnabled = string.Equals(await SettingManager.GetOrNullAsync(IdentitySettingNames.User.IsUserNameUpdateEnabled), "true",
         StringComparison.OrdinalIgnoreCase);
