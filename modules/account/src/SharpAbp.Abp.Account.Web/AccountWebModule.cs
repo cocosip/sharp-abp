@@ -60,7 +60,7 @@ namespace SharpAbp.Abp.Account.Web
             context.Services.AddAutoMapperObjectMapper<AccountWebModule>();
             Configure<AbpAutoMapperOptions>(options =>
             {
-                options.AddProfile<AbpAccountWebAutoMapperProfile>(validate: true);
+                options.AddProfile<AbpAccountWebAutoMapperProfile>();
             });
         }
 
