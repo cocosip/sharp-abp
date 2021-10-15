@@ -57,6 +57,7 @@ namespace SharpAbp.Abp.Identity
         }
 
         [HttpDelete]
+        [Route("{id}")]
         public async Task DeleteAsync(Guid id)
         {
             await _roleAppService.DeleteAsync(id);
