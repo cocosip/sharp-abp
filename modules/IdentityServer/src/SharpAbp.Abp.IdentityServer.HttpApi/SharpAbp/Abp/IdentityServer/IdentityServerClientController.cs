@@ -10,7 +10,7 @@ namespace SharpAbp.Abp.IdentityServer
 {
     [RemoteService(Name = IdentityServerRemoteServiceConsts.RemoteServiceName)]
     [Area("identity-server")]
-    [Route("api/identity-server/api-resources")]
+    [Route("api/identity-server/clients")]
     public class IdentityServerClientController : IdentityServerController, IIdentityServerClientAppService
     {
         private readonly IIdentityServerClientAppService _identityServerClientAppService;
