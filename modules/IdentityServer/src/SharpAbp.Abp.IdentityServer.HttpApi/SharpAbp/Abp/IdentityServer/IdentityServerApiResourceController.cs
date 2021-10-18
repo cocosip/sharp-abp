@@ -50,7 +50,7 @@ namespace SharpAbp.Abp.IdentityServer
         /// <param name="scopeNames"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("get-list")]
+        [Route("get-by-scopeNames")]
         public async Task<List<ApiResourceDto>> GetListByScopesAsync(string[] scopeNames)
         {
             return await _identityServerApiResourceAppService.GetListByScopesAsync(scopeNames);
@@ -61,6 +61,7 @@ namespace SharpAbp.Abp.IdentityServer
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [Route("all")]
         public async Task<List<ApiResourceDto>> GetAllAsync()
         {
             return await _identityServerApiResourceAppService.GetAllAsync();
