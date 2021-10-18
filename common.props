@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
-    <Version>1.5.2</Version>
+    <Version>1.5.3</Version>
     <NoWarn>$(NoWarn);CS1591;CS0436</NoWarn>
     <Authors>virtual</Authors>
     <Product>sharp-abp</Product>
