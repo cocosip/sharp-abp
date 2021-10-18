@@ -1,13 +1,18 @@
 {
   "culture": "zh-Hant",
   "texts": {
-    "MapTenancyManagement": "映射租戶管理",
-    "Permission:MapTenancyManagement.MapTenants": "映射租戶管理",
-    "Permission:MapTenancyManagement.MapTenants.Create": "創建映射租戶",
-    "Permission:MapTenancyManagement.MapTenants.Update": "修改映射租戶",
-    "Permission:MapTenancyManagement.MapTenants.Delete": "刪除映射租戶",
-    "MapTenancyManagement.DuplicateTenantId": "重複的租戶 '{0}'.",
-    "MapTenancyManagement.DuplicateCode": "重複的租戶編碼 '{0}'.",
-    "MapTenancyManagement.DuplicateMapCode": "重複的租戶映射編碼 '{0}'."
+    "SharpAbpIdentity": "Identity管理",
+    "Permission:SharpAbpIdentity.IdentityClaimTypes": "IdentityClaimType管理",
+    "Permission:SharpAbpIdentity.IdentityClaimTypes.Create": "創建IdentityClaimType",
+    "Permission:SharpAbpIdentity.IdentityClaimTypes.Update": "修改IdentityClaimType",
+    "Permission:SharpAbpIdentity.IdentityClaimTypes.Delete": "刪除IdentityClaimType",
+    "Permission:SharpAbpIdentity.IdentitySecurityLogs": "IdentitySecurityLog 管理",
+    "Permission:SharpAbpIdentity.IdentitySecurityLogs.Create": "創建Identity安全日誌",
+    "Permission:SharpAbpIdentity.IdentitySecurityLogs.Update": "修改Identity安全日誌",
+    "Permission:SharpAbpIdentity.IdentitySecurityLogs.Delete": "刪除Identity安全日誌",
+    "Permission:SharpAbpIdentity.OrganizationUnits": "組織架構管理",
+    "Permission:SharpAbpIdentity.OrganizationUnits.Create": "創建組織架構",
+    "Permission:SharpAbpIdentity.OrganizationUnits.Update": "修改組織價格",
+    "Permission:SharpAbpIdentity.OrganizationUnits.Delete": "刪除組織架構"
   }
 }

@@ -1,13 +1,18 @@
 {
   "culture": "en",
   "texts": {
-    "MapTenancyManagement": "Map tenancy management",
-    "Permission:MapTenancyManagement.MapTenants": "Map tenancy management",
-    "Permission:MapTenancyManagement.MapTenants.Create": "Create map tenant",
-    "Permission:MapTenancyManagement.MapTenants.Update": "Update map tenant",
-    "Permission:MapTenancyManagement.MapTenants.Delete": "Delete map tenant",
-    "MapTenancyManagement.DuplicateTenantId": "Duplicate tenantId '{0}'.",
-    "MapTenancyManagement.DuplicateCode": "Duplicate code '{0}'.",
-    "MapTenancyManagement.DuplicateMapCode": "Duplicate map code '{0}'."
+    "SharpAbpIdentity": "Identity management",
+    "Permission:SharpAbpIdentity.IdentityClaimTypes": "IdentityClaimType management",
+    "Permission:SharpAbpIdentity.IdentityClaimTypes.Create": "Create IdentityClaimType",
+    "Permission:SharpAbpIdentity.IdentityClaimTypes.Update": "Update IdentityClaimType",
+    "Permission:SharpAbpIdentity.IdentityClaimTypes.Delete": "Delete IdentityClaimType",
+    "Permission:SharpAbpIdentity.IdentitySecurityLogs": "IdentitySecurityLog management",
+    "Permission:SharpAbpIdentity.IdentitySecurityLogs.Create": "Create Identity security log",
+    "Permission:SharpAbpIdentity.IdentitySecurityLogs.Update": "Update Identity security log",
+    "Permission:SharpAbpIdentity.IdentitySecurityLogs.Delete": "Delete Identity security log",
+    "Permission:SharpAbpIdentity.OrganizationUnits": "OrganizationUnit management",
+    "Permission:SharpAbpIdentity.OrganizationUnits.Create": "Create organizationUnit",
+    "Permission:SharpAbpIdentity.OrganizationUnits.Update": "Update organizationUnit",
+    "Permission:SharpAbpIdentity.OrganizationUnits.Delete": "Delete organizationUnit"
   }
 }

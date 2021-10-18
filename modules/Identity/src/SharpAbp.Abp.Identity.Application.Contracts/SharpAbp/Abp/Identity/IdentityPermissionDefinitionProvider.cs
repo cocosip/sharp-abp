@@ -26,6 +26,40 @@ namespace SharpAbp.Abp.Identity
             identityClaimTypePermission.AddChild(
                 IdentityPermissions.IdentityClaimTypes.Delete,
                 L($"Permission:{IdentityPermissions.IdentityClaimTypes.Delete}"));
+
+            //IdentitySecurityLogs
+            var identitySecurityLogsPermission = identityGroup.AddPermission(
+                IdentityPermissions.IdentitySecurityLogs.Default,
+                L($"Permission:{IdentityPermissions.IdentitySecurityLogs.Default}"));
+
+            identitySecurityLogsPermission.AddChild(
+                IdentityPermissions.IdentitySecurityLogs.Create,
+                L($"Permission:{IdentityPermissions.IdentitySecurityLogs.Create}"));
+
+            identitySecurityLogsPermission.AddChild(
+                IdentityPermissions.IdentitySecurityLogs.Update,
+                L($"Permission:{IdentityPermissions.IdentitySecurityLogs.Update}"));
+
+            identitySecurityLogsPermission.AddChild(
+                IdentityPermissions.IdentitySecurityLogs.Delete,
+                L($"Permission:{IdentityPermissions.IdentitySecurityLogs.Delete}"));
+
+            //OrganizationUnits
+            var organizationUnitsPermission = identityGroup.AddPermission(
+                IdentityPermissions.OrganizationUnits.Default,
+                L($"Permission:{IdentityPermissions.OrganizationUnits.Default}"));
+
+            organizationUnitsPermission.AddChild(
+                IdentityPermissions.OrganizationUnits.Create,
+                L($"Permission:{IdentityPermissions.OrganizationUnits.Create}"));
+
+            organizationUnitsPermission.AddChild(
+                IdentityPermissions.OrganizationUnits.Update,
+                L($"Permission:{IdentityPermissions.OrganizationUnits.Update}"));
+
+            organizationUnitsPermission.AddChild(
+                IdentityPermissions.OrganizationUnits.Delete,
+                L($"Permission:{IdentityPermissions.OrganizationUnits.Delete}"));
         }
 
         private static LocalizableString L(string name)
