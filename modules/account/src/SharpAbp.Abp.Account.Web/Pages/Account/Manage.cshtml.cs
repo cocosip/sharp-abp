@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.Account.Web.ProfileManagement;
+using System;
 using System.Threading.Tasks;
 
 namespace SharpAbp.Abp.Account.Web.Pages.Account
@@ -22,7 +23,7 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
 
         public virtual async Task<IActionResult> OnGetAsync()
         {
-            ProfileManagementPageCreationContext = new ProfileManagementPageCreationContext(ServiceProvider);
+            ProfileManagementPageCreationContext = new ProfileManagementPageCreationContext(LazyServiceProvider.LazyGetRequiredService<IServiceProvider>());
 
             foreach (var contributor in Options.Contributors)
             {

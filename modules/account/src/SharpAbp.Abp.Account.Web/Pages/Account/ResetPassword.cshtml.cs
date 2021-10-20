@@ -75,6 +75,10 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
             }
             catch (AbpValidationException e)
             {
+                if (!string.IsNullOrWhiteSpace(e.Message))
+                {
+                    Alerts.Warning(GetLocalizeExceptionMessage(e));
+                }
                 return Page();
             }
 
