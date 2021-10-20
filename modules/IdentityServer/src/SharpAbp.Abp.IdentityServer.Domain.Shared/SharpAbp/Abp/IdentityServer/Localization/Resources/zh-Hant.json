@@ -1,13 +1,25 @@
 {
   "culture": "zh-Hant",
   "texts": {
-    "MapTenancyManagement": "映射租戶管理",
-    "Permission:MapTenancyManagement.MapTenants": "映射租戶管理",
-    "Permission:MapTenancyManagement.MapTenants.Create": "創建映射租戶",
-    "Permission:MapTenancyManagement.MapTenants.Update": "修改映射租戶",
-    "Permission:MapTenancyManagement.MapTenants.Delete": "刪除映射租戶",
-    "MapTenancyManagement.DuplicateTenantId": "重複的租戶 '{0}'.",
-    "MapTenancyManagement.DuplicateCode": "重複的租戶編碼 '{0}'.",
-    "MapTenancyManagement.DuplicateMapCode": "重複的租戶映射編碼 '{0}'."
+    "IdentityServer": "IdentityServer管理",
+    "Permission:IdentityServer.ApiResources": "IdentityServer Api資源管理",
+    "Permission:IdentityServer.ApiResources.Create": "創建 IdentityServer Api資源",
+    "Permission:IdentityServer.ApiResources.Update": "修改 IdentityServer Api資源",
+    "Permission:IdentityServer.ApiResources.Delete": "刪除 IdentityServer Api資源",
+    "Permission:IdentityServer.ApiScopes": "IdentityServer Api範圍",
+    "Permission:IdentityServer.ApiScopes.Create": "創建 IdentityServer Api範圍",
+    "Permission:IdentityServer.ApiScopes.Update": "修改 IdentityServer Api範圍",
+    "Permission:IdentityServer.ApiScopes.Delete": "刪除 IdentityServer Api範圍",
+    "Permission:IdentityServer.IdentityResources": "IdentityServer Identity資源管理",
+    "Permission:IdentityServer.IdentityResources.Create": "創建 IdentityServer Identity資源",
+    "Permission:IdentityServer.IdentityResources.Update": "修改 IdentityServer Identity資源",
+    "Permission:IdentityServer.IdentityResources.Delete": "刪除 IdentityServer Identity資源",
+    "Permission:IdentityServer.Clients": "IdentityServer客戶端管理",
+    "Permission:IdentityServer.Clients.Create": "創建IdentityServer客戶端",
+    "Permission:IdentityServer.Clients.Update": "修改IdentityServer客戶端",
+    "Permission:IdentityServer.Clients.Delete": "刪除IdentityServer客戶端",
+    "IdentityServer.DumplicateApiResourceName": "重複的ApiResource名稱'{0}'.",
+    "IdentityServer.DumplicateIdentityResourceName": "重複的IdentityResource名稱'{0}'.",
+    "IdentityServer.DumplicateApiScopeName": "重複的ApiScope名稱'{0}'."
   }
 }

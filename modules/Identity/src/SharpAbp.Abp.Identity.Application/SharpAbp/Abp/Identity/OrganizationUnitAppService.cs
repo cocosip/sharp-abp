@@ -84,7 +84,7 @@ namespace SharpAbp.Abp.Identity
         /// <param name="parentId"></param>
         /// <returns></returns>
         [Authorize(IdentityPermissions.OrganizationUnits.Default)]
-        public virtual async Task<List<OrganizationUnitDto>> GetChildrenAsync(Guid? parentId = null)
+        public virtual async Task<List<OrganizationUnitDto>> GetChildrenAsync(Guid? parentId)
         {
             var organizationUnits = await OrganizationUnitRepository.GetChildrenAsync(parentId);
             return ObjectMapper.Map<List<OrganizationUnit>, List<OrganizationUnitDto>>(organizationUnits);
@@ -97,7 +97,7 @@ namespace SharpAbp.Abp.Identity
         /// <param name="parentId"></param>
         /// <returns></returns>
         [Authorize(IdentityPermissions.OrganizationUnits.Default)]
-        public virtual async Task<List<OrganizationUnitDto>> GetAllChildrenWithParentCodeAsync(string code, Guid? parentId = null)
+        public virtual async Task<List<OrganizationUnitDto>> GetAllChildrenWithParentCodeAsync(string code, Guid? parentId)
         {
             var organizationUnits = await OrganizationUnitRepository.GetAllChildrenWithParentCodeAsync(code, parentId);
             return ObjectMapper.Map<List<OrganizationUnit>, List<OrganizationUnitDto>>(organizationUnits);
@@ -130,8 +130,8 @@ namespace SharpAbp.Abp.Identity
             var identityRoles = await OrganizationUnitRepository.GetRolesAsync(
                 organizationUnit,
                 input.Sorting,
-                input.SkipCount,
-                input.MaxResultCount);
+                input.MaxResultCount,
+                input.SkipCount);
 
             return new PagedResultDto<IdentityRoleDto>(
               count,
@@ -318,7 +318,7 @@ namespace SharpAbp.Abp.Identity
         /// <param name="userId"></param>
         /// <returns></returns>
         [Authorize(IdentityPermissions.OrganizationUnits.Update)]
-        public virtual async Task RemoveMemberFromOrganizationUnitAsync(Guid id,Guid userId)
+        public virtual async Task RemoveMemberFromOrganizationUnitAsync(Guid id, Guid userId)
         {
             await IdentityUserManager.RemoveFromOrganizationUnitAsync(userId, id);
         }

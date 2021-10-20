@@ -1,13 +1,25 @@
 {
   "culture": "en",
   "texts": {
-    "MapTenancyManagement": "Map tenancy management",
-    "Permission:MapTenancyManagement.MapTenants": "Map tenancy management",
-    "Permission:MapTenancyManagement.MapTenants.Create": "Create map tenant",
-    "Permission:MapTenancyManagement.MapTenants.Update": "Update map tenant",
-    "Permission:MapTenancyManagement.MapTenants.Delete": "Delete map tenant",
-    "MapTenancyManagement.DuplicateTenantId": "Duplicate tenantId '{0}'.",
-    "MapTenancyManagement.DuplicateCode": "Duplicate code '{0}'.",
-    "MapTenancyManagement.DuplicateMapCode": "Duplicate map code '{0}'."
+    "IdentityServer": "IdentityServer management",
+    "Permission:IdentityServer.ApiResources": "IdentityServer Api management",
+    "Permission:IdentityServer.ApiResources.Create": "Create IdentityServer Api resource",
+    "Permission:IdentityServer.ApiResources.Update": "Update IdentityServer Api resource",
+    "Permission:IdentityServer.ApiResources.Delete": "Delete IdentityServer Api resource",
+    "Permission:IdentityServer.ApiScopes": "IdentityServer Api scope",
+    "Permission:IdentityServer.ApiScopes.Create": "Create IdentityServer Api scope",
+    "Permission:IdentityServer.ApiScopes.Update": "Update IdentityServer Api scope",
+    "Permission:IdentityServer.ApiScopes.Delete": "Delete IdentityServer Api scope",
+    "Permission:IdentityServer.IdentityResources": "IdentityServer Identity resource management",
+    "Permission:IdentityServer.IdentityResources.Create": "Create IdentityServer Identity resource",
+    "Permission:IdentityServer.IdentityResources.Update": "Update IdentityServer Identity resource",
+    "Permission:IdentityServer.IdentityResources.Delete": "Delete IdentityServer Identity resource",
+    "Permission:IdentityServer.Clients": "IdentityServer client",
+    "Permission:IdentityServer.Clients.Create": "Create IdentityServer client",
+    "Permission:IdentityServer.Clients.Update": "Update IdentityServer client",
+    "Permission:IdentityServer.Clients.Delete": "Delete IdentityServer client",
+    "IdentityServer.DumplicateApiResourceName": "Dumplicate ApiResource name'{0}'.",
+    "IdentityServer.DumplicateIdentityResourceName": "Dumplicate IdentityResource name'{0}'.",
+    "IdentityServer.DumplicateApiScopeName": "Dumplicate ApiScope name'{0}'."
   }
 }

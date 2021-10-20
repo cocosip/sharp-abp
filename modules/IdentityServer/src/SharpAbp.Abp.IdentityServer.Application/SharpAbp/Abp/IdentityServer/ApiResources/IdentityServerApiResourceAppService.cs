@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.IdentityServer.ApiResources;
+using Volo.Abp.IdentityServer.ApiScopes;
 
 namespace SharpAbp.Abp.IdentityServer.ApiResources
 {
@@ -13,10 +14,13 @@ namespace SharpAbp.Abp.IdentityServer.ApiResources
     public class IdentityServerApiResourceAppService : IdentityServerAppServiceBase, IIdentityServerApiResourceAppService
     {
         protected IApiResourceRepository ApiResourceRepository { get; }
+        protected IApiScopeRepository ApiScopeRepository { get; }
         public IdentityServerApiResourceAppService(
-            IApiResourceRepository apiResourceRepository)
+            IApiResourceRepository apiResourceRepository,
+            IApiScopeRepository apiScopeRepository)
         {
             ApiResourceRepository = apiResourceRepository;
+            ApiScopeRepository = apiScopeRepository;
         }
 
         /// <summary>
@@ -108,8 +112,12 @@ namespace SharpAbp.Abp.IdentityServer.ApiResources
                 AllowedAccessTokenSigningAlgorithms = input.AllowedAccessTokenSigningAlgorithms
             };
 
-            //Add self
-            apiResource.AddScope(input.Name);
+            var scopes = await ApiScopeRepository.GetListAsync();
+            var scope = scopes.FirstOrDefault();
+            if (scope != null)
+            {
+                apiResource.AddScope(scope.Name);
+            }
 
             foreach (var userClaim in input.UserClaims)
             {
@@ -137,7 +145,14 @@ namespace SharpAbp.Abp.IdentityServer.ApiResources
             apiResource.Enabled = input.Enabled;
             apiResource.AllowedAccessTokenSigningAlgorithms = input.AllowedAccessTokenSigningAlgorithms;
 
-            //scope 
+            //scope
+            if (input.Scopes.Any())
+            {
+                apiResource.RemoveAllScopes();
+
+                var currentScope = input.Scopes.FirstOrDefault();
+                apiResource.AddScope(currentScope.Scope);
+            }
 
             //user claim
             var removeClaimTypes = apiResource.UserClaims.Select(x => x.Type)
