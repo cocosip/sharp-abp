@@ -1,4 +1,7 @@
-﻿using Volo.Abp.Account;
+﻿using SharpAbp.Abp.Account;
+using SharpAbp.Abp.Identity;
+using SharpAbp.Abp.IdentityServer;
+using Volo.Abp.Account;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity;
@@ -12,8 +15,11 @@ namespace IdentitySample
     [DependsOn(
         typeof(IdentitySampleDomainModule),
         typeof(AbpAccountApplicationModule),
+        typeof(AccountApplicationModule),
         typeof(IdentitySampleApplicationContractsModule),
         typeof(AbpIdentityApplicationModule),
+        typeof(IdentityApplicationModule),
+        typeof(IdentityServerApplicationModule),
         typeof(AbpPermissionManagementApplicationModule),
         typeof(AbpTenantManagementApplicationModule),
         typeof(AbpFeatureManagementApplicationModule),

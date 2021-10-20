@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\IdentitySample.Domain\IdentitySample.Domain.csproj" />
-    <PackageReference Include="Volo.Abp.EntityFrameworkCore.SqlServer" Version="$(VoloAbpPackageVersion)" />
+    <PackageReference Include="Volo.Abp.EntityFrameworkCore.PostgreSql" Version="$(VoloAbpPackageVersion)" />
     <PackageReference Include="Volo.Abp.PermissionManagement.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
     <PackageReference Include="Volo.Abp.SettingManagement.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
     <PackageReference Include="Volo.Abp.Identity.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />

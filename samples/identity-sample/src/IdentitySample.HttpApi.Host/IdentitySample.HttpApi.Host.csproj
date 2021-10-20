@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <Import Project="..\..\common.props" />
 
@@ -18,13 +18,13 @@
     <PackageReference Include="Volo.Abp.AspNetCore.Authentication.JwtBearer" Version="$(VoloAbpPackageVersion)" />
     <PackageReference Include="Volo.Abp.AspNetCore.Serilog" Version="$(VoloAbpPackageVersion)" />
     <PackageReference Include="Volo.Abp.Swashbuckle" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.Account.Web.IdentityServer" Version="$(VoloAbpPackageVersion)" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\IdentitySample.Application\IdentitySample.Application.csproj" />
     <ProjectReference Include="..\IdentitySample.EntityFrameworkCore\IdentitySample.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\IdentitySample.HttpApi\IdentitySample.HttpApi.csproj" />
+    <ProjectReference Include="..\..\..\..\modules\account\src\SharpAbp.Abp.Account.Web.IdentityServer\SharpAbp.Abp.Account.Web.IdentityServer.csproj" />
   </ItemGroup>
 
   <ItemGroup>

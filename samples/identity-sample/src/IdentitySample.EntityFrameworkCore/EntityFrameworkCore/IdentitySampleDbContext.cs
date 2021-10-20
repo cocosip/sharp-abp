@@ -73,6 +73,7 @@ namespace IdentitySample.EntityFrameworkCore
             builder.ConfigureFeatureManagement();
             builder.ConfigureTenantManagement();
 
+
             /* Configure your own tables/entities inside here */
 
             //builder.Entity<YourEntity>(b =>

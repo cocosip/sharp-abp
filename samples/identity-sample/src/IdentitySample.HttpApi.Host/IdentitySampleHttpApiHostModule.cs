@@ -14,7 +14,7 @@ using Volo.Abp.AspNetCore.Mvc.UI.Theme.Basic;
 using Microsoft.OpenApi.Models;
 using Volo.Abp;
 using Volo.Abp.Account;
-using Volo.Abp.Account.Web;
+using SharpAbp.Abp.Account.Web;
 using Volo.Abp.AspNetCore.Authentication.JwtBearer;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc;
@@ -39,7 +39,7 @@ namespace IdentitySample
         typeof(IdentitySampleEntityFrameworkCoreModule),
         typeof(AbpAspNetCoreMvcUiBasicThemeModule),
         typeof(AbpAspNetCoreAuthenticationJwtBearerModule),
-        typeof(AbpAccountWebIdentityServerModule),
+        typeof(AccountWebIdentityServerModule),
         typeof(AbpAspNetCoreSerilogModule),
         typeof(AbpSwashbuckleModule)
     )]

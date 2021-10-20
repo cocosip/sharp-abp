@@ -16,7 +16,7 @@ namespace IdentitySample.EntityFrameworkCore
             var configuration = BuildConfiguration();
 
             var builder = new DbContextOptionsBuilder<IdentitySampleDbContext>()
-                .UseSqlServer(configuration.GetConnectionString("Default"));
+                .UseNpgsql(configuration.GetConnectionString("Default"));
 
             return new IdentitySampleDbContext(builder.Options);
         }

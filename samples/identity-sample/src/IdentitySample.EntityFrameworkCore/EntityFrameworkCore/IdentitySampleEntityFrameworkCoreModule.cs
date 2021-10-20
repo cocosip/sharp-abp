@@ -2,7 +2,7 @@
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
-using Volo.Abp.EntityFrameworkCore.SqlServer;
+using Volo.Abp.EntityFrameworkCore.PostgreSql;
 using Volo.Abp.FeatureManagement.EntityFrameworkCore;
 using Volo.Abp.Identity.EntityFrameworkCore;
 using Volo.Abp.IdentityServer.EntityFrameworkCore;
@@ -19,7 +19,7 @@ namespace IdentitySample.EntityFrameworkCore
         typeof(AbpIdentityServerEntityFrameworkCoreModule),
         typeof(AbpPermissionManagementEntityFrameworkCoreModule),
         typeof(AbpSettingManagementEntityFrameworkCoreModule),
-        typeof(AbpEntityFrameworkCoreSqlServerModule),
+        typeof(AbpEntityFrameworkCorePostgreSqlModule),
         typeof(AbpBackgroundJobsEntityFrameworkCoreModule),
         typeof(AbpAuditLoggingEntityFrameworkCoreModule),
         typeof(AbpTenantManagementEntityFrameworkCoreModule),
@@ -45,7 +45,7 @@ namespace IdentitySample.EntityFrameworkCore
             {
                 /* The main point to change your DBMS.
                  * See also IdentitySampleMigrationsDbContextFactory for EF Core tooling. */
-                options.UseSqlServer();
+                options.UseNpgsql();
             });
         }
     }
