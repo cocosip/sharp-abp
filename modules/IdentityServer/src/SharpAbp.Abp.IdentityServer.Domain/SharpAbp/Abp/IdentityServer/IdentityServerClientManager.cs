@@ -24,7 +24,7 @@ namespace SharpAbp.Abp.IdentityServer
         {
             Check.NotNullOrWhiteSpace(clientId, nameof(clientId));
             var client = await ClientRepository.FindByClientIdAsync(clientId, false, default);
-            if (client == null)
+            if (client != null)
             {
                 throw new AbpException($"Dumplicate clientId {clientId}.");
             }

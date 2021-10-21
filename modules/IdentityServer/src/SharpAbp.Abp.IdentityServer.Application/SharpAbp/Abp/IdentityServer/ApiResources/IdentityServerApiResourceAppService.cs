@@ -113,6 +113,7 @@ namespace SharpAbp.Abp.IdentityServer.ApiResources
                 input.Description)
             {
                 Enabled = input.Enabled,
+                ShowInDiscoveryDocument = input.ShowInDiscoveryDocument,
                 AllowedAccessTokenSigningAlgorithms = input.AllowedAccessTokenSigningAlgorithms
             };
 
@@ -147,6 +148,7 @@ namespace SharpAbp.Abp.IdentityServer.ApiResources
             apiResource.DisplayName = input.DisplayName;
             apiResource.Description = input.Description;
             apiResource.Enabled = input.Enabled;
+            apiResource.ShowInDiscoveryDocument = input.ShowInDiscoveryDocument;
             apiResource.AllowedAccessTokenSigningAlgorithms = input.AllowedAccessTokenSigningAlgorithms;
 
             //scope
