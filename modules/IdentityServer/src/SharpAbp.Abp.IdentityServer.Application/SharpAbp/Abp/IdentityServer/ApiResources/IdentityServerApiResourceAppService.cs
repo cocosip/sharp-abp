@@ -88,6 +88,10 @@ namespace SharpAbp.Abp.IdentityServer.ApiResources
         [Authorize(IdentityServerPermissions.ApiResources.Default)]
         public virtual async Task<List<ApiResourceDto>> GetListByScopesAsync(string[] scopeNames)
         {
+            if (scopeNames == null)
+            {
+                scopeNames = new string[] { };
+            }
             var apiResources = await ApiResourceRepository.GetListByScopesAsync(scopeNames);
             return ObjectMapper.Map<List<ApiResource>, List<ApiResourceDto>>(apiResources);
         }

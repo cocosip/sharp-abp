@@ -82,6 +82,10 @@ namespace SharpAbp.Abp.IdentityServer.IdentityResources
         [Authorize(IdentityServerPermissions.IdentityResources.Default)]
         public virtual async Task<List<IdentityResourceDto>> GetListByScopeNameAsync(string[] scopeNames)
         {
+            if (scopeNames == null)
+            {
+                scopeNames = new string[] { };
+            }
             var identityResources = await IdentityResourceRepository.GetListByScopeNameAsync(scopeNames);
             return ObjectMapper.Map<List<IdentityResource>, List<IdentityResourceDto>>(identityResources);
         }
@@ -186,7 +190,7 @@ namespace SharpAbp.Abp.IdentityServer.IdentityResources
         {
             await IdentityResourceRepository.DeleteAsync(id);
         }
-        
+
         protected virtual async Task CheckNameExistAsync(string name, Guid? expectedId = null)
         {
             if (await IdentityResourceRepository.CheckNameExistAsync(name, expectedId))
