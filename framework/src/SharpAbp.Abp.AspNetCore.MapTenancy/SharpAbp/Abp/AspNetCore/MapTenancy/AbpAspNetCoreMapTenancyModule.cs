@@ -5,7 +5,8 @@ using Volo.Abp.MultiTenancy;
 namespace SharpAbp.Abp.AspNetCore.MapTenancy
 {
     [DependsOn(
-        typeof(AbpAspNetCoreMultiTenancyModule)
+        typeof(AbpAspNetCoreMultiTenancyModule),
+        typeof(SharpAbpAspNetCoreModule)
         )]
     public class AbpAspNetCoreMapTenancyModule : AbpModule
     {

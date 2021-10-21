@@ -18,6 +18,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SharpAbp.Abp.AspNetCore\SharpAbp.Abp.AspNetCore.csproj" />
     <ProjectReference Include="..\SharpAbp.Abp.MapTenancy\SharpAbp.Abp.MapTenancy.csproj" />
   </ItemGroup>
 
