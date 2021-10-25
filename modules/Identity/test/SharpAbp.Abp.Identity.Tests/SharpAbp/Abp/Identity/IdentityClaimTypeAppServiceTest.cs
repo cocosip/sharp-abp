@@ -39,12 +39,15 @@ namespace SharpAbp.Abp.Identity
             Assert.False(queryClaimType1.Required);
             Assert.False(queryClaimType1.IsStatic);
             Assert.Equal(Volo.Abp.Identity.IdentityClaimValueType.Int, queryClaimType1.ValueType);
+            Assert.Equal("Int", queryClaimType1.ValueTypeAsString);
+
 
             var queryClaimType2 = await _identityClaimTypeAppService.GetAsync(claimTypeId2);
             Assert.Equal("username", queryClaimType2.Name);
             Assert.True(queryClaimType2.Required);
             Assert.True(queryClaimType2.IsStatic);
             Assert.Equal(Volo.Abp.Identity.IdentityClaimValueType.String, queryClaimType2.ValueType);
+            Assert.Equal("String", queryClaimType2.ValueTypeAsString);
 
             var claimTypePagedResult = await _identityClaimTypeAppService.GetPagedListAsync(new IdentityClaimTypePagedRequestDto());
 
@@ -64,6 +67,7 @@ namespace SharpAbp.Abp.Identity
             Assert.True(queryClaimType3.Required);
             Assert.False(queryClaimType3.IsStatic);
             Assert.Equal(Volo.Abp.Identity.IdentityClaimValueType.Int, queryClaimType3.ValueType);
+            Assert.Equal("Int", queryClaimType3.ValueTypeAsString);
 
             await _identityClaimTypeAppService.DeleteAsync(claimTypeId1);
 

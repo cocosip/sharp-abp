@@ -20,5 +20,6 @@ namespace SharpAbp.Abp.Identity
 
         public IdentityClaimValueType ValueType { get; set; }
 
+        public string ValueTypeAsString { get; set; }
     }
 }

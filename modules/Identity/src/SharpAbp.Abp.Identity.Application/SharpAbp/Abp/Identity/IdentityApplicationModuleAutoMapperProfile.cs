@@ -7,7 +7,8 @@ namespace SharpAbp.Abp.Identity
     {
         public IdentityApplicationModuleAutoMapperProfile()
         {
-            CreateMap<IdentityClaimType, IdentityClaimTypeDto>();
+            CreateMap<IdentityClaimType, IdentityClaimTypeDto>()
+                .ForMember(t => t.ValueTypeAsString, s => s.MapFrom(x => x.ValueType.ToString()));
             CreateMap<IdentityRoleClaim, IdentityRoleClaimDto>();
             CreateMap<IdentitySecurityLog, IdentitySecurityLogDto>();
             CreateMap<OrganizationUnit, OrganizationUnitDto>();
