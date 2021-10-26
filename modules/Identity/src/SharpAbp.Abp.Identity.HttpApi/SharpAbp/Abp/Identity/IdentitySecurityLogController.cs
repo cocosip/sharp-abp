@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using Volo.Abp;
@@ -26,7 +27,7 @@ namespace SharpAbp.Abp.Identity
         }
 
         [HttpGet]
-        public async Task<PagedResultDto<IdentitySecurityLogDto>> GetPagedListAsync(IdentitySecurityLogPagedRequestDto input)
+        public async Task<PagedResultDto<IdentitySecurityLogDto>> GetPagedListAsync([FromQuery] IdentitySecurityLogPagedRequestDto input)
         {
             return await _identitySecurityLogAppService.GetPagedListAsync(input);
         }
@@ -42,7 +43,7 @@ namespace SharpAbp.Abp.Identity
         [Route("my")]
         public async Task<PagedResultDto<IdentitySecurityLogDto>> GetMyListAsync(IdentitySecurityLogPagedRequestDto input)
         {
-            input.UserId=CurrentTenant.Id;
+            input.UserId = CurrentTenant.Id;
             return await _identitySecurityLogAppService.GetPagedListAsync(input);
         }
 

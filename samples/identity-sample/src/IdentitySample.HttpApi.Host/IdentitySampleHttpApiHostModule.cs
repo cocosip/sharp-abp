@@ -58,6 +58,7 @@ namespace IdentitySample
             ConfigureVirtualFileSystem(context);
             ConfigureCors(context, configuration);
             ConfigureSwaggerServices(context, configuration);
+
         }
 
         private void ConfigureBundles()

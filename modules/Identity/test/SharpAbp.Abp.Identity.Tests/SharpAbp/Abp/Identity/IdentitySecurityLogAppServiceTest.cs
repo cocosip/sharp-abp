@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Volo.Abp.Identity;
 using Volo.Abp.SecurityLog;
 using Xunit;
 
@@ -10,36 +11,55 @@ namespace SharpAbp.Abp.Identity
     {
         private readonly ISecurityLogStore _securityLogStore;
         private readonly IIdentitySecurityLogAppService _identitySecurityLogAppService;
+        private readonly IdentitySecurityLogManager _identitySecurityLogManager;
         public IdentitySecurityLogAppServiceTest()
         {
             _securityLogStore = GetRequiredService<ISecurityLogStore>();
             _identitySecurityLogAppService = GetRequiredService<IIdentitySecurityLogAppService>();
+            _identitySecurityLogManager = GetRequiredService<IdentitySecurityLogManager>();
         }
 
         [Fact]
         public async Task SecurityLog_Crud_TestAsync()
         {
 
-            var securityLog1 = new SecurityLogInfo()
+            //var securityLog1 = new SecurityLogInfo()
+            //{
+            //    ApplicationName = "app1",
+            //    Identity = "123",
+            //    Action = "CreateUser",
+            //    UserId = null,
+            //    UserName = "",
+            //};
+
+            //var securityLog2 = new SecurityLogInfo()
+            //{
+            //    ApplicationName = "app1",
+            //    Identity = "456",
+            //    Action = "UpdateUser",
+            //    UserId = Guid.NewGuid(),
+            //    UserName = "",
+            //};
+
+            //await _securityLogStore.SaveAsync(securityLog1);
+            //await _securityLogStore.SaveAsync(securityLog2);
+
+            await _identitySecurityLogManager.SaveAsync(new IdentitySecurityLogContext()
             {
-                ApplicationName = "app1",
+                ClientId = "app1",
                 Identity = "123",
+                UserName = "zhangsan",
                 Action = "CreateUser",
-                UserId = null,
-                UserName = "",
-            };
+            });
 
-            var securityLog2 = new SecurityLogInfo()
+            await _identitySecurityLogManager.SaveAsync(new IdentitySecurityLogContext()
             {
-                ApplicationName = "app1",
-                Identity = "456",
-                Action = "UpdateUser",
-                UserId = Guid.NewGuid(),
-                UserName = "",
-            };
+                ClientId = "app1",
+                Identity = "123",
+                UserName = "lisi",
+                Action = "DeleteUser",
+            });
 
-            await _securityLogStore.SaveAsync(securityLog1);
-            await _securityLogStore.SaveAsync(securityLog2);
 
             var pagedSecurityLog = await _identitySecurityLogAppService.GetPagedListAsync(new IdentitySecurityLogPagedRequestDto());
 
