@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -53,12 +55,12 @@ namespace SharpAbp.Abp.Identity
             roleClaims.Add(new CreateOrUpdateIdentityRoleClaimDto()
             {
                 ClaimType = "profile",
-                Value = "zs",
+                ClaimValue = "zs",
             });
             roleClaims.Add(new CreateOrUpdateIdentityRoleClaimDto()
             {
                 ClaimType = "name",
-                Value = "n",
+                ClaimValue = "n",
             });
 
             await _identityRoleAppService.CreateOrUpdateClaimsAsync(role1.Id, roleClaims);
@@ -70,9 +72,28 @@ namespace SharpAbp.Abp.Identity
 
             var roleClaims3 = await _identityRoleAppService.GetClaimsAsync(role1.Id);
             Assert.Empty(roleClaims3);
-        
         }
 
+        [Fact]
+        public void ClaimValueCompare_Test()
+        {
 
+            var claims = new List<Claim>
+            {
+                new Claim("name", "zhangsan"),
+                new Claim("sub", "123"),
+                new Claim("phonenumber", "15868702111")
+            };
+
+            var claims2 = new List<Claim>
+            {
+                new Claim("name", "zhangsan"),
+                new Claim("sub", "1234")
+            };
+
+            var claims3 = claims.Except(claims2, new ClaimEqualityComparer()).ToList();
+
+            Assert.Equal(2, claims3.Count);
+        }
     }
 }

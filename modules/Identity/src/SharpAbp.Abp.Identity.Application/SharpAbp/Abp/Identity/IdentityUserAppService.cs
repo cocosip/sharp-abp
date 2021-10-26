@@ -90,9 +90,9 @@ namespace SharpAbp.Abp.Identity
         {
             var count = await UserRepository.GetCountAsync(input.Filter);
             var list = await UserRepository.GetListAsync(
-                input.Sorting, 
-                input.MaxResultCount, 
-                input.SkipCount, 
+                input.Sorting,
+                input.MaxResultCount,
+                input.SkipCount,
                 input.Filter);
 
             return new PagedResultDto<IdentityUserDto>(
@@ -298,6 +298,10 @@ namespace SharpAbp.Abp.Identity
 
             var claims = identityUserClaims.Select(x => new Claim(x.ClaimType, x.ClaimValue)).ToList();
 
+            var removeClaims = user.Claims.Select(x => new Claim(x.ClaimType, x.ClaimValue))
+                .Except(claims, new ClaimEqualityComparer())
+                .ToList();
+
             foreach (var addClaim in claims)
             {
                 var claim = user.FindClaim(addClaim);
@@ -307,9 +311,6 @@ namespace SharpAbp.Abp.Identity
                 }
             }
 
-            var removeClaims = user.Claims.Select(x => new Claim(x.ClaimType, x.ClaimValue))
-             .Except(claims)
-             .ToList();
             user.RemoveClaims(removeClaims);
 
             await UserRepository.UpdateAsync(user);

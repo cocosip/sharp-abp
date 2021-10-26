@@ -15,6 +15,6 @@ namespace SharpAbp.Abp.Identity
 
         [Required]
         [DynamicStringLength(typeof(IdentityRoleClaimConsts), nameof(IdentityRoleClaimConsts.MaxClaimValueLength))]
-        public string Value { get; set; }
+        public string ClaimValue { get; set; }
     }
 }

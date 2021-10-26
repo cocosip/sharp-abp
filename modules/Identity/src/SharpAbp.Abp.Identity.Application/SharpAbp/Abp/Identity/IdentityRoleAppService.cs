@@ -58,10 +58,10 @@ namespace SharpAbp.Abp.Identity
         {
             var identityRole = await IdentityRoleRepository.GetAsync(id);
 
-            var claims = roleClaims.Select(x => new Claim(x.ClaimType, x.Value)).ToList();
+            var claims = roleClaims.Select(x => new Claim(x.ClaimType, x.ClaimValue)).ToList();
 
             var removeClaims = identityRole.Claims.Select(x => new Claim(x.ClaimType, x.ClaimValue))
-                .Except(claims)
+                .Except(claims,new ClaimEqualityComparer())
                 .ToList();
 
             foreach (var addClaim in claims)
