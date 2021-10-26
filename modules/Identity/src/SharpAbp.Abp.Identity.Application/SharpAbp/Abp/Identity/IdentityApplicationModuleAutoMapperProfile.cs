@@ -9,6 +9,8 @@ namespace SharpAbp.Abp.Identity
         {
             CreateMap<IdentityClaimType, IdentityClaimTypeDto>()
                 .ForMember(t => t.ValueTypeAsString, s => s.MapFrom(x => x.ValueType.ToString()));
+
+            CreateMap<IdentityUserClaim, IdentityUserClaimDto>();
             CreateMap<IdentityRoleClaim, IdentityRoleClaimDto>();
             CreateMap<IdentitySecurityLog, IdentitySecurityLogDto>();
             CreateMap<OrganizationUnit, OrganizationUnitDto>();
