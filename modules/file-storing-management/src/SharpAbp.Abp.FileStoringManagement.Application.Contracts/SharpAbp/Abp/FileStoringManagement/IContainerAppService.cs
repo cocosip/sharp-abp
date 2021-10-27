@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
@@ -27,6 +28,12 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="input"></param>
         /// <returns></returns>
         Task<PagedResultDto<ContainerDto>> GetPagedListAsync(FileStoringContainerPagedRequestDto input);
+
+        /// <summary>
+        /// Get all containers
+        /// </summary>
+        /// <returns></returns>
+        Task<List<ContainerDto>> GetAllAsync();
 
         /// <summary>
         /// Create container

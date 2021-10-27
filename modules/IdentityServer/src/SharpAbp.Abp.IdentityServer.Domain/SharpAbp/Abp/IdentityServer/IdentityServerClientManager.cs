@@ -26,7 +26,7 @@ namespace SharpAbp.Abp.IdentityServer
             var client = await ClientRepository.FindByClientIdAsync(clientId, false, default);
             if (client != null)
             {
-                throw new AbpException($"Dumplicate clientId {clientId}.");
+                throw new UserFriendlyException($"Dumplicate clientId {clientId}.");
             }
         }
     }

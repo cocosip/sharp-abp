@@ -73,6 +73,18 @@ namespace SharpAbp.Abp.FileStoringManagement
         }
 
         /// <summary>
+        /// Get all containers
+        /// </summary>
+        /// <returns></returns>
+        [Authorize(FileStoringManagementPermissions.Containers.Default)]
+        public virtual async Task<List<ContainerDto>> GetAllAsync()
+        {
+            var containers = await ContainerRepository.GetListAsync(false, default);
+            return ObjectMapper.Map<List<FileStoringContainer>, List<ContainerDto>>(containers);
+        }
+
+
+        /// <summary>
         /// Create container
         /// </summary>
         /// <param name="input"></param>

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
@@ -31,6 +32,13 @@ namespace SharpAbp.Abp.FileStoringManagement
         }
 
         [HttpGet]
+        [Route("all")]
+        public async Task<List<ContainerDto>> GetAllAsync()
+        {
+            return await _containerAppService.GetAllAsync();
+        }
+
+        [HttpGet]
         [Route("find-by-name/{name}")]
         public async Task<ContainerDto> FindByNameAsync(string name)
         {
@@ -56,5 +64,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         {
             await _containerAppService.DeleteAsync(id);
         }
+
+       
     }
 }
