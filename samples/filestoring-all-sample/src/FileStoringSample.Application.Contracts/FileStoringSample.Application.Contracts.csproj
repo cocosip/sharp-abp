@@ -1,24 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\common.props" />
+	<Import Project="..\..\common.props" />
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>FileStoringSample</RootNamespace>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<RootNamespace>FileStoringSample</RootNamespace>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\FileStoringSample.Domain.Shared\FileStoringSample.Domain.Shared.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\FileStoringSample.Domain.Shared\FileStoringSample.Domain.Shared.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Volo.Abp.ObjectExtending" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.Account.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.Identity.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.PermissionManagement.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.TenantManagement.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.FeatureManagement.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.SettingManagement.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.ObjectExtending" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.Account.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.Identity.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.PermissionManagement.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.TenantManagement.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.FeatureManagement.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.SettingManagement.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\..\modules\file-storing-management\src\SharpAbp.Abp.FileStoringManagement.Application.Contracts\SharpAbp.Abp.FileStoringManagement.Application.Contracts.csproj" />
+	</ItemGroup>
 
 </Project>

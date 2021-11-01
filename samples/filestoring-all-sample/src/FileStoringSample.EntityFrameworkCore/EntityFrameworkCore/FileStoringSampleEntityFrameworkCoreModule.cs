@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
@@ -15,6 +16,7 @@ namespace FileStoringSample.EntityFrameworkCore
 {
     [DependsOn(
         typeof(FileStoringSampleDomainModule),
+        typeof(FileStoringManagementEntityFrameworkCoreModule),
         typeof(AbpIdentityEntityFrameworkCoreModule),
         typeof(AbpIdentityServerEntityFrameworkCoreModule),
         typeof(AbpPermissionManagementEntityFrameworkCoreModule),

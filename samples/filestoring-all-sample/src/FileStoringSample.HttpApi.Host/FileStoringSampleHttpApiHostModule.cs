@@ -39,12 +39,6 @@ namespace FileStoringSample
 {
     [DependsOn(
         typeof(FileStoringSampleHttpApiModule),
-        typeof(AbpFileStoringAliyunModule),
-        typeof(AbpFileStoringAzureModule),
-        typeof(AbpFileStoringFastDFSModule),
-        typeof(AbpFileStoringFileSystemModule),
-        typeof(AbpFileStoringMinioModule),
-        typeof(AbpFileStoringS3Module),
         typeof(AbpAutofacModule),
         typeof(AbpAspNetCoreMultiTenancyModule),
         typeof(FileStoringSampleApplicationModule),
@@ -61,6 +55,8 @@ namespace FileStoringSample
         {
             var configuration = context.Services.GetConfiguration();
             var hostingEnvironment = context.Services.GetHostingEnvironment();
+
+            context.Services.AddAlwaysAllowAuthorization();
 
             ConfigureBundles();
             ConfigureUrls(configuration);
@@ -153,7 +149,7 @@ namespace FileStoringSample
                 },
                 options =>
                 {
-                    options.SwaggerDoc("v1", new OpenApiInfo {Title = "FileStoringSample API", Version = "v1"});
+                    options.SwaggerDoc("v1", new OpenApiInfo { Title = "FileStoringSample API", Version = "v1" });
                     options.DocInclusionPredicate((docName, description) => true);
                     options.CustomSchemaIds(type => type.FullName);
                 });
@@ -187,21 +183,21 @@ namespace FileStoringSample
         {
             context.Services.AddCors(options =>
             {
-                options.AddDefaultPolicy( builder =>
-                {
-                    builder
-                        .WithOrigins(
-                            configuration["App:CorsOrigins"]
-                                .Split(",", StringSplitOptions.RemoveEmptyEntries)
-                                .Select(o => o.RemovePostFix("/"))
-                                .ToArray()
-                        )
-                        .WithAbpExposedHeaders()
-                        .SetIsOriginAllowedToAllowWildcardSubdomains()
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials();
-                });
+                options.AddDefaultPolicy(builder =>
+               {
+                   builder
+                       .WithOrigins(
+                           configuration["App:CorsOrigins"]
+                               .Split(",", StringSplitOptions.RemoveEmptyEntries)
+                               .Select(o => o.RemovePostFix("/"))
+                               .ToArray()
+                       )
+                       .WithAbpExposedHeaders()
+                       .SetIsOriginAllowedToAllowWildcardSubdomains()
+                       .AllowAnyHeader()
+                       .AllowAnyMethod()
+                       .AllowCredentials();
+               });
             });
         }
 

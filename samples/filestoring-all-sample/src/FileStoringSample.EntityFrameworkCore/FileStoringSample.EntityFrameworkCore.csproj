@@ -27,4 +27,8 @@
     </PackageReference>
   </ItemGroup>
 
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\..\modules\file-storing-management\src\SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore\SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore.csproj" />
+	</ItemGroup>
+
 </Project>

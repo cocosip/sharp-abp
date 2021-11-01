@@ -27,14 +27,7 @@
 		<ProjectReference Include="..\FileStoringSample.HttpApi\FileStoringSample.HttpApi.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.FileStoring.Aliyun\SharpAbp.Abp.FileStoring.Aliyun.csproj" />
-		<ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.FileStoring.Azure\SharpAbp.Abp.FileStoring.Azure.csproj" />
-		<ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.FileStoring.FastDFS\SharpAbp.Abp.FileStoring.FastDFS.csproj" />
-		<ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.FileStoring.FileSystem\SharpAbp.Abp.FileStoring.FileSystem.csproj" />
-		<ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.FileStoring.Minio\SharpAbp.Abp.FileStoring.Minio.csproj" />
-		<ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.FileStoring.S3\SharpAbp.Abp.FileStoring.S3.csproj" />
-	</ItemGroup>
+ 
 
 	<ItemGroup>
 		<Compile Remove="Logs\**" />

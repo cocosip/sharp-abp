@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using FileStoringSample.MultiTenancy;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using FileStoringSample.MultiTenancy;
+using SharpAbp.Abp.FileStoringManagement;
 using Volo.Abp.AuditLogging;
 using Volo.Abp.BackgroundJobs;
 using Volo.Abp.Emailing;
@@ -18,6 +19,7 @@ namespace FileStoringSample
 {
     [DependsOn(
         typeof(FileStoringSampleDomainSharedModule),
+        typeof(FileStoringManagementDomainModule),
         typeof(AbpAuditLoggingDomainModule),
         typeof(AbpBackgroundJobsDomainModule),
         typeof(AbpFeatureManagementDomainModule),

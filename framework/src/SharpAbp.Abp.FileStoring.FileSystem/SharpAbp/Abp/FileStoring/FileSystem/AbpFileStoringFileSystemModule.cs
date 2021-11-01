@@ -45,7 +45,7 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
 
         private FileProviderConfiguration GetFileProviderConfiguration()
         {
-            var configuration = new FileProviderConfiguration(FileSystemFileProviderConfigurationNames.ProviderName);
+            var configuration = new FileProviderConfiguration(FileSystemFileProviderConfigurationNames.ProviderName,typeof(FileStoringFileSystemResource));
             configuration.DefaultNamingNormalizers.TryAdd<FileSystemFileNamingNormalizer>();
             configuration
                 .SetValueType(FileSystemFileProviderConfigurationNames.BasePath, typeof(string))

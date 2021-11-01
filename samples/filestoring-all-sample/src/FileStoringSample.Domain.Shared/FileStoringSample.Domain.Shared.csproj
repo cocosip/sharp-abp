@@ -25,4 +25,9 @@
 		<Content Remove="Localization\FileStoringSample\*.json" />
 	</ItemGroup>
 
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\..\modules\file-storing-management\src\SharpAbp.Abp.FileStoringManagement.Domain.Shared\SharpAbp.Abp.FileStoringManagement.Domain.Shared.csproj" />
+	</ItemGroup>
+
 </Project>

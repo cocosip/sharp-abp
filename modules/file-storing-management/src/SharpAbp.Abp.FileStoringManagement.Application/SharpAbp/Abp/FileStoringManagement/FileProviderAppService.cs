@@ -1,8 +1,11 @@
 ﻿using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.FileStoring;
 using System.Collections.Generic;
+using System.Linq;
 using Volo.Abp;
 using Volo.Abp.Reflection;
 
@@ -60,10 +63,12 @@ namespace SharpAbp.Abp.FileStoringManagement
             var values = fileProviderConfiguration.GetValueTypes();
             var providerOptions = new ProviderOptionsDto(provider);
 
+            var ll = StringLocalizerFactory.Create(fileProviderConfiguration.LocalizationResourceType);
+
             foreach (var kv in values)
             {
                 var providerValue = new ProviderValueDto(
-                    kv.Key, L[kv.Key],
+                    kv.Key, ll[kv.Key],
                     TypeHelper.GetFullNameHandlingNullableAndGenerics(kv.Value));
 
                 providerOptions.Values.Add(providerValue);

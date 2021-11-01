@@ -1,4 +1,5 @@
 ﻿using FileStoringSample.Localization;
+using SharpAbp.Abp.FileStoringManagement;
 using Volo.Abp.AuditLogging;
 using Volo.Abp.BackgroundJobs;
 using Volo.Abp.FeatureManagement;
@@ -17,6 +18,7 @@ namespace FileStoringSample
 {
     [DependsOn(
         typeof(AbpAuditLoggingDomainSharedModule),
+        typeof(FileStoringManagementDomainSharedModule),
         typeof(AbpBackgroundJobsDomainSharedModule),
         typeof(AbpFeatureManagementDomainSharedModule),
         typeof(AbpIdentityDomainSharedModule),

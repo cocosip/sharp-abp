@@ -8,11 +8,13 @@ using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement.HttpApi;
 using Volo.Abp.SettingManagement;
 using Volo.Abp.TenantManagement;
+using SharpAbp.Abp.FileStoringManagement;
 
 namespace FileStoringSample
 {
     [DependsOn(
         typeof(FileStoringSampleApplicationContractsModule),
+        typeof(FileStoringManagementHttpApiModule),
         typeof(AbpAccountHttpApiModule),
         typeof(AbpIdentityHttpApiModule),
         typeof(AbpPermissionManagementHttpApiModule),

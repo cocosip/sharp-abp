@@ -96,6 +96,25 @@ namespace FileStoringSample.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AbpFileStoringContainers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsMultiTenant = table.Column<bool>(type: "boolean", nullable: false),
+                    Provider = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    Title = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    HttpAccess = table.Column<bool>(type: "boolean", nullable: false),
+                    ExtraProperties = table.Column<string>(type: "text", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AbpFileStoringContainers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AbpLinkUsers",
                 columns: table => new
                 {
@@ -503,6 +522,26 @@ namespace FileStoringSample.Migrations
                         name: "FK_AbpEntityChanges_AbpAuditLogs_AuditLogId",
                         column: x => x.AuditLogId,
                         principalTable: "AbpAuditLogs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AbpFileStoringContainerItems",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    Value = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
+                    ContainerId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AbpFileStoringContainerItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AbpFileStoringContainerItems_AbpFileStoringContainers_Conta~",
+                        column: x => x.ContainerId,
+                        principalTable: "AbpFileStoringContainers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1075,6 +1114,17 @@ namespace FileStoringSample.Migrations
                 columns: new[] { "Name", "ProviderName", "ProviderKey" });
 
             migrationBuilder.CreateIndex(
+                name: "IX_AbpFileStoringContainerItems_ContainerId_Name",
+                table: "AbpFileStoringContainerItems",
+                columns: new[] { "ContainerId", "Name" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AbpFileStoringContainers_TenantId_Name",
+                table: "AbpFileStoringContainers",
+                columns: new[] { "TenantId", "Name" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AbpLinkUsers_SourceUserId_SourceTenantId_TargetUserId_Targe~",
                 table: "AbpLinkUsers",
                 columns: new[] { "SourceUserId", "SourceTenantId", "TargetUserId", "TargetTenantId" },
@@ -1235,6 +1285,9 @@ namespace FileStoringSample.Migrations
                 name: "AbpFeatureValues");
 
             migrationBuilder.DropTable(
+                name: "AbpFileStoringContainerItems");
+
+            migrationBuilder.DropTable(
                 name: "AbpLinkUsers");
 
             migrationBuilder.DropTable(
@@ -1329,6 +1382,9 @@ namespace FileStoringSample.Migrations
 
             migrationBuilder.DropTable(
                 name: "AbpEntityChanges");
+
+            migrationBuilder.DropTable(
+                name: "AbpFileStoringContainers");
 
             migrationBuilder.DropTable(
                 name: "AbpTenants");

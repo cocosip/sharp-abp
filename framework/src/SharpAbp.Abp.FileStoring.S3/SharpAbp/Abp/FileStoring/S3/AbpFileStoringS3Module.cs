@@ -46,7 +46,7 @@ namespace SharpAbp.Abp.FileStoring.S3
 
         private FileProviderConfiguration GetFileProviderConfiguration()
         {
-            var configuration = new FileProviderConfiguration(S3FileProviderConfigurationNames.ProviderName);
+            var configuration = new FileProviderConfiguration(S3FileProviderConfigurationNames.ProviderName,typeof(FileStoringS3Resource));
             configuration.DefaultNamingNormalizers.TryAdd<S3FileNamingNormalizer>();
             configuration
                 .SetValueType(S3FileProviderConfigurationNames.BucketName, typeof(string))

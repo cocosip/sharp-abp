@@ -1,4 +1,5 @@
-﻿using Volo.Abp.Account;
+﻿using SharpAbp.Abp.FileStoringManagement;
+using Volo.Abp.Account;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity;
 using Volo.Abp.Modularity;
@@ -11,6 +12,7 @@ namespace FileStoringSample
 {
     [DependsOn(
         typeof(FileStoringSampleDomainSharedModule),
+        typeof(FileStoringManagementApplicationContractsModule),
         typeof(AbpAccountApplicationContractsModule),
         typeof(AbpFeatureManagementApplicationContractsModule),
         typeof(AbpIdentityApplicationContractsModule),

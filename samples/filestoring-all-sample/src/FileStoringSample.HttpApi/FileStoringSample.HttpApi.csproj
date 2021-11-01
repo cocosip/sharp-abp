@@ -1,23 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\common.props" />
+	<Import Project="..\..\common.props" />
 
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-    <RootNamespace>FileStoringSample</RootNamespace>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+		<RootNamespace>FileStoringSample</RootNamespace>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\FileStoringSample.Application.Contracts\FileStoringSample.Application.Contracts.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\FileStoringSample.Application.Contracts\FileStoringSample.Application.Contracts.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Volo.Abp.Account.HttpApi" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.Identity.HttpApi" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.PermissionManagement.HttpApi" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.TenantManagement.HttpApi" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.FeatureManagement.HttpApi" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.SettingManagement.HttpApi" Version="$(VoloAbpPackageVersion)" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.Account.HttpApi" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.Identity.HttpApi" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.PermissionManagement.HttpApi" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.TenantManagement.HttpApi" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.FeatureManagement.HttpApi" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.SettingManagement.HttpApi" Version="$(VoloAbpPackageVersion)" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\..\modules\file-storing-management\src\SharpAbp.Abp.FileStoringManagement.HttpApi\SharpAbp.Abp.FileStoringManagement.HttpApi.csproj" />
+	</ItemGroup>
 
 </Project>
