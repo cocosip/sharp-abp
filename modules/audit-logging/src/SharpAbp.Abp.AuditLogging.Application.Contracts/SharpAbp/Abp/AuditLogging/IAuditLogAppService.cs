@@ -45,5 +45,12 @@ namespace SharpAbp.Abp.AuditLogging
         /// <param name="entityTypeFullName"></param>
         /// <returns></returns>
         Task<List<EntityChangeWithUsernameDto>> GetEntityChangesWithUsernameAsync(string entityId, string entityTypeFullName);
+
+        /// <summary>
+        /// Delete
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task DeleteAsync(Guid id);
     }
 }

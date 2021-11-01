@@ -52,6 +52,11 @@ namespace SharpAbp.Abp.AuditLogging
             return await _auditLogAppService.GetEntityChangesWithUsernameAsync(entityId, entityTypeFullName);
         }
 
-
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task DeleteAsync(Guid id)
+        {
+            await _auditLogAppService.DeleteAsync(id);
+        }
     }
 }

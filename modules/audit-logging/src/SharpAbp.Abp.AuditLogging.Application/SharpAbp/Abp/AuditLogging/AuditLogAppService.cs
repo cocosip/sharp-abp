@@ -122,11 +122,22 @@ namespace SharpAbp.Abp.AuditLogging
         /// <param name="entityId"></param>
         /// <param name="entityTypeFullName"></param>
         /// <returns></returns>
-        public virtual async Task<List<EntityChangeWithUsernameDto>> GetEntityChangesWithUsernameAsync(string entityId,string entityTypeFullName)
+        public virtual async Task<List<EntityChangeWithUsernameDto>> GetEntityChangesWithUsernameAsync(string entityId, string entityTypeFullName)
         {
             var entityChangeWithUsernames = await AuditLogRepository.GetEntityChangesWithUsernameAsync(entityId, entityTypeFullName);
 
             return ObjectMapper.Map<List<EntityChangeWithUsername>, List<EntityChangeWithUsernameDto>>(entityChangeWithUsernames);
+        }
+
+        /// <summary>
+        /// Delete
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Authorize(AuditLoggingPermissions.AuditLogs.Delete)]
+        public virtual async Task DeleteAsync(Guid id)
+        {
+            await AuditLogRepository.DeleteAsync(id);
         }
     }
 }
