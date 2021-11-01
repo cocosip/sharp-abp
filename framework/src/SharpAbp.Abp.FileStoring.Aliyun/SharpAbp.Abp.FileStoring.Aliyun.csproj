@@ -1,28 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\..\common.props" />
-  <Import Project="..\..\..\configureawait.props" />
+	<Import Project="..\..\..\common.props" />
+	<Import Project="..\..\..\configureawait.props" />
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>SharpAbp.Abp.FileStoring.Aliyun</AssemblyName>
-    <PackageId>SharpAbp.Abp.FileStoring.Aliyun</PackageId>
-    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Description>SharpAbp FileStoring Module</Description>
-    <RootNamespace />
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<AssemblyName>SharpAbp.Abp.FileStoring.Aliyun</AssemblyName>
+		<PackageId>SharpAbp.Abp.FileStoring.Aliyun</PackageId>
+		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<Description>SharpAbp FileStoring Module</Description>
+		<RootNamespace />
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SharpAbp.Abp.FileStoring\SharpAbp.Abp.FileStoring.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\SharpAbp.Abp.FileStoring\SharpAbp.Abp.FileStoring.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="aliyun-net-sdk-sts" Version="3.1.0" />
-    <PackageReference Include="Aliyun.OSS.SDK.NetCore" Version="2.13.0" />
-    <PackageReference Include="Volo.Abp.Caching" Version="$(VoloAbpPackageVersion)" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="aliyun-net-sdk-sts" Version="3.1.0" />
+		<PackageReference Include="Aliyun.OSS.SDK.NetCore" Version="2.13.0" />
+		<PackageReference Include="Volo.Abp.Caching" Version="$(VoloAbpPackageVersion)" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="SharpAbp\Abp\FileStoring\Aliyun\Localization\Resources\*.json" />
+		<Content Remove="SharpAbp\Abp\FileStoring\Aliyun\Localization\Resources\*.json" />
+	</ItemGroup>
 
 </Project>

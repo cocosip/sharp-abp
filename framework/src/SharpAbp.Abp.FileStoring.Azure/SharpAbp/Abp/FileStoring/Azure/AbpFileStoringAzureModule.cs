@@ -33,7 +33,7 @@ namespace SharpAbp.Abp.FileStoring.Azure
                 options.Resources
                     .Add<FileStoringAzureResource>("en")
                     .AddBaseTypes(typeof(AbpValidationResource))
-                    .AddVirtualJson("/SharpAbp/Abp/FileStoring/Azure/Localization");
+                    .AddVirtualJson("/SharpAbp/Abp/FileStoring/Azure/Localization/Resources");
             });
 
             Configure<AbpExceptionLocalizationOptions>(options =>

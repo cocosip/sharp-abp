@@ -35,7 +35,7 @@ namespace SharpAbp.Abp.FileStoring.S3
                 options.Resources
                     .Add<FileStoringS3Resource>("en")
                     .AddBaseTypes(typeof(AbpValidationResource))
-                    .AddVirtualJson("/SharpAbp/Abp/FileStoring/S3/Localization");
+                    .AddVirtualJson("/SharpAbp/Abp/FileStoring/S3/Localization/Resources");
             });
 
             Configure<AbpExceptionLocalizationOptions>(options =>

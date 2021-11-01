@@ -40,7 +40,7 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
                 options.Resources
                     .Add<FileStoringFastDFSResource>("en")
                     .AddBaseTypes(typeof(AbpValidationResource))
-                    .AddVirtualJson("/SharpAbp/Abp/FileStoring/FastDFS/Localization");
+                    .AddVirtualJson("/SharpAbp/Abp/FileStoring/FastDFS/Localization/Resources");
             });
 
             Configure<AbpExceptionLocalizationOptions>(options =>

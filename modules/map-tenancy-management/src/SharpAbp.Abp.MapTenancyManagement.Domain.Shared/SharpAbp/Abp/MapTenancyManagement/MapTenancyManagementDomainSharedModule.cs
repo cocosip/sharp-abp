@@ -25,7 +25,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
                 options.Resources
                     .Add<MapTenancyManagementResource>("en")
                     .AddBaseTypes(typeof(AbpValidationResource))
-                    .AddVirtualJson("SharpAbp/Abp/MapTenancyManagement/Localization/Resources");
+                    .AddVirtualJson("/SharpAbp/Abp/MapTenancyManagement/Localization/Resources");
             });
 
             Configure<AbpExceptionLocalizationOptions>(options =>

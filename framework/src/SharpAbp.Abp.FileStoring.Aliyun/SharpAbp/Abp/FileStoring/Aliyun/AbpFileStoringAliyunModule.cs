@@ -36,7 +36,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
                 options.Resources
                     .Add<FileStoringAliyunResource>("en")
                     .AddBaseTypes(typeof(AbpValidationResource))
-                    .AddVirtualJson("/SharpAbp/Abp/FileStoring/Aliyun/Localization");
+                    .AddVirtualJson("/SharpAbp/Abp/FileStoring/Aliyun/Localization/Resources");
             });
 
             Configure<AbpExceptionLocalizationOptions>(options =>

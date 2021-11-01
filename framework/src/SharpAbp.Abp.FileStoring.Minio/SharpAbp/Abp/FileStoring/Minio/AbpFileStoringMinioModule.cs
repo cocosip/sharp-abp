@@ -33,7 +33,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
                 options.Resources
                     .Add<FileStoringMinioResource>("en")
                     .AddBaseTypes(typeof(AbpValidationResource))
-                    .AddVirtualJson("/SharpAbp/Abp/FileStoring/Minio/Localization");
+                    .AddVirtualJson("/SharpAbp/Abp/FileStoring/Minio/Localization/Resources");
             });
 
             Configure<AbpExceptionLocalizationOptions>(options =>

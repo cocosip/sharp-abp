@@ -1,26 +1,31 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\..\common.props" />
-  <Import Project="..\..\..\configureawait.props" />
+	<Import Project="..\..\..\common.props" />
+	<Import Project="..\..\..\configureawait.props" />
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>SharpAbp.Abp.FileStoring.FileSystem</AssemblyName>
-    <PackageId>SharpAbp.Abp.FileStoring.FileSystem</PackageId>
-    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Description>SharpAbp FileStoring Module</Description>
-    <RootNamespace />
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<AssemblyName>SharpAbp.Abp.FileStoring.FileSystem</AssemblyName>
+		<PackageId>SharpAbp.Abp.FileStoring.FileSystem</PackageId>
+		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<Description>SharpAbp FileStoring Module</Description>
+		<RootNamespace />
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SharpAbp.Abp.FileStoring\SharpAbp.Abp.FileStoring.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\SharpAbp.Abp.FileStoring\SharpAbp.Abp.FileStoring.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Polly" Version="7.2.2" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Polly" Version="7.2.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="SharpAbp\Abp\FileStoring\FileSystem\Localization\Resources\*.json" />
+		<Content Remove="SharpAbp\Abp\FileStoring\FileSystem\Localization\Resources\*.json" />
+	</ItemGroup>
 
 </Project>
