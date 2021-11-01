@@ -1,4 +1,5 @@
 ﻿using System;
+using SharpAbp.Abp.FileStoring.Database.Localization;
 using Volo.Abp.Domain;
 using Volo.Abp.Modularity;
 
@@ -37,7 +38,7 @@ namespace SharpAbp.Abp.FileStoring.Database
 
         private FileProviderConfiguration GetFileProviderConfiguration()
         {
-            var configuration = new FileProviderConfiguration(DatabaseFileProviderConsts.ProviderName);
+            var configuration = new FileProviderConfiguration(DatabaseFileProviderConsts.ProviderName, typeof(FileStoringDatabaseResource));
             return configuration;
         }
     }
