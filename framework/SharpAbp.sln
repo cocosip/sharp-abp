@@ -79,7 +79,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.AspNetCore", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.AspNetCore.Mvc", "src\SharpAbp.Abp.AspNetCore.Mvc\SharpAbp.Abp.AspNetCore.Mvc.csproj", "{2B3B9980-69F7-42AD-BB07-C89742A60134}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.IdentityModel", "src\SharpAbp.Abp.IdentityModel\SharpAbp.Abp.IdentityModel.csproj", "{82CE2F4D-5B4B-4F55-806C-7C5BE6773D96}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.IdentityModel", "src\SharpAbp.Abp.IdentityModel\SharpAbp.Abp.IdentityModel.csproj", "{82CE2F4D-5B4B-4F55-806C-7C5BE6773D96}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
