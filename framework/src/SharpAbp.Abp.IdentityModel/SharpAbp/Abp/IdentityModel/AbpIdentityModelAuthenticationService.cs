@@ -1,6 +1,5 @@
 ﻿using IdentityModel;
 using IdentityModel.Client;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Net.Http;
 using System.Threading.Tasks;

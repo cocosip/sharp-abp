@@ -42,7 +42,8 @@ namespace IdentitySample
         typeof(AbpAspNetCoreAuthenticationJwtBearerModule),
         typeof(AccountWebIdentityServerModule),
         typeof(AbpAspNetCoreSerilogModule),
-        typeof(AbpSwashbuckleModule)
+        typeof(AbpSwashbuckleModule),
+        typeof(SharpAbp.Abp.IdentityModel.AbpIdentityModelModule)
     )]
     public class IdentitySampleHttpApiHostModule : AbpModule
     {

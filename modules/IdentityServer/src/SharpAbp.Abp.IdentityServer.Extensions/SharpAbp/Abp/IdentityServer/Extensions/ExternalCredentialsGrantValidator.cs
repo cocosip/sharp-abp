@@ -51,7 +51,6 @@ namespace SharpAbp.Abp.IdentityServer.Extensions
         [UnitOfWork]
         public async Task ValidateAsync(ExtensionGrantValidationContext context)
         {
-
             var loginProvider = context.GetLoginProvider();
             if (loginProvider.IsNullOrWhiteSpace())
             {
