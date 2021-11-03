@@ -25,6 +25,7 @@
     <ProjectReference Include="..\IdentitySample.EntityFrameworkCore\IdentitySample.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\IdentitySample.HttpApi\IdentitySample.HttpApi.csproj" />
     <ProjectReference Include="..\..\..\..\modules\account\src\SharpAbp.Abp.Account.Web.IdentityServer\SharpAbp.Abp.Account.Web.IdentityServer.csproj" />
+	 <ProjectReference Include="..\..\..\..\modules\IdentityServer\src\SharpAbp.Abp.IdentityServer.Extensions\SharpAbp.Abp.IdentityServer.Extensions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -28,6 +28,7 @@ using Volo.Abp.Modularity;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
+using SharpAbp.Abp.IdentityServer.Extensions;
 
 namespace IdentitySample
 {
@@ -130,6 +131,9 @@ namespace IdentitySample
                             HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
                     };
                 });
+
+            context.Services.AddIdentityServerBuilder()
+                .AddExtensionGrantValidator<ExternalCredentialsGrantValidator>();
         }
 
         private static void ConfigureSwaggerServices(ServiceConfigurationContext context, IConfiguration configuration)

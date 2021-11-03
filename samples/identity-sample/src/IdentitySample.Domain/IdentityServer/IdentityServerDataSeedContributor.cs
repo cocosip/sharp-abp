@@ -7,6 +7,7 @@ using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Guids;
+using Volo.Abp.Identity;
 using Volo.Abp.IdentityServer.ApiResources;
 using Volo.Abp.IdentityServer.ApiScopes;
 using Volo.Abp.IdentityServer.Clients;
@@ -14,6 +15,7 @@ using Volo.Abp.IdentityServer.IdentityResources;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.PermissionManagement;
 using Volo.Abp.Uow;
+using Volo.Abp.Users;
 using ApiResource = Volo.Abp.IdentityServer.ApiResources.ApiResource;
 using ApiScope = Volo.Abp.IdentityServer.ApiScopes.ApiScope;
 using Client = Volo.Abp.IdentityServer.Clients.Client;
@@ -26,6 +28,7 @@ namespace IdentitySample.IdentityServer
         private readonly IApiScopeRepository _apiScopeRepository;
         private readonly IClientRepository _clientRepository;
         private readonly IIdentityResourceDataSeeder _identityResourceDataSeeder;
+        private readonly IdentityUserManager _identityUserManager;
         private readonly IGuidGenerator _guidGenerator;
         private readonly IPermissionDataSeeder _permissionDataSeeder;
         private readonly IConfiguration _configuration;
@@ -36,6 +39,7 @@ namespace IdentitySample.IdentityServer
             IApiResourceRepository apiResourceRepository,
             IApiScopeRepository apiScopeRepository,
             IIdentityResourceDataSeeder identityResourceDataSeeder,
+            IdentityUserManager identityUserManager,
             IGuidGenerator guidGenerator,
             IPermissionDataSeeder permissionDataSeeder,
             IConfiguration configuration,
@@ -45,6 +49,8 @@ namespace IdentitySample.IdentityServer
             _apiResourceRepository = apiResourceRepository;
             _apiScopeRepository = apiScopeRepository;
             _identityResourceDataSeeder = identityResourceDataSeeder;
+            _identityUserManager = identityUserManager;
+
             _guidGenerator = guidGenerator;
             _permissionDataSeeder = permissionDataSeeder;
             _configuration = configuration;
@@ -60,6 +66,7 @@ namespace IdentitySample.IdentityServer
                 await CreateApiResourcesAsync();
                 await CreateApiScopesAsync();
                 await CreateClientsAsync();
+                await AddUserLoginAsync();
             }
         }
 
@@ -152,7 +159,7 @@ namespace IdentitySample.IdentityServer
                 await CreateClientAsync(
                     name: consoleAndAngularClientId,
                     scopes: commonScopes,
-                    grantTypes: new[] { "password", "client_credentials", "authorization_code" },
+                    grantTypes: new[] { "password", "client_credentials", "authorization_code", "external_credentials" },
                     secret: (configurationSection["IdentitySample_App:ClientSecret"] ?? "1q2w3e*").Sha256(),
                     requireClientSecret: false,
                     redirectUri: webClientRootUrl,
@@ -160,9 +167,7 @@ namespace IdentitySample.IdentityServer
                     corsOrigins: new[] { webClientRootUrl.RemovePostFix("/") }
                 );
             }
-            
-            
-            
+
             // Swagger Client
             var swaggerClientId = configurationSection["IdentitySample_Swagger:ClientId"];
             if (!swaggerClientId.IsNullOrWhiteSpace())
@@ -172,7 +177,7 @@ namespace IdentitySample.IdentityServer
                 await CreateClientAsync(
                     name: swaggerClientId,
                     scopes: commonScopes,
-                    grantTypes: new[] { "authorization_code" },
+                    grantTypes: new[] { "authorization_code", "external_credentials" },
                     secret: configurationSection["IdentitySample_Swagger:ClientSecret"]?.Sha256(),
                     requireClientSecret: false,
                     redirectUri: $"{swaggerRootUrl}/swagger/oauth2-redirect.html",
@@ -283,6 +288,19 @@ namespace IdentitySample.IdentityServer
             }
 
             return await _clientRepository.UpdateAsync(client);
+        }
+
+
+        public async Task AddUserLoginAsync()
+        {
+            var user = await _identityUserManager.FindByNameAsync("admin");
+            if (user != null)
+            {
+                if (user.Logins.Count ==0)
+                {
+                    await _identityUserManager.AddLoginAsync(user, new Microsoft.AspNetCore.Identity.UserLoginInfo("wechat", "1234567890", "wechat111"));
+                }
+            }
         }
     }
 }

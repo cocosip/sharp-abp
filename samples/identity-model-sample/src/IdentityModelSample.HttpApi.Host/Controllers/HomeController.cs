@@ -2,15 +2,16 @@
 using SharpAbp.Abp.IdentityModel;
 using System.Threading.Tasks;
 using Volo.Abp.AspNetCore.Mvc;
+using Volo.Abp.IdentityModel;
 
 namespace IdentityModelSample.Controllers
 {
     public class HomeController : AbpController
     {
-        private readonly IIdentityModelUserAuthenticationService _identityModelUserAuthenticationService;
-        public HomeController(IIdentityModelUserAuthenticationService identityModelUserAuthenticationService)
+        private readonly ISharpAbpIdentityModelAuthenticationService _sharpAbpIdentityModelAuthenticationService;
+        public HomeController(ISharpAbpIdentityModelAuthenticationService sharpAbpIdentityModelAuthenticationService)
         {
-            _identityModelUserAuthenticationService = identityModelUserAuthenticationService;
+            _sharpAbpIdentityModelAuthenticationService = sharpAbpIdentityModelAuthenticationService;
         }
         public ActionResult Index()
         {
@@ -21,7 +22,11 @@ namespace IdentityModelSample.Controllers
         [HttpGet]
         public async Task<string> UserToken()
         {
-            return await _identityModelUserAuthenticationService.GetUserAccessTokenAsync("admin", "1q2w3E*", "Client1");
+            var token1 = await _sharpAbpIdentityModelAuthenticationService.GetUserAccessTokenAsync("admin", "1q2w3E*", "Client1");
+
+            var token2 = await _sharpAbpIdentityModelAuthenticationService.GetExternalCredentialsAccessTokenAsync("wechat", "1234567890", "Client2");
+
+            return $"[{token1}]-------[{token2}]";
         }
     }
 }

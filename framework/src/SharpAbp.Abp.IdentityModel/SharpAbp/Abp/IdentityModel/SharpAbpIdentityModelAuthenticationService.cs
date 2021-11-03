@@ -8,14 +8,14 @@ using Volo.Abp.IdentityModel;
 
 namespace SharpAbp.Abp.IdentityModel
 {
-    public class IdentityModelUserAuthenticationService : IIdentityModelUserAuthenticationService, ITransientDependency
+    public class SharpAbpIdentityModelAuthenticationService : ISharpAbpIdentityModelAuthenticationService, ITransientDependency
     {
         protected ILogger Logger { get; set; }
         protected AbpIdentityClientOptions ClientOptions { get; }
         protected IIdentityModelAuthenticationService IdentityModelAuthenticationService { get; }
 
-        public IdentityModelUserAuthenticationService(
-            ILogger<IdentityModelUserAuthenticationService> logger,
+        public SharpAbpIdentityModelAuthenticationService(
+            ILogger<SharpAbpIdentityModelAuthenticationService> logger,
             IOptions<AbpIdentityClientOptions> options,
             IIdentityModelAuthenticationService identityModelAuthenticationService)
         {
@@ -46,7 +46,29 @@ namespace SharpAbp.Abp.IdentityModel
             return await IdentityModelAuthenticationService.GetAccessTokenAsync(configuration);
         }
 
-        private IdentityClientConfiguration GetClientConfiguration(
+        /// <summary>
+        /// ExternalCredentials
+        /// </summary>
+        /// <param name="loginProvider"></param>
+        /// <param name="providerKey"></param>
+        /// <param name="identityClientName"></param>
+        /// <returns></returns>
+        public virtual async Task<string> GetExternalCredentialsAccessTokenAsync(
+            string loginProvider, 
+            string providerKey, 
+            string identityClientName = null)
+        {
+            var configuration = GetClientConfiguration(loginProvider, providerKey, identityClientName);
+            if (configuration == null)
+            {
+                Logger.LogWarning($"Could not find {nameof(IdentityClientConfiguration)} for {identityClientName}. Either define a configuration for {identityClientName} or set a default configuration.");
+                return null;
+            }
+
+            return await IdentityModelAuthenticationService.GetAccessTokenAsync(configuration);
+        }
+
+        protected virtual IdentityClientConfiguration GetClientConfiguration(
             string userName,
             string userPassword,
             string identityClientName = null)
