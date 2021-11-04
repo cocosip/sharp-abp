@@ -56,7 +56,6 @@ namespace SharpAbp.Abp.IdentityModel
                             CancellationTokenProvider.Token
                         );
                     case ExternalCredentialsConstants.GrantType:
-
                         return await httpClient.RequestExternalCredentialsTokenAsync(
                             await CreateExternalCredentialsTokenRequestAsync(tokenEndpoint, configuration),
                             CancellationTokenProvider.Token

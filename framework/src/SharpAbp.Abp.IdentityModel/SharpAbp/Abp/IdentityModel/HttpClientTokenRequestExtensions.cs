@@ -25,9 +25,9 @@ namespace SharpAbp.Abp.IdentityModel
             var clone = request.Clone();
 
             clone.Parameters.AddRequired(OidcConstants.TokenRequest.GrantType, ExternalCredentialsConstants.GrantType);
-             
             clone.Parameters.AddRequired(ExternalCredentialsConstants.LoginProvider, request.LoginProvider);
             clone.Parameters.AddRequired(ExternalCredentialsConstants.ProviderKey, request.ProviderKey);
+            
             clone.Parameters.AddOptional(OidcConstants.TokenRequest.Scope, request.Scope);
 
             foreach (var resource in request.Resource)
@@ -52,7 +52,6 @@ namespace SharpAbp.Abp.IdentityModel
             }
             catch (Exception ex)
             {
-                Console.WriteLine("-----出现异常:{0},url:{1}", ex.Message, request.RequestUri);
                 return ProtocolResponse.FromException<TokenResponse>(ex);
             }
 

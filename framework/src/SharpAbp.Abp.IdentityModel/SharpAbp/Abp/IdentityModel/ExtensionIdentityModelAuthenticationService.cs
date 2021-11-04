@@ -8,14 +8,14 @@ using Volo.Abp.IdentityModel;
 
 namespace SharpAbp.Abp.IdentityModel
 {
-    public class SharpAbpIdentityModelAuthenticationService : ISharpAbpIdentityModelAuthenticationService, ITransientDependency
+    public class ExtensionIdentityModelAuthenticationService : IExtensionIdentityModelAuthenticationService, ITransientDependency
     {
         protected ILogger Logger { get; set; }
         protected AbpIdentityClientOptions ClientOptions { get; }
         protected IIdentityModelAuthenticationService IdentityModelAuthenticationService { get; }
 
-        public SharpAbpIdentityModelAuthenticationService(
-            ILogger<SharpAbpIdentityModelAuthenticationService> logger,
+        public ExtensionIdentityModelAuthenticationService(
+            ILogger<ExtensionIdentityModelAuthenticationService> logger,
             IOptions<AbpIdentityClientOptions> options,
             IIdentityModelAuthenticationService identityModelAuthenticationService)
         {

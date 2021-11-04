@@ -7,10 +7,10 @@ namespace IdentitySample.Controllers
 {
     public class HomeController : AbpController
     {
-        private readonly ISharpAbpIdentityModelAuthenticationService _sharpAbpIdentityModelAuthenticationService;
-        public HomeController(ISharpAbpIdentityModelAuthenticationService sharpAbpIdentityModelAuthenticationService)
+        private readonly IExtensionIdentityModelAuthenticationService _identityModelAuthenticationService;
+        public HomeController(IExtensionIdentityModelAuthenticationService  identityModelAuthenticationService)
         {
-            _sharpAbpIdentityModelAuthenticationService = sharpAbpIdentityModelAuthenticationService;
+            _identityModelAuthenticationService = identityModelAuthenticationService;
         }
 
         public ActionResult Index()
@@ -20,11 +20,11 @@ namespace IdentitySample.Controllers
 
         public async Task<ActionResult> UserToken()
         {
-            var token1 = await _sharpAbpIdentityModelAuthenticationService.GetUserAccessTokenAsync("admin", "1q2w3E*", "Client1");
+            var token1 = await _identityModelAuthenticationService.GetUserAccessTokenAsync("admin", "1q2w3E*", "Client1");
 
-            var token2 = await _sharpAbpIdentityModelAuthenticationService.GetExternalCredentialsAccessTokenAsync("wechat", "1234567890", "Client2");
+            var token2 = await _identityModelAuthenticationService.GetExternalCredentialsAccessTokenAsync("wechat", "1234567890", "Client2");
 
-            return Content($"[{token1}]-------[{token2}]");
+            return Content($"[{token1}]-------</br>[{token2}]");
         }
 
 

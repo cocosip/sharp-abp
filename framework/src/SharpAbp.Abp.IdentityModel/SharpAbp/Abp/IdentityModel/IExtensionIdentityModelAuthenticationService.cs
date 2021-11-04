@@ -2,7 +2,7 @@
 
 namespace SharpAbp.Abp.IdentityModel
 {
-    public interface ISharpAbpIdentityModelAuthenticationService
+    public interface IExtensionIdentityModelAuthenticationService
     {
         /// <summary>
         /// Get user accessToken
