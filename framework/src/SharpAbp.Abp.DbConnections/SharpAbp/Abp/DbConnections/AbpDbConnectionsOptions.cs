@@ -19,7 +19,7 @@ namespace SharpAbp.Abp.DbConnections
 
         public AbpDbConnectionsOptions Configure(IConfiguration configuration)
         {
-            var dbConnectionConfigurations = configuration.GetSection("DataDbConnectionsOptions:DbConnections")
+            var dbConnectionConfigurations = configuration.GetSection("DbConnectionsOptions:DbConnections")
                 .Get<Dictionary<string, DbConnectionConfiguration>>();
 
             foreach (var dbConnectionConfigurationKv in dbConnectionConfigurations)
@@ -31,7 +31,7 @@ namespace SharpAbp.Abp.DbConnections
                 });
             }
 
-            var databaseProviders = configuration.GetSection("DatabaseProviders")?
+            var databaseProviders = configuration.GetSection("DbConnectionsOptions:DatabaseProviders")?
                 .Get<List<DatabaseProvider>>();
             if (databaseProviders != null)
             {
