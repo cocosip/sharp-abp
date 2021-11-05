@@ -18,7 +18,9 @@ namespace SharpAbp.Abp.FileStoring
 
         public AbpFileStoringOptions Configure(IConfiguration configuration)
         {
-            var entries = configuration.Get<Dictionary<string, FileContainerConfigurationEntry>>();
+            var entries = configuration
+                .GetSection("FileStoringOptions")
+                .Get<Dictionary<string, FileContainerConfigurationEntry>>();
 
             foreach (var entryKv in entries)
             {

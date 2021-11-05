@@ -24,7 +24,7 @@ namespace SharpAbp.Abp.DbConnections
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
 
-            var configuration = context.Services.GetConfiguration().GetSection("DataDbConnectionsOptions");
+            var configuration = context.Services.GetConfiguration();
 
             Configure<AbpDbConnectionsOptions>(options =>
             {

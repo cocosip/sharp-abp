@@ -19,7 +19,7 @@ namespace SharpAbp.Abp.DbConnections
 
         public AbpDbConnectionsOptions Configure(IConfiguration configuration)
         {
-            var dbConnectionConfigurations = configuration.GetSection("DbConnections")
+            var dbConnectionConfigurations = configuration.GetSection("DataDbConnectionsOptions:DbConnections")
                 .Get<Dictionary<string, DbConnectionConfiguration>>();
 
             foreach (var dbConnectionConfigurationKv in dbConnectionConfigurations)

@@ -26,7 +26,7 @@ namespace SharpAbp.Abp.FileStoring
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            var configuration = context.Services.GetConfiguration().GetSection("Containers");
+            var configuration = context.Services.GetConfiguration();
 
             Configure<AbpFileStoringOptions>(c =>
             {
