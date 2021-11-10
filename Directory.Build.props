@@ -2,7 +2,7 @@
   <PropertyGroup>
 
     <!--Volo ABP packages-->
-    <VoloAbpPackageVersion>4.4.3</VoloAbpPackageVersion>
+    <VoloAbpPackageVersion>4.4.4</VoloAbpPackageVersion>
 
     <!-- All Microsoft packages -->
     <MicrosoftPackageVersion>5.0.*</MicrosoftPackageVersion>
@@ -14,7 +14,7 @@
     <NSubstitutePackageVersion>4.2.2</NSubstitutePackageVersion>
 
     <!-- Shouldly https://www.nuget.org/packages/Shouldly -->
-    <ShouldlyPackageVersion>4.0.1</ShouldlyPackageVersion>
+    <ShouldlyPackageVersion>4.0.3</ShouldlyPackageVersion>
 
     <!-- Moq package-->
     <MoqPackageVersion>4.16.1</MoqPackageVersion>
