@@ -135,11 +135,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 
             var container = await ContainerRepository.GetAsync(id, true);
 
-            //Update container
-            container.IsMultiTenant = input.IsMultiTenant;
-            container.Provider = input.Provider;
-            container.Title = input.Title;
-            container.HttpAccess = input.HttpAccess;
+            container.Update(input.IsMultiTenant, input.Provider, input.Title, input.HttpAccess);
 
             //Remove all items
             container.RemoveAllItems();
@@ -152,6 +148,8 @@ namespace SharpAbp.Abp.FileStoringManagement
                     item.Name,
                     item.Value);
             }
+
+            await ContainerRepository.UpdateAsync(container);
         }
 
         /// <summary>
