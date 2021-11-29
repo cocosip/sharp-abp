@@ -14,7 +14,9 @@ namespace SharpAbp.Abp.FreeRedis
 
         public AbpFreeRedisOptions Configure(IConfiguration configuration)
         {
-            var csRedisConfigurations = configuration.Get<Dictionary<string, FreeRedisConfiguration>>();
+            var csRedisConfigurations = configuration
+                .GetSection("FreeRedisOptions")
+                .Get<Dictionary<string, FreeRedisConfiguration>>();
 
             foreach (var kv in csRedisConfigurations)
             {
