@@ -13,7 +13,7 @@ namespace SharpAbp.Abp.FreeRedis
                  .Build();
 
             var options = new AbpFreeRedisOptions()
-                .Configure(configuration.GetSection("FreeRedis"));
+                .Configure(configuration);
 
             var defaultConfiguration = options.Clients.GetConfiguration<DefaultClient>();
             Assert.Equal(RedisMode.Single, defaultConfiguration.Mode);
