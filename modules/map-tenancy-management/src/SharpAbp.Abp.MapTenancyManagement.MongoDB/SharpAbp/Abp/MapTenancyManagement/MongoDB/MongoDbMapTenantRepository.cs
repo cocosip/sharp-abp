@@ -123,15 +123,15 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
         /// <summary>
         /// Get list by tenant id
         /// </summary>
-        /// <param name="tenantId"></param>
+        /// <param name="tenantIds"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<List<MapTenant>> GetListByTenantIdAsync(
-            Guid tenantId,
+        public virtual async Task<List<MapTenant>> GetListByTenantIdsAsync(
+            List<Guid> tenantIds,
             CancellationToken cancellationToken = default)
         {
             return await (await GetMongoQueryableAsync())
-                .Where(x => x.TenantId == tenantId)
+                .Where(x => tenantIds.Contains(x.TenantId))
                 .As<IMongoQueryable<MapTenant>>()
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }

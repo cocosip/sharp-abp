@@ -77,7 +77,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
             CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(code, nameof(code));
-            
+
             return await (await GetDbSetAsync())
                 .WhereIf(!code.IsNullOrWhiteSpace(), x => x.Code == code)
                 .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
@@ -125,15 +125,15 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         /// <summary>
         /// Get list by tenant id
         /// </summary>
-        /// <param name="tenantId"></param>
+        /// <param name="tenantIds"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<List<MapTenant>> GetListByTenantIdAsync(
-            Guid tenantId,
+        public virtual async Task<List<MapTenant>> GetListByTenantIdsAsync(
+            List<Guid> tenantIds,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
-                .Where(x => x.TenantId == tenantId)
+                .Where(x => tenantIds.Contains(x.TenantId))
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 

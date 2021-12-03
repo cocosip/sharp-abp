@@ -18,6 +18,7 @@
   <ItemGroup>
     <PackageReference Include="Volo.Abp.Ddd.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
     <PackageReference Include="Volo.Abp.Authorization" Version="$(VoloAbpPackageVersion)" />
+    <PackageReference Include="Volo.Abp.TenantManagement.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
   </ItemGroup>
 
   <ItemGroup>

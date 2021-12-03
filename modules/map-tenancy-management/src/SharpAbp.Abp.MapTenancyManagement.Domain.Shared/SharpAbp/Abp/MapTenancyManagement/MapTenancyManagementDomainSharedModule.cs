@@ -2,6 +2,7 @@
 using Volo.Abp.Localization;
 using Volo.Abp.Localization.ExceptionHandling;
 using Volo.Abp.Modularity;
+using Volo.Abp.TenantManagement;
 using Volo.Abp.Validation;
 using Volo.Abp.Validation.Localization;
 using Volo.Abp.VirtualFileSystem;
@@ -9,7 +10,8 @@ using Volo.Abp.VirtualFileSystem;
 namespace SharpAbp.Abp.MapTenancyManagement
 {
     [DependsOn(
-        typeof(AbpValidationModule)
+        typeof(AbpValidationModule),
+        typeof(AbpTenantManagementDomainSharedModule)
         )]
     public class MapTenancyManagementDomainSharedModule : AbpModule
     {

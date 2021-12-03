@@ -63,10 +63,10 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <summary>
         /// Get list by tenant id
         /// </summary>
-        /// <param name="tenantId"></param>
+        /// <param name="tenantIds"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<List<MapTenant>> GetListByTenantIdAsync(Guid tenantId, CancellationToken cancellationToken = default);
+        Task<List<MapTenant>> GetListByTenantIdsAsync(List<Guid> tenantIds, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get list by codes

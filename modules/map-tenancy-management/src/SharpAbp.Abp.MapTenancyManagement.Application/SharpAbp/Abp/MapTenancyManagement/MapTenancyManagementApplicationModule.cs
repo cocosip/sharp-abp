@@ -2,12 +2,14 @@
 using Volo.Abp.Application;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Modularity;
+using Volo.Abp.TenantManagement;
 
 namespace SharpAbp.Abp.MapTenancyManagement
 {
     [DependsOn(
         typeof(MapTenancyManagementDomainModule),
         typeof(MapTenancyManagementApplicationContractsModule),
+        typeof(AbpTenantManagementApplicationModule),
         typeof(AbpDddApplicationModule),
         typeof(AbpAutoMapperModule)
         )]

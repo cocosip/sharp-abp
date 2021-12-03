@@ -17,8 +17,9 @@
 
   <ItemGroup>
     <PackageReference Include="Volo.Abp.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
+    <PackageReference Include="Volo.Abp.TenantManagement.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\SharpAbp.Abp.MapTenancyManagement.Domain\SharpAbp.Abp.MapTenancyManagement.Domain.csproj" />
   </ItemGroup>
