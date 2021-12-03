@@ -70,7 +70,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
             foreach (var hybridMapTenant in hybridMapTenants)
             {
                 var mapTenant = mapTenants.FirstOrDefault(x => x.TenantId == hybridMapTenant.Id);
-                ObjectMapper.Map<MapTenant, HybridMapTenantDto>(mapTenant);
+                ObjectMapper.Map(mapTenant, hybridMapTenant);
             }
 
             return hybridMapTenants;
@@ -180,7 +180,17 @@ namespace SharpAbp.Abp.MapTenancyManagement
             await TenantRepository.UpdateAsync(tenant);
 
             var mapTenant = await MapTenantRepository.FindByTenantIdAsync(id);
-            if (mapTenant != null)
+            if (mapTenant == null)
+            {
+                mapTenant = new MapTenant(
+                    GuidGenerator.Create(),
+                    input.Code,
+                    tenant.Id,
+                    input.MapCode
+                );
+                await MapTenantManager.CreateAsync(mapTenant);
+            }
+            else
             {
                 await MapTenantManager.UpdateAsync(mapTenant.Id, input.Code, id, input.MapCode);
             }
