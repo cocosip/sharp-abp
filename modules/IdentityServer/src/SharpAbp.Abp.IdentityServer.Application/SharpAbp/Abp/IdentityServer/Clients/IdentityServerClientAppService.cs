@@ -109,7 +109,8 @@ namespace SharpAbp.Abp.IdentityServer.Clients
             //secrets
             foreach (var secret in input.Secrets)
             {
-                var value = secret.Type == "SharedSecret" ? secret.Value : IdentityServer4.Models.HashExtensions.Sha256(secret.Value);
+                //var value = secret.Type == "SharedSecret" ? secret.Value : IdentityServer4.Models.HashExtensions.Sha256(secret.Value);
+                var value = IdentityServer4.Models.HashExtensions.Sha256(secret.Value);
                 client.AddSecret(value, secret.Expiration, secret.Type, secret.Description);
             }
 
@@ -188,7 +189,7 @@ namespace SharpAbp.Abp.IdentityServer.Clients
 
             //Claims
             var claims = input.Claims.Select(x => new System.Security.Claims.Claim(x.Type, x.Value)).ToList();
-            
+
             var removeClaims = client.Claims.Select(x => new System.Security.Claims.Claim(x.Type, x.Value))
                 .Except(claims)
                 .ToList();
@@ -217,7 +218,8 @@ namespace SharpAbp.Abp.IdentityServer.Clients
                 var secret = client.FindSecret(clientSecret.Value, clientSecret.Type);
                 if (secret == null)
                 {
-                    var value = clientSecret.Type == "SharedSecret" ? clientSecret.Value : IdentityServer4.Models.HashExtensions.Sha256(secret.Value);
+                    //var value = clientSecret.Type == "SharedSecret" ? clientSecret.Value : IdentityServer4.Models.HashExtensions.Sha256(secret.Value);
+                    var value = IdentityServer4.Models.HashExtensions.Sha256(secret.Value);
                     client.AddSecret(value, clientSecret.Expiration, clientSecret.Type, clientSecret.Description);
                 }
             }
