@@ -209,18 +209,26 @@ namespace SharpAbp.Abp.IdentityServer.Clients
             }
 
             //ClientSecrets
-            var removeSecrets = client.ClientSecrets.Select(x => (x.Value, x.Type))
-                .Except(input.ClientSecrets.Select(y => (y.Value, y.Type)))
+            var inputClientSecrets = input.ClientSecrets
+                .Select(x => new CreateOrUpdateClientSecretDto()
+                {
+                    Value = x.ClientId.HasValue ? x.Value : IdentityServer4.Models.HashExtensions.Sha256(x.Value),
+                    Type = x.Type,
+                    Expiration = x.Expiration,
+                    Description = x.Description
+                })
                 .ToList();
 
-            foreach (var clientSecret in input.ClientSecrets)
+            var removeSecrets = client.ClientSecrets.Select(x => (x.Value, x.Type))
+                .Except(inputClientSecrets.Select(y => (y.Value, y.Type)))
+                .ToList();
+
+            foreach (var clientSecret in inputClientSecrets)
             {
                 var secret = client.FindSecret(clientSecret.Value, clientSecret.Type);
                 if (secret == null)
                 {
-                    //var value = clientSecret.Type == "SharedSecret" ? clientSecret.Value : IdentityServer4.Models.HashExtensions.Sha256(secret.Value);
-                    var value = IdentityServer4.Models.HashExtensions.Sha256(secret.Value);
-                    client.AddSecret(value, clientSecret.Expiration, clientSecret.Type, clientSecret.Description);
+                    client.AddSecret(clientSecret.Value, clientSecret.Expiration, clientSecret.Type, clientSecret.Description);
                 }
             }
 
