@@ -38,6 +38,12 @@ namespace SharpAbp.Abp.MapTenancyManagement
             return await _hybridMapTenantAppService.GetListAsync(input);
         }
 
+        [HttpGet]
+        [Route("search")]
+        public async Task<PagedResultDto<HybridMapTenantDto>> SearchAsync(HybridMapTenantPagedRequestDto input)
+        {
+            return await _hybridMapTenantAppService.SearchAsync(input);
+        }
 
         [HttpPost]
         public async Task<HybridMapTenantDto> CreateAsync(CreateHybridMapTenantDto input)
@@ -80,6 +86,5 @@ namespace SharpAbp.Abp.MapTenancyManagement
             await _hybridMapTenantAppService.DeleteDefaultConnectionStringAsync(id);
         }
 
-   
     }
 }

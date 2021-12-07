@@ -108,6 +108,39 @@ namespace SharpAbp.Abp.MapTenancyManagement
         }
 
         /// <summary>
+        /// Search HybridMapTenant paged
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        public virtual async Task<PagedResultDto<HybridMapTenantDto>> SearchAsync(HybridMapTenantPagedRequestDto input)
+        {
+            if (input.Sorting.IsNullOrWhiteSpace())
+            {
+                input.Sorting = nameof(Tenant.Name);
+            }
+
+            var count = await TenantRepository.GetCountAsync(input.Filter);
+            var tenants = await TenantRepository.GetListAsync(
+                input.Sorting,
+                input.MaxResultCount,
+                input.SkipCount,
+                input.Filter
+            );
+            var hybridMapTenants = ObjectMapper.Map<List<Tenant>, List<HybridMapTenantDto>>(tenants);
+            var tenantIds = tenants.Select(x => x.Id).ToList();
+            var mapTenants = await MapTenantRepository.GetListByTenantIdsAsync(tenantIds);
+            foreach (var hybridMapTenant in hybridMapTenants)
+            {
+                var mapTenant = mapTenants.FirstOrDefault(x => x.TenantId == hybridMapTenant.Id);
+                ObjectMapper.Map(mapTenant, hybridMapTenant);
+            }
+
+            return new PagedResultDto<HybridMapTenantDto>(count, hybridMapTenants);
+        }
+
+
+        /// <summary>
         /// Create HybridMapTenant
         /// </summary>
         /// <param name="input"></param>
