@@ -10,8 +10,7 @@ namespace SharpAbp.Abp.AspNetCore
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-           
-
+            
         }
 
     }
