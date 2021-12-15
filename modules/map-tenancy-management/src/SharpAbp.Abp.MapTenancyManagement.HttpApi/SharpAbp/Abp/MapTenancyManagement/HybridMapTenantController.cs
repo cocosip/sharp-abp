@@ -33,6 +33,13 @@ namespace SharpAbp.Abp.MapTenancyManagement
         }
 
         [HttpGet]
+        [Route("current")]
+        public async Task<HybridMapTenantDto> CurrentAsync()
+        {
+            return await _hybridMapTenantAppService.CurrentAsync();
+        }
+
+        [HttpGet]
         public async Task<PagedResultDto<HybridMapTenantDto>> GetListAsync(HybridMapTenantPagedRequestDto input)
         {
             return await _hybridMapTenantAppService.GetListAsync(input);
