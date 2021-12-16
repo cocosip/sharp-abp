@@ -1,6 +1,6 @@
 ﻿using SharpAbp.Abp.Identity;
+using Volo.Abp.AutoMapper;
 using Volo.Abp.Emailing;
-using Volo.Abp.Identity;
 using Volo.Abp.Modularity;
 using Volo.Abp.UI.Navigation;
 using Volo.Abp.UI.Navigation.Urls;
@@ -21,6 +21,11 @@ namespace SharpAbp.Abp.Account
             Configure<AbpVirtualFileSystemOptions>(options =>
             {
                 options.FileSets.AddEmbedded<AccountApplicationModule>();
+            });
+
+            Configure<AbpAutoMapperOptions>(options =>
+            {
+                options.AddProfile<AbpAccountApplicationModuleAutoMapperProfile>(validate: true);
             });
 
             Configure<AppUrlOptions>(options =>

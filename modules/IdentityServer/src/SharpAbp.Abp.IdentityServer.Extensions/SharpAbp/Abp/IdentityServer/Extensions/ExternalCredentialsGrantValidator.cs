@@ -112,7 +112,7 @@ namespace SharpAbp.Abp.IdentityServer.Extensions
             else
             {
                 //User is null
-                Logger.LogInformation("No user found matching providerKey: {0}(1) .", loginProvider, providerKey);
+                Logger.LogInformation("No user found matching providerKey: {0}({1}) .", loginProvider, providerKey);
                 errorDescription = Localizer["InvalidUsername"];
 
                 await IdentitySecurityLogManager.SaveAsync(new IdentitySecurityLogContext()

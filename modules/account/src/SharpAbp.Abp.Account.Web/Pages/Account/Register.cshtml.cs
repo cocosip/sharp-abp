@@ -8,6 +8,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Volo.Abp;
+using Volo.Abp.Account;
 using Volo.Abp.Auditing;
 using Volo.Abp.Identity;
 using Volo.Abp.Settings;
@@ -69,7 +70,7 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
                     return;
                 }
 
-                Input = new PostInput {EmailAddress = emailClaim.Value};
+                Input = new PostInput { EmailAddress = emailClaim.Value };
             }
         }
 

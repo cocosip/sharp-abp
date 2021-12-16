@@ -4,7 +4,7 @@
 	<Import Project="..\..\..\..\configureawait.props" />
 
 	<PropertyGroup>
-		<TargetFramework>net5.0</TargetFramework>
+		<TargetFramework>net6.0</TargetFramework>
 		<AssemblyName>SharpAbp.Abp.Account.HttpApi</AssemblyName>
 		<PackageId>SharpAbp.Abp.Account.HttpApi</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
@@ -12,9 +12,9 @@
 		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
 		<Description>SharpAbp Account Module</Description>
-		<RootNamespace>SharpAbp.Abp.Account.Web</RootNamespace>
 		<IsPackable>true</IsPackable>
 		<OutputType>Library</OutputType>
+		<RootNamespace />
 	</PropertyGroup>
 
 	<ItemGroup>

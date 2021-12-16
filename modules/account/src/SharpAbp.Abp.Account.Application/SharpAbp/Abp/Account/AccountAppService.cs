@@ -5,6 +5,7 @@ using SharpAbp.Abp.Account.Localization;
 using SharpAbp.Abp.Account.Settings;
 using System.Threading.Tasks;
 using Volo.Abp;
+using Volo.Abp.Account;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Identity;
 using Volo.Abp.ObjectExtending;
@@ -48,7 +49,7 @@ namespace SharpAbp.Abp.Account
 
             (await UserManager.CreateAsync(user, input.Password)).CheckErrors();
 
-            await UserManager.SetEmailAsync(user,input.EmailAddress);
+            await UserManager.SetEmailAsync(user, input.EmailAddress);
             await UserManager.AddDefaultRolesAsync(user);
 
             return ObjectMapper.Map<IdentityUser, IdentityUserDto>(user);

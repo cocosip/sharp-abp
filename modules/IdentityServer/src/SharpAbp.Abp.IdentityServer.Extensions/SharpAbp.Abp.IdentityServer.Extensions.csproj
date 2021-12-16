@@ -4,7 +4,7 @@
 	<Import Project="..\..\..\..\configureawait.props" />
 
 	<PropertyGroup>
-		<TargetFramework>net5.0</TargetFramework>
+		<TargetFramework>net6.0</TargetFramework>
 		<AssemblyName>SharpAbp.Abp.IdentityServer.Extensions</AssemblyName>
 		<PackageId>SharpAbp.Abp.IdentityServer.Extensions</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
@@ -16,7 +16,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\SharpAbp.Abp.IdentityServer.Domain\SharpAbp.Abp.IdentityServer.Domain.csproj" />
+		<ProjectReference Include="..\SharpAbp.Abp.IdentityServer.Domain\SharpAbp.Abp.IdentityServer.Domain.csproj" />
 	</ItemGroup>
 
 </Project>

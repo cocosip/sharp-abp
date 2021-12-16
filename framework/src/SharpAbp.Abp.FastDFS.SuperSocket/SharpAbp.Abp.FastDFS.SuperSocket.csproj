@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FastDFSCore.Transport.SuperSocket" Version="1.5.2" />
+    <PackageReference Include="FastDFSCore.Transport.SuperSocket" Version="1.7.0" />
   </ItemGroup>
 
   <ItemGroup>

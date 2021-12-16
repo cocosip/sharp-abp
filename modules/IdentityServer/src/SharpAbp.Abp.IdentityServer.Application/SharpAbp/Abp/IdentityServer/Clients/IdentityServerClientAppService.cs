@@ -264,7 +264,7 @@ namespace SharpAbp.Abp.IdentityServer.Clients
 
             foreach (var property in input.Properties)
             {
-                var clientProperty = client.FindProperty(property.Key, property.Value);
+                var clientProperty = client.FindProperty(property.Key);
                 if (clientProperty == null)
                 {
                     client.AddProperty(property.Key, property.Value);
@@ -273,7 +273,7 @@ namespace SharpAbp.Abp.IdentityServer.Clients
 
             foreach (var removeProperty in removeProperties)
             {
-                client.RemoveProperty(removeProperty.Key, removeProperty.Value);
+                client.RemoveProperty(removeProperty.Key);
             }
 
             //RedirectUris

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using SharpAbp.Abp.Account.Web.Pages.Account.Components.ProfileManagementGroup.PersonalInfo;
-using Volo.Abp.Identity;
+using Volo.Abp.Account;
 
 namespace SharpAbp.Abp.Account.Web
 {

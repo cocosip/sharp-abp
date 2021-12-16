@@ -1,25 +1,26 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\..\common.props" />
-  <Import Project="..\..\..\configureawait.props" />
+	<Import Project="..\..\..\common.props" />
+	<Import Project="..\..\..\configureawait.props" />
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <AssemblyName>SharpAbp.Abp.DbConnections.Oracle</AssemblyName>
-    <PackageId>SharpAbp.Abp.DbConnections.Oracle</PackageId>
-    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Description>SharpAbp DbConnection Module</Description>
-    <RootNamespace />
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<AssemblyName>SharpAbp.Abp.DbConnections.Oracle</AssemblyName>
+		<PackageId>SharpAbp.Abp.DbConnections.Oracle</PackageId>
+		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<Description>SharpAbp DbConnection Module</Description>
+		<RootNamespace />
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Volo.Abp.EntityFrameworkCore.Oracle" Version="$(VoloAbpPackageVersion)" />
-  </ItemGroup>
+	<ItemGroup>
+		<!--<PackageReference Include="Volo.Abp.EntityFrameworkCore.Oracle" Version="$(VoloAbpPackageVersion)" />-->
+		<PackageReference Include="Volo.Abp.EntityFrameworkCore.Oracle" Version="4.4.4" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SharpAbp.Abp.DbConnections\SharpAbp.Abp.DbConnections.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\SharpAbp.Abp.DbConnections\SharpAbp.Abp.DbConnections.csproj" />
+	</ItemGroup>
 </Project>

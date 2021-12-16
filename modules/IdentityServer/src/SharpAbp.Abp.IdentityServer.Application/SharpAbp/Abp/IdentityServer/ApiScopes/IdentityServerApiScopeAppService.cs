@@ -38,7 +38,7 @@ namespace SharpAbp.Abp.IdentityServer.ApiScopes
         [Authorize(IdentityServerPermissions.ApiScopes.Default)]
         public virtual async Task<ApiScopeDto> FindByName(string name)
         {
-            var apiScope = await ApiScopeRepository.GetByNameAsync(name);
+            var apiScope = await ApiScopeRepository.FindByNameAsync(name);
             return ObjectMapper.Map<ApiScope, ApiScopeDto>(apiScope);
         }
 

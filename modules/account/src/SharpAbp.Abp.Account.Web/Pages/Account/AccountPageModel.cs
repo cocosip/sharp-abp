@@ -50,7 +50,8 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
         {
             if (exception is ILocalizeErrorMessage || exception is IHasErrorCode)
             {
-                return ExceptionToErrorInfoConverter.Convert(exception, false).Message;
+                return ExceptionToErrorInfoConverter.Convert(exception, null).Message;
+                //return ExceptionToErrorInfoConverter.Convert(exception, false).Message;
             }
 
             return exception.Message;
