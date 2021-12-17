@@ -12,8 +12,7 @@ using Volo.Abp.TenantManagement;
 
 namespace SharpAbp.Abp.MapTenancyManagement
 {
-    [Authorize(TenantManagementPermissions.Tenants.Default)]
-    [Authorize(MapTenancyManagementPermissions.MapTenants.Default)]
+    [Authorize]
     public class HybridMapTenantAppService : TenantManagementAppServiceBase, IHybridMapTenantAppService
     {
         protected IDataSeeder DataSeeder { get; }
@@ -44,6 +43,8 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [Authorize(TenantManagementPermissions.Tenants.Default)]
+        [Authorize(MapTenancyManagementPermissions.MapTenants.Default)]
         public virtual async Task<HybridMapTenantDto> GetAsync(Guid id)
         {
             var tenant = await TenantRepository.GetAsync(id);
@@ -81,6 +82,8 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
+        [Authorize(TenantManagementPermissions.Tenants.Default)]
+        [Authorize(MapTenancyManagementPermissions.MapTenants.Default)]
         public virtual async Task<PagedResultDto<HybridMapTenantDto>> GetListAsync(HybridMapTenantPagedRequestDto input)
         {
             if (input.Sorting.IsNullOrWhiteSpace())
