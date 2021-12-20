@@ -63,7 +63,7 @@ namespace SharpAbp.Abp.FileStoringManagement
             var values = fileProviderConfiguration.GetValueTypes();
             var providerOptions = new ProviderOptionsDto(provider);
 
-            var ll = StringLocalizerFactory.Create(fileProviderConfiguration.LocalizationResourceType);
+            var ll = StringLocalizerFactory.Create(fileProviderConfiguration.LocalizationResource);
 
             foreach (var kv in values)
             {

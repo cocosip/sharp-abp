@@ -10,7 +10,7 @@ namespace SharpAbp.Abp.FileStoring
     {
         public string Provider { get; }
 
-        public Type LocalizationResourceType { get; }
+        public Type LocalizationResource { get; }
 
         public ITypeList<IFileNamingNormalizer> DefaultNamingNormalizers { get; }
 
@@ -23,10 +23,10 @@ namespace SharpAbp.Abp.FileStoring
             _valueTypes = new Dictionary<string, Type>();
         }
 
-        public FileProviderConfiguration([NotNull] string provider, Type localizationResourceType) : this()
+        public FileProviderConfiguration([NotNull] string provider, Type localizationResource) : this()
         {
             Provider = provider;
-            LocalizationResourceType = localizationResourceType;
+            LocalizationResource = localizationResource;
         }
 
         public Type GetValueType([NotNull] string name)

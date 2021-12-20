@@ -44,7 +44,10 @@ namespace SharpAbp.Abp.FileStoring.Azure
 
         private FileProviderConfiguration GetFileProviderConfiguration()
         {
-            var configuration = new FileProviderConfiguration(AzureFileProviderConfigurationNames.ProviderName,typeof(FileStoringAzureResource));
+            var configuration = new FileProviderConfiguration(
+                AzureFileProviderConfigurationNames.ProviderName,
+                typeof(FileStoringAzureResource));
+                
             configuration.DefaultNamingNormalizers.TryAdd<AzureFileNamingNormalizer>();
             configuration
                 .SetValueType(AzureFileProviderConfigurationNames.ConnectionString, typeof(string))
