@@ -1,4 +1,4 @@
-﻿//using Devart.Data.Oracle;
+﻿using Devart.Data.Oracle;
 using Microsoft.Data.SqlClient;
 using MySqlConnector;
 using Npgsql;
@@ -30,9 +30,9 @@ namespace SharpAbp.Abp.DbConnections
             Assert.Equal(typeof(SqlConnection), dbConnection3.GetType());
             Assert.Equal("server=.;database=demo3;integrated security=SSPI", dbConnection3.ConnectionString);
 
-            // var dbConnection4 = await _dbConnectionFactory.GetDbConnectionAsync("db4");
-            // Assert.Equal(typeof(OracleConnection), dbConnection4.GetType());
-            // Assert.Equal("User ID=root;Password=123456;Data Source=(DESCRIPTION = (ADDRESS_LIST= (ADDRESS = (PROTOCOL = TCP)(HOST = 127.0.0.1)(PORT = 1521))) (CONNECT_DATA = (SERVICE_NAME = demo4)));", dbConnection4.ConnectionString);
+            var dbConnection4 = await _dbConnectionFactory.GetDbConnectionAsync("db4");
+            Assert.Equal(typeof(OracleConnection), dbConnection4.GetType());
+            Assert.Equal("User ID=root;Password=123456;Data Source=(DESCRIPTION = (ADDRESS_LIST= (ADDRESS = (PROTOCOL = TCP)(HOST = 127.0.0.1)(PORT = 1521))) (CONNECT_DATA = (SERVICE_NAME = demo4)));", dbConnection4.ConnectionString);
 
         }
     }

@@ -4,7 +4,7 @@
 	<Import Project="..\..\..\configureawait.props" />
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.1</TargetFramework>
+		<TargetFramework>net6.0</TargetFramework>
 		<AssemblyName>SharpAbp.Abp.DbConnections.Oracle.Devart</AssemblyName>
 		<PackageId>SharpAbp.Abp.DbConnections.Oracle.Devart</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
@@ -16,8 +16,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<!--<PackageReference Include="Volo.Abp.EntityFrameworkCore.Oracle.Devart" Version="$(VoloAbpPackageVersion)" />-->
-		<PackageReference Include="Volo.Abp.EntityFrameworkCore.Oracle.Devart" Version="4.4.4" />
+		<PackageReference Include="Volo.Abp.EntityFrameworkCore.Oracle.Devart" Version="$(VoloAbpPackageVersion)" />
 	</ItemGroup>
 
 	<ItemGroup>
