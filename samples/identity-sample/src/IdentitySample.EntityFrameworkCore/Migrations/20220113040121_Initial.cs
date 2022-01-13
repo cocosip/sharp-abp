@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
+#nullable disable
+
 namespace IdentitySample.Migrations
 {
     public partial class Initial : Migration
@@ -16,10 +18,12 @@ namespace IdentitySample.Migrations
                     UserId = table.Column<Guid>(type: "uuid", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     TenantId = table.Column<Guid>(type: "uuid", nullable: true),
-                    TenantName = table.Column<string>(type: "text", nullable: true),
+                    TenantName = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     ImpersonatorUserId = table.Column<Guid>(type: "uuid", nullable: true),
+                    ImpersonatorUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     ImpersonatorTenantId = table.Column<Guid>(type: "uuid", nullable: true),
-                    ExecutionTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    ImpersonatorTenantName = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
+                    ExecutionTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ExecutionDuration = table.Column<int>(type: "integer", nullable: false),
                     ClientIpAddress = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     ClientName = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
@@ -47,9 +51,9 @@ namespace IdentitySample.Migrations
                     JobName = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     JobArgs = table.Column<string>(type: "character varying(1048576)", maxLength: 1048576, nullable: false),
                     TryCount = table.Column<short>(type: "smallint", nullable: false, defaultValue: (short)0),
-                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    NextTryTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    LastTryTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    CreationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    NextTryTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastTryTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsAbandoned = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     Priority = table.Column<byte>(type: "smallint", nullable: false, defaultValue: (byte)15),
                     ExtraProperties = table.Column<string>(type: "text", nullable: true),
@@ -121,13 +125,13 @@ namespace IdentitySample.Migrations
                     DisplayName = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     ExtraProperties = table.Column<string>(type: "text", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: true),
-                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
-                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     LastModifierId = table.Column<Guid>(type: "uuid", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     DeleterId = table.Column<Guid>(type: "uuid", nullable: true),
-                    DeletionTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                    DeletionTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -136,8 +140,7 @@ namespace IdentitySample.Migrations
                         name: "FK_AbpOrganizationUnits_AbpOrganizationUnits_ParentId",
                         column: x => x.ParentId,
                         principalTable: "AbpOrganizationUnits",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -190,7 +193,7 @@ namespace IdentitySample.Migrations
                     CorrelationId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     ClientIpAddress = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     BrowserInfo = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: true),
-                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ExtraProperties = table.Column<string>(type: "text", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: true)
                 },
@@ -222,13 +225,13 @@ namespace IdentitySample.Migrations
                     Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     ExtraProperties = table.Column<string>(type: "text", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: true),
-                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
-                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     LastModifierId = table.Column<Guid>(type: "uuid", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     DeleterId = table.Column<Guid>(type: "uuid", nullable: true),
-                    DeletionTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                    DeletionTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -253,19 +256,20 @@ namespace IdentitySample.Migrations
                     IsExternal = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     PhoneNumber = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: true),
                     PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     AccessFailedCount = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
                     ExtraProperties = table.Column<string>(type: "text", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: true),
-                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
-                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     LastModifierId = table.Column<Guid>(type: "uuid", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     DeleterId = table.Column<Guid>(type: "uuid", nullable: true),
-                    DeletionTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                    DeletionTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -285,13 +289,13 @@ namespace IdentitySample.Migrations
                     ShowInDiscoveryDocument = table.Column<bool>(type: "boolean", nullable: false),
                     ExtraProperties = table.Column<string>(type: "text", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: true),
-                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
-                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     LastModifierId = table.Column<Guid>(type: "uuid", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     DeleterId = table.Column<Guid>(type: "uuid", nullable: true),
-                    DeletionTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                    DeletionTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -312,13 +316,13 @@ namespace IdentitySample.Migrations
                     ShowInDiscoveryDocument = table.Column<bool>(type: "boolean", nullable: false),
                     ExtraProperties = table.Column<string>(type: "text", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: true),
-                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
-                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     LastModifierId = table.Column<Guid>(type: "uuid", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     DeleterId = table.Column<Guid>(type: "uuid", nullable: true),
-                    DeletionTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                    DeletionTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -371,13 +375,13 @@ namespace IdentitySample.Migrations
                     DeviceCodeLifetime = table.Column<int>(type: "integer", nullable: false),
                     ExtraProperties = table.Column<string>(type: "text", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: true),
-                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
-                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     LastModifierId = table.Column<Guid>(type: "uuid", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     DeleterId = table.Column<Guid>(type: "uuid", nullable: true),
-                    DeletionTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                    DeletionTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -395,11 +399,11 @@ namespace IdentitySample.Migrations
                     SessionId = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     ClientId = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
-                    Expiration = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    Expiration = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Data = table.Column<string>(type: "character varying(50000)", maxLength: 50000, nullable: false),
                     ExtraProperties = table.Column<string>(type: "text", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: true),
-                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -421,13 +425,13 @@ namespace IdentitySample.Migrations
                     ShowInDiscoveryDocument = table.Column<bool>(type: "boolean", nullable: false),
                     ExtraProperties = table.Column<string>(type: "text", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: true),
-                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
-                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     LastModifierId = table.Column<Guid>(type: "uuid", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     DeleterId = table.Column<Guid>(type: "uuid", nullable: true),
-                    DeletionTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                    DeletionTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -444,9 +448,9 @@ namespace IdentitySample.Migrations
                     SessionId = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     ClientId = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
-                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    Expiration = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
-                    ConsumedTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    CreationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Expiration = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ConsumedTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     Data = table.Column<string>(type: "character varying(50000)", maxLength: 50000, nullable: false),
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ExtraProperties = table.Column<string>(type: "text", nullable: true),
@@ -467,7 +471,7 @@ namespace IdentitySample.Migrations
                     ServiceName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     MethodName = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
                     Parameters = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
-                    ExecutionTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    ExecutionTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ExecutionDuration = table.Column<int>(type: "integer", nullable: false),
                     ExtraProperties = table.Column<string>(type: "text", nullable: true)
                 },
@@ -489,7 +493,7 @@ namespace IdentitySample.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     AuditLogId = table.Column<Guid>(type: "uuid", nullable: false),
                     TenantId = table.Column<Guid>(type: "uuid", nullable: true),
-                    ChangeTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    ChangeTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ChangeType = table.Column<byte>(type: "smallint", nullable: false),
                     EntityTenantId = table.Column<Guid>(type: "uuid", nullable: true),
                     EntityId = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
@@ -514,7 +518,7 @@ namespace IdentitySample.Migrations
                     RoleId = table.Column<Guid>(type: "uuid", nullable: false),
                     OrganizationUnitId = table.Column<Guid>(type: "uuid", nullable: false),
                     TenantId = table.Column<Guid>(type: "uuid", nullable: true),
-                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -623,7 +627,7 @@ namespace IdentitySample.Migrations
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     OrganizationUnitId = table.Column<Guid>(type: "uuid", nullable: false),
                     TenantId = table.Column<Guid>(type: "uuid", nullable: true),
-                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -752,7 +756,7 @@ namespace IdentitySample.Migrations
                     Value = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: false),
                     ApiResourceId = table.Column<Guid>(type: "uuid", nullable: false),
                     Description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
-                    Expiration = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                    Expiration = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -956,7 +960,7 @@ namespace IdentitySample.Migrations
                     Value = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: false),
                     ClientId = table.Column<Guid>(type: "uuid", nullable: false),
                     Description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
-                    Expiration = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                    Expiration = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1072,7 +1076,8 @@ namespace IdentitySample.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_AbpFeatureValues_Name_ProviderName_ProviderKey",
                 table: "AbpFeatureValues",
-                columns: new[] { "Name", "ProviderName", "ProviderKey" });
+                columns: new[] { "Name", "ProviderName", "ProviderKey" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AbpLinkUsers_SourceUserId_SourceTenantId_TargetUserId_Targe~",
@@ -1096,9 +1101,10 @@ namespace IdentitySample.Migrations
                 column: "ParentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AbpPermissionGrants_Name_ProviderName_ProviderKey",
+                name: "IX_AbpPermissionGrants_TenantId_Name_ProviderName_ProviderKey",
                 table: "AbpPermissionGrants",
-                columns: new[] { "Name", "ProviderName", "ProviderKey" });
+                columns: new[] { "TenantId", "Name", "ProviderName", "ProviderKey" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AbpRoleClaims_RoleId",
@@ -1133,7 +1139,8 @@ namespace IdentitySample.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_AbpSettings_Name_ProviderName_ProviderKey",
                 table: "AbpSettings",
-                columns: new[] { "Name", "ProviderName", "ProviderKey" });
+                columns: new[] { "Name", "ProviderName", "ProviderKey" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AbpTenants_Name",

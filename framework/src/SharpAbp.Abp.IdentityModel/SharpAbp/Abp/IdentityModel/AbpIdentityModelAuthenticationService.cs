@@ -37,8 +37,6 @@ namespace SharpAbp.Abp.IdentityModel
 
         protected override async Task<TokenResponse> GetTokenResponse(IdentityClientConfiguration configuration)
         {
-            var tokenEndpoint = await GetTokenEndpoint(configuration);
-
             using (var httpClient = HttpClientFactory.CreateClient(HttpClientName))
             {
                 AddHeaders(httpClient);
@@ -47,17 +45,17 @@ namespace SharpAbp.Abp.IdentityModel
                 {
                     case OidcConstants.GrantTypes.ClientCredentials:
                         return await httpClient.RequestClientCredentialsTokenAsync(
-                            await CreateClientCredentialsTokenRequestAsync(tokenEndpoint, configuration),
+                            await CreateClientCredentialsTokenRequestAsync(configuration),
                             CancellationTokenProvider.Token
                         );
                     case OidcConstants.GrantTypes.Password:
                         return await httpClient.RequestPasswordTokenAsync(
-                            await CreatePasswordTokenRequestAsync(tokenEndpoint, configuration),
+                            await CreatePasswordTokenRequestAsync(configuration),
                             CancellationTokenProvider.Token
                         );
                     case ExternalCredentialsConstants.GrantType:
                         return await httpClient.RequestExternalCredentialsTokenAsync(
-                            await CreateExternalCredentialsTokenRequestAsync(tokenEndpoint, configuration),
+                            await CreateExternalCredentialsTokenRequestAsync(configuration),
                             CancellationTokenProvider.Token
                         );
                     default:
@@ -66,13 +64,12 @@ namespace SharpAbp.Abp.IdentityModel
             }
         }
 
-        protected virtual Task<ExternalCredentialsTokenRequest> CreateExternalCredentialsTokenRequestAsync(
-            string tokenEndpoint,
-            IdentityClientConfiguration configuration)
+        protected virtual async Task<ExternalCredentialsTokenRequest> CreateExternalCredentialsTokenRequestAsync(IdentityClientConfiguration configuration)
         {
+            var discoveryResponse = await GetDiscoveryResponse(configuration);
             var request = new ExternalCredentialsTokenRequest
             {
-                Address = tokenEndpoint,
+                Address = discoveryResponse.TokenEndpoint,
                 ClientId = configuration.ClientId,
                 ClientSecret = configuration.ClientSecret,
                 Scope = configuration.Scope,
@@ -82,9 +79,9 @@ namespace SharpAbp.Abp.IdentityModel
 
             IdentityModelHttpRequestMessageOptions.ConfigureHttpRequestMessage?.Invoke(request);
 
-            AddParametersToRequestAsync(configuration, request);
+            await AddParametersToRequestAsync(configuration, request);
 
-            return Task.FromResult(request);
+            return request;
         }
 
     }
