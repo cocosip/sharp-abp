@@ -22,6 +22,8 @@ namespace SharpAbp.Abp.AuditLogging
 
         public Guid? ImpersonatorTenantId { get; set; }
 
+        public string ImpersonatorTenantName { get; set; }
+
         public DateTime ExecutionTime { get; set; }
 
         public int ExecutionDuration { get; set; }
