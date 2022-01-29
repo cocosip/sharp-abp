@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Data;
+using Volo.Abp.Domain.Repositories;
 using Volo.Abp.EventBus.Distributed;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.ObjectExtending;
@@ -272,7 +273,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
             {
                 return;
             }
-            await TenantRepository.DeleteAsync(tenant);
+            await TenantRepository.HardDeleteAsync(tenant);
 
             var mapTenant = await MapTenantRepository.FindByTenantIdAsync(id);
             if (mapTenant == null)
