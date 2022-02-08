@@ -273,7 +273,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
             {
                 return;
             }
-            await TenantRepository.HardDeleteAsync(tenant);
+            await TenantRepository.DeleteAsync(tenant);
 
             var mapTenant = await MapTenantRepository.FindByTenantIdAsync(id);
             if (mapTenant == null)
