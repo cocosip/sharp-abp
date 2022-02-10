@@ -1,0 +1,19 @@
+{
+  "culture": "en",
+  "texts": {
+    "Aws.AccessKeyId": "AccessKeyId",
+    "Aws.SecretAccessKey": "SecretAccessKey",
+    "Aws.UseCredentials": "Use credentials",
+    "Aws.UseTemporaryCredentials": "Use temporary credentials",
+    "Aws.UseTemporaryFederatedCredentials": "Use temporary federated credentials",
+    "Aws.ProfileName": "Profile name",
+    "Aws.ProfilesLocation": "Profiles location",
+    "Aws.DurationSeconds": "Duration seconds",
+    "Aws.TemporaryCredentialsCacheKey": "Temporary credentials cache key",
+    "Aws.Name": "Aws name",
+    "Aws.Policy": "Policy",
+    "Aws.Region": "Region",
+    "Aws.ContainerName": "Container name",
+    "Aws.CreateContainerIfNotExists": "Create container if not exists"
+  }
+}

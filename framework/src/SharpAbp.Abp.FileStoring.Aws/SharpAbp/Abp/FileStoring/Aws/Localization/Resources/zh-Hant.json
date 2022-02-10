@@ -1,0 +1,19 @@
+{
+  "culture": "zh-Hant",
+  "texts": {
+    "Aws.AccessKeyId": "AccessKeyId",
+    "Aws.SecretAccessKey": "SecretAccessKey",
+    "Aws.UseCredentials": "是否使用憑據",
+    "Aws.UseTemporaryCredentials": "是否使用臨時憑據",
+    "Aws.UseTemporaryFederatedCredentials": "是否使用聯合臨時憑據",
+    "Aws.ProfileName": "配置文件名",
+    "Aws.ProfilesLocation": "配置文件位置",
+    "Aws.DurationSeconds": "持續秒數",
+    "Aws.TemporaryCredentialsCacheKey": "臨時憑據緩存Key",
+    "Aws.Name": "Aws名稱",
+    "Aws.Policy": "策略",
+    "Aws.Region": "區域",
+    "Aws.ContainerName": "容器名稱",
+    "Aws.CreateContainerIfNotExists": "自動創建容器"
+  }
+}
