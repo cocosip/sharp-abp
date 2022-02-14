@@ -315,6 +315,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "performance-sample", "perfo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoring.Aws", "framework\src\SharpAbp.Abp.FileStoring.Aws\SharpAbp.Abp.FileStoring.Aws.csproj", "{9597789A-71F0-47B8-BF79-B461D2EF102A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoring.KS3", "framework\src\SharpAbp.Abp.FileStoring.KS3\SharpAbp.Abp.FileStoring.KS3.csproj", "{AF413011-6A9E-463E-B863-425EC3AA05BE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -809,6 +811,10 @@ Global
 		{9597789A-71F0-47B8-BF79-B461D2EF102A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9597789A-71F0-47B8-BF79-B461D2EF102A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9597789A-71F0-47B8-BF79-B461D2EF102A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF413011-6A9E-463E-B863-425EC3AA05BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF413011-6A9E-463E-B863-425EC3AA05BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF413011-6A9E-463E-B863-425EC3AA05BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF413011-6A9E-463E-B863-425EC3AA05BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -967,6 +973,7 @@ Global
 		{1EB3C4EE-08B7-4821-976F-EAE125D1CF70} = {2603DFF1-AF81-4EF0-B0E2-23A0264D0236}
 		{A9B81D35-A74D-41F7-B25E-58E5E74AE08A} = {2603DFF1-AF81-4EF0-B0E2-23A0264D0236}
 		{9597789A-71F0-47B8-BF79-B461D2EF102A} = {16E4EB45-D029-4743-99CD-D125C72AE383}
+		{AF413011-6A9E-463E-B863-425EC3AA05BE} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {01335FC4-439E-46F3-B61A-B7919F950373}

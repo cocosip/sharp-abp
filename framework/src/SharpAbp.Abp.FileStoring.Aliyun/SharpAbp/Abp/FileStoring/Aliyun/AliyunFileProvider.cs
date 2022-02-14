@@ -39,7 +39,6 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             return OssClientFactory.Create(aliyunConfig);
         }
 
-
         public override Task<string> SaveAsync(FileProviderSaveArgs args)
         {
             var containerName = GetContainerName(args);

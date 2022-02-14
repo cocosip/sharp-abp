@@ -1,0 +1,15 @@
+{
+  "culture": "zh-Hans",
+  "texts": {
+    "KS3.BucketName": "桶名",
+    "KS3.Endpoint": "终结点",
+    "KS3.AccessKey": "AccessKey",
+    "KS3.SecretKey": "SecretKey",
+    "KS3.UserAgent": "User agent",
+    "KS3.Protocol": "协议",
+    "KS3.MaxConnections": "最大连接数",
+    "KS3.Timeout": "超时时间",
+    "KS3.ReadWriteTimeout": "读写超时时间",
+    "KS3.CreateContainerIfNotExists": "自动建桶"
+  }
+}
