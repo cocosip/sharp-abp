@@ -1,0 +1,15 @@
+{
+  "culture": "en",
+  "texts": {
+    "KS3.BucketName": "Bucket name",
+    "KS3.Endpoint": "Endpoint",
+    "KS3.AccessKey": "AccessKey",
+    "KS3.SecretKey": "SecretKey",
+    "KS3.UserAgent": "User agent",
+    "KS3.Protocol": "Protocol",
+    "KS3.MaxConnections": "Max connection count",
+    "KS3.Timeout": "Timeout",
+    "KS3.ReadWriteTimeout": "Read write time out",
+    "KS3.CreateContainerIfNotExists": "Create container if not exists"
+  }
+}

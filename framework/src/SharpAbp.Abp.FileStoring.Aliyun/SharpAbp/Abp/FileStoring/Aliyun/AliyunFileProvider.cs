@@ -39,7 +39,6 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             return OssClientFactory.Create(aliyunConfig);
         }
 
-
         public override Task<string> SaveAsync(FileProviderSaveArgs args)
         {
             var containerName = GetContainerName(args);
@@ -93,9 +92,8 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
                 return null;
             }
             var result = ossClient.GetObject(containerName, blobName);
-            var memoryStream = new MemoryStream();
-            await result.Content.CopyToAsync(memoryStream);
-            return memoryStream;
+
+            return await TryCopyToMemoryStreamAsync(result.Content, args.CancellationToken);
         }
 
         public override async Task<bool> DownloadAsync(FileProviderDownloadArgs args)
@@ -109,11 +107,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             }
 
             var result = ossClient.GetObject(containerName, fileName);
-
-            using (var fs = new FileStream(args.Path, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-            {
-                await result.Content.CopyToAsync(fs);
-            }
+            await TryWriteToFileAsync(result.Content, args.Path, args.CancellationToken);
             return true;
         }
 
@@ -127,7 +121,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             var containerName = GetContainerName(args);
             var fileName = AliyunFileNameCalculator.Calculate(args);
             var ossClient = GetOssClient(args.Configuration);
-            
+
             if (!FileExistsAsync(ossClient, containerName, fileName))
             {
                 return Task.FromResult(string.Empty);
@@ -139,8 +133,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             return Task.FromResult(uri.ToString());
         }
 
-
-        private string GetContainerName(FileProviderArgs args)
+        protected virtual string GetContainerName(FileProviderArgs args)
         {
             var configuration = args.Configuration.GetAliyunConfiguration();
             return configuration.BucketName.IsNullOrWhiteSpace()
@@ -148,7 +141,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
                 : FileNormalizeNamingService.NormalizeContainerName(args.Configuration, configuration.BucketName);
         }
 
-        private bool FileExistsAsync(IOss ossClient, string containerName, string fileName)
+        protected virtual bool FileExistsAsync(IOss ossClient, string containerName, string fileName)
         {
             // Make sure Blob Container exists.
             return ossClient.DoesBucketExist(containerName) &&

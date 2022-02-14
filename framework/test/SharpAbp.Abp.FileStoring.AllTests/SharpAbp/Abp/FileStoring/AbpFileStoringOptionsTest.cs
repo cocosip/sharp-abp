@@ -150,7 +150,7 @@ namespace SharpAbp.Abp.FileStoring
         public void FileProviders_Test()
         {
             var fileProviderConfigurations = _options.Providers.GetFileProviders();
-            Assert.Equal(6, fileProviderConfigurations.Count);
+            Assert.Equal(8, fileProviderConfigurations.Count);
 
             var aliyunProviderConfiguration = _options.Providers.GetConfiguration("Aliyun");
             Assert.Equal("Aliyun", aliyunProviderConfiguration.Provider);
@@ -166,6 +166,12 @@ namespace SharpAbp.Abp.FileStoring
 
             var fileSystemProviderConfiguration = _options.Providers.GetConfiguration("FileSystem");
             Assert.Equal("FileSystem", fileSystemProviderConfiguration.Provider);
+
+            var awsProviderConfiguration = _options.Providers.GetConfiguration("Aws");
+            Assert.Equal("Aws", awsProviderConfiguration.Provider);
+
+            var ks3ProviderConfiguration = _options.Providers.GetConfiguration("KS3");
+            Assert.Equal("KS3", ks3ProviderConfiguration.Provider);
 
             var s3ProviderConfiguration = _options.Providers.GetConfiguration("S3");
             Assert.Equal("S3", s3ProviderConfiguration.Provider);

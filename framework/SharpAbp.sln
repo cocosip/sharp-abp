@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30320.27
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32126.317
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{16E4EB45-D029-4743-99CD-D125C72AE383}"
 EndProject
@@ -80,6 +80,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.AspNetCore.Mvc", "src\SharpAbp.Abp.AspNetCore.Mvc\SharpAbp.Abp.AspNetCore.Mvc.csproj", "{2B3B9980-69F7-42AD-BB07-C89742A60134}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.IdentityModel", "src\SharpAbp.Abp.IdentityModel\SharpAbp.Abp.IdentityModel.csproj", "{82CE2F4D-5B4B-4F55-806C-7C5BE6773D96}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoring.Aws", "src\SharpAbp.Abp.FileStoring.Aws\SharpAbp.Abp.FileStoring.Aws.csproj", "{51280AE2-547D-4885-85E5-D9FA151E2DA3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.FileStoring.KS3", "src\SharpAbp.Abp.FileStoring.KS3\SharpAbp.Abp.FileStoring.KS3.csproj", "{F79903EC-60DE-4060-A4D9-FE533C052E60}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -535,6 +539,30 @@ Global
 		{82CE2F4D-5B4B-4F55-806C-7C5BE6773D96}.Release|x64.Build.0 = Release|Any CPU
 		{82CE2F4D-5B4B-4F55-806C-7C5BE6773D96}.Release|x86.ActiveCfg = Release|Any CPU
 		{82CE2F4D-5B4B-4F55-806C-7C5BE6773D96}.Release|x86.Build.0 = Release|Any CPU
+		{51280AE2-547D-4885-85E5-D9FA151E2DA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51280AE2-547D-4885-85E5-D9FA151E2DA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51280AE2-547D-4885-85E5-D9FA151E2DA3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{51280AE2-547D-4885-85E5-D9FA151E2DA3}.Debug|x64.Build.0 = Debug|Any CPU
+		{51280AE2-547D-4885-85E5-D9FA151E2DA3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{51280AE2-547D-4885-85E5-D9FA151E2DA3}.Debug|x86.Build.0 = Debug|Any CPU
+		{51280AE2-547D-4885-85E5-D9FA151E2DA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51280AE2-547D-4885-85E5-D9FA151E2DA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51280AE2-547D-4885-85E5-D9FA151E2DA3}.Release|x64.ActiveCfg = Release|Any CPU
+		{51280AE2-547D-4885-85E5-D9FA151E2DA3}.Release|x64.Build.0 = Release|Any CPU
+		{51280AE2-547D-4885-85E5-D9FA151E2DA3}.Release|x86.ActiveCfg = Release|Any CPU
+		{51280AE2-547D-4885-85E5-D9FA151E2DA3}.Release|x86.Build.0 = Release|Any CPU
+		{F79903EC-60DE-4060-A4D9-FE533C052E60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F79903EC-60DE-4060-A4D9-FE533C052E60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F79903EC-60DE-4060-A4D9-FE533C052E60}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F79903EC-60DE-4060-A4D9-FE533C052E60}.Debug|x64.Build.0 = Debug|Any CPU
+		{F79903EC-60DE-4060-A4D9-FE533C052E60}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F79903EC-60DE-4060-A4D9-FE533C052E60}.Debug|x86.Build.0 = Debug|Any CPU
+		{F79903EC-60DE-4060-A4D9-FE533C052E60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F79903EC-60DE-4060-A4D9-FE533C052E60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F79903EC-60DE-4060-A4D9-FE533C052E60}.Release|x64.ActiveCfg = Release|Any CPU
+		{F79903EC-60DE-4060-A4D9-FE533C052E60}.Release|x64.Build.0 = Release|Any CPU
+		{F79903EC-60DE-4060-A4D9-FE533C052E60}.Release|x86.ActiveCfg = Release|Any CPU
+		{F79903EC-60DE-4060-A4D9-FE533C052E60}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -577,6 +605,8 @@ Global
 		{2CEA443E-89B2-4380-84E0-DE46887F99AC} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 		{2B3B9980-69F7-42AD-BB07-C89742A60134} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 		{82CE2F4D-5B4B-4F55-806C-7C5BE6773D96} = {16E4EB45-D029-4743-99CD-D125C72AE383}
+		{51280AE2-547D-4885-85E5-D9FA151E2DA3} = {16E4EB45-D029-4743-99CD-D125C72AE383}
+		{F79903EC-60DE-4060-A4D9-FE533C052E60} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {30432CEA-45F2-4F5A-B44B-790A62AB73F1}

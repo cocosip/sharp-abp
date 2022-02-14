@@ -11,7 +11,7 @@
     <MicrosoftNETTestSdkPackageVersion>17.0.0</MicrosoftNETTestSdkPackageVersion>
 
     <!-- NSubstitute  https://www.nuget.org/packages/NSubstitute -->
-    <NSubstitutePackageVersion>4.2.2</NSubstitutePackageVersion>
+    <NSubstitutePackageVersion>4.3.0</NSubstitutePackageVersion>
 
     <!-- Shouldly https://www.nuget.org/packages/Shouldly -->
     <ShouldlyPackageVersion>4.0.3</ShouldlyPackageVersion>
