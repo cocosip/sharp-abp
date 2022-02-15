@@ -1,10 +1,8 @@
 ﻿using KS3;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Timing;
@@ -53,13 +51,13 @@ namespace SharpAbp.Abp.FileStoring.KS3
             var fileName = KS3FileNameCalculator.Calculate(args);
             var ks3Config = args.Configuration.GetKS3Configuration();
             var ks3Client = GetKS3Client(ks3Config);
-            if (!args.OverrideExisting && FileExistsAsync(ks3Client, containerName, fileName))
+            if (!args.OverrideExisting && FileExists(ks3Client, containerName, fileName))
             {
                 throw new FileAlreadyExistsException($"Saving FILE '{args.FileId}' does already exists in the container '{containerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
             }
             if (ks3Config.CreateContainerIfNotExists)
             {
-                if (!DoesBucketExist(ks3Client, containerName))
+                if (!BucketExist(ks3Client, containerName))
                 {
                     ks3Client.CreateBucket(containerName);
                 }
@@ -74,7 +72,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
             var containerName = GetContainerName(args);
             var fileName = KS3FileNameCalculator.Calculate(args);
             var ks3Client = GetKS3Client(args.Configuration);
-            if (!FileExistsAsync(ks3Client, containerName, fileName))
+            if (!FileExists(ks3Client, containerName, fileName))
             {
                 return Task.FromResult(false);
             }
@@ -87,7 +85,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
             var containerName = GetContainerName(args);
             var fileName = KS3FileNameCalculator.Calculate(args);
             var ks3Client = GetKS3Client(args.Configuration);
-            return Task.FromResult(FileExistsAsync(ks3Client, containerName, fileName));
+            return Task.FromResult(FileExists(ks3Client, containerName, fileName));
         }
 
         public override async Task<Stream> GetOrNullAsync(FileProviderGetArgs args)
@@ -95,7 +93,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
             var containerName = GetContainerName(args);
             var blobName = KS3FileNameCalculator.Calculate(args);
             var ks3Client = GetKS3Client(args.Configuration);
-            if (!FileExistsAsync(ks3Client, containerName, blobName))
+            if (!FileExists(ks3Client, containerName, blobName))
             {
                 return null;
             }
@@ -109,7 +107,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
             var containerName = GetContainerName(args);
             var fileName = KS3FileNameCalculator.Calculate(args);
             var ks3Client = GetKS3Client(args.Configuration);
-            if (!FileExistsAsync(ks3Client, containerName, fileName))
+            if (!FileExists(ks3Client, containerName, fileName))
             {
                 return false;
             }
@@ -130,7 +128,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
             var fileName = KS3FileNameCalculator.Calculate(args);
             var ks3Client = GetKS3Client(args.Configuration);
 
-            if (!FileExistsAsync(ks3Client, containerName, fileName))
+            if (!FileExists(ks3Client, containerName, fileName))
             {
                 return Task.FromResult(string.Empty);
             }
@@ -150,7 +148,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
         }
 
 
-        protected virtual bool DoesBucketExist(IKS3 ks3, string containerName)
+        protected virtual bool BucketExist(IKS3 ks3, string containerName)
         {
             var headBucket = ks3.HeadBucket(containerName);
             if (headBucket.StatueCode == HttpStatusCode.OK)
@@ -160,7 +158,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
             return false;
         }
 
-        protected virtual bool FileExistsAsync(IKS3 ks3, string containerName, string fileName)
+        protected virtual bool FileExists(IKS3 ks3, string containerName, string fileName)
         {
             var headBucket = ks3.HeadBucket(containerName);
             if (headBucket.StatueCode == HttpStatusCode.OK)
