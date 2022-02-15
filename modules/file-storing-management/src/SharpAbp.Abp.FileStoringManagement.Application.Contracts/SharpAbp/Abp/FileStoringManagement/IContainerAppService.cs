@@ -40,7 +40,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        Task<Guid> CreateAsync(CreateContainerDto input);
+        Task<ContainerDto> CreateAsync(CreateContainerDto input);
 
         /// <summary>
         /// Update container
@@ -48,7 +48,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="id"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        Task UpdateAsync(Guid id, UpdateContainerDto input);
+        Task<ContainerDto> UpdateAsync(Guid id, UpdateContainerDto input);
 
         /// <summary>
         /// Delete container

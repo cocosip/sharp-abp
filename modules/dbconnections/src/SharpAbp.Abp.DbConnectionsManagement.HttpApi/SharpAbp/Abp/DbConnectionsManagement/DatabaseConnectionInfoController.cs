@@ -39,16 +39,16 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         }
 
         [HttpPost]
-        public async Task<Guid> CreateAsync(CreateDatabaseConnectionInfoDto input)
+        public async Task<DatabaseConnectionInfoDto> CreateAsync(CreateDatabaseConnectionInfoDto input)
         {
             return await _databaseConnectionInfoAppService.CreateAsync(input);
         }
 
         [HttpPut]
         [Route("{id}")]
-        public async Task UpdateAsync(Guid id, UpdateDatabaseConnectionInfoDto input)
+        public async Task<DatabaseConnectionInfoDto> UpdateAsync(Guid id, UpdateDatabaseConnectionInfoDto input)
         {
-            await _databaseConnectionInfoAppService.UpdateAsync(id, input);
+            return await _databaseConnectionInfoAppService.UpdateAsync(id, input);
         }
 
         [HttpDelete]

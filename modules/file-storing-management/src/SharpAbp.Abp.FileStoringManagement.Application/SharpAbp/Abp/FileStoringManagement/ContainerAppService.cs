@@ -90,7 +90,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="input"></param>
         /// <returns></returns>
         [Authorize(FileStoringManagementPermissions.Containers.Create)]
-        public virtual async Task<Guid> CreateAsync(CreateContainerDto input)
+        public virtual async Task<ContainerDto> CreateAsync(CreateContainerDto input)
         {
             //Validate provider values
             var keyValuePairs = input.Items.ToDictionary(x => x.Name, y => y.Value);
@@ -100,13 +100,13 @@ namespace SharpAbp.Abp.FileStoringManagement
             await ContainerManager.ValidateNameAsync(CurrentTenant.Id, input.Name, null);
 
             var container = new FileStoringContainer(
-              GuidGenerator.Create(),
-              CurrentTenant.Id,
-              input.IsMultiTenant,
-              input.Provider,
-              input.Name,
-              input.Title,
-              input.HttpAccess);
+                GuidGenerator.Create(),
+                CurrentTenant.Id,
+                input.IsMultiTenant,
+                input.Provider,
+                input.Name,
+                input.Title,
+                input.HttpAccess);
 
             foreach (var item in input.Items)
             {
@@ -118,7 +118,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 
             await ContainerRepository.InsertAsync(container);
 
-            return container.Id;
+            return ObjectMapper.Map<FileStoringContainer, ContainerDto>(container);
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="input"></param>
         /// <returns></returns>
         [Authorize(FileStoringManagementPermissions.Containers.Update)]
-        public virtual async Task UpdateAsync(Guid id, UpdateContainerDto input)
+        public virtual async Task<ContainerDto> UpdateAsync(Guid id, UpdateContainerDto input)
         {
             var keyValuePairs = input.Items.ToDictionary(x => x.Name, y => y.Value);
             ContainerManager.ValidateProviderValues(input.Provider, keyValuePairs);
@@ -138,7 +138,7 @@ namespace SharpAbp.Abp.FileStoringManagement
             container.Update(input.IsMultiTenant, input.Provider, input.Title, input.HttpAccess);
 
             //Remove all items
-            container.RemoveAllItems();
+            container.CleanItem();
 
             //Create
             foreach (var item in input.Items)
@@ -150,6 +150,8 @@ namespace SharpAbp.Abp.FileStoringManagement
             }
 
             await ContainerRepository.UpdateAsync(container);
+
+            return ObjectMapper.Map<FileStoringContainer, ContainerDto>(container);
         }
 
         /// <summary>

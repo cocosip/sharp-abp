@@ -46,16 +46,16 @@ namespace SharpAbp.Abp.FileStoringManagement
         }
 
         [HttpPost]
-        public async Task<Guid> CreateAsync(CreateContainerDto input)
+        public async Task<ContainerDto> CreateAsync(CreateContainerDto input)
         {
             return await _containerAppService.CreateAsync(input);
         }
 
         [HttpPut]
         [Route("{id}")]
-        public async Task UpdateAsync(Guid id, UpdateContainerDto input)
+        public async Task<ContainerDto> UpdateAsync(Guid id, UpdateContainerDto input)
         {
-            await _containerAppService.UpdateAsync(id, input);
+            return await _containerAppService.UpdateAsync(id, input);
         }
 
         [HttpDelete]
@@ -65,6 +65,6 @@ namespace SharpAbp.Abp.FileStoringManagement
             await _containerAppService.DeleteAsync(id);
         }
 
-       
+
     }
 }

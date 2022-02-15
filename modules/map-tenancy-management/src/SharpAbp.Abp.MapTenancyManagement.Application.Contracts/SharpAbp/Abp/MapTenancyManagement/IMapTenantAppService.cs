@@ -48,7 +48,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        Task<Guid> CreateAsync(CreateMapTenantDto input);
+        Task<MapTenantDto> CreateAsync(CreateMapTenantDto input);
 
         /// <summary>
         /// Update MapTenant
@@ -56,7 +56,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <param name="id"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        Task UpdateAsync(Guid id, UpdateMapTenantDto input);
+        Task<MapTenantDto> UpdateAsync(Guid id, UpdateMapTenantDto input);
 
         /// <summary>
         /// Delete MapTenant

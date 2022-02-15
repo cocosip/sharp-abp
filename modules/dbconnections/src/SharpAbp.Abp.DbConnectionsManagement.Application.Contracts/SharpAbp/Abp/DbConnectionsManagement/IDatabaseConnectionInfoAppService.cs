@@ -34,7 +34,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        Task<Guid> CreateAsync(CreateDatabaseConnectionInfoDto input);
+        Task<DatabaseConnectionInfoDto> CreateAsync(CreateDatabaseConnectionInfoDto input);
 
         /// <summary>
         /// Update
@@ -42,7 +42,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         /// <param name="id"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        Task UpdateAsync(Guid id, UpdateDatabaseConnectionInfoDto input);
+        Task<DatabaseConnectionInfoDto> UpdateAsync(Guid id, UpdateDatabaseConnectionInfoDto input);
 
         /// <summary>
         /// Delete

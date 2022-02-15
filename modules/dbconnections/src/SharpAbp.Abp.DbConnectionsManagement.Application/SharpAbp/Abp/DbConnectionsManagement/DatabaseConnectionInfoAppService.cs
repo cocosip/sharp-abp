@@ -77,7 +77,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         /// <param name="input"></param>
         /// <returns></returns>
         [Authorize(DbConnectionsManagementPermissions.DatabaseConnectionInfos.Create)]
-        public virtual async Task<Guid> CreateAsync(CreateDatabaseConnectionInfoDto input)
+        public virtual async Task<DatabaseConnectionInfoDto> CreateAsync(CreateDatabaseConnectionInfoDto input)
         {
             var databaseConnectionInfo = new DatabaseConnectionInfo(
                 GuidGenerator.Create(),
@@ -86,7 +86,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
                 input.ConnectionString);
 
             await ConnectionInfoManager.CreateAsync(databaseConnectionInfo);
-            return databaseConnectionInfo.Id;
+            return ObjectMapper.Map<DatabaseConnectionInfo, DatabaseConnectionInfoDto>(databaseConnectionInfo);
         }
 
         /// <summary>
@@ -96,13 +96,14 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         /// <param name="input"></param>
         /// <returns></returns>
         [Authorize(DbConnectionsManagementPermissions.DatabaseConnectionInfos.Update)]
-        public virtual async Task UpdateAsync(Guid id, UpdateDatabaseConnectionInfoDto input)
+        public virtual async Task<DatabaseConnectionInfoDto> UpdateAsync(Guid id, UpdateDatabaseConnectionInfoDto input)
         {
-            await ConnectionInfoManager.UpdateAsync(
+            var databaseConnectionInfo = await ConnectionInfoManager.UpdateAsync(
                 id,
                 input.Name,
                 input.DatabaseProvider,
                 input.ConnectionString);
+            return ObjectMapper.Map<DatabaseConnectionInfo, DatabaseConnectionInfoDto>(databaseConnectionInfo);
         }
 
         /// <summary>

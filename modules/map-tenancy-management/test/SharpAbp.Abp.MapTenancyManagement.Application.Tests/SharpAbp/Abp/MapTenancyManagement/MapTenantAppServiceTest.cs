@@ -25,8 +25,8 @@ namespace SharpAbp.Abp.MapTenancyManagement
             var tenant1 = await _tenantRepository.FindByNameAsync("tenant1");
             var tenant2 = await _tenantRepository.FindByNameAsync("tenant2");
 
-            var id = await _mapTenantAppService.CreateAsync(new CreateMapTenantDto("100", tenant1.Id, "200"));
-            var mapTenant1 = await _mapTenantAppService.GetAsync(id);
+            var m1 = await _mapTenantAppService.CreateAsync(new CreateMapTenantDto("100", tenant1.Id, "200"));
+            var mapTenant1 = await _mapTenantAppService.GetAsync(m1.Id);
             var mapTenant1_2 = await _mapTenantAppService.FindByCodeAsync("100");
             var mapTenant1_3 = await _mapTenantAppService.FindByMapCodeAsync("200");
 
@@ -39,7 +39,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
             Assert.Equal(mapTenant1.TenantId, mapTenant1_3.TenantId);
             Assert.Equal(mapTenant1.MapCode, mapTenant1_3.MapCode);
 
-            await _mapTenantAppService.UpdateAsync(id, new UpdateMapTenantDto("300", tenant1.Id, "400"));
+            await _mapTenantAppService.UpdateAsync(m1.Id, new UpdateMapTenantDto("300", tenant1.Id, "400"));
 
             var mapTenant2 = await _mapTenantAppService.FindByCodeAsync("300");
             var mapTenant2_2 = await _mapTenantAppService.FindByMapCodeAsync("400");
@@ -53,8 +53,8 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
 
             //Update code
-            await _mapTenantAppService.UpdateAsync(id, new UpdateMapTenantDto("300", tenant2.Id, "500"));
-            var mapTenant3 = await _mapTenantAppService.GetAsync(id);
+            await _mapTenantAppService.UpdateAsync(m1.Id, new UpdateMapTenantDto("300", tenant2.Id, "500"));
+            var mapTenant3 = await _mapTenantAppService.GetAsync(m1.Id);
 
             await Assert.ThrowsAsync<UserFriendlyException>(() =>
             {
@@ -64,7 +64,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
             var mapTenancyConfiguration = await _mapTenancyConfigurationProvider.GetAsync("300");
             Assert.Equal(mapTenancyConfiguration.TenantId, tenant2.Id);
 
-            await _mapTenantAppService.DeleteAsync(id);
+            await _mapTenantAppService.DeleteAsync(m1.Id);
 
             var mapTenant5 = await _mapTenantAppService.FindByCodeAsync("300");
             Assert.Null(mapTenant5);

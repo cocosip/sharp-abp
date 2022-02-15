@@ -101,7 +101,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <param name="input"></param>
         /// <returns></returns>
         [Authorize(MapTenancyManagementPermissions.MapTenants.Create)]
-        public virtual async Task<Guid> CreateAsync(CreateMapTenantDto input)
+        public virtual async Task<MapTenantDto> CreateAsync(CreateMapTenantDto input)
         {
             var mapTenant = new MapTenant(
                 GuidGenerator.Create(),
@@ -110,7 +110,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
                 input.MapCode);
 
             await MapTenantManager.CreateAsync(mapTenant);
-            return mapTenant.Id;
+            return ObjectMapper.Map<MapTenant, MapTenantDto>(mapTenant);
         }
 
         /// <summary>
@@ -120,13 +120,14 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <param name="input"></param>
         /// <returns></returns>
         [Authorize(MapTenancyManagementPermissions.MapTenants.Update)]
-        public virtual async Task UpdateAsync(Guid id, UpdateMapTenantDto input)
+        public virtual async Task<MapTenantDto> UpdateAsync(Guid id, UpdateMapTenantDto input)
         {
-            await MapTenantManager.UpdateAsync(
-                id, 
-                input.Code, 
-                input.TenantId, 
+            var mapTenant = await MapTenantManager.UpdateAsync(
+                id,
+                input.Code,
+                input.TenantId,
                 input.MapCode);
+            return ObjectMapper.Map<MapTenant, MapTenantDto>(mapTenant);
         }
 
         /// <summary>

@@ -28,14 +28,14 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// </summary>
         /// <param name="mapTenant"></param>
         /// <returns></returns>
-        public virtual async Task CreateAsync(MapTenant mapTenant)
+        public virtual async Task<MapTenant> CreateAsync(MapTenant mapTenant)
         {
             //Validate
             await ValidateTenantAsync(mapTenant.TenantId);
             await ValidateCodeAsync(mapTenant.Code);
             await ValidateMapCodeAsync(mapTenant.MapCode);
 
-            await MapTenantRepository.InsertAsync(mapTenant);
+            return await MapTenantRepository.InsertAsync(mapTenant);
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <param name="tenantId"></param>
         /// <param name="mapCode"></param>
         /// <returns></returns>
-        public virtual async Task UpdateAsync(Guid id, string code, Guid tenantId, string mapCode)
+        public virtual async Task<MapTenant> UpdateAsync(Guid id, string code, Guid tenantId, string mapCode)
         {
             var mapTenant = await MapTenantRepository.GetAsync(id);
 
@@ -57,7 +57,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
             mapTenant.Update(code, tenantId, mapCode);
 
-            await MapTenantRepository.UpdateAsync(mapTenant);
+            return await MapTenantRepository.UpdateAsync(mapTenant);
         }
 
 

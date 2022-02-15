@@ -32,10 +32,10 @@ namespace SharpAbp.Abp.FileStoringManagement
             var tenantId = new Guid("42645233-3d72-4339-9adc-845321f8ada3");
             var tenantId2 = new Guid("d0ad04d5-2839-2c2a-1078-6b253678dceb");
 
-            Guid id;
+            ContainerDto c1;
             using (_currentTenant.Change(tenantId))
             {
-                id = await _containerAppService.CreateAsync(new CreateContainerDto()
+                c1 = await _containerAppService.CreateAsync(new CreateContainerDto()
                 {
                     Provider = MinioFileProviderConfigurationNames.ProviderName,
                     Name = "default1",
@@ -54,10 +54,10 @@ namespace SharpAbp.Abp.FileStoringManagement
                 });
             }
 
-            Guid id2;
+            ContainerDto c2;
             using (_currentTenant.Change(tenantId2))
             {
-                id2 = await _containerAppService.CreateAsync(new CreateContainerDto()
+                c2 = await _containerAppService.CreateAsync(new CreateContainerDto()
                 {
                     Provider = MinioFileProviderConfigurationNames.ProviderName,
                     Name = "default2",
@@ -98,7 +98,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 Assert.Equal(1, pagedContainers.TotalCount);
 
 
-                var container2 = await _containerAppService.GetAsync(id);
+                var container2 = await _containerAppService.GetAsync(c1.Id);
                 Assert.Equal("default1", container2.Name);
                 Assert.Equal("Minio", container2.Provider);
                 Assert.Equal(tenantId, container2.TenantId);
@@ -107,7 +107,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 Assert.Equal("test-container1", container2.Title);
                 Assert.Equal(6, container2.Items.Count);
 
-                await _containerAppService.UpdateAsync(id, new UpdateContainerDto()
+                await _containerAppService.UpdateAsync(c1.Id, new UpdateContainerDto()
                 {
                     Provider = "FileSystem",
                     IsMultiTenant = false,
@@ -121,7 +121,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                     }
                 });
 
-                var container3 = await _containerAppService.GetAsync(id);
+                var container3 = await _containerAppService.GetAsync(c1.Id);
                 Assert.Equal("default1", container3.Name);
                 Assert.Equal("FileSystem", container3.Provider);
                 Assert.Equal(tenantId, container3.TenantId);
@@ -136,10 +136,10 @@ namespace SharpAbp.Abp.FileStoringManagement
         public async Task CreateAsync_DeleteAsync_Test()
         {
             var tenantId = new Guid("42124112-3d72-4339-9adc-845321f8a2a0");
-            Guid id;
+            ContainerDto c1;
             using (_currentTenant.Change(tenantId))
             {
-                id = await _containerAppService.CreateAsync(new CreateContainerDto()
+                c1 = await _containerAppService.CreateAsync(new CreateContainerDto()
                 {
                     Provider = MinioFileProviderConfigurationNames.ProviderName,
                     Name = "default22",
@@ -160,7 +160,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 
             await Assert.ThrowsAsync<EntityNotFoundException>(() =>
             {
-                return _containerAppService.GetAsync(id);
+                return _containerAppService.GetAsync(c1.Id);
             });
 
 
@@ -169,14 +169,14 @@ namespace SharpAbp.Abp.FileStoringManagement
                 var container1 = await _containerAppService.FindByNameAsync("default22");
                 Assert.NotNull(container1);
 
-                var container2 = await _containerAppService.GetAsync(id);
+                var container2 = await _containerAppService.GetAsync(c1.Id);
                 Assert.NotNull(container2);
 
-                await _containerAppService.DeleteAsync(id);
+                await _containerAppService.DeleteAsync(c1.Id);
 
                 await Assert.ThrowsAsync<EntityNotFoundException>(() =>
                 {
-                    return _containerAppService.GetAsync(id);
+                    return _containerAppService.GetAsync(c1.Id);
                 });
             }
         }

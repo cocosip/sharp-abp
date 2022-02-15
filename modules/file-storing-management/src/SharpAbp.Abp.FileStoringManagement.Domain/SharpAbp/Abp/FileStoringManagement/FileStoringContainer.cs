@@ -67,7 +67,7 @@ namespace SharpAbp.Abp.FileStoringManagement
             Items.Add(new FileStoringContainerItem(id, name, value, Id));
         }
 
-        public void RemoveAllItems()
+        public void CleanItem()
         {
             Items.Clear();
         }
