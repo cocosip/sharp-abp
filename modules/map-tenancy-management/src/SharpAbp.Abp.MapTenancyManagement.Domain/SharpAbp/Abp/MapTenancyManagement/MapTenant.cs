@@ -1,9 +1,9 @@
 ﻿using System;
-using Volo.Abp.Domain.Entities;
+using Volo.Abp.Domain.Entities.Auditing;
 
 namespace SharpAbp.Abp.MapTenancyManagement
 {
-    public class MapTenant : AggregateRoot<Guid>
+    public class MapTenant : AuditedAggregateRoot<Guid>
     {
         public virtual string Code { get; set; }
         public virtual Guid TenantId { get; set; }

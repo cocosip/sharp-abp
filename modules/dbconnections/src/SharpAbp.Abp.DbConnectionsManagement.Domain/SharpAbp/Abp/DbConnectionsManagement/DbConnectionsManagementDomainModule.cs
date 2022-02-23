@@ -3,6 +3,7 @@ using SharpAbp.Abp.DbConnections;
 using System;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain;
+using Volo.Abp.Domain.Entities.Events.Distributed;
 using Volo.Abp.Modularity;
 
 namespace SharpAbp.Abp.DbConnectionsManagement
@@ -30,6 +31,12 @@ namespace SharpAbp.Abp.DbConnectionsManagement
                     }
                     return null;
                 });
+            });
+
+            Configure<AbpDistributedEntityEventOptions>(options =>
+            {
+                options.AutoEventSelectors.Add<DatabaseConnectionInfo>();
+                options.EtoMappings.Add<DatabaseConnectionInfo, DatabaseConnectionInfoEto>();
             });
 
         }

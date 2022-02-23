@@ -1,10 +1,12 @@
 ﻿using System;
-using Volo.Abp.Application.Dtos;
+using Volo.Abp.Domain.Entities.Events.Distributed;
 
 namespace SharpAbp.Abp.DbConnectionsManagement
 {
-    public class DatabaseConnectionInfoDto : ExtensibleAuditedEntityDto<Guid>
+    public class DatabaseConnectionInfoEto : EntityEto
     {
+        public Guid Id { get; set; }
+
         /// <summary>
         /// DbConnection name
         /// </summary>

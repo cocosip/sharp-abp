@@ -5,7 +5,6 @@ namespace SharpAbp.Abp.DbConnectionsManagement
 {
     public static class DatabaseConnectionInfoExtensions
     {
-
         public static DatabaseConnectionInfoCacheItem AsCacheItem([NotNull] this DatabaseConnectionInfo databaseConnectionInfo)
         {
             Check.NotNull(databaseConnectionInfo, nameof(databaseConnectionInfo));

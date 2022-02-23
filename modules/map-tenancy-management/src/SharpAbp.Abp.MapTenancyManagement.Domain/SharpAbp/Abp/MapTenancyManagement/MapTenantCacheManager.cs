@@ -67,7 +67,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <returns></returns>
         public virtual async Task UpdateCacheAsync(Guid id)
         {
-            var mapTenant = await MapTenantRepository.GetAsync(id, true);
+            var mapTenant = await MapTenantRepository.FindAsync(id, true);
             if (mapTenant != null)
             {
                 var cacheItem = mapTenant.AsCacheItem();
@@ -76,6 +76,20 @@ namespace SharpAbp.Abp.MapTenancyManagement
                 var mapCodeCacheItem = mapTenant.AsMapCodeCacheItem();
                 await MapTenantMapCodeCache.SetAsync(mapTenant.MapCode, mapCodeCacheItem);
             }
+        }
+
+        /// <summary>
+        /// Remove cache
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="mapCode"></param>
+        /// <returns></returns>
+        public virtual async Task RemoveCacheAsync([NotNull] string code, [NotNull] string mapCode)
+        {
+            Check.NotNullOrWhiteSpace(code, nameof(code));
+            Check.NotNullOrWhiteSpace(mapCode, nameof(mapCode));
+            await MapTenantCache.RemoveAsync(code);
+            await MapTenantMapCodeCache.RemoveAsync(mapCode);
         }
     }
 }

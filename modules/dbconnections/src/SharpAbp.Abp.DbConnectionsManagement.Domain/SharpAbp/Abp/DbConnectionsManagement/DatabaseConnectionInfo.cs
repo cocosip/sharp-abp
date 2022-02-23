@@ -1,9 +1,9 @@
 ﻿using System;
-using Volo.Abp.Domain.Entities;
+using Volo.Abp.Domain.Entities.Auditing;
 
 namespace SharpAbp.Abp.DbConnectionsManagement
 {
-    public class DatabaseConnectionInfo : AggregateRoot<Guid>
+    public class DatabaseConnectionInfo : AuditedAggregateRoot<Guid>
     {
         /// <summary>
         /// DbConnection name

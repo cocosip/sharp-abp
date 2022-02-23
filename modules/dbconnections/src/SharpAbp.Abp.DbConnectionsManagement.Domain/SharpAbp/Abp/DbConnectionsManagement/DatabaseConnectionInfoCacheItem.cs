@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SharpAbp.Abp.DbConnectionsManagement
+﻿namespace SharpAbp.Abp.DbConnectionsManagement
 {
     public class DatabaseConnectionInfoCacheItem
     {

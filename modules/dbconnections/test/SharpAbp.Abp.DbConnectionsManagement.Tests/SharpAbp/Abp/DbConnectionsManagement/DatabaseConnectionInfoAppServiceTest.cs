@@ -7,9 +7,11 @@ namespace SharpAbp.Abp.DbConnectionsManagement
     public class DatabaseConnectionInfoAppServiceTest : DbConnectionsManagementTestBase
     {
         private readonly IDatabaseConnectionInfoAppService _databaseConnectionInfoAppService;
+        private readonly IDatabaseConnectionInfoCacheManager _databaseConnectionInfoCacheManager;
         public DatabaseConnectionInfoAppServiceTest()
         {
             _databaseConnectionInfoAppService = GetRequiredService<IDatabaseConnectionInfoAppService>();
+            _databaseConnectionInfoCacheManager = GetRequiredService<IDatabaseConnectionInfoCacheManager>();
         }
 
         [Fact]
@@ -52,6 +54,14 @@ namespace SharpAbp.Abp.DbConnectionsManagement
 
             var databaseConnectionInfo2_2 = await _databaseConnectionInfoAppService.FindByNameAsync("postgresql");
             Assert.Null(databaseConnectionInfo2_2);
+
+
+            var c1 = await _databaseConnectionInfoCacheManager.GetCacheAsync("mysql");
+            Assert.Equal("mysql",c1.Name);
+
+            var c2 = await _databaseConnectionInfoCacheManager.GetCacheAsync("postgresql");
+            Assert.Null(c2);
+
         }
     }
 }
