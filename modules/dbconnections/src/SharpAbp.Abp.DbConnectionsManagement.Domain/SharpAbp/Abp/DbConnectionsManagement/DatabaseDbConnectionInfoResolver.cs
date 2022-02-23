@@ -24,7 +24,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
 
         public virtual async Task<DbConnectionInfo> ResolveAsync(string dbConnectionName)
         {
-            var cacheItem = await ConnectionInfoCacheManager.GetCacheAsync(dbConnectionName);
+            var cacheItem = await ConnectionInfoCacheManager.GetAsync(dbConnectionName);
             if (cacheItem != null)
             {
                 return ConvertToDbConnection(cacheItem); 

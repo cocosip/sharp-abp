@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
+using System.Threading;
 
 namespace SharpAbp.Abp.MapTenancyManagement
 {
@@ -30,17 +31,22 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// Get cache by code
         /// </summary>
         /// <param name="code"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<MapTenantCacheItem> GetCacheAsync([NotNull] string code)
+        public virtual async Task<MapTenantCacheItem> GetAsync(
+            [NotNull] string code,
+            CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(code, nameof(code));
             var cacheItem = await MapTenantCache.GetOrAddAsync(
                 code,
                 async () =>
                 {
-                    var mapTenant = await MapTenantRepository.FindByCodeAsync(code, default);
+                    var mapTenant = await MapTenantRepository.FindByCodeAsync(code, cancellationToken);
                     return mapTenant?.AsCacheItem();
-                });
+                },
+                hideErrors: false,
+                token: cancellationToken);
 
             return cacheItem;
         }
@@ -49,17 +55,22 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// Get mapCode cache by mapCode
         /// </summary>
         /// <param name="mapCode"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<MapTenantMapCodeCacheItem> GetMapCodeCacheAsync([NotNull] string mapCode)
+        public virtual async Task<MapTenantMapCodeCacheItem> GetMapCodeAsync(
+            [NotNull] string mapCode,
+            CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(mapCode, nameof(mapCode));
             var mapCodeCacheItem = await MapTenantMapCodeCache.GetOrAddAsync(
                 mapCode,
                 async () =>
                 {
-                    var mapTenant = await MapTenantRepository.FindByMapCodeAsync(mapCode, default);
+                    var mapTenant = await MapTenantRepository.FindByMapCodeAsync(mapCode, cancellationToken);
                     return mapTenant?.AsMapCodeCacheItem();
-                });
+                },
+                hideErrors: false,
+                token: cancellationToken);
 
             return mapCodeCacheItem;
         }
@@ -68,17 +79,29 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// Update cache by id
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task UpdateCacheAsync(Guid id)
+        public virtual async Task UpdateAsync(
+            [NotNull] Guid id,
+            CancellationToken cancellationToken = default)
         {
-            var mapTenant = await MapTenantRepository.FindAsync(id, true);
+            Check.NotNull(id, nameof(id));
+            var mapTenant = await MapTenantRepository.FindAsync(id, true, cancellationToken);
             if (mapTenant != null)
             {
                 var cacheItem = mapTenant.AsCacheItem();
-                await MapTenantCache.SetAsync(mapTenant.Code, cacheItem);
+                await MapTenantCache.SetAsync(
+                    mapTenant.Code,
+                    cacheItem,
+                    hideErrors: false,
+                    token: cancellationToken);
 
                 var mapCodeCacheItem = mapTenant.AsMapCodeCacheItem();
-                await MapTenantMapCodeCache.SetAsync(mapTenant.MapCode, mapCodeCacheItem);
+                await MapTenantMapCodeCache.SetAsync(
+                    mapTenant.MapCode,
+                    mapCodeCacheItem,
+                    hideErrors: false,
+                    token: cancellationToken);
             }
         }
 
@@ -87,26 +110,35 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// </summary>
         /// <param name="code"></param>
         /// <param name="mapCode"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task RemoveCacheAsync([NotNull] string code, [NotNull] string mapCode)
+        public virtual async Task RemoveAsync(
+            [NotNull] string code,
+            [NotNull] string mapCode,
+            CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(code, nameof(code));
             Check.NotNullOrWhiteSpace(mapCode, nameof(mapCode));
-            await MapTenantCache.RemoveAsync(code);
-            await MapTenantMapCodeCache.RemoveAsync(mapCode);
+            await MapTenantCache.RemoveAsync(code, hideErrors: false, token: cancellationToken);
+            await MapTenantMapCodeCache.RemoveAsync(mapCode, hideErrors: false, token: cancellationToken);
         }
 
         /// <summary>
         /// Get all cache
         /// </summary>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<AllMapTenantCacheItem> GetAllCacheAsync()
+        public virtual async Task<AllMapTenantCacheItem> GetAllCacheAsync(CancellationToken cancellationToken = default)
         {
             var cacheKey = CalculateAllCacheKey();
-            var allMapTenantCacheItem = await AllMapTenantCache.GetOrAddAsync(cacheKey, async () =>
-            {
-                return await GetAllMapTenantCacheItemAsync();
-            }, hideErrors: false);
+            var allMapTenantCacheItem = await AllMapTenantCache.GetOrAddAsync(
+                cacheKey,
+                async () =>
+                {
+                    return await GetAllMapTenantCacheItemAsync();
+                },
+                hideErrors: false,
+                token: cancellationToken);
 
             return allMapTenantCacheItem;
         }
@@ -114,22 +146,25 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <summary>
         /// Update all cache
         /// </summary>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task UpdateAllCacheAsync()
+        public virtual async Task UpdateAllCacheAsync(CancellationToken cancellationToken = default)
         {
             var cacheKey = CalculateAllCacheKey();
-            var allMapTenantCacheItem = await GetAllMapTenantCacheItemAsync();
-            await AllMapTenantCache.SetAsync(cacheKey, allMapTenantCacheItem, hideErrors: false);
+            var allMapTenantCacheItem = await GetAllMapTenantCacheItemAsync(cancellationToken);
+            await AllMapTenantCache.SetAsync(
+                cacheKey,
+                allMapTenantCacheItem,
+                hideErrors: false,
+                token: cancellationToken);
         }
 
 
-        protected virtual async Task<AllMapTenantCacheItem> GetAllMapTenantCacheItemAsync()
+        protected virtual async Task<AllMapTenantCacheItem> GetAllMapTenantCacheItemAsync(CancellationToken cancellationToken = default)
         {
             var allMapTenantCacheItem = new AllMapTenantCacheItem();
-
-            var mapTenants = await MapTenantRepository.GetListAsync(true, default);
+            var mapTenants = await MapTenantRepository.GetListAsync(true, cancellationToken);
             allMapTenantCacheItem.MapTenants = mapTenants.Select(x => x.AsCacheItem()).ToList();
-
             return allMapTenantCacheItem;
         }
 

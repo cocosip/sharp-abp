@@ -34,7 +34,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
             Assert.Equal(databaseConnectionInfo1.DatabaseProvider, databaseConnectionInfo1_1.DatabaseProvider);
             Assert.Equal(databaseConnectionInfo1.ConnectionString, databaseConnectionInfo1_1.ConnectionString);
 
-            var c0 = await _databaseConnectionInfoCacheManager.GetCacheAsync("mysql");
+            var c0 = await _databaseConnectionInfoCacheManager.GetAsync("mysql");
             Assert.Equal("mysql", c0.Name);
 
             await _databaseConnectionInfoAppService.UpdateAsync(d1.Id, new UpdateDatabaseConnectionInfoDto()
@@ -58,10 +58,10 @@ namespace SharpAbp.Abp.DbConnectionsManagement
             Assert.NotNull(databaseConnectionInfo2_2);
 
 
-            var c1 = await _databaseConnectionInfoCacheManager.GetCacheAsync("mysql");
+            var c1 = await _databaseConnectionInfoCacheManager.GetAsync("mysql");
             Assert.NotNull(c1);
 
-            var c2 = await _databaseConnectionInfoCacheManager.GetCacheAsync("postgresql");
+            var c2 = await _databaseConnectionInfoCacheManager.GetAsync("postgresql");
             Assert.NotNull(c2);
 
         }

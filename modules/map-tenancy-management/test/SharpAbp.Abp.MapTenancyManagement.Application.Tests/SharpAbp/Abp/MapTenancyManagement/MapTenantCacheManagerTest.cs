@@ -36,11 +36,11 @@ namespace SharpAbp.Abp.MapTenancyManagement
             });
 
 
-            var c1 = await _mapTenantCacheManager.GetCacheAsync("901");
+            var c1 = await _mapTenantCacheManager.GetAsync("901");
             Assert.Equal("901", c1.Code);
             Assert.Equal("1901", c1.MapCode);
 
-            var c2 = await _mapTenantCacheManager.GetCacheAsync("902");
+            var c2 = await _mapTenantCacheManager.GetAsync("902");
             Assert.Equal("902", c2.Code);
             Assert.Equal("1902", c2.MapCode);
 

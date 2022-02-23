@@ -1,5 +1,5 @@
-﻿using JetBrains.Annotations;
-using System;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SharpAbp.Abp.DbConnectionsManagement
@@ -7,37 +7,28 @@ namespace SharpAbp.Abp.DbConnectionsManagement
     public interface IDatabaseConnectionInfoCacheManager
     {
         /// <summary>
-        /// Get cache
+        /// Get cache by name
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<DatabaseConnectionInfoCacheItem> GetCacheAsync([NotNull] string name);
+        Task<DatabaseConnectionInfoCacheItem> GetAsync(string name, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Update cahce
+        /// Update cache
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task UpdateCacheAsync(Guid id);
+        Task UpdateAsync(Guid id, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Remove cache
+        /// Remove cache by name
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task RemoveCacheAsync([NotNull] string name);
-
-        /// <summary>
-        /// Get all cache
-        /// </summary>
-        /// <returns></returns>
-        Task<AllDatabaseConnectionInfoCacheItem> GetAllCacheAsync();
-
-        /// <summary>
-        /// Update all cache
-        /// </summary>
-        /// <returns></returns>
-        Task UpdateAllCacheAsync();
+        Task RemoveAsync(string name, CancellationToken cancellationToken = default);
     }
 
 }

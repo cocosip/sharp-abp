@@ -29,14 +29,6 @@ namespace SharpAbp.Abp.DbConnectionsManagement
                             AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(3600)
                         };
                     }
-
-                    if (cacheName == CacheNameAttribute.GetCacheName(typeof(AllDatabaseConnectionInfoCacheItem)))
-                    {
-                        return new DistributedCacheEntryOptions()
-                        {
-                            AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(3600)
-                        };
-                    }
                     return null;
                 });
             });

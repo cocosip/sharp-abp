@@ -1,5 +1,5 @@
-﻿using JetBrains.Annotations;
-using System;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SharpAbp.Abp.FileStoringManagement
@@ -10,14 +10,24 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// Get container cache
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<FileStoringContainerCacheItem> GetCacheAsync([NotNull] string name);
+        Task<FileStoringContainerCacheItem> GetAsync(string name, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Update container cache
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task UpdateCacheAsync(Guid id);
+        Task UpdateAsync(Guid id, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Remove container cache by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task RemoveAsync(string name, CancellationToken cancellationToken = default);
     }
 }

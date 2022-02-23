@@ -5,33 +5,33 @@ using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
+using System.Threading;
 
 namespace SharpAbp.Abp.DbConnectionsManagement
 {
     public class DatabaseConnectionInfoCacheManager : IDatabaseConnectionInfoCacheManager, ITransientDependency
     {
-        protected IDistributedCache<AllDatabaseConnectionInfoCacheItem> AllConnectionInfoCache { get; }
         protected IDistributedCache<DatabaseConnectionInfoCacheItem> ConnectionInfoCache { get; }
         protected IDatabaseConnectionInfoRepository ConnectionInfoRepository { get; }
         public DatabaseConnectionInfoCacheManager(
-            IDistributedCache<AllDatabaseConnectionInfoCacheItem> allConnectionInfoCache,
             IDistributedCache<DatabaseConnectionInfoCacheItem> connectionInfoCache,
             IDatabaseConnectionInfoRepository connectionInfoRepository)
         {
-            AllConnectionInfoCache = allConnectionInfoCache;
             ConnectionInfoCache = connectionInfoCache;
             ConnectionInfoRepository = connectionInfoRepository;
         }
 
         /// <summary>
-        /// Get cache
+        /// Get cache by name
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<DatabaseConnectionInfoCacheItem> GetCacheAsync([NotNull] string name)
+        public virtual async Task<DatabaseConnectionInfoCacheItem> GetAsync(
+            [NotNull] string name,
+            CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-
             var cacheItem = await ConnectionInfoCache.GetOrAddAsync(
                 name,
                 async () =>
@@ -39,80 +39,45 @@ namespace SharpAbp.Abp.DbConnectionsManagement
                     var databaseConnectionInfo = await ConnectionInfoRepository.FindByNameAsync(name);
                     return databaseConnectionInfo?.AsCacheItem();
                 },
-                hideErrors: false);
+                hideErrors: false,
+                token: cancellationToken);
 
             return cacheItem;
         }
 
         /// <summary>
-        /// Update cahce
+        /// Update cache
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task UpdateCacheAsync(Guid id)
+        public virtual async Task UpdateAsync([NotNull] Guid id, CancellationToken cancellationToken = default)
         {
-            var databaseConnectionInfo = await ConnectionInfoRepository.FindAsync(id, true, default);
+            Check.NotNull(id, nameof(id));
+            var databaseConnectionInfo = await ConnectionInfoRepository.FindAsync(id, true, cancellationToken);
             if (databaseConnectionInfo != null)
             {
-                await ConnectionInfoCache.SetAsync(databaseConnectionInfo.Name, databaseConnectionInfo.AsCacheItem());
+                await ConnectionInfoCache.SetAsync(
+                    databaseConnectionInfo.Name,
+                    databaseConnectionInfo.AsCacheItem(),
+                    hideErrors: false,
+                    token: cancellationToken);
             }
         }
 
         /// <summary>
-        /// Remove cache
+        /// Remove cache by name
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task RemoveCacheAsync([NotNull] string name)
+        public virtual async Task RemoveAsync(
+            [NotNull] string name, 
+            CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            await ConnectionInfoCache.RemoveAsync(name, hideErrors: false);
+            await ConnectionInfoCache.RemoveAsync(name, hideErrors: false, token: cancellationToken);
         }
-
-        /// <summary>
-        /// Get all cache
-        /// </summary>
-        /// <returns></returns>
-        public virtual async Task<AllDatabaseConnectionInfoCacheItem> GetAllCacheAsync()
-        {
-            var cacheKey = CalculateAllCacheKey();
-            var cacheItem = await AllConnectionInfoCache.GetOrAddAsync(
-               cacheKey,
-               async () =>
-               {
-                   var allDatabaseConnectionInfoCacheItem = await GetAllDatabaseConnectionInfoCacheItemAsync();
-                   return allDatabaseConnectionInfoCacheItem;
-               },
-               hideErrors: false);
-
-            return cacheItem;
-        }
-
-        /// <summary>
-        /// Update all cache
-        /// </summary>
-        /// <returns></returns>
-        public virtual async Task UpdateAllCacheAsync()
-        {
-            var cacheKey = CalculateAllCacheKey();
-            var cacheItem = await GetAllDatabaseConnectionInfoCacheItemAsync();
-            await AllConnectionInfoCache.SetAsync(cacheKey, cacheItem, hideErrors: false);
-        }
-
-        protected virtual async Task<AllDatabaseConnectionInfoCacheItem> GetAllDatabaseConnectionInfoCacheItemAsync()
-        {
-            var allDatabaseConnectionInfoCacheItem = new AllDatabaseConnectionInfoCacheItem();
-            var databaseConnectionInfos = await ConnectionInfoRepository.GetListAsync();
-            allDatabaseConnectionInfoCacheItem.DatabaseConnectionInfos = databaseConnectionInfos.Select(x => x.AsCacheItem()).ToList();
-
-            return allDatabaseConnectionInfoCacheItem;
-        }
-
-        protected virtual string CalculateAllCacheKey()
-        {
-            return "AllDatabaseConnectionInfo";
-        }
-
 
     }
 }

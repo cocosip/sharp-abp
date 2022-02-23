@@ -15,11 +15,11 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         public async Task GetAllAsync_Test()
         {
             var databaseProviders = await _databaseProviderAppService.GetAllAsync();
-            Assert.Equal(4, databaseProviders.Count);
+            Assert.Equal(5, databaseProviders.Count);
             Assert.Contains("MySql", databaseProviders);
             Assert.Contains("PostgreSql", databaseProviders);
             Assert.Contains("SqlServer", databaseProviders);
-           //Assert.Contains("Oracle", databaseProviders);
+            Assert.Contains("Oracle", databaseProviders);
             Assert.Contains("Sqlite", databaseProviders);
         }
 

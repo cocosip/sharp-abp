@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Caching;
@@ -26,17 +27,22 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// Get container cache
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<FileStoringContainerCacheItem> GetCacheAsync([NotNull] string name)
+        public virtual async Task<FileStoringContainerCacheItem> GetAsync(
+            [NotNull] string name,
+            CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
             var cacheItem = await ContainerCache.GetOrAddAsync(
                 name,
                 async () =>
                 {
-                    var container = await ContainerRepository.FindByNameAsync(name, true);
+                    var container = await ContainerRepository.FindByNameAsync(name, true, cancellationToken);
                     return container?.AsCacheItem();
-                });
+                },
+                hideErrors: false,
+                token: cancellationToken);
             return cacheItem;
         }
 
@@ -44,15 +50,33 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// Update container cache
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task UpdateCacheAsync(Guid id)
+        public virtual async Task UpdateAsync(
+            [NotNull] Guid id,
+            CancellationToken cancellationToken = default)
         {
-            var container = await ContainerRepository.GetAsync(id, true);
+            Check.NotNull(id, nameof(id));
+            var container = await ContainerRepository.FindAsync(id, true, cancellationToken);
             if (container != null)
             {
-                var cacheItem = container?.AsCacheItem();
-                await ContainerCache.SetAsync(container.Name, cacheItem);
+                var cacheItem = container.AsCacheItem();
+                await ContainerCache.SetAsync(container.Name, cacheItem, hideErrors: false, token: cancellationToken);
             }
+        }
+
+        /// <summary>
+        /// Remove container cache by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task RemoveAsync(
+            [NotNull] string name,
+            CancellationToken cancellationToken = default)
+        {
+            Check.NotNullOrWhiteSpace(name, nameof(name));
+            await ContainerCache.RemoveAsync(name, hideErrors: false, token: cancellationToken);
         }
     }
 }

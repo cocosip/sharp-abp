@@ -6,7 +6,6 @@ using Volo.Abp.EventBus.Distributed;
 namespace SharpAbp.Abp.DbConnectionsManagement
 {
     public class DbConnectionHandler :
-        IDistributedEventHandler<EntityCreatedEto<DatabaseConnectionInfoEto>>,
         IDistributedEventHandler<EntityUpdatedEto<DatabaseConnectionInfoEto>>,
         IDistributedEventHandler<EntityDeletedEto<DatabaseConnectionInfoEto>>,
         ITransientDependency
@@ -17,22 +16,14 @@ namespace SharpAbp.Abp.DbConnectionsManagement
             _connectionInfoCacheManager = connectionInfoCacheManager;
         }
 
-        public async Task HandleEventAsync(EntityCreatedEto<DatabaseConnectionInfoEto> eventData)
-        {
-            //await _connectionInfoCacheManager.UpdateCacheAsync(eventData.Entity.Id);
-            await _connectionInfoCacheManager.UpdateAllCacheAsync();
-        }
-
         public async Task HandleEventAsync(EntityUpdatedEto<DatabaseConnectionInfoEto> eventData)
         {
-            await _connectionInfoCacheManager.UpdateCacheAsync(eventData.Entity.Id);
-            await _connectionInfoCacheManager.UpdateAllCacheAsync();
+            await _connectionInfoCacheManager.UpdateAsync(eventData.Entity.Id);
         }
 
         public async Task HandleEventAsync(EntityDeletedEto<DatabaseConnectionInfoEto> eventData)
         {
-            await _connectionInfoCacheManager.RemoveCacheAsync(eventData.Entity.Name);
-            await _connectionInfoCacheManager.UpdateAllCacheAsync();
+            await _connectionInfoCacheManager.RemoveAsync(eventData.Entity.Name);
         }
     }
 }

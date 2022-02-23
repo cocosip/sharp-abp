@@ -9,6 +9,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 {
     public class FileStoringHandler :
         IDistributedEventHandler<EntityUpdatedEto<FileStoringContainerEto>>,
+        IDistributedEventHandler<EntityDeletedEto<FileStoringContainerEto>>,
         ITransientDependency
     {
         private readonly ICurrentTenant _currentTenant;
@@ -24,14 +25,18 @@ namespace SharpAbp.Abp.FileStoringManagement
         public async Task HandleEventAsync(EntityUpdatedEto<FileStoringContainerEto> eventData)
         {
             eventData.IsMultiTenant(out Guid? tenantId);
-            await UpdateCacheAsync(tenantId, eventData.Entity.Id);
-        }
-
-        private async Task UpdateCacheAsync(Guid? tenantId, Guid id)
-        {
             using (_currentTenant.Change(tenantId))
             {
-                await _containerCacheManager.UpdateCacheAsync(id);
+                await _containerCacheManager.UpdateAsync(eventData.Entity.Id);
+            }
+        }
+
+        public async Task HandleEventAsync(EntityDeletedEto<FileStoringContainerEto> eventData)
+        {
+            eventData.IsMultiTenant(out Guid? tenantId);
+            using (_currentTenant.Change(tenantId))
+            {
+                await _containerCacheManager.RemoveAsync(eventData.Entity.Name);
             }
         }
     }

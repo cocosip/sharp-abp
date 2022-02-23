@@ -8,19 +8,18 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         public static DatabaseConnectionInfoCacheItem AsCacheItem([NotNull] this DatabaseConnectionInfo databaseConnectionInfo)
         {
             Check.NotNull(databaseConnectionInfo, nameof(databaseConnectionInfo));
-            if (databaseConnectionInfo == null || databaseConnectionInfo == default)
+            if (databaseConnectionInfo != null)
             {
-                return null;
+                var cacheItem = new DatabaseConnectionInfoCacheItem()
+                {
+                    Name = databaseConnectionInfo.Name,
+                    DatabaseProvider = databaseConnectionInfo.DatabaseProvider,
+                    ConnectionString = databaseConnectionInfo.ConnectionString
+                };
+
+                return cacheItem;
             }
-
-            var cacheItem = new DatabaseConnectionInfoCacheItem()
-            {
-                Name = databaseConnectionInfo.Name,
-                DatabaseProvider = databaseConnectionInfo.DatabaseProvider,
-                ConnectionString = databaseConnectionInfo.ConnectionString
-            };
-
-            return cacheItem;
+            return null;
         }
     }
 }

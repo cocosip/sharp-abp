@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.DbConnections.MySQL;
+using SharpAbp.Abp.DbConnections.Oracle.Drvart;
 using SharpAbp.Abp.DbConnections.PostgreSql;
 using SharpAbp.Abp.DbConnections.Sqlite;
 using SharpAbp.Abp.DbConnections.SqlServer;
@@ -20,7 +21,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
        typeof(AbpDbConnectionsMySQLModule),
        typeof(AbpDbConnectionsPostgreSqlModule),
        typeof(AbpDbConnectionsSqlServerModule),
-       //typeof(AbpDbConnectionsOracleDevartModule),
+       typeof(AbpDbConnectionsOracleDevartModule),
        typeof(AbpDbConnectionsSqliteModule),
        typeof(AbpTestBaseModule),
        typeof(AbpAutofacModule)
