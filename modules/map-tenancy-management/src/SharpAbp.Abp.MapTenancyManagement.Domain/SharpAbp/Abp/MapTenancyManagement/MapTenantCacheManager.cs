@@ -1,5 +1,6 @@
 using JetBrains.Annotations;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Caching;
@@ -9,14 +10,17 @@ namespace SharpAbp.Abp.MapTenancyManagement
 {
     public class MapTenantCacheManager : IMapTenantCacheManager, ITransientDependency
     {
+        protected IDistributedCache<AllMapTenantCacheItem> AllMapTenantCache { get; }
         protected IDistributedCache<MapTenantCacheItem> MapTenantCache { get; }
         protected IDistributedCache<MapTenantMapCodeCacheItem> MapTenantMapCodeCache { get; }
         protected IMapTenantRepository MapTenantRepository { get; }
         public MapTenantCacheManager(
+            IDistributedCache<AllMapTenantCacheItem> allMapTenantCache,
             IDistributedCache<MapTenantCacheItem> mapTenantCache,
             IDistributedCache<MapTenantMapCodeCacheItem> mapTenantMapCodeCache,
             IMapTenantRepository mapTenantRepository)
         {
+            AllMapTenantCache = allMapTenantCache;
             MapTenantCache = mapTenantCache;
             MapTenantMapCodeCache = mapTenantMapCodeCache;
             MapTenantRepository = mapTenantRepository;
@@ -91,5 +95,48 @@ namespace SharpAbp.Abp.MapTenancyManagement
             await MapTenantCache.RemoveAsync(code);
             await MapTenantMapCodeCache.RemoveAsync(mapCode);
         }
+
+        /// <summary>
+        /// Get all cache
+        /// </summary>
+        /// <returns></returns>
+        public virtual async Task<AllMapTenantCacheItem> GetAllCacheAsync()
+        {
+            var cacheKey = CalculateAllCacheKey();
+            var allMapTenantCacheItem = await AllMapTenantCache.GetOrAddAsync(cacheKey, async () =>
+            {
+                return await GetAllMapTenantCacheItemAsync();
+            }, hideErrors: false);
+
+            return allMapTenantCacheItem;
+        }
+
+        /// <summary>
+        /// Update all cache
+        /// </summary>
+        /// <returns></returns>
+        public virtual async Task UpdateAllCacheAsync()
+        {
+            var cacheKey = CalculateAllCacheKey();
+            var allMapTenantCacheItem = await GetAllMapTenantCacheItemAsync();
+            await AllMapTenantCache.SetAsync(cacheKey, allMapTenantCacheItem, hideErrors: false);
+        }
+
+
+        protected virtual async Task<AllMapTenantCacheItem> GetAllMapTenantCacheItemAsync()
+        {
+            var allMapTenantCacheItem = new AllMapTenantCacheItem();
+
+            var mapTenants = await MapTenantRepository.GetListAsync(true, default);
+            allMapTenantCacheItem.MapTenants = mapTenants.Select(x => x.AsCacheItem()).ToList();
+
+            return allMapTenantCacheItem;
+        }
+
+        protected virtual string CalculateAllCacheKey()
+        {
+            return "AllMapTenant";
+        }
+
     }
 }

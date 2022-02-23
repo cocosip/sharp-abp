@@ -7,12 +7,10 @@ namespace SharpAbp.Abp.MapTenancyManagement
     public class MapTenantCacheManagerTest : MapTenancyManagementApplicationTestBase
     {
         private readonly IHybridMapTenantAppService _hybridMapTenantAppService;
-        private readonly IAllMapTenantCacheManager _allMapTenantCacheManager;
         private readonly IMapTenantCacheManager _mapTenantCacheManager;
         public MapTenantCacheManagerTest()
         {
             _hybridMapTenantAppService = GetRequiredService<IHybridMapTenantAppService>();
-            _allMapTenantCacheManager = GetRequiredService<IAllMapTenantCacheManager>();
             _mapTenantCacheManager = GetRequiredService<IMapTenantCacheManager>();
         }
 
@@ -46,7 +44,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
             Assert.Equal("902", c2.Code);
             Assert.Equal("1902", c2.MapCode);
 
-            var all = await _allMapTenantCacheManager.GetAsync();
+            var all = await _mapTenantCacheManager.GetAllCacheAsync();
 
             var all_c1 = all.MapTenants.FirstOrDefault(x => x.Code == "901");
             Assert.NotNull(all_c1);

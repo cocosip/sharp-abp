@@ -34,5 +34,17 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <param name="mapCode"></param>
         /// <returns></returns>
         Task RemoveCacheAsync([NotNull] string code, [NotNull] string mapCode);
+
+        /// <summary>
+        /// Get all cache
+        /// </summary>
+        /// <returns></returns>
+        Task<AllMapTenantCacheItem> GetAllCacheAsync();
+
+        /// <summary>
+        /// Update all cache
+        /// </summary>
+        /// <returns></returns>
+        Task UpdateAllCacheAsync();
     }
 }
