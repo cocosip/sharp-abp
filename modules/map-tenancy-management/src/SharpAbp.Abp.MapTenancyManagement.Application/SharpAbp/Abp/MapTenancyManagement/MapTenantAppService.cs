@@ -81,7 +81,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         {
             var count = await MapTenantRepository.GetCountAsync(input.Code, input.TenantId, input.MapCode);
 
-            var mapTenants = await MapTenantRepository.GetListAsync(
+            var mapTenants = await MapTenantRepository.GetPagedListAsync(
                 input.SkipCount,
                 input.MaxResultCount,
                 input.Sorting,

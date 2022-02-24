@@ -39,22 +39,21 @@ namespace SharpAbp.Abp.DbConnectionsManagement
 
             await _databaseConnectionInfoAppService.UpdateAsync(d1.Id, new UpdateDatabaseConnectionInfoDto()
             {
-                Name = "postgresql",
                 DatabaseProvider = "PostgreSql",
                 ConnectionString = "Server=127.0.0.1;Port=9432;Username=root;Password=123456;Database=demo2;"
             });
 
             var databaseConnectionInfo2 = await _databaseConnectionInfoAppService.GetAsync(d1.Id);
-            Assert.Equal("postgresql", databaseConnectionInfo2.Name);
+            Assert.Equal("mysql", databaseConnectionInfo2.Name);
             Assert.Equal("PostgreSql", databaseConnectionInfo2.DatabaseProvider);
             Assert.Equal("Server=127.0.0.1;Port=9432;Username=root;Password=123456;Database=demo2;", databaseConnectionInfo2.ConnectionString);
 
-            var databaseConnectionInfo2_1 = await _databaseConnectionInfoAppService.FindByNameAsync("postgresql");
+            var databaseConnectionInfo2_1 = await _databaseConnectionInfoAppService.FindByNameAsync("mysql");
             Assert.Equal(databaseConnectionInfo2.Name, databaseConnectionInfo2_1.Name);
             Assert.Equal(databaseConnectionInfo2.DatabaseProvider, databaseConnectionInfo2_1.DatabaseProvider);
             Assert.Equal(databaseConnectionInfo2.ConnectionString, databaseConnectionInfo2_1.ConnectionString);
 
-            var databaseConnectionInfo2_2 = await _databaseConnectionInfoAppService.FindByNameAsync("postgresql");
+            var databaseConnectionInfo2_2 = await _databaseConnectionInfoAppService.FindByNameAsync("mysql");
             Assert.NotNull(databaseConnectionInfo2_2);
 
 
@@ -62,7 +61,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
             Assert.NotNull(c1);
 
             var c2 = await _databaseConnectionInfoCacheManager.GetAsync("postgresql");
-            Assert.NotNull(c2);
+            Assert.Null(c2);
 
         }
     }

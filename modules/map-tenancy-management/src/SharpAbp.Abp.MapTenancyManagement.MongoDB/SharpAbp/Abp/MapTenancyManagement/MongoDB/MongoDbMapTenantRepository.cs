@@ -22,57 +22,64 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
         }
 
         /// <summary>
-        /// Find MapTenant by code
+        /// Find by code
         /// </summary>
         /// <param name="code"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<MapTenant> FindByCodeAsync(
             [NotNull] string code,
+            bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(code, nameof(code));
-            return await FindAsync(x => x.Code == code, true, GetCancellationToken(cancellationToken));
+            return await FindAsync(x => x.Code == code, includeDetails, GetCancellationToken(cancellationToken));
         }
 
         /// <summary>
-        /// Find MapTenant by mapCode
+        /// Find by mapCode
         /// </summary>
         /// <param name="mapCode"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<MapTenant> FindByMapCodeAsync(
-          [NotNull] string mapCode,
-          CancellationToken cancellationToken = default)
+            [NotNull] string mapCode,
+            bool includeDetails = true,
+            CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(mapCode, nameof(mapCode));
-            return await FindAsync(x => x.MapCode == mapCode, true, GetCancellationToken(cancellationToken));
+            return await FindAsync(x => x.MapCode == mapCode, includeDetails, GetCancellationToken(cancellationToken));
         }
 
         /// <summary>
-        /// Find MapTenant by tenantId
+        /// Find by tenantId
         /// </summary>
         /// <param name="tenantId"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<MapTenant> FindByTenantIdAsync(
             Guid tenantId,
+            bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
-            return await FindAsync(x => x.TenantId == tenantId, true, GetCancellationToken(cancellationToken));
+            return await FindAsync(x => x.TenantId == tenantId, includeDetails, GetCancellationToken(cancellationToken));
         }
 
-
         /// <summary>
-        /// Find MapTenant by code
+        /// Find expected by code
         /// </summary>
         /// <param name="code"></param>
         /// <param name="expectedId"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<MapTenant> FindExpectedCodeAsync(
             [NotNull] string code,
             Guid? expectedId = null,
+            bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
             return await (await GetMongoQueryableAsync())
@@ -83,15 +90,17 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
         }
 
         /// <summary>
-        /// Find MapTenant by mapCode
+        /// Find expected by mapCode
         /// </summary>
         /// <param name="mapCode"></param>
         /// <param name="expectedId"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<MapTenant> FindExpectedMapCodeAsync(
            [NotNull] string mapCode,
            Guid? expectedId = null,
+           bool includeDetails = true,
            CancellationToken cancellationToken = default)
         {
             return await (await GetMongoQueryableAsync())
@@ -102,15 +111,17 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
         }
 
         /// <summary>
-        /// Find MapTenant
+        /// Find expected by tenantId
         /// </summary>
         /// <param name="tenantId"></param>
         /// <param name="expectedId"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<MapTenant> FindExpectedTenantIdAsync(
             Guid tenantId,
             Guid? expectedId = null,
+            bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
             return await (await GetMongoQueryableAsync())
@@ -121,13 +132,15 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
         }
 
         /// <summary>
-        /// Get list by tenant id
+        /// Get list by tenantIds
         /// </summary>
         /// <param name="tenantIds"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<List<MapTenant>> GetListByTenantIdsAsync(
             List<Guid> tenantIds,
+            bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
             return await (await GetMongoQueryableAsync())
@@ -140,10 +153,12 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
         /// Get list by codes
         /// </summary>
         /// <param name="codes"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public async Task<List<MapTenant>> GetListByCodesAsync(
             List<string> codes,
+            bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
             return await (await GetMongoQueryableAsync())
@@ -153,13 +168,15 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
         }
 
         /// <summary>
-        /// Get list by  mapCodes
+        /// Get list by mapCodes
         /// </summary>
         /// <param name="mapCodes"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public async Task<List<MapTenant>> GetListByMapCodesAsync(
             List<string> mapCodes,
+            bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
             return await (await GetMongoQueryableAsync())
@@ -169,7 +186,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
         }
 
         /// <summary>
-        /// Get List
+        /// Get paged list
         /// </summary>
         /// <param name="skipCount"></param>
         /// <param name="maxResultCount"></param>
@@ -177,15 +194,17 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
         /// <param name="code"></param>
         /// <param name="tenantId"></param>
         /// <param name="mapCode"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<List<MapTenant>> GetListAsync(
+        public virtual async Task<List<MapTenant>> GetPagedListAsync(
             int skipCount,
             int maxResultCount,
             string sorting = null,
             string code = "",
             Guid? tenantId = null,
             string mapCode = "",
+            bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
             return await (await GetMongoQueryableAsync())

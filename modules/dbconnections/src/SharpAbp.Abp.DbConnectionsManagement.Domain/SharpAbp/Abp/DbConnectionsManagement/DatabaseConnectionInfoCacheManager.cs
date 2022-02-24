@@ -36,7 +36,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
                 name,
                 async () =>
                 {
-                    var databaseConnectionInfo = await ConnectionInfoRepository.FindByNameAsync(name);
+                    var databaseConnectionInfo = await ConnectionInfoRepository.FindByNameAsync(name, true, cancellationToken);
                     return databaseConnectionInfo?.AsCacheItem();
                 },
                 hideErrors: false,
@@ -72,7 +72,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task RemoveAsync(
-            [NotNull] string name, 
+            [NotNull] string name,
             CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));

@@ -29,29 +29,29 @@ namespace SharpAbp.Abp.FileStoringManagement
         Task<FileStoringContainer> FindExpectedByNameAsync(string name, Guid? expectedId = null, bool includeDetails = false, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Get List
+        /// Get list
+        /// </summary>
+        /// <param name="sorting"></param>
+        /// <param name="name"></param>
+        /// <param name="provider"></param>
+        /// <param name="includeDetails"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<List<FileStoringContainer>> GetListAsync(string sorting = null, string name = "", string provider = "", bool includeDetails = false, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get paged list
         /// </summary>
         /// <param name="skipCount"></param>
         /// <param name="maxResultCount"></param>
         /// <param name="sorting"></param>
-        /// <param name="includeDetails"></param>
         /// <param name="name"></param>
         /// <param name="provider"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        Task<List<FileStoringContainer>> GetListAsync(int skipCount, int maxResultCount, string sorting = null, bool includeDetails = true, string name = "", string provider = "", CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Get List
-        /// </summary>
-        /// <param name="sorting"></param>
         /// <param name="includeDetails"></param>
-        /// <param name="name"></param>
-        /// <param name="provider"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<List<FileStoringContainer>> GetListAsync(string sorting = null, bool includeDetails = true, string name = "", string provider = "", CancellationToken cancellationToken = default);
-
+        Task<List<FileStoringContainer>> GetPagedListAsync(int skipCount, int maxResultCount, string sorting = null, string name = "", string provider = "", bool includeDetails = false, CancellationToken cancellationToken = default);
+        
         /// <summary>
         /// Get count async
         /// </summary>

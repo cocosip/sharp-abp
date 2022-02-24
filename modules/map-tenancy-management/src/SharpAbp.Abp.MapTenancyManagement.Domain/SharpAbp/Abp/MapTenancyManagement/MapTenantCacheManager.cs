@@ -42,7 +42,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
                 code,
                 async () =>
                 {
-                    var mapTenant = await MapTenantRepository.FindByCodeAsync(code, cancellationToken);
+                    var mapTenant = await MapTenantRepository.FindByCodeAsync(code, true, cancellationToken);
                     return mapTenant?.AsCacheItem();
                 },
                 hideErrors: false,
@@ -66,7 +66,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
                 mapCode,
                 async () =>
                 {
-                    var mapTenant = await MapTenantRepository.FindByMapCodeAsync(mapCode, cancellationToken);
+                    var mapTenant = await MapTenantRepository.FindByMapCodeAsync(mapCode, true, cancellationToken);
                     return mapTenant?.AsMapCodeCacheItem();
                 },
                 hideErrors: false,
@@ -135,7 +135,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
                 cacheKey,
                 async () =>
                 {
-                    return await GetAllMapTenantCacheItemAsync();
+                    return await GetAllMapTenantCacheItemAsync(cancellationToken);
                 },
                 hideErrors: false,
                 token: cancellationToken);

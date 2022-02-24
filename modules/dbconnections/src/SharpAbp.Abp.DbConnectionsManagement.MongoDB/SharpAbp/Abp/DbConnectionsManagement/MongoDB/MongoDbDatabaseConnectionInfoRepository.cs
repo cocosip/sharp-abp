@@ -21,17 +21,19 @@ namespace SharpAbp.Abp.DbConnectionsManagement.MongoDB
         }
 
         /// <summary>
-        /// Find by name
+        ///  Find by name
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<DatabaseConnectionInfo> FindByNameAsync(
             [NotNull] string name,
+            bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            return await FindAsync(x => x.Name == name, cancellationToken: GetCancellationToken(cancellationToken));
+            return await FindAsync(x => x.Name == name, includeDetails, GetCancellationToken(cancellationToken));
         }
 
         /// <summary>
@@ -39,11 +41,13 @@ namespace SharpAbp.Abp.DbConnectionsManagement.MongoDB
         /// </summary>
         /// <param name="name"></param>
         /// <param name="expectedId"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<DatabaseConnectionInfo> FindExpectedByNameAsync(
             string name,
             Guid? expectedId = null,
+            bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
             return await (await GetMongoQueryableAsync())
@@ -54,21 +58,23 @@ namespace SharpAbp.Abp.DbConnectionsManagement.MongoDB
         }
 
         /// <summary>
-        /// Get list
+        /// Get paged list
         /// </summary>
         /// <param name="skipCount"></param>
         /// <param name="maxResultCount"></param>
         /// <param name="sorting"></param>
         /// <param name="name"></param>
         /// <param name="databaseProvider"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<List<DatabaseConnectionInfo>> GetListAsync(
+        public virtual async Task<List<DatabaseConnectionInfo>> GetPagedListAsync(
             int skipCount,
             int maxResultCount,
             string sorting = null,
             string name = "",
             string databaseProvider = "",
+            bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
             return await (await GetMongoQueryableAsync())
@@ -88,8 +94,8 @@ namespace SharpAbp.Abp.DbConnectionsManagement.MongoDB
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<int> GetCountAsync(
-            string name = "", 
-            string databaseProvider = "", 
+            string name = "",
+            string databaseProvider = "",
             CancellationToken cancellationToken = default)
         {
             return await (await GetMongoQueryableAsync())

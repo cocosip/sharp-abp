@@ -13,79 +13,88 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// Find MapTenant by code
         /// </summary>
         /// <param name="code"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<MapTenant> FindByCodeAsync([NotNull] string code, CancellationToken cancellationToken = default);
+        Task<MapTenant> FindByCodeAsync(string code, bool includeDetails = true, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Find MapTenant by mapCode
+        /// Find by mapCode
         /// </summary>
         /// <param name="mapCode"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<MapTenant> FindByMapCodeAsync([NotNull] string mapCode, CancellationToken cancellationToken = default);
+        Task<MapTenant> FindByMapCodeAsync(string mapCode, bool includeDetails = true, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Find MapTenant by tenantId
+        /// Find by tenantId
         /// </summary>
         /// <param name="tenantId"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<MapTenant> FindByTenantIdAsync(Guid tenantId, CancellationToken cancellationToken = default);
+        Task<MapTenant> FindByTenantIdAsync(Guid tenantId, bool includeDetails = true, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Find MapTenant
+        /// Find expected by code
         /// </summary>
         /// <param name="code"></param>
         /// <param name="expectedId"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<MapTenant> FindExpectedCodeAsync([NotNull] string code, Guid? expectedId = null, CancellationToken cancellationToken = default);
+        Task<MapTenant> FindExpectedCodeAsync([NotNull] string code, Guid? expectedId = null, bool includeDetails = true, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Find MapTenant
+        /// Find expected by mapCode
         /// </summary>
         /// <param name="mapCode"></param>
         /// <param name="expectedId"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<MapTenant> FindExpectedMapCodeAsync([NotNull] string mapCode, Guid? expectedId = null, CancellationToken cancellationToken = default);
+        Task<MapTenant> FindExpectedMapCodeAsync([NotNull] string mapCode, Guid? expectedId = null, bool includeDetails = true, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Find MapTenant
+        /// Find expected by tenantId
         /// </summary>
         /// <param name="tenantId"></param>
         /// <param name="expectedId"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<MapTenant> FindExpectedTenantIdAsync(Guid tenantId, Guid? expectedId = null, CancellationToken cancellationToken = default);
+        Task<MapTenant> FindExpectedTenantIdAsync(Guid tenantId, Guid? expectedId = null, bool includeDetails = true, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Get list by tenant id
+        /// Get list by tenantIds
         /// </summary>
         /// <param name="tenantIds"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<List<MapTenant>> GetListByTenantIdsAsync(List<Guid> tenantIds, CancellationToken cancellationToken = default);
+        Task<List<MapTenant>> GetListByTenantIdsAsync(List<Guid> tenantIds, bool includeDetails = false, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get list by codes
         /// </summary>
         /// <param name="codes"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<List<MapTenant>> GetListByCodesAsync(List<string> codes, CancellationToken cancellationToken = default);
+        Task<List<MapTenant>> GetListByCodesAsync(List<string> codes, bool includeDetails = false, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Get list by mapCode
+        /// Get list by mapCodes
         /// </summary>
         /// <param name="mapCodes"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<List<MapTenant>> GetListByMapCodesAsync(List<string> mapCodes, CancellationToken cancellationToken = default);
+        Task<List<MapTenant>> GetListByMapCodesAsync(List<string> mapCodes, bool includeDetails = false, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Get List
+        /// Get list
         /// </summary>
         /// <param name="skipCount"></param>
         /// <param name="maxResultCount"></param>
@@ -93,9 +102,10 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <param name="code"></param>
         /// <param name="tenantId"></param>
         /// <param name="mapCode"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<List<MapTenant>> GetListAsync(int skipCount, int maxResultCount, string sorting = null, string code = "", Guid? tenantId = null, string mapCode = "", CancellationToken cancellationToken = default);
+        Task<List<MapTenant>> GetPagedListAsync(int skipCount, int maxResultCount, string sorting = null, string code = "", Guid? tenantId = null, string mapCode = "", bool includeDetails = false, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get count async

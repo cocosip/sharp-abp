@@ -13,30 +13,33 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         /// Find by name
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<DatabaseConnectionInfo> FindByNameAsync([NotNull] string name, CancellationToken cancellationToken = default);
+        Task<DatabaseConnectionInfo> FindByNameAsync(string name, bool includeDetails = true, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Find by name
+        /// Find expected by name
         /// </summary>
         /// <param name="name"></param>
         /// <param name="expectedId"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<DatabaseConnectionInfo> FindExpectedByNameAsync(string name, Guid? expectedId = null, CancellationToken cancellationToken = default);
+        Task<DatabaseConnectionInfo> FindExpectedByNameAsync(string name, Guid? expectedId = null, bool includeDetails = true, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Get list
+        /// Get paged list
         /// </summary>
         /// <param name="skipCount"></param>
         /// <param name="maxResultCount"></param>
         /// <param name="sorting"></param>
         /// <param name="name"></param>
         /// <param name="databaseProvider"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<List<DatabaseConnectionInfo>> GetListAsync(int skipCount, int maxResultCount, string sorting = null, string name = "", string databaseProvider = "", CancellationToken cancellationToken = default);
+        Task<List<DatabaseConnectionInfo>> GetPagedListAsync(int skipCount, int maxResultCount, string sorting = null, string name = "", string databaseProvider = "", bool includeDetails = false, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get count

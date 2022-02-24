@@ -58,11 +58,10 @@ namespace SharpAbp.Abp.FileStoringManagement
         public virtual async Task<PagedResultDto<ContainerDto>> GetPagedListAsync(FileStoringContainerPagedRequestDto input)
         {
             var count = await ContainerRepository.GetCountAsync(input.Name, input.Provider);
-            var fileStoringContainers = await ContainerRepository.GetListAsync(
+            var fileStoringContainers = await ContainerRepository.GetPagedListAsync(
                 input.SkipCount,
                 input.MaxResultCount,
                 input.Sorting,
-                false,
                 input.Name,
                 input.Provider);
 

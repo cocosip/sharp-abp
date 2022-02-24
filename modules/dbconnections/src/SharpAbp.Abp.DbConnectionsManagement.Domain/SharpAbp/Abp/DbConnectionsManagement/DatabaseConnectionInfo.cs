@@ -35,11 +35,9 @@ namespace SharpAbp.Abp.DbConnectionsManagement
 
 
         public void Update(
-            string name, 
             string databaseProvider, 
             string connectionString)
         {
-            Name = name;
             DatabaseProvider = databaseProvider;
             ConnectionString = connectionString;
         }

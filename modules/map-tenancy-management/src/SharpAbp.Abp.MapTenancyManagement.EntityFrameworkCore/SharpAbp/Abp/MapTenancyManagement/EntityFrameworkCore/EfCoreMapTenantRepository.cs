@@ -23,116 +23,137 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         /// Find MapTenant by code
         /// </summary>
         /// <param name="code"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<MapTenant> FindByCodeAsync(
             [NotNull] string code,
+            bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(code, nameof(code));
             return await (await GetDbSetAsync())
+                .IncludeDetails(includeDetails)
                 .FirstOrDefaultAsync(x => x.Code == code, GetCancellationToken(cancellationToken));
         }
 
         /// <summary>
-        /// Find MapTenant by mapCode
+        /// Find by mapCode
         /// </summary>
         /// <param name="mapCode"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<MapTenant> FindByMapCodeAsync(
             [NotNull] string mapCode,
+            bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(mapCode, nameof(mapCode));
             return await (await GetDbSetAsync())
+                .IncludeDetails(includeDetails)
                 .FirstOrDefaultAsync(x => x.MapCode == mapCode, GetCancellationToken(cancellationToken));
         }
 
         /// <summary>
-        /// Find MapTenant by tenantId
+        /// Find by tenantId
         /// </summary>
         /// <param name="tenantId"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<MapTenant> FindByTenantIdAsync(
             Guid tenantId,
+            bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
+                .IncludeDetails(includeDetails)
                 .FirstOrDefaultAsync(x => x.TenantId == tenantId, GetCancellationToken(cancellationToken));
         }
 
 
         /// <summary>
-        /// Find MapTenant
+        /// Find expected by code
         /// </summary>
         /// <param name="code"></param>
         /// <param name="expectedId"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<MapTenant> FindExpectedCodeAsync(
             [NotNull] string code,
             Guid? expectedId = null,
+            bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(code, nameof(code));
 
             return await (await GetDbSetAsync())
+                .IncludeDetails(includeDetails)
                 .WhereIf(!code.IsNullOrWhiteSpace(), x => x.Code == code)
                 .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
         /// <summary>
-        /// Find MapTenant
+        /// Find expected by mapCode
         /// </summary>
         /// <param name="mapCode"></param>
         /// <param name="expectedId"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<MapTenant> FindExpectedMapCodeAsync(
            [NotNull] string mapCode,
            Guid? expectedId = null,
+           bool includeDetails = true,
            CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(mapCode, nameof(mapCode));
 
             return await (await GetDbSetAsync())
+                .IncludeDetails(includeDetails)
                 .WhereIf(!mapCode.IsNullOrWhiteSpace(), x => x.Code == mapCode)
                 .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
         /// <summary>
-        /// Find MapTenant
+        /// Find expected by tenantId
         /// </summary>
         /// <param name="tenantId"></param>
         /// <param name="expectedId"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<MapTenant> FindExpectedTenantIdAsync(
             Guid tenantId,
             Guid? expectedId = null,
+            bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
+                .IncludeDetails(includeDetails)
                 .Where(x => x.TenantId == tenantId)
                 .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
         /// <summary>
-        /// Get list by tenant id
+        /// Get list by tenantIds
         /// </summary>
         /// <param name="tenantIds"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<List<MapTenant>> GetListByTenantIdsAsync(
             List<Guid> tenantIds,
+            bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
+                .IncludeDetails(includeDetails)
                 .Where(x => tenantIds.Contains(x.TenantId))
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
@@ -141,34 +162,40 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         /// Get list by codes
         /// </summary>
         /// <param name="codes"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<List<MapTenant>> GetListByCodesAsync(
             List<string> codes,
+            bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
+                .IncludeDetails(includeDetails)
                 .Where(x => codes.Contains(x.Code))
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
         /// <summary>
-        /// Get list by mapCode
+        /// Get list by mapCodes
         /// </summary>
         /// <param name="mapCodes"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<List<MapTenant>> GetListByMapCodesAsync(
            List<string> mapCodes,
+           bool includeDetails = false,
            CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
+                .IncludeDetails(includeDetails)
                 .Where(x => mapCodes.Contains(x.MapCode))
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
         /// <summary>
-        /// Get list
+        /// Get paged list
         /// </summary>
         /// <param name="skipCount"></param>
         /// <param name="maxResultCount"></param>
@@ -176,18 +203,21 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         /// <param name="code"></param>
         /// <param name="tenantId"></param>
         /// <param name="mapCode"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<List<MapTenant>> GetListAsync(
+        public virtual async Task<List<MapTenant>> GetPagedListAsync(
             int skipCount,
             int maxResultCount,
             string sorting = null,
             string code = "",
             Guid? tenantId = null,
             string mapCode = "",
+            bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
+                .IncludeDetails(includeDetails)
                 .WhereIf(!code.IsNullOrWhiteSpace(), item => item.Code == code)
                 .WhereIf(tenantId.HasValue, item => item.TenantId == tenantId.Value)
                 .WhereIf(!mapCode.IsNullOrWhiteSpace(), item => item.MapCode == mapCode)

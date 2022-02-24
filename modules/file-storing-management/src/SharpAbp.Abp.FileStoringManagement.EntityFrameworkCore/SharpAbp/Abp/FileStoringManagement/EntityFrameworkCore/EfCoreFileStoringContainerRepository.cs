@@ -63,21 +63,45 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
         /// <summary>
         /// Get List
         /// </summary>
-        /// <param name="skipCount"></param>
-        /// <param name="maxResultCount"></param>
         /// <param name="sorting"></param>
-        /// <param name="includeDetails"></param>
         /// <param name="name"></param>
         /// <param name="provider"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<List<FileStoringContainer>> GetListAsync(
+            string sorting = null,
+            string name = "",
+            string provider = "",
+            bool includeDetails = false,
+            CancellationToken cancellationToken = default)
+        {
+            return await (await GetDbSetAsync())
+                .IncludeDetails(includeDetails)
+                .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+                .WhereIf(!provider.IsNullOrWhiteSpace(), item => item.Provider == provider)
+                .OrderBy(sorting ?? nameof(FileStoringContainer.Name))
+                .ToListAsync(GetCancellationToken(cancellationToken));
+        }
+
+        /// <summary>
+        /// Get list
+        /// </summary>
+        /// <param name="skipCount"></param>
+        /// <param name="maxResultCount"></param>
+        /// <param name="sorting"></param>
+        /// <param name="name"></param>
+        /// <param name="provider"></param>
+        /// <param name="includeDetails"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<List<FileStoringContainer>> GetPagedListAsync(
             int skipCount,
             int maxResultCount,
             string sorting = null,
-            bool includeDetails = true,
             string name = "",
             string provider = "",
+            bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
@@ -87,30 +111,6 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
                 .OrderBy(sorting ?? nameof(FileStoringContainer.Name))
                 .Skip(skipCount)
                 .Take(maxResultCount)
-                .ToListAsync(GetCancellationToken(cancellationToken));
-        }
-
-        /// <summary>
-        /// Get List
-        /// </summary>
-        /// <param name="sorting"></param>
-        /// <param name="includeDetails"></param>
-        /// <param name="name"></param>
-        /// <param name="provider"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public virtual async Task<List<FileStoringContainer>> GetListAsync(
-            string sorting = null,
-            bool includeDetails = true,
-            string name = "",
-            string provider = "",
-            CancellationToken cancellationToken = default)
-        {
-            return await (await GetDbSetAsync())
-                .IncludeDetails(includeDetails)
-                .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
-                .WhereIf(!provider.IsNullOrWhiteSpace(), item => item.Provider == provider)
-                .OrderBy(sorting ?? nameof(FileStoringContainer.Name))
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 

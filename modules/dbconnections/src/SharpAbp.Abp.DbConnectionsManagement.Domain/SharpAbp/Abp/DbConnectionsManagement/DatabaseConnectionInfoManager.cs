@@ -39,19 +39,17 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         /// Update
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="name"></param>
         /// <param name="databaseProvider"></param>
         /// <param name="connectionString"></param>
         /// <returns></returns>
         public virtual async Task<DatabaseConnectionInfo> UpdateAsync(
             Guid id,
-            string name,
             string databaseProvider,
             string connectionString)
         {
             var databaseConnectionInfo = await ConnectionInfoRepository.GetAsync(id);
 
-            databaseConnectionInfo.Update(name, databaseProvider, connectionString);
+            databaseConnectionInfo.Update(databaseProvider, connectionString);
             return await ConnectionInfoRepository.UpdateAsync(databaseConnectionInfo);
         }
     }

@@ -62,21 +62,45 @@ namespace SharpAbp.Abp.FileStoringManagement.MongoDB
         /// <summary>
         /// Get List
         /// </summary>
-        /// <param name="skipCount"></param>
-        /// <param name="maxResultCount"></param>
         /// <param name="sorting"></param>
-        /// <param name="includeDetails"></param>
         /// <param name="name"></param>
         /// <param name="provider"></param>
+        /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<List<FileStoringContainer>> GetListAsync(
+            string sorting = null,
+            string name = "",
+            string provider = "",
+            bool includeDetails = true,
+            CancellationToken cancellationToken = default)
+        {
+            return await (await GetMongoQueryableAsync())
+               .WhereIf<FileStoringContainer, IMongoQueryable<FileStoringContainer>>(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+               .WhereIf<FileStoringContainer, IMongoQueryable<FileStoringContainer>>(!provider.IsNullOrWhiteSpace(), item => item.Provider == provider)
+               .OrderBy(sorting ?? nameof(FileStoringContainer.Name))
+               .As<IMongoQueryable<FileStoringContainer>>()
+               .ToListAsync(GetCancellationToken(cancellationToken));
+        }
+
+        /// <summary>
+        /// Get paged list
+        /// </summary>
+        /// <param name="skipCount"></param>
+        /// <param name="maxResultCount"></param>
+        /// <param name="sorting"></param>
+        /// <param name="name"></param>
+        /// <param name="provider"></param>
+        /// <param name="includeDetails"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<List<FileStoringContainer>> GetPagedListAsync(
             int skipCount,
             int maxResultCount,
             string sorting = "",
-            bool includeDetails = true,
             string name = "",
             string provider = "",
+            bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
             return await (await GetMongoQueryableAsync())
@@ -87,30 +111,6 @@ namespace SharpAbp.Abp.FileStoringManagement.MongoDB
                 .PageBy<FileStoringContainer, IMongoQueryable<FileStoringContainer>>(skipCount, maxResultCount)
                 .ToListAsync(GetCancellationToken(cancellationToken));
 
-        }
-
-        /// <summary>
-        /// Get List
-        /// </summary>
-        /// <param name="sorting"></param>
-        /// <param name="includeDetails"></param>
-        /// <param name="name"></param>
-        /// <param name="provider"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public virtual async Task<List<FileStoringContainer>> GetListAsync(
-            string sorting = null,
-            bool includeDetails = true,
-            string name = "",
-            string provider = "",
-            CancellationToken cancellationToken = default)
-        {
-            return await (await GetMongoQueryableAsync())
-               .WhereIf<FileStoringContainer, IMongoQueryable<FileStoringContainer>>(!name.IsNullOrWhiteSpace(), item => item.Name == name)
-               .WhereIf<FileStoringContainer, IMongoQueryable<FileStoringContainer>>(!provider.IsNullOrWhiteSpace(), item => item.Provider == provider)
-               .OrderBy(sorting ?? nameof(FileStoringContainer.Name))
-               .As<IMongoQueryable<FileStoringContainer>>()
-               .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
         /// <summary>

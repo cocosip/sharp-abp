@@ -58,7 +58,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         {
             var count = await ConnectionInfoRepository.GetCountAsync(input.Name, input.DatabaseProvider);
 
-            var databaseConnectionInfos = await ConnectionInfoRepository.GetListAsync(
+            var databaseConnectionInfos = await ConnectionInfoRepository.GetPagedListAsync(
                 input.SkipCount,
                 input.MaxResultCount,
                 input.Sorting,
@@ -100,7 +100,6 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         {
             var databaseConnectionInfo = await ConnectionInfoManager.UpdateAsync(
                 id,
-                input.Name,
                 input.DatabaseProvider,
                 input.ConnectionString);
             return ObjectMapper.Map<DatabaseConnectionInfo, DatabaseConnectionInfoDto>(databaseConnectionInfo);
