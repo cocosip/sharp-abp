@@ -12,19 +12,24 @@ namespace SharpAbp.Abp.MassTransit.Kafka
         public string Topic { get; set; }
 
         /// <summary>
+        /// Group
+        /// </summary>
+        public string GroupId { get; set; }
+
+        /// <summary>
         /// Producer configure
         /// </summary>
-        public Action<IRiderRegistrationConfigurator> Configurator { get; set; }
+        public Action<IRiderRegistrationConfigurator> Configure { get; set; }
 
         /// <summary>
         /// Receive endpoint
         /// </summary>
-        public Action<IKafkaTopicReceiveEndpointConfigurator> ReceiveEndpointConfigurator { get; set; }
+        public Action<IKafkaTopicReceiveEndpointConfigurator> ReceiveEndpointConfigure { get; set; }
 
         /// <summary>
         /// TopicEndPoint configure
         /// </summary>
-        public Action<string, string, Action<IKafkaTopicReceiveEndpointConfigurator>, IRiderRegistrationContext, IKafkaFactoryConfigurator> TopicEndpointConfigurator { get; set; }
+        public Action<string, string, Action<IKafkaTopicReceiveEndpointConfigurator>, IRiderRegistrationContext, IKafkaFactoryConfigurator> TopicEndpointConfigure { get; set; }
 
     }
 }

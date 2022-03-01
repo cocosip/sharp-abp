@@ -13,6 +13,6 @@ namespace SharpAbp.Abp.MassTransit.Kafka
         /// <summary>
         /// Producer configuration
         /// </summary>
-        public Action<string, IRiderRegistrationConfigurator> Configurator { get; set; }
+        public Action<string, IRiderRegistrationConfigurator> Configure { get; set; }
     }
 }

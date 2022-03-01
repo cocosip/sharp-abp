@@ -25,12 +25,15 @@ namespace SharpAbp.Abp.MassTransit
         /// Stop timeout millisecond
         /// </summary>
         public int StopTimeoutMilliSeconds { get; set; } = 3000;
-        
+
         public List<Action<IServiceCollectionBusConfigurator>> PreConfigures { get; set; }
+
+        public List<Action<IServiceCollectionBusConfigurator>> PostConfigures { get; set; }
 
         public AbpMassTransitOptions()
         {
             PreConfigures = new List<Action<IServiceCollectionBusConfigurator>>();
+            PostConfigures = new List<Action<IServiceCollectionBusConfigurator>>();
         }
 
     }

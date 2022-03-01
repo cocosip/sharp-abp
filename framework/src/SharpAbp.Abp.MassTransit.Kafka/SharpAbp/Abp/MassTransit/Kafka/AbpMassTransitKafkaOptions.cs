@@ -7,10 +7,11 @@ namespace SharpAbp.Abp.MassTransit.Kafka
     public class AbpMassTransitKafkaOptions
     {
         public string Server { get; set; }
+        public string DefaultConsumerGroupId { get; set; }
         public bool UseSsl { get; set; }
         public Action<IKafkaSslConfigurator> ConfigureSsl { get; set; }
-        public Action<IKafkaTopicReceiveEndpointConfigurator> DefaultReceiveEndpointConfigurator { get; set; }
-
+        public Func<string,string,string> DefaultTopicFormatFunc { get; set; }
+        public Action<IKafkaTopicReceiveEndpointConfigurator> DefaultReceiveEndpointConfigure { get; set; }
         public List<KafkaProducerConfiguration> Producers { get; set; }
         public List<KafkaConsumerConfiguration> Consumers { get; set; }
 

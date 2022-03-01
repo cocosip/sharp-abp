@@ -43,6 +43,11 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
                         }
                     });
 
+                    cfg.ReceiveEndpoint("", e =>
+                    {
+                        e.Consumer<Class111Consumer>();
+                    });
+
                     cfg.ConfigureEndpoints(ctx);
                 });
 
@@ -51,4 +56,14 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
 
 
     }
+}
+
+public class Class111
+{
+
+}
+
+public class Class111Consumer : IConsumer
+{
+
 }

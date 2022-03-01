@@ -1,7 +1,5 @@
 ﻿using MassTransit;
 using MassTransit.ExtensionsDependencyInjectionIntegration;
-using MassTransit.KafkaIntegration;
-using MassTransit.Registration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using Volo.Abp.Modularity;
@@ -23,6 +21,12 @@ namespace SharpAbp.Abp.MassTransit.Kafka
                 }));
             });
 
+            PreConfigure<AbpMassTransitKafkaOptions>(options =>
+            {
+                options.DefaultTopicFormatFunc = KafkaUtil.TopicFormat;
+                options.DefaultConsumerGroupId = "SharpAbp.MassTransit";
+            });
+
         }
 
         public override void ConfigureServices(ServiceConfigurationContext context)
@@ -33,7 +37,7 @@ namespace SharpAbp.Abp.MassTransit.Kafka
 
             context.Services.AddMassTransit(x =>
             {
-                //Preconfig
+                //PreConfigure
                 foreach (var preConfigure in massTransitOptions.PreConfigures)
                 {
                     preConfigure(x);
@@ -44,16 +48,15 @@ namespace SharpAbp.Abp.MassTransit.Kafka
                     //Producer
                     foreach (var producer in kafkaOptions.Producers)
                     {
-                        var topic = "";
-                        producer.Configurator(topic, rider);
+                        var topic = kafkaOptions.DefaultTopicFormatFunc(massTransitOptions.Prefix, producer.Topic);
+                        producer.Configure(topic, rider);
                     }
 
                     //Consumer
                     foreach (var consumer in kafkaOptions.Consumers)
                     {
-                        consumer.Configurator(rider);
+                        consumer.Configure(rider);
                     }
-
 
                     rider.UsingKafka((ctx, k) =>
                     {
@@ -67,55 +70,22 @@ namespace SharpAbp.Abp.MassTransit.Kafka
 
                         foreach (var consumer in kafkaOptions.Consumers)
                         {
-                            var topic = "";
-                            var group = "";
+                            var topic = kafkaOptions.DefaultTopicFormatFunc(massTransitOptions.Prefix, consumer.Topic);
 
-                            consumer.TopicEndpointConfigurator(topic, group, consumer.ReceiveEndpointConfigurator, ctx, k);
+                            var group = consumer.GroupId.IsNullOrWhiteSpace() ? kafkaOptions.DefaultConsumerGroupId : consumer.GroupId;
+
+                            consumer.TopicEndpointConfigure(topic, group, consumer.ReceiveEndpointConfigure, ctx, k);
                         }
 
                     });
                 });
-            });
 
-
-
-            var o = new AbpMassTransitKafkaOptions();
-            o.Producers.Add(new KafkaProducerConfiguration()
-            {
-                Topic = "1",
-                Configurator = new Action<string, IRiderRegistrationConfigurator>((topic, cfg) =>
+                //PostConfigure
+                foreach (var postConfigure in massTransitOptions.PostConfigures)
                 {
-                    cfg.AddProducer<string, Class111>(topic);
-                })
+                    postConfigure(x);
+                }
             });
-
-            o.Consumers.Add(new KafkaConsumerConfiguration()
-            {
-                Topic = "consumer1",
-                Configurator = new Action<IRiderRegistrationConfigurator>(cfg =>
-                {
-                    cfg.AddConsumer<Class111Consumer>();
-                }),
-                TopicEndpointConfigurator = new Action<string, string, Action<IKafkaTopicReceiveEndpointConfigurator>, IRiderRegistrationContext, IKafkaFactoryConfigurator>((topic, group, preConfigure, ctx, cfg) =>
-                {
-                    cfg.TopicEndpoint<string, Class111>(topic, group, e =>
-                    {
-                        preConfigure?.Invoke(e);
-                        e.ConfigureConsumer<Class111Consumer>(ctx);
-                    });
-                })
-            });
-
         }
-    }
-
-    public class Class111
-    {
-
-    }
-
-    public class Class111Consumer : IConsumer
-    {
-
     }
 }
