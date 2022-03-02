@@ -1,5 +1,7 @@
 ﻿using MassTransit;
 using MassTransit.ExtensionsDependencyInjectionIntegration;
+using MassTransit.KafkaIntegration;
+using MassTransit.Registration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using Volo.Abp.Modularity;
@@ -24,7 +26,16 @@ namespace SharpAbp.Abp.MassTransit.Kafka
             PreConfigure<AbpMassTransitKafkaOptions>(options =>
             {
                 options.DefaultTopicFormatFunc = KafkaUtil.TopicFormat;
-                options.DefaultConsumerGroupId = "SharpAbp.MassTransit";
+
+                //Kafka keep alive
+                options.KafkaConfigures.Add(new Action<IRiderRegistrationContext, IKafkaFactoryConfigurator>((ctx, k) =>
+                {
+                    k.ConfigureSocket(s =>
+                    {
+                        s.KeepaliveEnable = true;
+                    });
+                }));
+
             });
 
         }
@@ -45,21 +56,39 @@ namespace SharpAbp.Abp.MassTransit.Kafka
 
                 x.AddRider(rider =>
                 {
+                    //Rider preConfigure
+                    foreach (var preConfigure in kafkaOptions.RiderPreConfigures)
+                    {
+                        preConfigure(rider);
+                    }
+
                     //Producer
                     foreach (var producer in kafkaOptions.Producers)
                     {
                         var topic = kafkaOptions.DefaultTopicFormatFunc(massTransitOptions.Prefix, producer.Topic);
-                        producer.Configure(topic, rider);
+                        producer.Configure?.Invoke(topic, rider);
                     }
 
                     //Consumer
                     foreach (var consumer in kafkaOptions.Consumers)
                     {
-                        consumer.Configure(rider);
+                        consumer.Configure?.Invoke(rider);
+                    }
+
+                    //Rider configure
+                    foreach (var configure in kafkaOptions.RiderConfigures)
+                    {
+                        configure(rider);
                     }
 
                     rider.UsingKafka((ctx, k) =>
                     {
+                        //Kafka preConfigure
+                        foreach (var preConfigure in kafkaOptions.KafkaPreConfigures)
+                        {
+                            preConfigure(ctx, k);
+                        }
+
                         k.Host(kafkaOptions.Server, c =>
                         {
                             if (kafkaOptions.UseSsl && kafkaOptions.ConfigureSsl != null)
@@ -68,16 +97,50 @@ namespace SharpAbp.Abp.MassTransit.Kafka
                             }
                         });
 
+                        k.TopicEndpoint<string, MassTransitBus>("", "", c =>
+                        {
+                            c.MaxPollInterval = TimeSpan.FromSeconds(1);
+                        });
+
+
+                        //Kafka configures
+                        foreach (var configure in kafkaOptions.KafkaConfigures)
+                        {
+                            configure(ctx, k);
+                        }
+
                         foreach (var consumer in kafkaOptions.Consumers)
                         {
                             var topic = kafkaOptions.DefaultTopicFormatFunc(massTransitOptions.Prefix, consumer.Topic);
 
-                            var group = consumer.GroupId.IsNullOrWhiteSpace() ? kafkaOptions.DefaultConsumerGroupId : consumer.GroupId;
+                            // var groupId = consumer.GroupId.IsNullOrWhiteSpace() ? kafkaOptions.DefaultGroupId : consumer.GroupId;
+                            var groupId = "";
 
-                            consumer.TopicEndpointConfigure(topic, group, consumer.ReceiveEndpointConfigure, ctx, k);
+                            var receiveEndpointConfigure = consumer.ReceiveEndpointConfigure ?? kafkaOptions.DefaultReceiveEndpointConfigure;
+
+                            consumer.TopicEndpointConfigure?.Invoke(topic, groupId, receiveEndpointConfigure, ctx, k);
+                        }
+
+                        //k.TopicEndpoint<string, AbpMassTransitKafkaModule>("", "", c =>
+                        //{
+                        //    c.CheckpointInterval
+                        //});
+
+
+                        //Kafka postConfigure
+                        foreach (var postConfigure in kafkaOptions.KafkaPostConfigures)
+                        {
+                            postConfigure(ctx, k);
                         }
 
                     });
+
+                    //Rider postConfigure
+                    foreach (var postConfigure in kafkaOptions.RiderPostConfigures)
+                    {
+                        postConfigure(rider);
+                    }
+
                 });
 
                 //PostConfigure
@@ -86,6 +149,8 @@ namespace SharpAbp.Abp.MassTransit.Kafka
                     postConfigure(x);
                 }
             });
+
+
         }
     }
 }
