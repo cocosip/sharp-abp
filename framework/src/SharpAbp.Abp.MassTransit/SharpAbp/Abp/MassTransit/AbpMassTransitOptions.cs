@@ -1,4 +1,5 @@
 ﻿using MassTransit.ExtensionsDependencyInjectionIntegration;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 
@@ -10,6 +11,11 @@ namespace SharpAbp.Abp.MassTransit
         /// Topic or queue prefix
         /// </summary>
         public string Prefix { get; set; }
+
+        /// <summary>
+        /// Provider
+        /// </summary>
+        public string Provider { get; set; }
 
         /// <summary>
         /// Wait until started
@@ -35,6 +41,27 @@ namespace SharpAbp.Abp.MassTransit
             PreConfigures = new List<Action<IServiceCollectionBusConfigurator>>();
             PostConfigures = new List<Action<IServiceCollectionBusConfigurator>>();
         }
+
+
+        public AbpMassTransitOptions PreConfigure(IConfiguration configuration)
+        {
+            var massTransitOptions = configuration
+                .GetSection("MassTransitOptions")
+                .Get<AbpMassTransitOptions>();
+
+            if (massTransitOptions != null)
+            {
+                Prefix = massTransitOptions.Prefix;
+                Provider = massTransitOptions.Provider;
+                WaitUntilStarted = massTransitOptions.WaitUntilStarted;
+                StartTimeoutMilliSeconds = massTransitOptions.StartTimeoutMilliSeconds;
+                StopTimeoutMilliSeconds = massTransitOptions.StopTimeoutMilliSeconds;
+            }
+
+            return this;
+        }
+
+
 
     }
 }

@@ -9,11 +9,11 @@ namespace SharpAbp.Abp.MassTransit
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
+            var configuration = context.Services.GetConfiguration();
+
             PreConfigure<AbpMassTransitOptions>(options =>
             {
-                options.Prefix = "SharpAbp";
-                options.StartTimeoutMilliSeconds = 30000;
-                options.StopTimeoutMilliSeconds = 5000;
+                options.PreConfigure(configuration);
             });
         }
 
@@ -26,6 +26,17 @@ namespace SharpAbp.Abp.MassTransit
             var stopTimeout = TimeSpan.FromMilliseconds(massTransitOptions.StopTimeoutMilliSeconds);
 
             context.Services.AddMassTransitHostedService(massTransitOptions.WaitUntilStarted, startTimeout, stopTimeout);
+
+
+            Configure<AbpMassTransitOptions>(options =>
+            {
+                var actions = context.Services.GetPreConfigureActions<AbpMassTransitOptions>();
+                foreach (var action in actions)
+                {
+                    action(options);
+                }
+            });
+
         }
     }
 }

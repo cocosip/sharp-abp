@@ -10,7 +10,7 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
         /// <summary>
         /// EntityName
         /// </summary>
-        public string EntityName { get; set; }
+        public string ExchangeName { get; set; }
 
         /// <summary>
         /// Message configure

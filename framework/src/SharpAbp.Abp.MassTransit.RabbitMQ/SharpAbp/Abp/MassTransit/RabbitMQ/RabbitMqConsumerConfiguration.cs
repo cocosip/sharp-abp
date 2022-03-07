@@ -10,7 +10,17 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
         /// <summary>
         /// EntityName
         /// </summary>
-        public string EntityName { get; set; }
+        public string ExchangeName { get; set; }
+
+        /// <summary>
+        /// QueueName
+        /// </summary>
+        public string QueueName { get; set; }
+
+        /// <summary>
+        /// Message configure
+        /// </summary>
+        public Action<string, IRabbitMqBusFactoryConfigurator> MessageConfigure { get; set; }
 
         /// <summary>
         /// Configure
@@ -20,11 +30,11 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
         /// <summary>
         /// ReceiveEndPoint configure
         /// </summary>
-        public Action<IReceiveEndpointConfigurator> ReceiveEndpointConfigure { get; set; }
+        public Action<string, string, IRabbitMqReceiveEndpointConfigurator> ReceiveEndpointConfigure { get; set; }
 
         /// <summary>
         /// ReceiveEndPoint configure
         /// </summary>
-        public Action<string, Action<IReceiveEndpointConfigurator>, IBusRegistrationContext, IRabbitMqBusFactoryConfigurator> ReceiveEndpoint { get; set; }
+        public Action<string, string, Action<string, string, IRabbitMqReceiveEndpointConfigurator>, IBusRegistrationContext, IRabbitMqBusFactoryConfigurator> ReceiveEndpoint { get; set; }
     }
 }

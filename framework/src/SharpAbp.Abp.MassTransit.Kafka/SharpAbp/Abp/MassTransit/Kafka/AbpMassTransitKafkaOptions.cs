@@ -1,5 +1,8 @@
-﻿using MassTransit.KafkaIntegration;
+﻿using Confluent.Kafka;
+using MassTransit.KafkaIntegration;
+using MassTransit.KafkaIntegration.Configurators;
 using MassTransit.Registration;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 
@@ -9,7 +12,31 @@ namespace SharpAbp.Abp.MassTransit.Kafka
     {
         public string Server { get; set; }
         public bool UseSsl { get; set; }
-        public KafkaTopicReceiveEndpointConfiguration DefaultReceiveEndpointConfiguration { get; set; }
+
+        public string DefaultGroupId { get; set; } = "SharpAbp";
+
+        public int DefaultConcurrentMessageLimit { get; set; } = 1;
+
+        /// <summary>
+        /// MaxPollInterval, default: 60000ms
+        /// </summary>
+        public int DefaultMaxPollInterval { get; set; } = 60000;
+
+        /// <summary>
+        /// SessionTimeout, default: 300s
+        /// </summary>
+        public int DefaultSessionTimeout { get; set; } = 300;
+
+        /// <summary>
+        /// EnableAutoOffsetStore, default: false
+        /// </summary>
+        public bool DefaultEnableAutoOffsetStore { get; set; } = false;
+
+        /// <summary>
+        /// AutoOffsetReset,default: AutoOffsetReset.Earliest
+        /// </summary>
+        public AutoOffsetReset DefaultAutoOffsetReset { get; set; } = AutoOffsetReset.Earliest;
+
         public Action<IKafkaSslConfigurator> ConfigureSsl { get; set; }
         public Func<string, string, string> DefaultTopicFormatFunc { get; set; }
         public Action<IKafkaTopicReceiveEndpointConfigurator> DefaultReceiveEndpointConfigure { get; set; }
@@ -27,7 +54,6 @@ namespace SharpAbp.Abp.MassTransit.Kafka
 
         public AbpMassTransitKafkaOptions()
         {
-            DefaultReceiveEndpointConfiguration = new KafkaTopicReceiveEndpointConfiguration();
 
             RiderPreConfigures = new List<Action<IRiderRegistrationConfigurator>>();
             RiderConfigures = new List<Action<IRiderRegistrationConfigurator>>();
@@ -39,6 +65,27 @@ namespace SharpAbp.Abp.MassTransit.Kafka
 
             Producers = new List<KafkaProducerConfiguration>();
             Consumers = new List<KafkaConsumerConfiguration>();
+        }
+
+        public AbpMassTransitKafkaOptions PreConfigure(IConfiguration configuration)
+        {
+            var massTransitKafkaOptions = configuration
+                .GetSection("MassTransitOptions:KafkaOptions")
+                .Get<AbpMassTransitKafkaOptions>();
+            if (massTransitKafkaOptions != null)
+            {
+                Server = massTransitKafkaOptions.Server;
+                UseSsl = massTransitKafkaOptions.UseSsl;
+
+                DefaultGroupId = massTransitKafkaOptions.DefaultGroupId;
+                DefaultConcurrentMessageLimit = massTransitKafkaOptions.DefaultConcurrentMessageLimit;
+                DefaultMaxPollInterval = massTransitKafkaOptions.DefaultMaxPollInterval;
+                DefaultSessionTimeout = massTransitKafkaOptions.DefaultSessionTimeout;
+                DefaultEnableAutoOffsetStore = massTransitKafkaOptions.DefaultEnableAutoOffsetStore;
+                DefaultAutoOffsetReset = massTransitKafkaOptions.DefaultAutoOffsetReset;
+            }
+
+            return this;
         }
 
 

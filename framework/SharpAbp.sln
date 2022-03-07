@@ -85,11 +85,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoring.Aw
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoring.KS3", "src\SharpAbp.Abp.FileStoring.KS3\SharpAbp.Abp.FileStoring.KS3.csproj", "{F79903EC-60DE-4060-A4D9-FE533C052E60}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.MassTransit", "src\SharpAbp.Abp.MassTransit\SharpAbp.Abp.MassTransit.csproj", "{E0093F7E-A81B-479B-A6C2-7F1EDED9B109}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.MassTransit", "src\SharpAbp.Abp.MassTransit\SharpAbp.Abp.MassTransit.csproj", "{E0093F7E-A81B-479B-A6C2-7F1EDED9B109}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.MassTransit.RabbitMQ", "src\SharpAbp.Abp.MassTransit.RabbitMQ\SharpAbp.Abp.MassTransit.RabbitMQ.csproj", "{3A09971E-E754-44F1-B00C-9CACA6CBA4C6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.MassTransit.RabbitMQ", "src\SharpAbp.Abp.MassTransit.RabbitMQ\SharpAbp.Abp.MassTransit.RabbitMQ.csproj", "{3A09971E-E754-44F1-B00C-9CACA6CBA4C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.MassTransit.Kafka", "src\SharpAbp.Abp.MassTransit.Kafka\SharpAbp.Abp.MassTransit.Kafka.csproj", "{9B21C424-1937-46FD-872F-F1656FAE4DC6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.MassTransit.Kafka", "src\SharpAbp.Abp.MassTransit.Kafka\SharpAbp.Abp.MassTransit.Kafka.csproj", "{9B21C424-1937-46FD-872F-F1656FAE4DC6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.MassTransit.Tests", "test\SharpAbp.Abp.MassTransit.Tests\SharpAbp.Abp.MassTransit.Tests.csproj", "{230C45B0-6226-41B1-A3A3-96374B861B6D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -605,6 +607,18 @@ Global
 		{9B21C424-1937-46FD-872F-F1656FAE4DC6}.Release|x64.Build.0 = Release|Any CPU
 		{9B21C424-1937-46FD-872F-F1656FAE4DC6}.Release|x86.ActiveCfg = Release|Any CPU
 		{9B21C424-1937-46FD-872F-F1656FAE4DC6}.Release|x86.Build.0 = Release|Any CPU
+		{230C45B0-6226-41B1-A3A3-96374B861B6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{230C45B0-6226-41B1-A3A3-96374B861B6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{230C45B0-6226-41B1-A3A3-96374B861B6D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{230C45B0-6226-41B1-A3A3-96374B861B6D}.Debug|x64.Build.0 = Debug|Any CPU
+		{230C45B0-6226-41B1-A3A3-96374B861B6D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{230C45B0-6226-41B1-A3A3-96374B861B6D}.Debug|x86.Build.0 = Debug|Any CPU
+		{230C45B0-6226-41B1-A3A3-96374B861B6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{230C45B0-6226-41B1-A3A3-96374B861B6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{230C45B0-6226-41B1-A3A3-96374B861B6D}.Release|x64.ActiveCfg = Release|Any CPU
+		{230C45B0-6226-41B1-A3A3-96374B861B6D}.Release|x64.Build.0 = Release|Any CPU
+		{230C45B0-6226-41B1-A3A3-96374B861B6D}.Release|x86.ActiveCfg = Release|Any CPU
+		{230C45B0-6226-41B1-A3A3-96374B861B6D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -652,6 +666,7 @@ Global
 		{E0093F7E-A81B-479B-A6C2-7F1EDED9B109} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 		{3A09971E-E754-44F1-B00C-9CACA6CBA4C6} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 		{9B21C424-1937-46FD-872F-F1656FAE4DC6} = {16E4EB45-D029-4743-99CD-D125C72AE383}
+		{230C45B0-6226-41B1-A3A3-96374B861B6D} = {51F9C36E-772F-4E52-A4AC-3EE8F13FDAD3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {30432CEA-45F2-4F5A-B44B-790A62AB73F1}

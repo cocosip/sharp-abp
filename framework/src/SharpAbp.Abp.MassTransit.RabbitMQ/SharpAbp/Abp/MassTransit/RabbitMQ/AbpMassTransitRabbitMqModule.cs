@@ -1,10 +1,9 @@
 ﻿using MassTransit;
-using MassTransit.ExtensionsDependencyInjectionIntegration;
 using MassTransit.RabbitMqTransport;
 using MassTransit.RabbitMqTransport.Topology;
 using Microsoft.Extensions.DependencyInjection;
-using RabbitMQ.Client;
 using System;
+using System.Linq;
 using Volo.Abp.Modularity;
 
 namespace SharpAbp.Abp.MassTransit.RabbitMQ
@@ -16,9 +15,34 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
+
+            var configuration = context.Services.GetConfiguration();
+            PreConfigure<AbpMassTransitRabbitMqOptions>(options => options.PreConfigure(configuration));
+
+            var rabbitMqOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitRabbitMqOptions>();
+
             PreConfigure<AbpMassTransitRabbitMqOptions>(options =>
             {
-                options.DefaultEntityNameFormatFunc = RabbitMqUtil.EntityNameFormat;
+                options.DefaultExchangeNameFormatFunc = RabbitMqUtil.ExchangeNameFormat;
+                options.DefaultQueueNameFormatFunc = RabbitMqUtil.QueueNameFormat;
+
+                options.DefaultPublishTopologyConfigure = new Action<IRabbitMqMessagePublishTopologyConfigurator>(c =>
+                {
+                    c.AutoDelete = rabbitMqOptions.DefaultAutoDelete;
+                    c.Durable = rabbitMqOptions.DefaultDurable;
+                    c.ExchangeType = rabbitMqOptions.DefaultExchangeType;
+                });
+
+                options.DefaultReceiveEndpointConfigure = new Action<string, string, IRabbitMqReceiveEndpointConfigurator>((exchangeName, queueName, c) =>
+                {
+                    c.Bind(exchangeName);
+                    c.ConcurrentMessageLimit = rabbitMqOptions.DefaultConcurrentMessageLimit;
+                    c.PrefetchCount = rabbitMqOptions.DefaultPrefetchCount;
+                    c.AutoDelete = rabbitMqOptions.DefaultAutoDelete;
+                    c.Durable = rabbitMqOptions.DefaultDurable;
+                    c.ExchangeType = rabbitMqOptions.DefaultExchangeType;
+                });
+
 
                 options.RabbitMqPostConfigures.Add(new Action<IBusRegistrationContext, IRabbitMqBusFactoryConfigurator>((ctx, cfg) =>
                 {
@@ -32,139 +56,114 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
 
             var massTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
 
-            var rabbitMqOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitRabbitMqOptions>();
-
-            context.Services.AddMassTransit(x =>
+            if (massTransitOptions.Provider.Equals(MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
-                //Masstransit preConfigure
-                foreach (var preConfigure in massTransitOptions.PreConfigures)
+
+                var rabbitMqOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitRabbitMqOptions>();
+
+                context.Services.AddMassTransit(x =>
                 {
-                    preConfigure(x);
-                }
-
-                //Consumer
-                foreach (var consumer in rabbitMqOptions.Consumers)
-                {
-                    consumer.Configure?.Invoke(x);
-                }
-
-
-                x.UsingRabbitMq((ctx, cfg) =>
-                {
-                    //RabbitMq preConfigure
-                    foreach (var preConfigure in rabbitMqOptions.RabbitMqPreConfigures)
+                    //Masstransit preConfigure
+                    foreach (var preConfigure in massTransitOptions.PreConfigures)
                     {
-                        preConfigure(ctx, cfg);
-                    }
-
-                    cfg.Host(rabbitMqOptions.Host, rabbitMqOptions.Port, rabbitMqOptions.VirtualHost, h =>
-                    {
-                        h.Username(rabbitMqOptions.Username);
-                        h.Password(rabbitMqOptions.Password);
-                        //SSL
-                        if (rabbitMqOptions.UseSsl && rabbitMqOptions.ConfigureSsl != null)
-                        {
-                            h.UseSsl(rabbitMqOptions.ConfigureSsl);
-                        }
-                    });
-
-                    //RabbitMq configure
-                    foreach (var configure in rabbitMqOptions.RabbitMqConfigures)
-                    {
-                        configure(ctx, cfg);
-                    }
-
-                    //Producer
-                    foreach (var producer in rabbitMqOptions.Producers)
-                    {
-                        var entityName = rabbitMqOptions.DefaultEntityNameFormatFunc(massTransitOptions.Prefix, producer.EntityName);
-                        producer.MessageConfigure?.Invoke(entityName, cfg);
-
-                        var publishTopologyConfigure = producer.PublishTopologyConfigure ?? rabbitMqOptions.DefaultPublishTopologyConfigure;
-
-                        producer.PublishConfigure?.Invoke(publishTopologyConfigure, ctx, cfg);
+                        preConfigure(x);
                     }
 
                     //Consumer
                     foreach (var consumer in rabbitMqOptions.Consumers)
                     {
-                        var entityName = rabbitMqOptions.DefaultEntityNameFormatFunc(massTransitOptions.Prefix, consumer.EntityName);
-
-                        //var receiveEndpointConfigure = consumer.ReceiveEndpointConfigure ?? rabbitMqOptions.DefaultReceiveEndpointConfigure;
-
-                        //consumer.ReceiveEndpointConfigure?.Invoke(entityName,, ctx, cfg);
+                        consumer.Configure?.Invoke(x);
                     }
 
+                    //Get message configures
+                    var messageConfigues = rabbitMqOptions.GetMessageConfigures();
 
-                    cfg.ReceiveEndpoint("", c =>
+                    x.UsingRabbitMq((ctx, cfg) =>
                     {
-                        c.Durable = true;
-                        c.AutoDelete = true;
+                        //RabbitMq preConfigure
+                        foreach (var preConfigure in rabbitMqOptions.RabbitMqPreConfigures)
+                        {
+                            preConfigure(ctx, cfg);
+                        }
 
-                        c.Bind("");
+
+                        cfg.Host(rabbitMqOptions.Host, rabbitMqOptions.Port, rabbitMqOptions.VirtualHost, h =>
+                        {
+                            h.Username(rabbitMqOptions.Username);
+                            h.Password(rabbitMqOptions.Password);
+                            //SSL
+                            if (rabbitMqOptions.UseSsl && rabbitMqOptions.ConfigureSsl != null)
+                            {
+                                h.UseSsl(rabbitMqOptions.ConfigureSsl);
+                            }
+
+                            //Cluster
+                            if (rabbitMqOptions.UseCluster && rabbitMqOptions.ClusterNodes.Any())
+                            {
+                                h.UseCluster(c =>
+                                {
+                                    foreach (var clusterNode in rabbitMqOptions.ClusterNodes)
+                                    {
+                                        c.Node(clusterNode);
+                                    }
+                                });
+                            }
+                        });
+
+                        //RabbitMq configure
+                        foreach (var configure in rabbitMqOptions.RabbitMqConfigures)
+                        {
+                            configure(ctx, cfg);
+                        }
+
+                        //Message configure
+                        foreach (var messageConfigue in messageConfigues)
+                        {
+                            var entityName = rabbitMqOptions.DefaultExchangeNameFormatFunc(massTransitOptions.Prefix, messageConfigue.Item1);
+                            messageConfigue.Item2?.Invoke(entityName, cfg);
+                        }
+
+                        //Producer
+                        foreach (var producer in rabbitMqOptions.Producers)
+                        {
+                            var publishTopologyConfigure = producer.PublishTopologyConfigure ?? rabbitMqOptions.DefaultPublishTopologyConfigure;
+
+                            producer.PublishConfigure?.Invoke(publishTopologyConfigure, ctx, cfg);
+                        }
+
+                        //Consumer
+                        foreach (var consumer in rabbitMqOptions.Consumers)
+                        {
+                            var exchangeName = rabbitMqOptions.DefaultExchangeNameFormatFunc(massTransitOptions.Prefix, consumer.ExchangeName);
+
+                            var queueName = rabbitMqOptions.DefaultQueueNameFormatFunc(massTransitOptions.Prefix, rabbitMqOptions.DefaultQueuePrefix, consumer.QueueName);
+
+                            var receiveEndpointConfigure = consumer.ReceiveEndpointConfigure ?? rabbitMqOptions.DefaultReceiveEndpointConfigure;
+
+                            consumer.ReceiveEndpoint?.Invoke(exchangeName, queueName, receiveEndpointConfigure, ctx, cfg);
+                        }
+
+                        //RabbitMq postConfigure
+                        foreach (var postConfigure in rabbitMqOptions.RabbitMqPostConfigures)
+                        {
+                            postConfigure(ctx, cfg);
+                        }
                     });
-
-                    //RabbitMq postConfigure
-                    foreach (var postConfigure in rabbitMqOptions.RabbitMqPostConfigures)
-                    {
-                        postConfigure(ctx, cfg);
-                    }
                 });
-
-            });
-
-            var o = new AbpMassTransitRabbitMqOptions();
-            o.Producers.Add(new RabbitMqProducerConfiguration()
-            {
-                EntityName = "Entity1",
-                MessageConfigure = new Action<string, IRabbitMqBusFactoryConfigurator>((entityName, cfg) =>
-                {
-                    cfg.Message<Class111>(c =>
-                    {
-                        c.SetEntityName(entityName);
-                    });
-                }),
-                PublishConfigure = new Action<Action<IRabbitMqMessagePublishTopologyConfigurator>, IBusRegistrationContext, IRabbitMqBusFactoryConfigurator>((action, ctx, cfg) =>
-                {
-                    cfg.Publish<Class111>(c =>
-                    {
-                        action(c);
-                    });
-                })
-            });
-
-
-            o.Consumers.Add(new RabbitMqConsumerConfiguration()
-            {
-                EntityName = "Entity1",
-                Configure = new Action<IServiceCollectionBusConfigurator>(c =>
-                {
-                    c.AddConsumer<Class111Consumer>();
-                }),
-                ReceiveEndpoint = new Action<string, Action<IReceiveEndpointConfigurator>, IBusRegistrationContext, IRabbitMqBusFactoryConfigurator>((entityName, action, ctx, cfg) =>
-                  {
-                      cfg.ReceiveEndpoint(entityName, e =>
-                      {
-                          action?.Invoke(e);
-                          e.Durable = true;
-                          e.ExchangeType = ExchangeType.Fanout;
-                          e.Consumer<Class111Consumer>(ctx);
-                      });
-                  })
-            });
-
+            }
 
         }
 
+        public override void PostConfigureServices(ServiceConfigurationContext context)
+        {
+            Configure<AbpMassTransitRabbitMqOptions>(options =>
+            {
+                var actions = context.Services.GetPreConfigureActions<AbpMassTransitRabbitMqOptions>();
+                foreach (var action in actions)
+                {
+                    action(options);
+                }
+            });
+        }
     }
-}
-
-public class Class111
-{
-
-}
-
-public class Class111Consumer : IConsumer
-{
-
 }
