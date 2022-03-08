@@ -2,7 +2,7 @@
   <PropertyGroup>
 
     <!--Volo ABP packages-->
-    <VoloAbpPackageVersion>5.1.3</VoloAbpPackageVersion>
+    <VoloAbpPackageVersion>5.1.4</VoloAbpPackageVersion>
 
     <!-- All Microsoft packages -->
     <MicrosoftPackageVersion>6.0.*</MicrosoftPackageVersion>
@@ -17,7 +17,7 @@
     <ShouldlyPackageVersion>4.0.3</ShouldlyPackageVersion>
 
     <!-- Moq package-->
-    <MoqPackageVersion>4.16.1</MoqPackageVersion>
+    <MoqPackageVersion>4.17.2</MoqPackageVersion>
 
     <!-- xunit https://www.nuget.org/packages/xUnit -->
     <xUnitPackageVersion>2.4.1</xUnitPackageVersion>

@@ -154,7 +154,10 @@ namespace SharpAbp.Abp.FileStoring.Aws
         }
 
 
-        protected virtual async Task<bool> FileExistsAsync(AmazonS3Client amazonS3Client, string containerName, string fileName)
+        protected virtual async Task<bool> FileExistsAsync(
+            AmazonS3Client amazonS3Client, 
+            string containerName,
+            string fileName)
         {
             // Make sure file Container exists.
             if (!await AmazonS3Util.DoesS3BucketExistV2Async(amazonS3Client, containerName))
@@ -178,7 +181,9 @@ namespace SharpAbp.Abp.FileStoring.Aws
             return true;
         }
 
-        protected virtual async Task CreateContainerIfNotExists(AmazonS3Client amazonS3Client, string containerName)
+        protected virtual async Task CreateContainerIfNotExists(
+            AmazonS3Client amazonS3Client, 
+            string containerName)
         {
             if (!await AmazonS3Util.DoesS3BucketExistV2Async(amazonS3Client, containerName))
             {

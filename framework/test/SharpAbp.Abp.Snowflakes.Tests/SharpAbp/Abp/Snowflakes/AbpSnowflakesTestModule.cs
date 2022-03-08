@@ -14,7 +14,7 @@ namespace SharpAbp.Abp.Snowflakes
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            var configuration = context.Services.GetConfiguration().GetSection("SnowflakeOptions");
+            var configuration = context.Services.GetConfiguration();
             Configure<AbpSnowflakesOptions>(options =>
             {
                 options.Configure(configuration);
