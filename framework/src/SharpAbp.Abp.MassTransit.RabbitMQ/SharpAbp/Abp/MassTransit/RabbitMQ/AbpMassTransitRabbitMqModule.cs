@@ -35,7 +35,7 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
 
                 options.DefaultReceiveEndpointConfigure = new Action<string, string, IRabbitMqReceiveEndpointConfigurator>((exchangeName, queueName, c) =>
                 {
-                    c.Bind(exchangeName);
+                    //c.Bind(exchangeName);
                     c.ConcurrentMessageLimit = rabbitMqOptions.DefaultConcurrentMessageLimit;
                     c.PrefetchCount = rabbitMqOptions.DefaultPrefetchCount;
                     c.AutoDelete = rabbitMqOptions.DefaultAutoDelete;
@@ -44,10 +44,10 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
                 });
 
 
-                options.RabbitMqPostConfigures.Add(new Action<IBusRegistrationContext, IRabbitMqBusFactoryConfigurator>((ctx, cfg) =>
-                {
-                    cfg.ConfigureEndpoints(ctx);
-                }));
+                // options.RabbitMqPostConfigures.Add(new Action<IBusRegistrationContext, IRabbitMqBusFactoryConfigurator>((ctx, cfg) =>
+                // {
+                //     cfg.ConfigureEndpoints(ctx);
+                // }));
             });
         }
 

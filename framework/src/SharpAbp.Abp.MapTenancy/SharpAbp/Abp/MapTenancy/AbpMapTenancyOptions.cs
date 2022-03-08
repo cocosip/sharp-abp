@@ -14,7 +14,9 @@ namespace SharpAbp.Abp.MapTenancy
 
         public AbpMapTenancyOptions Configure(IConfiguration configuration)
         {
-            var mapTenancyConfigurations = configuration.Get<Dictionary<string, MapTenancyConfiguration>>();
+            var mapTenancyConfigurations = configuration
+                .GetSection("MapTenancyOptions")
+                .Get<Dictionary<string, MapTenancyConfiguration>>();
             foreach (var mapTenancyKv in mapTenancyConfigurations)
             {
                 Mappers.Configure(mapTenancyKv.Key, c =>

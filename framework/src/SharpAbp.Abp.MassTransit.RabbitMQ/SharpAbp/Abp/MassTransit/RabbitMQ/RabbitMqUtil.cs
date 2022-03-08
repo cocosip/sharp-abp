@@ -11,7 +11,7 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
                 return exchangeName;
             }
 
-            return $"{prefix}-{exchangeName}";
+            return $"{prefix}.{exchangeName}";
         }
 
         public static string QueueNameFormat(string prefix, string queuePrefix, string queueName)
@@ -20,12 +20,12 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
             var name = queueName;
             if (!queuePrefix.IsNullOrWhiteSpace())
             {
-                name = $"{queuePrefix}-{name}";
+                name = $"{queuePrefix}.{name}";
             }
 
             if (!prefix.IsNullOrWhiteSpace())
             {
-                name = $"{prefix}-{name}";
+                name = $"{prefix}.{name}";
             }
 
             return name;

@@ -15,7 +15,9 @@ namespace SharpAbp.Abp.Snowflakes
 
         public AbpSnowflakesOptions Configure(IConfiguration configuration)
         {
-            var snowflakeConfigurations = configuration.Get<Dictionary<string, SnowflakeConfiguration>>();
+            var snowflakeConfigurations = configuration
+                .GetSection("SnowflakeOptions")
+                .Get<Dictionary<string, SnowflakeConfiguration>>();
 
             foreach (var keyValuePair in snowflakeConfigurations)
             {
