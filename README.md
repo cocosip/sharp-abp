@@ -13,6 +13,7 @@
 | FastDFS | FastDFS ABP Adapter | [doc](/docs/FastDFS.md) |
 | FileStoring | ABP Store File | [doc](/docs/FileStoring.md) |
 | DbConnections | DbConnections Manager | [doc](/docs/DbConnections.md) |
+| MassTransit | MassTransit integration | [doc](/docs/MassTransit.md) |
 
 
 ## Packages
@@ -31,13 +32,19 @@
 | `SharpAbp.Abp.FastDFS` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FastDFS.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FastDFS) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FastDFS.svg)|
 | `SharpAbp.Abp.FastDFS.DotNetty` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FastDFS.DotNetty.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FastDFS.DotNetty) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FastDFS.DotNetty.svg)|
 | `SharpAbp.Abp.FastDFS.SuperSocket` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FastDFS.SuperSocket.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FastDFS.SuperSocket) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FastDFS.SuperSocket.svg)|
+| **MassTransit** | - | - |
+| `SharpAbp.Abp.MassTransit` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.MassTransit.svg)](https://www.nuget.org/packages/SharpAbp.Abp.MassTransit) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.MassTransit.svg)|
+| `SharpAbp.Abp.MassTransit.Kafka` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.MassTransit.Kafka.svg)](https://www.nuget.org/packages/SharpAbp.Abp.MassTransit.Kafka) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.MassTransit.Kafka.svg)|
+| `SharpAbp.Abp.MassTransit.RabbitMQ` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.MassTransit.RabbitMQ.svg)](https://www.nuget.org/packages/SharpAbp.Abp.MassTransit.RabbitMQ) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.MassTransit.RabbitMQ.svg)|
 | **FileStoring** | - | - |
 | `SharpAbp.Abp.FileStoring` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FileStoring.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FileStoring) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FileStoring.svg)|
 | `SharpAbp.Abp.FileStoring.Aliyun` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FileStoring.Aliyun.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FileStoring.Aliyun) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FileStoring.Aliyun.svg)|
 | `SharpAbp.Abp.FileStoring.Azure` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FileStoring.Azure.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FileStoring.Azure) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FileStoring.Azure.svg)|
+| `SharpAbp.Abp.FileStoring.Aws` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FileStoring.Aws.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FileStoring.Aws) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FileStoring.Aws.svg)|
 | `SharpAbp.Abp.FileStoring.FastDFS` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FileStoring.FastDFS.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FileStoring.FastDFS) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FileStoring.FastDFS.svg)|
 | `SharpAbp.Abp.FileStoring.FileSystem` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FileStoring.FileSystem.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FileStoring.FileSystem) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FileStoring.FileSystem.svg)|
 | `SharpAbp.Abp.FileStoring.Minio` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FileStoring.Minio.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FileStoring.Minio) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FileStoring.Minio.svg)|
+| `SharpAbp.Abp.FileStoring.KS3` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FileStoring.KS3.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FileStoring.KS3) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FileStoring.KS3.svg)|
 | `SharpAbp.Abp.FileStoring.S3` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FileStoring.S3.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FileStoring.S3) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FileStoring.S3.svg)|
 | **FileStoringManagement** | - | - |
 | `SharpAbp.Abp.FileStoringManagement.Domain.Shared` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FileStoringManagement.Domain.Shared.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FileStoringManagement.Domain.Shared) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FileStoringManagement.Domain.Shared.svg)|
