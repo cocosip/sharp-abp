@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30503.244
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{75AA1786-8B10-4E0A-89F6-79B714F85E34}"
 EndProject
@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoringMan
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoringManagement.Application.Tests", "test\SharpAbp.Abp.FileStoringManagement.Application.Tests\SharpAbp.Abp.FileStoringManagement.Application.Tests.csproj", "{5D674D69-7762-479E-8748-FF0BB06FBBED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.FileStoringManagement.HttpApi", "src\SharpAbp.Abp.FileStoringManagement.HttpApi\SharpAbp.Abp.FileStoringManagement.HttpApi.csproj", "{34DEDC42-0448-434B-8F5E-E2B07817CD92}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoringManagement.HttpApi", "src\SharpAbp.Abp.FileStoringManagement.HttpApi\SharpAbp.Abp.FileStoringManagement.HttpApi.csproj", "{34DEDC42-0448-434B-8F5E-E2B07817CD92}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.FileStoringManagement.HttpApi.Client", "src\SharpAbp.Abp.FileStoringManagement.HttpApi.Client\SharpAbp.Abp.FileStoringManagement.HttpApi.Client.csproj", "{7F5F92D5-6381-475B-86CF-F6B81226C1B3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -143,6 +145,18 @@ Global
 		{34DEDC42-0448-434B-8F5E-E2B07817CD92}.Release|x64.Build.0 = Release|Any CPU
 		{34DEDC42-0448-434B-8F5E-E2B07817CD92}.Release|x86.ActiveCfg = Release|Any CPU
 		{34DEDC42-0448-434B-8F5E-E2B07817CD92}.Release|x86.Build.0 = Release|Any CPU
+		{7F5F92D5-6381-475B-86CF-F6B81226C1B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F5F92D5-6381-475B-86CF-F6B81226C1B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F5F92D5-6381-475B-86CF-F6B81226C1B3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7F5F92D5-6381-475B-86CF-F6B81226C1B3}.Debug|x64.Build.0 = Debug|Any CPU
+		{7F5F92D5-6381-475B-86CF-F6B81226C1B3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7F5F92D5-6381-475B-86CF-F6B81226C1B3}.Debug|x86.Build.0 = Debug|Any CPU
+		{7F5F92D5-6381-475B-86CF-F6B81226C1B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F5F92D5-6381-475B-86CF-F6B81226C1B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F5F92D5-6381-475B-86CF-F6B81226C1B3}.Release|x64.ActiveCfg = Release|Any CPU
+		{7F5F92D5-6381-475B-86CF-F6B81226C1B3}.Release|x64.Build.0 = Release|Any CPU
+		{7F5F92D5-6381-475B-86CF-F6B81226C1B3}.Release|x86.ActiveCfg = Release|Any CPU
+		{7F5F92D5-6381-475B-86CF-F6B81226C1B3}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -157,6 +171,7 @@ Global
 		{D0D2378E-FCC0-4469-9C00-2B117F8D6D76} = {75AA1786-8B10-4E0A-89F6-79B714F85E34}
 		{5D674D69-7762-479E-8748-FF0BB06FBBED} = {06678086-FFDA-429B-92D9-99641F15AF8C}
 		{34DEDC42-0448-434B-8F5E-E2B07817CD92} = {75AA1786-8B10-4E0A-89F6-79B714F85E34}
+		{7F5F92D5-6381-475B-86CF-F6B81226C1B3} = {75AA1786-8B10-4E0A-89F6-79B714F85E34}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B1F6BBC3-F876-4997-B320-49965C56774F}

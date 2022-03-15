@@ -36,7 +36,7 @@ namespace SharpAbp.Abp.Identity
             });
 
 
-            var claimTypes = await _identityRoleAppService.GetAllClaimTypes();
+            var claimTypes = await _identityRoleAppService.GetAllClaimTypesAsync();
             Assert.Equal(2, claimTypes.Count);
         }
 

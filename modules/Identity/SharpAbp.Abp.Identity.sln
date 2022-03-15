@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30114.105
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9840BF94-88B6-4A65-AE53-6D4D2DF6FBFC}"
 EndProject
@@ -17,7 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Identity.Appli
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Identity.HttpApi", "src\SharpAbp.Abp.Identity.HttpApi\SharpAbp.Abp.Identity.HttpApi.csproj", "{CC70D7DD-362F-4AF6-8F72-A2860BD72B74}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Identity.Tests", "test\SharpAbp.Abp.Identity.Tests\SharpAbp.Abp.Identity.Tests.csproj", "{8C77E5A0-5EF6-4883-A25A-F451C8CFD3CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Identity.Tests", "test\SharpAbp.Abp.Identity.Tests\SharpAbp.Abp.Identity.Tests.csproj", "{8C77E5A0-5EF6-4883-A25A-F451C8CFD3CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Identity.HttpApi.Client", "src\SharpAbp.Abp.Identity.HttpApi.Client\SharpAbp.Abp.Identity.HttpApi.Client.csproj", "{AFAA00A7-F06B-4CDE-AC2C-B3C04D07B4B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,6 +103,18 @@ Global
 		{8C77E5A0-5EF6-4883-A25A-F451C8CFD3CE}.Release|x64.Build.0 = Release|Any CPU
 		{8C77E5A0-5EF6-4883-A25A-F451C8CFD3CE}.Release|x86.ActiveCfg = Release|Any CPU
 		{8C77E5A0-5EF6-4883-A25A-F451C8CFD3CE}.Release|x86.Build.0 = Release|Any CPU
+		{AFAA00A7-F06B-4CDE-AC2C-B3C04D07B4B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFAA00A7-F06B-4CDE-AC2C-B3C04D07B4B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFAA00A7-F06B-4CDE-AC2C-B3C04D07B4B0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AFAA00A7-F06B-4CDE-AC2C-B3C04D07B4B0}.Debug|x64.Build.0 = Debug|Any CPU
+		{AFAA00A7-F06B-4CDE-AC2C-B3C04D07B4B0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AFAA00A7-F06B-4CDE-AC2C-B3C04D07B4B0}.Debug|x86.Build.0 = Debug|Any CPU
+		{AFAA00A7-F06B-4CDE-AC2C-B3C04D07B4B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFAA00A7-F06B-4CDE-AC2C-B3C04D07B4B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFAA00A7-F06B-4CDE-AC2C-B3C04D07B4B0}.Release|x64.ActiveCfg = Release|Any CPU
+		{AFAA00A7-F06B-4CDE-AC2C-B3C04D07B4B0}.Release|x64.Build.0 = Release|Any CPU
+		{AFAA00A7-F06B-4CDE-AC2C-B3C04D07B4B0}.Release|x86.ActiveCfg = Release|Any CPU
+		{AFAA00A7-F06B-4CDE-AC2C-B3C04D07B4B0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -112,6 +126,7 @@ Global
 		{1F204A8F-BC8B-49B9-9E65-33C2BCC37D56} = {9840BF94-88B6-4A65-AE53-6D4D2DF6FBFC}
 		{CC70D7DD-362F-4AF6-8F72-A2860BD72B74} = {9840BF94-88B6-4A65-AE53-6D4D2DF6FBFC}
 		{8C77E5A0-5EF6-4883-A25A-F451C8CFD3CE} = {1A855256-798C-47CC-8FAD-32182D9FC4AE}
+		{AFAA00A7-F06B-4CDE-AC2C-B3C04D07B4B0} = {9840BF94-88B6-4A65-AE53-6D4D2DF6FBFC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C4125CB8-7853-4390-964A-2EDE386015CC}

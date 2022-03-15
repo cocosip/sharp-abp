@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30114.105
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6744D432-22D5-41F3-869C-492C12F78990}"
 EndProject
@@ -17,7 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.AuditLogging.H
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{D96FC585-11DB-4814-8DF3-87B49220AE3E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.AuditLogging.Application.Tests", "test\SharpAbp.Abp.AuditLogging.Application.Tests\SharpAbp.Abp.AuditLogging.Application.Tests.csproj", "{3B19BD5C-A3D4-45E7-BAE8-27D020CF419F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.AuditLogging.Application.Tests", "test\SharpAbp.Abp.AuditLogging.Application.Tests\SharpAbp.Abp.AuditLogging.Application.Tests.csproj", "{3B19BD5C-A3D4-45E7-BAE8-27D020CF419F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.AuditLogging.HttpApi.Client", "src\SharpAbp.Abp.AuditLogging.HttpApi.Client\SharpAbp.Abp.AuditLogging.HttpApi.Client.csproj", "{5A6DBAF8-2CA5-4A5D-AA5A-6321A77993CF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,6 +103,18 @@ Global
 		{3B19BD5C-A3D4-45E7-BAE8-27D020CF419F}.Release|x64.Build.0 = Release|Any CPU
 		{3B19BD5C-A3D4-45E7-BAE8-27D020CF419F}.Release|x86.ActiveCfg = Release|Any CPU
 		{3B19BD5C-A3D4-45E7-BAE8-27D020CF419F}.Release|x86.Build.0 = Release|Any CPU
+		{5A6DBAF8-2CA5-4A5D-AA5A-6321A77993CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A6DBAF8-2CA5-4A5D-AA5A-6321A77993CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A6DBAF8-2CA5-4A5D-AA5A-6321A77993CF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5A6DBAF8-2CA5-4A5D-AA5A-6321A77993CF}.Debug|x64.Build.0 = Debug|Any CPU
+		{5A6DBAF8-2CA5-4A5D-AA5A-6321A77993CF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5A6DBAF8-2CA5-4A5D-AA5A-6321A77993CF}.Debug|x86.Build.0 = Debug|Any CPU
+		{5A6DBAF8-2CA5-4A5D-AA5A-6321A77993CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A6DBAF8-2CA5-4A5D-AA5A-6321A77993CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A6DBAF8-2CA5-4A5D-AA5A-6321A77993CF}.Release|x64.ActiveCfg = Release|Any CPU
+		{5A6DBAF8-2CA5-4A5D-AA5A-6321A77993CF}.Release|x64.Build.0 = Release|Any CPU
+		{5A6DBAF8-2CA5-4A5D-AA5A-6321A77993CF}.Release|x86.ActiveCfg = Release|Any CPU
+		{5A6DBAF8-2CA5-4A5D-AA5A-6321A77993CF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -112,6 +126,7 @@ Global
 		{992ABCD3-EF13-40B8-8755-A0D0CF173A74} = {6744D432-22D5-41F3-869C-492C12F78990}
 		{916EC461-79BD-4608-9E28-A02199AAC615} = {6744D432-22D5-41F3-869C-492C12F78990}
 		{3B19BD5C-A3D4-45E7-BAE8-27D020CF419F} = {D96FC585-11DB-4814-8DF3-87B49220AE3E}
+		{5A6DBAF8-2CA5-4A5D-AA5A-6321A77993CF} = {6744D432-22D5-41F3-869C-492C12F78990}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5DBBFD02-B2D5-49A3-81E3-B55751DD1C53}

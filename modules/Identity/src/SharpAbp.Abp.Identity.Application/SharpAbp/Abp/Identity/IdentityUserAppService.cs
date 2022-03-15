@@ -106,7 +106,7 @@ namespace SharpAbp.Abp.Identity
         /// </summary>
         /// <returns></returns>
         [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Default)]
-        public virtual async Task<List<IdentityClaimTypeDto>> GetAllClaimTypes()
+        public virtual async Task<List<IdentityClaimTypeDto>> GetAllClaimTypesAsync()
         {
             var identityClaimTypes = await IdentityClaimTypeRepository.GetListAsync(false, default);
             return ObjectMapper.Map<List<IdentityClaimType>, List<IdentityClaimTypeDto>>(identityClaimTypes);

@@ -38,9 +38,9 @@ namespace SharpAbp.Abp.IdentityServer
         /// <returns></returns>
         [HttpGet]
         [Route("find-by-name/{name}")]
-        public async Task<ApiScopeDto> FindByName(string name)
+        public async Task<ApiScopeDto> FindByNameAsync(string name)
         {
-            return await _identityServerApiScopeAppService.FindByName(name);
+            return await _identityServerApiScopeAppService.FindByNameAsync(name);
         }
 
         /// <summary>

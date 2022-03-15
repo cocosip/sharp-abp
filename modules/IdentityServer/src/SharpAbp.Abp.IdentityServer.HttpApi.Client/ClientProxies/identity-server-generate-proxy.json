@@ -1,0 +1,1354 @@
+{
+  "modules": {
+    "identity-server": {
+      "rootPath": "identity-server",
+      "remoteServiceName": "AbpIdentityServer",
+      "controllers": {
+        "SharpAbp.Abp.IdentityServer.IdentityResourceController": {
+          "controllerName": "IdentityResource",
+          "controllerGroupName": "IdentityResource",
+          "type": "SharpAbp.Abp.IdentityServer.IdentityResourceController",
+          "interfaces": [
+            {
+              "type": "SharpAbp.Abp.IdentityServer.IdentityResources.IIdentityResourceAppService"
+            }
+          ],
+          "actions": {
+            "GetAsyncById": {
+              "uniqueName": "GetAsyncById",
+              "name": "GetAsync",
+              "httpMethod": "GET",
+              "url": "api/identity-server/identity-resources/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "SharpAbp.Abp.IdentityServer.IdentityResources.IdentityResourceDto",
+                "typeSimple": "SharpAbp.Abp.IdentityServer.IdentityResources.IdentityResourceDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.IdentityResources.IIdentityResourceAppService"
+            },
+            "FindByNameAsyncByName": {
+              "uniqueName": "FindByNameAsyncByName",
+              "name": "FindByNameAsync",
+              "httpMethod": "GET",
+              "url": "api/identity-server/identity-resources/find-by-name/{name}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "name",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "name",
+                  "name": "name",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "SharpAbp.Abp.IdentityServer.IdentityResources.IdentityResourceDto",
+                "typeSimple": "SharpAbp.Abp.IdentityServer.IdentityResources.IdentityResourceDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.IdentityResources.IIdentityResourceAppService"
+            },
+            "GetPagedListAsyncByInput": {
+              "uniqueName": "GetPagedListAsyncByInput",
+              "name": "GetPagedListAsync",
+              "httpMethod": "GET",
+              "url": "api/identity-server/identity-resources",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "SharpAbp.Abp.IdentityServer.IdentityResources.IdentityResourcePagedRequestDto, SharpAbp.Abp.IdentityServer.Application.Contracts",
+                  "type": "SharpAbp.Abp.IdentityServer.IdentityResources.IdentityResourcePagedRequestDto",
+                  "typeSimple": "SharpAbp.Abp.IdentityServer.IdentityResources.IdentityResourcePagedRequestDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "Filter",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "Sorting",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "SkipCount",
+                  "jsonName": null,
+                  "type": "System.Int32",
+                  "typeSimple": "number",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "MaxResultCount",
+                  "jsonName": null,
+                  "type": "System.Int32",
+                  "typeSimple": "number",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                }
+              ],
+              "returnValue": {
+                "type": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.Abp.IdentityServer.IdentityResources.IdentityResourceDto>",
+                "typeSimple": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.Abp.IdentityServer.IdentityResources.IdentityResourceDto>"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.IdentityResources.IIdentityResourceAppService"
+            },
+            "GetListByScopeNameAsyncByScopeNames": {
+              "uniqueName": "GetListByScopeNameAsyncByScopeNames",
+              "name": "GetListByScopeNameAsync",
+              "httpMethod": "GET",
+              "url": "api/identity-server/identity-resources/get-list",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "scopeNames",
+                  "typeAsString": "System.String[], System.Private.CoreLib",
+                  "type": "System.String[]",
+                  "typeSimple": "[string]",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "scopeNames",
+                  "name": "scopeNames",
+                  "jsonName": null,
+                  "type": "System.String[]",
+                  "typeSimple": "[string]",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Collections.Generic.List<SharpAbp.Abp.IdentityServer.IdentityResources.IdentityResourceDto>",
+                "typeSimple": "[SharpAbp.Abp.IdentityServer.IdentityResources.IdentityResourceDto]"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.IdentityResources.IIdentityResourceAppService"
+            },
+            "GetAllAsync": {
+              "uniqueName": "GetAllAsync",
+              "name": "GetAllAsync",
+              "httpMethod": "GET",
+              "url": "api/identity-server/identity-resources/all",
+              "supportedVersions": [],
+              "parametersOnMethod": [],
+              "parameters": [],
+              "returnValue": {
+                "type": "System.Collections.Generic.List<SharpAbp.Abp.IdentityServer.IdentityResources.IdentityResourceDto>",
+                "typeSimple": "[SharpAbp.Abp.IdentityServer.IdentityResources.IdentityResourceDto]"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.IdentityResources.IIdentityResourceAppService"
+            },
+            "CreateAsyncByInput": {
+              "uniqueName": "CreateAsyncByInput",
+              "name": "CreateAsync",
+              "httpMethod": "POST",
+              "url": "api/identity-server/identity-resources",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "SharpAbp.Abp.IdentityServer.IdentityResources.CreateIdentityResourceDto, SharpAbp.Abp.IdentityServer.Application.Contracts",
+                  "type": "SharpAbp.Abp.IdentityServer.IdentityResources.CreateIdentityResourceDto",
+                  "typeSimple": "SharpAbp.Abp.IdentityServer.IdentityResources.CreateIdentityResourceDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "SharpAbp.Abp.IdentityServer.IdentityResources.CreateIdentityResourceDto",
+                  "typeSimple": "SharpAbp.Abp.IdentityServer.IdentityResources.CreateIdentityResourceDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Guid",
+                "typeSimple": "string"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.IdentityResources.IIdentityResourceAppService"
+            },
+            "UpdateAsyncByIdAndInput": {
+              "uniqueName": "UpdateAsyncByIdAndInput",
+              "name": "UpdateAsync",
+              "httpMethod": "PUT",
+              "url": "api/identity-server/identity-resources/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                },
+                {
+                  "name": "input",
+                  "typeAsString": "SharpAbp.Abp.IdentityServer.IdentityResources.UpdateIdentityResourceDto, SharpAbp.Abp.IdentityServer.Application.Contracts",
+                  "type": "SharpAbp.Abp.IdentityServer.IdentityResources.UpdateIdentityResourceDto",
+                  "typeSimple": "SharpAbp.Abp.IdentityServer.IdentityResources.UpdateIdentityResourceDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "SharpAbp.Abp.IdentityServer.IdentityResources.UpdateIdentityResourceDto",
+                  "typeSimple": "SharpAbp.Abp.IdentityServer.IdentityResources.UpdateIdentityResourceDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Void",
+                "typeSimple": "System.Void"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.IdentityResources.IIdentityResourceAppService"
+            },
+            "DeleteAsyncById": {
+              "uniqueName": "DeleteAsyncById",
+              "name": "DeleteAsync",
+              "httpMethod": "DELETE",
+              "url": "api/identity-server/identity-resources/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Void",
+                "typeSimple": "System.Void"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.IdentityResources.IIdentityResourceAppService"
+            }
+          }
+        },
+        "SharpAbp.Abp.IdentityServer.IdentityServerApiResourceController": {
+          "controllerName": "IdentityServerApiResource",
+          "controllerGroupName": "IdentityServerApiResource",
+          "type": "SharpAbp.Abp.IdentityServer.IdentityServerApiResourceController",
+          "interfaces": [
+            {
+              "type": "SharpAbp.Abp.IdentityServer.ApiResources.IIdentityServerApiResourceAppService"
+            }
+          ],
+          "actions": {
+            "GetAsyncById": {
+              "uniqueName": "GetAsyncById",
+              "name": "GetAsync",
+              "httpMethod": "GET",
+              "url": "api/identity-server/api-resources/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "SharpAbp.Abp.IdentityServer.ApiResources.ApiResourceDto",
+                "typeSimple": "SharpAbp.Abp.IdentityServer.ApiResources.ApiResourceDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.ApiResources.IIdentityServerApiResourceAppService"
+            },
+            "FindByNameAsyncByApiResourceName": {
+              "uniqueName": "FindByNameAsyncByApiResourceName",
+              "name": "FindByNameAsync",
+              "httpMethod": "GET",
+              "url": "api/identity-server/api-resources/find-by-name/{apiResourceName}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "apiResourceName",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "apiResourceName",
+                  "name": "apiResourceName",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "SharpAbp.Abp.IdentityServer.ApiResources.ApiResourceDto",
+                "typeSimple": "SharpAbp.Abp.IdentityServer.ApiResources.ApiResourceDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.ApiResources.IIdentityServerApiResourceAppService"
+            },
+            "GetListByScopesAsyncByScopeNames": {
+              "uniqueName": "GetListByScopesAsyncByScopeNames",
+              "name": "GetListByScopesAsync",
+              "httpMethod": "GET",
+              "url": "api/identity-server/api-resources/get-by-scopeNames",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "scopeNames",
+                  "typeAsString": "System.String[], System.Private.CoreLib",
+                  "type": "System.String[]",
+                  "typeSimple": "[string]",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "scopeNames",
+                  "name": "scopeNames",
+                  "jsonName": null,
+                  "type": "System.String[]",
+                  "typeSimple": "[string]",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Collections.Generic.List<SharpAbp.Abp.IdentityServer.ApiResources.ApiResourceDto>",
+                "typeSimple": "[SharpAbp.Abp.IdentityServer.ApiResources.ApiResourceDto]"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.ApiResources.IIdentityServerApiResourceAppService"
+            },
+            "GetAllAsync": {
+              "uniqueName": "GetAllAsync",
+              "name": "GetAllAsync",
+              "httpMethod": "GET",
+              "url": "api/identity-server/api-resources/all",
+              "supportedVersions": [],
+              "parametersOnMethod": [],
+              "parameters": [],
+              "returnValue": {
+                "type": "System.Collections.Generic.List<SharpAbp.Abp.IdentityServer.ApiResources.ApiResourceDto>",
+                "typeSimple": "[SharpAbp.Abp.IdentityServer.ApiResources.ApiResourceDto]"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.ApiResources.IIdentityServerApiResourceAppService"
+            },
+            "GetPagedListAsyncByInput": {
+              "uniqueName": "GetPagedListAsyncByInput",
+              "name": "GetPagedListAsync",
+              "httpMethod": "GET",
+              "url": "api/identity-server/api-resources",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "SharpAbp.Abp.IdentityServer.ApiResources.ApiResourcePagedRequestDto, SharpAbp.Abp.IdentityServer.Application.Contracts",
+                  "type": "SharpAbp.Abp.IdentityServer.ApiResources.ApiResourcePagedRequestDto",
+                  "typeSimple": "SharpAbp.Abp.IdentityServer.ApiResources.ApiResourcePagedRequestDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "Filter",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "Sorting",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "SkipCount",
+                  "jsonName": null,
+                  "type": "System.Int32",
+                  "typeSimple": "number",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "MaxResultCount",
+                  "jsonName": null,
+                  "type": "System.Int32",
+                  "typeSimple": "number",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                }
+              ],
+              "returnValue": {
+                "type": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.Abp.IdentityServer.ApiResources.ApiResourceDto>",
+                "typeSimple": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.Abp.IdentityServer.ApiResources.ApiResourceDto>"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.ApiResources.IIdentityServerApiResourceAppService"
+            },
+            "CreateAsyncByInput": {
+              "uniqueName": "CreateAsyncByInput",
+              "name": "CreateAsync",
+              "httpMethod": "POST",
+              "url": "api/identity-server/api-resources",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "SharpAbp.Abp.IdentityServer.ApiResources.CreateApiResourceDto, SharpAbp.Abp.IdentityServer.Application.Contracts",
+                  "type": "SharpAbp.Abp.IdentityServer.ApiResources.CreateApiResourceDto",
+                  "typeSimple": "SharpAbp.Abp.IdentityServer.ApiResources.CreateApiResourceDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "SharpAbp.Abp.IdentityServer.ApiResources.CreateApiResourceDto",
+                  "typeSimple": "SharpAbp.Abp.IdentityServer.ApiResources.CreateApiResourceDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Guid",
+                "typeSimple": "string"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.ApiResources.IIdentityServerApiResourceAppService"
+            },
+            "UpdateAsyncByIdAndInput": {
+              "uniqueName": "UpdateAsyncByIdAndInput",
+              "name": "UpdateAsync",
+              "httpMethod": "PUT",
+              "url": "api/identity-server/api-resources/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                },
+                {
+                  "name": "input",
+                  "typeAsString": "SharpAbp.Abp.IdentityServer.ApiResources.UpdateApiResourceDto, SharpAbp.Abp.IdentityServer.Application.Contracts",
+                  "type": "SharpAbp.Abp.IdentityServer.ApiResources.UpdateApiResourceDto",
+                  "typeSimple": "SharpAbp.Abp.IdentityServer.ApiResources.UpdateApiResourceDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "SharpAbp.Abp.IdentityServer.ApiResources.UpdateApiResourceDto",
+                  "typeSimple": "SharpAbp.Abp.IdentityServer.ApiResources.UpdateApiResourceDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Void",
+                "typeSimple": "System.Void"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.ApiResources.IIdentityServerApiResourceAppService"
+            },
+            "DeleteAsyncById": {
+              "uniqueName": "DeleteAsyncById",
+              "name": "DeleteAsync",
+              "httpMethod": "DELETE",
+              "url": "api/identity-server/api-resources/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Void",
+                "typeSimple": "System.Void"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.ApiResources.IIdentityServerApiResourceAppService"
+            }
+          }
+        },
+        "SharpAbp.Abp.IdentityServer.IdentityServerApiScopeController": {
+          "controllerName": "IdentityServerApiScope",
+          "controllerGroupName": "IdentityServerApiScope",
+          "type": "SharpAbp.Abp.IdentityServer.IdentityServerApiScopeController",
+          "interfaces": [
+            {
+              "type": "SharpAbp.Abp.IdentityServer.ApiScopes.IIdentityServerApiScopeAppService"
+            }
+          ],
+          "actions": {
+            "GetAsyncById": {
+              "uniqueName": "GetAsyncById",
+              "name": "GetAsync",
+              "httpMethod": "GET",
+              "url": "api/identity-server/apiScopes/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "SharpAbp.Abp.IdentityServer.ApiScopes.ApiScopeDto",
+                "typeSimple": "SharpAbp.Abp.IdentityServer.ApiScopes.ApiScopeDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.ApiScopes.IIdentityServerApiScopeAppService"
+            },
+            "FindByNameAsyncByName": {
+              "uniqueName": "FindByNameAsyncByName",
+              "name": "FindByNameAsync",
+              "httpMethod": "GET",
+              "url": "api/identity-server/apiScopes/find-by-name/{name}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "name",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "name",
+                  "name": "name",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "SharpAbp.Abp.IdentityServer.ApiScopes.ApiScopeDto",
+                "typeSimple": "SharpAbp.Abp.IdentityServer.ApiScopes.ApiScopeDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.ApiScopes.IIdentityServerApiScopeAppService"
+            },
+            "GetPagedListAsyncByInput": {
+              "uniqueName": "GetPagedListAsyncByInput",
+              "name": "GetPagedListAsync",
+              "httpMethod": "GET",
+              "url": "api/identity-server/apiScopes",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "SharpAbp.Abp.IdentityServer.ApiScopes.ApiScopePagedRequestDto, SharpAbp.Abp.IdentityServer.Application.Contracts",
+                  "type": "SharpAbp.Abp.IdentityServer.ApiScopes.ApiScopePagedRequestDto",
+                  "typeSimple": "SharpAbp.Abp.IdentityServer.ApiScopes.ApiScopePagedRequestDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "Filter",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "Sorting",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "SkipCount",
+                  "jsonName": null,
+                  "type": "System.Int32",
+                  "typeSimple": "number",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "MaxResultCount",
+                  "jsonName": null,
+                  "type": "System.Int32",
+                  "typeSimple": "number",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                }
+              ],
+              "returnValue": {
+                "type": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.Abp.IdentityServer.ApiScopes.ApiScopeDto>",
+                "typeSimple": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.Abp.IdentityServer.ApiScopes.ApiScopeDto>"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.ApiScopes.IIdentityServerApiScopeAppService"
+            },
+            "GetListByNameAsyncByScopeNames": {
+              "uniqueName": "GetListByNameAsyncByScopeNames",
+              "name": "GetListByNameAsync",
+              "httpMethod": "GET",
+              "url": "api/identity-server/apiScopes/get-list",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "scopeNames",
+                  "typeAsString": "System.String[], System.Private.CoreLib",
+                  "type": "System.String[]",
+                  "typeSimple": "[string]",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "scopeNames",
+                  "name": "scopeNames",
+                  "jsonName": null,
+                  "type": "System.String[]",
+                  "typeSimple": "[string]",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Collections.Generic.List<SharpAbp.Abp.IdentityServer.ApiScopes.ApiScopeDto>",
+                "typeSimple": "[SharpAbp.Abp.IdentityServer.ApiScopes.ApiScopeDto]"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.ApiScopes.IIdentityServerApiScopeAppService"
+            },
+            "CreateAsyncByInput": {
+              "uniqueName": "CreateAsyncByInput",
+              "name": "CreateAsync",
+              "httpMethod": "POST",
+              "url": "api/identity-server/apiScopes",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "SharpAbp.Abp.IdentityServer.ApiScopes.CreateApiScopeDto, SharpAbp.Abp.IdentityServer.Application.Contracts",
+                  "type": "SharpAbp.Abp.IdentityServer.ApiScopes.CreateApiScopeDto",
+                  "typeSimple": "SharpAbp.Abp.IdentityServer.ApiScopes.CreateApiScopeDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "SharpAbp.Abp.IdentityServer.ApiScopes.CreateApiScopeDto",
+                  "typeSimple": "SharpAbp.Abp.IdentityServer.ApiScopes.CreateApiScopeDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Guid",
+                "typeSimple": "string"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.ApiScopes.IIdentityServerApiScopeAppService"
+            },
+            "UpdateAsyncByIdAndInput": {
+              "uniqueName": "UpdateAsyncByIdAndInput",
+              "name": "UpdateAsync",
+              "httpMethod": "PUT",
+              "url": "api/identity-server/apiScopes/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                },
+                {
+                  "name": "input",
+                  "typeAsString": "SharpAbp.Abp.IdentityServer.ApiScopes.UpdateApiScopeDto, SharpAbp.Abp.IdentityServer.Application.Contracts",
+                  "type": "SharpAbp.Abp.IdentityServer.ApiScopes.UpdateApiScopeDto",
+                  "typeSimple": "SharpAbp.Abp.IdentityServer.ApiScopes.UpdateApiScopeDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "SharpAbp.Abp.IdentityServer.ApiScopes.UpdateApiScopeDto",
+                  "typeSimple": "SharpAbp.Abp.IdentityServer.ApiScopes.UpdateApiScopeDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Void",
+                "typeSimple": "System.Void"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.ApiScopes.IIdentityServerApiScopeAppService"
+            },
+            "DeleteAsyncById": {
+              "uniqueName": "DeleteAsyncById",
+              "name": "DeleteAsync",
+              "httpMethod": "DELETE",
+              "url": "api/identity-server/apiScopes/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Void",
+                "typeSimple": "System.Void"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.ApiScopes.IIdentityServerApiScopeAppService"
+            }
+          }
+        },
+        "SharpAbp.Abp.IdentityServer.IdentityServerClaimTypeController": {
+          "controllerName": "IdentityServerClaimType",
+          "controllerGroupName": "IdentityServerClaimType",
+          "type": "SharpAbp.Abp.IdentityServer.IdentityServerClaimTypeController",
+          "interfaces": [
+            {
+              "type": "SharpAbp.Abp.IdentityServer.IIdentityServerClaimTypeAppService"
+            }
+          ],
+          "actions": {
+            "GetAllAsync": {
+              "uniqueName": "GetAllAsync",
+              "name": "GetAllAsync",
+              "httpMethod": "GET",
+              "url": "api/identity-server/claim-types",
+              "supportedVersions": [],
+              "parametersOnMethod": [],
+              "parameters": [],
+              "returnValue": {
+                "type": "System.Collections.Generic.List<SharpAbp.Abp.Identity.IdentityClaimTypeDto>",
+                "typeSimple": "[SharpAbp.Abp.Identity.IdentityClaimTypeDto]"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.IIdentityServerClaimTypeAppService"
+            }
+          }
+        },
+        "SharpAbp.Abp.IdentityServer.IdentityServerClientController": {
+          "controllerName": "IdentityServerClient",
+          "controllerGroupName": "IdentityServerClient",
+          "type": "SharpAbp.Abp.IdentityServer.IdentityServerClientController",
+          "interfaces": [
+            {
+              "type": "SharpAbp.Abp.IdentityServer.Clients.IIdentityServerClientAppService"
+            }
+          ],
+          "actions": {
+            "GetAsyncById": {
+              "uniqueName": "GetAsyncById",
+              "name": "GetAsync",
+              "httpMethod": "GET",
+              "url": "api/identity-server/clients/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "SharpAbp.Abp.IdentityServer.Clients.ClientDto",
+                "typeSimple": "SharpAbp.Abp.IdentityServer.Clients.ClientDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.Clients.IIdentityServerClientAppService"
+            },
+            "FindByClientIdAsyncByClientId": {
+              "uniqueName": "FindByClientIdAsyncByClientId",
+              "name": "FindByClientIdAsync",
+              "httpMethod": "GET",
+              "url": "api/identity-server/clients/find-by-clientId/{clientId}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "clientId",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "clientId",
+                  "name": "clientId",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "SharpAbp.Abp.IdentityServer.Clients.ClientDto",
+                "typeSimple": "SharpAbp.Abp.IdentityServer.Clients.ClientDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.Clients.IIdentityServerClientAppService"
+            },
+            "GetPagedListAsyncByInput": {
+              "uniqueName": "GetPagedListAsyncByInput",
+              "name": "GetPagedListAsync",
+              "httpMethod": "GET",
+              "url": "api/identity-server/clients",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "SharpAbp.Abp.IdentityServer.Clients.ClientPagedRequestDto, SharpAbp.Abp.IdentityServer.Application.Contracts",
+                  "type": "SharpAbp.Abp.IdentityServer.Clients.ClientPagedRequestDto",
+                  "typeSimple": "SharpAbp.Abp.IdentityServer.Clients.ClientPagedRequestDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "Filter",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "Sorting",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "SkipCount",
+                  "jsonName": null,
+                  "type": "System.Int32",
+                  "typeSimple": "number",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "MaxResultCount",
+                  "jsonName": null,
+                  "type": "System.Int32",
+                  "typeSimple": "number",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                }
+              ],
+              "returnValue": {
+                "type": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.Abp.IdentityServer.Clients.ClientDto>",
+                "typeSimple": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.Abp.IdentityServer.Clients.ClientDto>"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.Clients.IIdentityServerClientAppService"
+            },
+            "GetAllDistinctAllowedCorsOriginsAsync": {
+              "uniqueName": "GetAllDistinctAllowedCorsOriginsAsync",
+              "name": "GetAllDistinctAllowedCorsOriginsAsync",
+              "httpMethod": "GET",
+              "url": "api/identity-server/clients/allowed-cors-origins",
+              "supportedVersions": [],
+              "parametersOnMethod": [],
+              "parameters": [],
+              "returnValue": {
+                "type": "System.Collections.Generic.List<System.String>",
+                "typeSimple": "[string]"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.Clients.IIdentityServerClientAppService"
+            },
+            "CreateAsyncByInput": {
+              "uniqueName": "CreateAsyncByInput",
+              "name": "CreateAsync",
+              "httpMethod": "POST",
+              "url": "api/identity-server/clients",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "SharpAbp.Abp.IdentityServer.Clients.CreateClientDto, SharpAbp.Abp.IdentityServer.Application.Contracts",
+                  "type": "SharpAbp.Abp.IdentityServer.Clients.CreateClientDto",
+                  "typeSimple": "SharpAbp.Abp.IdentityServer.Clients.CreateClientDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "SharpAbp.Abp.IdentityServer.Clients.CreateClientDto",
+                  "typeSimple": "SharpAbp.Abp.IdentityServer.Clients.CreateClientDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Guid",
+                "typeSimple": "string"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.Clients.IIdentityServerClientAppService"
+            },
+            "UpdateAsyncByIdAndInput": {
+              "uniqueName": "UpdateAsyncByIdAndInput",
+              "name": "UpdateAsync",
+              "httpMethod": "PUT",
+              "url": "api/identity-server/clients/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                },
+                {
+                  "name": "input",
+                  "typeAsString": "SharpAbp.Abp.IdentityServer.Clients.UpdateClientDto, SharpAbp.Abp.IdentityServer.Application.Contracts",
+                  "type": "SharpAbp.Abp.IdentityServer.Clients.UpdateClientDto",
+                  "typeSimple": "SharpAbp.Abp.IdentityServer.Clients.UpdateClientDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "SharpAbp.Abp.IdentityServer.Clients.UpdateClientDto",
+                  "typeSimple": "SharpAbp.Abp.IdentityServer.Clients.UpdateClientDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Void",
+                "typeSimple": "System.Void"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.Clients.IIdentityServerClientAppService"
+            },
+            "DeleteAsyncById": {
+              "uniqueName": "DeleteAsyncById",
+              "name": "DeleteAsync",
+              "httpMethod": "DELETE",
+              "url": "api/identity-server/clients/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Void",
+                "typeSimple": "System.Void"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.IdentityServer.Clients.IIdentityServerClientAppService"
+            }
+          }
+        }
+      }
+    }
+  },
+  "types": {}
+}

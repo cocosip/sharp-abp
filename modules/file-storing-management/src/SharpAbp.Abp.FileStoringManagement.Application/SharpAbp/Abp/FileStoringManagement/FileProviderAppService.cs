@@ -1,11 +1,9 @@
 ﻿using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.FileStoring;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Reflection;
 
@@ -25,10 +23,11 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// </summary>
         /// <returns></returns>
         [Authorize(FileStoringManagementPermissions.Providers.Default)]
-        public virtual List<ProviderDto> GetProviders()
+        public virtual Task<List<ProviderDto>> GetProvidersAsync()
         {
             var providerConfigurations = Options.Providers.GetFileProviders();
-            return ObjectMapper.Map<List<FileProviderConfiguration>, List<ProviderDto>>(providerConfigurations);
+            var providers = ObjectMapper.Map<List<FileProviderConfiguration>, List<ProviderDto>>(providerConfigurations);
+            return Task.FromResult(providers);
         }
 
         /// <summary>
@@ -37,11 +36,11 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="provider"></param>
         /// <returns></returns>
         [Authorize(FileStoringManagementPermissions.Providers.Default)]
-        public virtual bool HasProvider([NotNull] string provider)
+        public virtual Task<bool> HasProviderAsync([NotNull] string provider)
         {
             Check.NotNullOrWhiteSpace(provider, nameof(provider));
             var configuration = Options.Providers.GetConfiguration(provider);
-            return configuration != null;
+            return Task.FromResult(configuration is not null);
         }
 
         /// <summary>
@@ -50,7 +49,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="provider"></param>
         /// <returns></returns>
         [Authorize(FileStoringManagementPermissions.Providers.Options)]
-        public virtual ProviderOptionsDto GetOptions([NotNull] string provider)
+        public virtual Task<ProviderOptionsDto> GetOptionsAsync([NotNull] string provider)
         {
             Check.NotNullOrWhiteSpace(provider, nameof(provider));
 
@@ -74,7 +73,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 providerOptions.Values.Add(providerValue);
             }
 
-            return providerOptions;
+            return Task.FromResult(providerOptions);
         }
     }
 }

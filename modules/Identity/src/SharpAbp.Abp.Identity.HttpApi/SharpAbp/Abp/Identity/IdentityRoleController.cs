@@ -11,63 +11,60 @@ namespace SharpAbp.Abp.Identity
     [Area("identity")]
     [ControllerName("Role")]
     [Route("api/identity/roles")]
-    public class IdentityRoleController : IdentityController, IIdentityRoleAppService, Volo.Abp.Identity.IIdentityRoleAppService
+    public class IdentityRoleController : IdentityController, IIdentityRoleAppService
     {
         private readonly IIdentityRoleAppService _identityRoleAppService;
-        private readonly Volo.Abp.Identity.IIdentityRoleAppService _roleAppService;
         public IdentityRoleController(
-            IIdentityRoleAppService identityRoleAppService,
-            Volo.Abp.Identity.IIdentityRoleAppService roleAppService)
+            IIdentityRoleAppService identityRoleAppService)
         {
             _identityRoleAppService = identityRoleAppService;
-            _roleAppService = roleAppService;
         }
 
         [HttpGet]
         [Route("all")]
         public async Task<ListResultDto<IdentityRoleDto>> GetAllListAsync()
         {
-            return await _roleAppService.GetAllListAsync();
+            return await _identityRoleAppService.GetAllListAsync();
         }
 
         [HttpGet]
         public async Task<PagedResultDto<IdentityRoleDto>> GetListAsync(GetIdentityRolesInput input)
         {
-            return await _roleAppService.GetListAsync(input);
+            return await _identityRoleAppService.GetListAsync(input);
         }
 
         [HttpGet]
         [Route("{id}")]
         public async Task<IdentityRoleDto> GetAsync(Guid id)
         {
-            return await _roleAppService.GetAsync(id);
+            return await _identityRoleAppService.GetAsync(id);
         }
 
         [HttpPost]
         public async Task<IdentityRoleDto> CreateAsync(IdentityRoleCreateDto input)
         {
-            return await _roleAppService.CreateAsync(input);
+            return await _identityRoleAppService.CreateAsync(input);
         }
 
         [HttpPut]
         [Route("{id}")]
         public async Task<IdentityRoleDto> UpdateAsync(Guid id, IdentityRoleUpdateDto input)
         {
-            return await _roleAppService.UpdateAsync(id, input);
+            return await _identityRoleAppService.UpdateAsync(id, input);
         }
 
         [HttpDelete]
         [Route("{id}")]
         public async Task DeleteAsync(Guid id)
         {
-            await _roleAppService.DeleteAsync(id);
+            await _identityRoleAppService.DeleteAsync(id);
         }
 
         [HttpGet]
         [Route("all-claim-types")]
-        public async Task<List<IdentityClaimTypeDto>> GetAllClaimTypes()
+        public async Task<List<IdentityClaimTypeDto>> GetAllClaimTypesAsync()
         {
-            return await _identityRoleAppService.GetAllClaimTypes();
+            return await _identityRoleAppService.GetAllClaimTypesAsync();
         }
 
         [HttpGet]

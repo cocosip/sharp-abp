@@ -1,0 +1,429 @@
+{
+  "modules": {
+    "file-storing": {
+      "rootPath": "file-storing",
+      "remoteServiceName": "FileStoringManagement",
+      "controllers": {
+        "SharpAbp.Abp.FileStoringManagement.ContainerController": {
+          "controllerName": "Container",
+          "controllerGroupName": "Container",
+          "type": "SharpAbp.Abp.FileStoringManagement.ContainerController",
+          "interfaces": [
+            {
+              "type": "SharpAbp.Abp.FileStoringManagement.IContainerAppService"
+            }
+          ],
+          "actions": {
+            "GetAsyncById": {
+              "uniqueName": "GetAsyncById",
+              "name": "GetAsync",
+              "httpMethod": "GET",
+              "url": "api/file-storing/containers/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "SharpAbp.Abp.FileStoringManagement.ContainerDto",
+                "typeSimple": "SharpAbp.Abp.FileStoringManagement.ContainerDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.FileStoringManagement.IContainerAppService"
+            },
+            "GetPagedListAsyncByInput": {
+              "uniqueName": "GetPagedListAsyncByInput",
+              "name": "GetPagedListAsync",
+              "httpMethod": "GET",
+              "url": "api/file-storing/containers",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "SharpAbp.Abp.FileStoringManagement.FileStoringContainerPagedRequestDto, SharpAbp.Abp.FileStoringManagement.Application.Contracts",
+                  "type": "SharpAbp.Abp.FileStoringManagement.FileStoringContainerPagedRequestDto",
+                  "typeSimple": "SharpAbp.Abp.FileStoringManagement.FileStoringContainerPagedRequestDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "Name",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "Provider",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "Sorting",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "SkipCount",
+                  "jsonName": null,
+                  "type": "System.Int32",
+                  "typeSimple": "number",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "MaxResultCount",
+                  "jsonName": null,
+                  "type": "System.Int32",
+                  "typeSimple": "number",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                }
+              ],
+              "returnValue": {
+                "type": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.Abp.FileStoringManagement.ContainerDto>",
+                "typeSimple": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.Abp.FileStoringManagement.ContainerDto>"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.FileStoringManagement.IContainerAppService"
+            },
+            "GetAllAsync": {
+              "uniqueName": "GetAllAsync",
+              "name": "GetAllAsync",
+              "httpMethod": "GET",
+              "url": "api/file-storing/containers/all",
+              "supportedVersions": [],
+              "parametersOnMethod": [],
+              "parameters": [],
+              "returnValue": {
+                "type": "System.Collections.Generic.List<SharpAbp.Abp.FileStoringManagement.ContainerDto>",
+                "typeSimple": "[SharpAbp.Abp.FileStoringManagement.ContainerDto]"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.FileStoringManagement.IContainerAppService"
+            },
+            "FindByNameAsyncByName": {
+              "uniqueName": "FindByNameAsyncByName",
+              "name": "FindByNameAsync",
+              "httpMethod": "GET",
+              "url": "api/file-storing/containers/find-by-name/{name}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "name",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "name",
+                  "name": "name",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "SharpAbp.Abp.FileStoringManagement.ContainerDto",
+                "typeSimple": "SharpAbp.Abp.FileStoringManagement.ContainerDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.FileStoringManagement.IContainerAppService"
+            },
+            "CreateAsyncByInput": {
+              "uniqueName": "CreateAsyncByInput",
+              "name": "CreateAsync",
+              "httpMethod": "POST",
+              "url": "api/file-storing/containers",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "SharpAbp.Abp.FileStoringManagement.CreateContainerDto, SharpAbp.Abp.FileStoringManagement.Application.Contracts",
+                  "type": "SharpAbp.Abp.FileStoringManagement.CreateContainerDto",
+                  "typeSimple": "SharpAbp.Abp.FileStoringManagement.CreateContainerDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "SharpAbp.Abp.FileStoringManagement.CreateContainerDto",
+                  "typeSimple": "SharpAbp.Abp.FileStoringManagement.CreateContainerDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "SharpAbp.Abp.FileStoringManagement.ContainerDto",
+                "typeSimple": "SharpAbp.Abp.FileStoringManagement.ContainerDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.FileStoringManagement.IContainerAppService"
+            },
+            "UpdateAsyncByIdAndInput": {
+              "uniqueName": "UpdateAsyncByIdAndInput",
+              "name": "UpdateAsync",
+              "httpMethod": "PUT",
+              "url": "api/file-storing/containers/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                },
+                {
+                  "name": "input",
+                  "typeAsString": "SharpAbp.Abp.FileStoringManagement.UpdateContainerDto, SharpAbp.Abp.FileStoringManagement.Application.Contracts",
+                  "type": "SharpAbp.Abp.FileStoringManagement.UpdateContainerDto",
+                  "typeSimple": "SharpAbp.Abp.FileStoringManagement.UpdateContainerDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "SharpAbp.Abp.FileStoringManagement.UpdateContainerDto",
+                  "typeSimple": "SharpAbp.Abp.FileStoringManagement.UpdateContainerDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "SharpAbp.Abp.FileStoringManagement.ContainerDto",
+                "typeSimple": "SharpAbp.Abp.FileStoringManagement.ContainerDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.FileStoringManagement.IContainerAppService"
+            },
+            "DeleteAsyncById": {
+              "uniqueName": "DeleteAsyncById",
+              "name": "DeleteAsync",
+              "httpMethod": "DELETE",
+              "url": "api/file-storing/containers/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Void",
+                "typeSimple": "System.Void"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.FileStoringManagement.IContainerAppService"
+            }
+          }
+        },
+        "SharpAbp.Abp.FileStoringManagement.FileProviderController": {
+          "controllerName": "FileProvider",
+          "controllerGroupName": "FileProvider",
+          "type": "SharpAbp.Abp.FileStoringManagement.FileProviderController",
+          "interfaces": [
+            {
+              "type": "SharpAbp.Abp.FileStoringManagement.IFileProviderAppService"
+            }
+          ],
+          "actions": {
+            "GetProvidersAsync": {
+              "uniqueName": "GetProvidersAsync",
+              "name": "GetProvidersAsync",
+              "httpMethod": "GET",
+              "url": "api/file-storing/file-providers",
+              "supportedVersions": [],
+              "parametersOnMethod": [],
+              "parameters": [],
+              "returnValue": {
+                "type": "System.Collections.Generic.List<SharpAbp.Abp.FileStoringManagement.ProviderDto>",
+                "typeSimple": "[SharpAbp.Abp.FileStoringManagement.ProviderDto]"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.FileStoringManagement.IFileProviderAppService"
+            },
+            "HasProviderAsyncByProvider": {
+              "uniqueName": "HasProviderAsyncByProvider",
+              "name": "HasProviderAsync",
+              "httpMethod": "GET",
+              "url": "api/file-storing/file-providers/has-provider/{provider}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "provider",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "provider",
+                  "name": "provider",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Boolean",
+                "typeSimple": "boolean"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.FileStoringManagement.IFileProviderAppService"
+            },
+            "GetOptionsAsyncByProvider": {
+              "uniqueName": "GetOptionsAsyncByProvider",
+              "name": "GetOptionsAsync",
+              "httpMethod": "GET",
+              "url": "api/file-storing/file-providers/get-options/{provider}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "provider",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "provider",
+                  "name": "provider",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "SharpAbp.Abp.FileStoringManagement.ProviderOptionsDto",
+                "typeSimple": "SharpAbp.Abp.FileStoringManagement.ProviderOptionsDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.FileStoringManagement.IFileProviderAppService"
+            }
+          }
+        }
+      }
+    }
+  },
+  "types": {}
+}

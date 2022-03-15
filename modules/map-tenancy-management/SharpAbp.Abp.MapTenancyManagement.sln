@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.6.30114.105
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4D4823FD-B3B7-45CF-86FF-9D54FAFA3808}"
 EndProject
@@ -21,7 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.MapTenancyMana
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.MapTenancyManagement.HttpApi", "src\SharpAbp.Abp.MapTenancyManagement.HttpApi\SharpAbp.Abp.MapTenancyManagement.HttpApi.csproj", "{36943724-18CC-4BFE-B0FD-B65C994BCDB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.MapTenancyManagement.Application.Tests", "test\SharpAbp.Abp.MapTenancyManagement.Application.Tests\SharpAbp.Abp.MapTenancyManagement.Application.Tests.csproj", "{249B81F9-4B3C-4BEC-A19C-CA5CA6198255}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.MapTenancyManagement.Application.Tests", "test\SharpAbp.Abp.MapTenancyManagement.Application.Tests\SharpAbp.Abp.MapTenancyManagement.Application.Tests.csproj", "{249B81F9-4B3C-4BEC-A19C-CA5CA6198255}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.MapTenancyManagement.HttpApi.Client", "src\SharpAbp.Abp.MapTenancyManagement.HttpApi.Client\SharpAbp.Abp.MapTenancyManagement.HttpApi.Client.csproj", "{F9D9213C-B95B-4240-9171-CFCAA844F88F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -129,6 +131,18 @@ Global
 		{249B81F9-4B3C-4BEC-A19C-CA5CA6198255}.Release|x64.Build.0 = Release|Any CPU
 		{249B81F9-4B3C-4BEC-A19C-CA5CA6198255}.Release|x86.ActiveCfg = Release|Any CPU
 		{249B81F9-4B3C-4BEC-A19C-CA5CA6198255}.Release|x86.Build.0 = Release|Any CPU
+		{F9D9213C-B95B-4240-9171-CFCAA844F88F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9D9213C-B95B-4240-9171-CFCAA844F88F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9D9213C-B95B-4240-9171-CFCAA844F88F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F9D9213C-B95B-4240-9171-CFCAA844F88F}.Debug|x64.Build.0 = Debug|Any CPU
+		{F9D9213C-B95B-4240-9171-CFCAA844F88F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F9D9213C-B95B-4240-9171-CFCAA844F88F}.Debug|x86.Build.0 = Debug|Any CPU
+		{F9D9213C-B95B-4240-9171-CFCAA844F88F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9D9213C-B95B-4240-9171-CFCAA844F88F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9D9213C-B95B-4240-9171-CFCAA844F88F}.Release|x64.ActiveCfg = Release|Any CPU
+		{F9D9213C-B95B-4240-9171-CFCAA844F88F}.Release|x64.Build.0 = Release|Any CPU
+		{F9D9213C-B95B-4240-9171-CFCAA844F88F}.Release|x86.ActiveCfg = Release|Any CPU
+		{F9D9213C-B95B-4240-9171-CFCAA844F88F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -142,6 +156,7 @@ Global
 		{DAC33F09-D76B-4C01-88F4-580FA26F6BE1} = {4D4823FD-B3B7-45CF-86FF-9D54FAFA3808}
 		{36943724-18CC-4BFE-B0FD-B65C994BCDB7} = {4D4823FD-B3B7-45CF-86FF-9D54FAFA3808}
 		{249B81F9-4B3C-4BEC-A19C-CA5CA6198255} = {3F3714EF-283B-4C60-8E52-62102DA70094}
+		{F9D9213C-B95B-4240-9171-CFCAA844F88F} = {4D4823FD-B3B7-45CF-86FF-9D54FAFA3808}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D8C08A3D-45ED-4E87-92FA-ED97DEE00C8C}

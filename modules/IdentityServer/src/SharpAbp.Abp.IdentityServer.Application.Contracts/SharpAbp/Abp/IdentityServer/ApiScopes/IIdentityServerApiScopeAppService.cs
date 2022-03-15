@@ -20,7 +20,7 @@ namespace SharpAbp.Abp.IdentityServer.ApiScopes
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        Task<ApiScopeDto> FindByName(string name);
+        Task<ApiScopeDto> FindByNameAsync(string name);
 
         /// <summary>
         /// Get paged list

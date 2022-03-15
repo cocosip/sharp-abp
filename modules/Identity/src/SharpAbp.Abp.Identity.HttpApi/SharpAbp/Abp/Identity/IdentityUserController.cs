@@ -115,9 +115,9 @@ namespace SharpAbp.Abp.Identity
         /// <returns></returns>
         [HttpGet]
         [Route("all-claim-types")]
-        public async Task<List<IdentityClaimTypeDto>> GetAllClaimTypes()
+        public async Task<List<IdentityClaimTypeDto>> GetAllClaimTypesAsync()
         {
-            return await _identityUserAppService.GetAllClaimTypes();
+            return await _identityUserAppService.GetAllClaimTypesAsync();
         }
 
         /// <summary>

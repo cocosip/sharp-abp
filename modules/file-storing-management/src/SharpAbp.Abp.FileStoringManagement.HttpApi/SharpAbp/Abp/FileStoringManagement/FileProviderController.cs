@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Volo.Abp;
 
 namespace SharpAbp.Abp.FileStoringManagement
@@ -16,23 +17,23 @@ namespace SharpAbp.Abp.FileStoringManagement
         }
 
         [HttpGet]
-        public List<ProviderDto> GetProviders()
+        public async Task<List<ProviderDto>> GetProvidersAsync()
         {
-            return _fileProviderAppService.GetProviders();
+            return await _fileProviderAppService.GetProvidersAsync();
         }
 
         [HttpGet]
         [Route("has-provider/{provider}")]
-        public bool HasProvider(string provider)
+        public async Task<bool> HasProviderAsync(string provider)
         {
-            return _fileProviderAppService.HasProvider(provider);
+            return await _fileProviderAppService.HasProviderAsync(provider);
         }
 
         [HttpGet]
         [Route("get-options/{provider}")]
-        public ProviderOptionsDto GetOptions(string provider)
+        public async Task<ProviderOptionsDto> GetOptionsAsync(string provider)
         {
-            return _fileProviderAppService.GetOptions(provider);
+            return await _fileProviderAppService.GetOptionsAsync(provider);
         }
 
     }

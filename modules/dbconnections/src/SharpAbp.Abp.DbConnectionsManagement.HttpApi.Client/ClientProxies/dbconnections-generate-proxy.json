@@ -1,0 +1,340 @@
+{
+  "modules": {
+    "dbconnections": {
+      "rootPath": "dbconnections",
+      "remoteServiceName": "DbConnectionsManagement",
+      "controllers": {
+        "SharpAbp.Abp.DbConnectionsManagement.DatabaseConnectionInfoController": {
+          "controllerName": "DatabaseConnectionInfo",
+          "controllerGroupName": "DatabaseConnectionInfo",
+          "type": "SharpAbp.Abp.DbConnectionsManagement.DatabaseConnectionInfoController",
+          "interfaces": [
+            {
+              "type": "SharpAbp.Abp.DbConnectionsManagement.IDatabaseConnectionInfoAppService"
+            }
+          ],
+          "actions": {
+            "GetAsyncById": {
+              "uniqueName": "GetAsyncById",
+              "name": "GetAsync",
+              "httpMethod": "GET",
+              "url": "api/dbconnections/database-connectioninfos/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "SharpAbp.Abp.DbConnectionsManagement.DatabaseConnectionInfoDto",
+                "typeSimple": "SharpAbp.Abp.DbConnectionsManagement.DatabaseConnectionInfoDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.DbConnectionsManagement.IDatabaseConnectionInfoAppService"
+            },
+            "FindByNameAsyncByName": {
+              "uniqueName": "FindByNameAsyncByName",
+              "name": "FindByNameAsync",
+              "httpMethod": "GET",
+              "url": "api/dbconnections/database-connectioninfos/find-by-name/{name}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "name",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "name",
+                  "name": "name",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "SharpAbp.Abp.DbConnectionsManagement.DatabaseConnectionInfoDto",
+                "typeSimple": "SharpAbp.Abp.DbConnectionsManagement.DatabaseConnectionInfoDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.DbConnectionsManagement.IDatabaseConnectionInfoAppService"
+            },
+            "GetPagedListAsyncByInput": {
+              "uniqueName": "GetPagedListAsyncByInput",
+              "name": "GetPagedListAsync",
+              "httpMethod": "GET",
+              "url": "api/dbconnections/database-connectioninfos",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "SharpAbp.Abp.DbConnectionsManagement.DatabaseConnectionInfoPagedRequestDto, SharpAbp.Abp.DbConnectionsManagement.Application.Contracts",
+                  "type": "SharpAbp.Abp.DbConnectionsManagement.DatabaseConnectionInfoPagedRequestDto",
+                  "typeSimple": "SharpAbp.Abp.DbConnectionsManagement.DatabaseConnectionInfoPagedRequestDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "Name",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "DatabaseProvider",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "Sorting",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "SkipCount",
+                  "jsonName": null,
+                  "type": "System.Int32",
+                  "typeSimple": "number",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "MaxResultCount",
+                  "jsonName": null,
+                  "type": "System.Int32",
+                  "typeSimple": "number",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                }
+              ],
+              "returnValue": {
+                "type": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.Abp.DbConnectionsManagement.DatabaseConnectionInfoDto>",
+                "typeSimple": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.Abp.DbConnectionsManagement.DatabaseConnectionInfoDto>"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.DbConnectionsManagement.IDatabaseConnectionInfoAppService"
+            },
+            "CreateAsyncByInput": {
+              "uniqueName": "CreateAsyncByInput",
+              "name": "CreateAsync",
+              "httpMethod": "POST",
+              "url": "api/dbconnections/database-connectioninfos",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "SharpAbp.Abp.DbConnectionsManagement.CreateDatabaseConnectionInfoDto, SharpAbp.Abp.DbConnectionsManagement.Application.Contracts",
+                  "type": "SharpAbp.Abp.DbConnectionsManagement.CreateDatabaseConnectionInfoDto",
+                  "typeSimple": "SharpAbp.Abp.DbConnectionsManagement.CreateDatabaseConnectionInfoDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "SharpAbp.Abp.DbConnectionsManagement.CreateDatabaseConnectionInfoDto",
+                  "typeSimple": "SharpAbp.Abp.DbConnectionsManagement.CreateDatabaseConnectionInfoDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "SharpAbp.Abp.DbConnectionsManagement.DatabaseConnectionInfoDto",
+                "typeSimple": "SharpAbp.Abp.DbConnectionsManagement.DatabaseConnectionInfoDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.DbConnectionsManagement.IDatabaseConnectionInfoAppService"
+            },
+            "UpdateAsyncByIdAndInput": {
+              "uniqueName": "UpdateAsyncByIdAndInput",
+              "name": "UpdateAsync",
+              "httpMethod": "PUT",
+              "url": "api/dbconnections/database-connectioninfos/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                },
+                {
+                  "name": "input",
+                  "typeAsString": "SharpAbp.Abp.DbConnectionsManagement.UpdateDatabaseConnectionInfoDto, SharpAbp.Abp.DbConnectionsManagement.Application.Contracts",
+                  "type": "SharpAbp.Abp.DbConnectionsManagement.UpdateDatabaseConnectionInfoDto",
+                  "typeSimple": "SharpAbp.Abp.DbConnectionsManagement.UpdateDatabaseConnectionInfoDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "SharpAbp.Abp.DbConnectionsManagement.UpdateDatabaseConnectionInfoDto",
+                  "typeSimple": "SharpAbp.Abp.DbConnectionsManagement.UpdateDatabaseConnectionInfoDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "SharpAbp.Abp.DbConnectionsManagement.DatabaseConnectionInfoDto",
+                "typeSimple": "SharpAbp.Abp.DbConnectionsManagement.DatabaseConnectionInfoDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.DbConnectionsManagement.IDatabaseConnectionInfoAppService"
+            },
+            "DeleteAsyncById": {
+              "uniqueName": "DeleteAsyncById",
+              "name": "DeleteAsync",
+              "httpMethod": "DELETE",
+              "url": "api/dbconnections/database-connectioninfos/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Void",
+                "typeSimple": "System.Void"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.DbConnectionsManagement.IDatabaseConnectionInfoAppService"
+            }
+          }
+        },
+        "SharpAbp.Abp.DbConnectionsManagement.DatabaseProviderController": {
+          "controllerName": "DatabaseProvider",
+          "controllerGroupName": "DatabaseProvider",
+          "type": "SharpAbp.Abp.DbConnectionsManagement.DatabaseProviderController",
+          "interfaces": [
+            {
+              "type": "SharpAbp.Abp.DbConnectionsManagement.IDatabaseProviderAppService"
+            }
+          ],
+          "actions": {
+            "GetAllAsync": {
+              "uniqueName": "GetAllAsync",
+              "name": "GetAllAsync",
+              "httpMethod": "GET",
+              "url": "api/database-provider/all",
+              "supportedVersions": [],
+              "parametersOnMethod": [],
+              "parameters": [],
+              "returnValue": {
+                "type": "System.Collections.Generic.List<System.String>",
+                "typeSimple": "[string]"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.DbConnectionsManagement.IDatabaseProviderAppService"
+            }
+          }
+        }
+      }
+    }
+  },
+  "types": {}
+}

@@ -42,7 +42,7 @@ namespace SharpAbp.Abp.Identity
         /// Get all claimTypes
         /// </summary>
         /// <returns></returns>
-        Task<List<IdentityClaimTypeDto>> GetAllClaimTypes();
+        Task<List<IdentityClaimTypeDto>> GetAllClaimTypesAsync();
 
         /// <summary>
         /// Get user roles

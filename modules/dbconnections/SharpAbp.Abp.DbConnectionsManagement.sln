@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30114.105
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0D56501B-3D77-4E3C-BD45-33A8D0329DE4}"
 EndProject
@@ -22,6 +22,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.DbConnectionsManagement.HttpApi", "src\SharpAbp.Abp.DbConnectionsManagement.HttpApi\SharpAbp.Abp.DbConnectionsManagement.HttpApi.csproj", "{10DC66FF-B108-4B2B-8DA5-19B5E13EBF2B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.DbConnectionsManagement.Tests", "test\SharpAbp.Abp.DbConnectionsManagement.Tests\SharpAbp.Abp.DbConnectionsManagement.Tests.csproj", "{BDBAD9C4-9800-4DD6-9703-0F1B51BE10A4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.DbConnectionsManagement.HttpApi.Client", "src\SharpAbp.Abp.DbConnectionsManagement.HttpApi.Client\SharpAbp.Abp.DbConnectionsManagement.HttpApi.Client.csproj", "{CA57005E-5CDA-425C-8C86-FACE50B4CCC2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -129,6 +131,18 @@ Global
 		{BDBAD9C4-9800-4DD6-9703-0F1B51BE10A4}.Release|x64.Build.0 = Release|Any CPU
 		{BDBAD9C4-9800-4DD6-9703-0F1B51BE10A4}.Release|x86.ActiveCfg = Release|Any CPU
 		{BDBAD9C4-9800-4DD6-9703-0F1B51BE10A4}.Release|x86.Build.0 = Release|Any CPU
+		{CA57005E-5CDA-425C-8C86-FACE50B4CCC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA57005E-5CDA-425C-8C86-FACE50B4CCC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA57005E-5CDA-425C-8C86-FACE50B4CCC2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CA57005E-5CDA-425C-8C86-FACE50B4CCC2}.Debug|x64.Build.0 = Debug|Any CPU
+		{CA57005E-5CDA-425C-8C86-FACE50B4CCC2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CA57005E-5CDA-425C-8C86-FACE50B4CCC2}.Debug|x86.Build.0 = Debug|Any CPU
+		{CA57005E-5CDA-425C-8C86-FACE50B4CCC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA57005E-5CDA-425C-8C86-FACE50B4CCC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA57005E-5CDA-425C-8C86-FACE50B4CCC2}.Release|x64.ActiveCfg = Release|Any CPU
+		{CA57005E-5CDA-425C-8C86-FACE50B4CCC2}.Release|x64.Build.0 = Release|Any CPU
+		{CA57005E-5CDA-425C-8C86-FACE50B4CCC2}.Release|x86.ActiveCfg = Release|Any CPU
+		{CA57005E-5CDA-425C-8C86-FACE50B4CCC2}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -142,6 +156,7 @@ Global
 		{9CC89DA1-4A27-4220-8221-4DDD6D3CCB02} = {0D56501B-3D77-4E3C-BD45-33A8D0329DE4}
 		{10DC66FF-B108-4B2B-8DA5-19B5E13EBF2B} = {0D56501B-3D77-4E3C-BD45-33A8D0329DE4}
 		{BDBAD9C4-9800-4DD6-9703-0F1B51BE10A4} = {E7A7F980-6097-4D8D-89DB-7E11E2355CCD}
+		{CA57005E-5CDA-425C-8C86-FACE50B4CCC2} = {0D56501B-3D77-4E3C-BD45-33A8D0329DE4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {46B59D22-94D1-4CCB-8FB9-7E0F4B2A7FD7}
