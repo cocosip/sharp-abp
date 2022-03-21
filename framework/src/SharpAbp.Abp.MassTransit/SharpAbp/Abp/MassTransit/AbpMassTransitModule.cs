@@ -19,15 +19,6 @@ namespace SharpAbp.Abp.MassTransit
 
         public override void PostConfigureServices(ServiceConfigurationContext context)
         {
-            var massTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
-
-            var startTimeout = TimeSpan.FromMilliseconds(massTransitOptions.StartTimeoutMilliSeconds);
-
-            var stopTimeout = TimeSpan.FromMilliseconds(massTransitOptions.StopTimeoutMilliSeconds);
-
-            context.Services.AddMassTransitHostedService(massTransitOptions.WaitUntilStarted, startTimeout, stopTimeout);
-
-
             Configure<AbpMassTransitOptions>(options =>
             {
                 var actions = context.Services.GetPreConfigureActions<AbpMassTransitOptions>();
@@ -37,6 +28,19 @@ namespace SharpAbp.Abp.MassTransit
                 }
             });
 
+            var massTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
+
+            var startTimeout = TimeSpan.FromMilliseconds(massTransitOptions.StartTimeoutMilliSeconds);
+
+            var stopTimeout = TimeSpan.FromMilliseconds(massTransitOptions.StopTimeoutMilliSeconds);
+
+
+            Configure<MassTransitHostOptions>(options =>
+            {
+                options.WaitUntilStarted = massTransitOptions.WaitUntilStarted;
+                options.StartTimeout = startTimeout;
+                options.StartTimeout = stopTimeout;
+            });
         }
     }
 }

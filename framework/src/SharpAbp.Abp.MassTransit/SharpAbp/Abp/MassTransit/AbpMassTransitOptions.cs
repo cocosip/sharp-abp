@@ -1,4 +1,4 @@
-﻿using MassTransit.ExtensionsDependencyInjectionIntegration;
+﻿using MassTransit;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -32,14 +32,14 @@ namespace SharpAbp.Abp.MassTransit
         /// </summary>
         public int StopTimeoutMilliSeconds { get; set; } = 3000;
 
-        public List<Action<IServiceCollectionBusConfigurator>> PreConfigures { get; set; }
+        public List<Action<IBusRegistrationConfigurator>> PreConfigures { get; set; }
 
-        public List<Action<IServiceCollectionBusConfigurator>> PostConfigures { get; set; }
+        public List<Action<IBusRegistrationConfigurator>> PostConfigures { get; set; }
 
         public AbpMassTransitOptions()
         {
-            PreConfigures = new List<Action<IServiceCollectionBusConfigurator>>();
-            PostConfigures = new List<Action<IServiceCollectionBusConfigurator>>();
+            PreConfigures = new List<Action<IBusRegistrationConfigurator>>();
+            PostConfigures = new List<Action<IBusRegistrationConfigurator>>();
         }
 
 

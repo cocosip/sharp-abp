@@ -1,9 +1,5 @@
 ﻿using MassTransit;
-using MassTransit.KafkaIntegration;
-using MassTransit.Registration;
 using MassTransitSample.Common;
-using Microsoft.Extensions.DependencyInjection;
-using SharpAbp.Abp.MassTransit;
 using SharpAbp.Abp.MassTransit.Kafka;
 using System;
 using Volo.Abp.Autofac;
@@ -31,7 +27,7 @@ namespace MassTransitSample.KafkaConsumer
                     {
                         c.AddConsumer<KafkaMessageConsumer>();
                     }),
-                    TopicEndpointConfigure = new Action<string, string, Action<IKafkaTopicReceiveEndpointConfigurator>, MassTransit.Registration.IRiderRegistrationContext, IKafkaFactoryConfigurator>((topic, groupId, preConfigure, ctx, cfg) =>
+                    TopicEndpointConfigure = new Action<string, string, Action<IKafkaTopicReceiveEndpointConfigurator>, IRiderRegistrationContext, IKafkaFactoryConfigurator>((topic, groupId, preConfigure, ctx, cfg) =>
                      {
                          cfg.TopicEndpoint<string, KafkaMessage>(topic, groupId, e =>
                          {

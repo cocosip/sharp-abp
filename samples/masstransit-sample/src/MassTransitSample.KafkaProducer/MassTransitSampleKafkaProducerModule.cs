@@ -1,8 +1,6 @@
-﻿using MassTransit.KafkaIntegration;
-using MassTransit.Registration;
+﻿using MassTransit;
 using MassTransitSample.Common;
 using Microsoft.Extensions.DependencyInjection;
-using SharpAbp.Abp.MassTransit;
 using SharpAbp.Abp.MassTransit.Kafka;
 using System;
 using Volo.Abp.Autofac;

@@ -1,7 +1,5 @@
 ﻿using Confluent.Kafka;
-using MassTransit.KafkaIntegration;
-using MassTransit.KafkaIntegration.Configurators;
-using MassTransit.Registration;
+using MassTransit;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;

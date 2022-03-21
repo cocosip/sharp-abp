@@ -1,5 +1,5 @@
 ﻿using Confluent.Kafka;
-using MassTransit.KafkaIntegration;
+using MassTransit;
 using System;
 
 namespace SharpAbp.Abp.MassTransit.Kafka

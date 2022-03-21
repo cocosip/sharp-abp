@@ -1,4 +1,4 @@
-﻿using MassTransit.Registration;
+﻿using MassTransit;
 using System;
 
 namespace SharpAbp.Abp.MassTransit.Kafka

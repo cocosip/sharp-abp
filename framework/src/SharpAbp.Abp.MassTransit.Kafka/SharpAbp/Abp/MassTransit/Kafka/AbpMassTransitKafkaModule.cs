@@ -1,7 +1,4 @@
 ﻿using MassTransit;
-using MassTransit.ExtensionsDependencyInjectionIntegration;
-using MassTransit.KafkaIntegration;
-using MassTransit.Registration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using Volo.Abp.Modularity;
@@ -17,7 +14,7 @@ namespace SharpAbp.Abp.MassTransit.Kafka
         {
             PreConfigure<AbpMassTransitOptions>(options =>
             {
-                options.PreConfigures.Add(new Action<IServiceCollectionBusConfigurator>(c =>
+                options.PreConfigures.Add(new Action<IBusRegistrationConfigurator>(c =>
                 {
                     c.UsingInMemory();
                 }));

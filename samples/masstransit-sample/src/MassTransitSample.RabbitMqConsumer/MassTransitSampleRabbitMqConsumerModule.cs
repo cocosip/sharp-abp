@@ -1,6 +1,4 @@
 ﻿using MassTransit;
-using MassTransit.ExtensionsDependencyInjectionIntegration;
-using MassTransit.RabbitMqTransport;
 using MassTransitSample.Common;
 using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.MassTransit.RabbitMQ;
@@ -26,7 +24,7 @@ namespace MassTransitSample.RabbitMqConsumer
                 {
                     ExchangeName = RabbitMqQueues.Exchange1,
                     QueueName = RabbitMqQueues.Queue1,
-                    Configure = new Action<IServiceCollectionBusConfigurator>(c =>
+                    Configure = new Action<IBusRegistrationConfigurator>(c =>
                     {
                         c.AddConsumer<RabbitMqMessageConsumer>();
                     }),
@@ -42,7 +40,7 @@ namespace MassTransitSample.RabbitMqConsumer
                         cfg.ReceiveEndpoint(queueName, e =>
                         {
                             preConfigure?.Invoke(exchangeName, queueName, e);
-                            e.Consumer<RabbitMqMessageConsumer>(ctx);
+                            e.ConfigureConsumer<RabbitMqMessageConsumer>(ctx);
                         });
 
                     })
@@ -55,12 +53,6 @@ namespace MassTransitSample.RabbitMqConsumer
 
         public override void PostConfigureServices(ServiceConfigurationContext context)
         {
-
-            var s = context.Services.ExecutePreConfiguredActions<AbpMassTransitRabbitMqOptions>();
-
-            var cfgs = s.GetMessageConfigures();
-
-
             context.Services.AddHostedService<MassTransitSampleRabbitMqConsumerHostedService>();
         }
     }

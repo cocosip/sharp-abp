@@ -1,6 +1,4 @@
 ﻿using MassTransit;
-using MassTransit.RabbitMqTransport;
-using MassTransit.RabbitMqTransport.Topology;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;

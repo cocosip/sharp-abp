@@ -1,4 +1,4 @@
-﻿using MassTransit.KafkaIntegration;
+﻿using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading;

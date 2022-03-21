@@ -1,6 +1,4 @@
 ﻿using MassTransit;
-using MassTransit.ExtensionsDependencyInjectionIntegration;
-using MassTransit.RabbitMqTransport;
 using System;
 
 namespace SharpAbp.Abp.MassTransit.RabbitMQ
@@ -25,7 +23,7 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
         /// <summary>
         /// Configure
         /// </summary>
-        public Action<IServiceCollectionBusConfigurator> Configure { get; set; }
+        public Action<IBusRegistrationConfigurator> Configure { get; set; }
 
         /// <summary>
         /// ReceiveEndPoint configure
