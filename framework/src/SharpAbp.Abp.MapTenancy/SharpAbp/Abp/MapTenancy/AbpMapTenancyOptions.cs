@@ -17,14 +17,18 @@ namespace SharpAbp.Abp.MapTenancy
             var mapTenancyConfigurations = configuration
                 .GetSection("MapTenancyOptions")
                 .Get<Dictionary<string, MapTenancyConfiguration>>();
-            foreach (var mapTenancyKv in mapTenancyConfigurations)
+
+            if (mapTenancyConfigurations != null)
             {
-                Mappers.Configure(mapTenancyKv.Key, c =>
+                foreach (var mapTenancyKv in mapTenancyConfigurations)
                 {
-                    c.TenantId = mapTenancyKv.Value.TenantId;
-                    c.Code = mapTenancyKv.Value.Code;
-                    c.MapCode = mapTenancyKv.Value.MapCode;
-                });
+                    Mappers.Configure(mapTenancyKv.Key, c =>
+                    {
+                        c.TenantId = mapTenancyKv.Value.TenantId;
+                        c.Code = mapTenancyKv.Value.Code;
+                        c.MapCode = mapTenancyKv.Value.MapCode;
+                    });
+                }
             }
             return this;
         }

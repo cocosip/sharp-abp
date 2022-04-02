@@ -18,16 +18,20 @@ namespace SharpAbp.Abp.FreeRedis
                 .GetSection("FreeRedisOptions")
                 .Get<Dictionary<string, FreeRedisConfiguration>>();
 
-            foreach (var kv in csRedisConfigurations)
+            if (csRedisConfigurations != null)
             {
-                Clients.Configure(kv.Key, c =>
+                foreach (var kv in csRedisConfigurations)
                 {
-                    c.Mode = kv.Value.Mode;
-                    c.ConnectionString = kv.Value.ConnectionString;
-                    c.Sentinels = kv.Value.Sentinels;
-                    c.ReadOnly = kv.Value.ReadOnly;
-                });
+                    Clients.Configure(kv.Key, c =>
+                    {
+                        c.Mode = kv.Value.Mode;
+                        c.ConnectionString = kv.Value.ConnectionString;
+                        c.Sentinels = kv.Value.Sentinels;
+                        c.ReadOnly = kv.Value.ReadOnly;
+                    });
+                }
             }
+
             return this;
         }
     }

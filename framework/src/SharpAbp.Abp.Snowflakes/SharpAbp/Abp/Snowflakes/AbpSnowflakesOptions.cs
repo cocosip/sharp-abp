@@ -19,21 +19,23 @@ namespace SharpAbp.Abp.Snowflakes
                 .GetSection("SnowflakeOptions")
                 .Get<Dictionary<string, SnowflakeConfiguration>>();
 
-            foreach (var keyValuePair in snowflakeConfigurations)
+            if (snowflakeConfigurations != null)
             {
-                var snowflakeConfiguration = keyValuePair.Value;
-
-                Snowflakes.Configure(keyValuePair.Key, c =>
+                foreach (var keyValuePair in snowflakeConfigurations)
                 {
-                    c.Twepoch = snowflakeConfiguration.Twepoch;
-                    c.WorkerIdBits = snowflakeConfiguration.WorkerIdBits;
-                    c.DatacenterIdBits = snowflakeConfiguration.DatacenterIdBits;
-                    c.SequenceBits = snowflakeConfiguration.SequenceBits;
-                    c.WorkerId = snowflakeConfiguration.WorkerId;
-                    c.DatacenterId = snowflakeConfiguration.DatacenterId;
-                });
-            }
+                    var snowflakeConfiguration = keyValuePair.Value;
 
+                    Snowflakes.Configure(keyValuePair.Key, c =>
+                    {
+                        c.Twepoch = snowflakeConfiguration.Twepoch;
+                        c.WorkerIdBits = snowflakeConfiguration.WorkerIdBits;
+                        c.DatacenterIdBits = snowflakeConfiguration.DatacenterIdBits;
+                        c.SequenceBits = snowflakeConfiguration.SequenceBits;
+                        c.WorkerId = snowflakeConfiguration.WorkerId;
+                        c.DatacenterId = snowflakeConfiguration.DatacenterId;
+                    });
+                }
+            }
             return this;
         }
     }

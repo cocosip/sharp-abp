@@ -21,39 +21,40 @@ namespace SharpAbp.Abp.FileStoring
             var entries = configuration
                 .GetSection("FileStoringOptions")
                 .Get<Dictionary<string, FileContainerConfigurationEntry>>();
-
-            foreach (var entryKv in entries)
+            if (entries != null)
             {
-                var fileProviderConfiguration = Providers.GetConfiguration(entryKv.Value.Provider);
-                if (fileProviderConfiguration == null)
+                foreach (var entryKv in entries)
                 {
-                    throw new AbpException($"Could not find any provider configuration for '{entryKv.Key}' container, provider:'{entryKv.Value.Provider}'");
+                    var fileProviderConfiguration = Providers.GetConfiguration(entryKv.Value.Provider);
+                    if (fileProviderConfiguration == null)
+                    {
+                        throw new AbpException($"Could not find any provider configuration for '{entryKv.Key}' container, provider:'{entryKv.Value.Provider}'");
+                    }
+
+                    Containers.Configure(entryKv.Key, c =>
+                    {
+                        c.Provider = fileProviderConfiguration.Provider;
+                        c.IsMultiTenant = entryKv.Value?.IsMultiTenant ?? false;
+                        c.HttpAccess = entryKv.Value?.HttpAccess ?? true;
+
+                        foreach (var defaultNamingNormalizer in fileProviderConfiguration.DefaultNamingNormalizers)
+                        {
+                            c.NamingNormalizers.Add(defaultNamingNormalizer);
+                        }
+
+                        var valueTypes = fileProviderConfiguration.GetValueTypes();
+
+                        foreach (var valueTypeKv in valueTypes)
+                        {
+                            entryKv.Value.Properties.TryGetValue(valueTypeKv.Key, out string value);
+                            var realValue = TypeHelper.ConvertFromString(valueTypeKv.Value, value);
+                            c.SetConfiguration(valueTypeKv.Key, realValue);
+                        }
+
+                    });
+
                 }
-
-                Containers.Configure(entryKv.Key, c =>
-                {
-                    c.Provider = fileProviderConfiguration.Provider;
-                    c.IsMultiTenant = entryKv.Value?.IsMultiTenant ?? false;
-                    c.HttpAccess = entryKv.Value?.HttpAccess ?? true;
-
-                    foreach (var defaultNamingNormalizer in fileProviderConfiguration.DefaultNamingNormalizers)
-                    {
-                        c.NamingNormalizers.Add(defaultNamingNormalizer);
-                    }
-
-                    var valueTypes = fileProviderConfiguration.GetValueTypes();
-
-                    foreach (var valueTypeKv in valueTypes)
-                    {
-                        entryKv.Value.Properties.TryGetValue(valueTypeKv.Key, out string value);
-                        var realValue = TypeHelper.ConvertFromString(valueTypeKv.Value, value);
-                        c.SetConfiguration(valueTypeKv.Key, realValue);
-                    }
-
-                });
-
             }
-
             return this;
         }
 
