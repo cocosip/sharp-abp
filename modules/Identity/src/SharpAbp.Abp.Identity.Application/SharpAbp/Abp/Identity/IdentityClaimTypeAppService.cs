@@ -10,14 +10,14 @@ namespace SharpAbp.Abp.Identity
     [Authorize(IdentityPermissions.IdentityClaimTypes.Default)]
     public class IdentityClaimTypeAppService : IdentityAppServiceBase, IIdentityClaimTypeAppService
     {
-        protected IIdentityClaimTypeRepository IdentityClaimTypeRepository { get; }
-        protected IdentityClaimTypeManager IdentityClaimTypeManager { get; }
+        protected IIdentityClaimTypeRepository ClaimTypeRepository { get; }
+        protected IdentityClaimTypeManager ClaimTypeManager { get; }
         public IdentityClaimTypeAppService(
-            IIdentityClaimTypeRepository identityClaimTypeRepository,
-            IdentityClaimTypeManager identityClaimTypeManager)
+            IIdentityClaimTypeRepository claimTypeRepository,
+            IdentityClaimTypeManager claimTypeManager)
         {
-            IdentityClaimTypeRepository = identityClaimTypeRepository;
-            IdentityClaimTypeManager = identityClaimTypeManager;
+            ClaimTypeRepository = claimTypeRepository;
+            ClaimTypeManager = claimTypeManager;
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace SharpAbp.Abp.Identity
         [Authorize(IdentityPermissions.IdentityClaimTypes.Default)]
         public virtual async Task<IdentityClaimTypeDto> GetAsync(Guid id)
         {
-            var identityClaimType = await IdentityClaimTypeRepository.GetAsync(id);
+            var identityClaimType = await ClaimTypeRepository.GetAsync(id);
             return ObjectMapper.Map<IdentityClaimType, IdentityClaimTypeDto>(identityClaimType);
         }
 
@@ -41,7 +41,7 @@ namespace SharpAbp.Abp.Identity
         [Authorize(IdentityPermissions.IdentityClaimTypes.Default)]
         public virtual async Task<bool> AnyAsync(string name, Guid? ignoredId = null)
         {
-            return await IdentityClaimTypeRepository.AnyAsync(name, ignoredId);
+            return await ClaimTypeRepository.AnyAsync(name, ignoredId);
         }
 
         /// <summary>
@@ -52,8 +52,8 @@ namespace SharpAbp.Abp.Identity
         [Authorize(IdentityPermissions.IdentityClaimTypes.Default)]
         public virtual async Task<PagedResultDto<IdentityClaimTypeDto>> GetPagedListAsync(IdentityClaimTypePagedRequestDto input)
         {
-            var count = await IdentityClaimTypeRepository.GetCountAsync(input.Filter);
-            var identityClaimTypes = await IdentityClaimTypeRepository.GetListAsync(
+            var count = await ClaimTypeRepository.GetCountAsync(input.Filter);
+            var identityClaimTypes = await ClaimTypeRepository.GetListAsync(
                 input.Sorting,
                 input.MaxResultCount,
                 input.SkipCount,
@@ -83,7 +83,7 @@ namespace SharpAbp.Abp.Identity
                 input.Description,
                 input.ValueType);
 
-            await IdentityClaimTypeManager.CreateAsync(identityClaimType);
+            await ClaimTypeManager.CreateAsync(identityClaimType);
             return identityClaimType.Id;
         }
 
@@ -96,12 +96,12 @@ namespace SharpAbp.Abp.Identity
         [Authorize(IdentityPermissions.IdentityClaimTypes.Update)]
         public virtual async Task UpdateAsync(Guid id, UpdateIdentityClaimTypeDto input)
         {
-            var identityClaimType = await IdentityClaimTypeRepository.GetAsync(id);
+            var identityClaimType = await ClaimTypeRepository.GetAsync(id);
             identityClaimType.Required = input.Required;
             identityClaimType.Regex = input.Regex;
             identityClaimType.RegexDescription = input.RegexDescription;
             identityClaimType.Description = input.Description;
-            await IdentityClaimTypeManager.UpdateAsync(identityClaimType);
+            await ClaimTypeManager.UpdateAsync(identityClaimType);
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace SharpAbp.Abp.Identity
         [Authorize(IdentityPermissions.IdentityClaimTypes.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {
-            await IdentityClaimTypeRepository.DeleteAsync(id);
+            await ClaimTypeRepository.DeleteAsync(id);
         }
 
     }

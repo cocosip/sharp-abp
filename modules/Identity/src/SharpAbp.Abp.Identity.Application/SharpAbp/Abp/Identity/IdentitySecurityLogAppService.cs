@@ -11,10 +11,10 @@ namespace SharpAbp.Abp.Identity
     [Authorize(IdentityPermissions.IdentitySecurityLogs.Default)]
     public class IdentitySecurityLogAppService : IdentityAppServiceBase, IIdentitySecurityLogAppService
     {
-        protected IIdentitySecurityLogRepository IdentitySecurityLogRepository { get; }
-        public IdentitySecurityLogAppService(IIdentitySecurityLogRepository identitySecurityLogRepository)
+        protected IIdentitySecurityLogRepository SecurityLogRepository { get; }
+        public IdentitySecurityLogAppService(IIdentitySecurityLogRepository securityLogRepository)
         {
-            IdentitySecurityLogRepository = identitySecurityLogRepository;
+            SecurityLogRepository = securityLogRepository;
         }
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace SharpAbp.Abp.Identity
         [Authorize(IdentityPermissions.IdentitySecurityLogs.Default)]
         public virtual async Task<IdentitySecurityLogDto> GetAsync(Guid id)
         {
-            var identitySecurityLog = await IdentitySecurityLogRepository.GetAsync(id);
+            var identitySecurityLog = await SecurityLogRepository.GetAsync(id);
             return ObjectMapper.Map<IdentitySecurityLog, IdentitySecurityLogDto>(identitySecurityLog);
         }
 
@@ -37,7 +37,7 @@ namespace SharpAbp.Abp.Identity
         [Authorize(IdentityPermissions.IdentitySecurityLogs.Default)]
         public virtual async Task<PagedResultDto<IdentitySecurityLogDto>> GetPagedListAsync(IdentitySecurityLogPagedRequestDto input)
         {
-            var count = await IdentitySecurityLogRepository.GetCountAsync(
+            var count = await SecurityLogRepository.GetCountAsync(
                 input.StartTime,
                 input.EndTime,
                 input.ApplicationName,
@@ -48,7 +48,7 @@ namespace SharpAbp.Abp.Identity
                 input.ClientId,
                 input.CorrelationId);
 
-            var identitySecurityLogs = await IdentitySecurityLogRepository.GetListAsync(
+            var identitySecurityLogs = await SecurityLogRepository.GetListAsync(
                 input.Sorting,
                 input.MaxResultCount,
                 input.SkipCount,
@@ -76,7 +76,7 @@ namespace SharpAbp.Abp.Identity
         [Authorize(IdentityPermissions.IdentitySecurityLogs.Default)]
         public virtual async Task DeleteAsync(Guid id)
         {
-            await IdentitySecurityLogRepository.DeleteAsync(id);
+            await SecurityLogRepository.DeleteAsync(id);
         }
     }
 }

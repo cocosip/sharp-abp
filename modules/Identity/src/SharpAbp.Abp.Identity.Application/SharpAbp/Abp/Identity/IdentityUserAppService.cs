@@ -20,7 +20,7 @@ namespace SharpAbp.Abp.Identity
         protected IIdentityUserRepository UserRepository { get; }
         protected IIdentityRoleRepository RoleRepository { get; }
         protected IOrganizationUnitRepository OrganizationUnitRepository { get; }
-        protected IIdentityClaimTypeRepository IdentityClaimTypeRepository { get; }
+        protected IIdentityClaimTypeRepository ClaimTypeRepository { get; }
         protected IOptions<IdentityOptions> IdentityOptions { get; }
 
         public IdentityUserAppService(
@@ -28,14 +28,14 @@ namespace SharpAbp.Abp.Identity
             IIdentityUserRepository userRepository,
             IIdentityRoleRepository roleRepository,
             IOrganizationUnitRepository organizationUnitRepository,
-            IIdentityClaimTypeRepository identityClaimTypeRepository,
+            IIdentityClaimTypeRepository claimTypeRepository,
             IOptions<IdentityOptions> identityOptions)
         {
             UserManager = userManager;
             UserRepository = userRepository;
             RoleRepository = roleRepository;
             OrganizationUnitRepository = organizationUnitRepository;
-            IdentityClaimTypeRepository = identityClaimTypeRepository;
+            ClaimTypeRepository = claimTypeRepository;
             IdentityOptions = identityOptions;
         }
 
@@ -108,7 +108,7 @@ namespace SharpAbp.Abp.Identity
         [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Default)]
         public virtual async Task<List<IdentityClaimTypeDto>> GetAllClaimTypesAsync()
         {
-            var identityClaimTypes = await IdentityClaimTypeRepository.GetListAsync(false, default);
+            var identityClaimTypes = await ClaimTypeRepository.GetListAsync(false, default);
             return ObjectMapper.Map<List<IdentityClaimType>, List<IdentityClaimTypeDto>>(identityClaimTypes);
         }
 

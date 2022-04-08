@@ -18,15 +18,15 @@ namespace SharpAbp.Abp.Identity
         protected IdentityRoleManager RoleManager { get; }
         protected IIdentityRoleRepository RoleRepository { get; }
         protected IIdentityClaimTypeRepository IdentityClaimTypeRepository { get; }
-        protected IdentityRoleManager IdentityRoleManager { get; }
+
         public IdentityRoleAppService(
+            IdentityRoleManager roleManager,
             IIdentityRoleRepository roleRepository,
-            IIdentityClaimTypeRepository identityClaimTypeRepository,
-            IdentityRoleManager identityRoleManager)
+            IIdentityClaimTypeRepository identityClaimTypeRepository)
         {
+            RoleManager = roleManager;
             RoleRepository = roleRepository;
             IdentityClaimTypeRepository = identityClaimTypeRepository;
-            IdentityRoleManager = identityRoleManager;
         }
 
         /// <summary>
