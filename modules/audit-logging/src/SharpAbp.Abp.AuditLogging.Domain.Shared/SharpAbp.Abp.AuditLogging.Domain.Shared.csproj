@@ -21,8 +21,9 @@
 		<PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="$(MicrosoftPackageVersion)" />
 	</ItemGroup>
 
-	<!--<ItemGroup>
-		<Folder Include="SharpAbp\Abp\AuditLogging\Localization\Resources\" />
-	</ItemGroup>-->
+	<ItemGroup>
+		<EmbeddedResource Include="SharpAbp\Abp\AuditLogging\Localization\Resources\*.json" />
+		<Content Remove="SharpAbp\Abp\AuditLogging\Localization\Resources\*.json" />
+	</ItemGroup>
 
 </Project>

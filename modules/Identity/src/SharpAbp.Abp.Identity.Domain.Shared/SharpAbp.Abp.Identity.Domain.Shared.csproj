@@ -20,7 +20,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="SharpAbp\Abp\Identity\Localization\Resources\" />
+		<EmbeddedResource Include="SharpAbp\Abp\Identity\Localization\Resources\*.json" />
+		<Content Remove="SharpAbp\Abp\Identity\Localization\Resources\*.json" />
 	</ItemGroup>
 
 </Project>

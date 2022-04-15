@@ -19,4 +19,9 @@
 		<PackageReference Include="Volo.Abp.IdentityServer.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<EmbeddedResource Include="SharpAbp\Abp\IdentityServer\Localization\Resources\*.json" />
+		<Content Remove="SharpAbp\Abp\IdentityServer\Localization\Resources\*.json" />
+	</ItemGroup>
+
 </Project>
