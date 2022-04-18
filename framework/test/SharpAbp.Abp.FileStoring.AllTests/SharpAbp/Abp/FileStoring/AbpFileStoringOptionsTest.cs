@@ -14,10 +14,12 @@ namespace SharpAbp.Abp.FileStoring
     {
         private readonly IFileContainerConfigurationProvider _configurationProvider;
         private readonly AbpFileStoringOptions _options;
+        private readonly IFileContainerFactory _fileContainerFactory;
         public AbpFileStoringOptionsTest()
         {
             _configurationProvider = GetRequiredService<IFileContainerConfigurationProvider>();
             _options = GetRequiredService<IOptions<AbpFileStoringOptions>>().Value;
+            _fileContainerFactory = GetRequiredService<IFileContainerFactory>();
         }
 
 
@@ -103,7 +105,7 @@ namespace SharpAbp.Abp.FileStoring
         }
 
         [Fact]
-        public void Minio_Configuration_Test()
+        public async void Minio_Configuration_Test()
         {
             var configuration = _configurationProvider.Get("minio-container");
             Assert.Equal("Minio", configuration.Provider);
@@ -118,6 +120,11 @@ namespace SharpAbp.Abp.FileStoring
             Assert.Equal("SecretKey", minioConfiguration.SecretKey);
             Assert.False(minioConfiguration.WithSSL);
             Assert.True(minioConfiguration.CreateBucketIfNotExists);
+
+
+            //var container = _fileContainerFactory.Create("minio-test");
+            //var fileId = await container.SaveAsync("2022/04/18/1.dcm", "D:\\1.dcm", true);
+
         }
 
 

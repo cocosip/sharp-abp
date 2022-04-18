@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Timing;
 using System.Threading;
+using Volo.Abp;
 
 namespace SharpAbp.Abp.FileStoring.Minio
 {
@@ -47,10 +48,13 @@ namespace SharpAbp.Abp.FileStoring.Minio
                 await CreateBucketIfNotExists(client, containerName, args.CancellationToken);
             }
 
+            Check.NotNull(args.FileStream, "args stream");
+
             var putObjectArgs = new PutObjectArgs()
                 .WithBucket(containerName)
                 .WithObject(fileName)
-                .WithStreamData(args.FileStream);
+                .WithStreamData(args.FileStream)
+                .WithObjectSize(args.FileStream.Length);
 
             await client.PutObjectAsync(putObjectArgs, args.CancellationToken);
 
