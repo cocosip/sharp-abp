@@ -36,5 +36,7 @@ namespace SharpAbp.Abp.FileStoring
                 c.Configure(configuration);
             });
         }
+
+
     }
 }

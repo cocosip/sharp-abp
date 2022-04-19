@@ -6,6 +6,7 @@ using SharpAbp.Abp.FileStoring.FileSystem;
 using SharpAbp.Abp.FileStoring.Minio;
 using SharpAbp.Abp.FileStoring.S3;
 using System;
+using System.IO;
 using Xunit;
 
 namespace SharpAbp.Abp.FileStoring
@@ -105,7 +106,7 @@ namespace SharpAbp.Abp.FileStoring
         }
 
         [Fact]
-        public async void Minio_Configuration_Test()
+        public void Minio_Configuration_Test()
         {
             var configuration = _configurationProvider.Get("minio-container");
             Assert.Equal("Minio", configuration.Provider);
@@ -124,7 +125,7 @@ namespace SharpAbp.Abp.FileStoring
 
             //var container = _fileContainerFactory.Create("minio-test");
             //var fileId = await container.SaveAsync("2022/04/18/1.dcm", "D:\\1.dcm", true);
-
+            //await container.DownloadAsync(fileId, "D:\\2.dcm");
         }
 
 

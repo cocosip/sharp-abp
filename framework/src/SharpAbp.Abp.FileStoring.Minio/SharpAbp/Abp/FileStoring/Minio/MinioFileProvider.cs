@@ -105,11 +105,12 @@ namespace SharpAbp.Abp.FileStoring.Minio
             var getObjectArgs = new GetObjectArgs()
                 .WithBucket(containerName)
                 .WithObject(fileName)
-                .WithCallbackStream(async stream =>
+                .WithCallbackStream(stream =>
                 {
                     if (stream != null)
                     {
-                        await stream.CopyToAsync(memoryStream, args.CancellationToken);
+                        stream.CopyTo(memoryStream);
+                        memoryStream.Seek(0, SeekOrigin.Begin);
                     }
                     else
                     {

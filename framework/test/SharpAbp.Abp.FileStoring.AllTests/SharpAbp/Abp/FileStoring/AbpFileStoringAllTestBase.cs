@@ -9,5 +9,10 @@ namespace SharpAbp.Abp.FileStoring
         {
             options.UseAutofac();
         }
+
+        public override void Dispose()
+        {
+
+        }
     }
 }
