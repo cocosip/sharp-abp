@@ -91,7 +91,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.MassTransit.Ra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.MassTransit.Kafka", "src\SharpAbp.Abp.MassTransit.Kafka\SharpAbp.Abp.MassTransit.Kafka.csproj", "{9B21C424-1937-46FD-872F-F1656FAE4DC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.MassTransit.Tests", "test\SharpAbp.Abp.MassTransit.Tests\SharpAbp.Abp.MassTransit.Tests.csproj", "{230C45B0-6226-41B1-A3A3-96374B861B6D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.MassTransit.Tests", "test\SharpAbp.Abp.MassTransit.Tests\SharpAbp.Abp.MassTransit.Tests.csproj", "{230C45B0-6226-41B1-A3A3-96374B861B6D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
