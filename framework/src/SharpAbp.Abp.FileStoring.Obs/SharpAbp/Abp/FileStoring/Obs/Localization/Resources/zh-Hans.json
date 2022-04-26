@@ -1,0 +1,17 @@
+{
+  "culture": "zh-Hans",
+  "texts": {
+    "Aliyun.RegionId": "地区",
+    "Aliyun.Endpoint": "终结点",
+    "Aliyun.BucketName": "桶名",
+    "Aliyun.AccessKeyId": "AccessKeyId",
+    "Aliyun.AccessKeySecret": "AccessKeySecret",
+    "Aliyun.UseSecurityTokenService": "使用安全令牌服务",
+    "Aliyun.RoleArn": "角色名",
+    "Aliyun.RoleSessionName": "角色Session名",
+    "Aliyun.DurationSeconds": "临时凭据有效期",
+    "Aliyun.Policy": "代理",
+    "Aliyun.CreateContainerIfNotExists": "自动建桶",
+    "Aliyun.TemporaryCredentialsCacheKey": "临时凭证缓存Key"
+  }
+}

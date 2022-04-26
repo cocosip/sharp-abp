@@ -1,0 +1,17 @@
+{
+  "culture": "en",
+  "texts": {
+    "Aliyun.RegionId": "RegionId",
+    "Aliyun.Endpoint": "Endpoint",
+    "Aliyun.BucketName": "Bucket name",
+    "Aliyun.AccessKeyId": "AccessKeyId",
+    "Aliyun.AccessKeySecret": "AccessKeySecret",
+    "Aliyun.UseSecurityTokenService": "Use security token service",
+    "Aliyun.RoleArn": "Role name",
+    "Aliyun.RoleSessionName": "Role session name",
+    "Aliyun.DurationSeconds": "Duration seconds",
+    "Aliyun.Policy": "Policy",
+    "Aliyun.CreateContainerIfNotExists": "Create bucket if not exists",
+    "Aliyun.TemporaryCredentialsCacheKey": "Temporary credentials cache key"
+  }
+}
