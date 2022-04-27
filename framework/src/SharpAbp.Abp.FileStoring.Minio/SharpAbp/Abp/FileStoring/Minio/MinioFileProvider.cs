@@ -86,11 +86,11 @@ namespace SharpAbp.Abp.FileStoring.Minio
             }
 
             var memoryStream = new MemoryStream();
-            await client.GetObjectAsync(containerName, fileName, async stream =>
+            await client.GetObjectAsync(containerName, fileName, stream =>
             {
                 if (stream != null)
                 {
-                    await stream.CopyToAsync(memoryStream);
+                    stream.CopyTo(memoryStream);
                 }
                 else
                 {
@@ -127,7 +127,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
             var fileName = MinioFileNameCalculator.Calculate(args);
             var client = GetMinioClient(args);
             var containerName = GetContainerName(args);
-            
+
             if (!await FileExistsAsync(client, containerName, fileName))
             {
                 return string.Empty;
