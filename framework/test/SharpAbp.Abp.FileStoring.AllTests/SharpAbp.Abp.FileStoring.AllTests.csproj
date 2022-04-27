@@ -32,6 +32,7 @@
     <ProjectReference Include="..\..\src\SharpAbp.Abp.FileStoring.Minio\SharpAbp.Abp.FileStoring.Minio.csproj" />
     <ProjectReference Include="..\..\src\SharpAbp.Abp.FileStoring.Aws\SharpAbp.Abp.FileStoring.Aws.csproj" />
     <ProjectReference Include="..\..\src\SharpAbp.Abp.FileStoring.KS3\SharpAbp.Abp.FileStoring.KS3.csproj" />
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.FileStoring.Obs\SharpAbp.Abp.FileStoring.Obs.csproj" />
     <ProjectReference Include="..\..\src\SharpAbp.Abp.FileStoring.S3\SharpAbp.Abp.FileStoring.S3.csproj" />
   </ItemGroup>
 

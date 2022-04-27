@@ -31,12 +31,12 @@ namespace SharpAbp.Abp.FileStoring.Aws
 
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
-            var fileName = AwsFileNameCalculator.Calculate(args);
+            var objectKey = AwsFileNameCalculator.Calculate(args);
             var configuration = args.Configuration.GetAwsConfiguration();
             var containerName = GetContainerName(args);
 
             using var amazonS3Client = await GetAmazonS3Client(args);
-            if (!args.OverrideExisting && await FileExistsAsync(amazonS3Client, containerName, fileName))
+            if (!args.OverrideExisting && await FileExistsAsync(amazonS3Client, containerName, objectKey))
             {
                 throw new FileAlreadyExistsException(
                     $"Saving File '{args.FileId}' does already exists in the container '{containerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
@@ -50,7 +50,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             await amazonS3Client.PutObjectAsync(new PutObjectRequest
             {
                 BucketName = containerName,
-                Key = fileName,
+                Key = objectKey,
                 InputStream = args.FileStream
             });
 
@@ -59,11 +59,11 @@ namespace SharpAbp.Abp.FileStoring.Aws
 
         public override async Task<bool> DeleteAsync(FileProviderDeleteArgs args)
         {
-            var fileName = AwsFileNameCalculator.Calculate(args);
+            var objectKey = AwsFileNameCalculator.Calculate(args);
             var containerName = GetContainerName(args);
 
             using var amazonS3Client = await GetAmazonS3Client(args);
-            if (!await FileExistsAsync(amazonS3Client, containerName, fileName))
+            if (!await FileExistsAsync(amazonS3Client, containerName, objectKey))
             {
                 return false;
             }
@@ -71,7 +71,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             await amazonS3Client.DeleteObjectAsync(new DeleteObjectRequest
             {
                 BucketName = containerName,
-                Key = fileName
+                Key = objectKey
             });
 
             return true;
@@ -79,19 +79,19 @@ namespace SharpAbp.Abp.FileStoring.Aws
 
         public override async Task<bool> ExistsAsync(FileProviderExistsArgs args)
         {
-            var fileName = AwsFileNameCalculator.Calculate(args);
+            var objectKey = AwsFileNameCalculator.Calculate(args);
             var containerName = GetContainerName(args);
 
             using var amazonS3Client = await GetAmazonS3Client(args);
-            return await FileExistsAsync(amazonS3Client, containerName, fileName);
+            return await FileExistsAsync(amazonS3Client, containerName, objectKey);
         }
         public override async Task<Stream> GetOrNullAsync(FileProviderGetArgs args)
         {
-            var fileName = AwsFileNameCalculator.Calculate(args);
+            var objectKey = AwsFileNameCalculator.Calculate(args);
             var containerName = GetContainerName(args);
 
             using var amazonS3Client = await GetAmazonS3Client(args);
-            if (!await FileExistsAsync(amazonS3Client, containerName, fileName))
+            if (!await FileExistsAsync(amazonS3Client, containerName, objectKey))
             {
                 return null;
             }
@@ -99,7 +99,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             var response = await amazonS3Client.GetObjectAsync(new GetObjectRequest
             {
                 BucketName = containerName,
-                Key = fileName
+                Key = objectKey
             });
 
             return await TryCopyToMemoryStreamAsync(response.ResponseStream, args.CancellationToken);
@@ -107,11 +107,11 @@ namespace SharpAbp.Abp.FileStoring.Aws
 
         public override async Task<bool> DownloadAsync(FileProviderDownloadArgs args)
         {
-            var fileName = AwsFileNameCalculator.Calculate(args);
+            var objectKey = AwsFileNameCalculator.Calculate(args);
             var containerName = GetContainerName(args);
 
             using var amazonS3Client = await GetAmazonS3Client(args);
-            if (!await FileExistsAsync(amazonS3Client, containerName, fileName))
+            if (!await FileExistsAsync(amazonS3Client, containerName, objectKey))
             {
                 return false;
             }
@@ -119,7 +119,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             var response = await amazonS3Client.GetObjectAsync(new GetObjectRequest
             {
                 BucketName = containerName,
-                Key = fileName
+                Key = objectKey
             });
 
             await TryWriteToFileAsync(response.ResponseStream, args.Path, args.CancellationToken);
@@ -133,11 +133,11 @@ namespace SharpAbp.Abp.FileStoring.Aws
                 return string.Empty;
             }
 
-            var fileName = AwsFileNameCalculator.Calculate(args);
+            var objectKey = AwsFileNameCalculator.Calculate(args);
             var containerName = GetContainerName(args);
 
             using var amazonS3Client = await GetAmazonS3Client(args);
-            if (!await FileExistsAsync(amazonS3Client, containerName, fileName))
+            if (!await FileExistsAsync(amazonS3Client, containerName, objectKey))
             {
                 return string.Empty;
             }
@@ -146,7 +146,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             var url = amazonS3Client.GetPreSignedURL(new GetPreSignedUrlRequest()
             {
                 BucketName = containerName,
-                Key = fileName,
+                Key = objectKey,
                 Expires = datetime
             });
 
@@ -196,8 +196,8 @@ namespace SharpAbp.Abp.FileStoring.Aws
 
         protected virtual async Task<AmazonS3Client> GetAmazonS3Client(FileProviderArgs args)
         {
-            var configuration = args.Configuration.GetAwsConfiguration();
-            return await AmazonS3ClientFactory.GetAmazonS3Client(configuration);
+            var awsConfiguration = args.Configuration.GetAwsConfiguration();
+            return await AmazonS3ClientFactory.GetAmazonS3Client(awsConfiguration);
         }
 
         protected virtual string GetContainerName(FileProviderArgs args)

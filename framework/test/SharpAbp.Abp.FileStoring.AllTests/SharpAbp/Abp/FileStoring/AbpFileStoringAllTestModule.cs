@@ -6,6 +6,7 @@ using SharpAbp.Abp.FileStoring.FastDFS;
 using SharpAbp.Abp.FileStoring.FileSystem;
 using SharpAbp.Abp.FileStoring.KS3;
 using SharpAbp.Abp.FileStoring.Minio;
+using SharpAbp.Abp.FileStoring.Obs;
 using SharpAbp.Abp.FileStoring.S3;
 using Volo.Abp;
 using Volo.Abp.Autofac;
@@ -15,6 +16,7 @@ namespace SharpAbp.Abp.FileStoring
 {
     [DependsOn(
        typeof(AbpFileStoringAliyunModule),
+       typeof(AbpFileStoringObsModule),
        typeof(AbpFileStoringFastDFSModule),
        typeof(AbpFileStoringAzureModule),
        typeof(AbpFileStoringAwsModule),

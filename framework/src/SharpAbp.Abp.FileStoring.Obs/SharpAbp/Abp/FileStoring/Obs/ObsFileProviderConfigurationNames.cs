@@ -9,5 +9,7 @@
         public const string BucketName = "Obs.BucketName";
         public const string AccessKeyId = "Obs.AccessKeyId";
         public const string AccessKeySecret = "Obs.AccessKeySecret";
+
+        public const string CreateContainerIfNotExists = "Obs.CreateContainerIfNotExists";
     }
 }

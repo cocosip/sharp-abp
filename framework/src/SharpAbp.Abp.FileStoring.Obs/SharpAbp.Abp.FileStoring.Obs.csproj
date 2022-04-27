@@ -16,16 +16,17 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="HuaweiCloud.OBS.SDK" Version="3.20.7" />
+		<PackageReference Include="Volo.Abp.Timing" Version="$(VoloAbpPackageVersion)" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\SharpAbp.Abp.FileStoring\SharpAbp.Abp.FileStoring.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<EmbeddedResource Include="SharpAbp\Abp\FileStoring\Obs\Localization\Resources\*.json" />
 		<Content Remove="SharpAbp\Abp\FileStoring\Obs\Localization\Resources\*.json" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <PackageReference Include="HuaweiCloud.OBS.SDK" Version="3.20.7" />
 	</ItemGroup>
 
 

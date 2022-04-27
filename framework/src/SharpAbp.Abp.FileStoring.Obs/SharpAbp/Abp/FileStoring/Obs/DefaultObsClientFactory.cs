@@ -1,7 +1,5 @@
 ﻿using OBS;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.FileStoring.Obs
@@ -11,14 +9,10 @@ namespace SharpAbp.Abp.FileStoring.Obs
 
         public virtual ObsClient Create(ObsFileProviderConfiguration configuration)
         {
-            var config = new ObsConfig()
-            {
-            };
-            var client = new ObsClient("", "", "",new ObsConfig())
-            {
-
-            };
-            return client;
+            Check.NotNullOrWhiteSpace(configuration.AccessKeyId, nameof(configuration.AccessKeyId));
+            Check.NotNullOrWhiteSpace(configuration.AccessKeySecret, nameof(configuration.AccessKeySecret));
+            Check.NotNullOrWhiteSpace(configuration.Endpoint, nameof(configuration.Endpoint));
+            return new ObsClient(configuration.Endpoint, configuration.AccessKeyId, configuration.AccessKeySecret);
         }
 
     }

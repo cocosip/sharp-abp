@@ -158,10 +158,13 @@ namespace SharpAbp.Abp.FileStoring
         public void FileProviders_Test()
         {
             var fileProviderConfigurations = _options.Providers.GetFileProviders();
-            Assert.Equal(8, fileProviderConfigurations.Count);
+            Assert.Equal(9, fileProviderConfigurations.Count);
 
             var aliyunProviderConfiguration = _options.Providers.GetConfiguration("Aliyun");
             Assert.Equal("Aliyun", aliyunProviderConfiguration.Provider);
+
+            var obsProviderConfiguration = _options.Providers.GetConfiguration("Obs");
+            Assert.Equal("Obs", obsProviderConfiguration.Provider);
 
             var azureProviderConfiguration = _options.Providers.GetConfiguration("Azure");
             Assert.Equal("Azure", azureProviderConfiguration.Provider);
