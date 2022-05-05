@@ -40,12 +40,13 @@ namespace SharpAbp.Abp.FileStoring.S3
 
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
-            var fileName = FileNameCalculator.Calculate(args);
+            var containerName = GetContainerName(args);
+            var objectKey = FileNameCalculator.Calculate(args);
             var configuration = args.Configuration.GetS3Configuration();
             var client = GetS3Client(args);
-            var containerName = GetContainerName(args);
+        
 
-            if (!args.OverrideExisting && await FileExistsAsync(client, containerName, fileName, args.CancellationToken))
+            if (!args.OverrideExisting && await FileExistsAsync(client, containerName, objectKey, args.CancellationToken))
             {
                 throw new FileAlreadyExistsException($"Saving File '{args.FileId}' does already exists in the container '{containerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
             }
@@ -57,11 +58,11 @@ namespace SharpAbp.Abp.FileStoring.S3
 
             if (configuration.EnableSlice && (args.FileStream.Length > configuration.SliceSize))
             {
-                await MultipartUploadAsync(client, containerName, fileName, args.FileStream, configuration.UseChunkEncoding, configuration.SliceSize);
+                await MultipartUploadAsync(client, containerName, objectKey, args.FileStream, configuration.UseChunkEncoding, configuration.SliceSize);
             }
             else
             {
-                await SingleUploadAsync(client, containerName, fileName, args.FileStream, configuration.UseChunkEncoding);
+                await SingleUploadAsync(client, containerName, objectKey, args.FileStream, configuration.UseChunkEncoding);
             }
 
             args.FileStream?.Dispose();
@@ -71,13 +72,14 @@ namespace SharpAbp.Abp.FileStoring.S3
 
         public override async Task<bool> DeleteAsync(FileProviderDeleteArgs args)
         {
-            var fileName = FileNameCalculator.Calculate(args);
-            var client = GetS3Client(args);
             var containerName = GetContainerName(args);
+            var objectKey = FileNameCalculator.Calculate(args);
+            var client = GetS3Client(args);
+      
 
-            if (await FileExistsAsync(client, containerName, fileName, args.CancellationToken))
+            if (await FileExistsAsync(client, containerName, objectKey, args.CancellationToken))
             {
-                await client.DeleteAsync(containerName, fileName, null, args.CancellationToken);
+                await client.DeleteAsync(containerName, objectKey, null, args.CancellationToken);
                 return true;
             }
 
@@ -86,36 +88,36 @@ namespace SharpAbp.Abp.FileStoring.S3
 
         public override async Task<bool> ExistsAsync(FileProviderExistsArgs args)
         {
-            var fileName = FileNameCalculator.Calculate(args);
-            var client = GetS3Client(args);
             var containerName = GetContainerName(args);
+            var objectKey = FileNameCalculator.Calculate(args);
+            var client = GetS3Client(args);
 
-            return await FileExistsAsync(client, containerName, fileName, args.CancellationToken);
+            return await FileExistsAsync(client, containerName, objectKey, args.CancellationToken);
         }
 
         public override async Task<bool> DownloadAsync(FileProviderDownloadArgs args)
         {
-            var fileName = FileNameCalculator.Calculate(args);
-            var client = GetS3Client(args);
             var containerName = GetContainerName(args);
+            var objectKey = FileNameCalculator.Calculate(args);
+            var client = GetS3Client(args);
 
-            var getObjectResponse = await client.GetObjectAsync(containerName, fileName);
+            var getObjectResponse = await client.GetObjectAsync(containerName, objectKey);
             await getObjectResponse.WriteResponseStreamToFileAsync(args.Path, true, args.CancellationToken);
             return true;
         }
 
         public override async Task<Stream> GetOrNullAsync(FileProviderGetArgs args)
         {
-            var fileName = FileNameCalculator.Calculate(args);
-            var client = GetS3Client(args);
             var containerName = GetContainerName(args);
+            var objectKey = FileNameCalculator.Calculate(args);
+            var client = GetS3Client(args);
 
-            if (!await FileExistsAsync(client, containerName, fileName, args.CancellationToken))
+            if (!await FileExistsAsync(client, containerName, objectKey, args.CancellationToken))
             {
                 return null;
             }
 
-            var getObjectResponse = await client.GetObjectAsync(containerName, fileName);
+            var getObjectResponse = await client.GetObjectAsync(containerName, objectKey);
             if (getObjectResponse.ResponseStream != null)
             {
                 var memoryStream = new MemoryStream();
@@ -125,22 +127,28 @@ namespace SharpAbp.Abp.FileStoring.S3
             return null;
         }
 
-        public override Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)
+        public override async Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)
         {
             if (!args.Configuration.HttpAccess)
             {
-                return Task.FromResult(string.Empty);
+                return string.Empty;
             }
 
-            var fileName = FileNameCalculator.Calculate(args);
-            var client = GetS3Client(args);
             var containerName = GetContainerName(args);
+            var objectKey = FileNameCalculator.Calculate(args);
+            var client = GetS3Client(args);
+           
             var configuration = args.Configuration.GetS3Configuration();
+
+            if (args.CheckFileExist && !await FileExistsAsync(client, containerName, objectKey, args.CancellationToken))
+            {
+                return string.Empty;
+            }
 
             var preSignedUrlRequest = new GetPreSignedUrlRequest()
             {
                 BucketName = containerName,
-                Key = fileName,
+                Key = objectKey,
                 Protocol = (Protocol)configuration.Protocol
             };
 
@@ -148,7 +156,7 @@ namespace SharpAbp.Abp.FileStoring.S3
 
             var accessUrl = client.GetPreSignedURL(preSignedUrlRequest);
 
-            return Task.FromResult(accessUrl);
+            return accessUrl;
         }
 
 

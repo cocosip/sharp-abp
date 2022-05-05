@@ -107,18 +107,23 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
                 });
         }
 
-        public override Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)
+        public override async Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)
         {
             if (!args.Configuration.HttpAccess)
             {
-                return Task.FromResult(string.Empty);
+                return string.Empty;
             }
 
             var configuration = args.Configuration.GetFileSystemConfiguration();
             var relativePath = CalculateRelativePath(args);
+            var filePath = FilePathCalculator.Calculate(args);
+            if (args.CheckFileExist && !await ExistsAsync(filePath))
+            {
+                return string.Empty;
+            }
 
             var accessUrl = BuildAccessUrl(configuration, relativePath);
-            return Task.FromResult(accessUrl);
+            return accessUrl;
         }
 
 

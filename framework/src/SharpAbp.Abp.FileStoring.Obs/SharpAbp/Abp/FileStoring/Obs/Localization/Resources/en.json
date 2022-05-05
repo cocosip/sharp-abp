@@ -1,0 +1,11 @@
+{
+  "culture": "en",
+  "texts": {
+    "Obs.RegionId": "RegionId",
+    "Obs.Endpoint": "Endpoint",
+    "Obs.BucketName": "Bucket name",
+    "Obs.AccessKeyId": "AccessKeyId",
+    "Obs.AccessKeySecret": "AccessKeySecret",
+    "Obs.CreateContainerIfNotExists": "Create bucket if not exists"
+  }
+}

@@ -36,22 +36,22 @@ namespace SharpAbp.Abp.FileStoring.KS3
 
         protected virtual IKS3 GetKS3Client(FileContainerConfiguration fileContainerConfiguration)
         {
-            var ks3Config = fileContainerConfiguration.GetKS3Configuration();
-            return KS3ClientFactory.Create(ks3Config);
+            var ks3Configuration = fileContainerConfiguration.GetKS3Configuration();
+            return KS3ClientFactory.Create(ks3Configuration);
         }
 
-        protected virtual IKS3 GetKS3Client(KS3FileProviderConfiguration ks3Config)
+        protected virtual IKS3 GetKS3Client(KS3FileProviderConfiguration ks3Configuration)
         {
-            return KS3ClientFactory.Create(ks3Config);
+            return KS3ClientFactory.Create(ks3Configuration);
         }
 
         public override Task<string> SaveAsync(FileProviderSaveArgs args)
         {
             var containerName = GetContainerName(args);
-            var fileName = KS3FileNameCalculator.Calculate(args);
+            var objectKey = KS3FileNameCalculator.Calculate(args);
             var ks3Config = args.Configuration.GetKS3Configuration();
             var ks3Client = GetKS3Client(ks3Config);
-            if (!args.OverrideExisting && FileExists(ks3Client, containerName, fileName))
+            if (!args.OverrideExisting && FileExists(ks3Client, containerName, objectKey))
             {
                 throw new FileAlreadyExistsException($"Saving FILE '{args.FileId}' does already exists in the container '{containerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
             }
@@ -63,41 +63,41 @@ namespace SharpAbp.Abp.FileStoring.KS3
                 }
             }
 
-            ks3Client.PutObject(containerName, fileName, args.FileStream, new KS3SDK.Model.ObjectMetadata());
+            ks3Client.PutObject(containerName, objectKey, args.FileStream, new KS3SDK.Model.ObjectMetadata());
             return Task.FromResult(args.FileId);
         }
 
         public override Task<bool> DeleteAsync(FileProviderDeleteArgs args)
         {
             var containerName = GetContainerName(args);
-            var fileName = KS3FileNameCalculator.Calculate(args);
+            var objectKey = KS3FileNameCalculator.Calculate(args);
             var ks3Client = GetKS3Client(args.Configuration);
-            if (!FileExists(ks3Client, containerName, fileName))
+            if (!FileExists(ks3Client, containerName, objectKey))
             {
                 return Task.FromResult(false);
             }
-            ks3Client.DeleteObject(containerName, fileName);
+            ks3Client.DeleteObject(containerName, objectKey);
             return Task.FromResult(true);
         }
 
         public override Task<bool> ExistsAsync(FileProviderExistsArgs args)
         {
             var containerName = GetContainerName(args);
-            var fileName = KS3FileNameCalculator.Calculate(args);
+            var objectKey = KS3FileNameCalculator.Calculate(args);
             var ks3Client = GetKS3Client(args.Configuration);
-            return Task.FromResult(FileExists(ks3Client, containerName, fileName));
+            return Task.FromResult(FileExists(ks3Client, containerName, objectKey));
         }
 
         public override async Task<Stream> GetOrNullAsync(FileProviderGetArgs args)
         {
             var containerName = GetContainerName(args);
-            var blobName = KS3FileNameCalculator.Calculate(args);
+            var objectKey = KS3FileNameCalculator.Calculate(args);
             var ks3Client = GetKS3Client(args.Configuration);
-            if (!FileExists(ks3Client, containerName, blobName))
+            if (!FileExists(ks3Client, containerName, objectKey))
             {
                 return null;
             }
-            var result = ks3Client.GetObject(containerName, blobName);
+            var result = ks3Client.GetObject(containerName, objectKey);
 
             return await TryCopyToMemoryStreamAsync(result.ObjectContent, args.CancellationToken);
         }
@@ -105,14 +105,14 @@ namespace SharpAbp.Abp.FileStoring.KS3
         public override async Task<bool> DownloadAsync(FileProviderDownloadArgs args)
         {
             var containerName = GetContainerName(args);
-            var fileName = KS3FileNameCalculator.Calculate(args);
+            var objectKey = KS3FileNameCalculator.Calculate(args);
             var ks3Client = GetKS3Client(args.Configuration);
-            if (!FileExists(ks3Client, containerName, fileName))
+            if (!FileExists(ks3Client, containerName, objectKey))
             {
                 return false;
             }
 
-            var result = ks3Client.GetObject(containerName, fileName);
+            var result = ks3Client.GetObject(containerName, objectKey);
             await TryWriteToFileAsync(result.ObjectContent, args.Path, args.CancellationToken);
             return true;
         }
@@ -125,16 +125,16 @@ namespace SharpAbp.Abp.FileStoring.KS3
             }
 
             var containerName = GetContainerName(args);
-            var fileName = KS3FileNameCalculator.Calculate(args);
+            var objectKey = KS3FileNameCalculator.Calculate(args);
             var ks3Client = GetKS3Client(args.Configuration);
 
-            if (!FileExists(ks3Client, containerName, fileName))
+            if (args.CheckFileExist && !FileExists(ks3Client, containerName, objectKey))
             {
                 return Task.FromResult(string.Empty);
             }
 
             var datetime = args.Expires ?? Clock.Now.AddSeconds(600);
-            var uri = ks3Client.GeneratePresignedUrl(containerName, fileName, datetime);
+            var uri = ks3Client.GeneratePresignedUrl(containerName, objectKey, datetime);
 
             return Task.FromResult(uri.ToString());
         }

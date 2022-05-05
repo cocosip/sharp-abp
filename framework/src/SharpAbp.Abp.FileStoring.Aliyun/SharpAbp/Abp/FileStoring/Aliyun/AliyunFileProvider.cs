@@ -30,22 +30,22 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
 
         protected virtual IOss GetOssClient(FileContainerConfiguration fileContainerConfiguration)
         {
-            var aliyunConfig = fileContainerConfiguration.GetAliyunConfiguration();
-            return OssClientFactory.Create(aliyunConfig);
+            var aliyunConfiguration = fileContainerConfiguration.GetAliyunConfiguration();
+            return OssClientFactory.Create(aliyunConfiguration);
         }
 
-        protected virtual IOss GetOssClient(AliyunFileProviderConfiguration aliyunConfig)
+        protected virtual IOss GetOssClient(AliyunFileProviderConfiguration aliyunConfiguration)
         {
-            return OssClientFactory.Create(aliyunConfig);
+            return OssClientFactory.Create(aliyunConfiguration);
         }
 
         public override Task<string> SaveAsync(FileProviderSaveArgs args)
         {
             var containerName = GetContainerName(args);
-            var fileName = AliyunFileNameCalculator.Calculate(args);
+            var objectKey = AliyunFileNameCalculator.Calculate(args);
             var aliyunConfig = args.Configuration.GetAliyunConfiguration();
             var ossClient = GetOssClient(aliyunConfig);
-            if (!args.OverrideExisting && FileExistsAsync(ossClient, containerName, fileName))
+            if (!args.OverrideExisting && FileExistsAsync(ossClient, containerName, objectKey))
             {
                 throw new FileAlreadyExistsException($"Saving FILE '{args.FileId}' does already exists in the container '{containerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
             }
@@ -57,41 +57,41 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
                 }
             }
 
-            ossClient.PutObject(containerName, fileName, args.FileStream);
+            ossClient.PutObject(containerName, objectKey, args.FileStream);
             return Task.FromResult(args.FileId);
         }
 
         public override Task<bool> DeleteAsync(FileProviderDeleteArgs args)
         {
             var containerName = GetContainerName(args);
-            var fileName = AliyunFileNameCalculator.Calculate(args);
+            var objectKey = AliyunFileNameCalculator.Calculate(args);
             var ossClient = GetOssClient(args.Configuration);
-            if (!FileExistsAsync(ossClient, containerName, fileName))
+            if (!FileExistsAsync(ossClient, containerName, objectKey))
             {
                 return Task.FromResult(false);
             }
-            ossClient.DeleteObject(containerName, fileName);
+            ossClient.DeleteObject(containerName, objectKey);
             return Task.FromResult(true);
         }
 
         public override Task<bool> ExistsAsync(FileProviderExistsArgs args)
         {
             var containerName = GetContainerName(args);
-            var blobName = AliyunFileNameCalculator.Calculate(args);
+            var objectKey = AliyunFileNameCalculator.Calculate(args);
             var ossClient = GetOssClient(args.Configuration);
-            return Task.FromResult(FileExistsAsync(ossClient, containerName, blobName));
+            return Task.FromResult(FileExistsAsync(ossClient, containerName, objectKey));
         }
 
         public override async Task<Stream> GetOrNullAsync(FileProviderGetArgs args)
         {
             var containerName = GetContainerName(args);
-            var blobName = AliyunFileNameCalculator.Calculate(args);
+            var objectKey = AliyunFileNameCalculator.Calculate(args);
             var ossClient = GetOssClient(args.Configuration);
-            if (!FileExistsAsync(ossClient, containerName, blobName))
+            if (!FileExistsAsync(ossClient, containerName, objectKey))
             {
                 return null;
             }
-            var result = ossClient.GetObject(containerName, blobName);
+            var result = ossClient.GetObject(containerName, objectKey);
 
             return await TryCopyToMemoryStreamAsync(result.Content, args.CancellationToken);
         }
@@ -99,14 +99,14 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
         public override async Task<bool> DownloadAsync(FileProviderDownloadArgs args)
         {
             var containerName = GetContainerName(args);
-            var fileName = AliyunFileNameCalculator.Calculate(args);
+            var objectKey = AliyunFileNameCalculator.Calculate(args);
             var ossClient = GetOssClient(args.Configuration);
-            if (!FileExistsAsync(ossClient, containerName, fileName))
+            if (!FileExistsAsync(ossClient, containerName, objectKey))
             {
                 return false;
             }
 
-            var result = ossClient.GetObject(containerName, fileName);
+            var result = ossClient.GetObject(containerName, objectKey);
             await TryWriteToFileAsync(result.Content, args.Path, args.CancellationToken);
             return true;
         }
@@ -119,16 +119,16 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             }
 
             var containerName = GetContainerName(args);
-            var fileName = AliyunFileNameCalculator.Calculate(args);
+            var objectKey = AliyunFileNameCalculator.Calculate(args);
             var ossClient = GetOssClient(args.Configuration);
 
-            if (!FileExistsAsync(ossClient, containerName, fileName))
+            if (args.CheckFileExist && !FileExistsAsync(ossClient, containerName, objectKey))
             {
                 return Task.FromResult(string.Empty);
             }
 
             var datetime = args.Expires ?? Clock.Now.AddSeconds(600);
-            var uri = ossClient.GeneratePresignedUri(containerName, fileName, datetime);
+            var uri = ossClient.GeneratePresignedUri(containerName, objectKey, datetime);
 
             return Task.FromResult(uri.ToString());
         }

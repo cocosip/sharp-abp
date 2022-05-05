@@ -1,0 +1,11 @@
+{
+  "culture": "zh-Hant",
+  "texts": {
+    "Obs.RegionId": "地區",
+    "Obs.Endpoint": "終結點",
+    "Obs.BucketName": "桶名",
+    "Obs.AccessKeyId": "AccessKeyId",
+    "Obs.AccessKeySecret": "AccessKeySecret",
+    "Obs.CreateContainerIfNotExists": "自動建桶"
+  }
+}

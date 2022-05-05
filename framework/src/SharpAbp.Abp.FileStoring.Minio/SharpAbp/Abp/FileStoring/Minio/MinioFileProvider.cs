@@ -33,12 +33,12 @@ namespace SharpAbp.Abp.FileStoring.Minio
 
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
-            var fileName = MinioFileNameCalculator.Calculate(args);
+            var objectKey = MinioFileNameCalculator.Calculate(args);
             var configuration = args.Configuration.GetMinioConfiguration();
             var client = GetMinioClient(args);
             var containerName = GetContainerName(args);
 
-            if (!args.OverrideExisting && await FileExistsAsync(client, containerName, fileName, args.CancellationToken))
+            if (!args.OverrideExisting && await FileExistsAsync(client, containerName, objectKey, args.CancellationToken))
             {
                 throw new FileAlreadyExistsException($"Saving File '{args.FileId}' does already exists in the container '{containerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
             }
@@ -52,7 +52,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
 
             var putObjectArgs = new PutObjectArgs()
                 .WithBucket(containerName)
-                .WithObject(fileName)
+                .WithObject(objectKey)
                 .WithStreamData(args.FileStream)
                 .WithObjectSize(args.FileStream.Length);
 
@@ -64,15 +64,15 @@ namespace SharpAbp.Abp.FileStoring.Minio
 
         public override async Task<bool> DeleteAsync(FileProviderDeleteArgs args)
         {
-            var fileName = MinioFileNameCalculator.Calculate(args);
+            var objectKey = MinioFileNameCalculator.Calculate(args);
             var client = GetMinioClient(args);
             var containerName = GetContainerName(args);
 
-            if (await FileExistsAsync(client, containerName, fileName, args.CancellationToken))
+            if (await FileExistsAsync(client, containerName, objectKey, args.CancellationToken))
             {
                 var removeObjectArgs = new RemoveObjectArgs()
                     .WithBucket(containerName)
-                    .WithObject(fileName);
+                    .WithObject(objectKey);
 
                 await client.RemoveObjectAsync(removeObjectArgs, args.CancellationToken);
                 return true;
@@ -83,20 +83,20 @@ namespace SharpAbp.Abp.FileStoring.Minio
 
         public override async Task<bool> ExistsAsync(FileProviderExistsArgs args)
         {
-            var fileName = MinioFileNameCalculator.Calculate(args);
+            var objectKey = MinioFileNameCalculator.Calculate(args);
             var client = GetMinioClient(args);
             var containerName = GetContainerName(args);
 
-            return await FileExistsAsync(client, containerName, fileName, args.CancellationToken);
+            return await FileExistsAsync(client, containerName, objectKey, args.CancellationToken);
         }
 
         public override async Task<Stream> GetOrNullAsync(FileProviderGetArgs args)
         {
-            var fileName = MinioFileNameCalculator.Calculate(args);
+            var objectKey = MinioFileNameCalculator.Calculate(args);
             var client = GetMinioClient(args);
             var containerName = GetContainerName(args);
 
-            if (!await FileExistsAsync(client, containerName, fileName))
+            if (!await FileExistsAsync(client, containerName, objectKey))
             {
                 return null;
             }
@@ -104,7 +104,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
             var memoryStream = new MemoryStream();
             var getObjectArgs = new GetObjectArgs()
                 .WithBucket(containerName)
-                .WithObject(fileName)
+                .WithObject(objectKey)
                 .WithCallbackStream(stream =>
                 {
                     if (stream != null)
@@ -124,18 +124,18 @@ namespace SharpAbp.Abp.FileStoring.Minio
 
         public override async Task<bool> DownloadAsync(FileProviderDownloadArgs args)
         {
-            var fileName = MinioFileNameCalculator.Calculate(args);
+            var objectKey = MinioFileNameCalculator.Calculate(args);
             var client = GetMinioClient(args);
             var containerName = GetContainerName(args);
 
-            if (!await FileExistsAsync(client, containerName, fileName, args.CancellationToken))
+            if (!await FileExistsAsync(client, containerName, objectKey, args.CancellationToken))
             {
                 return false;
             }
 
             var getObjectArgs = new GetObjectArgs()
                 .WithBucket(containerName)
-                .WithObject(fileName)
+                .WithObject(objectKey)
                 .WithFile(args.Path);
 
             await client.GetObjectAsync(getObjectArgs, args.CancellationToken);
@@ -149,11 +149,11 @@ namespace SharpAbp.Abp.FileStoring.Minio
                 return string.Empty;
             }
 
-            var fileName = MinioFileNameCalculator.Calculate(args);
+            var objectKey = MinioFileNameCalculator.Calculate(args);
             var client = GetMinioClient(args);
             var containerName = GetContainerName(args);
 
-            if (!await FileExistsAsync(client, containerName, fileName, args.CancellationToken))
+            if (args.CheckFileExist && !await FileExistsAsync(client, containerName, objectKey, args.CancellationToken))
             {
                 return string.Empty;
             }
@@ -165,7 +165,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
             }
             var presignedGetObjectArgs = new PresignedGetObjectArgs()
                 .WithBucket(containerName)
-                .WithObject(fileName)
+                .WithObject(objectKey)
                 .WithExpiry(expiresInt);
 
             return await client.PresignedGetObjectAsync(presignedGetObjectArgs);
@@ -174,11 +174,11 @@ namespace SharpAbp.Abp.FileStoring.Minio
 
         protected virtual MinioClient GetMinioClient(FileProviderArgs args)
         {
-            var configuration = args.Configuration.GetMinioConfiguration();
+            var minioConfiguration = args.Configuration.GetMinioConfiguration();
             var client = new MinioClient()
-                .WithEndpoint(configuration.EndPoint)
-                .WithCredentials(configuration.AccessKey, configuration.SecretKey);
-            if (configuration.WithSSL)
+                .WithEndpoint(minioConfiguration.EndPoint)
+                .WithCredentials(minioConfiguration.AccessKey, minioConfiguration.SecretKey);
+            if (minioConfiguration.WithSSL)
             {
                 client.WithSSL();
             }
