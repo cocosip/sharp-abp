@@ -110,11 +110,13 @@ namespace SharpAbp.Abp.FileStoring
         /// </summary>
         /// <param name="fileId">The name of the file</param>
         /// <param name="expires">Expires time</param>
+        /// <param name="checkFileExist">Check file exist or not</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns></returns>
         Task<string> GetAccessUrlAsync(
             string fileId,
             DateTime? expires = null,
+            bool checkFileExist = false,
             CancellationToken cancellationToken = default
         );
 

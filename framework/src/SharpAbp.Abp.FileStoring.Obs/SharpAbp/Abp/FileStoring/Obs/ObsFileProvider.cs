@@ -136,7 +136,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
             var objectKey = ObsFileNameCalculator.Calculate(args);
             var obsClient = GetObsClient(args.Configuration);
 
-            if (!FileExistsAsync(obsClient, containerName, objectKey))
+            if (args.CheckFileExist && !FileExistsAsync(obsClient, containerName, objectKey))
             {
                 return Task.FromResult(string.Empty);
             }

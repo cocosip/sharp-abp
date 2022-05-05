@@ -128,7 +128,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
             var objectKey = KS3FileNameCalculator.Calculate(args);
             var ks3Client = GetKS3Client(args.Configuration);
 
-            if (!FileExists(ks3Client, containerName, objectKey))
+            if (args.CheckFileExist && !FileExists(ks3Client, containerName, objectKey))
             {
                 return Task.FromResult(string.Empty);
             }

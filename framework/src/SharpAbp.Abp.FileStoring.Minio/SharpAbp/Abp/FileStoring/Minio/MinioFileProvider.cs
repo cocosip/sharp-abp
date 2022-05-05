@@ -153,7 +153,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
             var client = GetMinioClient(args);
             var containerName = GetContainerName(args);
 
-            if (!await FileExistsAsync(client, containerName, objectKey, args.CancellationToken))
+            if (args.CheckFileExist && !await FileExistsAsync(client, containerName, objectKey, args.CancellationToken))
             {
                 return string.Empty;
             }

@@ -95,11 +95,13 @@ namespace SharpAbp.Abp.FileStoring
         public Task<string> GetAccessUrlAsync(
             string fileId,
             DateTime? expires = null,
+            bool checkFileExist = false,
             CancellationToken cancellationToken = default)
         {
             return _container.GetAccessUrlAsync(
                fileId,
                expires,
+               checkFileExist,
                cancellationToken
            );
         }
@@ -261,6 +263,7 @@ namespace SharpAbp.Abp.FileStoring
         public virtual async Task<string> GetAccessUrlAsync(
             string fileId,
             DateTime? expires = null,
+            bool checkFileExist = false,
             CancellationToken cancellationToken = default)
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
@@ -273,6 +276,7 @@ namespace SharpAbp.Abp.FileStoring
                         Configuration,
                         fileNormalizeNaming.FileName,
                         expires,
+                        checkFileExist,
                         CancellationTokenProvider.FallbackToProvider(cancellationToken)
                     )
                 );

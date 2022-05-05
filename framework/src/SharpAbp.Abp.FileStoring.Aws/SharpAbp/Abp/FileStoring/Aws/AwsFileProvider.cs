@@ -137,7 +137,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             var containerName = GetContainerName(args);
 
             using var amazonS3Client = await GetAmazonS3Client(args);
-            if (!await FileExistsAsync(amazonS3Client, containerName, objectKey))
+            if (args.CheckFileExist && !await FileExistsAsync(amazonS3Client, containerName, objectKey))
             {
                 return string.Empty;
             }
@@ -155,7 +155,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
 
 
         protected virtual async Task<bool> FileExistsAsync(
-            AmazonS3Client amazonS3Client, 
+            AmazonS3Client amazonS3Client,
             string containerName,
             string fileName)
         {
@@ -182,7 +182,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
         }
 
         protected virtual async Task CreateContainerIfNotExists(
-            AmazonS3Client amazonS3Client, 
+            AmazonS3Client amazonS3Client,
             string containerName)
         {
             if (!await AmazonS3Util.DoesS3BucketExistV2Async(amazonS3Client, containerName))

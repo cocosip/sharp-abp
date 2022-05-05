@@ -122,7 +122,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             var objectKey = AliyunFileNameCalculator.Calculate(args);
             var ossClient = GetOssClient(args.Configuration);
 
-            if (!FileExistsAsync(ossClient, containerName, objectKey))
+            if (args.CheckFileExist && !FileExistsAsync(ossClient, containerName, objectKey))
             {
                 return Task.FromResult(string.Empty);
             }
