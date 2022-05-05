@@ -44,9 +44,6 @@ namespace SharpAbp.Abp.FileStoring.S3
             //Protocol
             ValidateHelper.ShouldInt(result, Provider, S3FileProviderConfigurationNames.Protocol, keyValuePairs[S3FileProviderConfigurationNames.Protocol]);
 
-            //VendorType
-            ValidateHelper.ShouldInt(result, Provider, S3FileProviderConfigurationNames.VendorType, keyValuePairs[S3FileProviderConfigurationNames.VendorType]);
-
             //EnableSlice
             ValidateHelper.ShouldBool(result, Provider, S3FileProviderConfigurationNames.EnableSlice, keyValuePairs[S3FileProviderConfigurationNames.EnableSlice]);
 
@@ -58,9 +55,6 @@ namespace SharpAbp.Abp.FileStoring.S3
 
             //CreateBucketIfNotExists
             ValidateHelper.ShouldBool(result, Provider, S3FileProviderConfigurationNames.CreateBucketIfNotExists, keyValuePairs[S3FileProviderConfigurationNames.CreateBucketIfNotExists]);
-
-            //MaxClient
-            ValidateHelper.ShouldInt(result, Provider, S3FileProviderConfigurationNames.MaxClient, keyValuePairs[S3FileProviderConfigurationNames.MaxClient]);
 
             return result;
         }

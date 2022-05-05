@@ -1,5 +1,4 @@
-﻿using AutoS3;
-using Volo.Abp;
+﻿using Volo.Abp;
 
 namespace SharpAbp.Abp.FileStoring.S3
 {
@@ -67,18 +66,6 @@ namespace SharpAbp.Abp.FileStoring.S3
             set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.Protocol, value);
         }
 
-
-
-        /// <summary>
-        ///  S3 Vendor
-        /// </summary>
-        public int VendorType
-        {
-            get => _containerConfiguration.GetConfigurationOrDefault(S3FileProviderConfigurationNames.VendorType, (int)S3VendorType.Amazon);
-            set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.VendorType, value);
-        }
-
-
         /// <summary>
         /// EnableSlice.
         /// </summary>
@@ -113,16 +100,6 @@ namespace SharpAbp.Abp.FileStoring.S3
         {
             get => _containerConfiguration.GetConfigurationOrDefault(S3FileProviderConfigurationNames.CreateBucketIfNotExists, false);
             set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.CreateBucketIfNotExists, value);
-        }
-
-
-        /// <summary>
-        /// MaxClient
-        /// </summary>
-        public int MaxClient
-        {
-            get => _containerConfiguration.GetConfigurationOrDefault(S3FileProviderConfigurationNames.MaxClient, 10);
-            set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.MaxClient, value);
         }
 
 

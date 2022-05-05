@@ -1,7 +1,5 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
-using AmazonKS3;
-using AutoS3;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -245,42 +243,8 @@ namespace SharpAbp.Abp.FileStoring.S3
         protected virtual IAmazonS3 GetS3Client(FileProviderArgs args)
         {
             var configuration = args.Configuration.GetS3Configuration();
-
-            var containerName = GetContainerName(args);
-
-            var amazonS3 = ClientFactory.GetOrAdd(containerName, () =>
-            {
-                var s3ClientConfiguration = new S3ClientConfiguration()
-                {
-                    Vendor = (S3VendorType)configuration.VendorType,
-                    AccessKeyId = configuration.AccessKeyId,
-                    SecretAccessKey = configuration.SecretAccessKey,
-                    MaxClient = configuration.MaxClient,
-                };
-
-                if (configuration.VendorType == (int)S3VendorType.KS3)
-                {
-                    s3ClientConfiguration.Config = new AmazonS3Config()
-                    {
-                        ServiceURL = configuration.ServerUrl,
-                        ForcePathStyle = configuration.ForcePathStyle,
-                        SignatureVersion = configuration.SignatureVersion
-                    };
-                }
-                else
-                {
-                    s3ClientConfiguration.Config = new AmazonKS3Config()
-                    {
-                        ServiceURL = configuration.ServerUrl,
-                        ForcePathStyle = configuration.ForcePathStyle,
-                        SignatureVersion = configuration.SignatureVersion
-                    };
-                }
-
-                return s3ClientConfiguration;
-            });
-
-            return amazonS3;
+            var client = ClientFactory.Create(configuration);
+            return client;
         }
 
         protected virtual async Task CreateBucketIfNotExists(IAmazonS3 client, string containerName)

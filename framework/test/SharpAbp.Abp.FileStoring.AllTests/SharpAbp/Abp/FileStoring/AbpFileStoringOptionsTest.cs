@@ -146,12 +146,10 @@ namespace SharpAbp.Abp.FileStoring
             Assert.False(s3Configuration.ForcePathStyle);
             Assert.False(s3Configuration.UseChunkEncoding);
             Assert.Equal(0, s3Configuration.Protocol); //0-HTTPS,1-HTTP
-            Assert.Equal(1, s3Configuration.VendorType); //1-Amazon,2-KS3,4-Other
             Assert.True(s3Configuration.EnableSlice);
             Assert.Equal(5242880, s3Configuration.SliceSize);
             Assert.Equal("2.0", s3Configuration.SignatureVersion);
             Assert.False(s3Configuration.CreateBucketIfNotExists);
-            Assert.Equal(20, s3Configuration.MaxClient);
         }
 
         [Fact]

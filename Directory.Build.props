@@ -26,7 +26,7 @@
     <xUnitExtensibilityExecutionPackageVersion>2.4.1</xUnitExtensibilityExecutionPackageVersion>
 
     <!-- xunit.runner.visualstudio https://www.nuget.org/packages/xunit.runner.visualstudio -->
-    <xUnitRunnerVisualstudioPackageVersion>2.4.3</xUnitRunnerVisualstudioPackageVersion>
+    <xUnitRunnerVisualstudioPackageVersion>2.4.4</xUnitRunnerVisualstudioPackageVersion>
 
     <!--coverlet.collector-->
     <CoverletCollectorPackageVersion>3.1.2</CoverletCollectorPackageVersion>
