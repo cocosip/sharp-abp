@@ -66,9 +66,11 @@ namespace SharpAbp.Abp.FileStoringManagement
 
             foreach (var kv in values)
             {
+                var info = kv.Value;
                 var providerValue = new ProviderValueDto(
                     kv.Key, ll[kv.Key],
-                    TypeHelper.GetFullNameHandlingNullableAndGenerics(kv.Value));
+                    TypeHelper.GetFullNameHandlingNullableAndGenerics(info.Type),
+                    info.Eg);
 
                 providerOptions.Values.Add(providerValue);
             }

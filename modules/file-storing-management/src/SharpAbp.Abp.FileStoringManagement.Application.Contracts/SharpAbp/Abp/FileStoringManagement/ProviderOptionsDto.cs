@@ -32,16 +32,22 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// </summary>
         public string Type { get; set; }
 
+        /// <summary>
+        /// Example
+        /// </summary>
+        public string Eg { get; set; }
+
         public ProviderValueDto()
         {
 
         }
 
-        public ProviderValueDto(string name, string localizationValue, string type)
+        public ProviderValueDto(string name, string localizationValue, string type, string eg)
         {
             Name = name;
             LocalizationValue = localizationValue;
             Type = type;
+            Eg = eg;
         }
     }
 }

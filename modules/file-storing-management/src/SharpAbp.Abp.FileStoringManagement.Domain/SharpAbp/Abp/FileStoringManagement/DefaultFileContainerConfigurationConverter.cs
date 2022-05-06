@@ -34,8 +34,9 @@ namespace SharpAbp.Abp.FileStoringManagement
 
             foreach (var item in container.Items)
             {
-                var type = fileProviderConfiguration.GetValueType(item.Name);
-                var value = TypeHelper.ConvertFromString(type, item.Value);
+                var info = fileProviderConfiguration.GetValueType(item.Name);
+
+                var value = TypeHelper.ConvertFromString(info.Type, item.Value);
                 configuration.SetConfiguration(item.Name, value);
             }
 
@@ -66,8 +67,9 @@ namespace SharpAbp.Abp.FileStoringManagement
 
             foreach (var item in cacheItem.Items)
             {
-                var type = fileProviderConfiguration.GetValueType(item.Name);
-                var value = TypeHelper.ConvertFromString(type, item.Value);
+                var info = fileProviderConfiguration.GetValueType(item.Name);
+
+                var value = TypeHelper.ConvertFromString(info.Type, item.Value);
                 configuration.SetConfiguration(item.Name, value);
             }
 
