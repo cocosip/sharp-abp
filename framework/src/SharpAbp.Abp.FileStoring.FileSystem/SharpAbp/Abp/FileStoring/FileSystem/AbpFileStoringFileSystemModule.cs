@@ -51,9 +51,9 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
 
             configuration.DefaultNamingNormalizers.TryAdd<FileSystemFileNamingNormalizer>();
             configuration
-                .SetValueType(FileSystemFileProviderConfigurationNames.BasePath, typeof(string), "/data1")
-                .SetValueType(FileSystemFileProviderConfigurationNames.AppendContainerNameToBasePath, typeof(bool), "false")
-                .SetValueType(FileSystemFileProviderConfigurationNames.HttpServer, typeof(string), "http://192.168.0.100:8080");
+                .AddItem(FileSystemFileProviderConfigurationNames.BasePath, typeof(string), "/data1")
+                .AddItem(FileSystemFileProviderConfigurationNames.AppendContainerNameToBasePath, typeof(bool), "false")
+                .AddItem(FileSystemFileProviderConfigurationNames.HttpServer, typeof(string), "http://192.168.0.100:8080");
             return configuration;
         }
     }

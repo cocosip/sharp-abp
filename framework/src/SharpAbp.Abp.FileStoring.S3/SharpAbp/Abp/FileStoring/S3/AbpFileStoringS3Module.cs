@@ -50,17 +50,17 @@ namespace SharpAbp.Abp.FileStoring.S3
 
             configuration.DefaultNamingNormalizers.TryAdd<S3FileNamingNormalizer>();
             configuration
-                .SetValueType(S3FileProviderConfigurationNames.BucketName, typeof(string), "bucket1")
-                .SetValueType(S3FileProviderConfigurationNames.ServerUrl, typeof(string), "http://192.168.0.100:9005")
-                .SetValueType(S3FileProviderConfigurationNames.AccessKeyId, typeof(string), "")
-                .SetValueType(S3FileProviderConfigurationNames.SecretAccessKey, typeof(string), "")
-                .SetValueType(S3FileProviderConfigurationNames.ForcePathStyle, typeof(bool), "false")
-                .SetValueType(S3FileProviderConfigurationNames.UseChunkEncoding, typeof(bool), "false")
-                .SetValueType(S3FileProviderConfigurationNames.Protocol, typeof(int), "1-http,2-https")
-                .SetValueType(S3FileProviderConfigurationNames.EnableSlice, typeof(bool), "false")
-                .SetValueType(S3FileProviderConfigurationNames.SliceSize, typeof(int), "5242800")
-                .SetValueType(S3FileProviderConfigurationNames.SignatureVersion, typeof(string), "v2.0")
-                .SetValueType(S3FileProviderConfigurationNames.CreateBucketIfNotExists, typeof(bool), "false");
+                .AddItem(S3FileProviderConfigurationNames.BucketName, typeof(string), "bucket1")
+                .AddItem(S3FileProviderConfigurationNames.ServerUrl, typeof(string), "http://192.168.0.100:9005")
+                .AddItem(S3FileProviderConfigurationNames.AccessKeyId, typeof(string), "")
+                .AddItem(S3FileProviderConfigurationNames.SecretAccessKey, typeof(string), "")
+                .AddItem(S3FileProviderConfigurationNames.ForcePathStyle, typeof(bool), "false")
+                .AddItem(S3FileProviderConfigurationNames.UseChunkEncoding, typeof(bool), "false")
+                .AddItem(S3FileProviderConfigurationNames.Protocol, typeof(int), "1-http,2-https")
+                .AddItem(S3FileProviderConfigurationNames.EnableSlice, typeof(bool), "false")
+                .AddItem(S3FileProviderConfigurationNames.SliceSize, typeof(int), "5242800")
+                .AddItem(S3FileProviderConfigurationNames.SignatureVersion, typeof(string), "v2.0")
+                .AddItem(S3FileProviderConfigurationNames.CreateBucketIfNotExists, typeof(bool), "false");
             return configuration;
         }
     }

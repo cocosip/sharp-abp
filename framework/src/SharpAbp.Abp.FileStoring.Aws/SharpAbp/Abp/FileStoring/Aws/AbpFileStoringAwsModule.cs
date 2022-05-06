@@ -53,20 +53,20 @@ namespace SharpAbp.Abp.FileStoring.Aws
 
             configuration.DefaultNamingNormalizers.TryAdd<AwsFileNamingNormalizer>();
             configuration
-                .SetValueType(AwsFileProviderConfigurationNames.AccessKeyId, typeof(string), "")
-                .SetValueType(AwsFileProviderConfigurationNames.SecretAccessKey, typeof(string), "")
-                .SetValueType(AwsFileProviderConfigurationNames.UseCredentials, typeof(bool), "false")
-                .SetValueType(AwsFileProviderConfigurationNames.UseTemporaryCredentials, typeof(bool), "false")
-                .SetValueType(AwsFileProviderConfigurationNames.UseTemporaryFederatedCredentials, typeof(bool), "false")
-                .SetValueType(AwsFileProviderConfigurationNames.ProfileName, typeof(string), "")
-                .SetValueType(AwsFileProviderConfigurationNames.ProfilesLocation, typeof(string), "")
-                .SetValueType(AwsFileProviderConfigurationNames.DurationSeconds, typeof(int), "3600")
-                .SetValueType(AwsFileProviderConfigurationNames.Name, typeof(string), "bucket1")
-                .SetValueType(AwsFileProviderConfigurationNames.Policy, typeof(string), "")
-                .SetValueType(AwsFileProviderConfigurationNames.Region, typeof(string), "eu-west-1")
-                .SetValueType(AwsFileProviderConfigurationNames.ContainerName, typeof(string), "container1")
-                .SetValueType(AwsFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool), "false")
-                .SetValueType(AwsFileProviderConfigurationNames.TemporaryCredentialsCacheKey, typeof(string), "AwsCacheKey");
+                .AddItem(AwsFileProviderConfigurationNames.AccessKeyId, typeof(string), "ak")
+                .AddItem(AwsFileProviderConfigurationNames.SecretAccessKey, typeof(string), "sk")
+                .AddItem(AwsFileProviderConfigurationNames.UseCredentials, typeof(bool), "false")
+                .AddItem(AwsFileProviderConfigurationNames.UseTemporaryCredentials, typeof(bool), "false")
+                .AddItem(AwsFileProviderConfigurationNames.UseTemporaryFederatedCredentials, typeof(bool), "false")
+                .AddItem(AwsFileProviderConfigurationNames.ProfileName, typeof(string), "")
+                .AddItem(AwsFileProviderConfigurationNames.ProfilesLocation, typeof(string), "")
+                .AddItem(AwsFileProviderConfigurationNames.DurationSeconds, typeof(int), "3600")
+                .AddItem(AwsFileProviderConfigurationNames.Name, typeof(string), "bucket1")
+                .AddItem(AwsFileProviderConfigurationNames.Policy, typeof(string), "")
+                .AddItem(AwsFileProviderConfigurationNames.Region, typeof(string), "eu-west-1")
+                .AddItem(AwsFileProviderConfigurationNames.ContainerName, typeof(string), "container1")
+                .AddItem(AwsFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool), "false")
+                .AddItem(AwsFileProviderConfigurationNames.TemporaryCredentialsCacheKey, typeof(string), "AwsCacheKey");
 
             return configuration;
         }

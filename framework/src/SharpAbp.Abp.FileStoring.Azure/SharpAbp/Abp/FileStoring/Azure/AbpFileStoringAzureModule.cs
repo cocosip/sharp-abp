@@ -50,9 +50,9 @@ namespace SharpAbp.Abp.FileStoring.Azure
 
             configuration.DefaultNamingNormalizers.TryAdd<AzureFileNamingNormalizer>();
             configuration
-                .SetValueType(AzureFileProviderConfigurationNames.ConnectionString, typeof(string), "DefaultEndpointsProtocol=[http|https];AccountName=myAccountName;AccountKey=myAccountKey")
-                .SetValueType(AzureFileProviderConfigurationNames.ContainerName, typeof(string), "container1")
-                .SetValueType(AzureFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool), "false");
+                .AddItem(AzureFileProviderConfigurationNames.ConnectionString, typeof(string), "DefaultEndpointsProtocol=[http|https];AccountName=myAccountName;AccountKey=myAccountKey")
+                .AddItem(AzureFileProviderConfigurationNames.ContainerName, typeof(string), "container1")
+                .AddItem(AzureFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool), "false");
             return configuration;
         }
     }

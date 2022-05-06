@@ -42,14 +42,16 @@ namespace SharpAbp.Abp.FileStoring
                             c.NamingNormalizers.Add(defaultNamingNormalizer);
                         }
 
-                        var valueTypes = fileProviderConfiguration.GetValueTypes();
+                        var itemDict = fileProviderConfiguration.GetItems();
 
-                        foreach (var valueTypeKv in valueTypes)
+                        foreach (var itemKeyValuePair in itemDict)
                         {
-                            entryKv.Value.Properties.TryGetValue(valueTypeKv.Key, out string value);
-                            var info = valueTypeKv.Value;
-                            var realValue = TypeHelper.ConvertFromString(info.Type, value);
-                            c.SetConfiguration(valueTypeKv.Key, realValue);
+                            entryKv.Value.Properties.TryGetValue(itemKeyValuePair.Key, out string value);
+
+                            var item = itemKeyValuePair.Value;
+
+                            var realValue = TypeHelper.ConvertFromString(item.ValueType, value);
+                            c.SetConfiguration(itemKeyValuePair.Key, realValue);
                         }
 
                     });

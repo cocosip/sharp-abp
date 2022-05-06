@@ -53,18 +53,18 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
 
             configuration.DefaultNamingNormalizers.TryAdd<AliyunFileNamingNormalizer>();
             configuration
-                .SetValueType(AliyunFileProviderConfigurationNames.RegionId, typeof(string), "oss-cn-hangzhou")
-                .SetValueType(AliyunFileProviderConfigurationNames.Endpoint, typeof(string), "https://oss-cn-hangzhou.aliyuncs.com")
-                .SetValueType(AliyunFileProviderConfigurationNames.BucketName, typeof(string), "bucket1")
-                .SetValueType(AliyunFileProviderConfigurationNames.AccessKeyId, typeof(string), "")
-                .SetValueType(AliyunFileProviderConfigurationNames.AccessKeySecret, typeof(string), "")
-                .SetValueType(AliyunFileProviderConfigurationNames.UseSecurityTokenService, typeof(bool), "false")
-                .SetValueType(AliyunFileProviderConfigurationNames.RoleArn, typeof(string), "")
-                .SetValueType(AliyunFileProviderConfigurationNames.RoleSessionName, typeof(string), "")
-                .SetValueType(AliyunFileProviderConfigurationNames.DurationSeconds, typeof(int), "3600")
-                .SetValueType(AliyunFileProviderConfigurationNames.Policy, typeof(string), "")
-                .SetValueType(AliyunFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool), "false")
-                .SetValueType(AliyunFileProviderConfigurationNames.TemporaryCredentialsCacheKey, typeof(string), "OssCacheKey");
+                .AddItem(AliyunFileProviderConfigurationNames.RegionId, typeof(string), "oss-cn-hangzhou")
+                .AddItem(AliyunFileProviderConfigurationNames.Endpoint, typeof(string), "https://oss-cn-hangzhou.aliyuncs.com")
+                .AddItem(AliyunFileProviderConfigurationNames.BucketName, typeof(string), "bucket1")
+                .AddItem(AliyunFileProviderConfigurationNames.AccessKeyId, typeof(string), "ak")
+                .AddItem(AliyunFileProviderConfigurationNames.AccessKeySecret, typeof(string), "sk")
+                .AddItem(AliyunFileProviderConfigurationNames.UseSecurityTokenService, typeof(bool), "false")
+                .AddItem(AliyunFileProviderConfigurationNames.RoleArn, typeof(string), "")
+                .AddItem(AliyunFileProviderConfigurationNames.RoleSessionName, typeof(string), "")
+                .AddItem(AliyunFileProviderConfigurationNames.DurationSeconds, typeof(int), "3600")
+                .AddItem(AliyunFileProviderConfigurationNames.Policy, typeof(string), "")
+                .AddItem(AliyunFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool), "false")
+                .AddItem(AliyunFileProviderConfigurationNames.TemporaryCredentialsCacheKey, typeof(string), "OssCacheKey");
 
             return configuration;
         }

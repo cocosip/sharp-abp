@@ -52,16 +52,16 @@ namespace SharpAbp.Abp.FileStoring.KS3
 
             configuration.DefaultNamingNormalizers.TryAdd<KS3FileNamingNormalizer>();
             configuration
-                .SetValueType(KS3FileProviderConfigurationNames.AccessKey, typeof(string), "")
-                .SetValueType(KS3FileProviderConfigurationNames.SecretKey, typeof(string), "")
-                .SetValueType(KS3FileProviderConfigurationNames.BucketName, typeof(string), "bucket1")
-                .SetValueType(KS3FileProviderConfigurationNames.Endpoint, typeof(string), "ks3-cn-beijing.ksyun.com")
-                .SetValueType(KS3FileProviderConfigurationNames.UserAgent, typeof(string), "KS3")
-                .SetValueType(KS3FileProviderConfigurationNames.Protocol, typeof(string), "https")
-                .SetValueType(KS3FileProviderConfigurationNames.MaxConnections, typeof(int), "30")
-                .SetValueType(KS3FileProviderConfigurationNames.Timeout, typeof(int), "600000")
-                .SetValueType(KS3FileProviderConfigurationNames.ReadWriteTimeout, typeof(int), "600000")
-                .SetValueType(KS3FileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool), "false");
+                .AddItem(KS3FileProviderConfigurationNames.AccessKey, typeof(string), "")
+                .AddItem(KS3FileProviderConfigurationNames.SecretKey, typeof(string), "")
+                .AddItem(KS3FileProviderConfigurationNames.BucketName, typeof(string), "bucket1")
+                .AddItem(KS3FileProviderConfigurationNames.Endpoint, typeof(string), "ks3-cn-beijing.ksyun.com")
+                .AddItem(KS3FileProviderConfigurationNames.UserAgent, typeof(string), "KS3")
+                .AddItem(KS3FileProviderConfigurationNames.Protocol, typeof(string), "https")
+                .AddItem(KS3FileProviderConfigurationNames.MaxConnections, typeof(int), "30")
+                .AddItem(KS3FileProviderConfigurationNames.Timeout, typeof(int), "600000")
+                .AddItem(KS3FileProviderConfigurationNames.ReadWriteTimeout, typeof(int), "600000")
+                .AddItem(KS3FileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool), "false");
 
             return configuration;
         }

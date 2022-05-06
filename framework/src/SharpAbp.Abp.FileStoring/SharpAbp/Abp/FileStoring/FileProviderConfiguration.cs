@@ -15,12 +15,12 @@ namespace SharpAbp.Abp.FileStoring
         public ITypeList<IFileNamingNormalizer> DefaultNamingNormalizers { get; }
 
         [NotNull]
-        private readonly Dictionary<string, ValueTypeInfo> _valueTypes;
+        private readonly Dictionary<string, FileProviderConfigurationItem> _items;
 
         public FileProviderConfiguration()
         {
             DefaultNamingNormalizers = new TypeList<IFileNamingNormalizer>();
-            _valueTypes = new Dictionary<string, ValueTypeInfo>();
+            _items = new Dictionary<string, FileProviderConfigurationItem>();
         }
 
         public FileProviderConfiguration([NotNull] string provider, Type localizationResource) : this()
@@ -29,38 +29,39 @@ namespace SharpAbp.Abp.FileStoring
             LocalizationResource = localizationResource;
         }
 
-        public ValueTypeInfo GetValueType([NotNull] string name)
+        public FileProviderConfigurationItem GetItem([NotNull] string name)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            _valueTypes.TryGetValue(name, out ValueTypeInfo info);
-            return info;
+            _items.TryGetValue(name, out FileProviderConfigurationItem item);
+            return item;
         }
 
-        public FileProviderConfiguration SetValueType([NotNull] string name, [NotNull] Type type, string eg = "")
+        public FileProviderConfiguration AddItem([NotNull] string name, [NotNull] FileProviderConfigurationItem item)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            Check.NotNull(type, nameof(type));
-            _valueTypes.Add(name, new ValueTypeInfo(type, eg));
+            Check.NotNull(item, nameof(item));
+            _items.Add(name, item);
             return this;
         }
 
-        public FileProviderConfiguration SetValueType([NotNull] string name, ValueTypeInfo info)
+        public FileProviderConfiguration AddItem([NotNull] string name, [NotNull] Type valueType, string eg = "", string noteLocalizationName = "")
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            _valueTypes.Add(name, info);
+            Check.NotNull(valueType, nameof(valueType));
+            return AddItem(name, new FileProviderConfigurationItem(valueType, eg, noteLocalizationName));
+        }
+
+        public FileProviderConfiguration RemoveItem([NotNull] string name)
+        {
+            Check.NotNullOrWhiteSpace(name, nameof(name));
+            _items.Remove(name);
             return this;
         }
 
-        public FileProviderConfiguration ClearValueType([NotNull] string name)
-        {
-            Check.NotNullOrWhiteSpace(name, nameof(name));
-            _valueTypes.Remove(name);
-            return this;
-        }
 
-        public Dictionary<string, ValueTypeInfo> GetValueTypes()
+        public Dictionary<string, FileProviderConfigurationItem> GetItems()
         {
-            return _valueTypes;
+            return _items;
         }
     }
 

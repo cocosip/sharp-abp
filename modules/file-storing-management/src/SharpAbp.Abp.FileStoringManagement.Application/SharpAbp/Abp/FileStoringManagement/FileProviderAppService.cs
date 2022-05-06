@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.FileStoring;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp;
@@ -59,22 +60,29 @@ namespace SharpAbp.Abp.FileStoringManagement
                 throw new UserFriendlyException($"Could not get provider configuration by name '{provider}'.");
             }
 
-            var values = fileProviderConfiguration.GetValueTypes();
+            var providerItems = fileProviderConfiguration.GetItems();
             var providerOptions = new ProviderOptionsDto(provider);
 
             var ll = StringLocalizerFactory.Create(fileProviderConfiguration.LocalizationResource);
 
-            foreach (var kv in values)
+            foreach (var itemKeyValuePair in providerItems)
             {
-                var info = kv.Value;
+                var providerItem = itemKeyValuePair.Value;
+                var note = "";
+                if (!providerItem.NoteLocalizationName.IsNullOrWhiteSpace())
+                {
+                    note = ll[providerItem.NoteLocalizationName];
+                }
                 var providerValue = new ProviderValueDto(
-                    kv.Key, ll[kv.Key],
-                    TypeHelper.GetFullNameHandlingNullableAndGenerics(info.Type),
-                    info.Eg);
+                    itemKeyValuePair.Key,
+                    ll[itemKeyValuePair.Key],
+                    TypeHelper.GetFullNameHandlingNullableAndGenerics(providerItem.ValueType),
+                    providerItem.Eg,
+                    note);
 
                 providerOptions.Values.Add(providerValue);
             }
-
+            
             return Task.FromResult(providerOptions);
         }
     }

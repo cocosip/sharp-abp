@@ -50,12 +50,12 @@ namespace SharpAbp.Abp.FileStoring.Minio
 
             configuration.DefaultNamingNormalizers.TryAdd<MinioFileNamingNormalizer>();
             configuration
-                .SetValueType(MinioFileProviderConfigurationNames.BucketName, typeof(string), "bucket1")
-                .SetValueType(MinioFileProviderConfigurationNames.EndPoint, typeof(string), "192.168.0.100:9005")
-                .SetValueType(MinioFileProviderConfigurationNames.AccessKey, typeof(string), "minioadmin")
-                .SetValueType(MinioFileProviderConfigurationNames.SecretKey, typeof(string), "minioadmin")
-                .SetValueType(MinioFileProviderConfigurationNames.WithSSL, typeof(bool), "false")
-                .SetValueType(MinioFileProviderConfigurationNames.CreateBucketIfNotExists, typeof(bool), "false");
+                .AddItem(MinioFileProviderConfigurationNames.BucketName, typeof(string), "bucket1")
+                .AddItem(MinioFileProviderConfigurationNames.EndPoint, typeof(string), "192.168.0.100:9005")
+                .AddItem(MinioFileProviderConfigurationNames.AccessKey, typeof(string), "minioadmin")
+                .AddItem(MinioFileProviderConfigurationNames.SecretKey, typeof(string), "minioadmin")
+                .AddItem(MinioFileProviderConfigurationNames.WithSSL, typeof(bool), "false")
+                .AddItem(MinioFileProviderConfigurationNames.CreateBucketIfNotExists, typeof(bool), "false");
 
             return configuration;
         }
