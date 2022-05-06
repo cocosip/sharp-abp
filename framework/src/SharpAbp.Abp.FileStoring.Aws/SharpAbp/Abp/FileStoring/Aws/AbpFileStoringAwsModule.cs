@@ -53,20 +53,20 @@ namespace SharpAbp.Abp.FileStoring.Aws
 
             configuration.DefaultNamingNormalizers.TryAdd<AwsFileNamingNormalizer>();
             configuration
-                .SetValueType(AwsFileProviderConfigurationNames.AccessKeyId, typeof(string))
-                .SetValueType(AwsFileProviderConfigurationNames.SecretAccessKey, typeof(string))
-                .SetValueType(AwsFileProviderConfigurationNames.UseCredentials, typeof(bool))
-                .SetValueType(AwsFileProviderConfigurationNames.UseTemporaryCredentials, typeof(bool))
-                .SetValueType(AwsFileProviderConfigurationNames.UseTemporaryFederatedCredentials, typeof(bool))
-                .SetValueType(AwsFileProviderConfigurationNames.ProfileName, typeof(string))
-                .SetValueType(AwsFileProviderConfigurationNames.ProfilesLocation, typeof(string))
-                .SetValueType(AwsFileProviderConfigurationNames.DurationSeconds, typeof(int))
-                .SetValueType(AwsFileProviderConfigurationNames.Name, typeof(string))
-                .SetValueType(AwsFileProviderConfigurationNames.Policy, typeof(string))
-                .SetValueType(AwsFileProviderConfigurationNames.Region, typeof(string))
-                .SetValueType(AwsFileProviderConfigurationNames.ContainerName, typeof(string))
-                .SetValueType(AwsFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool))
-                .SetValueType(AwsFileProviderConfigurationNames.TemporaryCredentialsCacheKey, typeof(string));
+                .SetValueType(AwsFileProviderConfigurationNames.AccessKeyId, typeof(string), "")
+                .SetValueType(AwsFileProviderConfigurationNames.SecretAccessKey, typeof(string), "")
+                .SetValueType(AwsFileProviderConfigurationNames.UseCredentials, typeof(bool), "false")
+                .SetValueType(AwsFileProviderConfigurationNames.UseTemporaryCredentials, typeof(bool), "false")
+                .SetValueType(AwsFileProviderConfigurationNames.UseTemporaryFederatedCredentials, typeof(bool), "false")
+                .SetValueType(AwsFileProviderConfigurationNames.ProfileName, typeof(string), "")
+                .SetValueType(AwsFileProviderConfigurationNames.ProfilesLocation, typeof(string), "")
+                .SetValueType(AwsFileProviderConfigurationNames.DurationSeconds, typeof(int), "3600")
+                .SetValueType(AwsFileProviderConfigurationNames.Name, typeof(string), "bucket1")
+                .SetValueType(AwsFileProviderConfigurationNames.Policy, typeof(string), "")
+                .SetValueType(AwsFileProviderConfigurationNames.Region, typeof(string), "eu-west-1")
+                .SetValueType(AwsFileProviderConfigurationNames.ContainerName, typeof(string), "container1")
+                .SetValueType(AwsFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool), "false")
+                .SetValueType(AwsFileProviderConfigurationNames.TemporaryCredentialsCacheKey, typeof(string), "AwsCacheKey");
 
             return configuration;
         }

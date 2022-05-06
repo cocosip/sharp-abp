@@ -25,7 +25,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
             }
 
             //RegionId
-            ValidateHelper.NotNullOrWhiteSpace(result, Provider, ObsFileProviderConfigurationNames.RegionId, keyValuePairs[ObsFileProviderConfigurationNames.RegionId]);
+            // ValidateHelper.NotNullOrWhiteSpace(result, Provider, ObsFileProviderConfigurationNames.RegionId, keyValuePairs[ObsFileProviderConfigurationNames.RegionId]);
 
             //Endpoint
             ValidateHelper.NotNullOrWhiteSpace(result, Provider, ObsFileProviderConfigurationNames.Endpoint, keyValuePairs[ObsFileProviderConfigurationNames.Endpoint]);

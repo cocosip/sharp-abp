@@ -15,12 +15,12 @@ namespace SharpAbp.Abp.FileStoring
         public ITypeList<IFileNamingNormalizer> DefaultNamingNormalizers { get; }
 
         [NotNull]
-        private readonly Dictionary<string, Type> _valueTypes;
+        private readonly Dictionary<string, ValueTypeInfo> _valueTypes;
 
         public FileProviderConfiguration()
         {
             DefaultNamingNormalizers = new TypeList<IFileNamingNormalizer>();
-            _valueTypes = new Dictionary<string, Type>();
+            _valueTypes = new Dictionary<string, ValueTypeInfo>();
         }
 
         public FileProviderConfiguration([NotNull] string provider, Type localizationResource) : this()
@@ -29,18 +29,25 @@ namespace SharpAbp.Abp.FileStoring
             LocalizationResource = localizationResource;
         }
 
-        public Type GetValueType([NotNull] string name)
+        public ValueTypeInfo GetValueType([NotNull] string name)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            _valueTypes.TryGetValue(name, out Type type);
-            return type;
+            _valueTypes.TryGetValue(name, out ValueTypeInfo info);
+            return info;
         }
 
-        public FileProviderConfiguration SetValueType([NotNull] string name, [NotNull] Type type)
+        public FileProviderConfiguration SetValueType([NotNull] string name, [NotNull] Type type, string eg = "")
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
             Check.NotNull(type, nameof(type));
-            _valueTypes.Add(name, type);
+            _valueTypes.Add(name, new ValueTypeInfo(type, eg));
+            return this;
+        }
+
+        public FileProviderConfiguration SetValueType([NotNull] string name, ValueTypeInfo info)
+        {
+            Check.NotNullOrWhiteSpace(name, nameof(name));
+            _valueTypes.Add(name, info);
             return this;
         }
 
@@ -51,7 +58,7 @@ namespace SharpAbp.Abp.FileStoring
             return this;
         }
 
-        public Dictionary<string, Type> GetValueTypes()
+        public Dictionary<string, ValueTypeInfo> GetValueTypes()
         {
             return _valueTypes;
         }

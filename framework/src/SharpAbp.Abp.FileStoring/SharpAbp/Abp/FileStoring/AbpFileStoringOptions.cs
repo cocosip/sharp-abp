@@ -47,7 +47,8 @@ namespace SharpAbp.Abp.FileStoring
                         foreach (var valueTypeKv in valueTypes)
                         {
                             entryKv.Value.Properties.TryGetValue(valueTypeKv.Key, out string value);
-                            var realValue = TypeHelper.ConvertFromString(valueTypeKv.Value, value);
+                            var info = valueTypeKv.Value;
+                            var realValue = TypeHelper.ConvertFromString(info.Type, value);
                             c.SetConfiguration(valueTypeKv.Key, realValue);
                         }
 

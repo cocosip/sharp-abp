@@ -48,23 +48,23 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
         private FileProviderConfiguration GetFileProviderConfiguration()
         {
             var configuration = new FileProviderConfiguration(
-                AliyunFileProviderConfigurationNames.ProviderName, 
+                AliyunFileProviderConfigurationNames.ProviderName,
                 typeof(FileStoringAliyunResource));
-                
+
             configuration.DefaultNamingNormalizers.TryAdd<AliyunFileNamingNormalizer>();
             configuration
-                .SetValueType(AliyunFileProviderConfigurationNames.RegionId, typeof(string))
-                .SetValueType(AliyunFileProviderConfigurationNames.Endpoint, typeof(string))
-                .SetValueType(AliyunFileProviderConfigurationNames.BucketName, typeof(string))
-                .SetValueType(AliyunFileProviderConfigurationNames.AccessKeyId, typeof(string))
-                .SetValueType(AliyunFileProviderConfigurationNames.AccessKeySecret, typeof(string))
-                .SetValueType(AliyunFileProviderConfigurationNames.UseSecurityTokenService, typeof(bool))
-                .SetValueType(AliyunFileProviderConfigurationNames.RoleArn, typeof(string))
-                .SetValueType(AliyunFileProviderConfigurationNames.RoleSessionName, typeof(string))
-                .SetValueType(AliyunFileProviderConfigurationNames.DurationSeconds, typeof(int))
-                .SetValueType(AliyunFileProviderConfigurationNames.Policy, typeof(string))
-                .SetValueType(AliyunFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool))
-                .SetValueType(AliyunFileProviderConfigurationNames.TemporaryCredentialsCacheKey, typeof(string));
+                .SetValueType(AliyunFileProviderConfigurationNames.RegionId, typeof(string), "oss-cn-hangzhou")
+                .SetValueType(AliyunFileProviderConfigurationNames.Endpoint, typeof(string), "https://oss-cn-hangzhou.aliyuncs.com")
+                .SetValueType(AliyunFileProviderConfigurationNames.BucketName, typeof(string), "bucket1")
+                .SetValueType(AliyunFileProviderConfigurationNames.AccessKeyId, typeof(string), "")
+                .SetValueType(AliyunFileProviderConfigurationNames.AccessKeySecret, typeof(string), "")
+                .SetValueType(AliyunFileProviderConfigurationNames.UseSecurityTokenService, typeof(bool), "false")
+                .SetValueType(AliyunFileProviderConfigurationNames.RoleArn, typeof(string), "")
+                .SetValueType(AliyunFileProviderConfigurationNames.RoleSessionName, typeof(string), "")
+                .SetValueType(AliyunFileProviderConfigurationNames.DurationSeconds, typeof(int), "3600")
+                .SetValueType(AliyunFileProviderConfigurationNames.Policy, typeof(string), "")
+                .SetValueType(AliyunFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool), "false")
+                .SetValueType(AliyunFileProviderConfigurationNames.TemporaryCredentialsCacheKey, typeof(string), "OssCacheKey");
 
             return configuration;
         }

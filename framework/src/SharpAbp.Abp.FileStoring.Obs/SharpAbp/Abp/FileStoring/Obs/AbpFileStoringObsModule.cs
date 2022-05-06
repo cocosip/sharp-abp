@@ -53,12 +53,12 @@ namespace SharpAbp.Abp.FileStoring.Obs
 
             configuration.DefaultNamingNormalizers.TryAdd<ObsFileNamingNormalizer>();
             configuration
-                .SetValueType(ObsFileProviderConfigurationNames.RegionId, typeof(string))
-                .SetValueType(ObsFileProviderConfigurationNames.Endpoint, typeof(string))
-                .SetValueType(ObsFileProviderConfigurationNames.BucketName, typeof(string))
-                .SetValueType(ObsFileProviderConfigurationNames.AccessKeyId, typeof(string))
-                .SetValueType(ObsFileProviderConfigurationNames.AccessKeySecret, typeof(string))
-                .SetValueType(ObsFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool));
+                //.SetValueType(ObsFileProviderConfigurationNames.RegionId, typeof(string), "")
+                .SetValueType(ObsFileProviderConfigurationNames.Endpoint, typeof(string), "https://obs.cn-east-3.myhuaweicloud.com")
+                .SetValueType(ObsFileProviderConfigurationNames.BucketName, typeof(string), "bucket1")
+                .SetValueType(ObsFileProviderConfigurationNames.AccessKeyId, typeof(string), "")
+                .SetValueType(ObsFileProviderConfigurationNames.AccessKeySecret, typeof(string), "")
+                .SetValueType(ObsFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool), "false");
 
             return configuration;
         }

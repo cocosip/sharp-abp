@@ -55,23 +55,23 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
             var configuration = new FileProviderConfiguration(
                 FastDFSFileProviderConfigurationNames.ProviderName,
                 typeof(FileStoringFastDFSResource));
-                
+
             configuration.DefaultNamingNormalizers.TryAdd<FastDFSFileNamingNormalizer>();
             configuration
-                .SetValueType(FastDFSFileProviderConfigurationNames.ClusterName, typeof(string))
-                .SetValueType(FastDFSFileProviderConfigurationNames.GroupName, typeof(string))
-                .SetValueType(FastDFSFileProviderConfigurationNames.HttpServer, typeof(string))
-                .SetValueType(FastDFSFileProviderConfigurationNames.AppendGroupNameToUrl, typeof(bool))
-                .SetValueType(FastDFSFileProviderConfigurationNames.Trackers, typeof(string))
-                .SetValueType(FastDFSFileProviderConfigurationNames.AntiStealCheckToken, typeof(bool))
-                .SetValueType(FastDFSFileProviderConfigurationNames.SecretKey, typeof(string))
-                .SetValueType(FastDFSFileProviderConfigurationNames.ConnectionTimeout, typeof(int))
-                .SetValueType(FastDFSFileProviderConfigurationNames.ConnectionLifeTime, typeof(int))
-                .SetValueType(FastDFSFileProviderConfigurationNames.Charset, typeof(string))
-                .SetValueType(FastDFSFileProviderConfigurationNames.ConnectionConcurrentThread, typeof(int))
-                .SetValueType(FastDFSFileProviderConfigurationNames.ScanTimeoutConnectionInterval, typeof(int))
-                .SetValueType(FastDFSFileProviderConfigurationNames.TrackerMaxConnection, typeof(int))
-                .SetValueType(FastDFSFileProviderConfigurationNames.StorageMaxConnection, typeof(int));
+                .SetValueType(FastDFSFileProviderConfigurationNames.ClusterName, typeof(string), "default1")
+                .SetValueType(FastDFSFileProviderConfigurationNames.GroupName, typeof(string), "group1")
+                .SetValueType(FastDFSFileProviderConfigurationNames.HttpServer, typeof(string), "http://192.168.0.100:8080")
+                .SetValueType(FastDFSFileProviderConfigurationNames.AppendGroupNameToUrl, typeof(bool), "true")
+                .SetValueType(FastDFSFileProviderConfigurationNames.Trackers, typeof(string), "192.168.0.100:23000,192.168.0.101:23000")
+                .SetValueType(FastDFSFileProviderConfigurationNames.AntiStealCheckToken, typeof(bool), "true")
+                .SetValueType(FastDFSFileProviderConfigurationNames.SecretKey, typeof(string), "abc123456789")
+                .SetValueType(FastDFSFileProviderConfigurationNames.ConnectionTimeout, typeof(int), "3600")
+                .SetValueType(FastDFSFileProviderConfigurationNames.ConnectionLifeTime, typeof(int), "300")
+                .SetValueType(FastDFSFileProviderConfigurationNames.Charset, typeof(string), "utf-8")
+                .SetValueType(FastDFSFileProviderConfigurationNames.ConnectionConcurrentThread, typeof(int), "3")
+                .SetValueType(FastDFSFileProviderConfigurationNames.ScanTimeoutConnectionInterval, typeof(int), "10")
+                .SetValueType(FastDFSFileProviderConfigurationNames.TrackerMaxConnection, typeof(int), "10")
+                .SetValueType(FastDFSFileProviderConfigurationNames.StorageMaxConnection, typeof(int), "20");
             return configuration;
         }
     }

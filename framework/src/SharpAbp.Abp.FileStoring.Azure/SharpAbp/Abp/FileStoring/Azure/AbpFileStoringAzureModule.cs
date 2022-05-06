@@ -47,12 +47,12 @@ namespace SharpAbp.Abp.FileStoring.Azure
             var configuration = new FileProviderConfiguration(
                 AzureFileProviderConfigurationNames.ProviderName,
                 typeof(FileStoringAzureResource));
-                
+
             configuration.DefaultNamingNormalizers.TryAdd<AzureFileNamingNormalizer>();
             configuration
-                .SetValueType(AzureFileProviderConfigurationNames.ConnectionString, typeof(string))
-                .SetValueType(AzureFileProviderConfigurationNames.ContainerName, typeof(string))
-                .SetValueType(AzureFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool));
+                .SetValueType(AzureFileProviderConfigurationNames.ConnectionString, typeof(string), "DefaultEndpointsProtocol=[http|https];AccountName=myAccountName;AccountKey=myAccountKey")
+                .SetValueType(AzureFileProviderConfigurationNames.ContainerName, typeof(string), "container1")
+                .SetValueType(AzureFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool), "false");
             return configuration;
         }
     }
