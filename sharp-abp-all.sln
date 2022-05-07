@@ -259,6 +259,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.DbConnectionsM
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoringManagement.HttpApi.Client", "modules\file-storing-management\src\SharpAbp.Abp.FileStoringManagement.HttpApi.Client\SharpAbp.Abp.FileStoringManagement.HttpApi.Client.csproj", "{87C9DA33-B0F0-4FD3-92E8-71302933CDD2}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoring.Obs", "framework\src\SharpAbp.Abp.FileStoring.Obs\SharpAbp.Abp.FileStoring.Obs.csproj", "{0C9B33BA-7A7B-4632-A027-48341AB507F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -665,6 +667,10 @@ Global
 		{87C9DA33-B0F0-4FD3-92E8-71302933CDD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87C9DA33-B0F0-4FD3-92E8-71302933CDD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87C9DA33-B0F0-4FD3-92E8-71302933CDD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C9B33BA-7A7B-4632-A027-48341AB507F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C9B33BA-7A7B-4632-A027-48341AB507F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C9B33BA-7A7B-4632-A027-48341AB507F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C9B33BA-7A7B-4632-A027-48341AB507F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -796,6 +802,7 @@ Global
 		{48A6A7FB-1CD9-4B55-A04E-17F9071795A2} = {6744D432-22D5-41F3-869C-492C12F78990}
 		{69A5CBDA-7E85-4599-921E-660FF9E8CAA5} = {0D56501B-3D77-4E3C-BD45-33A8D0329DE4}
 		{87C9DA33-B0F0-4FD3-92E8-71302933CDD2} = {75AA1786-8B10-4E0A-89F6-79B714F85E34}
+		{0C9B33BA-7A7B-4632-A027-48341AB507F8} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {01335FC4-439E-46F3-B61A-B7919F950373}
