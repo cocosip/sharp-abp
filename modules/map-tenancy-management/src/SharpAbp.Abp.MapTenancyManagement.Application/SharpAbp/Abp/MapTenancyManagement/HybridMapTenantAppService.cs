@@ -150,17 +150,19 @@ namespace SharpAbp.Abp.MapTenancyManagement
         public virtual async Task<HybridMapTenantDto> CurrentAsync()
         {
             var hybridMapTenant = new HybridMapTenantDto();
-            var tenant = await TenantRepository.FindAsync(CurrentTenant.GetId());
-            if (tenant != null)
+            if (CurrentTenant.IsAvailable)
             {
-                ObjectMapper.Map(tenant, hybridMapTenant);
-                var mapTenant = await MapTenantRepository.FindByTenantIdAsync(tenant.Id);
-                if (mapTenant != null)
+                var tenant = await TenantRepository.FindAsync(CurrentTenant.Id.Value);
+                if (tenant != null)
                 {
-                    ObjectMapper.Map(mapTenant, hybridMapTenant);
+                    ObjectMapper.Map(tenant, hybridMapTenant);
+                    var mapTenant = await MapTenantRepository.FindByTenantIdAsync(tenant.Id);
+                    if (mapTenant != null)
+                    {
+                        ObjectMapper.Map(mapTenant, hybridMapTenant);
+                    }
                 }
             }
-
             return hybridMapTenant;
         }
 
