@@ -1,0 +1,14 @@
+{
+  "culture": "en",
+  "texts": {
+    "MinId": "MinId Manager",
+    "Permission:MinId.MinIdInfos": "MinIdInfo Manager",
+    "Permission:MinId.MinIdInfos.Create": "Create MinIdInfo",
+    "Permission:MinId.MinIdInfos.Update": "Update MinIdInfo",
+    "Permission:MinId.MinIdInfos.Delete": "Delete MinIdInfo",
+    "Permission:MinId.MinIdTokens": "MinIdToken Manager",
+    "Permission:MinId.MinIdTokens.Create": "Create MinIdToken",
+    "Permission:MinId.MinIdTokens.Update": "Update MinIdToken",
+    "Permission:MinId.MinIdTokens.Delete": "Delete MinIdToken"
+  }
+}

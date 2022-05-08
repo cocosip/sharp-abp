@@ -18,8 +18,9 @@ $solutionPaths = @(
 		"../modules/dbconnections",
 		"../modules/Identity",
 		"../modules/IdentityServer",
-		"../modules/audit-logging"
-		"../modules/account"
+		"../modules/audit-logging",
+		"../modules/account",
+		"../modules/minid"
 	)
 
 if ($full -eq "-f")

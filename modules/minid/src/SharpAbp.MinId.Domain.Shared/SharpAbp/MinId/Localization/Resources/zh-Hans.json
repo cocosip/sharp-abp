@@ -1,0 +1,14 @@
+{
+  "culture": "zh-Hans",
+  "texts": {
+    "MinId": "MinId管理",
+    "Permission:MinId.MinIdInfos": "MinId配置管理",
+    "Permission:MinId.MinIdInfos.Create": "创建MinId配置",
+    "Permission:MinId.MinIdInfos.Update": "修改MinId配置",
+    "Permission:MinId.MinIdInfos.Delete": "删除MinId配置",
+    "Permission:MinId.MinIdTokens": "MinId Token管理",
+    "Permission:MinId.MinIdTokens.Create": "创建MinId Token",
+    "Permission:MinId.MinIdTokens.Update": "修改MinId Token",
+    "Permission:MinId.MinIdTokens.Delete": "删除MinId Token"
+  }
+}
