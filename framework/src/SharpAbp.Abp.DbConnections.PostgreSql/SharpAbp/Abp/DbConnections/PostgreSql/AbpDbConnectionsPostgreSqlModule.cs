@@ -4,8 +4,8 @@ using Volo.Abp.Modularity;
 namespace SharpAbp.Abp.DbConnections.PostgreSql
 {
     [DependsOn(
-          typeof(AbpDbConnectionsModule),
-          typeof(AbpEntityFrameworkCorePostgreSqlModule)
+          typeof(AbpDbConnectionsModule)
+          //typeof(AbpEntityFrameworkCorePostgreSqlModule)
           )]
     public class AbpDbConnectionsPostgreSqlModule : AbpModule
     {

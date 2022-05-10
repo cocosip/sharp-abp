@@ -4,8 +4,8 @@ using Volo.Abp.Modularity;
 namespace SharpAbp.Abp.DbConnections.Sqlite
 {
     [DependsOn(
-        typeof(AbpDbConnectionsModule),
-        typeof(AbpEntityFrameworkCoreSqliteModule)
+        typeof(AbpDbConnectionsModule)
+        //typeof(AbpEntityFrameworkCoreSqliteModule)
         )]
     public class AbpDbConnectionsSqliteModule : AbpModule
     {

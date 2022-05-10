@@ -4,8 +4,8 @@ using Volo.Abp.Modularity;
 namespace SharpAbp.Abp.DbConnections.Oracle
 {
     [DependsOn(
-        typeof(AbpDbConnectionsModule),
-        typeof(AbpEntityFrameworkCoreOracleModule)
+        typeof(AbpDbConnectionsModule)
+        //typeof(AbpEntityFrameworkCoreOracleModule)
         )]
     public class AbpDbConnectionsOracleModule : AbpModule
     {

@@ -4,8 +4,8 @@ using Volo.Abp.Modularity;
 namespace SharpAbp.Abp.DbConnections.MySQL
 {
     [DependsOn(
-        typeof(AbpDbConnectionsModule),
-        typeof(AbpEntityFrameworkCoreMySQLModule)
+        typeof(AbpDbConnectionsModule)
+        //typeof(AbpEntityFrameworkCoreMySQLModule)
         )]
     public class AbpDbConnectionsMySQLModule : AbpModule
     {
