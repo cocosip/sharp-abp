@@ -36,7 +36,9 @@ namespace SharpAbp.Abp.FileStoring
             return item;
         }
 
-        public FileProviderConfiguration AddItem([NotNull] string name, [NotNull] FileProviderConfigurationItem item)
+        public FileProviderConfiguration AddItem(
+            [NotNull] string name, 
+            [NotNull] FileProviderConfigurationItem item)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
             Check.NotNull(item, nameof(item));
@@ -44,7 +46,11 @@ namespace SharpAbp.Abp.FileStoring
             return this;
         }
 
-        public FileProviderConfiguration AddItem([NotNull] string name, [NotNull] Type valueType, string eg = "", string noteLocalizationName = "")
+        public FileProviderConfiguration AddItem(
+            [NotNull] string name, 
+            [NotNull] Type valueType, 
+            string eg = "", 
+            string noteLocalizationName = "")
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
             Check.NotNull(valueType, nameof(valueType));

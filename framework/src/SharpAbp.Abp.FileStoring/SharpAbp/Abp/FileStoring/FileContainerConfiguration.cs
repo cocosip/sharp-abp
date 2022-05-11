@@ -63,9 +63,7 @@ namespace SharpAbp.Abp.FileStoring
         public FileContainerConfiguration SetConfiguration([NotNull] string name, [CanBeNull] object value)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-
             _properties[name] = value;
-
             return this;
         }
 
@@ -73,9 +71,7 @@ namespace SharpAbp.Abp.FileStoring
         public FileContainerConfiguration ClearConfiguration([NotNull] string name)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-
             _properties.Remove(name);
-
             return this;
         }
     }
