@@ -134,7 +134,7 @@ namespace SharpAbp.Abp.FileStoring
             ServiceProvider = serviceProvider;
         }
 
-        public FileContainerConfiguration GetConfiguration()
+        public virtual FileContainerConfiguration GetConfiguration()
         {
             return Configuration;
         }
