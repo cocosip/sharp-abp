@@ -14,6 +14,7 @@ namespace SharpAbp.Abp.Identity
             CreateMap<IdentityRoleClaim, IdentityRoleClaimDto>();
             CreateMap<IdentitySecurityLog, IdentitySecurityLogDto>();
             CreateMap<OrganizationUnit, OrganizationUnitDto>();
+            CreateMap<OrganizationUnitRole, OrganizationUnitRoleDto>();
         }
     }
 }
