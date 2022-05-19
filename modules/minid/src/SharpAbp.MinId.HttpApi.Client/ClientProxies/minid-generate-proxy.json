@@ -1,419 +1,34 @@
 {
   "modules": {
-    "map-tenancy": {
-      "rootPath": "map-tenancy",
-      "remoteServiceName": "MapTenancyManagement",
+    "minid": {
+      "rootPath": "minid",
+      "remoteServiceName": "MinId",
       "controllers": {
-        "SharpAbp.Abp.MapTenancyManagement.HybridMapTenantController": {
-          "controllerName": "HybridMapTenant",
-          "controllerGroupName": "HybridMapTenant",
+        "SharpAbp.MinId.IdController": {
+          "controllerName": "Id",
+          "controllerGroupName": "Id",
           "isRemoteService": true,
           "apiVersion": null,
-          "type": "SharpAbp.Abp.MapTenancyManagement.HybridMapTenantController",
-          "interfaces": [
-            {
-              "type": "SharpAbp.Abp.MapTenancyManagement.IHybridMapTenantAppService"
-            }
-          ],
+          "type": "SharpAbp.MinId.IdController",
+          "interfaces": [],
           "actions": {
-            "GetAsyncById": {
-              "uniqueName": "GetAsyncById",
-              "name": "GetAsync",
+            "SimpleNextIdAsyncByBizTypeAndToken": {
+              "uniqueName": "SimpleNextIdAsyncByBizTypeAndToken",
+              "name": "SimpleNextIdAsync",
               "httpMethod": "GET",
-              "url": "api/map-tenancy/hybrid-map-tenants/{id}",
+              "url": "api/minid/id/simple/nextId",
               "supportedVersions": [],
               "parametersOnMethod": [
                 {
-                  "name": "id",
-                  "typeAsString": "System.Guid, System.Private.CoreLib",
-                  "type": "System.Guid",
-                  "typeSimple": "string",
-                  "isOptional": false,
-                  "defaultValue": null
-                }
-              ],
-              "parameters": [
-                {
-                  "nameOnMethod": "id",
-                  "name": "id",
-                  "jsonName": null,
-                  "type": "System.Guid",
-                  "typeSimple": "string",
-                  "isOptional": false,
-                  "defaultValue": null,
-                  "constraintTypes": [],
-                  "bindingSourceId": "Path",
-                  "descriptorName": ""
-                }
-              ],
-              "returnValue": {
-                "type": "SharpAbp.Abp.MapTenancyManagement.HybridMapTenantDto",
-                "typeSimple": "SharpAbp.Abp.MapTenancyManagement.HybridMapTenantDto"
-              },
-              "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.MapTenancyManagement.IHybridMapTenantAppService"
-            },
-            "GetAllAsync": {
-              "uniqueName": "GetAllAsync",
-              "name": "GetAllAsync",
-              "httpMethod": "GET",
-              "url": "api/map-tenancy/hybrid-map-tenants/all",
-              "supportedVersions": [],
-              "parametersOnMethod": [],
-              "parameters": [],
-              "returnValue": {
-                "type": "System.Collections.Generic.List<SharpAbp.Abp.MapTenancyManagement.HybridMapTenantDto>",
-                "typeSimple": "[SharpAbp.Abp.MapTenancyManagement.HybridMapTenantDto]"
-              },
-              "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.MapTenancyManagement.IHybridMapTenantAppService"
-            },
-            "CurrentAsync": {
-              "uniqueName": "CurrentAsync",
-              "name": "CurrentAsync",
-              "httpMethod": "GET",
-              "url": "api/map-tenancy/hybrid-map-tenants/current",
-              "supportedVersions": [],
-              "parametersOnMethod": [],
-              "parameters": [],
-              "returnValue": {
-                "type": "SharpAbp.Abp.MapTenancyManagement.HybridMapTenantDto",
-                "typeSimple": "SharpAbp.Abp.MapTenancyManagement.HybridMapTenantDto"
-              },
-              "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.MapTenancyManagement.IHybridMapTenantAppService"
-            },
-            "GetListAsyncByInput": {
-              "uniqueName": "GetListAsyncByInput",
-              "name": "GetListAsync",
-              "httpMethod": "GET",
-              "url": "api/map-tenancy/hybrid-map-tenants",
-              "supportedVersions": [],
-              "parametersOnMethod": [
-                {
-                  "name": "input",
-                  "typeAsString": "SharpAbp.Abp.MapTenancyManagement.HybridMapTenantPagedRequestDto, SharpAbp.Abp.MapTenancyManagement.Application.Contracts",
-                  "type": "SharpAbp.Abp.MapTenancyManagement.HybridMapTenantPagedRequestDto",
-                  "typeSimple": "SharpAbp.Abp.MapTenancyManagement.HybridMapTenantPagedRequestDto",
-                  "isOptional": false,
-                  "defaultValue": null
-                }
-              ],
-              "parameters": [
-                {
-                  "nameOnMethod": "input",
-                  "name": "Filter",
-                  "jsonName": null,
+                  "name": "bizType",
+                  "typeAsString": "System.String, System.Private.CoreLib",
                   "type": "System.String",
                   "typeSimple": "string",
                   "isOptional": false,
-                  "defaultValue": null,
-                  "constraintTypes": null,
-                  "bindingSourceId": "ModelBinding",
-                  "descriptorName": "input"
-                },
-                {
-                  "nameOnMethod": "input",
-                  "name": "Sorting",
-                  "jsonName": null,
-                  "type": "System.String",
-                  "typeSimple": "string",
-                  "isOptional": false,
-                  "defaultValue": null,
-                  "constraintTypes": null,
-                  "bindingSourceId": "ModelBinding",
-                  "descriptorName": "input"
-                },
-                {
-                  "nameOnMethod": "input",
-                  "name": "SkipCount",
-                  "jsonName": null,
-                  "type": "System.Int32",
-                  "typeSimple": "number",
-                  "isOptional": false,
-                  "defaultValue": null,
-                  "constraintTypes": null,
-                  "bindingSourceId": "ModelBinding",
-                  "descriptorName": "input"
-                },
-                {
-                  "nameOnMethod": "input",
-                  "name": "MaxResultCount",
-                  "jsonName": null,
-                  "type": "System.Int32",
-                  "typeSimple": "number",
-                  "isOptional": false,
-                  "defaultValue": null,
-                  "constraintTypes": null,
-                  "bindingSourceId": "ModelBinding",
-                  "descriptorName": "input"
-                }
-              ],
-              "returnValue": {
-                "type": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.Abp.MapTenancyManagement.HybridMapTenantDto>",
-                "typeSimple": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.Abp.MapTenancyManagement.HybridMapTenantDto>"
-              },
-              "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.MapTenancyManagement.IHybridMapTenantAppService"
-            },
-            "SearchAsyncByInput": {
-              "uniqueName": "SearchAsyncByInput",
-              "name": "SearchAsync",
-              "httpMethod": "GET",
-              "url": "api/map-tenancy/hybrid-map-tenants/search",
-              "supportedVersions": [],
-              "parametersOnMethod": [
-                {
-                  "name": "input",
-                  "typeAsString": "SharpAbp.Abp.MapTenancyManagement.HybridMapTenantPagedRequestDto, SharpAbp.Abp.MapTenancyManagement.Application.Contracts",
-                  "type": "SharpAbp.Abp.MapTenancyManagement.HybridMapTenantPagedRequestDto",
-                  "typeSimple": "SharpAbp.Abp.MapTenancyManagement.HybridMapTenantPagedRequestDto",
-                  "isOptional": false,
-                  "defaultValue": null
-                }
-              ],
-              "parameters": [
-                {
-                  "nameOnMethod": "input",
-                  "name": "Filter",
-                  "jsonName": null,
-                  "type": "System.String",
-                  "typeSimple": "string",
-                  "isOptional": false,
-                  "defaultValue": null,
-                  "constraintTypes": null,
-                  "bindingSourceId": "ModelBinding",
-                  "descriptorName": "input"
-                },
-                {
-                  "nameOnMethod": "input",
-                  "name": "Sorting",
-                  "jsonName": null,
-                  "type": "System.String",
-                  "typeSimple": "string",
-                  "isOptional": false,
-                  "defaultValue": null,
-                  "constraintTypes": null,
-                  "bindingSourceId": "ModelBinding",
-                  "descriptorName": "input"
-                },
-                {
-                  "nameOnMethod": "input",
-                  "name": "SkipCount",
-                  "jsonName": null,
-                  "type": "System.Int32",
-                  "typeSimple": "number",
-                  "isOptional": false,
-                  "defaultValue": null,
-                  "constraintTypes": null,
-                  "bindingSourceId": "ModelBinding",
-                  "descriptorName": "input"
-                },
-                {
-                  "nameOnMethod": "input",
-                  "name": "MaxResultCount",
-                  "jsonName": null,
-                  "type": "System.Int32",
-                  "typeSimple": "number",
-                  "isOptional": false,
-                  "defaultValue": null,
-                  "constraintTypes": null,
-                  "bindingSourceId": "ModelBinding",
-                  "descriptorName": "input"
-                }
-              ],
-              "returnValue": {
-                "type": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.Abp.MapTenancyManagement.HybridMapTenantDto>",
-                "typeSimple": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.Abp.MapTenancyManagement.HybridMapTenantDto>"
-              },
-              "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.MapTenancyManagement.IHybridMapTenantAppService"
-            },
-            "CreateAsyncByInput": {
-              "uniqueName": "CreateAsyncByInput",
-              "name": "CreateAsync",
-              "httpMethod": "POST",
-              "url": "api/map-tenancy/hybrid-map-tenants",
-              "supportedVersions": [],
-              "parametersOnMethod": [
-                {
-                  "name": "input",
-                  "typeAsString": "SharpAbp.Abp.MapTenancyManagement.CreateHybridMapTenantDto, SharpAbp.Abp.MapTenancyManagement.Application.Contracts",
-                  "type": "SharpAbp.Abp.MapTenancyManagement.CreateHybridMapTenantDto",
-                  "typeSimple": "SharpAbp.Abp.MapTenancyManagement.CreateHybridMapTenantDto",
-                  "isOptional": false,
-                  "defaultValue": null
-                }
-              ],
-              "parameters": [
-                {
-                  "nameOnMethod": "input",
-                  "name": "input",
-                  "jsonName": null,
-                  "type": "SharpAbp.Abp.MapTenancyManagement.CreateHybridMapTenantDto",
-                  "typeSimple": "SharpAbp.Abp.MapTenancyManagement.CreateHybridMapTenantDto",
-                  "isOptional": false,
-                  "defaultValue": null,
-                  "constraintTypes": null,
-                  "bindingSourceId": "Body",
-                  "descriptorName": ""
-                }
-              ],
-              "returnValue": {
-                "type": "SharpAbp.Abp.MapTenancyManagement.HybridMapTenantDto",
-                "typeSimple": "SharpAbp.Abp.MapTenancyManagement.HybridMapTenantDto"
-              },
-              "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.MapTenancyManagement.IHybridMapTenantAppService"
-            },
-            "UpdateAsyncByIdAndInput": {
-              "uniqueName": "UpdateAsyncByIdAndInput",
-              "name": "UpdateAsync",
-              "httpMethod": "PUT",
-              "url": "api/map-tenancy/hybrid-map-tenants/{id}",
-              "supportedVersions": [],
-              "parametersOnMethod": [
-                {
-                  "name": "id",
-                  "typeAsString": "System.Guid, System.Private.CoreLib",
-                  "type": "System.Guid",
-                  "typeSimple": "string",
-                  "isOptional": false,
                   "defaultValue": null
                 },
                 {
-                  "name": "input",
-                  "typeAsString": "SharpAbp.Abp.MapTenancyManagement.UpdateHybridMapTenantDto, SharpAbp.Abp.MapTenancyManagement.Application.Contracts",
-                  "type": "SharpAbp.Abp.MapTenancyManagement.UpdateHybridMapTenantDto",
-                  "typeSimple": "SharpAbp.Abp.MapTenancyManagement.UpdateHybridMapTenantDto",
-                  "isOptional": false,
-                  "defaultValue": null
-                }
-              ],
-              "parameters": [
-                {
-                  "nameOnMethod": "id",
-                  "name": "id",
-                  "jsonName": null,
-                  "type": "System.Guid",
-                  "typeSimple": "string",
-                  "isOptional": false,
-                  "defaultValue": null,
-                  "constraintTypes": [],
-                  "bindingSourceId": "Path",
-                  "descriptorName": ""
-                },
-                {
-                  "nameOnMethod": "input",
-                  "name": "input",
-                  "jsonName": null,
-                  "type": "SharpAbp.Abp.MapTenancyManagement.UpdateHybridMapTenantDto",
-                  "typeSimple": "SharpAbp.Abp.MapTenancyManagement.UpdateHybridMapTenantDto",
-                  "isOptional": false,
-                  "defaultValue": null,
-                  "constraintTypes": null,
-                  "bindingSourceId": "Body",
-                  "descriptorName": ""
-                }
-              ],
-              "returnValue": {
-                "type": "SharpAbp.Abp.MapTenancyManagement.HybridMapTenantDto",
-                "typeSimple": "SharpAbp.Abp.MapTenancyManagement.HybridMapTenantDto"
-              },
-              "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.MapTenancyManagement.IHybridMapTenantAppService"
-            },
-            "DeleteAsyncById": {
-              "uniqueName": "DeleteAsyncById",
-              "name": "DeleteAsync",
-              "httpMethod": "DELETE",
-              "url": "api/map-tenancy/hybrid-map-tenants/{id}",
-              "supportedVersions": [],
-              "parametersOnMethod": [
-                {
-                  "name": "id",
-                  "typeAsString": "System.Guid, System.Private.CoreLib",
-                  "type": "System.Guid",
-                  "typeSimple": "string",
-                  "isOptional": false,
-                  "defaultValue": null
-                }
-              ],
-              "parameters": [
-                {
-                  "nameOnMethod": "id",
-                  "name": "id",
-                  "jsonName": null,
-                  "type": "System.Guid",
-                  "typeSimple": "string",
-                  "isOptional": false,
-                  "defaultValue": null,
-                  "constraintTypes": [],
-                  "bindingSourceId": "Path",
-                  "descriptorName": ""
-                }
-              ],
-              "returnValue": {
-                "type": "System.Void",
-                "typeSimple": "System.Void"
-              },
-              "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.MapTenancyManagement.IHybridMapTenantAppService"
-            },
-            "GetDefaultConnectionStringAsyncById": {
-              "uniqueName": "GetDefaultConnectionStringAsyncById",
-              "name": "GetDefaultConnectionStringAsync",
-              "httpMethod": "GET",
-              "url": "api/map-tenancy/hybrid-map-tenants/{id}/default-connection-string",
-              "supportedVersions": [],
-              "parametersOnMethod": [
-                {
-                  "name": "id",
-                  "typeAsString": "System.Guid, System.Private.CoreLib",
-                  "type": "System.Guid",
-                  "typeSimple": "string",
-                  "isOptional": false,
-                  "defaultValue": null
-                }
-              ],
-              "parameters": [
-                {
-                  "nameOnMethod": "id",
-                  "name": "id",
-                  "jsonName": null,
-                  "type": "System.Guid",
-                  "typeSimple": "string",
-                  "isOptional": false,
-                  "defaultValue": null,
-                  "constraintTypes": [],
-                  "bindingSourceId": "Path",
-                  "descriptorName": ""
-                }
-              ],
-              "returnValue": {
-                "type": "System.String",
-                "typeSimple": "string"
-              },
-              "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.MapTenancyManagement.IHybridMapTenantAppService"
-            },
-            "UpdateDefaultConnectionStringAsyncByIdAndDefaultConnectionString": {
-              "uniqueName": "UpdateDefaultConnectionStringAsyncByIdAndDefaultConnectionString",
-              "name": "UpdateDefaultConnectionStringAsync",
-              "httpMethod": "PUT",
-              "url": "api/map-tenancy/hybrid-map-tenants/{id}/default-connection-string",
-              "supportedVersions": [],
-              "parametersOnMethod": [
-                {
-                  "name": "id",
-                  "typeAsString": "System.Guid, System.Private.CoreLib",
-                  "type": "System.Guid",
-                  "typeSimple": "string",
-                  "isOptional": false,
-                  "defaultValue": null
-                },
-                {
-                  "name": "defaultConnectionString",
+                  "name": "token",
                   "typeAsString": "System.String, System.Private.CoreLib",
                   "type": "System.String",
                   "typeSimple": "string",
@@ -423,20 +38,20 @@
               ],
               "parameters": [
                 {
-                  "nameOnMethod": "id",
-                  "name": "id",
+                  "nameOnMethod": "bizType",
+                  "name": "bizType",
                   "jsonName": null,
-                  "type": "System.Guid",
+                  "type": "System.String",
                   "typeSimple": "string",
                   "isOptional": false,
                   "defaultValue": null,
-                  "constraintTypes": [],
-                  "bindingSourceId": "Path",
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
                   "descriptorName": ""
                 },
                 {
-                  "nameOnMethod": "defaultConnectionString",
-                  "name": "defaultConnectionString",
+                  "nameOnMethod": "token",
+                  "name": "token",
                   "jsonName": null,
                   "type": "System.String",
                   "typeSimple": "string",
@@ -448,23 +63,31 @@
                 }
               ],
               "returnValue": {
-                "type": "System.Void",
-                "typeSimple": "System.Void"
+                "type": "System.Int64",
+                "typeSimple": "number"
               },
               "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.MapTenancyManagement.IHybridMapTenantAppService"
+              "implementFrom": "SharpAbp.MinId.IdController"
             },
-            "DeleteDefaultConnectionStringAsyncById": {
-              "uniqueName": "DeleteDefaultConnectionStringAsyncById",
-              "name": "DeleteDefaultConnectionStringAsync",
-              "httpMethod": "DELETE",
-              "url": "api/map-tenancy/hybrid-map-tenants/{id}/default-connection-string",
+            "NextIdAsyncByBizTypeAndToken": {
+              "uniqueName": "NextIdAsyncByBizTypeAndToken",
+              "name": "NextIdAsync",
+              "httpMethod": "GET",
+              "url": "api/minid/id/nextId",
               "supportedVersions": [],
               "parametersOnMethod": [
                 {
-                  "name": "id",
-                  "typeAsString": "System.Guid, System.Private.CoreLib",
-                  "type": "System.Guid",
+                  "name": "bizType",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                },
+                {
+                  "name": "token",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
                   "typeSimple": "string",
                   "isOptional": false,
                   "defaultValue": null
@@ -472,36 +95,239 @@
               ],
               "parameters": [
                 {
-                  "nameOnMethod": "id",
-                  "name": "id",
+                  "nameOnMethod": "bizType",
+                  "name": "bizType",
                   "jsonName": null,
-                  "type": "System.Guid",
+                  "type": "System.String",
                   "typeSimple": "string",
                   "isOptional": false,
                   "defaultValue": null,
-                  "constraintTypes": [],
-                  "bindingSourceId": "Path",
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                },
+                {
+                  "nameOnMethod": "token",
+                  "name": "token",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
                   "descriptorName": ""
                 }
               ],
               "returnValue": {
-                "type": "System.Void",
-                "typeSimple": "System.Void"
+                "type": "SharpAbp.MinId.MinIdResponse<System.Int64>",
+                "typeSimple": "SharpAbp.MinId.MinIdResponse<number>"
               },
               "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.MapTenancyManagement.IHybridMapTenantAppService"
+              "implementFrom": "SharpAbp.MinId.IdController"
+            },
+            "SimpleBatchNextIdAsyncByBizTypeAndTokenAndBatchSize": {
+              "uniqueName": "SimpleBatchNextIdAsyncByBizTypeAndTokenAndBatchSize",
+              "name": "SimpleBatchNextIdAsync",
+              "httpMethod": "GET",
+              "url": "api/minid/id/simple/batch-nextId",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "bizType",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                },
+                {
+                  "name": "token",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                },
+                {
+                  "name": "batchSize",
+                  "typeAsString": "System.Int32, System.Private.CoreLib",
+                  "type": "System.Int32",
+                  "typeSimple": "number",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "bizType",
+                  "name": "bizType",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                },
+                {
+                  "nameOnMethod": "token",
+                  "name": "token",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                },
+                {
+                  "nameOnMethod": "batchSize",
+                  "name": "batchSize",
+                  "jsonName": null,
+                  "type": "System.Int32",
+                  "typeSimple": "number",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Collections.Generic.List<System.Int64>",
+                "typeSimple": "[number]"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.MinId.IdController"
+            },
+            "BatchNextIdAsyncByBizTypeAndTokenAndBatchSize": {
+              "uniqueName": "BatchNextIdAsyncByBizTypeAndTokenAndBatchSize",
+              "name": "BatchNextIdAsync",
+              "httpMethod": "GET",
+              "url": "api/minid/id/batch-nextId",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "bizType",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                },
+                {
+                  "name": "token",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                },
+                {
+                  "name": "batchSize",
+                  "typeAsString": "System.Int32, System.Private.CoreLib",
+                  "type": "System.Int32",
+                  "typeSimple": "number",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "bizType",
+                  "name": "bizType",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                },
+                {
+                  "nameOnMethod": "token",
+                  "name": "token",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                },
+                {
+                  "nameOnMethod": "batchSize",
+                  "name": "batchSize",
+                  "jsonName": null,
+                  "type": "System.Int32",
+                  "typeSimple": "number",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "SharpAbp.MinId.MinIdResponse<System.Collections.Generic.List<System.Int64>>",
+                "typeSimple": "SharpAbp.MinId.MinIdResponse<System.Collections.Generic.List<number>>"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.MinId.IdController"
+            },
+            "GetNextSegmentIdAsyncByBizType": {
+              "uniqueName": "GetNextSegmentIdAsyncByBizType",
+              "name": "GetNextSegmentIdAsync",
+              "httpMethod": "GET",
+              "url": "api/minid/id/next-segmentId",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "bizType",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "bizType",
+                  "name": "bizType",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "SharpAbp.MinId.SegmentIdDto",
+                "typeSimple": "SharpAbp.MinId.SegmentIdDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.MinId.IdController"
             }
           }
         },
-        "SharpAbp.Abp.MapTenancyManagement.MapTenantController": {
-          "controllerName": "MapTenant",
-          "controllerGroupName": "MapTenant",
+        "SharpAbp.MinId.MinIdInfoController": {
+          "controllerName": "MinIdInfo",
+          "controllerGroupName": "MinIdInfo",
           "isRemoteService": true,
           "apiVersion": null,
-          "type": "SharpAbp.Abp.MapTenancyManagement.MapTenantController",
+          "type": "SharpAbp.MinId.MinIdInfoController",
           "interfaces": [
             {
-              "type": "SharpAbp.Abp.MapTenancyManagement.IMapTenantAppService"
+              "type": "SharpAbp.MinId.IMinIdInfoAppService"
             }
           ],
           "actions": {
@@ -509,7 +335,7 @@
               "uniqueName": "GetAsyncById",
               "name": "GetAsync",
               "httpMethod": "GET",
-              "url": "api/map-tenancy/map-tenants/{id}",
+              "url": "api/minid/minid-info/{id}",
               "supportedVersions": [],
               "parametersOnMethod": [
                 {
@@ -536,21 +362,21 @@
                 }
               ],
               "returnValue": {
-                "type": "SharpAbp.Abp.MapTenancyManagement.MapTenantDto",
-                "typeSimple": "SharpAbp.Abp.MapTenancyManagement.MapTenantDto"
+                "type": "SharpAbp.MinId.MinIdInfoDto",
+                "typeSimple": "SharpAbp.MinId.MinIdInfoDto"
               },
               "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.MapTenancyManagement.IMapTenantAppService"
+              "implementFrom": "SharpAbp.MinId.IMinIdInfoAppService"
             },
-            "FindByCodeAsyncByCode": {
-              "uniqueName": "FindByCodeAsyncByCode",
-              "name": "FindByCodeAsync",
+            "FindByBizTypeAsyncByBizType": {
+              "uniqueName": "FindByBizTypeAsyncByBizType",
+              "name": "FindByBizTypeAsync",
               "httpMethod": "GET",
-              "url": "api/map-tenancy/map-tenants/find-by-code/{code}",
+              "url": "api/minid/minid-info/find-by-bizType/{bizType}",
               "supportedVersions": [],
               "parametersOnMethod": [
                 {
-                  "name": "code",
+                  "name": "bizType",
                   "typeAsString": "System.String, System.Private.CoreLib",
                   "type": "System.String",
                   "typeSimple": "string",
@@ -560,8 +386,8 @@
               ],
               "parameters": [
                 {
-                  "nameOnMethod": "code",
-                  "name": "code",
+                  "nameOnMethod": "bizType",
+                  "name": "bizType",
                   "jsonName": null,
                   "type": "System.String",
                   "typeSimple": "string",
@@ -573,98 +399,24 @@
                 }
               ],
               "returnValue": {
-                "type": "SharpAbp.Abp.MapTenancyManagement.MapTenantDto",
-                "typeSimple": "SharpAbp.Abp.MapTenancyManagement.MapTenantDto"
+                "type": "SharpAbp.MinId.MinIdInfoDto",
+                "typeSimple": "SharpAbp.MinId.MinIdInfoDto"
               },
               "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.MapTenancyManagement.IMapTenantAppService"
-            },
-            "FindByMapCodeAsyncByMapCode": {
-              "uniqueName": "FindByMapCodeAsyncByMapCode",
-              "name": "FindByMapCodeAsync",
-              "httpMethod": "GET",
-              "url": "api/map-tenancy/map-tenants/find-by-mapCode/{mapCode}",
-              "supportedVersions": [],
-              "parametersOnMethod": [
-                {
-                  "name": "mapCode",
-                  "typeAsString": "System.String, System.Private.CoreLib",
-                  "type": "System.String",
-                  "typeSimple": "string",
-                  "isOptional": false,
-                  "defaultValue": null
-                }
-              ],
-              "parameters": [
-                {
-                  "nameOnMethod": "mapCode",
-                  "name": "mapCode",
-                  "jsonName": null,
-                  "type": "System.String",
-                  "typeSimple": "string",
-                  "isOptional": false,
-                  "defaultValue": null,
-                  "constraintTypes": [],
-                  "bindingSourceId": "Path",
-                  "descriptorName": ""
-                }
-              ],
-              "returnValue": {
-                "type": "SharpAbp.Abp.MapTenancyManagement.MapTenantDto",
-                "typeSimple": "SharpAbp.Abp.MapTenancyManagement.MapTenantDto"
-              },
-              "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.MapTenancyManagement.IMapTenantAppService"
-            },
-            "FindByTenantIdAsyncByTenantId": {
-              "uniqueName": "FindByTenantIdAsyncByTenantId",
-              "name": "FindByTenantIdAsync",
-              "httpMethod": "GET",
-              "url": "api/map-tenancy/map-tenants/find-by-tenantId/{tenantId}",
-              "supportedVersions": [],
-              "parametersOnMethod": [
-                {
-                  "name": "tenantId",
-                  "typeAsString": "System.Guid, System.Private.CoreLib",
-                  "type": "System.Guid",
-                  "typeSimple": "string",
-                  "isOptional": false,
-                  "defaultValue": null
-                }
-              ],
-              "parameters": [
-                {
-                  "nameOnMethod": "tenantId",
-                  "name": "tenantId",
-                  "jsonName": null,
-                  "type": "System.Guid",
-                  "typeSimple": "string",
-                  "isOptional": false,
-                  "defaultValue": null,
-                  "constraintTypes": [],
-                  "bindingSourceId": "Path",
-                  "descriptorName": ""
-                }
-              ],
-              "returnValue": {
-                "type": "SharpAbp.Abp.MapTenancyManagement.MapTenantDto",
-                "typeSimple": "SharpAbp.Abp.MapTenancyManagement.MapTenantDto"
-              },
-              "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.MapTenancyManagement.IMapTenantAppService"
+              "implementFrom": "SharpAbp.MinId.IMinIdInfoAppService"
             },
             "GetPagedListAsyncByInput": {
               "uniqueName": "GetPagedListAsyncByInput",
               "name": "GetPagedListAsync",
               "httpMethod": "GET",
-              "url": "api/map-tenancy/map-tenants",
+              "url": "api/minid/minid-info",
               "supportedVersions": [],
               "parametersOnMethod": [
                 {
                   "name": "input",
-                  "typeAsString": "SharpAbp.Abp.MapTenancyManagement.MapTenantPagedRequestDto, SharpAbp.Abp.MapTenancyManagement.Application.Contracts",
-                  "type": "SharpAbp.Abp.MapTenancyManagement.MapTenantPagedRequestDto",
-                  "typeSimple": "SharpAbp.Abp.MapTenancyManagement.MapTenantPagedRequestDto",
+                  "typeAsString": "SharpAbp.MinId.MinIdInfoPagedRequestDto, SharpAbp.MinId.Application.Contracts",
+                  "type": "SharpAbp.MinId.MinIdInfoPagedRequestDto",
+                  "typeSimple": "SharpAbp.MinId.MinIdInfoPagedRequestDto",
                   "isOptional": false,
                   "defaultValue": null
                 }
@@ -672,31 +424,7 @@
               "parameters": [
                 {
                   "nameOnMethod": "input",
-                  "name": "Code",
-                  "jsonName": null,
-                  "type": "System.String",
-                  "typeSimple": "string",
-                  "isOptional": false,
-                  "defaultValue": null,
-                  "constraintTypes": null,
-                  "bindingSourceId": "ModelBinding",
-                  "descriptorName": "input"
-                },
-                {
-                  "nameOnMethod": "input",
-                  "name": "TenantId",
-                  "jsonName": null,
-                  "type": "System.Guid?",
-                  "typeSimple": "string?",
-                  "isOptional": false,
-                  "defaultValue": null,
-                  "constraintTypes": null,
-                  "bindingSourceId": "ModelBinding",
-                  "descriptorName": "input"
-                },
-                {
-                  "nameOnMethod": "input",
-                  "name": "MapCode",
+                  "name": "BizType",
                   "jsonName": null,
                   "type": "System.String",
                   "typeSimple": "string",
@@ -744,24 +472,24 @@
                 }
               ],
               "returnValue": {
-                "type": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.Abp.MapTenancyManagement.MapTenantDto>",
-                "typeSimple": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.Abp.MapTenancyManagement.MapTenantDto>"
+                "type": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.MinId.MinIdInfoDto>",
+                "typeSimple": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.MinId.MinIdInfoDto>"
               },
               "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.MapTenancyManagement.IMapTenantAppService"
+              "implementFrom": "SharpAbp.MinId.IMinIdInfoAppService"
             },
             "CreateAsyncByInput": {
               "uniqueName": "CreateAsyncByInput",
               "name": "CreateAsync",
               "httpMethod": "POST",
-              "url": "api/map-tenancy/map-tenants",
+              "url": "api/minid/minid-info",
               "supportedVersions": [],
               "parametersOnMethod": [
                 {
                   "name": "input",
-                  "typeAsString": "SharpAbp.Abp.MapTenancyManagement.CreateMapTenantDto, SharpAbp.Abp.MapTenancyManagement.Application.Contracts",
-                  "type": "SharpAbp.Abp.MapTenancyManagement.CreateMapTenantDto",
-                  "typeSimple": "SharpAbp.Abp.MapTenancyManagement.CreateMapTenantDto",
+                  "typeAsString": "SharpAbp.MinId.CreateMinIdInfoDto, SharpAbp.MinId.Application.Contracts",
+                  "type": "SharpAbp.MinId.CreateMinIdInfoDto",
+                  "typeSimple": "SharpAbp.MinId.CreateMinIdInfoDto",
                   "isOptional": false,
                   "defaultValue": null
                 }
@@ -771,8 +499,8 @@
                   "nameOnMethod": "input",
                   "name": "input",
                   "jsonName": null,
-                  "type": "SharpAbp.Abp.MapTenancyManagement.CreateMapTenantDto",
-                  "typeSimple": "SharpAbp.Abp.MapTenancyManagement.CreateMapTenantDto",
+                  "type": "SharpAbp.MinId.CreateMinIdInfoDto",
+                  "typeSimple": "SharpAbp.MinId.CreateMinIdInfoDto",
                   "isOptional": false,
                   "defaultValue": null,
                   "constraintTypes": null,
@@ -781,17 +509,17 @@
                 }
               ],
               "returnValue": {
-                "type": "SharpAbp.Abp.MapTenancyManagement.MapTenantDto",
-                "typeSimple": "SharpAbp.Abp.MapTenancyManagement.MapTenantDto"
+                "type": "System.Guid",
+                "typeSimple": "string"
               },
               "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.MapTenancyManagement.IMapTenantAppService"
+              "implementFrom": "SharpAbp.MinId.IMinIdInfoAppService"
             },
             "UpdateAsyncByIdAndInput": {
               "uniqueName": "UpdateAsyncByIdAndInput",
               "name": "UpdateAsync",
               "httpMethod": "PUT",
-              "url": "api/map-tenancy/map-tenants/{id}",
+              "url": "api/minid/minid-info/{id}",
               "supportedVersions": [],
               "parametersOnMethod": [
                 {
@@ -804,9 +532,9 @@
                 },
                 {
                   "name": "input",
-                  "typeAsString": "SharpAbp.Abp.MapTenancyManagement.UpdateMapTenantDto, SharpAbp.Abp.MapTenancyManagement.Application.Contracts",
-                  "type": "SharpAbp.Abp.MapTenancyManagement.UpdateMapTenantDto",
-                  "typeSimple": "SharpAbp.Abp.MapTenancyManagement.UpdateMapTenantDto",
+                  "typeAsString": "SharpAbp.MinId.UpdateMinIdInfoDto, SharpAbp.MinId.Application.Contracts",
+                  "type": "SharpAbp.MinId.UpdateMinIdInfoDto",
+                  "typeSimple": "SharpAbp.MinId.UpdateMinIdInfoDto",
                   "isOptional": false,
                   "defaultValue": null
                 }
@@ -828,8 +556,8 @@
                   "nameOnMethod": "input",
                   "name": "input",
                   "jsonName": null,
-                  "type": "SharpAbp.Abp.MapTenancyManagement.UpdateMapTenantDto",
-                  "typeSimple": "SharpAbp.Abp.MapTenancyManagement.UpdateMapTenantDto",
+                  "type": "SharpAbp.MinId.UpdateMinIdInfoDto",
+                  "typeSimple": "SharpAbp.MinId.UpdateMinIdInfoDto",
                   "isOptional": false,
                   "defaultValue": null,
                   "constraintTypes": null,
@@ -838,17 +566,17 @@
                 }
               ],
               "returnValue": {
-                "type": "SharpAbp.Abp.MapTenancyManagement.MapTenantDto",
-                "typeSimple": "SharpAbp.Abp.MapTenancyManagement.MapTenantDto"
+                "type": "System.Void",
+                "typeSimple": "System.Void"
               },
               "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.MapTenancyManagement.IMapTenantAppService"
+              "implementFrom": "SharpAbp.MinId.IMinIdInfoAppService"
             },
             "DeleteAsyncById": {
               "uniqueName": "DeleteAsyncById",
               "name": "DeleteAsync",
               "httpMethod": "DELETE",
-              "url": "api/map-tenancy/map-tenants/{id}",
+              "url": "api/minid/minid-info/{id}",
               "supportedVersions": [],
               "parametersOnMethod": [
                 {
@@ -879,7 +607,331 @@
                 "typeSimple": "System.Void"
               },
               "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.MapTenancyManagement.IMapTenantAppService"
+              "implementFrom": "SharpAbp.MinId.IMinIdInfoAppService"
+            }
+          }
+        },
+        "SharpAbp.MinId.MinIdTokenController": {
+          "controllerName": "MinIdToken",
+          "controllerGroupName": "MinIdToken",
+          "isRemoteService": true,
+          "apiVersion": null,
+          "type": "SharpAbp.MinId.MinIdTokenController",
+          "interfaces": [
+            {
+              "type": "SharpAbp.MinId.IMinIdTokenAppService"
+            }
+          ],
+          "actions": {
+            "GetAsyncById": {
+              "uniqueName": "GetAsyncById",
+              "name": "GetAsync",
+              "httpMethod": "GET",
+              "url": "api/minid/minid-token/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "SharpAbp.MinId.MinIdTokenDto",
+                "typeSimple": "SharpAbp.MinId.MinIdTokenDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.MinId.IMinIdTokenAppService"
+            },
+            "FindByTokenAsyncByBizTypeAndToken": {
+              "uniqueName": "FindByTokenAsyncByBizTypeAndToken",
+              "name": "FindByTokenAsync",
+              "httpMethod": "GET",
+              "url": "api/minid/minid-token/find-by-token/{bizType}/{token}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "bizType",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                },
+                {
+                  "name": "token",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "bizType",
+                  "name": "bizType",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                },
+                {
+                  "nameOnMethod": "token",
+                  "name": "token",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "SharpAbp.MinId.MinIdTokenDto",
+                "typeSimple": "SharpAbp.MinId.MinIdTokenDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.MinId.IMinIdTokenAppService"
+            },
+            "GetPagedListAsyncByInput": {
+              "uniqueName": "GetPagedListAsyncByInput",
+              "name": "GetPagedListAsync",
+              "httpMethod": "GET",
+              "url": "api/minid/minid-token",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "SharpAbp.MinId.MinIdTokenPagedRequestDto, SharpAbp.MinId.Application.Contracts",
+                  "type": "SharpAbp.MinId.MinIdTokenPagedRequestDto",
+                  "typeSimple": "SharpAbp.MinId.MinIdTokenPagedRequestDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "BizType",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "Token",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "Sorting",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "SkipCount",
+                  "jsonName": null,
+                  "type": "System.Int32",
+                  "typeSimple": "number",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "MaxResultCount",
+                  "jsonName": null,
+                  "type": "System.Int32",
+                  "typeSimple": "number",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": "input"
+                }
+              ],
+              "returnValue": {
+                "type": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.MinId.MinIdTokenDto>",
+                "typeSimple": "Volo.Abp.Application.Dtos.PagedResultDto<SharpAbp.MinId.MinIdTokenDto>"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.MinId.IMinIdTokenAppService"
+            },
+            "CreateAsyncByInput": {
+              "uniqueName": "CreateAsyncByInput",
+              "name": "CreateAsync",
+              "httpMethod": "POST",
+              "url": "api/minid/minid-token",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "input",
+                  "typeAsString": "SharpAbp.MinId.CreateMinIdTokenDto, SharpAbp.MinId.Application.Contracts",
+                  "type": "SharpAbp.MinId.CreateMinIdTokenDto",
+                  "typeSimple": "SharpAbp.MinId.CreateMinIdTokenDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "SharpAbp.MinId.CreateMinIdTokenDto",
+                  "typeSimple": "SharpAbp.MinId.CreateMinIdTokenDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Guid",
+                "typeSimple": "string"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.MinId.IMinIdTokenAppService"
+            },
+            "UpdateAsyncByIdAndInput": {
+              "uniqueName": "UpdateAsyncByIdAndInput",
+              "name": "UpdateAsync",
+              "httpMethod": "PUT",
+              "url": "api/minid/minid-token/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                },
+                {
+                  "name": "input",
+                  "typeAsString": "SharpAbp.MinId.UpdateMinIdTokenDto, SharpAbp.MinId.Application.Contracts",
+                  "type": "SharpAbp.MinId.UpdateMinIdTokenDto",
+                  "typeSimple": "SharpAbp.MinId.UpdateMinIdTokenDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "SharpAbp.MinId.UpdateMinIdTokenDto",
+                  "typeSimple": "SharpAbp.MinId.UpdateMinIdTokenDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Void",
+                "typeSimple": "System.Void"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.MinId.IMinIdTokenAppService"
+            },
+            "DeleteAsyncById": {
+              "uniqueName": "DeleteAsyncById",
+              "name": "DeleteAsync",
+              "httpMethod": "DELETE",
+              "url": "api/minid/minid-token/{id}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Void",
+                "typeSimple": "System.Void"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.MinId.IMinIdTokenAppService"
             }
           }
         }

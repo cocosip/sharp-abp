@@ -7,6 +7,8 @@
         "SharpAbp.Abp.DbConnectionsManagement.DatabaseConnectionInfoController": {
           "controllerName": "DatabaseConnectionInfo",
           "controllerGroupName": "DatabaseConnectionInfo",
+          "isRemoteService": true,
+          "apiVersion": null,
           "type": "SharpAbp.Abp.DbConnectionsManagement.DatabaseConnectionInfoController",
           "interfaces": [
             {
@@ -309,6 +311,8 @@
         "SharpAbp.Abp.DbConnectionsManagement.DatabaseProviderController": {
           "controllerName": "DatabaseProvider",
           "controllerGroupName": "DatabaseProvider",
+          "isRemoteService": true,
+          "apiVersion": null,
           "type": "SharpAbp.Abp.DbConnectionsManagement.DatabaseProviderController",
           "interfaces": [
             {

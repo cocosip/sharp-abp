@@ -7,6 +7,8 @@
         "SharpAbp.Abp.FileStoringManagement.ContainerController": {
           "controllerName": "Container",
           "controllerGroupName": "Container",
+          "isRemoteService": true,
+          "apiVersion": null,
           "type": "SharpAbp.Abp.FileStoringManagement.ContainerController",
           "interfaces": [
             {
@@ -324,6 +326,8 @@
         "SharpAbp.Abp.FileStoringManagement.FileProviderController": {
           "controllerName": "FileProvider",
           "controllerGroupName": "FileProvider",
+          "isRemoteService": true,
+          "apiVersion": null,
           "type": "SharpAbp.Abp.FileStoringManagement.FileProviderController",
           "interfaces": [
             {

@@ -7,6 +7,8 @@
         "SharpAbp.Abp.Account.AccountController": {
           "controllerName": "Account",
           "controllerGroupName": "Account",
+          "isRemoteService": true,
+          "apiVersion": null,
           "type": "SharpAbp.Abp.Account.AccountController",
           "interfaces": [
             {
@@ -130,6 +132,8 @@
         "SharpAbp.Abp.Account.Web.Areas.Account.Controllers.AccountController": {
           "controllerName": "Account",
           "controllerGroupName": "Login",
+          "isRemoteService": true,
+          "apiVersion": null,
           "type": "SharpAbp.Abp.Account.Web.Areas.Account.Controllers.AccountController",
           "interfaces": [],
           "actions": {

@@ -1,36 +1,37 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\common.props" />
+	<Import Project="..\..\common.props" />
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <RootNamespace>AllApiSample</RootNamespace>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<RootNamespace>AllApiSample</RootNamespace>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AllApiSample.Domain.Shared\AllApiSample.Domain.Shared.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\AllApiSample.Domain.Shared\AllApiSample.Domain.Shared.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\modules\audit-logging\src\SharpAbp.Abp.AuditLogging.Domain\SharpAbp.Abp.AuditLogging.Domain.csproj" />
-    <ProjectReference Include="..\..\..\..\modules\dbconnections\src\SharpAbp.Abp.DbConnectionsManagement.Domain\SharpAbp.Abp.DbConnectionsManagement.Domain.csproj" />
-    <ProjectReference Include="..\..\..\..\modules\file-storing-management\src\SharpAbp.Abp.FileStoringManagement.Domain\SharpAbp.Abp.FileStoringManagement.Domain.csproj" />
-    <ProjectReference Include="..\..\..\..\modules\identity\src\SharpAbp.Abp.Identity.Domain\SharpAbp.Abp.Identity.Domain.csproj" />
-    <ProjectReference Include="..\..\..\..\modules\IdentityServer\src\SharpAbp.Abp.IdentityServer.Domain\SharpAbp.Abp.IdentityServer.Domain.csproj" />
-    <ProjectReference Include="..\..\..\..\modules\map-tenancy-management\src\SharpAbp.Abp.MapTenancyManagement.Domain\SharpAbp.Abp.MapTenancyManagement.Domain.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\..\modules\audit-logging\src\SharpAbp.Abp.AuditLogging.Domain\SharpAbp.Abp.AuditLogging.Domain.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\dbconnections\src\SharpAbp.Abp.DbConnectionsManagement.Domain\SharpAbp.Abp.DbConnectionsManagement.Domain.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\file-storing-management\src\SharpAbp.Abp.FileStoringManagement.Domain\SharpAbp.Abp.FileStoringManagement.Domain.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\identity\src\SharpAbp.Abp.Identity.Domain\SharpAbp.Abp.Identity.Domain.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\IdentityServer\src\SharpAbp.Abp.IdentityServer.Domain\SharpAbp.Abp.IdentityServer.Domain.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\map-tenancy-management\src\SharpAbp.Abp.MapTenancyManagement.Domain\SharpAbp.Abp.MapTenancyManagement.Domain.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\minid\src\SharpAbp.MinId.Domain\SharpAbp.MinId.Domain.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Volo.Abp.Emailing" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.Identity.Domain" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.PermissionManagement.Domain.Identity" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.IdentityServer.Domain" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.PermissionManagement.Domain.IdentityServer" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.BackgroundJobs.Domain" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.AuditLogging.Domain" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.TenantManagement.Domain" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.FeatureManagement.Domain" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.SettingManagement.Domain" Version="$(VoloAbpPackageVersion)" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.Emailing" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.Identity.Domain" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.PermissionManagement.Domain.Identity" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.IdentityServer.Domain" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.PermissionManagement.Domain.IdentityServer" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.BackgroundJobs.Domain" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.AuditLogging.Domain" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.TenantManagement.Domain" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.FeatureManagement.Domain" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.SettingManagement.Domain" Version="$(VoloAbpPackageVersion)" />
+	</ItemGroup>
 
 </Project>

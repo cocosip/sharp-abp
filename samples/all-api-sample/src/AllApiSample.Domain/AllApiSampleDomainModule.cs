@@ -19,6 +19,7 @@ using SharpAbp.Abp.IdentityServer;
 using SharpAbp.Abp.MapTenancyManagement;
 using SharpAbp.Abp.FileStoringManagement;
 using SharpAbp.Abp.DbConnectionsManagement;
+using SharpAbp.MinId;
 
 namespace AllApiSample;
 
@@ -35,7 +36,8 @@ namespace AllApiSample;
     typeof(MapTenancyManagementDomainModule),
     typeof(FileStoringManagementDomainModule),
     typeof(DbConnectionsManagementDomainModule),
-    typeof(AbpEmailingModule)
+    typeof(AbpEmailingModule),
+    typeof(MinIdDomainModule)
     )]
 public class AllApiSampleDomainModule : AbpModule
 {

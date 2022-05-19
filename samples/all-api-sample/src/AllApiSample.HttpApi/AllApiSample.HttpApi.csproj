@@ -1,33 +1,34 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\common.props" />
+	<Import Project="..\..\common.props" />
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <RootNamespace>AllApiSample</RootNamespace>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<RootNamespace>AllApiSample</RootNamespace>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AllApiSample.Application.Contracts\AllApiSample.Application.Contracts.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\AllApiSample.Application.Contracts\AllApiSample.Application.Contracts.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\modules\account\src\SharpAbp.Abp.Account.HttpApi\SharpAbp.Abp.Account.HttpApi.csproj" />
-    <ProjectReference Include="..\..\..\..\modules\audit-logging\src\SharpAbp.Abp.AuditLogging.HttpApi\SharpAbp.Abp.AuditLogging.HttpApi.csproj" />
-    <ProjectReference Include="..\..\..\..\modules\dbconnections\src\SharpAbp.Abp.DbConnectionsManagement.HttpApi\SharpAbp.Abp.DbConnectionsManagement.HttpApi.csproj" />
-    <ProjectReference Include="..\..\..\..\modules\file-storing-management\src\SharpAbp.Abp.FileStoringManagement.HttpApi\SharpAbp.Abp.FileStoringManagement.HttpApi.csproj" />
-    <ProjectReference Include="..\..\..\..\modules\identity\src\SharpAbp.Abp.Identity.HttpApi\SharpAbp.Abp.Identity.HttpApi.csproj" />
-    <ProjectReference Include="..\..\..\..\modules\IdentityServer\src\SharpAbp.Abp.IdentityServer.HttpApi\SharpAbp.Abp.IdentityServer.HttpApi.csproj" />
-    <ProjectReference Include="..\..\..\..\modules\map-tenancy-management\src\SharpAbp.Abp.MapTenancyManagement.HttpApi\SharpAbp.Abp.MapTenancyManagement.HttpApi.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\..\modules\account\src\SharpAbp.Abp.Account.HttpApi\SharpAbp.Abp.Account.HttpApi.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\audit-logging\src\SharpAbp.Abp.AuditLogging.HttpApi\SharpAbp.Abp.AuditLogging.HttpApi.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\dbconnections\src\SharpAbp.Abp.DbConnectionsManagement.HttpApi\SharpAbp.Abp.DbConnectionsManagement.HttpApi.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\file-storing-management\src\SharpAbp.Abp.FileStoringManagement.HttpApi\SharpAbp.Abp.FileStoringManagement.HttpApi.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\identity\src\SharpAbp.Abp.Identity.HttpApi\SharpAbp.Abp.Identity.HttpApi.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\IdentityServer\src\SharpAbp.Abp.IdentityServer.HttpApi\SharpAbp.Abp.IdentityServer.HttpApi.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\map-tenancy-management\src\SharpAbp.Abp.MapTenancyManagement.HttpApi\SharpAbp.Abp.MapTenancyManagement.HttpApi.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\minid\src\SharpAbp.MinId.HttpApi\SharpAbp.MinId.HttpApi.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <!-- <PackageReference Include="Volo.Abp.Account.HttpApi" Version="$(VoloAbpPackageVersion)" />
+	<ItemGroup>
+		<!-- <PackageReference Include="Volo.Abp.Account.HttpApi" Version="$(VoloAbpPackageVersion)" />
     <PackageReference Include="Volo.Abp.Identity.HttpApi" Version="$(VoloAbpPackageVersion)" /> -->
-    <PackageReference Include="Volo.Abp.PermissionManagement.HttpApi" Version="$(VoloAbpPackageVersion)" />
-    <!-- <PackageReference Include="Volo.Abp.TenantManagement.HttpApi" Version="$(VoloAbpPackageVersion)" /> -->
-    <PackageReference Include="Volo.Abp.FeatureManagement.HttpApi" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.SettingManagement.HttpApi" Version="$(VoloAbpPackageVersion)" />
-  </ItemGroup>
+		<PackageReference Include="Volo.Abp.PermissionManagement.HttpApi" Version="$(VoloAbpPackageVersion)" />
+		<!-- <PackageReference Include="Volo.Abp.TenantManagement.HttpApi" Version="$(VoloAbpPackageVersion)" /> -->
+		<PackageReference Include="Volo.Abp.FeatureManagement.HttpApi" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.SettingManagement.HttpApi" Version="$(VoloAbpPackageVersion)" />
+	</ItemGroup>
 
 </Project>

@@ -5,6 +5,8 @@ using SharpAbp.Abp.FileStoringManagement;
 using SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore;
 using SharpAbp.Abp.MapTenancyManagement;
 using SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore;
+using SharpAbp.MinId;
+using SharpAbp.MinId.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
@@ -62,6 +64,9 @@ public class AllApiSampleDbContext :
 
     public DbSet<FileStoringContainer> FileStoringContainers { get; set; }
     public DbSet<FileStoringContainerItem> FileStoringContainerItems { get; set; }
+    
+    public DbSet<MinIdInfo> MinIdInfos { get; set; }
+    public DbSet<MinIdToken> MinIdTokens { get; set; }
 
     #endregion
 
@@ -89,6 +94,7 @@ public class AllApiSampleDbContext :
         builder.ConfigureMapTenancyManagement();
         builder.ConfigureDbConnectionsManagement();
         builder.ConfigureFileStoringManagement();
+        builder.ConfigureMinId();
         /* Configure your own tables/entities inside here */
 
         //builder.Entity<YourEntity>(b =>

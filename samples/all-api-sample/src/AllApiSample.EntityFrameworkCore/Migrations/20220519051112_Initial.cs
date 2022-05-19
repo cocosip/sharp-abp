@@ -174,6 +174,48 @@ namespace AllApiSample.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AbpMinIdInfos",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    BizType = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    MaxId = table.Column<long>(type: "bigint", nullable: false),
+                    Step = table.Column<int>(type: "integer", nullable: false),
+                    Delta = table.Column<int>(type: "integer", nullable: false),
+                    Remainder = table.Column<int>(type: "integer", nullable: false),
+                    ExtraProperties = table.Column<string>(type: "text", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: true),
+                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    LastModifierId = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AbpMinIdInfos", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AbpMinIdTokens",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Token = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    BizType = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    Remark = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    ExtraProperties = table.Column<string>(type: "text", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: true),
+                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    LastModifierId = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AbpMinIdTokens", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AbpOrganizationUnits",
                 columns: table => new
                 {
@@ -1194,6 +1236,18 @@ namespace AllApiSample.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_AbpMinIdInfos_BizType",
+                table: "AbpMinIdInfos",
+                column: "BizType",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AbpMinIdTokens_BizType_Token",
+                table: "AbpMinIdTokens",
+                columns: new[] { "BizType", "Token" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AbpOrganizationUnitRoles_RoleId_OrganizationUnitId",
                 table: "AbpOrganizationUnitRoles",
                 columns: new[] { "RoleId", "OrganizationUnitId" });
@@ -1360,6 +1414,12 @@ namespace AllApiSample.Migrations
 
             migrationBuilder.DropTable(
                 name: "AbpMapTenants");
+
+            migrationBuilder.DropTable(
+                name: "AbpMinIdInfos");
+
+            migrationBuilder.DropTable(
+                name: "AbpMinIdTokens");
 
             migrationBuilder.DropTable(
                 name: "AbpOrganizationUnitRoles");

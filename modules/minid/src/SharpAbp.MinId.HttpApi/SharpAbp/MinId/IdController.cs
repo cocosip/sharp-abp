@@ -8,7 +8,7 @@ namespace SharpAbp.MinId
 {
     [RemoteService(Name = MinIdRemoteServiceConsts.RemoteServiceName)]
     [Area("minid")]
-    [Route("api/id")]
+    [Route("api/minid/id")]
     public class IdController : MinIdController, IRemoteService
     {
         private readonly IMinIdTokenValidator _minIdTokenValidator;

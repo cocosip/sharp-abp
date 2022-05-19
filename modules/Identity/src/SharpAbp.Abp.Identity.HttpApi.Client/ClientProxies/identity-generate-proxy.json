@@ -4,110 +4,11 @@
       "rootPath": "identity",
       "remoteServiceName": "SharpAbpAccount",
       "controllers": {
-        "SharpAbp.Abp.Account.ProfileController": {
-          "controllerName": "Profile",
-          "controllerGroupName": "Profile",
-          "type": "SharpAbp.Abp.Account.ProfileController",
-          "interfaces": [
-            {
-              "type": "SharpAbp.Abp.Account.IProfileAppService"
-            }
-          ],
-          "actions": {
-            "GetAsync": {
-              "uniqueName": "GetAsync",
-              "name": "GetAsync",
-              "httpMethod": "GET",
-              "url": "api/identity/my-profile",
-              "supportedVersions": [],
-              "parametersOnMethod": [],
-              "parameters": [],
-              "returnValue": {
-                "type": "Volo.Abp.Account.ProfileDto",
-                "typeSimple": "Volo.Abp.Account.ProfileDto"
-              },
-              "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.Account.IProfileAppService"
-            },
-            "UpdateAsyncByInput": {
-              "uniqueName": "UpdateAsyncByInput",
-              "name": "UpdateAsync",
-              "httpMethod": "PUT",
-              "url": "api/identity/my-profile",
-              "supportedVersions": [],
-              "parametersOnMethod": [
-                {
-                  "name": "input",
-                  "typeAsString": "Volo.Abp.Account.UpdateProfileDto, Volo.Abp.Account.Application.Contracts",
-                  "type": "Volo.Abp.Account.UpdateProfileDto",
-                  "typeSimple": "Volo.Abp.Account.UpdateProfileDto",
-                  "isOptional": false,
-                  "defaultValue": null
-                }
-              ],
-              "parameters": [
-                {
-                  "nameOnMethod": "input",
-                  "name": "input",
-                  "jsonName": null,
-                  "type": "Volo.Abp.Account.UpdateProfileDto",
-                  "typeSimple": "Volo.Abp.Account.UpdateProfileDto",
-                  "isOptional": false,
-                  "defaultValue": null,
-                  "constraintTypes": null,
-                  "bindingSourceId": "Body",
-                  "descriptorName": ""
-                }
-              ],
-              "returnValue": {
-                "type": "Volo.Abp.Account.ProfileDto",
-                "typeSimple": "Volo.Abp.Account.ProfileDto"
-              },
-              "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.Account.IProfileAppService"
-            },
-            "ChangePasswordAsyncByInput": {
-              "uniqueName": "ChangePasswordAsyncByInput",
-              "name": "ChangePasswordAsync",
-              "httpMethod": "POST",
-              "url": "api/identity/my-profile/change-password",
-              "supportedVersions": [],
-              "parametersOnMethod": [
-                {
-                  "name": "input",
-                  "typeAsString": "Volo.Abp.Account.ChangePasswordInput, Volo.Abp.Account.Application.Contracts",
-                  "type": "Volo.Abp.Account.ChangePasswordInput",
-                  "typeSimple": "Volo.Abp.Account.ChangePasswordInput",
-                  "isOptional": false,
-                  "defaultValue": null
-                }
-              ],
-              "parameters": [
-                {
-                  "nameOnMethod": "input",
-                  "name": "input",
-                  "jsonName": null,
-                  "type": "Volo.Abp.Account.ChangePasswordInput",
-                  "typeSimple": "Volo.Abp.Account.ChangePasswordInput",
-                  "isOptional": false,
-                  "defaultValue": null,
-                  "constraintTypes": null,
-                  "bindingSourceId": "Body",
-                  "descriptorName": ""
-                }
-              ],
-              "returnValue": {
-                "type": "System.Void",
-                "typeSimple": "System.Void"
-              },
-              "allowAnonymous": null,
-              "implementFrom": "SharpAbp.Abp.Account.IProfileAppService"
-            }
-          }
-        },
         "SharpAbp.Abp.Identity.IdentityClaimTypeController": {
           "controllerName": "IdentityClaimType",
           "controllerGroupName": "IdentityClaimType",
+          "isRemoteService": true,
+          "apiVersion": null,
           "type": "SharpAbp.Abp.Identity.IdentityClaimTypeController",
           "interfaces": [
             {
@@ -418,6 +319,8 @@
         "SharpAbp.Abp.Identity.IdentityRoleController": {
           "controllerName": "IdentityRole",
           "controllerGroupName": "Role",
+          "isRemoteService": true,
+          "apiVersion": null,
           "type": "SharpAbp.Abp.Identity.IdentityRoleController",
           "interfaces": [
             {
@@ -750,7 +653,7 @@
                 },
                 {
                   "name": "roleClaims",
-                  "typeAsString": "System.Collections.Generic.List`1[[SharpAbp.Abp.Identity.CreateOrUpdateIdentityRoleClaimDto, SharpAbp.Abp.Identity.Application.Contracts, Version=2.2.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib",
+                  "typeAsString": "System.Collections.Generic.List`1[[SharpAbp.Abp.Identity.CreateOrUpdateIdentityRoleClaimDto, SharpAbp.Abp.Identity.Application.Contracts, Version=2.3.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib",
                   "type": "System.Collections.Generic.List<SharpAbp.Abp.Identity.CreateOrUpdateIdentityRoleClaimDto>",
                   "typeSimple": "[SharpAbp.Abp.Identity.CreateOrUpdateIdentityRoleClaimDto]",
                   "isOptional": false,
@@ -795,6 +698,8 @@
         "SharpAbp.Abp.Identity.IdentitySecurityLogController": {
           "controllerName": "IdentitySecurityLog",
           "controllerGroupName": "IdentitySecurityLog",
+          "isRemoteService": true,
+          "apiVersion": null,
           "type": "SharpAbp.Abp.Identity.IdentitySecurityLogController",
           "interfaces": [
             {
@@ -1243,6 +1148,8 @@
         "SharpAbp.Abp.Identity.IdentityUserController": {
           "controllerName": "IdentityUser",
           "controllerGroupName": "User",
+          "isRemoteService": true,
+          "apiVersion": null,
           "type": "SharpAbp.Abp.Identity.IdentityUserController",
           "interfaces": [
             {
@@ -1743,7 +1650,7 @@
                 },
                 {
                   "name": "identityUserClaims",
-                  "typeAsString": "System.Collections.Generic.List`1[[SharpAbp.Abp.Identity.CreateOrUpdateIdentityUserClaimDto, SharpAbp.Abp.Identity.Application.Contracts, Version=2.2.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib",
+                  "typeAsString": "System.Collections.Generic.List`1[[SharpAbp.Abp.Identity.CreateOrUpdateIdentityUserClaimDto, SharpAbp.Abp.Identity.Application.Contracts, Version=2.3.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib",
                   "type": "System.Collections.Generic.List<SharpAbp.Abp.Identity.CreateOrUpdateIdentityUserClaimDto>",
                   "typeSimple": "[SharpAbp.Abp.Identity.CreateOrUpdateIdentityUserClaimDto]",
                   "isOptional": false,
@@ -2085,6 +1992,8 @@
         "SharpAbp.Abp.Identity.IdentityUserLookupController": {
           "controllerName": "IdentityUserLookup",
           "controllerGroupName": "UserLookup",
+          "isRemoteService": true,
+          "apiVersion": null,
           "type": "SharpAbp.Abp.Identity.IdentityUserLookupController",
           "interfaces": [
             {
@@ -2281,6 +2190,8 @@
         "SharpAbp.Abp.Identity.OrganizationUnitController": {
           "controllerName": "OrganizationUnit",
           "controllerGroupName": "OrganizationUnit",
+          "isRemoteService": true,
+          "apiVersion": null,
           "type": "SharpAbp.Abp.Identity.OrganizationUnitController",
           "interfaces": [
             {

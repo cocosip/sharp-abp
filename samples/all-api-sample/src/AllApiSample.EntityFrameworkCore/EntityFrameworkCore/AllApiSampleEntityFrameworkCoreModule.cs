@@ -2,6 +2,7 @@
 using SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore;
 using SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore;
 using SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore;
+using SharpAbp.MinId.EntityFrameworkCore;
 using System;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -28,7 +29,8 @@ namespace AllApiSample.EntityFrameworkCore;
     typeof(MapTenancyManagementEntityFrameworkCoreModule),
     typeof(AbpFeatureManagementEntityFrameworkCoreModule),
     typeof(DbConnectionsManagementEntityFrameworkCoreModule),
-    typeof(FileStoringManagementEntityFrameworkCoreModule)
+    typeof(FileStoringManagementEntityFrameworkCoreModule),
+    typeof(MinIdEntityFrameworkCoreModule)
     )]
 public class AllApiSampleEntityFrameworkCoreModule : AbpModule
 {

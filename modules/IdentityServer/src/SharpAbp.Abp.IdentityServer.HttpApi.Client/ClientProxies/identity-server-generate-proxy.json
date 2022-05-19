@@ -7,6 +7,8 @@
         "SharpAbp.Abp.IdentityServer.IdentityResourceController": {
           "controllerName": "IdentityResource",
           "controllerGroupName": "IdentityResource",
+          "isRemoteService": true,
+          "apiVersion": null,
           "type": "SharpAbp.Abp.IdentityServer.IdentityResourceController",
           "interfaces": [
             {
@@ -349,6 +351,8 @@
         "SharpAbp.Abp.IdentityServer.IdentityServerApiResourceController": {
           "controllerName": "IdentityServerApiResource",
           "controllerGroupName": "IdentityServerApiResource",
+          "isRemoteService": true,
+          "apiVersion": null,
           "type": "SharpAbp.Abp.IdentityServer.IdentityServerApiResourceController",
           "interfaces": [
             {
@@ -691,6 +695,8 @@
         "SharpAbp.Abp.IdentityServer.IdentityServerApiScopeController": {
           "controllerName": "IdentityServerApiScope",
           "controllerGroupName": "IdentityServerApiScope",
+          "isRemoteService": true,
+          "apiVersion": null,
           "type": "SharpAbp.Abp.IdentityServer.IdentityServerApiScopeController",
           "interfaces": [
             {
@@ -1018,6 +1024,8 @@
         "SharpAbp.Abp.IdentityServer.IdentityServerClaimTypeController": {
           "controllerName": "IdentityServerClaimType",
           "controllerGroupName": "IdentityServerClaimType",
+          "isRemoteService": true,
+          "apiVersion": null,
           "type": "SharpAbp.Abp.IdentityServer.IdentityServerClaimTypeController",
           "interfaces": [
             {
@@ -1045,6 +1053,8 @@
         "SharpAbp.Abp.IdentityServer.IdentityServerClientController": {
           "controllerName": "IdentityServerClient",
           "controllerGroupName": "IdentityServerClient",
+          "isRemoteService": true,
+          "apiVersion": null,
           "type": "SharpAbp.Abp.IdentityServer.IdentityServerClientController",
           "interfaces": [
             {

@@ -15,6 +15,7 @@
 		<ProjectReference Include="..\..\..\..\modules\dbconnections\src\SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore\SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore.csproj" />
 		<ProjectReference Include="..\..\..\..\modules\file-storing-management\src\SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore\SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore.csproj" />
 		<ProjectReference Include="..\..\..\..\modules\map-tenancy-management\src\SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore\SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\minid\src\SharpAbp.MinId.EntityFrameworkCore\SharpAbp.MinId.EntityFrameworkCore.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -34,6 +35,10 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
 			<PrivateAssets>compile; contentFiles; build; buildMultitargeting; buildTransitive; analyzers; native</PrivateAssets>
 		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Migrations\" />
 	</ItemGroup>
 
 </Project>

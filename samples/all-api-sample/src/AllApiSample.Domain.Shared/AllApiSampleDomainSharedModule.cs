@@ -5,6 +5,7 @@ using SharpAbp.Abp.FileStoringManagement;
 using SharpAbp.Abp.Identity;
 using SharpAbp.Abp.IdentityServer;
 using SharpAbp.Abp.MapTenancyManagement;
+using SharpAbp.MinId;
 using Volo.Abp.AuditLogging;
 using Volo.Abp.BackgroundJobs;
 using Volo.Abp.FeatureManagement;
@@ -31,7 +32,8 @@ namespace AllApiSample;
     typeof(AbpSettingManagementDomainSharedModule),
     typeof(MapTenancyManagementDomainSharedModule),
     typeof(FileStoringManagementDomainSharedModule),
-    typeof(DbConnectionsManagementDomainSharedModule)
+    typeof(DbConnectionsManagementDomainSharedModule),
+    typeof(MinIdDomainSharedModule)
     )]
 public class AllApiSampleDomainSharedModule : AbpModule
 {
