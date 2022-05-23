@@ -53,6 +53,10 @@ namespace SharpAbp.Abp.MapTenancyManagement
             Assert.NotNull(all_c2);
 
 
+            var codeCacheItem = await _mapTenantCacheManager.GetCodeCacheAsync(t1.Id);
+            Assert.Equal("901", codeCacheItem.Code);
+            Assert.Equal("1901", codeCacheItem.MapCode);
+
         }
 
     }
