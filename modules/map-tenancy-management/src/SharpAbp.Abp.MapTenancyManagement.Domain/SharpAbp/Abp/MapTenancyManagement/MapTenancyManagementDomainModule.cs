@@ -38,6 +38,14 @@ namespace SharpAbp.Abp.MapTenancyManagement
                         };
                     }
 
+                    if (cacheName == CacheNameAttribute.GetCacheName(typeof(CodeCacheItem)))
+                    {
+                        return new DistributedCacheEntryOptions()
+                        {
+                            AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(3600)
+                        };
+                    }
+
                     if (cacheName == CacheNameAttribute.GetCacheName(typeof(AllMapTenantCacheItem)))
                     {
                         return new DistributedCacheEntryOptions()

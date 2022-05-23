@@ -6,24 +6,31 @@ using Volo.Abp;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
 using System.Threading;
+using Volo.Abp.MultiTenancy;
 
 namespace SharpAbp.Abp.MapTenancyManagement
 {
     public class MapTenantCacheManager : IMapTenantCacheManager, ITransientDependency
     {
+        protected ICurrentTenant CurrentTenant { get; }
         protected IDistributedCache<AllMapTenantCacheItem> AllMapTenantCache { get; }
         protected IDistributedCache<MapTenantCacheItem> MapTenantCache { get; }
         protected IDistributedCache<MapTenantMapCodeCacheItem> MapTenantMapCodeCache { get; }
+        protected IDistributedCache<CodeCacheItem> CodeCache { get; }
         protected IMapTenantRepository MapTenantRepository { get; }
         public MapTenantCacheManager(
+            ICurrentTenant currentTenant,
             IDistributedCache<AllMapTenantCacheItem> allMapTenantCache,
             IDistributedCache<MapTenantCacheItem> mapTenantCache,
             IDistributedCache<MapTenantMapCodeCacheItem> mapTenantMapCodeCache,
+            IDistributedCache<CodeCacheItem> codeCache,
             IMapTenantRepository mapTenantRepository)
         {
+            CurrentTenant = currentTenant;
             AllMapTenantCache = allMapTenantCache;
             MapTenantCache = mapTenantCache;
             MapTenantMapCodeCache = mapTenantMapCodeCache;
+            CodeCache = codeCache;
             MapTenantRepository = mapTenantRepository;
         }
 
@@ -76,6 +83,36 @@ namespace SharpAbp.Abp.MapTenancyManagement
         }
 
         /// <summary>
+        /// Get code cache
+        /// </summary>
+        /// <param name="tenantId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<CodeCacheItem> GetCodeCacheAsync(
+            Guid? tenantId,
+            CancellationToken cancellationToken = default)
+        {
+            if (tenantId == null)
+            {
+                return null;
+            }
+            using (CurrentTenant.Change(tenantId))
+            {
+                var key = tenantId.Value.ToString("D");
+                var codeCacheItem = await CodeCache.GetOrAddAsync(
+                    key,
+                    async () =>
+                    {
+                        var mapTenant = await MapTenantRepository.FindByTenantIdAsync(tenantId.Value, true, cancellationToken);
+                        return mapTenant?.AsCodeCacheItem();
+                    },
+                    hideErrors: false,
+                    token: cancellationToken);
+                return codeCacheItem;
+            }
+        }
+
+        /// <summary>
         /// Update cache by id
         /// </summary>
         /// <param name="id"></param>
@@ -102,6 +139,13 @@ namespace SharpAbp.Abp.MapTenancyManagement
                     mapCodeCacheItem,
                     hideErrors: false,
                     token: cancellationToken);
+
+                using (CurrentTenant.Change(mapTenant.TenantId))
+                {
+                    var codeCacheItem = mapTenant.AsCodeCacheItem();
+                    var key = mapTenant.TenantId.ToString("D");
+                    await CodeCache.SetAsync(key, codeCacheItem, hideErrors: false, token: cancellationToken);
+                }
             }
         }
 

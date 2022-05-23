@@ -23,6 +23,14 @@ namespace SharpAbp.Abp.MapTenancyManagement
         Task<MapTenantMapCodeCacheItem> GetMapCodeAsync(string mapCode, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Get code cache
+        /// </summary>
+        /// <param name="tenantId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<CodeCacheItem> GetCodeCacheAsync(Guid? tenantId, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Update cache by id
         /// </summary>
         /// <param name="id"></param>

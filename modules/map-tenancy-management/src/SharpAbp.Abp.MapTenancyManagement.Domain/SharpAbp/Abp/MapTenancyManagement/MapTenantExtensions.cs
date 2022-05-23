@@ -36,5 +36,20 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
             return mapCodeCacheItem;
         }
+
+        public static CodeCacheItem AsCodeCacheItem([NotNull] this MapTenant mapTenant)
+        {
+            Check.NotNull(mapTenant, nameof(mapTenant));
+            if (mapTenant == null || mapTenant == default)
+            {
+                return null;
+            }
+
+            var codeCacheItem = new CodeCacheItem(
+                mapTenant.Code,
+                mapTenant.MapCode);
+
+            return codeCacheItem;
+        }
     }
 }
