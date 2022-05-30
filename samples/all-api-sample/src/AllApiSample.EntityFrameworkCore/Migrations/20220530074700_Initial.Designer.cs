@@ -13,7 +13,7 @@ using Volo.Abp.EntityFrameworkCore;
 namespace AllApiSample.Migrations
 {
     [DbContext(typeof(AllApiSampleDbContext))]
-    [Migration("20220519051112_Initial")]
+    [Migration("20220530074700_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -90,6 +90,9 @@ namespace AllApiSample.Migrations
                         .HasColumnType("character varying(40)")
                         .HasColumnName("ConcurrencyStamp");
 
+                    b.Property<bool>("EnableAutoMultiPartUpload")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("ExtraProperties")
                         .HasColumnType("text")
                         .HasColumnName("ExtraProperties");
@@ -99,6 +102,12 @@ namespace AllApiSample.Migrations
 
                     b.Property<bool>("IsMultiTenant")
                         .HasColumnType("boolean");
+
+                    b.Property<int>("MultiPartUploadMinFileSize")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MultiPartUploadShardingSize")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()

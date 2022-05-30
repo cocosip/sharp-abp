@@ -67,24 +67,6 @@ namespace SharpAbp.Abp.FileStoring.S3
         }
 
         /// <summary>
-        /// EnableSlice.
-        /// </summary>
-        public bool EnableSlice
-        {
-            get => _containerConfiguration.GetConfigurationOrDefault(S3FileProviderConfigurationNames.EnableSlice, true);
-            set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.EnableSlice, value);
-        }
-
-        /// <summary>
-        /// SliceSize (Default is 5MB)
-        /// </summary>
-        public int SliceSize
-        {
-            get => _containerConfiguration.GetConfigurationOrDefault(S3FileProviderConfigurationNames.SliceSize, 5242880);
-            set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.SliceSize, value);
-        }
-
-        /// <summary>
         ///  SignatureVersion
         /// </summary>
         public string SignatureVersion

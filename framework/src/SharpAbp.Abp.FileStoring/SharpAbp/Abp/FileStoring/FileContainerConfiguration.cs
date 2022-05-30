@@ -25,6 +25,24 @@ namespace SharpAbp.Abp.FileStoring
         public bool IsMultiTenant { get; set; } = true;
 
         /// <summary>
+        /// Enable auto multi-part upload
+        /// </summary>
+        /// <value></value>
+        public bool EnableAutoMultiPartUpload { get; set; } = false;
+
+        /// <summary>
+        /// Multi-part upload min file size
+        /// </summary>
+        /// <value></value>
+        public int MultiPartUploadMinFileSize { get; set; } = 1024 * 1024 * 100;
+
+        /// <summary>
+        /// Multi-part upload sharding size
+        /// </summary>
+        /// <value></value>
+        public int MultiPartUploadShardingSize { get; set; } = 1024 * 1024 * 3;
+
+        /// <summary>
         /// Whether the container support use http url to access object
         /// Default: true
         /// </summary>

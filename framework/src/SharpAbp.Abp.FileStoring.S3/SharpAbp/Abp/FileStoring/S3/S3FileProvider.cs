@@ -42,7 +42,7 @@ namespace SharpAbp.Abp.FileStoring.S3
             var objectKey = FileNameCalculator.Calculate(args);
             var configuration = args.Configuration.GetS3Configuration();
             var client = GetS3Client(args);
-        
+
 
             if (!args.OverrideExisting && await FileExistsAsync(client, containerName, objectKey, args.CancellationToken))
             {
@@ -54,9 +54,9 @@ namespace SharpAbp.Abp.FileStoring.S3
                 await CreateBucketIfNotExists(client, containerName);
             }
 
-            if (configuration.EnableSlice && (args.FileStream.Length > configuration.SliceSize))
+            if (args.Configuration.EnableAutoMultiPartUpload && (args.FileStream.Length > args.Configuration.MultiPartUploadMinFileSize))
             {
-                await MultipartUploadAsync(client, containerName, objectKey, args.FileStream, configuration.UseChunkEncoding, configuration.SliceSize);
+                await MultipartUploadAsync(client, containerName, objectKey, args.FileStream, configuration.UseChunkEncoding, args.Configuration.MultiPartUploadShardingSize);
             }
             else
             {
@@ -73,7 +73,7 @@ namespace SharpAbp.Abp.FileStoring.S3
             var containerName = GetContainerName(args);
             var objectKey = FileNameCalculator.Calculate(args);
             var client = GetS3Client(args);
-      
+
 
             if (await FileExistsAsync(client, containerName, objectKey, args.CancellationToken))
             {
@@ -135,7 +135,7 @@ namespace SharpAbp.Abp.FileStoring.S3
             var containerName = GetContainerName(args);
             var objectKey = FileNameCalculator.Calculate(args);
             var client = GetS3Client(args);
-           
+
             var configuration = args.Configuration.GetS3Configuration();
 
             if (args.CheckFileExist && !await FileExistsAsync(client, containerName, objectKey, args.CancellationToken))

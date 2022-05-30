@@ -20,6 +20,9 @@ namespace SharpAbp.Abp.FileStoringManagement
                 container.Provider,
                 container.Name,
                 container.Title,
+                container.EnableAutoMultiPartUpload,
+                container.MultiPartUploadMinFileSize,
+                container.MultiPartUploadShardingSize,
                 container.HttpAccess);
 
             foreach (var item in container.Items)

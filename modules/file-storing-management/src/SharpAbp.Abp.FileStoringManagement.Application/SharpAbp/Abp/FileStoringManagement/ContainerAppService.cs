@@ -105,6 +105,9 @@ namespace SharpAbp.Abp.FileStoringManagement
                 input.Provider,
                 input.Name,
                 input.Title,
+                input.EnableAutoMultiPartUpload,
+                input.MultiPartUploadMinFileSize,
+                input.MultiPartUploadShardingSize,
                 input.HttpAccess);
 
             foreach (var item in input.Items)
@@ -134,7 +137,14 @@ namespace SharpAbp.Abp.FileStoringManagement
 
             var container = await ContainerRepository.GetAsync(id, true);
 
-            container.Update(input.IsMultiTenant, input.Provider, input.Title, input.HttpAccess);
+            container.Update(
+                input.IsMultiTenant,
+                input.Provider,
+                input.Title,
+                input.EnableAutoMultiPartUpload,
+                input.MultiPartUploadMinFileSize,
+                input.MultiPartUploadShardingSize,
+                input.HttpAccess);
 
             //Remove all items
             container.CleanItem();

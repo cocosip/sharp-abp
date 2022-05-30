@@ -1,6 +1,8 @@
-﻿using OBS;
+﻿using Microsoft.Extensions.Logging;
+using OBS;
 using OBS.Model;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
@@ -10,17 +12,20 @@ namespace SharpAbp.Abp.FileStoring.Obs
 {
     public class ObsFileProvider : FileProviderBase, ITransientDependency
     {
+        protected ILogger Logger { get; }
         protected IClock Clock { get; }
         protected IObsClientFactory ObsClientFactory { get; }
         protected IObsFileNameCalculator ObsFileNameCalculator { get; }
         protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
 
         public ObsFileProvider(
+            ILogger<ObsFileProvider> logger,
             IClock clock,
             IObsClientFactory obsClientFactory,
             IObsFileNameCalculator obsFileNameCalculator,
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
+            Logger = logger;
             Clock = clock;
             ObsClientFactory = obsClientFactory;
             ObsFileNameCalculator = obsFileNameCalculator;
@@ -40,7 +45,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
             return ObsClientFactory.Create(obsConfiguration);
         }
 
-        public override Task<string> SaveAsync(FileProviderSaveArgs args)
+        public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
             var containerName = GetContainerName(args);
             var objectKey = ObsFileNameCalculator.Calculate(args);
@@ -58,15 +63,14 @@ namespace SharpAbp.Abp.FileStoring.Obs
                 }
             }
 
-            var request = new PutObjectRequest()
+            if (args.Configuration.EnableAutoMultiPartUpload && args.FileStream.Length > args.Configuration.MultiPartUploadMinFileSize)
             {
-                BucketName = containerName,
-                ObjectKey = objectKey,
-                InputStream = args.FileStream
-            };
-
-            obsClient.PutObject(request);
-            return Task.FromResult(args.FileId);
+                return await MultiPartUploadAsync(obsClient, containerName, objectKey, args);
+            }
+            else
+            {
+                return await PutObjectAsync(obsClient, containerName, objectKey, args);
+            }
         }
 
         public override Task<bool> DeleteAsync(FileProviderDeleteArgs args)
@@ -183,6 +187,86 @@ namespace SharpAbp.Abp.FileStoring.Obs
             return obsClient.HeadBucket(headBucketRequest) &&
                    obsClient.HeadObject(hadObjectRequest);
         }
+
+        protected virtual Task<string> PutObjectAsync(
+            ObsClient obsClient,
+            string containerName,
+            string objectKey,
+            FileProviderSaveArgs args)
+        {
+            obsClient.PutObject(new PutObjectRequest
+            {
+                BucketName = containerName,
+                ObjectKey = objectKey,
+                InputStream = args.FileStream,
+            });
+            return Task.FromResult(args.FileId);
+        }
+
+        protected virtual async Task<string> MultiPartUploadAsync(
+            ObsClient obsClient,
+            string containerName,
+            string objectKey,
+            FileProviderSaveArgs args)
+        {
+            var initiateMultipartUploadResponse = obsClient.InitiateMultipartUpload(new InitiateMultipartUploadRequest()
+            {
+                BucketName = containerName,
+                ObjectKey = objectKey
+            });
+
+            //上传Id
+            var uploadId = initiateMultipartUploadResponse.UploadId;
+            // 计算分片总数。
+            var partSize = args.Configuration.MultiPartUploadShardingSize;
+
+            var fileSize = args.FileStream.Length;
+            var partCount = fileSize / partSize;
+            if (fileSize % partSize != 0)
+            {
+                partCount++;
+            }
+
+            // 开始分片上传。partETags是保存partETag的列表，OSS收到用户提交的分片列表后，会逐一验证每个分片数据的有效性。 当所有的数据分片通过验证后，OSS会将这些分片组合成一个完整的文件。
+            var partETags = new List<PartETag>();
+
+            for (var i = 0; i < partCount; i++)
+            {
+                var skipBytes = (long)partSize * i;
+                args.FileStream.Seek(skipBytes, 0);
+
+                // 计算本次上传的分片大小，最后一片为剩余的数据大小。
+                var size = (partSize < fileSize - skipBytes) ? partSize : (fileSize - skipBytes);
+                var buffer = new byte[size];
+                await args.FileStream.ReadAsync(buffer, 0, buffer.Length);
+
+                var request = new UploadPartRequest()
+                {
+                    BucketName = containerName,
+                    ObjectKey = objectKey,
+                    UploadId = uploadId,
+                    InputStream = new MemoryStream(buffer),
+                    PartSize = size,
+                    PartNumber = i + 1
+                };
+                // 调用UploadPart接口执行上传功能，返回结果中包含了这个数据片的ETag值。
+                var result = obsClient.UploadPart(request);
+                partETags.Add(new PartETag(result.PartNumber, result.ETag));
+
+                Logger.LogDebug("UploadId {uploadId} finish {Count}/{partCount}.", uploadId, partETags.Count, partCount);
+            }
+
+            obsClient.CompleteMultipartUpload(new CompleteMultipartUploadRequest()
+            {
+                BucketName = containerName,
+                ObjectKey = objectKey,
+                UploadId = uploadId,
+                PartETags = partETags
+            });
+
+            return args.FileId;
+        }
+
 
     }
 }

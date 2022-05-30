@@ -35,6 +35,9 @@ namespace SharpAbp.Abp.FileStoring
                     {
                         c.Provider = fileProviderConfiguration.Provider;
                         c.IsMultiTenant = entryKv.Value?.IsMultiTenant ?? false;
+                        c.EnableAutoMultiPartUpload = entryKv.Value?.EnableAutoMultiPartUpload ?? false;
+                        c.MultiPartUploadMinFileSize = entryKv.Value?.MultiPartUploadMinFileSize ?? 1024 * 1024 * 100;
+                        c.MultiPartUploadShardingSize = entryKv.Value?.MultiPartUploadShardingSize ?? 1024 * 1024 * 3;
                         c.HttpAccess = entryKv.Value?.HttpAccess ?? true;
 
                         foreach (var defaultNamingNormalizer in fileProviderConfiguration.DefaultNamingNormalizers)

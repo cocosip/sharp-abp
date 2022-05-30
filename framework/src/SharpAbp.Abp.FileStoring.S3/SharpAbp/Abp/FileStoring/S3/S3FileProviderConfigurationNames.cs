@@ -15,8 +15,6 @@
         public const string Protocol = "S3.Protocol";
         //1-Amazon, 2-KS3,4-Other
         //public const string VendorType = "S3.VendorType";
-        public const string EnableSlice = "S3.EnableSlice";
-        public const string SliceSize = "S3.SliceSize";
         public const string SignatureVersion = "S3.SignatureVersion";
         public const string CreateBucketIfNotExists = "S3.CreateBucketIfNotExists";
 

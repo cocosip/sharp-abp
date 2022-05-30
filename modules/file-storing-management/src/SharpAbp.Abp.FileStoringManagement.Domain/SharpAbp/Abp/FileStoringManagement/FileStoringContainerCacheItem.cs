@@ -17,6 +17,12 @@ namespace SharpAbp.Abp.FileStoringManagement
 
         public string Title { get; set; }
 
+        public bool EnableAutoMultiPartUpload { get; set; }
+
+        public int MultiPartUploadMinFileSize { get; set; }
+
+        public int MultiPartUploadShardingSize { get; set; }
+
         public bool HttpAccess { get; set; }
 
         public List<FileStoringContainerItemCacheItem> Items { get; set; }
@@ -33,6 +39,9 @@ namespace SharpAbp.Abp.FileStoringManagement
             string provider,
             string name,
             string title,
+            bool enableAutoMultiPartUpload,
+            int multiPartUploadMinFileSize,
+            int multiPartUploadShardingSize,
             bool httpAccess)
             : this()
         {
@@ -42,6 +51,9 @@ namespace SharpAbp.Abp.FileStoringManagement
             Provider = provider;
             Name = name;
             Title = title;
+            EnableAutoMultiPartUpload = enableAutoMultiPartUpload;
+            MultiPartUploadMinFileSize = multiPartUploadMinFileSize;
+            MultiPartUploadShardingSize = multiPartUploadShardingSize;
             HttpAccess = httpAccess;
         }
     }

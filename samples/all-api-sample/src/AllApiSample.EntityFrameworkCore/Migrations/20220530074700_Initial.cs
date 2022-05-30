@@ -129,6 +129,9 @@ namespace AllApiSample.Migrations
                     Provider = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     Title = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    EnableAutoMultiPartUpload = table.Column<bool>(type: "boolean", nullable: false),
+                    MultiPartUploadMinFileSize = table.Column<int>(type: "integer", nullable: false),
+                    MultiPartUploadShardingSize = table.Column<int>(type: "integer", nullable: false),
                     HttpAccess = table.Column<bool>(type: "boolean", nullable: false),
                     ExtraProperties = table.Column<string>(type: "text", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: true)

@@ -29,6 +29,9 @@ namespace SharpAbp.Abp.FileStoringManagement
             {
                 Provider = fileProviderConfiguration.Provider,
                 IsMultiTenant = container.IsMultiTenant,
+                EnableAutoMultiPartUpload = container.EnableAutoMultiPartUpload,
+                MultiPartUploadMinFileSize = container.MultiPartUploadMinFileSize,
+                MultiPartUploadShardingSize = container.MultiPartUploadShardingSize,
                 HttpAccess = container.HttpAccess
             };
 
@@ -61,6 +64,9 @@ namespace SharpAbp.Abp.FileStoringManagement
             {
                 Provider = fileProviderConfiguration.Provider,
                 IsMultiTenant = cacheItem.IsMultiTenant,
+                EnableAutoMultiPartUpload = cacheItem.EnableAutoMultiPartUpload,
+                MultiPartUploadMinFileSize = cacheItem.MultiPartUploadMinFileSize,
+                MultiPartUploadShardingSize = cacheItem.MultiPartUploadShardingSize,
                 HttpAccess = cacheItem.HttpAccess
             };
 

@@ -136,6 +136,9 @@ namespace SharpAbp.Abp.FileStoring
             Assert.Equal("S3", configuration.Provider);
             Assert.True(configuration.IsMultiTenant);
             Assert.True(configuration.HttpAccess);
+            Assert.True(configuration.EnableAutoMultiPartUpload);
+            Assert.Equal(5242880, configuration.MultiPartUploadMinFileSize);
+            Assert.Equal(1048570, configuration.MultiPartUploadShardingSize);
 
             var s3Configuration = configuration.GetS3Configuration();
 
@@ -146,8 +149,6 @@ namespace SharpAbp.Abp.FileStoring
             Assert.False(s3Configuration.ForcePathStyle);
             Assert.False(s3Configuration.UseChunkEncoding);
             Assert.Equal(0, s3Configuration.Protocol); //0-HTTPS,1-HTTP
-            Assert.True(s3Configuration.EnableSlice);
-            Assert.Equal(5242880, s3Configuration.SliceSize);
             Assert.Equal("2.0", s3Configuration.SignatureVersion);
             Assert.False(s3Configuration.CreateBucketIfNotExists);
         }

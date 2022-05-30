@@ -88,6 +88,9 @@ namespace AllApiSample.Migrations
                         .HasColumnType("character varying(40)")
                         .HasColumnName("ConcurrencyStamp");
 
+                    b.Property<bool>("EnableAutoMultiPartUpload")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("ExtraProperties")
                         .HasColumnType("text")
                         .HasColumnName("ExtraProperties");
@@ -97,6 +100,12 @@ namespace AllApiSample.Migrations
 
                     b.Property<bool>("IsMultiTenant")
                         .HasColumnType("boolean");
+
+                    b.Property<int>("MultiPartUploadMinFileSize")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MultiPartUploadShardingSize")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()

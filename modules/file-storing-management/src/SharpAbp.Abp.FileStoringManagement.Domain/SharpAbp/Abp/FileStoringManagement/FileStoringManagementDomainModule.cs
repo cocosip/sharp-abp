@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using SharpAbp.Abp.FileStoring;
 using System;
 using Volo.Abp.Caching;

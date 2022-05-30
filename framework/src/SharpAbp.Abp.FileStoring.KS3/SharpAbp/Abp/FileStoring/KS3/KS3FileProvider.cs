@@ -1,9 +1,13 @@
 ﻿using KS3;
+using KS3.Model;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Timing;
 using KS3SDK = KS3;
@@ -45,7 +49,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
             return KS3ClientFactory.Create(ks3Configuration);
         }
 
-        public override Task<string> SaveAsync(FileProviderSaveArgs args)
+        public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
             var containerName = GetContainerName(args);
             var objectKey = KS3FileNameCalculator.Calculate(args);
@@ -63,8 +67,14 @@ namespace SharpAbp.Abp.FileStoring.KS3
                 }
             }
 
-            ks3Client.PutObject(containerName, objectKey, args.FileStream, new KS3SDK.Model.ObjectMetadata());
-            return Task.FromResult(args.FileId);
+            if (args.Configuration.EnableAutoMultiPartUpload && args.FileStream.Length > args.Configuration.MultiPartUploadMinFileSize)
+            {
+                return await MultiPartUploadAsync(ks3Client, containerName, objectKey, args);
+            }
+            else
+            {
+                return await PutObjectAsync(ks3Client, containerName, objectKey, args);
+            }
         }
 
         public override Task<bool> DeleteAsync(FileProviderDeleteArgs args)
@@ -174,6 +184,90 @@ namespace SharpAbp.Abp.FileStoring.KS3
                 }
             }
             return false;
+        }
+
+        protected virtual Task<string> PutObjectAsync(
+            IKS3 ks3,
+            string containerName,
+            string objectKey,
+            FileProviderSaveArgs args)
+        {
+            ks3.PutObject(new PutObjectRequest(containerName, objectKey, args.FileStream, new ObjectMetadata()));
+            return Task.FromResult(args.FileId);
+        }
+
+
+        protected virtual async Task<string> MultiPartUploadAsync(
+            IKS3 ks3,
+            string containerName,
+            string objectKey,
+            FileProviderSaveArgs args)
+        {
+            var initiateMultipartUploadResult = ks3.InitiateMultipartUpload(new InitiateMultipartUploadRequest(containerName, objectKey));
+
+            //上传Id
+            var uploadId = initiateMultipartUploadResult.UploadId;
+            // 计算分片总数。
+            var partSize = args.Configuration.MultiPartUploadShardingSize;
+            //var fi = new FileInfo(spoolFile.FilePath);//?
+            var fileSize = args.FileStream.Length;
+            var partCount = fileSize / partSize;
+            if (fileSize % partSize != 0)
+            {
+                partCount++;
+            }
+
+            // 开始分片上传。partETags是保存partETag的列表，OSS收到用户提交的分片列表后，会逐一验证每个分片数据的有效性。 当所有的数据分片通过验证后，OSS会将这些分片组合成一个完整的文件。
+            var partETags = new List<PartETag>();
+            for (var i = 0; i < partCount; i++)
+            {
+                var skipBytes = (long)partSize * i;
+                // 定位到本次上传的起始位置。
+                args.FileStream.Seek(skipBytes, 0);
+
+                // 计算本次上传的分片大小，最后一片为剩余的数据大小。
+                var size = (partSize < fileSize - skipBytes) ? partSize : (fileSize - skipBytes);
+                var buffer = new byte[size];
+                await args.FileStream.ReadAsync(buffer, 0, buffer.Length);
+
+                var request = new UploadPartRequest()
+                {
+                    BucketName = containerName,
+                    ObjectKey = objectKey,
+                    UploadId = uploadId,
+                    InputStream = new MemoryStream(buffer),
+                    PartNumber = i + 1
+                };
+
+                // 调用UploadPart接口执行上传功能，返回结果中包含了这个数据片的ETag值。
+                var partETag = ks3.UploadPart(request);
+                partETags.Add(partETag);
+
+                Logger.LogDebug("UploadId {uploadId} finish {Count}/{partCount}.", uploadId, partETags.Count, partCount);
+            }
+
+            XElement root = new XElement("CompleteMultipartUpload");
+            foreach (var partETag in partETags)
+            {
+                XElement partE = new XElement("Part");
+                partE.Add(new XElement("PartNumber", partETag.PartNumber));
+                partE.Add(new XElement("ETag", partETag.ETag));
+                root.Add(partE);
+            }
+
+            var contentBuffer = Encoding.UTF8.GetBytes(root.ToString());
+
+            var completeMultipartUploadRequest = new CompleteMultipartUploadRequest()
+            {
+                BucketName = containerName,
+                ObjectKey = objectKey,
+                UploadId = uploadId,
+                Content = new MemoryStream(contentBuffer)
+            };
+
+            ks3.CompleteMultipartUpload(completeMultipartUploadRequest);
+
+            return args.FileId;
         }
 
     }

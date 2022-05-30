@@ -33,6 +33,9 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
                 "Minio",
                 "default",
                 "test-container",
+                false,
+                1,
+                100,
                 true);
 
             container.Items.Add(new FileStoringContainerItem(
@@ -60,13 +63,13 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
                 container.Id));
 
             container.Items.Add(new FileStoringContainerItem(
-                _guidGenerator.Create(), 
-                "Minio.WithSSL", 
-                "true", 
+                _guidGenerator.Create(),
+                "Minio.WithSSL",
+                "true",
                 container.Id));
 
             container.Items.Add(new FileStoringContainerItem(
-                _guidGenerator.Create(), 
+                _guidGenerator.Create(),
                 "Minio.CreateBucketIfNotExists",
                 "true",
                 container.Id));

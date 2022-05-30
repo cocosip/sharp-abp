@@ -44,12 +44,6 @@ namespace SharpAbp.Abp.FileStoring.S3
             //Protocol
             ValidateHelper.ShouldInt(result, Provider, S3FileProviderConfigurationNames.Protocol, keyValuePairs[S3FileProviderConfigurationNames.Protocol]);
 
-            //EnableSlice
-            ValidateHelper.ShouldBool(result, Provider, S3FileProviderConfigurationNames.EnableSlice, keyValuePairs[S3FileProviderConfigurationNames.EnableSlice]);
-
-            //SliceSize
-            ValidateHelper.ShouldInt(result, Provider, S3FileProviderConfigurationNames.SliceSize, keyValuePairs[S3FileProviderConfigurationNames.SliceSize]);
-
             //SignatureVersion
             ValidateHelper.NotNullOrWhiteSpace(result, Provider, S3FileProviderConfigurationNames.SignatureVersion, keyValuePairs[S3FileProviderConfigurationNames.SignatureVersion]);
 

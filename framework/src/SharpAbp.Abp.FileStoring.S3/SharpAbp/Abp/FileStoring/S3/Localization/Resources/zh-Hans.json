@@ -9,8 +9,6 @@
     "S3.UseChunkEncoding": "Chunk编码",
     "S3.Protocol": "协议",
     "S3.VendorType": "供应商",
-    "S3.EnableSlice": "自动分片",
-    "S3.SliceSize": "分片大小",
     "S3.SignatureVersion": "签名版本",
     "S3.CreateBucketIfNotExists": "自动建桶",
     "S3.MaxClient": "客户端连接数"

@@ -32,6 +32,12 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
 
                 b.Property(p => p.Provider).IsRequired().HasMaxLength(FileStoringContainerConsts.MaxProviderLength);
 
+                b.Property(p => p.EnableAutoMultiPartUpload).IsRequired();
+
+                b.Property(p => p.MultiPartUploadMinFileSize).IsRequired();
+
+                b.Property(p => p.MultiPartUploadShardingSize).IsRequired();
+
                 b.Property(p => p.HttpAccess).IsRequired();
 
                 b.Property(p => p.IsMultiTenant).IsRequired();
@@ -48,7 +54,7 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
 
                 b.ConfigureByConvention();
 
-                b.Property(p => p.ContainerId).IsRequired(); 
+                b.Property(p => p.ContainerId).IsRequired();
 
                 b.Property(p => p.Name).IsRequired().HasMaxLength(FileStoringContainerItemConsts.MaxNameLength);
 

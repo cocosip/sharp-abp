@@ -245,6 +245,6 @@ namespace SharpAbp.Abp.FileStoring.Minio
                 ? args.ContainerName
                 : FileNormalizeNamingService.NormalizeContainerName(args.Configuration, configuration.BucketName);
         }
-
     }
+
 }

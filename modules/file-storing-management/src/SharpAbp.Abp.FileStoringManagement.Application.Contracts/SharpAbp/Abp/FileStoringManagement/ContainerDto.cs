@@ -16,6 +16,12 @@ namespace SharpAbp.Abp.FileStoringManagement
 
         public string Provider { get; set; }
 
+        public bool EnableAutoMultiPartUpload { get; set; }
+
+        public int MultiPartUploadMinFileSize { get; set; }
+
+        public int MultiPartUploadShardingSize { get; set; }
+
         public bool HttpAccess { get; set; }
 
         public List<ContainerItemDto> Items { get; set; }

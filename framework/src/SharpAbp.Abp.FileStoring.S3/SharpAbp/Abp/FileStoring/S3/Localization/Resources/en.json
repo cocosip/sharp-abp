@@ -9,8 +9,6 @@
     "S3.UseChunkEncoding": "UseChunkEncoding",
     "S3.Protocol": "Protocol",
     "S3.VendorType": "Vendor",
-    "S3.EnableSlice": "Auto slice",
-    "S3.SliceSize": "Slice size",
     "S3.SignatureVersion": "Signature version",
     "S3.CreateBucketIfNotExists": "Create bucket if not exist",
     "S3.MaxClient": "Max client connection"
