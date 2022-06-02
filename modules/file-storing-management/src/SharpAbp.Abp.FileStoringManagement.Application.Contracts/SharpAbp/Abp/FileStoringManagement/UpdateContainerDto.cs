@@ -42,11 +42,11 @@ namespace SharpAbp.Abp.FileStoringManagement
         {
             if (EnableAutoMultiPartUpload)
             {
-                if (MultiPartUploadMinFileSize <= 1024 * 1024 * 5)
+                if (MultiPartUploadMinFileSize < 1024 * 1024 * 5)
                 {
                     yield return new ValidationResult("MultiPartUploadMinFileSize should greater than 5MB(5242880).");
                 }
-                if (MultiPartUploadShardingSize <= 1024 * 1024)
+                if (MultiPartUploadShardingSize < 1024 * 1024)
                 {
                     yield return new ValidationResult("MultiPartUploadShardingSize should greater than 1MB(1048576).");
                 }
