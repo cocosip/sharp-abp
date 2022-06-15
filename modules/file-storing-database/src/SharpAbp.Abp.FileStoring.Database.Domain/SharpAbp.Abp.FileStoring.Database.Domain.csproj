@@ -4,7 +4,7 @@
   <Import Project="..\..\..\..\configureawait.props" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>SharpAbp.Abp.FileStoring.Database.Domain</AssemblyName>
     <PackageId>SharpAbp.Abp.FileStoring.Database.Domain</PackageId>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
