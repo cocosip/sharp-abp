@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
@@ -20,6 +21,15 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         /// <param name="name"></param>
         /// <returns></returns>
         Task<DatabaseConnectionInfoDto> FindByNameAsync(string name);
+
+        /// <summary>
+        /// Get list
+        /// </summary>
+        /// <param name="sorting"></param>
+        /// <param name="name"></param>
+        /// <param name="databaseProvider"></param>
+        /// <returns></returns>
+        Task<List<DatabaseConnectionInfoDto>> GetListAsync(string sorting = null, string name = "", string databaseProvider = "");
 
         /// <summary>
         /// Get paged list

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
@@ -8,7 +9,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
 {
     [RemoteService(Name = DbConnectionsManagementRemoteServiceConsts.RemoteServiceName)]
     [Area("dbconnections")]
-    [Route("api/dbconnections/database-connectioninfos")]
+    [Route("api/dbconnections/database-connection-infos")]
     public class DatabaseConnectionInfoController : DbConnectionsController, IDatabaseConnectionInfoAppService
     {
         private readonly IDatabaseConnectionInfoAppService _databaseConnectionInfoAppService;
@@ -30,6 +31,16 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         public async Task<DatabaseConnectionInfoDto> FindByNameAsync(string name)
         {
             return await _databaseConnectionInfoAppService.FindByNameAsync(name);
+        }
+
+        [HttpGet]
+        [Route("get-list")]
+        public async Task<List<DatabaseConnectionInfoDto>> GetListAsync(
+            string sorting = null,
+            string name = "",
+            string databaseProvider = "")
+        {
+            return await _databaseConnectionInfoAppService.GetListAsync(sorting, name, databaseProvider);
         }
 
         [HttpGet]
@@ -57,6 +68,5 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         {
             await _databaseConnectionInfoAppService.DeleteAsync(id);
         }
-
     }
 }

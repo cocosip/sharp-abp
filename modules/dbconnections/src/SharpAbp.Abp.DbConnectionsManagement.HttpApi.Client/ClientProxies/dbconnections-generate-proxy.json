@@ -20,7 +20,7 @@
               "uniqueName": "GetAsyncById",
               "name": "GetAsync",
               "httpMethod": "GET",
-              "url": "api/dbconnections/database-connectioninfos/{id}",
+              "url": "api/dbconnections/database-connection-infos/{id}",
               "supportedVersions": [],
               "parametersOnMethod": [
                 {
@@ -57,7 +57,7 @@
               "uniqueName": "FindByNameAsyncByName",
               "name": "FindByNameAsync",
               "httpMethod": "GET",
-              "url": "api/dbconnections/database-connectioninfos/find-by-name/{name}",
+              "url": "api/dbconnections/database-connection-infos/find-by-name/{name}",
               "supportedVersions": [],
               "parametersOnMethod": [
                 {
@@ -90,11 +90,88 @@
               "allowAnonymous": null,
               "implementFrom": "SharpAbp.Abp.DbConnectionsManagement.IDatabaseConnectionInfoAppService"
             },
+            "GetListAsyncBySortingAndNameAndDatabaseProvider": {
+              "uniqueName": "GetListAsyncBySortingAndNameAndDatabaseProvider",
+              "name": "GetListAsync",
+              "httpMethod": "GET",
+              "url": "api/dbconnections/database-connection-infos/get-list",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "sorting",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": true,
+                  "defaultValue": null
+                },
+                {
+                  "name": "name",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": true,
+                  "defaultValue": ""
+                },
+                {
+                  "name": "databaseProvider",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": true,
+                  "defaultValue": ""
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "sorting",
+                  "name": "sorting",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                },
+                {
+                  "nameOnMethod": "name",
+                  "name": "name",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                },
+                {
+                  "nameOnMethod": "databaseProvider",
+                  "name": "databaseProvider",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Collections.Generic.List<SharpAbp.Abp.DbConnectionsManagement.DatabaseConnectionInfoDto>",
+                "typeSimple": "[SharpAbp.Abp.DbConnectionsManagement.DatabaseConnectionInfoDto]"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "SharpAbp.Abp.DbConnectionsManagement.IDatabaseConnectionInfoAppService"
+            },
             "GetPagedListAsyncByInput": {
               "uniqueName": "GetPagedListAsyncByInput",
               "name": "GetPagedListAsync",
               "httpMethod": "GET",
-              "url": "api/dbconnections/database-connectioninfos",
+              "url": "api/dbconnections/database-connection-infos",
               "supportedVersions": [],
               "parametersOnMethod": [
                 {
@@ -179,7 +256,7 @@
               "uniqueName": "CreateAsyncByInput",
               "name": "CreateAsync",
               "httpMethod": "POST",
-              "url": "api/dbconnections/database-connectioninfos",
+              "url": "api/dbconnections/database-connection-infos",
               "supportedVersions": [],
               "parametersOnMethod": [
                 {
@@ -216,7 +293,7 @@
               "uniqueName": "UpdateAsyncByIdAndInput",
               "name": "UpdateAsync",
               "httpMethod": "PUT",
-              "url": "api/dbconnections/database-connectioninfos/{id}",
+              "url": "api/dbconnections/database-connection-infos/{id}",
               "supportedVersions": [],
               "parametersOnMethod": [
                 {
@@ -273,7 +350,7 @@
               "uniqueName": "DeleteAsyncById",
               "name": "DeleteAsync",
               "httpMethod": "DELETE",
-              "url": "api/dbconnections/database-connectioninfos/{id}",
+              "url": "api/dbconnections/database-connection-infos/{id}",
               "supportedVersions": [],
               "parametersOnMethod": [
                 {
@@ -324,7 +401,7 @@
               "uniqueName": "GetAllAsync",
               "name": "GetAllAsync",
               "httpMethod": "GET",
-              "url": "api/database-provider/all",
+              "url": "api/dbconnections/database-provider/all",
               "supportedVersions": [],
               "parametersOnMethod": [],
               "parameters": [],

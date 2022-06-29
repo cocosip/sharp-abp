@@ -59,18 +59,41 @@ namespace SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
+        /// <summary>
+        /// Get list
+        /// </summary>
+        /// <param name="sorting"></param>
+        /// <param name="name"></param>
+        /// <param name="databaseProvider"></param>
+        /// <param name="includeDetails"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<List<DatabaseConnectionInfo>> GetListAsync(
+            string sorting = null,
+            string name = "",
+            string databaseProvider = "",
+            bool includeDetails = false,
+            CancellationToken cancellationToken = default)
+        {
+            return await (await GetDbSetAsync())
+                .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+                .WhereIf(!databaseProvider.IsNullOrWhiteSpace(), item => item.DatabaseProvider == databaseProvider)
+                .OrderBy(sorting ?? nameof(DatabaseConnectionInfo.Id))
+                .ToListAsync(GetCancellationToken(cancellationToken));
+        }
 
-       /// <summary>
-       /// Get paged list
-       /// </summary>
-       /// <param name="skipCount"></param>
-       /// <param name="maxResultCount"></param>
-       /// <param name="sorting"></param>
-       /// <param name="name"></param>
-       /// <param name="databaseProvider"></param>
-       /// <param name="includeDetails"></param>
-       /// <param name="cancellationToken"></param>
-       /// <returns></returns>
+
+        /// <summary>
+        /// Get paged list
+        /// </summary>
+        /// <param name="skipCount"></param>
+        /// <param name="maxResultCount"></param>
+        /// <param name="sorting"></param>
+        /// <param name="name"></param>
+        /// <param name="databaseProvider"></param>
+        /// <param name="includeDetails"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public virtual async Task<List<DatabaseConnectionInfo>> GetPagedListAsync(
             int skipCount,
             int maxResultCount,
@@ -83,7 +106,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore
             return await (await GetDbSetAsync())
                 .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
                 .WhereIf(!databaseProvider.IsNullOrWhiteSpace(), item => item.DatabaseProvider == databaseProvider)
-                .OrderBy(sorting ?? nameof(DatabaseConnectionInfo.Name))
+                .OrderBy(sorting ?? nameof(DatabaseConnectionInfo.Id))
                 .Skip(skipCount)
                 .Take(maxResultCount)
                 .ToListAsync(GetCancellationToken(cancellationToken));

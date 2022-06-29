@@ -48,6 +48,25 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         }
 
         /// <summary>
+        /// Get list
+        /// </summary>
+        /// <param name="sorting"></param>
+        /// <param name="name"></param>
+        /// <param name="databaseProvider"></param>
+        /// <returns></returns>
+        public virtual async Task<List<DatabaseConnectionInfoDto>> GetListAsync(
+            string sorting = null,
+            string name = "",
+            string databaseProvider = "")
+        {
+            var databaseConnectionInfos = await ConnectionInfoRepository.GetListAsync(
+                sorting,
+                name,
+                databaseProvider);
+            return ObjectMapper.Map<List<DatabaseConnectionInfo>, List<DatabaseConnectionInfoDto>>(databaseConnectionInfos);
+        }
+
+        /// <summary>
         /// Get paged list
         /// </summary>
         /// <param name="input"></param>

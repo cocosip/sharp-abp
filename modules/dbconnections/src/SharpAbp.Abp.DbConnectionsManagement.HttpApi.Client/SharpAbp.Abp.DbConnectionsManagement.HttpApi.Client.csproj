@@ -23,4 +23,8 @@
 	  <ProjectReference Include="..\SharpAbp.Abp.DbConnectionsManagement.Application.Contracts\SharpAbp.Abp.DbConnectionsManagement.Application.Contracts.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="ClientProxies\" />
+	</ItemGroup>
+
 </Project>

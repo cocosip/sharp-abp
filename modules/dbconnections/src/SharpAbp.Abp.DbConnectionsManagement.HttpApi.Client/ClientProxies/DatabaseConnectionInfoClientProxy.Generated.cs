@@ -7,6 +7,7 @@ using Volo.Abp.Http.Modeling;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Http.Client.ClientProxying;
 using SharpAbp.Abp.DbConnectionsManagement;
+using System.Collections.Generic;
 
 // ReSharper disable once CheckNamespace
 namespace SharpAbp.Abp.DbConnectionsManagement.ClientProxies;
@@ -28,6 +29,16 @@ public partial class DatabaseConnectionInfoClientProxy : ClientProxyBase<IDataba
         return await RequestAsync<DatabaseConnectionInfoDto>(nameof(FindByNameAsync), new ClientProxyRequestTypeValue
         {
             { typeof(string), name }
+        });
+    }
+
+    public virtual async Task<List<DatabaseConnectionInfoDto>> GetListAsync(string sorting, string name, string databaseProvider)
+    {
+        return await RequestAsync<List<DatabaseConnectionInfoDto>>(nameof(GetListAsync), new ClientProxyRequestTypeValue
+        {
+            { typeof(string), sorting },
+            { typeof(string), name },
+            { typeof(string), databaseProvider }
         });
     }
 

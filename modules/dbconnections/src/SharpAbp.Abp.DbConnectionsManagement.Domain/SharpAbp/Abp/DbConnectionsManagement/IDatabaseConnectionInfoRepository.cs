@@ -29,6 +29,17 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         Task<DatabaseConnectionInfo> FindExpectedByNameAsync(string name, Guid? expectedId = null, bool includeDetails = true, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Get list
+        /// </summary>
+        /// <param name="sorting"></param>
+        /// <param name="name"></param>
+        /// <param name="databaseProvider"></param>
+        /// <param name="includeDetails"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<List<DatabaseConnectionInfo>> GetListAsync(string sorting = null, string name = "", string databaseProvider = "", bool includeDetails = false, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Get paged list
         /// </summary>
         /// <param name="skipCount"></param>

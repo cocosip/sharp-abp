@@ -58,6 +58,30 @@ namespace SharpAbp.Abp.DbConnectionsManagement.MongoDB
         }
 
         /// <summary>
+        /// Get list
+        /// </summary>
+        /// <param name="sorting"></param>
+        /// <param name="name"></param>
+        /// <param name="databaseProvider"></param>
+        /// <param name="includeDetails"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<List<DatabaseConnectionInfo>> GetListAsync(
+            string sorting = null,
+            string name = "",
+            string databaseProvider = "",
+            bool includeDetails = false,
+            CancellationToken cancellationToken = default)
+        {
+            return await (await GetMongoQueryableAsync())
+                .WhereIf<DatabaseConnectionInfo, IMongoQueryable<DatabaseConnectionInfo>>(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+                .WhereIf<DatabaseConnectionInfo, IMongoQueryable<DatabaseConnectionInfo>>(!databaseProvider.IsNullOrWhiteSpace(), item => item.DatabaseProvider == databaseProvider)
+                .OrderBy(sorting ?? nameof(DatabaseConnectionInfo.Name))
+                .As<IMongoQueryable<DatabaseConnectionInfo>>()
+                .ToListAsync(GetCancellationToken(cancellationToken));
+        }
+
+        /// <summary>
         /// Get paged list
         /// </summary>
         /// <param name="skipCount"></param>
@@ -104,7 +128,5 @@ namespace SharpAbp.Abp.DbConnectionsManagement.MongoDB
                 .As<IMongoQueryable<DatabaseConnectionInfo>>()
                 .CountAsync(GetCancellationToken(cancellationToken));
         }
-
-
     }
 }

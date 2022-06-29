@@ -7,7 +7,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
 {
     [RemoteService(Name = DbConnectionsManagementRemoteServiceConsts.RemoteServiceName)]
     [Area("dbconnections")]
-    [Route("api/database-provider")]
+    [Route("api/dbconnections/database-provider")]
     public class DatabaseProviderController : DbConnectionsController, IDatabaseProviderAppService
     {
         private readonly IDatabaseProviderAppService _databaseProviderAppService;
