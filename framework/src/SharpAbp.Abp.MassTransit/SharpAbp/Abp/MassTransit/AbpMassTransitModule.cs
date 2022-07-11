@@ -39,7 +39,7 @@ namespace SharpAbp.Abp.MassTransit
             {
                 options.WaitUntilStarted = massTransitOptions.WaitUntilStarted;
                 options.StartTimeout = startTimeout;
-                options.StartTimeout = stopTimeout;
+                options.StopTimeout = stopTimeout;
             });
         }
     }
