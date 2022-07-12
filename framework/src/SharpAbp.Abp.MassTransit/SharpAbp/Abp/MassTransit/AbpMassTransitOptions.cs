@@ -30,7 +30,7 @@ namespace SharpAbp.Abp.MassTransit
         /// <summary>
         /// Stop timeout millisecond
         /// </summary>
-        public int StopTimeoutMilliSeconds { get; set; } = 3000;
+        public int StopTimeoutMilliSeconds { get; set; } = 10000;
 
         public List<Action<IBusRegistrationConfigurator>> PreConfigures { get; set; }
 
