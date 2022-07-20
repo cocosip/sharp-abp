@@ -26,7 +26,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                     {
                         return new DistributedCacheEntryOptions()
                         {
-                            AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(7200)
+                            SlidingExpiration = TimeSpan.FromSeconds(3600)
                         };
                     }
                     return null;

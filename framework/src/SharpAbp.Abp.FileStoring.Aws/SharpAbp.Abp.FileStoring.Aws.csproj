@@ -16,8 +16,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AWSSDK.S3" Version="3.7.9.21" />
-		<PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.170" />
+		<PackageReference Include="AWSSDK.S3" Version="3.7.9.27" />
+		<PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.175" />
 		<PackageReference Include="Volo.Abp.Caching" Version="$(VoloAbpPackageVersion)" />
 	</ItemGroup>
 

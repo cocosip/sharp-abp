@@ -16,7 +16,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="MassTransit.Kafka" Version="8.0.4" />
+		<PackageReference Include="MassTransit.Kafka" Version="8.0.5" />
 	</ItemGroup>
 
 	<ItemGroup>

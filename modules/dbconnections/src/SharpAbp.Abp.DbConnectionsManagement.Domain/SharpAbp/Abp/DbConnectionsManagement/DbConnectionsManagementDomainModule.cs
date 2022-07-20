@@ -26,7 +26,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
                     {
                         return new DistributedCacheEntryOptions()
                         {
-                            AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(3600)
+                            SlidingExpiration = TimeSpan.FromSeconds(1800)
                         };
                     }
                     return null;
