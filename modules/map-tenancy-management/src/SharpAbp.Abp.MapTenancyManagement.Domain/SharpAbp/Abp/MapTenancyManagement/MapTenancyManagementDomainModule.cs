@@ -29,7 +29,11 @@ namespace SharpAbp.Abp.MapTenancyManagement
                             SlidingExpiration = TimeSpan.FromSeconds(1800)
                         };
                     }
+                    return null;
+                });
 
+                options.CacheConfigurators.Add(cacheName =>
+                {
                     if (cacheName == CacheNameAttribute.GetCacheName(typeof(MapTenantMapCodeCacheItem)))
                     {
                         return new DistributedCacheEntryOptions()
@@ -37,7 +41,11 @@ namespace SharpAbp.Abp.MapTenancyManagement
                             SlidingExpiration = TimeSpan.FromSeconds(1800)
                         };
                     }
+                    return null;
+                });
 
+                options.CacheConfigurators.Add(cacheName =>
+                {
                     if (cacheName == CacheNameAttribute.GetCacheName(typeof(CodeCacheItem)))
                     {
                         return new DistributedCacheEntryOptions()
@@ -45,7 +53,11 @@ namespace SharpAbp.Abp.MapTenancyManagement
                             SlidingExpiration = TimeSpan.FromSeconds(1800)
                         };
                     }
+                    return null;
+                });
 
+                options.CacheConfigurators.Add(cacheName =>
+                {
                     if (cacheName == CacheNameAttribute.GetCacheName(typeof(AllMapTenantCacheItem)))
                     {
                         return new DistributedCacheEntryOptions()
