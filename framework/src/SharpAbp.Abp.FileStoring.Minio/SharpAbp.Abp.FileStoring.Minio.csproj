@@ -20,7 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Minio" Version="4.0.4" />
+		<PackageReference Include="Minio" Version="4.0.5" />
 		<PackageReference Include="Volo.Abp.Timing" Version="$(VoloAbpPackageVersion)" />
 	</ItemGroup>
 
