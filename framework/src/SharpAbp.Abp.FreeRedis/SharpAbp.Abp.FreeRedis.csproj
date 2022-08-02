@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FreeRedis" Version="0.5.9" />
+    <PackageReference Include="FreeRedis" Version="0.6.2" />
     <PackageReference Include="Volo.Abp" Version="$(VoloAbpPackageVersion)" />
   </ItemGroup>
 
