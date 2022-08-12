@@ -27,7 +27,7 @@ namespace SharpAbp.Abp.AuditLogging
                 options.Resources
                     .Add<AuditLoggingResource>("en")
                     .AddBaseTypes(typeof(AbpValidationResource))
-                    .AddVirtualJson("/SharpAbp/Abp/DbConnectionsManagement/Localization/Resources");
+                    .AddVirtualJson("/SharpAbp/Abp/AuditLogging/Localization/Resources");
             });
 
             Configure<AbpExceptionLocalizationOptions>(options =>
