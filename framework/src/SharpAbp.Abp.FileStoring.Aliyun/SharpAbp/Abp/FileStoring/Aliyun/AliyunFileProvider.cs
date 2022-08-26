@@ -222,6 +222,8 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
                 completeMultipartUploadRequest.PartETags.Add(partETag);
             }
 
+            var completeMultipartUploadResult = ossClient.CompleteMultipartUpload(completeMultipartUploadRequest);
+
             return args.FileId;
         }
 

@@ -256,7 +256,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
                 Logger.LogDebug("UploadId {uploadId} finish {Count}/{partCount}.", uploadId, partETags.Count, partCount);
             }
 
-            obsClient.CompleteMultipartUpload(new CompleteMultipartUploadRequest()
+            var completeMultipartUploadResponse = obsClient.CompleteMultipartUpload(new CompleteMultipartUploadRequest()
             {
                 BucketName = containerName,
                 ObjectKey = objectKey,

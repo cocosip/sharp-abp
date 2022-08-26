@@ -265,7 +265,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
                 Content = new MemoryStream(contentBuffer)
             };
 
-            ks3.CompleteMultipartUpload(completeMultipartUploadRequest);
+            var completeMultipartUploadResult = ks3.CompleteMultipartUpload(completeMultipartUploadRequest);
 
             return args.FileId;
         }
