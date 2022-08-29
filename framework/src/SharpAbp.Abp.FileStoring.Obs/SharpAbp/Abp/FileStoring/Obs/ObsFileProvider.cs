@@ -264,6 +264,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
                 PartETags = partETags
             });
 
+            Logger.LogDebug("CompleteMultipartUpload {ObjectKey} ({ETag}).", completeMultipartUploadResponse.ObjectKey, completeMultipartUploadResponse.ETag);
             return args.FileId;
         }
 

@@ -266,7 +266,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
             };
 
             var completeMultipartUploadResult = ks3.CompleteMultipartUpload(completeMultipartUploadRequest);
-
+            Logger.LogDebug("CompleteMultipartUpload {Key} ({ETag}).", completeMultipartUploadResult.Key, completeMultipartUploadResult.ETag);
             return args.FileId;
         }
 

@@ -77,7 +77,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             {
                 BucketName = containerName,
                 Key = objectKey
-            });
+            }, args.CancellationToken);
 
             return true;
         }
@@ -105,7 +105,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             {
                 BucketName = containerName,
                 Key = objectKey
-            });
+            }, args.CancellationToken);
 
             return await TryCopyToMemoryStreamAsync(response.ResponseStream, args.CancellationToken);
         }
@@ -125,7 +125,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             {
                 BucketName = containerName,
                 Key = objectKey
-            });
+            }, args.CancellationToken);
 
             await TryWriteToFileAsync(response.ResponseStream, args.Path, args.CancellationToken);
             return true;
@@ -224,7 +224,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
                 BucketName = containerName,
                 Key = objectKey,
                 InputStream = args.FileStream
-            });
+            }, args.CancellationToken);
             return args.FileId;
         }
 
@@ -238,7 +238,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             {
                 BucketName = containerName,
                 Key = objectKey
-            });
+            }, args.CancellationToken);
 
             //上传Id
             var uploadId = initiateMultipartUploadResponse.UploadId;
@@ -276,19 +276,21 @@ namespace SharpAbp.Abp.FileStoring.Aws
                 };
 
                 // 调用UploadPart接口执行上传功能，返回结果中包含了这个数据片的ETag值。
-                var result = await amazonS3Client.UploadPartAsync(request);
+                var result = await amazonS3Client.UploadPartAsync(request, args.CancellationToken);
                 partETags.Add(new PartETag(result.PartNumber, result.ETag));
 
                 Logger.LogDebug("UploadId {uploadId} finish {Count}/{partCount}.", uploadId, partETags.Count, partCount);
             }
 
-            await amazonS3Client.CompleteMultipartUploadAsync(new CompleteMultipartUploadRequest()
+            var completeMultipartUploadResponse = await amazonS3Client.CompleteMultipartUploadAsync(new CompleteMultipartUploadRequest()
             {
                 BucketName = containerName,
                 Key = objectKey,
                 UploadId = uploadId,
                 PartETags = partETags
-            });
+            }, args.CancellationToken);
+
+            Logger.LogDebug("CompleteMultipartUpload {Key} ({ETag}).", completeMultipartUploadResponse.Key, completeMultipartUploadResponse.ETag);
 
             return args.FileId;
         }

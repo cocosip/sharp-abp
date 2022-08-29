@@ -54,18 +54,19 @@ namespace SharpAbp.Abp.FileStoring.S3
                 await CreateBucketIfNotExists(client, containerName);
             }
 
+            string fileId;
             if (args.Configuration.EnableAutoMultiPartUpload && (args.FileStream.Length > args.Configuration.MultiPartUploadMinFileSize))
             {
-                await MultipartUploadAsync(client, containerName, objectKey, args.FileStream, configuration.UseChunkEncoding, args.Configuration.MultiPartUploadShardingSize);
+                fileId = await MultipartUploadAsync(client, containerName, objectKey, configuration, args);
             }
             else
             {
-                await SingleUploadAsync(client, containerName, objectKey, args.FileStream, configuration.UseChunkEncoding);
+                fileId = await SingleUploadAsync(client, containerName, objectKey, configuration, args);
             }
 
             args.FileStream?.Dispose();
 
-            return args.FileId;
+            return fileId;
         }
 
         public override async Task<bool> DeleteAsync(FileProviderDeleteArgs args)
@@ -73,7 +74,6 @@ namespace SharpAbp.Abp.FileStoring.S3
             var containerName = GetContainerName(args);
             var objectKey = FileNameCalculator.Calculate(args);
             var client = GetS3Client(args);
-
 
             if (await FileExistsAsync(client, containerName, objectKey, args.CancellationToken))
             {
@@ -143,14 +143,13 @@ namespace SharpAbp.Abp.FileStoring.S3
                 return string.Empty;
             }
 
-            var preSignedUrlRequest = new GetPreSignedUrlRequest()
+            var preSignedUrlRequest = new GetPreSignedUrlRequest
             {
                 BucketName = containerName,
                 Key = objectKey,
-                Protocol = (Protocol)configuration.Protocol
+                Protocol = (Protocol)configuration.Protocol,
+                Expires = args.Expires ?? Clock.Now.AddSeconds(600)
             };
-
-            preSignedUrlRequest.Expires = args.Expires ?? Clock.Now.AddSeconds(600);
 
             var accessUrl = client.GetPreSignedURL(preSignedUrlRequest);
 
@@ -160,40 +159,39 @@ namespace SharpAbp.Abp.FileStoring.S3
 
         /// <summary>单文件上传
         /// </summary>
-        protected virtual async Task<PutObjectResponse> SingleUploadAsync(
+        protected virtual async Task<string> SingleUploadAsync(
             IAmazonS3 client,
-            string bucketName,
-            string fileName,
-            Stream stream,
-            bool useChunkEncoding)
+            string containerName,
+            string objectKey,
+            S3FileProviderConfiguration configuration,
+            FileProviderSaveArgs args)
         {
             var putObjectRequest = new PutObjectRequest()
             {
-                BucketName = bucketName,
-                Key = fileName,
-                InputStream = stream,
+                BucketName = containerName,
+                Key = objectKey,
+                InputStream = args.FileStream,
                 AutoCloseStream = true,
-                UseChunkEncoding = useChunkEncoding
+                UseChunkEncoding = configuration.UseChunkEncoding,
             };
-            var putObjectResponse = await client.PutObjectAsync(putObjectRequest);
-            return putObjectResponse;
+            await client.PutObjectAsync(putObjectRequest, args.CancellationToken);
+            return args.FileId;
         }
 
-        protected virtual async Task<CompleteMultipartUploadResponse> MultipartUploadAsync(
+        protected virtual async Task<string> MultipartUploadAsync(
             IAmazonS3 client,
-            string bucketName,
-            string fileName,
-            Stream stream,
-            bool useChunkEncoding,
-            int sliceSize)
+            string containerName,
+            string objectKey,
+            S3FileProviderConfiguration configuration,
+            FileProviderSaveArgs args)
         {
-            var initiateMultipartUploadResponse = await client.InitiateMultipartUploadAsync(bucketName, fileName);
+            var initiateMultipartUploadResponse = await client.InitiateMultipartUploadAsync(containerName, objectKey, args.CancellationToken);
             //UploadId
             var uploadId = initiateMultipartUploadResponse.UploadId;
             //Calculate slice part count
-            var partSize = sliceSize;
+            var partSize = args.Configuration.MultiPartUploadShardingSize;
             //var fi = new FileInfo(spoolFile.FilePath);//?
-            var fileSize = stream.Length;
+            var fileSize = args.FileStream.Length;
             var partCount = fileSize / partSize;
             if (fileSize % partSize != 0)
             {
@@ -210,33 +208,35 @@ namespace SharpAbp.Abp.FileStoring.S3
                 var size = (int)((partSize < fileSize - skipBytes) ? partSize : (fileSize - skipBytes));
 
                 byte[] buffer = new byte[size];
-                stream.Read(buffer, 0, size);
+                args.FileStream.Read(buffer, 0, size);
 
                 //分片上传
                 var uploadPartResponse = await client.UploadPartAsync(new UploadPartRequest()
                 {
-                    BucketName = bucketName,
+                    BucketName = containerName,
                     UploadId = uploadId,
-                    Key = fileName,
+                    Key = objectKey,
                     InputStream = new MemoryStream(buffer),
                     PartSize = size,
                     PartNumber = i + 1,
                     //UseChunkEncoding = useChunkEncoding
                 });
                 partETags.Add(new PartETag(uploadPartResponse.PartNumber, uploadPartResponse.ETag));
-                Logger.LogDebug("Upload part file ,key:{0},UploadId:{1},Complete {2}/{3}", fileName, uploadId, partETags.Count, partCount);
+                Logger.LogDebug("Upload part file ,key:{0},UploadId:{1},Complete {2}/{3}", objectKey, uploadId, partETags.Count, partCount);
             }
 
             //完成上传分片
             var completeMultipartUploadRequest = new CompleteMultipartUploadRequest()
             {
-                BucketName = bucketName,
-                Key = fileName,
+                BucketName = containerName,
+                Key = objectKey,
                 UploadId = uploadId,
                 PartETags = partETags
             };
 
-            return await client.CompleteMultipartUploadAsync(completeMultipartUploadRequest);
+            var completeMultipartUploadResponse = await client.CompleteMultipartUploadAsync(completeMultipartUploadRequest, args.CancellationToken);
+            Logger.LogDebug("CompleteMultipartUpload {Key} ({ETag}).", completeMultipartUploadResponse.Key, completeMultipartUploadResponse.ETag);
+            return args.FileId;
         }
 
 
@@ -252,7 +252,11 @@ namespace SharpAbp.Abp.FileStoring.S3
             await client.EnsureBucketExistsAsync(containerName);
         }
 
-        private async Task<bool> FileExistsAsync(IAmazonS3 client, string containerName, string fileId, CancellationToken cancellationToken)
+        private async Task<bool> FileExistsAsync(
+            IAmazonS3 client,
+            string containerName,
+            string fileId, 
+            CancellationToken cancellationToken)
         {
             // Make sure Blob Container exists.
             if (await client.DoesS3BucketExistAsync(containerName))
