@@ -11,6 +11,7 @@ using Volo.Abp.Identity.AspNetCore;
 using Volo.Abp.Identity.EntityFrameworkCore;
 using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
+using Volo.Abp.SettingManagement.EntityFrameworkCore;
 
 namespace SharpAbp.Abp.Account
 {
@@ -22,6 +23,7 @@ namespace SharpAbp.Abp.Account
         typeof(AccountApplicationModule),
         typeof(AbpIdentityEntityFrameworkCoreModule),
         typeof(AbpPermissionManagementEntityFrameworkCoreModule),
+        typeof(AbpSettingManagementEntityFrameworkCoreModule),
         typeof(AbpEntityFrameworkCoreSqliteModule)
     )]
     public class AccountApplicationTestModule : AbpModule
@@ -42,6 +44,10 @@ namespace SharpAbp.Abp.Account
         {
             var connection = new SqliteConnection("Data Source=:memory:");
             connection.Open();
+
+            new SettingManagementDbContext(
+               new DbContextOptionsBuilder<SettingManagementDbContext>().UseSqlite(connection).Options
+           ).GetService<IRelationalDatabaseCreator>().CreateTables();
 
             new IdentityDbContext(
                 new DbContextOptionsBuilder<IdentityDbContext>().UseSqlite(connection).Options
