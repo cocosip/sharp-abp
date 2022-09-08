@@ -7,6 +7,7 @@ using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.Identity.EntityFrameworkCore;
 using Volo.Abp.Modularity;
 using Volo.Abp.SecurityLog;
+using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.Uow;
 
 namespace SharpAbp.Abp.Identity
@@ -14,6 +15,7 @@ namespace SharpAbp.Abp.Identity
     [DependsOn(
          typeof(IdentityApplicationModule),
          typeof(AbpIdentityEntityFrameworkCoreModule),
+         typeof(AbpSettingManagementEntityFrameworkCoreModule),
          typeof(AbpTestBaseModule),
          typeof(AbpAutofacModule)
          )]

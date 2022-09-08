@@ -15,6 +15,16 @@ namespace SharpAbp.Abp.Identity
             CreateMap<IdentitySecurityLog, IdentitySecurityLogDto>();
             CreateMap<OrganizationUnit, OrganizationUnitDto>();
             CreateMap<OrganizationUnitRole, OrganizationUnitRoleDto>();
+
+            CreateMap<IdentityLockoutSettings, IdentityLockoutSettingsDto>();
+            CreateMap<IdentityPasswordSettings, IdentityPasswordSettingsDto>();
+            CreateMap<IdentitySignInSettings, IdentitySignInSettingsDto>();
+            CreateMap<IdentityUserSettings, IdentityUserSettingsDto>();
+
+            CreateMap<UpdateIdentityLockoutSettingsDto, IdentityLockoutSettings>();
+            CreateMap<UpdateIdentityPasswordSettingsDto, IdentityPasswordSettings>();
+            CreateMap<UpdateIdentitySignInSettingsDto, IdentitySignInSettings>();
+            CreateMap<UpdateIdentityUserSettingsDto, IdentityUserSettings>();
         }
     }
 }

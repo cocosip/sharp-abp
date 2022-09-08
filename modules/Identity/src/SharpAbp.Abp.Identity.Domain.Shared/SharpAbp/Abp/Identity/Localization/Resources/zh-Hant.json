@@ -13,6 +13,8 @@
     "Permission:SharpAbpIdentity.OrganizationUnits": "組織架構管理",
     "Permission:SharpAbpIdentity.OrganizationUnits.Create": "創建組織架構",
     "Permission:SharpAbpIdentity.OrganizationUnits.Update": "修改組織價格",
-    "Permission:SharpAbpIdentity.OrganizationUnits.Delete": "刪除組織架構"
+    "Permission:SharpAbpIdentity.OrganizationUnits.Delete": "刪除組織架構",
+    "Permission:SharpAbpIdentity.Settings": "Identity配置",
+    "Permission:SharpAbpIdentity.Settings.Update": "修改Identity配置"
   }
 }

@@ -13,6 +13,8 @@
     "Permission:SharpAbpIdentity.OrganizationUnits": "组织架构管理",
     "Permission:SharpAbpIdentity.OrganizationUnits.Create": "创建组织架构",
     "Permission:SharpAbpIdentity.OrganizationUnits.Update": "修改组织架构",
-    "Permission:SharpAbpIdentity.OrganizationUnits.Delete": "删除组织架构"
+    "Permission:SharpAbpIdentity.OrganizationUnits.Delete": "删除组织架构",
+    "Permission:SharpAbpIdentity.Settings": "Identity配置",
+    "Permission:SharpAbpIdentity.Settings.Update": "修改Identity配置"
   }
 }

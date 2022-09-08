@@ -13,6 +13,8 @@
     "Permission:SharpAbpIdentity.OrganizationUnits": "OrganizationUnit management",
     "Permission:SharpAbpIdentity.OrganizationUnits.Create": "Create organizationUnit",
     "Permission:SharpAbpIdentity.OrganizationUnits.Update": "Update organizationUnit",
-    "Permission:SharpAbpIdentity.OrganizationUnits.Delete": "Delete organizationUnit"
+    "Permission:SharpAbpIdentity.OrganizationUnits.Delete": "Delete organizationUnit",
+    "Permission:SharpAbpIdentity.Settings": "Identity settings",
+    "Permission:SharpAbpIdentity.Settings.Update": "Update identity settings"
   }
 }
