@@ -20,7 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AWSSDK.S3" Version="3.7.9.54" />
+		<PackageReference Include="AWSSDK.S3" Version="3.7.9.60" />
 		<PackageReference Include="Volo.Abp.Timing" Version="$(VoloAbpPackageVersion)" />
 	</ItemGroup>
 
