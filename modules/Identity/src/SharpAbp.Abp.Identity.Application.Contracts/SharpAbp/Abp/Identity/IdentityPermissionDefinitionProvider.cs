@@ -60,6 +60,15 @@ namespace SharpAbp.Abp.Identity
             organizationUnitsPermission.AddChild(
                 IdentityPermissions.OrganizationUnits.Delete,
                 L($"Permission:{IdentityPermissions.OrganizationUnits.Delete}"));
+            
+            //Identity settings
+            var settingsPermission = identityGroup.AddPermission(
+                IdentityPermissions.Settings.Default,
+                L($"Permission:{IdentityPermissions.Settings.Default}"));
+
+            settingsPermission.AddChild(
+                IdentityPermissions.Settings.Update,
+                L($"Permission:{IdentityPermissions.Settings.Update}"));
         }
 
         private static LocalizableString L(string name)
