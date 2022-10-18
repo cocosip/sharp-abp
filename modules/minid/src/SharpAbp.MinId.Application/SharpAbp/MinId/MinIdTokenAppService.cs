@@ -54,7 +54,7 @@ namespace SharpAbp.MinId
         public virtual async Task<PagedResultDto<MinIdTokenDto>> GetPagedListAsync(MinIdTokenPagedRequestDto input)
         {
             var count = await MinIdTokenRepository.GetCountAsync(input.BizType, input.Token);
-            var minIdTokens = await MinIdTokenRepository.GetListAsync(
+            var minIdTokens = await MinIdTokenRepository.GetPagedListAsync(
                 input.SkipCount,
                 input.MaxResultCount,
                 input.Sorting,

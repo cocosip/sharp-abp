@@ -29,6 +29,14 @@ namespace SharpAbp.MinId
         Task<MinIdToken> FindExpectedByTokenAsync(string bizType, string token, Guid? expectedId = null, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Get list by bizType
+        /// </summary>
+        /// <param name="bizType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<List<MinIdToken>> GetListByBizTypeAsync([NotNull] string bizType, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Get list
         /// </summary>
         /// <param name="skipCount"></param>
@@ -38,7 +46,7 @@ namespace SharpAbp.MinId
         /// <param name="token"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<List<MinIdToken>> GetListAsync(int skipCount, int maxResultCount, string sorting = null, string bizType = "", string token = "", CancellationToken cancellationToken = default);
+        Task<List<MinIdToken>> GetPagedListAsync(int skipCount, int maxResultCount, string sorting = null, string bizType = "", string token = "", CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get count
@@ -48,7 +56,7 @@ namespace SharpAbp.MinId
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<int> GetCountAsync(string bizType = "", string token = "", CancellationToken cancellationToken = default);
-    
+
 
     }
 }

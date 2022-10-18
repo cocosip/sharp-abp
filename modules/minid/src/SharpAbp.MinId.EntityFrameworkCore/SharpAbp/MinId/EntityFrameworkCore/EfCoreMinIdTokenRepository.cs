@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
@@ -61,6 +60,22 @@ namespace SharpAbp.MinId.EntityFrameworkCore
         }
 
         /// <summary>
+        /// Get list by bizType
+        /// </summary>
+        /// <param name="bizType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<List<MinIdToken>> GetListByBizTypeAsync(
+            [NotNull] string bizType,
+            CancellationToken cancellationToken = default)
+        {
+            Check.NotNullOrWhiteSpace(bizType, nameof(bizType));
+            return await (await GetDbSetAsync())
+                .WhereIf(!bizType.IsNullOrWhiteSpace(), item => item.BizType == bizType)
+                .ToListAsync(GetCancellationToken(cancellationToken));
+        }
+
+        /// <summary>
         /// Get list
         /// </summary>
         /// <param name="skipCount"></param>
@@ -70,7 +85,7 @@ namespace SharpAbp.MinId.EntityFrameworkCore
         /// <param name="token"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<List<MinIdToken>> GetListAsync(
+        public virtual async Task<List<MinIdToken>> GetPagedListAsync(
             int skipCount,
             int maxResultCount,
             string sorting = null,
