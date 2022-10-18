@@ -60,7 +60,7 @@ namespace SharpAbp.MinId.EntityFrameworkCore
         /// <param name="bizType"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<List<MinIdInfo>> GetListAsync(
+        public virtual async Task<List<MinIdInfo>> GetPagedListAsync(
             int skipCount,
             int maxResultCount,
             string sorting = null,
@@ -72,6 +72,24 @@ namespace SharpAbp.MinId.EntityFrameworkCore
                 .OrderBy(sorting ?? nameof(MinIdInfo.Id))
                 .Skip(skipCount)
                 .Take(maxResultCount)
+                .ToListAsync(GetCancellationToken(cancellationToken));
+        }
+
+        /// <summary>
+        /// Get list
+        /// </summary>
+        /// <param name="sorting"></param>
+        /// <param name="bizType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<List<MinIdInfo>> GetListAsync(
+            string sorting = null,
+            string bizType = "",
+            CancellationToken cancellationToken = default)
+        {
+            return await (await GetDbSetAsync())
+                .WhereIf(!bizType.IsNullOrWhiteSpace(), item => item.BizType == bizType)
+                .OrderBy(sorting ?? nameof(MinIdInfo.Id))
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 

@@ -5,7 +5,7 @@ using Volo.Abp.Domain.Services;
 
 namespace SharpAbp.MinId
 {
-    public class MinIdInfoManager : DomainService, IMinIdInfoManager
+    public class MinIdInfoManager : DomainService
     {
         protected IMinIdInfoRepository MinIdInfoRepository { get; }
         public MinIdInfoManager(IMinIdInfoRepository minIdInfoRepository)
@@ -18,7 +18,7 @@ namespace SharpAbp.MinId
         /// </summary>
         /// <param name="minIdInfo"></param>
         /// <returns></returns>
-        public virtual async Task CreateAsync(MinIdInfo minIdInfo)
+        public virtual async Task<MinIdInfo> CreateAsync(MinIdInfo minIdInfo)
         {
             var queryMinIdInfo = await MinIdInfoRepository.FindExpectedByBizTypeAsync(minIdInfo.BizType);
             if (queryMinIdInfo != null)
@@ -26,7 +26,7 @@ namespace SharpAbp.MinId
                 throw new AbpException($"Duplicate bizType '{minIdInfo.BizType}'.");
             }
 
-            await MinIdInfoRepository.InsertAsync(minIdInfo);
+            return await MinIdInfoRepository.InsertAsync(minIdInfo);
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace SharpAbp.MinId
         /// <param name="delta"></param>
         /// <param name="remainder"></param>
         /// <returns></returns>
-        public virtual async Task UpdateAsync(Guid id, string bizType, long maxId, int step, int delta, int remainder)
+        public virtual async Task<MinIdInfo> UpdateAsync(Guid id, string bizType, long maxId, int step, int delta, int remainder)
         {
             var minIdInfo = await MinIdInfoRepository.GetAsync(id);
 
@@ -51,7 +51,7 @@ namespace SharpAbp.MinId
 
             minIdInfo.Update(bizType, maxId, step, delta, remainder);
 
-            await MinIdInfoRepository.UpdateAsync(minIdInfo);
+            return await MinIdInfoRepository.UpdateAsync(minIdInfo);
         }
 
     }

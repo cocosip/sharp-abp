@@ -38,16 +38,16 @@ namespace SharpAbp.MinId
         }
 
         [HttpPost]
-        public async Task<Guid> CreateAsync(CreateMinIdTokenDto input)
+        public async Task<MinIdTokenDto> CreateAsync(CreateMinIdTokenDto input)
         {
             return await _minIdTokenAppService.CreateAsync(input);
         }
 
         [HttpPut]
         [Route("{id}")]
-        public async Task UpdateAsync(Guid id, UpdateMinIdTokenDto input)
+        public async Task<MinIdTokenDto> UpdateAsync(Guid id, UpdateMinIdTokenDto input)
         {
-            await _minIdTokenAppService.UpdateAsync(id, input);
+            return await _minIdTokenAppService.UpdateAsync(id, input);
         }
 
         [HttpDelete]

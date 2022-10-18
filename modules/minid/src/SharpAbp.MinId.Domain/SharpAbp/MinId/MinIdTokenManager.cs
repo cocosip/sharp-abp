@@ -5,7 +5,7 @@ using Volo.Abp.Domain.Services;
 
 namespace SharpAbp.MinId
 {
-    public class MinIdTokenManager : DomainService, IMinIdTokenManager
+    public class MinIdTokenManager : DomainService
     {
         protected IMinIdInfoRepository MinIdInfoRepository { get; }
         protected IMinIdTokenRepository MinIdTokenRepository { get; }
@@ -23,7 +23,7 @@ namespace SharpAbp.MinId
         /// </summary>
         /// <param name="minIdToken"></param>
         /// <returns></returns>
-        public virtual async Task CreateAsync(MinIdToken minIdToken)
+        public virtual async Task<MinIdToken> CreateAsync(MinIdToken minIdToken)
         {
             var minIdInfo = await MinIdInfoRepository.FindByBizTypeAsync(minIdToken.BizType);
             if (minIdInfo == null)
@@ -37,7 +37,7 @@ namespace SharpAbp.MinId
                 throw new AbpException($"Duplicate token '{minIdToken.Token}' with bizType '{minIdToken.BizType}'.");
             }
 
-            await MinIdTokenRepository.InsertAsync(minIdToken);
+            return await MinIdTokenRepository.InsertAsync(minIdToken);
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace SharpAbp.MinId
         /// <param name="token"></param>
         /// <param name="remark"></param>
         /// <returns></returns>
-        public virtual async Task UpdateAsync(Guid id, string bizType, string token, string remark)
+        public virtual async Task<MinIdToken> UpdateAsync(Guid id, string bizType, string token, string remark)
         {
             var minIdToken = await MinIdTokenRepository.GetAsync(id);
             if (minIdToken.BizType != bizType)
@@ -69,7 +69,7 @@ namespace SharpAbp.MinId
 
             minIdToken.Update(bizType, token, remark);
 
-            await MinIdTokenRepository.UpdateAsync(minIdToken);
+            return await MinIdTokenRepository.UpdateAsync(minIdToken);
         }
 
     }

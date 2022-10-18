@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
@@ -37,17 +38,24 @@ namespace SharpAbp.MinId
             return await _minIdInfoAppService.GetPagedListAsync(input);
         }
 
+        [HttpGet]
+        [Route("get-list")]
+        public async Task<List<MinIdInfoDto>> GetListAsync(string sorting = null, string bizType = "")
+        {
+            return await _minIdInfoAppService.GetListAsync(sorting, bizType);
+        }
+
         [HttpPost]
-        public async Task<Guid> CreateAsync(CreateMinIdInfoDto input)
+        public async Task<MinIdInfoDto> CreateAsync(CreateMinIdInfoDto input)
         {
             return await _minIdInfoAppService.CreateAsync(input);
         }
 
         [HttpPut]
         [Route("{id}")]
-        public async Task UpdateAsync(Guid id, UpdateMinIdInfoDto input)
+        public async Task<MinIdInfoDto> UpdateAsync(Guid id, UpdateMinIdInfoDto input)
         {
-            await _minIdInfoAppService.UpdateAsync(id, input);
+            return await _minIdInfoAppService.UpdateAsync(id, input);
         }
 
         [HttpDelete]

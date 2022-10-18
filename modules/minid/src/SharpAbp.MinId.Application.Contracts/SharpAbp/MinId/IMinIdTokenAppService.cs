@@ -34,7 +34,7 @@ namespace SharpAbp.MinId
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        Task<Guid> CreateAsync(CreateMinIdTokenDto input);
+        Task<MinIdTokenDto> CreateAsync(CreateMinIdTokenDto input);
 
         /// <summary>
         /// Update minIdToken
@@ -42,7 +42,7 @@ namespace SharpAbp.MinId
         /// <param name="id"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        Task UpdateAsync(Guid id, UpdateMinIdTokenDto input);
+        Task<MinIdTokenDto> UpdateAsync(Guid id, UpdateMinIdTokenDto input);
 
         /// <summary>
         /// Delete minIdToken

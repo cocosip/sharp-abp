@@ -9,11 +9,11 @@ namespace SharpAbp.MinId
     [Authorize(MinIdPermissions.MinIdTokens.Default)]
     public class MinIdTokenAppService : MinIdAppService, IMinIdTokenAppService
     {
-        protected IMinIdTokenManager MinIdTokenManager { get; }
+        protected MinIdTokenManager MinIdTokenManager { get; }
         protected IMinIdTokenRepository MinIdTokenRepository { get; }
 
         public MinIdTokenAppService(
-            IMinIdTokenManager minIdTokenManager,
+            MinIdTokenManager minIdTokenManager,
             IMinIdTokenRepository minIdTokenRepository)
         {
             MinIdTokenManager = minIdTokenManager;
@@ -73,7 +73,7 @@ namespace SharpAbp.MinId
         /// <param name="input"></param>
         /// <returns></returns>
         [Authorize(MinIdPermissions.MinIdTokens.Create)]
-        public virtual async Task<Guid> CreateAsync(CreateMinIdTokenDto input)
+        public virtual async Task<MinIdTokenDto> CreateAsync(CreateMinIdTokenDto input)
         {
             var minIdToken = new MinIdToken(
                 GuidGenerator.Create(),
@@ -82,7 +82,7 @@ namespace SharpAbp.MinId
                 input.Remark);
 
             await MinIdTokenManager.CreateAsync(minIdToken);
-            return minIdToken.Id;
+            return ObjectMapper.Map<MinIdToken, MinIdTokenDto>(minIdToken);
         }
 
         /// <summary>
@@ -92,9 +92,10 @@ namespace SharpAbp.MinId
         /// <param name="input"></param>
         /// <returns></returns>
         [Authorize(MinIdPermissions.MinIdTokens.Update)]
-        public virtual async Task UpdateAsync(Guid id, UpdateMinIdTokenDto input)
+        public virtual async Task<MinIdTokenDto> UpdateAsync(Guid id, UpdateMinIdTokenDto input)
         {
-            await MinIdTokenManager.UpdateAsync(id, input.BizType, input.Token, input.Remark);
+            var minIdToken = await MinIdTokenManager.UpdateAsync(id, input.BizType, input.Token, input.Remark);
+            return ObjectMapper.Map<MinIdToken, MinIdTokenDto>(minIdToken);
         }
 
         /// <summary>

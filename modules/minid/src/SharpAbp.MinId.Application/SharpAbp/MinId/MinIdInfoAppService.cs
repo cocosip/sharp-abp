@@ -11,11 +11,11 @@ namespace SharpAbp.MinId
     [Authorize(MinIdPermissions.MinIdInfos.Default)]
     public class MinIdInfoAppService : MinIdAppService, IMinIdInfoAppService
     {
-        protected IMinIdInfoManager MinIdInfoManager { get; }
+        protected MinIdInfoManager MinIdInfoManager { get; }
         protected IMinIdInfoRepository MinIdInfoRepository { get; }
 
         public MinIdInfoAppService(
-            IMinIdInfoManager minIdInfoManager,
+            MinIdInfoManager minIdInfoManager,
             IMinIdInfoRepository minIdInfoRepository)
         {
             MinIdInfoManager = minIdInfoManager;
@@ -56,7 +56,7 @@ namespace SharpAbp.MinId
         public virtual async Task<PagedResultDto<MinIdInfoDto>> GetPagedListAsync(MinIdInfoPagedRequestDto input)
         {
             var count = await MinIdInfoRepository.GetCountAsync(input.BizType);
-            var minIdInfos = await MinIdInfoRepository.GetListAsync(
+            var minIdInfos = await MinIdInfoRepository.GetPagedListAsync(
                 input.SkipCount,
                 input.MaxResultCount,
                 input.Sorting,
@@ -69,12 +69,25 @@ namespace SharpAbp.MinId
         }
 
         /// <summary>
+        /// Get list
+        /// </summary>
+        /// <param name="sorting"></param>
+        /// <param name="bizType"></param>
+        /// <returns></returns>
+        [Authorize(MinIdPermissions.MinIdInfos.Default)]
+        public virtual async Task<List<MinIdInfoDto>> GetListAsync(string sorting = null, string bizType = "")
+        {
+            var minIdInfos = await MinIdInfoRepository.GetListAsync(sorting, bizType);
+            return ObjectMapper.Map<List<MinIdInfo>, List<MinIdInfoDto>>(minIdInfos);
+        }
+
+        /// <summary>
         /// Create minIdInfo
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
         [Authorize(MinIdPermissions.MinIdInfos.Create)]
-        public virtual async Task<Guid> CreateAsync(CreateMinIdInfoDto input)
+        public virtual async Task<MinIdInfoDto> CreateAsync(CreateMinIdInfoDto input)
         {
             var minIdInfo = new MinIdInfo(
                 GuidGenerator.Create(),
@@ -85,7 +98,7 @@ namespace SharpAbp.MinId
                 input.Remainder);
 
             await MinIdInfoManager.CreateAsync(minIdInfo);
-            return minIdInfo.Id;
+            return ObjectMapper.Map<MinIdInfo, MinIdInfoDto>(minIdInfo);
         }
 
         /// <summary>
@@ -95,15 +108,17 @@ namespace SharpAbp.MinId
         /// <param name="input"></param>
         /// <returns></returns>
         [Authorize(MinIdPermissions.MinIdInfos.Update)]
-        public virtual async Task UpdateAsync(Guid id, UpdateMinIdInfoDto input)
+        public virtual async Task<MinIdInfoDto> UpdateAsync(Guid id, UpdateMinIdInfoDto input)
         {
-            await MinIdInfoManager.UpdateAsync(
-                id, 
+            var minIdInfo = await MinIdInfoManager.UpdateAsync(
+                id,
                 input.BizType,
-                input.MaxId, 
-                input.Step, 
+                input.MaxId,
+                input.Step,
                 input.Delta,
                 input.Remainder);
+
+            return ObjectMapper.Map<MinIdInfo, MinIdInfoDto>(minIdInfo);
         }
 
         /// <summary>

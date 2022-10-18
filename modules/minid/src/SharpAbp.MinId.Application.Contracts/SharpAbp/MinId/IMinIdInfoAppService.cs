@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
@@ -30,11 +31,19 @@ namespace SharpAbp.MinId
         Task<PagedResultDto<MinIdInfoDto>> GetPagedListAsync(MinIdInfoPagedRequestDto input);
 
         /// <summary>
+        /// Get list
+        /// </summary>
+        /// <param name="sorting"></param>
+        /// <param name="bizType"></param>
+        /// <returns></returns>
+        Task<List<MinIdInfoDto>> GetListAsync(string sorting = null, string bizType = "");
+
+        /// <summary>
         /// Create minIdInfo
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        Task<Guid> CreateAsync(CreateMinIdInfoDto input);
+        Task<MinIdInfoDto> CreateAsync(CreateMinIdInfoDto input);
 
         /// <summary>
         /// Update minIdInfo
@@ -42,7 +51,7 @@ namespace SharpAbp.MinId
         /// <param name="id"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        Task UpdateAsync(Guid id, UpdateMinIdInfoDto input);
+        Task<MinIdInfoDto> UpdateAsync(Guid id, UpdateMinIdInfoDto input);
 
         /// <summary>
         /// Delete minIdInfo
