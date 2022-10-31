@@ -2,7 +2,7 @@
   <PropertyGroup>
 
     <!--Volo ABP packages-->
-    <VoloAbpPackageVersion>6.0.0</VoloAbpPackageVersion>
+    <VoloAbpPackageVersion>6.0.1</VoloAbpPackageVersion>
 
     <!-- All Microsoft packages -->
     <MicrosoftPackageVersion>6.0.*</MicrosoftPackageVersion>
@@ -29,7 +29,7 @@
     <xUnitRunnerVisualstudioPackageVersion>2.4.5</xUnitRunnerVisualstudioPackageVersion>
 
     <!--coverlet.collector-->
-    <CoverletCollectorPackageVersion>3.1.2</CoverletCollectorPackageVersion>
+    <CoverletCollectorPackageVersion>3.2.0</CoverletCollectorPackageVersion>
 
     <!-- Mongo2Go https://www.nuget.org/packages/Mongo2Go -->
     <Mongo2GoPackageVersion>2.2.14</Mongo2GoPackageVersion>
