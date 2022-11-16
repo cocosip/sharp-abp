@@ -8,7 +8,7 @@
     <MicrosoftPackageVersion>6.0.*</MicrosoftPackageVersion>
 
     <!-- Microsoft.NET.Test.Sdk https://www.nuget.org/packages/Microsoft.NET.Test.Sdk -->
-    <MicrosoftNETTestSdkPackageVersion>17.3.2</MicrosoftNETTestSdkPackageVersion>
+    <MicrosoftNETTestSdkPackageVersion>17.4.0</MicrosoftNETTestSdkPackageVersion>
 
     <!-- NSubstitute  https://www.nuget.org/packages/NSubstitute -->
     <NSubstitutePackageVersion>4.3.0</NSubstitutePackageVersion>

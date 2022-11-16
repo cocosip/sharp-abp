@@ -7,17 +7,21 @@ using SharpAbp.Abp.FileStoring.Minio;
 using SharpAbp.Abp.FileStoring.S3;
 using System;
 using System.IO;
+using System.Threading.Tasks;
+using Volo.Abp.MultiTenancy;
 using Xunit;
 
 namespace SharpAbp.Abp.FileStoring
 {
     public class AbpFileStoringOptionsTest : AbpFileStoringAllTestBase
     {
+        private readonly ICurrentTenant _currentTenant;
         private readonly IFileContainerConfigurationProvider _configurationProvider;
         private readonly AbpFileStoringOptions _options;
         private readonly IFileContainerFactory _fileContainerFactory;
         public AbpFileStoringOptionsTest()
         {
+            _currentTenant = GetRequiredService<ICurrentTenant>();
             _configurationProvider = GetRequiredService<IFileContainerConfigurationProvider>();
             _options = GetRequiredService<IOptions<AbpFileStoringOptions>>().Value;
             _fileContainerFactory = GetRequiredService<IFileContainerFactory>();
@@ -122,10 +126,11 @@ namespace SharpAbp.Abp.FileStoring
             Assert.False(minioConfiguration.WithSSL);
             Assert.True(minioConfiguration.CreateBucketIfNotExists);
 
-
-            //var container = _fileContainerFactory.Create("minio-test");
-            //var fileId = await container.SaveAsync("2022/04/18/1.dcm", "D:\\1.dcm", true);
-            //await container.DownloadAsync(fileId, "D:\\2.dcm");
+            //using (_currentTenant.Change(Guid.Parse("3a044922-eeea-f5b0-b21d-581b400d73c0")))
+            //{
+            //    var container = _fileContainerFactory.Create("minio-test");
+            //    var url = await container.GetAccessUrlAsync("Hidos/3a044922-eeea-f5b0-b21d-581b400d73c0/Default/1.2.156.112618.86.101.3706474.22062178130944.4151728/1.3.12.2.1107.5.3.63.20350.2.202206210956460246-CR/1.3.12.2.1107.5.3.63.20350.11.202206210956460246-1-1.dcm");
+            //}
         }
 
 

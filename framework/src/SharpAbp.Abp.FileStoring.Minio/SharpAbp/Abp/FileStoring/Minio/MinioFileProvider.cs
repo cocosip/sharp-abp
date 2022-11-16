@@ -182,7 +182,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
             {
                 client.WithSSL();
             }
-
+            client.Build();
             return client;
         }
 
