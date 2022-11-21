@@ -16,7 +16,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FreeSql" Version="3.2.682" />
+		<PackageReference Include="FreeSql" Version="3.2.683" />
 		<PackageReference Include="Volo.Abp.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
 	</ItemGroup>
 
