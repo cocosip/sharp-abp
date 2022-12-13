@@ -4,7 +4,7 @@
 	<Import Project="..\..\..\configureawait.props" />
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<AssemblyName>SharpAbp.Abp.FreeSql</AssemblyName>
 		<PackageId>SharpAbp.Abp.FreeSql</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>

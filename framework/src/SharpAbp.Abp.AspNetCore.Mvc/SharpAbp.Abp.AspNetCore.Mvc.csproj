@@ -4,7 +4,7 @@
 	<Import Project="..\..\..\configureawait.props" />
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<AssemblyName>SharpAbp.Abp.AspNetCore.Mvc</AssemblyName>
 		<PackageId>SharpAbp.Abp.AspNetCore.Mvc</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
@@ -22,7 +22,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\SharpAbp.Abp.AspNetCore\SharpAbp.Abp.AspNetCore.csproj" />
+		<ProjectReference Include="..\SharpAbp.Abp.AspNetCore\SharpAbp.Abp.AspNetCore.csproj" />
 	</ItemGroup>
 
 </Project>
