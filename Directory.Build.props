@@ -2,10 +2,10 @@
   <PropertyGroup>
 
     <!--Volo ABP packages-->
-    <VoloAbpPackageVersion>6.0.2</VoloAbpPackageVersion>
+    <VoloAbpPackageVersion>7.0.0-rc.4</VoloAbpPackageVersion>
 
     <!-- All Microsoft packages -->
-    <MicrosoftPackageVersion>6.0.*</MicrosoftPackageVersion>
+    <MicrosoftPackageVersion>7.0.*</MicrosoftPackageVersion>
 
     <!-- Microsoft.NET.Test.Sdk https://www.nuget.org/packages/Microsoft.NET.Test.Sdk -->
     <MicrosoftNETTestSdkPackageVersion>17.4.0</MicrosoftNETTestSdkPackageVersion>

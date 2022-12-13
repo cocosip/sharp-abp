@@ -4,7 +4,7 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<UserSecretsId>4b65d15f-0de9-4f35-8204-a916e4b6f794</UserSecretsId>
 		<IsPackable>false</IsPackable>
 	</PropertyGroup>
