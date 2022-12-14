@@ -1,0 +1,25 @@
+{
+  "culture": "en",
+  "texts": {
+    "SharpAbpIdentityServer": "IdentityServer management",
+    "Permission:SharpAbpIdentityServer.ApiResources": "IdentityServer Api management",
+    "Permission:SharpAbpIdentityServer.ApiResources.Create": "Create IdentityServer Api resource",
+    "Permission:SharpAbpIdentityServer.ApiResources.Update": "Update IdentityServer Api resource",
+    "Permission:SharpAbpIdentityServer.ApiResources.Delete": "Delete IdentityServer Api resource",
+    "Permission:SharpAbpIdentityServer.ApiScopes": "IdentityServer Api scope",
+    "Permission:SharpAbpIdentityServer.ApiScopes.Create": "Create IdentityServer Api scope",
+    "Permission:SharpAbpIdentityServer.ApiScopes.Update": "Update IdentityServer Api scope",
+    "Permission:SharpAbpIdentityServer.ApiScopes.Delete": "Delete IdentityServer Api scope",
+    "Permission:SharpAbpIdentityServer.IdentityResources": "IdentityServer Identity resource management",
+    "Permission:SharpAbpIdentityServer.IdentityResources.Create": "Create IdentityServer Identity resource",
+    "Permission:SharpAbpIdentityServer.IdentityResources.Update": "Update IdentityServer Identity resource",
+    "Permission:SharpAbpIdentityServer.IdentityResources.Delete": "Delete IdentityServer Identity resource",
+    "Permission:SharpAbpIdentityServer.Clients": "IdentityServer client",
+    "Permission:SharpAbpIdentityServer.Clients.Create": "Create IdentityServer client",
+    "Permission:SharpAbpIdentityServer.Clients.Update": "Update IdentityServer client",
+    "Permission:SharpAbpIdentityServer.Clients.Delete": "Delete IdentityServer client",
+    "SharpAbpIdentityServer.DumplicateApiResourceName": "Dumplicate ApiResource name'{0}'.",
+    "SharpAbpIdentityServer.DumplicateIdentityResourceName": "Dumplicate IdentityResource name'{0}'.",
+    "SharpAbpIdentityServer.DumplicateApiScopeName": "Dumplicate ApiScope name'{0}'."
+  }
+}

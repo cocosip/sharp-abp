@@ -1,0 +1,25 @@
+{
+  "culture": "zh-Hant",
+  "texts": {
+    "SharpAbpIdentityServer": "IdentityServer管理",
+    "Permission:SharpAbpIdentityServer.ApiResources": "IdentityServer Api資源管理",
+    "Permission:SharpAbpIdentityServer.ApiResources.Create": "創建 IdentityServer Api資源",
+    "Permission:SharpAbpIdentityServer.ApiResources.Update": "修改 IdentityServer Api資源",
+    "Permission:SharpAbpIdentityServer.ApiResources.Delete": "刪除 IdentityServer Api資源",
+    "Permission:SharpAbpIdentityServer.ApiScopes": "IdentityServer Api範圍",
+    "Permission:SharpAbpIdentityServer.ApiScopes.Create": "創建 IdentityServer Api範圍",
+    "Permission:SharpAbpIdentityServer.ApiScopes.Update": "修改 IdentityServer Api範圍",
+    "Permission:SharpAbpIdentityServer.ApiScopes.Delete": "刪除 IdentityServer Api範圍",
+    "Permission:SharpAbpIdentityServer.IdentityResources": "IdentityServer Identity資源管理",
+    "Permission:SharpAbpIdentityServer.IdentityResources.Create": "創建 IdentityServer Identity資源",
+    "Permission:SharpAbpIdentityServer.IdentityResources.Update": "修改 IdentityServer Identity資源",
+    "Permission:SharpAbpIdentityServer.IdentityResources.Delete": "刪除 IdentityServer Identity資源",
+    "Permission:SharpAbpIdentityServer.Clients": "IdentityServer客戶端管理",
+    "Permission:SharpAbpIdentityServer.Clients.Create": "創建IdentityServer客戶端",
+    "Permission:SharpAbpIdentityServer.Clients.Update": "修改IdentityServer客戶端",
+    "Permission:SharpAbpIdentityServer.Clients.Delete": "刪除IdentityServer客戶端",
+    "SharpAbpIdentityServer.DumplicateApiResourceName": "重複的ApiResource名稱'{0}'.",
+    "SharpAbpIdentityServer.DumplicateIdentityResourceName": "重複的IdentityResource名稱'{0}'.",
+    "SharpAbpIdentityServer.DumplicateApiScopeName": "重複的ApiScope名稱'{0}'."
+  }
+}
