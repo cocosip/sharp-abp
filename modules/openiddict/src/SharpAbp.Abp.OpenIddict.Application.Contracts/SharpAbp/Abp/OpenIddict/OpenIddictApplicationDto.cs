@@ -84,10 +84,13 @@ namespace SharpAbp.Abp.OpenIddict
 
         public OpenIddictApplicationDto()
         {
+            DisplayNames = new Dictionary<string, string>();
+            RedirectUris = new List<string>();
+            PostLogoutRedirectUris = new List<string>();
+            Requirements = new List<string>();
+
             GrantTypes = new List<string>();
             Scopes = new List<string>();
-
-            DisplayNames = new Dictionary<string, string>();
         }
     }
 }

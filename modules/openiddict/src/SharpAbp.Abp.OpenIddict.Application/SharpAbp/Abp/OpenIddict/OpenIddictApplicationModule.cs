@@ -1,7 +1,7 @@
 ﻿using Volo.Abp.Application;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Modularity;
-using Volo.Abp.OpenIddict.Applications;
+using Volo.Abp.PermissionManagement.OpenIddict;
 
 namespace SharpAbp.Abp.OpenIddict
 {
@@ -9,6 +9,7 @@ namespace SharpAbp.Abp.OpenIddict
         typeof(AbpDddApplicationModule),
         typeof(AbpAutoMapperModule),
         typeof(OpenIddictApplicationContractsModule),
+        typeof(AbpPermissionManagementDomainOpenIddictModule),
         typeof(OpenIddictDomainModule)
         )]
     public class OpenIddictApplicationModule : AbpModule

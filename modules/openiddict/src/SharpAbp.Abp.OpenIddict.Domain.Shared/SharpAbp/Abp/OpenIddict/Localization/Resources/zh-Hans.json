@@ -1,25 +1,14 @@
 {
   "culture": "zh-Hans",
   "texts": {
-    "SharpAbpIdentityServer": "IdentityServer管理",
-    "Permission:SharpAbpIdentityServer.ApiResources": "IdentityServer Api资源管理",
-    "Permission:SharpAbpIdentityServer.ApiResources.Create": "创建IdentityServer Api资源",
-    "Permission:SharpAbpIdentityServer.ApiResources.Update": "修改IdentityServer Api资源",
-    "Permission:SharpAbpIdentityServer.ApiResources.Delete": "删除IdentityServer Api资源",
-    "Permission:SharpAbpIdentityServer.ApiScopes": "IdentityServer Api范围",
-    "Permission:SharpAbpIdentityServer.ApiScopes.Create": "创建IdentityServer Api范围",
-    "Permission:SharpAbpIdentityServer.ApiScopes.Update": "修改IdentityServer Api范围",
-    "Permission:SharpAbpIdentityServer.ApiScopes.Delete": "删除IdentityServer Api范围",
-    "Permission:SharpAbpIdentityServer.IdentityResources": "IdentityServer Identity资源管理",
-    "Permission:SharpAbpIdentityServer.IdentityResources.Create": "创建IdentityServer Identity资源",
-    "Permission:SharpAbpIdentityServer.IdentityResources.Update": "修改IdentityServer Identity资源",
-    "Permission:SharpAbpIdentityServer.IdentityResources.Delete": "删除IdentityServer Identity资源",
-    "Permission:SharpAbpIdentityServer.Clients": "IdentityServer客户端管理",
-    "Permission:SharpAbpIdentityServer.Clients.Create": "创建IdentityServer客户端",
-    "Permission:SharpAbpIdentityServer.Clients.Update": "修改IdentityServer客户端",
-    "Permission:SharpAbpIdentityServer.Clients.Delete": "删除IdentityServer客户端",
-    "SharpAbpIdentityServer.DumplicateApiResourceName": "重复的ApiResource名称'{0}'.",
-    "SharpAbpIdentityServer.DumplicateIdentityResourceName": "重复的IdentityResource名称'{0}'.",
-    "SharpAbpIdentityServer.DumplicateApiScopeName": "重复的ApiScope名称'{0}'."
+    "OpenIddict": "OpenIddict",
+    "Permission:OpenIddict.Applications": "OpenIddict应用",
+    "Permission:OpenIddict.Applications.Create": "创建应用",
+    "Permission:OpenIddict.Applications.Update": "修改应用",
+    "Permission:OpenIddict.Applications.Delete": "删除应用",
+    "Permission:OpenIddict.Scopes": "OpenIddict Scopes",
+    "Permission:OpenIddict.Scopes.Create": "创建Scope",
+    "Permission:OpenIddict.Scopes.Update": "修改Scope",
+    "Permission:OpenIddict.Scopes.Delete": "删除Scope"
   }
 }

@@ -18,6 +18,7 @@ $solutionPaths = @(
 		"../modules/dbconnections",
 		"../modules/Identity",
 		"../modules/IdentityServer",
+		"../modules/openiddict",
 		"../modules/audit-logging",
 		"../modules/account",
 		"../modules/minid"

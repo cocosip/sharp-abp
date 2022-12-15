@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using OpenIddict.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -6,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.OpenIddict.Scopes;
@@ -15,8 +17,8 @@ namespace SharpAbp.Abp.OpenIddict
     [Authorize(OpenIddictPermissions.Scopes.Default)]
     public class OpenIddictScopeAppService : OpenIddictAppServiceBase, IOpenIddictScopeAppService
     {
-        protected AbpOpenIddictScopeStore OpenIddictScopeStore { get; }
-        public OpenIddictScopeAppService(AbpOpenIddictScopeStore openIddictScopeStore)
+        protected IOpenIddictScopeStore<OpenIddictScopeModel> OpenIddictScopeStore { get; }
+        public OpenIddictScopeAppService(IOpenIddictScopeStore<OpenIddictScopeModel> openIddictScopeStore)
         {
             OpenIddictScopeStore = openIddictScopeStore;
         }
@@ -24,22 +26,23 @@ namespace SharpAbp.Abp.OpenIddict
         [Authorize(OpenIddictPermissions.Scopes.Default)]
         public virtual async Task<OpenIddictScopeDto> GetAsync(Guid id)
         {
-            var model = await OpenIddictScopeStore.FindByIdAsync(id.ToString("D"), default);
+            var model = await OpenIddictScopeStore.FindByIdAsync(id.ToString("D"), CancellationToken.None);
             return await ToScopeDtoAsync(model);
         }
 
         [Authorize(OpenIddictPermissions.Scopes.Default)]
         public virtual async Task<OpenIddictScopeDto> FindByNameAsync(string name)
         {
-            var model = await OpenIddictScopeStore.FindByNameAsync(name, default);
+            Check.NotNullOrWhiteSpace(name, nameof(name));
+            var model = await OpenIddictScopeStore.FindByNameAsync(name, CancellationToken.None);
             return await ToScopeDtoAsync(model);
         }
 
         [Authorize(OpenIddictPermissions.Scopes.Default)]
         public virtual async Task<PagedResultDto<OpenIddictScopeDto>> GetPagedListAsync(PagedAndSortedResultRequestDto input)
         {
-            var count = await OpenIddictScopeStore.CountAsync(default);
-            var scopes = OpenIddictScopeStore.ListAsync(input.MaxResultCount, input.SkipCount, default);
+            var count = await OpenIddictScopeStore.CountAsync(CancellationToken.None);
+            var scopes = OpenIddictScopeStore.ListAsync(input.MaxResultCount, input.SkipCount, CancellationToken.None);
 
             var scopeDtos = new List<OpenIddictScopeDto>();
             await foreach (var model in scopes)
@@ -48,6 +51,18 @@ namespace SharpAbp.Abp.OpenIddict
             }
 
             return new PagedResultDto<OpenIddictScopeDto>(count, scopeDtos);
+        }
+
+        [Authorize(OpenIddictPermissions.Scopes.Default)]
+        public virtual async Task<List<OpenIddictScopeDto>> GetListAsync()
+        {
+            var scopes = OpenIddictScopeStore.ListAsync(int.MaxValue, 0, CancellationToken.None);
+            var scopeDtos = new List<OpenIddictScopeDto>();
+            await foreach (var model in scopes)
+            {
+                scopeDtos.Add(await ToScopeDtoAsync(model));
+            }
+            return scopeDtos;
         }
 
         [Authorize(OpenIddictPermissions.Scopes.Create)]
@@ -126,7 +141,6 @@ namespace SharpAbp.Abp.OpenIddict
             }
             await OpenIddictScopeStore.DeleteAsync(model, CancellationToken.None);
         }
-
 
         protected virtual async Task<OpenIddictScopeDto> ToScopeDtoAsync(OpenIddictScopeModel model, CancellationToken cancellationToken = default)
         {
