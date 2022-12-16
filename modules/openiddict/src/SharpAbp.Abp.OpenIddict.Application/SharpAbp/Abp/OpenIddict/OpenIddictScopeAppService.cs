@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
@@ -74,7 +75,6 @@ namespace SharpAbp.Abp.OpenIddict
                 Name = input.Name,
                 DisplayName = input.DisplayName,
                 Description = input.Description,
-                Properties = input.Properties,
             };
 
             foreach (var extraProperty in input.ExtraProperties)
@@ -82,20 +82,13 @@ namespace SharpAbp.Abp.OpenIddict
                 model.ExtraProperties.Add(extraProperty.Key, extraProperty.Value);
             }
 
+            await OpenIddictScopeStore.SetPropertiesAsync(model, input.Properties.ToImmutableDictionary(), CancellationToken.None);
             await OpenIddictScopeStore.SetResourcesAsync(model, input.Resources.ToImmutableArray(), CancellationToken.None);
 
-            var descriptions = new Dictionary<CultureInfo, string>();
-            foreach (var description in input.Descriptions)
-            {
-                descriptions.Add(new CultureInfo(description.Key, true), description.Value);
-            }
+            var descriptions = new Dictionary<CultureInfo, string>(input.Descriptions.Select(x => new KeyValuePair<CultureInfo, string>(new CultureInfo(x.Key), x.Value)));
             await OpenIddictScopeStore.SetDescriptionsAsync(model, descriptions.ToImmutableDictionary(), CancellationToken.None);
 
-            var displayNames = new Dictionary<CultureInfo, string>();
-            foreach (var displayName in input.DisplayNames)
-            {
-                displayNames.Add(new CultureInfo(displayName.Key, true), displayName.Value);
-            }
+            var displayNames = new Dictionary<CultureInfo, string>(input.DisplayNames.Select(x => new KeyValuePair<CultureInfo, string>(new CultureInfo(x.Key), x.Value)));
             await OpenIddictScopeStore.SetDisplayNamesAsync(model, displayNames.ToImmutableDictionary(), CancellationToken.None);
 
             await OpenIddictScopeStore.CreateAsync(model, CancellationToken.None);
@@ -107,27 +100,26 @@ namespace SharpAbp.Abp.OpenIddict
         public virtual async Task<OpenIddictScopeDto> UpdateAsync(Guid id, UpdateOpenIddictScopeDto input)
         {
             var model = await OpenIddictScopeStore.FindByIdAsync(id.ToString("D"), CancellationToken.None);
+            model.ExtraProperties.Clear();
+            foreach (var extraProperty in input.ExtraProperties)
+            {
+                model.ExtraProperties.Add(extraProperty.Key, extraProperty.Value);
+            }
+
             await OpenIddictScopeStore.SetNameAsync(model, input.Name, CancellationToken.None);
             await OpenIddictScopeStore.SetDisplayNameAsync(model, input.DisplayName, CancellationToken.None);
             await OpenIddictScopeStore.SetDescriptionAsync(model, input.Description, CancellationToken.None);
+
+            await OpenIddictScopeStore.SetPropertiesAsync(model, input.Properties.ToImmutableDictionary(), CancellationToken.None);
             await OpenIddictScopeStore.SetResourcesAsync(model, input.Resources.ToImmutableArray(), CancellationToken.None);
 
-            var descriptions = new Dictionary<CultureInfo, string>();
-            foreach (var description in input.Descriptions)
-            {
-                descriptions.Add(new CultureInfo(description.Key, true), description.Value);
-            }
+            var descriptions = new Dictionary<CultureInfo, string>(input.Descriptions.Select(x => new KeyValuePair<CultureInfo, string>(new CultureInfo(x.Key), x.Value)));
             await OpenIddictScopeStore.SetDescriptionsAsync(model, descriptions.ToImmutableDictionary(), CancellationToken.None);
 
-            var displayNames = new Dictionary<CultureInfo, string>();
-            foreach (var displayName in input.DisplayNames)
-            {
-                displayNames.Add(new CultureInfo(displayName.Key, true), displayName.Value);
-            }
+            var displayNames = new Dictionary<CultureInfo, string>(input.DisplayNames.Select(x => new KeyValuePair<CultureInfo, string>(new CultureInfo(x.Key), x.Value)));
             await OpenIddictScopeStore.SetDisplayNamesAsync(model, displayNames.ToImmutableDictionary(), CancellationToken.None);
 
             await OpenIddictScopeStore.UpdateAsync(model, CancellationToken.None);
-
             return await ToScopeDtoAsync(model, CancellationToken.None);
         }
 
@@ -149,9 +141,10 @@ namespace SharpAbp.Abp.OpenIddict
                 Id = model.Id,
                 Description = model.Description,
                 DisplayName = model.DisplayName,
-                Name = model.Name,
-                Properties = model.Properties
+                Name = model.Name
             };
+
+            dto.Properties = new Dictionary<string, JsonElement>(await OpenIddictScopeStore.GetPropertiesAsync(model, cancellationToken));
 
             var displayNames = await OpenIddictScopeStore.GetDisplayNamesAsync(model, cancellationToken);
             dto.DisplayNames = new Dictionary<string, string>(displayNames.Select(x => new KeyValuePair<string, string>(x.Key.Name, x.Value)));

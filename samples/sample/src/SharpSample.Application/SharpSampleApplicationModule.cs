@@ -1,7 +1,11 @@
-﻿using Volo.Abp.Account;
+﻿using SharpAbp.Abp.Account;
+using SharpAbp.Abp.DbConnectionsManagement;
+using SharpAbp.Abp.FileStoringManagement;
+using SharpAbp.Abp.Identity;
+using SharpAbp.Abp.MapTenancyManagement;
+using SharpAbp.Abp.OpenIddict;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.FeatureManagement;
-using Volo.Abp.Identity;
 using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement;
 using Volo.Abp.SettingManagement;
@@ -11,9 +15,13 @@ namespace SharpSample;
 
 [DependsOn(
     typeof(SharpSampleDomainModule),
-    typeof(AbpAccountApplicationModule),
+    typeof(AccountApplicationModule),
     typeof(SharpSampleApplicationContractsModule),
-    typeof(AbpIdentityApplicationModule),
+    typeof(IdentityApplicationModule),
+    typeof(OpenIddictApplicationModule),
+    typeof(MapTenancyManagementApplicationModule),
+    typeof(DbConnectionsManagementApplicationModule),
+    typeof(FileStoringManagementApplicationModule),
     typeof(AbpPermissionManagementApplicationModule),
     typeof(AbpTenantManagementApplicationModule),
     typeof(AbpFeatureManagementApplicationModule),

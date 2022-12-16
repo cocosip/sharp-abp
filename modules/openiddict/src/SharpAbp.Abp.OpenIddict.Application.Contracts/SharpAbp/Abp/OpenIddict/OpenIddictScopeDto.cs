@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using Volo.Abp.Application.Dtos;
 
 namespace SharpAbp.Abp.OpenIddict
 {
-    public class OpenIddictScopeDto : ExtensibleFullAuditedEntityDto<Guid>
+    public class OpenIddictScopeDto : ExtensibleEntityDto<Guid>
     {
         /// <summary>
         /// Gets or sets the public description associated with the current scope.
@@ -25,7 +26,7 @@ namespace SharpAbp.Abp.OpenIddict
         /// Gets or sets the additional properties serialized as a JSON object,
         /// or <c>null</c> if no bag was associated with the current scope.
         /// </summary>
-        public string Properties { get; set; }
+        public Dictionary<string, JsonElement> Properties { get; set; }
 
         /// <summary>
         /// Gets or sets the resources associated with the
@@ -48,6 +49,7 @@ namespace SharpAbp.Abp.OpenIddict
 
         public OpenIddictScopeDto()
         {
+            Properties = new Dictionary<string, JsonElement>();
             Resources = new List<string>();
             Descriptions = new Dictionary<string, string>();
             DisplayNames = new Dictionary<string, string>();

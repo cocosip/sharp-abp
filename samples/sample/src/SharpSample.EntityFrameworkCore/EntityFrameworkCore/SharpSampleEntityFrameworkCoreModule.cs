@@ -3,6 +3,7 @@ using SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore;
 using SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore;
 using SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore;
 using SharpAbp.MinId.EntityFrameworkCore;
+using System;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
@@ -42,6 +43,8 @@ public class SharpSampleEntityFrameworkCoreModule : AbpModule
 
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
         context.Services.AddAbpDbContext<SharpSampleDbContext>(options =>
         {
                 /* Remove "includeAllEntities: true" to create

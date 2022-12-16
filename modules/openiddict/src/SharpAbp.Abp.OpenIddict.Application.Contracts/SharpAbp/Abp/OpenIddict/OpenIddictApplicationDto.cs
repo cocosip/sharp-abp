@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Text.Json;
 using Volo.Abp.Application.Dtos;
 
 namespace SharpAbp.Abp.OpenIddict
 {
-    public class OpenIddictApplicationDto : ExtensibleFullAuditedEntityDto<Guid>
+    public class OpenIddictApplicationDto : ExtensibleEntityDto<Guid>
     {
         /// <summary>
         /// Gets or sets the client identifier associated with the current application.
@@ -48,7 +48,7 @@ namespace SharpAbp.Abp.OpenIddict
         /// Gets or sets the additional properties serialized as a JSON object,
         /// or <c>null</c> if no bag was associated with the current scope.
         /// </summary>
-        public string Properties { get; set; }
+        public Dictionary<string, JsonElement> Properties { get; set; }
 
         /// <summary>
         /// DisplayNames
@@ -84,6 +84,7 @@ namespace SharpAbp.Abp.OpenIddict
 
         public OpenIddictApplicationDto()
         {
+            Properties = new Dictionary<string, JsonElement>();
             DisplayNames = new Dictionary<string, string>();
             RedirectUris = new List<string>();
             PostLogoutRedirectUris = new List<string>();

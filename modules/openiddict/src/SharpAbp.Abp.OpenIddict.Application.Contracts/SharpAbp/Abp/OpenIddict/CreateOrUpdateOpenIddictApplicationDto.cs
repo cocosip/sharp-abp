@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 using Volo.Abp.ObjectExtending;
 using Volo.Abp.OpenIddict.Applications;
 using Volo.Abp.Validation;
@@ -55,7 +56,7 @@ namespace SharpAbp.Abp.OpenIddict
         /// Gets or sets the additional properties serialized as a JSON object,
         /// or <c>null</c> if no bag was associated with the current scope.
         /// </summary>
-        public string Properties { get; set; }
+        public Dictionary<string, JsonElement> Properties { get; set; }
 
         /// <summary>
         /// DisplayNames
@@ -96,6 +97,7 @@ namespace SharpAbp.Abp.OpenIddict
 
         public CreateOrUpdateOpenIddictApplicationDto()
         {
+            Properties = new Dictionary<string, JsonElement>();
             DisplayNames = new Dictionary<string, string>();
             RedirectUris = new List<string>();
             PostLogoutRedirectUris = new List<string>();

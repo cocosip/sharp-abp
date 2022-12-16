@@ -1,33 +1,46 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Localization;
 using OpenIddict.Abstractions;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.OpenIddict.Applications;
 using Volo.Abp.PermissionManagement;
-using static System.Net.Mime.MediaTypeNames;
+
 
 namespace SharpAbp.Abp.OpenIddict
 {
     [Authorize(OpenIddictPermissions.Applications.Default)]
     public class OpenIddictApplicationAppService : OpenIddictAppServiceBase, IOpenIddictApplicationAppService
     {
+
+        protected IOpenIddictApplicationStoreResolver Resolver { get; }
+        protected IAbpOpenIdApplicationStore OpenIdApplicationStore { get; }
         protected IAbpApplicationManager ApplicationManager { get; }
         protected IPermissionDataSeeder PermissionDataSeeder { get; }
         protected IPermissionManager PermissionManager { get; }
+        protected IStringLocalizer<OpenIddictResponse> LL { get; }
         public OpenIddictApplicationAppService(
+            IOpenIddictApplicationStoreResolver resolver,
             IAbpApplicationManager applicationManager,
             IPermissionDataSeeder permissionDataSeeder,
-            IPermissionManager permissionManager)
+            IPermissionManager permissionManager,
+            IStringLocalizer<OpenIddictResponse> ll)
         {
+            Resolver = resolver;
+            OpenIdApplicationStore = (resolver ?? throw new ArgumentNullException(nameof(resolver))).Get<OpenIddictApplicationModel>().As<IAbpOpenIdApplicationStore>();
             ApplicationManager = applicationManager;
             PermissionDataSeeder = permissionDataSeeder;
             PermissionManager = permissionManager;
+            LL = ll;
         }
 
         [Authorize(OpenIddictPermissions.Applications.Default)]
@@ -74,7 +87,17 @@ namespace SharpAbp.Abp.OpenIddict
         [Authorize(OpenIddictPermissions.Applications.Create)]
         public virtual async Task<OpenIddictApplicationDto> CreateAsync(CreateOrUpdateOpenIddictApplicationDto input)
         {
-            var application = BuildApplicationDescriptor(input);
+            if (!string.IsNullOrEmpty(input.ClientSecret) && string.Equals(input.Type, OpenIddictConstants.ClientTypes.Public, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new BusinessException(LL["NoClientSecretCanBeSetForPublicApplications"]);
+            }
+
+            if (string.IsNullOrEmpty(input.ClientSecret) && string.Equals(input.Type, OpenIddictConstants.ClientTypes.Confidential, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new BusinessException(LL["TheClientSecretIsRequiredForConfidentialApplications"]);
+            }
+
+            var model = await BuildModel(input);
 
             if (input.Permissions.Any())
             {
@@ -85,21 +108,36 @@ namespace SharpAbp.Abp.OpenIddict
                     null);
             }
 
+            var application = new AbpApplicationDescriptor();
+            await ApplicationManager.PopulateAsync(application, model);
             var created = await ApplicationManager.CreateAsync(application);
+
             return await ToApplicationDtoAsync(created.As<OpenIddictApplicationModel>());
         }
 
         [Authorize(OpenIddictPermissions.Applications.Update)]
         public virtual async Task<OpenIddictApplicationDto> UpdateAsync(Guid id, CreateOrUpdateOpenIddictApplicationDto input)
         {
-            var model = (await ApplicationManager.FindByIdAsync(id.ToString("D"))).As<OpenIddictApplicationModel>();
-            var application = BuildApplicationDescriptor(input);
+            if (!string.IsNullOrEmpty(input.ClientSecret) && string.Equals(input.Type, OpenIddictConstants.ClientTypes.Public, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new BusinessException(LL["NoClientSecretCanBeSetForPublicApplications"]);
+            }
 
-            await ApplicationManager.PopulateAsync(model, application);
+            if (string.IsNullOrEmpty(input.ClientSecret) && string.Equals(input.Type, OpenIddictConstants.ClientTypes.Confidential, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new BusinessException(LL["TheClientSecretIsRequiredForConfidentialApplications"]);
+            }
+
+
+            var model = (await ApplicationManager.FindByIdAsync(id.ToString("D"))).As<OpenIddictApplicationModel>();
+            var buildModel = await BuildModel(input);
+            buildModel.Id = id;
+            var application = new AbpApplicationDescriptor();
+            await ApplicationManager.PopulateAsync(application, buildModel);
 
             if (input.Permissions.Any())
             {
-                await PermissionManager.DeleteAsync(ClientPermissionValueProvider.ProviderName, model.As<OpenIddictApplicationModel>().ClientId);
+                await PermissionManager.DeleteAsync(ClientPermissionValueProvider.ProviderName, model.ClientId);
                 await PermissionDataSeeder.SeedAsync(
                     ClientPermissionValueProvider.ProviderName,
                     input.ClientId,
@@ -107,10 +145,10 @@ namespace SharpAbp.Abp.OpenIddict
                     null);
             }
 
-            await ApplicationManager.UpdateAsync(model);
-            model = (await ApplicationManager.FindByIdAsync(id.ToString("D"))).As<OpenIddictApplicationModel>();
 
-            return await ToApplicationDtoAsync(model);
+            await ApplicationManager.UpdateAsync(model, application);
+            var updated = (await ApplicationManager.FindByIdAsync(id.ToString("D"))).As<OpenIddictApplicationModel>();
+            return await ToApplicationDtoAsync(updated);
         }
 
         [Authorize(OpenIddictPermissions.Applications.Delete)]
@@ -120,9 +158,9 @@ namespace SharpAbp.Abp.OpenIddict
             await ApplicationManager.DeleteAsync(model);
         }
 
-        protected virtual AbpApplicationDescriptor BuildApplicationDescriptor(CreateOrUpdateOpenIddictApplicationDto input)
+        protected virtual async Task<OpenIddictApplicationModel> BuildModel(CreateOrUpdateOpenIddictApplicationDto input)
         {
-            var application = new AbpApplicationDescriptor()
+            var model = new OpenIddictApplicationModel()
             {
                 ClientId = input.ClientId,
                 Type = input.Type,
@@ -133,59 +171,65 @@ namespace SharpAbp.Abp.OpenIddict
                 LogoUri = input.LogoUri,
             };
 
-            //DisplayNames
-            foreach (var kv in input.DisplayNames)
-            {
-                application.DisplayNames.Add(new CultureInfo(kv.Key), kv.Value);
-            }
+            var displayNames = new Dictionary<CultureInfo, string>(input.DisplayNames.Select(x => new KeyValuePair<CultureInfo, string>(new CultureInfo(x.Key), x.Value)));
+            await OpenIdApplicationStore.SetDisplayNamesAsync(model, displayNames.ToImmutableDictionary(), CancellationToken.None);
 
-            foreach (var requirement in input.Requirements)
-            {
-                application.Requirements.Add(requirement);
-            }
-
+            await OpenIdApplicationStore.SetRequirementsAsync(model, input.Requirements.ToImmutableArray(), CancellationToken.None);
 
             //RedirectUris
+            var redirectUris = new List<string>();
             foreach (var redirectUri in input.RedirectUris)
             {
                 if (!Uri.TryCreate(redirectUri, UriKind.Absolute, out var uri) || !uri.IsWellFormedOriginalString())
                 {
-                    throw new BusinessException(L["InvalidRedirectUri", redirectUri]);
+                    throw new BusinessException(LL["InvalidRedirectUri", redirectUri]);
                 }
-                application.RedirectUris.Add(uri);
+                redirectUris.Add(uri.ToString());
             }
-            var fRedirectUri = input.RedirectUris?.FirstOrDefault();
-            var fPostLogoutRedirectUri = input.PostLogoutRedirectUris?.FirstOrDefault();
 
+            await OpenIdApplicationStore.SetRedirectUrisAsync(model, redirectUris.ToImmutableArray(), CancellationToken.None);
+            var firstRedirectUri = redirectUris.FirstOrDefault();
 
+            var postLogoutRedirectUris = new List<string>();
+            foreach (var postLogoutRedirectUri in input.PostLogoutRedirectUris)
+            {
+                if (!Uri.TryCreate(postLogoutRedirectUri, UriKind.Absolute, out var uri) || !uri.IsWellFormedOriginalString())
+                {
+                    throw new BusinessException(LL["InvalidRedirectUri", postLogoutRedirectUri]);
+                }
+                redirectUris.Add(uri.ToString());
+            }
+            await OpenIdApplicationStore.SetPostLogoutRedirectUrisAsync(model, postLogoutRedirectUris.ToImmutableArray(), CancellationToken.None);
+            var firstPostLogoutRedirectUri = postLogoutRedirectUris.FirstOrDefault();
 
+            var permissions = new List<string>();
             if (new[] { OpenIddictConstants.GrantTypes.AuthorizationCode, OpenIddictConstants.GrantTypes.Implicit }.All(input.GrantTypes.Contains))
             {
-                application.Permissions.Add(OpenIddictConstants.Permissions.ResponseTypes.CodeIdToken);
+                permissions.Add(OpenIddictConstants.Permissions.ResponseTypes.CodeIdToken);
 
                 if (string.Equals(input.Type, OpenIddictConstants.ClientTypes.Public, StringComparison.OrdinalIgnoreCase))
                 {
-                    application.Permissions.Add(OpenIddictConstants.Permissions.ResponseTypes.CodeIdTokenToken);
-                    application.Permissions.Add(OpenIddictConstants.Permissions.ResponseTypes.CodeToken);
+                    permissions.Add(OpenIddictConstants.Permissions.ResponseTypes.CodeIdTokenToken);
+                    permissions.Add(OpenIddictConstants.Permissions.ResponseTypes.CodeToken);
                 }
             }
 
-            if (!fRedirectUri.IsNullOrWhiteSpace() || !fPostLogoutRedirectUri.IsNullOrWhiteSpace())
+            if (!firstRedirectUri.IsNullOrWhiteSpace() || !firstPostLogoutRedirectUri.IsNullOrWhiteSpace())
             {
-                application.Permissions.Add(OpenIddictConstants.Permissions.Endpoints.Logout);
+                permissions.Add(OpenIddictConstants.Permissions.Endpoints.Logout);
             }
 
             foreach (var grantType in input.GrantTypes)
             {
                 if (grantType == OpenIddictConstants.GrantTypes.AuthorizationCode)
                 {
-                    application.Permissions.Add(OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode);
-                    application.Permissions.Add(OpenIddictConstants.Permissions.ResponseTypes.Code);
+                    permissions.Add(OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode);
+                    permissions.Add(OpenIddictConstants.Permissions.ResponseTypes.Code);
                 }
 
                 if (grantType == OpenIddictConstants.GrantTypes.AuthorizationCode || grantType == OpenIddictConstants.GrantTypes.Implicit)
                 {
-                    application.Permissions.Add(OpenIddictConstants.Permissions.Endpoints.Authorization);
+                    permissions.Add(OpenIddictConstants.Permissions.Endpoints.Authorization);
                 }
 
                 if (grantType == OpenIddictConstants.GrantTypes.AuthorizationCode ||
@@ -194,44 +238,44 @@ namespace SharpAbp.Abp.OpenIddict
                     grantType == OpenIddictConstants.GrantTypes.RefreshToken ||
                     grantType == OpenIddictConstants.GrantTypes.DeviceCode)
                 {
-                    application.Permissions.Add(OpenIddictConstants.Permissions.Endpoints.Token);
-                    application.Permissions.Add(OpenIddictConstants.Permissions.Endpoints.Revocation);
-                    application.Permissions.Add(OpenIddictConstants.Permissions.Endpoints.Introspection);
+                    permissions.Add(OpenIddictConstants.Permissions.Endpoints.Token);
+                    permissions.Add(OpenIddictConstants.Permissions.Endpoints.Revocation);
+                    permissions.Add(OpenIddictConstants.Permissions.Endpoints.Introspection);
                 }
 
                 if (grantType == OpenIddictConstants.GrantTypes.ClientCredentials)
                 {
-                    application.Permissions.Add(OpenIddictConstants.Permissions.GrantTypes.ClientCredentials);
+                    permissions.Add(OpenIddictConstants.Permissions.GrantTypes.ClientCredentials);
                 }
 
                 if (grantType == OpenIddictConstants.GrantTypes.Implicit)
                 {
-                    application.Permissions.Add(OpenIddictConstants.Permissions.GrantTypes.Implicit);
+                    permissions.Add(OpenIddictConstants.Permissions.GrantTypes.Implicit);
                 }
 
                 if (grantType == OpenIddictConstants.GrantTypes.Password)
                 {
-                    application.Permissions.Add(OpenIddictConstants.Permissions.GrantTypes.Password);
+                    permissions.Add(OpenIddictConstants.Permissions.GrantTypes.Password);
                 }
 
                 if (grantType == OpenIddictConstants.GrantTypes.RefreshToken)
                 {
-                    application.Permissions.Add(OpenIddictConstants.Permissions.GrantTypes.RefreshToken);
+                    permissions.Add(OpenIddictConstants.Permissions.GrantTypes.RefreshToken);
                 }
 
                 if (grantType == OpenIddictConstants.GrantTypes.DeviceCode)
                 {
-                    application.Permissions.Add(OpenIddictConstants.Permissions.GrantTypes.DeviceCode);
-                    application.Permissions.Add(OpenIddictConstants.Permissions.Endpoints.Device);
+                    permissions.Add(OpenIddictConstants.Permissions.GrantTypes.DeviceCode);
+                    permissions.Add(OpenIddictConstants.Permissions.Endpoints.Device);
                 }
 
                 if (grantType == OpenIddictConstants.GrantTypes.Implicit)
                 {
-                    application.Permissions.Add(OpenIddictConstants.Permissions.ResponseTypes.IdToken);
+                    permissions.Add(OpenIddictConstants.Permissions.ResponseTypes.IdToken);
                     if (string.Equals(input.Type, OpenIddictConstants.ClientTypes.Public, StringComparison.OrdinalIgnoreCase))
                     {
-                        application.Permissions.Add(OpenIddictConstants.Permissions.ResponseTypes.IdTokenToken);
-                        application.Permissions.Add(OpenIddictConstants.Permissions.ResponseTypes.Token);
+                        permissions.Add(OpenIddictConstants.Permissions.ResponseTypes.IdTokenToken);
+                        permissions.Add(OpenIddictConstants.Permissions.ResponseTypes.Token);
                     }
                 }
             }
@@ -242,67 +286,40 @@ namespace SharpAbp.Abp.OpenIddict
             {
                 if (buildInScopes.Contains(scope))
                 {
-                    application.Permissions.Add(scope);
+                    permissions.Add(scope);
                 }
                 else
                 {
-                    application.Permissions.Add(OpenIddictConstants.Permissions.Prefixes.Scope + scope);
+                    permissions.Add(OpenIddictConstants.Permissions.Prefixes.Scope + scope);
                 }
             }
 
-            if (fRedirectUri != null)
-            {
-                if (!fRedirectUri.IsNullOrEmpty())
-                {
-                    if (!Uri.TryCreate(fRedirectUri, UriKind.Absolute, out var uri) || !uri.IsWellFormedOriginalString())
-                    {
-                        throw new BusinessException(L["InvalidRedirectUri", fRedirectUri]);
-                    }
-
-                    if (application.RedirectUris.All(x => x != uri))
-                    {
-                        application.RedirectUris.Add(uri);
-                    }
-                }
-            }
-
-            if (fPostLogoutRedirectUri != null)
-            {
-                if (!fPostLogoutRedirectUri.IsNullOrEmpty())
-                {
-                    if (!Uri.TryCreate(fPostLogoutRedirectUri, UriKind.Absolute, out var uri) || !uri.IsWellFormedOriginalString())
-                    {
-                        throw new BusinessException(L["InvalidPostLogoutRedirectUri", fPostLogoutRedirectUri]);
-                    }
-
-                    if (application.PostLogoutRedirectUris.All(x => x != uri))
-                    {
-                        application.PostLogoutRedirectUris.Add(uri);
-                    }
-                }
-            }
-            return application;
+            await OpenIdApplicationStore.SetPermissionsAsync(model, permissions.ToImmutableArray(), CancellationToken.None);
+            return model;
         }
 
         protected virtual async Task<OpenIddictApplicationDto> ToApplicationDtoAsync(OpenIddictApplicationModel model)
         {
+
             var dto = new OpenIddictApplicationDto()
             {
                 Id = model.Id,
                 ClientId = model.ClientId,
-                ClientSecret = model.ClientSecret,
+                //ClientSecret = model.ClientSecret,
                 ConsentType = model.ConsentType,
                 DisplayName = model.DisplayName,
                 Type = model.Type,
                 ClientUri = model.ClientUri,
                 LogoUri = model.LogoUri,
-                Properties = model.Properties,
             };
+
 
             foreach (var extraProperty in model.ExtraProperties)
             {
                 dto.ExtraProperties.Add(extraProperty.Key, extraProperty.Value);
             }
+
+            dto.Properties = new Dictionary<string, JsonElement>(await ApplicationManager.GetPropertiesAsync(model));
 
             var displayNames = await ApplicationManager.GetDisplayNamesAsync(model);
             dto.DisplayNames = new Dictionary<string, string>(displayNames.Select(x => new KeyValuePair<string, string>(x.Key.Name, x.Value)));
@@ -317,25 +334,18 @@ namespace SharpAbp.Abp.OpenIddict
             dto.Requirements = requirements.ToList();
 
             var permissions = await ApplicationManager.GetPermissionsAsync(model);
-            var commonScopes = GetAllScopes();
+            // var commonScopes = GetAllScopes();
 
             foreach (var permission in permissions)
             {
                 if (permission.StartsWith(OpenIddictConstants.Permissions.Prefixes.Scope))
                 {
-                    if (commonScopes.Contains(permission))
-                    {
-                        dto.Scopes.Add(permission);
-                    }
-                    else
-                    {
-                        dto.Scopes.Add(permission.RemovePreFix($"{OpenIddictConstants.Permissions.Prefixes.Scope}."));
-                    }
+                    dto.Scopes.Add(permission.RemovePreFix(OpenIddictConstants.Permissions.Prefixes.Scope));
                 }
 
                 if (permission.StartsWith(OpenIddictConstants.Permissions.Prefixes.GrantType))
                 {
-                    dto.GrantTypes.Add(permission.RemovePostFix($"{OpenIddictConstants.Permissions.Prefixes.GrantType}."));
+                    dto.GrantTypes.Add(permission.RemovePreFix(OpenIddictConstants.Permissions.Prefixes.GrantType));
                 }
             }
 
