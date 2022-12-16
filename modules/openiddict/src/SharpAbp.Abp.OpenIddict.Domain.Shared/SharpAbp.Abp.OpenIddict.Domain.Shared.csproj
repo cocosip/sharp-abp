@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\..\..\..\common.props" />
+	<Import Project="..\..\..\..\configureawait.props" />
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<AssemblyName>SharpAbp.Abp.OpenIddict.Domain.Shared</AssemblyName>
+		<PackageId>SharpAbp.Abp.OpenIddict.Domain.Shared</PackageId>
+		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<Description>SharpAbp OpenIddict Module</Description>
+		<RootNamespace />
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.OpenIddict.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="SharpAbp\Abp\OpenIddict\Localization\Resources\*.json" />
+		<Content Remove="SharpAbp\Abp\OpenIddict\Localization\Resources\*.json" />
+	</ItemGroup>
+
+</Project>

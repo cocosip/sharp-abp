@@ -1,0 +1,14 @@
+{
+  "culture": "zh-Hant",
+  "texts": {
+    "OpenIddict": "OpenIddict",
+    "Permission:OpenIddict.Applications": "OpenIddict應用",
+    "Permission:OpenIddict.Applications.Create": "創建應用",
+    "Permission:OpenIddict.Applications.Update": "修改應用",
+    "Permission:OpenIddict.Applications.Delete": "刪除應用",
+    "Permission:OpenIddict.Scopes": "OpenIddict Scopes",
+    "Permission:OpenIddict.Scopes.Create": "創建Scope",
+    "Permission:OpenIddict.Scopes.Update": "修改Scope",
+    "Permission:OpenIddict.Scopes.Delete": "刪除Scope"
+  }
+}

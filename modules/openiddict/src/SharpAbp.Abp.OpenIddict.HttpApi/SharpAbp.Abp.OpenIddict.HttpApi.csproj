@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\..\..\..\common.props" />
+	<Import Project="..\..\..\..\configureawait.props" />
+
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<AssemblyName>SharpAbp.Abp.OpenIddict.HttpApi</AssemblyName>
+		<PackageId>SharpAbp.Abp.OpenIddict.HttpApi</PackageId>
+		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<Description>SharpAbp OpenIddict Module</Description>
+		<RootNamespace />
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="$(VoloAbpPackageVersion)" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\SharpAbp.Abp.OpenIddict.Application.Contracts\SharpAbp.Abp.OpenIddict.Application.Contracts.csproj" />
+	</ItemGroup>
+
+</Project>

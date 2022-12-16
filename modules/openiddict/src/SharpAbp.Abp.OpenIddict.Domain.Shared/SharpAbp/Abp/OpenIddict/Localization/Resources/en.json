@@ -1,0 +1,14 @@
+{
+  "culture": "en",
+  "texts": {
+    "OpenIddict": "OpenIddict",
+    "Permission:OpenIddict.Applications": "OpenIddict application",
+    "Permission:OpenIddict.Applications.Create": "Create application",
+    "Permission:OpenIddict.Applications.Update": "Update application",
+    "Permission:OpenIddict.Applications.Delete": "Delete application",
+    "Permission:OpenIddict.Scopes": "OpenIddict Scopes",
+    "Permission:OpenIddict.Scopes.Create": "Create scope",
+    "Permission:OpenIddict.Scopes.Update": "Update scope",
+    "Permission:OpenIddict.Scopes.Delete": "Delete scope"
+  }
+}

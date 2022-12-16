@@ -1,0 +1,14 @@
+{
+  "culture": "zh-Hans",
+  "texts": {
+    "OpenIddict": "OpenIddict",
+    "Permission:OpenIddict.Applications": "OpenIddict应用",
+    "Permission:OpenIddict.Applications.Create": "创建应用",
+    "Permission:OpenIddict.Applications.Update": "修改应用",
+    "Permission:OpenIddict.Applications.Delete": "删除应用",
+    "Permission:OpenIddict.Scopes": "OpenIddict Scopes",
+    "Permission:OpenIddict.Scopes.Create": "创建Scope",
+    "Permission:OpenIddict.Scopes.Update": "修改Scope",
+    "Permission:OpenIddict.Scopes.Delete": "删除Scope"
+  }
+}

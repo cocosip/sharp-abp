@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\..\common.props" />
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<RootNamespace>SharpSample</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SharpSample.Domain.Shared\SharpSample.Domain.Shared.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.ObjectExtending" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.Account.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.Identity.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.PermissionManagement.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.TenantManagement.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.FeatureManagement.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.SettingManagement.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\..\modules\account\src\SharpAbp.Abp.Account.Application.Contracts\SharpAbp.Abp.Account.Application.Contracts.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\audit-logging\src\SharpAbp.Abp.AuditLogging.Application.Contracts\SharpAbp.Abp.AuditLogging.Application.Contracts.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\dbconnections\src\SharpAbp.Abp.DbConnectionsManagement.Application.Contracts\SharpAbp.Abp.DbConnectionsManagement.Application.Contracts.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\file-storing-management\src\SharpAbp.Abp.FileStoringManagement.Application.Contracts\SharpAbp.Abp.FileStoringManagement.Application.Contracts.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\identity\src\SharpAbp.Abp.Identity.Application.Contracts\SharpAbp.Abp.Identity.Application.Contracts.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\openiddict\src\SharpAbp.Abp.OpenIddict.Application.Contracts\SharpAbp.Abp.OpenIddict.Application.Contracts.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\map-tenancy-management\src\SharpAbp.Abp.MapTenancyManagement.Application.Contracts\SharpAbp.Abp.MapTenancyManagement.Application.Contracts.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\minid\src\SharpAbp.MinId.Application.Contracts\SharpAbp.MinId.Application.Contracts.csproj" />
+	</ItemGroup>
+
+</Project>
