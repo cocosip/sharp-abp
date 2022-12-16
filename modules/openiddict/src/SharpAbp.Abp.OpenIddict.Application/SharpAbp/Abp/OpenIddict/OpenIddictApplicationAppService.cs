@@ -107,11 +107,14 @@ namespace SharpAbp.Abp.OpenIddict
                     input.Permissions,
                     null);
             }
+            var descriptor = new AbpApplicationDescriptor()
+            {
+                LogoUri = input.LogoUri,
+                ClientUri = input.ClientUri
+            };
 
-            var application = new AbpApplicationDescriptor();
-            await ApplicationManager.PopulateAsync(application, model);
-            var created = await ApplicationManager.CreateAsync(application);
-
+            await ApplicationManager.PopulateAsync(descriptor, model);
+            var created = await ApplicationManager.CreateAsync(descriptor);
             return await ToApplicationDtoAsync(created.As<OpenIddictApplicationModel>());
         }
 
@@ -131,9 +134,10 @@ namespace SharpAbp.Abp.OpenIddict
 
             var model = (await ApplicationManager.FindByIdAsync(id.ToString("D"))).As<OpenIddictApplicationModel>();
             var buildModel = await BuildModel(input);
-            buildModel.Id = id;
-            var application = new AbpApplicationDescriptor();
-            await ApplicationManager.PopulateAsync(application, buildModel);
+            if (buildModel.ClientSecret.IsNullOrWhiteSpace())
+            {
+                buildModel.ClientSecret = model.ClientSecret;
+            }
 
             if (input.Permissions.Any())
             {
@@ -145,8 +149,15 @@ namespace SharpAbp.Abp.OpenIddict
                     null);
             }
 
+            var descriptor = new AbpApplicationDescriptor()
+            {
+                LogoUri = input.LogoUri,
+                ClientUri = input.ClientUri
+            };
 
-            await ApplicationManager.UpdateAsync(model, application);
+            await ApplicationManager.PopulateAsync(descriptor, buildModel);
+            await ApplicationManager.UpdateAsync(model, descriptor);
+
             var updated = (await ApplicationManager.FindByIdAsync(id.ToString("D"))).As<OpenIddictApplicationModel>();
             return await ToApplicationDtoAsync(updated);
         }
@@ -305,7 +316,7 @@ namespace SharpAbp.Abp.OpenIddict
             {
                 Id = model.Id,
                 ClientId = model.ClientId,
-                //ClientSecret = model.ClientSecret,
+                ClientSecret = model.ClientSecret,
                 ConsentType = model.ConsentType,
                 DisplayName = model.DisplayName,
                 Type = model.Type,
