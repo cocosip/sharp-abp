@@ -208,7 +208,7 @@ namespace SharpAbp.Abp.OpenIddict
                 {
                     throw new BusinessException(LL["InvalidRedirectUri", postLogoutRedirectUri]);
                 }
-                redirectUris.Add(uri.ToString());
+                postLogoutRedirectUris.Add(uri.ToString());
             }
             await OpenIdApplicationStore.SetPostLogoutRedirectUrisAsync(model, postLogoutRedirectUris.ToImmutableArray(), CancellationToken.None);
             var firstPostLogoutRedirectUri = postLogoutRedirectUris.FirstOrDefault();
