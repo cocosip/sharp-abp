@@ -9,5 +9,10 @@ namespace SharpAbp.Abp.IdentityServer
         {
             options.UseAutofac();
         }
+
+        public override void Dispose()
+        {
+
+        }
     }
 }
