@@ -3,7 +3,7 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <Version>2.6.0</Version>
-    <NoWarn>$(NoWarn);CS1591;CS0436</NoWarn>
+    <NoWarn>$(NoWarn);CS1591;CS0436;NU1608</NoWarn>
     <Authors>virtual</Authors>
     <Product>sharp-abp</Product>
     <PackageProjectUrl>https://github.com/cocosip/sharp-abp</PackageProjectUrl>
