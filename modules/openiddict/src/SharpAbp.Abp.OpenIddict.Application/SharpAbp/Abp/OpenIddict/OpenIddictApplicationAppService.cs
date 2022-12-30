@@ -126,10 +126,10 @@ namespace SharpAbp.Abp.OpenIddict
                 throw new BusinessException(LL["NoClientSecretCanBeSetForPublicApplications"]);
             }
 
-            if (string.IsNullOrEmpty(input.ClientSecret) && string.Equals(input.Type, OpenIddictConstants.ClientTypes.Confidential, StringComparison.OrdinalIgnoreCase))
-            {
-                throw new BusinessException(LL["TheClientSecretIsRequiredForConfidentialApplications"]);
-            }
+            // if (string.IsNullOrEmpty(input.ClientSecret) && string.Equals(input.Type, OpenIddictConstants.ClientTypes.Confidential, StringComparison.OrdinalIgnoreCase))
+            // {
+            //     throw new BusinessException(LL["TheClientSecretIsRequiredForConfidentialApplications"]);
+            // }
 
 
             var model = (await ApplicationManager.FindByIdAsync(id.ToString("D"))).As<OpenIddictApplicationModel>();
