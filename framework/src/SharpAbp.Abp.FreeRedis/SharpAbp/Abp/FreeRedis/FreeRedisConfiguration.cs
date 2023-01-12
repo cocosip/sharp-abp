@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using FreeRedis;
+using System;
+using System.Collections.Generic;
 
 namespace SharpAbp.Abp.FreeRedis
 {
@@ -20,9 +22,12 @@ namespace SharpAbp.Abp.FreeRedis
         /// </summary>
         public bool ReadOnly { get; set; }
 
+        public List<Action<RedisClient>> CliConfigures { get; set; }
+
         public FreeRedisConfiguration()
         {
             Sentinels = new List<string>();
+            CliConfigures = new List<Action<RedisClient>>();
         }
     }
 }

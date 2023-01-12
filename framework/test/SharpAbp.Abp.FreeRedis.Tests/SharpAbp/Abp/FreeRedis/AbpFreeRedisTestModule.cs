@@ -1,4 +1,5 @@
 ﻿using SharpAbp.Abp.FreeRedis.TestObjects;
+using System;
 using System.Collections.Generic;
 using Volo.Abp;
 using Volo.Abp.Autofac;
@@ -33,6 +34,10 @@ namespace SharpAbp.Abp.FreeRedis
                         {
                             "192.168.0.100"
                         };
+                        client.CliConfigures.Add(new Action<global::FreeRedis.RedisClient>(cc =>
+                        {
+
+                        }));
                     })
                     .Configure<TestClient2>(client =>
                     {

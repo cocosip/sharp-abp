@@ -7,14 +7,25 @@ namespace SharpAbp.Abp.FreeRedis
     {
         public virtual RedisClient CreateClient(FreeRedisConfiguration configuration)
         {
+            RedisClient cli;
             if (configuration.Mode == RedisMode.Sentinel)
             {
-                return new RedisClient(configuration.ConnectionString, configuration.Sentinels.ToArray(), configuration.ReadOnly);
+                cli = new RedisClient(configuration.ConnectionString, configuration.Sentinels.ToArray(), configuration.ReadOnly);
             }
             else
             {
-                return new RedisClient(configuration.ConnectionString);
+                cli = new RedisClient(configuration.ConnectionString);
             }
+
+            if (configuration.CliConfigures != null)
+            {
+                foreach (var c in configuration.CliConfigures)
+                {
+                    c(cli);
+                }
+            }
+
+            return cli;
         }
     }
 }
