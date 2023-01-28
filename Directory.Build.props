@@ -2,7 +2,7 @@
   <PropertyGroup>
 
     <!--Volo ABP packages-->
-    <VoloAbpPackageVersion>7.0.0</VoloAbpPackageVersion>
+    <VoloAbpPackageVersion>7.0.1</VoloAbpPackageVersion>
 
     <!-- All Microsoft EntityFrameworkCore packages -->
     <MicrosoftEntityFrameworkCorePackageVersion>7.0.1</MicrosoftEntityFrameworkCorePackageVersion>
