@@ -1,6 +1,4 @@
 ﻿using MassTransit;
-using MassTransit.RabbitMqTransport;
-using MassTransit.RabbitMqTransport.Topology;
 using System;
 
 namespace SharpAbp.Abp.MassTransit.RabbitMQ
@@ -26,5 +24,6 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
         /// Publish configure
         /// </summary>
         public Action<Action<IRabbitMqMessagePublishTopologyConfigurator>, IBusRegistrationContext, IRabbitMqBusFactoryConfigurator> PublishConfigure { get; set; }
+
     }
 }

@@ -14,7 +14,6 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
-
             var configuration = context.Services.GetConfiguration();
             PreConfigure<AbpMassTransitRabbitMqOptions>(options => options.PreConfigure(configuration));
 
@@ -84,7 +83,6 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
                         {
                             preConfigure(ctx, cfg);
                         }
-
 
                         cfg.Host(rabbitMqOptions.Host, rabbitMqOptions.Port, rabbitMqOptions.VirtualHost, h =>
                         {
