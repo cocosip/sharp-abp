@@ -255,11 +255,11 @@ namespace SharpAbp.Abp.FileStoring.S3
         private async Task<bool> FileExistsAsync(
             IAmazonS3 client,
             string containerName,
-            string fileId, 
+            string fileId,
             CancellationToken cancellationToken)
         {
             // Make sure Blob Container exists.
-            if (await client.DoesS3BucketExistAsync(containerName))
+            if (await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(client, containerName))
             {
                 try
                 {
