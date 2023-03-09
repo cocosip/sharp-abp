@@ -13,6 +13,11 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
         public string VirtualHost { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+
+        /// <summary>
+        /// ConnectionName
+        /// </summary>
+        public string ConnectionName { get; set; }
         public bool UseSsl { get; set; }
         public bool UseCluster { get; set; }
         public List<string> ClusterNodes { get; set; }
@@ -65,6 +70,7 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
                 VirtualHost = massTransitRabbitMqOptions.VirtualHost;
                 Username = massTransitRabbitMqOptions.Username;
                 Password = massTransitRabbitMqOptions.Password;
+                ConnectionName = massTransitRabbitMqOptions.ConnectionName;
                 UseSsl = massTransitRabbitMqOptions.UseSsl;
                 UseCluster = massTransitRabbitMqOptions.UseCluster;
                 ClusterNodes = massTransitRabbitMqOptions.ClusterNodes;

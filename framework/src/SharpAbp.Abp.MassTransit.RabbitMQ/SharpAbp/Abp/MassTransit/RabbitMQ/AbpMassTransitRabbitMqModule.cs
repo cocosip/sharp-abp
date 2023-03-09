@@ -1,6 +1,5 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
-using RabbitMQ.Client;
 using System;
 using System.Linq;
 using Volo.Abp.Modularity;
@@ -84,7 +83,7 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
                             preConfigure(ctx, cfg);
                         }
 
-                        cfg.Host(rabbitMqOptions.Host, rabbitMqOptions.Port, rabbitMqOptions.VirtualHost, h =>
+                        cfg.Host(rabbitMqOptions.Host, rabbitMqOptions.Port, rabbitMqOptions.VirtualHost, rabbitMqOptions.ConnectionName, h =>
                         {
                             h.Username(rabbitMqOptions.Username);
                             h.Password(rabbitMqOptions.Password);
