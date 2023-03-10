@@ -4,19 +4,20 @@
 	<Import Project="..\..\..\configureawait.props" />
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
-		<AssemblyName>SharpAbp.Abp.Snowflakes</AssemblyName>
-		<PackageId>SharpAbp.Abp.Snowflakes</PackageId>
+		<TargetFramework>net7.0</TargetFramework>
+		<AssemblyName>SharpAbp.Abp.Swashbuckle.Versioning</AssemblyName>
+		<PackageId>SharpAbp.Abp.Swashbuckle.Versioning</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
 		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-		<Description>SharpAbp Snowflake Module</Description>
+		<Description>SharpAbp Swashbuckle Versioning Module</Description>
 		<RootNamespace />
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Volo.Abp" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.Swashbuckle" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />
 	</ItemGroup>
 
 </Project>

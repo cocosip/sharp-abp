@@ -4,19 +4,25 @@
 	<Import Project="..\..\..\configureawait.props" />
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
-		<AssemblyName>SharpAbp.Abp.Snowflakes</AssemblyName>
-		<PackageId>SharpAbp.Abp.Snowflakes</PackageId>
+		<TargetFramework>net7.0</TargetFramework>
+		<AssemblyName>SharpAbp.Abp.Swashbuckle</AssemblyName>
+		<PackageId>SharpAbp.Abp.Swashbuckle</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
 		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-		<Description>SharpAbp Snowflake Module</Description>
+		<Description>SharpAbp Swashbuckle Module</Description>
 		<RootNamespace />
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Volo.Abp" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.Swashbuckle" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Remove="wwwroot\swagger\ui\swagger_theme.css" />
+		<EmbeddedResource Include="wwwroot\swagger\ui\swagger_theme.css" />
 	</ItemGroup>
 
 </Project>
