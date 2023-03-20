@@ -17,14 +17,14 @@ using Volo.Abp.Uow;
 namespace SharpAbp.Abp.FileStoringManagement
 {
     [DependsOn(
-       typeof(FileStoringManagementApplicationModule),
-       typeof(FileStoringManagementEntityFrameworkCoreModule),
        typeof(AbpFileStoringAliyunModule),
        typeof(AbpFileStoringAzureModule),
        typeof(AbpFileStoringFastDFSModule),
        typeof(AbpFileStoringFileSystemModule),
        typeof(AbpFileStoringMinioModule),
        typeof(AbpFileStoringS3Module),
+       typeof(FileStoringManagementApplicationModule),
+       typeof(FileStoringManagementEntityFrameworkCoreModule),
        typeof(AbpTestBaseModule),
        typeof(AbpAutofacModule)
        )]

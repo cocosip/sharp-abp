@@ -1,10 +1,13 @@
 ﻿using JetBrains.Annotations;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.FileStoring
 {
+    [Dependency(ServiceLifetime.Transient, ReplaceServices = true)]
+    [ExposeServices(typeof(IFileContainerConfigurationProvider))]
     public class DefaultFileContainerConfigurationProvider : IFileContainerConfigurationProvider, ITransientDependency
     {
         protected AbpFileStoringOptions Options { get; }
