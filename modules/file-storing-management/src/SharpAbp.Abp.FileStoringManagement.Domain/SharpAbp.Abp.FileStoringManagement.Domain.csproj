@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SharpAbp.Abp.FileStoringManagement.Domain.Shared\SharpAbp.Abp.FileStoringManagement.Domain.Shared.csproj" />
-    <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.FileStoring\SharpAbp.Abp.FileStoring.csproj" />
+    <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.FileStoring.Abstractions\SharpAbp.Abp.FileStoring.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

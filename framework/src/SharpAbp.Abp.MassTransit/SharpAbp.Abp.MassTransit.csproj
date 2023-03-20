@@ -16,7 +16,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="MassTransit" Version="8.0.13" />
+		<PackageReference Include="MassTransit" Version="8.0.14" />
 		<PackageReference Include="Volo.Abp" Version="$(VoloAbpPackageVersion)" />
 	</ItemGroup>
 

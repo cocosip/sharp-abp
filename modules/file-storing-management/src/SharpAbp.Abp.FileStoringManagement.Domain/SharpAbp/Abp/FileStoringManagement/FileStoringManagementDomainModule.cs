@@ -11,7 +11,7 @@ namespace SharpAbp.Abp.FileStoringManagement
     [DependsOn(
         typeof(AbpDddDomainModule),
         typeof(AbpCachingModule),
-        typeof(AbpFileStoringModule),
+        typeof(AbpFileStoringAbstractionsModule),
         typeof(FileStoringManagementDomainSharedModule)
         )]
     public class FileStoringManagementDomainModule : AbpModule

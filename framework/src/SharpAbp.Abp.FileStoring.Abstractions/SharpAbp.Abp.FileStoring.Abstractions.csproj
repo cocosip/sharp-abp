@@ -5,22 +5,18 @@
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<AssemblyName>SharpAbp.Abp.MassTransit.ActiveMQ</AssemblyName>
-		<PackageId>SharpAbp.Abp.MassTransit.ActiveMQ</PackageId>
+		<AssemblyName>SharpAbp.Abp.FileStoring.Abstractions</AssemblyName>
+		<PackageId>SharpAbp.Abp.FileStoring.Abstractions</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
 		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-		<Description>SharpAbp MassTransit Module</Description>
+		<Description>SharpAbp FileStoring Module</Description>
 		<RootNamespace />
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="MassTransit.ActiveMQ" Version="8.0.14" />
+		<PackageReference Include="Volo.Abp.Validation" Version="$(VoloAbpPackageVersion)" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\SharpAbp.Abp.MassTransit\SharpAbp.Abp.MassTransit.csproj" />
-	</ItemGroup>
-
+	
 </Project>

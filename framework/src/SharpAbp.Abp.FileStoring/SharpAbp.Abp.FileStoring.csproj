@@ -1,24 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\..\common.props" />
-  <Import Project="..\..\..\configureawait.props" />
+	<Import Project="..\..\..\common.props" />
+	<Import Project="..\..\..\configureawait.props" />
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>SharpAbp.Abp.FileStoring</AssemblyName>
-    <PackageId>SharpAbp.Abp.FileStoring</PackageId>
-    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Description>SharpAbp FileStoring Module</Description>
-    <RootNamespace />
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<AssemblyName>SharpAbp.Abp.FileStoring</AssemblyName>
+		<PackageId>SharpAbp.Abp.FileStoring</PackageId>
+		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<Description>SharpAbp FileStoring Module</Description>
+		<RootNamespace />
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Volo.Abp.MultiTenancy" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.Threading" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.Validation" Version="$(VoloAbpPackageVersion)" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.MultiTenancy" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.Threading" Version="$(VoloAbpPackageVersion)" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\SharpAbp.Abp.FileStoring.Abstractions\SharpAbp.Abp.FileStoring.Abstractions.csproj" />
+	</ItemGroup>
 
 </Project>

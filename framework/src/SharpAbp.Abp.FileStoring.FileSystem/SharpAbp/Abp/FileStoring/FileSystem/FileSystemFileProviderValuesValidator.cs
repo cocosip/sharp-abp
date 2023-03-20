@@ -10,7 +10,7 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
     {
         public override string Provider => FileSystemFileProviderConfigurationNames.ProviderName;
 
-        public FileSystemFileProviderValuesValidator(IOptions<AbpFileStoringOptions> options) : base(options)
+        public FileSystemFileProviderValuesValidator(IOptions<AbpFileStoringAbstractionsOptions> options) : base(options)
         {
         }
 

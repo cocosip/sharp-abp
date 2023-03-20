@@ -10,7 +10,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
     {
         public override string Provider => AliyunFileProviderConfigurationNames.ProviderName;
 
-        public AliyunFileProviderValuesValidator(IOptions<AbpFileStoringOptions> options) : base(options)
+        public AliyunFileProviderValuesValidator(IOptions<AbpFileStoringAbstractionsOptions> options) : base(options)
         {
 
         }

@@ -97,9 +97,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoring.Ob
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.MassTransit.ActiveMQ", "src\SharpAbp.Abp.MassTransit.ActiveMQ\SharpAbp.Abp.MassTransit.ActiveMQ.csproj", "{7DC28761-6579-4286-B582-985D75F8C871}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Swashbuckle", "src\SharpAbp.Abp.Swashbuckle\SharpAbp.Abp.Swashbuckle.csproj", "{410796C3-C5F1-432E-B264-F8520DABCFCC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Swashbuckle", "src\SharpAbp.Abp.Swashbuckle\SharpAbp.Abp.Swashbuckle.csproj", "{410796C3-C5F1-432E-B264-F8520DABCFCC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Swashbuckle.Versioning", "src\SharpAbp.Abp.Swashbuckle.Versioning\SharpAbp.Abp.Swashbuckle.Versioning.csproj", "{2A1F05BF-7172-4EDD-ADB5-E08E8492B1EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Swashbuckle.Versioning", "src\SharpAbp.Abp.Swashbuckle.Versioning\SharpAbp.Abp.Swashbuckle.Versioning.csproj", "{2A1F05BF-7172-4EDD-ADB5-E08E8492B1EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.FileStoring.Abstractions", "src\SharpAbp.Abp.FileStoring.Abstractions\SharpAbp.Abp.FileStoring.Abstractions.csproj", "{CC1ECD6B-549B-4843-99D4-2B4FE773B892}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -675,6 +677,18 @@ Global
 		{2A1F05BF-7172-4EDD-ADB5-E08E8492B1EC}.Release|x64.Build.0 = Release|Any CPU
 		{2A1F05BF-7172-4EDD-ADB5-E08E8492B1EC}.Release|x86.ActiveCfg = Release|Any CPU
 		{2A1F05BF-7172-4EDD-ADB5-E08E8492B1EC}.Release|x86.Build.0 = Release|Any CPU
+		{CC1ECD6B-549B-4843-99D4-2B4FE773B892}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC1ECD6B-549B-4843-99D4-2B4FE773B892}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC1ECD6B-549B-4843-99D4-2B4FE773B892}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CC1ECD6B-549B-4843-99D4-2B4FE773B892}.Debug|x64.Build.0 = Debug|Any CPU
+		{CC1ECD6B-549B-4843-99D4-2B4FE773B892}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CC1ECD6B-549B-4843-99D4-2B4FE773B892}.Debug|x86.Build.0 = Debug|Any CPU
+		{CC1ECD6B-549B-4843-99D4-2B4FE773B892}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC1ECD6B-549B-4843-99D4-2B4FE773B892}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC1ECD6B-549B-4843-99D4-2B4FE773B892}.Release|x64.ActiveCfg = Release|Any CPU
+		{CC1ECD6B-549B-4843-99D4-2B4FE773B892}.Release|x64.Build.0 = Release|Any CPU
+		{CC1ECD6B-549B-4843-99D4-2B4FE773B892}.Release|x86.ActiveCfg = Release|Any CPU
+		{CC1ECD6B-549B-4843-99D4-2B4FE773B892}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -727,6 +741,7 @@ Global
 		{7DC28761-6579-4286-B582-985D75F8C871} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 		{410796C3-C5F1-432E-B264-F8520DABCFCC} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 		{2A1F05BF-7172-4EDD-ADB5-E08E8492B1EC} = {16E4EB45-D029-4743-99CD-D125C72AE383}
+		{CC1ECD6B-549B-4843-99D4-2B4FE773B892} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {30432CEA-45F2-4F5A-B44B-790A62AB73F1}

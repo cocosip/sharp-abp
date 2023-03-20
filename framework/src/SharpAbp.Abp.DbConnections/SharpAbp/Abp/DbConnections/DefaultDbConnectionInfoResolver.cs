@@ -30,8 +30,7 @@ namespace SharpAbp.Abp.DbConnections
 
             var dbConnectionInfo = new DbConnectionInfo(
                 dbConnectionConfiguration.DatabaseProvider,
-                dbConnectionConfiguration.ConnectionString
-                );
+                dbConnectionConfiguration.ConnectionString);
 
             return await Task.FromResult(dbConnectionInfo);
         }

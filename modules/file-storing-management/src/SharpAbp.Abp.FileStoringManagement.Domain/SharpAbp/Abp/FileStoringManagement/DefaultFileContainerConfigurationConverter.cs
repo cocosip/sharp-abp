@@ -8,9 +8,9 @@ namespace SharpAbp.Abp.FileStoringManagement
 {
     public class DefaultFileContainerConfigurationConverter : IFileContainerConfigurationConverter, ITransientDependency
     {
-        protected AbpFileStoringOptions Options { get; }
+        protected AbpFileStoringAbstractionsOptions Options { get; }
 
-        public DefaultFileContainerConfigurationConverter(IOptions<AbpFileStoringOptions> options)
+        public DefaultFileContainerConfigurationConverter(IOptions<AbpFileStoringAbstractionsOptions> options)
         {
             Options = options.Value;
         }

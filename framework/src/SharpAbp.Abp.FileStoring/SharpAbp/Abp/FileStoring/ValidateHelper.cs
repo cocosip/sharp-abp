@@ -31,9 +31,6 @@ namespace SharpAbp.Abp.FileStoring
             }
         }
 
-
-
-
         internal static bool IsBoolean(string value)
         {
             if (!value.IsNullOrWhiteSpace())

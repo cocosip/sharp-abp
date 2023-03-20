@@ -10,7 +10,7 @@ namespace SharpAbp.Abp.FileStoring.Azure
     {
         public override string Provider => AzureFileProviderConfigurationNames.ProviderName;
 
-        public AzureFileProviderValuesValidator(IOptions<AbpFileStoringOptions> options) : base(options)
+        public AzureFileProviderValuesValidator(IOptions<AbpFileStoringAbstractionsOptions> options) : base(options)
         {
 
         }

@@ -9,7 +9,7 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
     public class FastDFSFileProviderValuesValidator : BaseFileProviderValuesValidator, ITransientDependency
     {
         public override string Provider => FastDFSFileProviderConfigurationNames.ProviderName;
-        public FastDFSFileProviderValuesValidator(IOptions<AbpFileStoringOptions> options) : base(options)
+        public FastDFSFileProviderValuesValidator(IOptions<AbpFileStoringAbstractionsOptions> options) : base(options)
         {
 
         }

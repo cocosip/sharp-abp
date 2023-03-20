@@ -35,7 +35,7 @@ namespace SharpAbp.Abp.FileStoring
 
             Configure<AbpFileStoringOptions>(c =>
             {
-                c.Configure(configuration);
+                c.Configure(configuration, context);
             });
         }
 

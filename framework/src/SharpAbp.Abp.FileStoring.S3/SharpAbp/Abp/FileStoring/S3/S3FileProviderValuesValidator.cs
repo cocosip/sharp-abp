@@ -9,7 +9,7 @@ namespace SharpAbp.Abp.FileStoring.S3
     public class S3FileProviderValuesValidator : BaseFileProviderValuesValidator, ITransientDependency
     {
         public override string Provider => S3FileProviderConfigurationNames.ProviderName;
-        public S3FileProviderValuesValidator(IOptions<AbpFileStoringOptions> options) : base(options)
+        public S3FileProviderValuesValidator(IOptions<AbpFileStoringAbstractionsOptions> options) : base(options)
         {
 
         }

@@ -8,9 +8,9 @@ namespace SharpAbp.Abp.FileStoring
 {
     public abstract class BaseFileProviderValuesValidator : IFileProviderValuesValidator
     {
-        protected AbpFileStoringOptions Options { get; }
+        protected AbpFileStoringAbstractionsOptions Options { get; }
 
-        public BaseFileProviderValuesValidator(IOptions<AbpFileStoringOptions> options)
+        public BaseFileProviderValuesValidator(IOptions<AbpFileStoringAbstractionsOptions> options)
         {
             Options = options.Value;
         }

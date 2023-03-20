@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using Volo.Abp;
+using Volo.Abp.Modularity;
 using Volo.Abp.Reflection;
 
 namespace SharpAbp.Abp.FileStoring
@@ -8,24 +10,25 @@ namespace SharpAbp.Abp.FileStoring
     public class AbpFileStoringOptions
     {
         public FileContainerConfigurations Containers { get; }
-        public FileProviderConfigurations Providers { get; }
 
         public AbpFileStoringOptions()
         {
             Containers = new FileContainerConfigurations();
-            Providers = new FileProviderConfigurations();
         }
 
-        public AbpFileStoringOptions Configure(IConfiguration configuration)
+        public AbpFileStoringOptions Configure(IConfiguration configuration, ServiceConfigurationContext context)
         {
             var entries = configuration
                 .GetSection("FileStoringOptions")
                 .Get<Dictionary<string, FileContainerConfigurationEntry>>();
+
+            var abstractionsOptions = context.Services.ExecutePreConfiguredActions<AbpFileStoringAbstractionsOptions>();
+
             if (entries != null)
             {
                 foreach (var entryKv in entries)
                 {
-                    var fileProviderConfiguration = Providers.GetConfiguration(entryKv.Value.Provider);
+                    var fileProviderConfiguration = abstractionsOptions.Providers.GetConfiguration(entryKv.Value.Provider);
                     if (fileProviderConfiguration == null)
                     {
                         throw new AbpException($"Could not find any provider configuration for '{entryKv.Key}' container, provider:'{entryKv.Value.Provider}'");

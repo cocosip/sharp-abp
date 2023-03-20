@@ -13,8 +13,8 @@ namespace SharpAbp.Abp.FileStoringManagement
     [Authorize(FileStoringManagementPermissions.Providers.Default)]
     public class FileProviderAppService : FileStoringManagementAppServiceBase, IFileProviderAppService
     {
-        protected AbpFileStoringOptions Options { get; }
-        public FileProviderAppService(IOptions<AbpFileStoringOptions> options)
+        protected AbpFileStoringAbstractionsOptions Options { get; }
+        public FileProviderAppService(IOptions<AbpFileStoringAbstractionsOptions> options)
         {
             Options = options.Value;
         }

@@ -10,7 +10,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
     {
         public override string Provider => ObsFileProviderConfigurationNames.ProviderName;
 
-        public ObsFileProviderValuesValidator(IOptions<AbpFileStoringOptions> options) : base(options)
+        public ObsFileProviderValuesValidator(IOptions<AbpFileStoringAbstractionsOptions> options) : base(options)
         {
 
         }

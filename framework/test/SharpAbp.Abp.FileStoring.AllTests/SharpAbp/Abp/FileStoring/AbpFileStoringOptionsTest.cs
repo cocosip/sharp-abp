@@ -18,12 +18,14 @@ namespace SharpAbp.Abp.FileStoring
         private readonly ICurrentTenant _currentTenant;
         private readonly IFileContainerConfigurationProvider _configurationProvider;
         private readonly AbpFileStoringOptions _options;
+        private readonly AbpFileStoringAbstractionsOptions _abstractionsOptions;
         private readonly IFileContainerFactory _fileContainerFactory;
         public AbpFileStoringOptionsTest()
         {
             _currentTenant = GetRequiredService<ICurrentTenant>();
             _configurationProvider = GetRequiredService<IFileContainerConfigurationProvider>();
             _options = GetRequiredService<IOptions<AbpFileStoringOptions>>().Value;
+            _abstractionsOptions = GetRequiredService<IOptions<AbpFileStoringAbstractionsOptions>>().Value;
             _fileContainerFactory = GetRequiredService<IFileContainerFactory>();
         }
 
@@ -161,34 +163,34 @@ namespace SharpAbp.Abp.FileStoring
         [Fact]
         public void FileProviders_Test()
         {
-            var fileProviderConfigurations = _options.Providers.GetFileProviders();
+            var fileProviderConfigurations = _abstractionsOptions.Providers.GetFileProviders();
             Assert.Equal(9, fileProviderConfigurations.Count);
 
-            var aliyunProviderConfiguration = _options.Providers.GetConfiguration("Aliyun");
+            var aliyunProviderConfiguration = _abstractionsOptions.Providers.GetConfiguration("Aliyun");
             Assert.Equal("Aliyun", aliyunProviderConfiguration.Provider);
 
-            var obsProviderConfiguration = _options.Providers.GetConfiguration("Obs");
+            var obsProviderConfiguration = _abstractionsOptions.Providers.GetConfiguration("Obs");
             Assert.Equal("Obs", obsProviderConfiguration.Provider);
 
-            var azureProviderConfiguration = _options.Providers.GetConfiguration("Azure");
+            var azureProviderConfiguration = _abstractionsOptions.Providers.GetConfiguration("Azure");
             Assert.Equal("Azure", azureProviderConfiguration.Provider);
 
-            var fastDFSProviderConfiguration = _options.Providers.GetConfiguration("FastDFS");
+            var fastDFSProviderConfiguration = _abstractionsOptions.Providers.GetConfiguration("FastDFS");
             Assert.Equal("FastDFS", fastDFSProviderConfiguration.Provider);
 
-            var minioProviderConfiguration = _options.Providers.GetConfiguration("Minio");
+            var minioProviderConfiguration = _abstractionsOptions.Providers.GetConfiguration("Minio");
             Assert.Equal("Minio", minioProviderConfiguration.Provider);
 
-            var fileSystemProviderConfiguration = _options.Providers.GetConfiguration("FileSystem");
+            var fileSystemProviderConfiguration = _abstractionsOptions.Providers.GetConfiguration("FileSystem");
             Assert.Equal("FileSystem", fileSystemProviderConfiguration.Provider);
 
-            var awsProviderConfiguration = _options.Providers.GetConfiguration("Aws");
+            var awsProviderConfiguration = _abstractionsOptions.Providers.GetConfiguration("Aws");
             Assert.Equal("Aws", awsProviderConfiguration.Provider);
 
-            var ks3ProviderConfiguration = _options.Providers.GetConfiguration("KS3");
+            var ks3ProviderConfiguration = _abstractionsOptions.Providers.GetConfiguration("KS3");
             Assert.Equal("KS3", ks3ProviderConfiguration.Provider);
 
-            var s3ProviderConfiguration = _options.Providers.GetConfiguration("S3");
+            var s3ProviderConfiguration = _abstractionsOptions.Providers.GetConfiguration("S3");
             Assert.Equal("S3", s3ProviderConfiguration.Provider);
 
         }

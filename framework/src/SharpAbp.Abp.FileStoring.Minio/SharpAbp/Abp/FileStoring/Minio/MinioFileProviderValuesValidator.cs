@@ -9,7 +9,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
     public class MinioFileProviderValuesValidator : BaseFileProviderValuesValidator, ITransientDependency
     {
         public override string Provider => MinioFileProviderConfigurationNames.ProviderName;
-        public MinioFileProviderValuesValidator(IOptions<AbpFileStoringOptions> options) : base(options)
+        public MinioFileProviderValuesValidator(IOptions<AbpFileStoringAbstractionsOptions> options) : base(options)
         {
 
         }

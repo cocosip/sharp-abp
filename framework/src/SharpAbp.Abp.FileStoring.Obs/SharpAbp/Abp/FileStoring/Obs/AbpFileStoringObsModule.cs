@@ -16,7 +16,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
-            Configure<AbpFileStoringOptions>(options =>
+            PreConfigure<AbpFileStoringAbstractionsOptions>(options =>
             {
                 var configuration = GetFileProviderConfiguration();
                 options.Providers.TryAdd(configuration);

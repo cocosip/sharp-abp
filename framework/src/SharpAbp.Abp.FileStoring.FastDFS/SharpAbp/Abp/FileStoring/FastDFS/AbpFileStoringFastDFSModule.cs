@@ -19,7 +19,7 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
-            Configure<AbpFileStoringOptions>(c =>
+            PreConfigure<AbpFileStoringAbstractionsOptions>(c =>
             {
                 var configuration = GetFileProviderConfiguration();
                 c.Providers.TryAdd(configuration);
