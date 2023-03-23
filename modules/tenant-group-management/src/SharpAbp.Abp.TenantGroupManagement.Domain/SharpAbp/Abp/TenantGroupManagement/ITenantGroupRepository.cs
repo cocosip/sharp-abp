@@ -1,0 +1,71 @@
+﻿using System;
+using System.Threading.Tasks;
+using System.Threading;
+using Volo.Abp.Domain.Repositories;
+using System.Collections.Generic;
+
+namespace SharpAbp.Abp.TenantGroupManagement
+{
+    public interface ITenantGroupRepository : IBasicRepository<TenantGroup, Guid>
+    {
+        /// <summary>
+        /// Find by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="includeDetails"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<TenantGroup> FindByNameAsync(string name, bool includeDetails = true, CancellationToken cancellationToken = default);
+
+
+        /// <summary>
+        /// Find expected by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="expectedId"></param>
+        /// <param name="includeDetails"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<TenantGroup> FindExpectedByNameAsync(string name, Guid? expectedId = null, bool includeDetails = true, CancellationToken cancellationToken = default);
+
+
+        /// <summary>
+        /// Find by tenantId
+        /// </summary>
+        /// <param name="tenantId"></param>
+        /// <param name="includeDetails"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<TenantGroup> FindByTenantIdAsync(Guid? tenantId, bool includeDetails = true, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Find expected by tenantId
+        /// </summary>
+        /// <param name="tenantId"></param>
+        /// <param name="expectedId"></param>
+        /// <param name="includeDetails"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<TenantGroup> FindExpectedByTenantIdAsync(Guid? tenantId, Guid? expectedId = null, bool includeDetails = true, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get paged list
+        /// </summary>
+        /// <param name="skipCount"></param>
+        /// <param name="maxResultCount"></param>
+        /// <param name="sorting"></param>
+        /// <param name="name"></param>
+        /// <param name="includeDetails"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<List<TenantGroup>> GetPagedListAsync(int skipCount, int maxResultCount, string sorting = null, string name = "", bool includeDetails = false, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get count
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<int> GetCountAsync(string name = "", CancellationToken cancellationToken = default);
+    }
+}

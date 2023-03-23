@@ -1,0 +1,13 @@
+{
+  "culture": "zh-Hant",
+  "texts": {
+    "MapTenancyManagement": "映射租戶管理",
+    "Permission:MapTenancyManagement.MapTenants": "映射租戶管理",
+    "Permission:MapTenancyManagement.MapTenants.Create": "創建映射租戶",
+    "Permission:MapTenancyManagement.MapTenants.Update": "修改映射租戶",
+    "Permission:MapTenancyManagement.MapTenants.Delete": "刪除映射租戶",
+    "MapTenancyManagement.DuplicateTenantId": "重複的租戶 '{0}'.",
+    "MapTenancyManagement.DuplicateCode": "重複的租戶編碼 '{0}'.",
+    "MapTenancyManagement.DuplicateMapCode": "重複的租戶映射編碼 '{0}'."
+  }
+}

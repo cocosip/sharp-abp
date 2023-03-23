@@ -17,23 +17,25 @@ namespace SharpAbp.Abp.IdentityModel
     {
         public AbpIdentityModelAuthenticationService(
             IOptions<AbpIdentityClientOptions> options,
-            ICancellationTokenProvider cancellationTokenProvider,
-            IHttpClientFactory httpClientFactory,
+            ICancellationTokenProvider cancellationTokenProvider, 
+            IHttpClientFactory httpClientFactory, 
             ICurrentTenant currentTenant,
             IOptions<IdentityModelHttpRequestMessageOptions> identityModelHttpRequestMessageOptions,
-            IDistributedCache<IdentityModelTokenCacheItem> tokenCache,
-            IDistributedCache<IdentityModelDiscoveryDocumentCacheItem> discoveryDocumentCache) : base(
-                options,
-                cancellationTokenProvider,
-                httpClientFactory,
-                currentTenant,
-                identityModelHttpRequestMessageOptions,
-                tokenCache,
-                discoveryDocumentCache)
+            IDistributedCache<IdentityModelTokenCacheItem> tokenCache, 
+            IDistributedCache<IdentityModelDiscoveryDocumentCacheItem> discoveryDocumentCache, 
+            IAbpHostEnvironment abpHostEnvironment) 
+            : base(
+                  options, 
+                  cancellationTokenProvider, 
+                  httpClientFactory,
+                  currentTenant, 
+                  identityModelHttpRequestMessageOptions,
+                  tokenCache, 
+                  discoveryDocumentCache, 
+                  abpHostEnvironment)
         {
 
         }
-
 
         protected override async Task<TokenResponse> GetTokenResponse(IdentityClientConfiguration configuration)
         {

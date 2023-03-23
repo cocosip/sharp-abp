@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5DC8EBF8-1084-4005-8822-DB65FFFC0909}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.TenantGroupManagement.Domain.Shared", "src\SharpAbp.Abp.TenantGroupManagement.Domain.Shared\SharpAbp.Abp.TenantGroupManagement.Domain.Shared.csproj", "{EF63B3CD-29D9-4965-B8F7-F021A4031853}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.TenantGroupManagement.Domain", "src\SharpAbp.Abp.TenantGroupManagement.Domain\SharpAbp.Abp.TenantGroupManagement.Domain.csproj", "{46F98940-6D4B-459D-9D25-3844DDF69A46}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore", "src\SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore\SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore.csproj", "{D5CA2CC8-A3A5-42CB-9D4F-A8C40858D528}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.TenantGroupManagement.MongoDB", "src\SharpAbp.Abp.TenantGroupManagement.MongoDB\SharpAbp.Abp.TenantGroupManagement.MongoDB.csproj", "{7ADC9E3E-8DD1-44AA-9A50-D2C955AEB3A1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EF63B3CD-29D9-4965-B8F7-F021A4031853}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF63B3CD-29D9-4965-B8F7-F021A4031853}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF63B3CD-29D9-4965-B8F7-F021A4031853}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF63B3CD-29D9-4965-B8F7-F021A4031853}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46F98940-6D4B-459D-9D25-3844DDF69A46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46F98940-6D4B-459D-9D25-3844DDF69A46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46F98940-6D4B-459D-9D25-3844DDF69A46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46F98940-6D4B-459D-9D25-3844DDF69A46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5CA2CC8-A3A5-42CB-9D4F-A8C40858D528}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5CA2CC8-A3A5-42CB-9D4F-A8C40858D528}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5CA2CC8-A3A5-42CB-9D4F-A8C40858D528}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5CA2CC8-A3A5-42CB-9D4F-A8C40858D528}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7ADC9E3E-8DD1-44AA-9A50-D2C955AEB3A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7ADC9E3E-8DD1-44AA-9A50-D2C955AEB3A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7ADC9E3E-8DD1-44AA-9A50-D2C955AEB3A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7ADC9E3E-8DD1-44AA-9A50-D2C955AEB3A1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EF63B3CD-29D9-4965-B8F7-F021A4031853} = {5DC8EBF8-1084-4005-8822-DB65FFFC0909}
+		{46F98940-6D4B-459D-9D25-3844DDF69A46} = {5DC8EBF8-1084-4005-8822-DB65FFFC0909}
+		{D5CA2CC8-A3A5-42CB-9D4F-A8C40858D528} = {5DC8EBF8-1084-4005-8822-DB65FFFC0909}
+		{7ADC9E3E-8DD1-44AA-9A50-D2C955AEB3A1} = {5DC8EBF8-1084-4005-8822-DB65FFFC0909}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4650D0B6-DFBA-4C60-97B5-488DAAD6E6DD}
+	EndGlobalSection
+EndGlobal
