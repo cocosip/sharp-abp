@@ -12,11 +12,11 @@ namespace SharpAbp.Abp.TenantGroupManagement.MongoDB
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            //context.Services.AddMongoDbContext<MapTenancyManagementMongoDbContext>(options =>
-            //{
-            //    options.AddDefaultRepositories<IMapTenancyManagementMongoDbContext>();
-            //    options.AddRepository<MapTenant, MongoDbMapTenantRepository>();
-            //});
+            context.Services.AddMongoDbContext<TenantGroupManagementMongoDbContext>(options =>
+            {
+                options.AddDefaultRepositories<ITenantGroupManagementMongoDbContext>();
+                options.AddRepository<TenantGroup, MongoDbTenantGroupRepository>();
+            });
         }
     }
 }

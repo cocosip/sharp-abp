@@ -31,6 +31,34 @@ namespace SharpAbp.Abp.TenantGroupManagement
             Name = name;
         }
 
+        public virtual void AddTenant(TenantGroupTenant tenant)
+        {
+            if (Tenants.Any(x => x.TenantId == tenant.Id))
+            {
+                throw new AbpException($"Dumplicate tenantId: {tenant.Id}");
+            }
+
+            Tenants.Add(tenant);
+        }
+
+        public virtual void RemoveTenant(Guid tenantGroupTenantId)
+        {
+            var tenant = Tenants.FirstOrDefault(x => x.Id == tenantGroupTenantId);
+            if (tenant != null)
+            {
+                Tenants.Remove(tenant);
+            }
+        }
+
+        public virtual void RemoveTenantByTenantId(Guid tenantId)
+        {
+            var tenant = Tenants.FirstOrDefault(x => x.TenantId == tenantId);
+            if (tenant != null)
+            {
+                Tenants.Remove(tenant);
+            }
+        }
+
 
         public virtual void SetConnectionString(string name, string connectionString)
         {

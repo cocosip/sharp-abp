@@ -95,6 +95,27 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
+        /// <summary>
+        /// Get list
+        /// </summary>
+        /// <param name="sorting"></param>
+        /// <param name="name"></param>
+        /// <param name="includeDetails"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<List<TenantGroup>> GetListAsync(
+            string sorting = null,
+            string name = "",
+            bool includeDetails = false,
+            CancellationToken cancellationToken = default)
+        {
+            return await (await GetDbSetAsync())
+                .IncludeDetails(includeDetails)
+                .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+                .OrderBy(sorting ?? nameof(TenantGroup.Id))
+                .ToListAsync(GetCancellationToken(cancellationToken));
+        }
+
 
         /// <summary>
         /// Get paged list

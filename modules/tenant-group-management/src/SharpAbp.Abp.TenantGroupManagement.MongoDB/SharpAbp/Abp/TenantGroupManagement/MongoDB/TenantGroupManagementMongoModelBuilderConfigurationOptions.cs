@@ -1,11 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using JetBrains.Annotations;
+using Volo.Abp.MongoDB;
 
 namespace SharpAbp.Abp.TenantGroupManagement.MongoDB
 {
-    public class TenantGroupManagementMongoModelBuilderConfigurationOptions
+    public class TenantGroupManagementMongoModelBuilderConfigurationOptions : AbpMongoModelBuilderConfigurationOptions
     {
+        public TenantGroupManagementMongoModelBuilderConfigurationOptions([NotNull] string collectionPrefix = "")
+            : base(collectionPrefix)
+        {
 
+        }
     }
 }

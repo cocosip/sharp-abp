@@ -17,12 +17,12 @@ namespace SharpAbp.Abp.TenancyGrouping
 
         public ConnectionStrings ConnectionStrings { get; set; }
 
-        public List<Guid> TenantIds { get; set; }
+        public List<Guid> Tenants { get; set; }
 
         public TenantGroupConfiguration()
         {
             IsActive = true;
-            TenantIds = new List<Guid>();
+            Tenants = new List<Guid>();
             ConnectionStrings = new ConnectionStrings();
         }
 

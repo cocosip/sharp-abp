@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Threading.Tasks;
-using System.Threading;
-using Volo.Abp.Domain.Repositories;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Volo.Abp.Domain.Repositories;
 
 namespace SharpAbp.Abp.TenantGroupManagement
 {
@@ -47,6 +47,16 @@ namespace SharpAbp.Abp.TenantGroupManagement
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<TenantGroup> FindExpectedByTenantIdAsync(Guid? tenantId, Guid? expectedId = null, bool includeDetails = true, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get list
+        /// </summary>
+        /// <param name="sorting"></param>
+        /// <param name="name"></param>
+        /// <param name="includeDetails"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<List<TenantGroup>> GetListAsync(string sorting = null, string name = "", bool includeDetails = false, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get paged list
