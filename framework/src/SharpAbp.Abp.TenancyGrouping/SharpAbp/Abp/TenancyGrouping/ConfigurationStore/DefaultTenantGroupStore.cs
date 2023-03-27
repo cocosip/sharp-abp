@@ -42,7 +42,7 @@ namespace SharpAbp.Abp.TenancyGrouping.ConfigurationStore
 
         public TenantGroupConfiguration FindByTenantId(Guid tenantId)
         {
-            return _options.TenantGroups?.FirstOrDefault(t => t.TenantIds.Contains(tenantId));
+            return _options.TenantGroups?.FirstOrDefault(t => t.Tenants.Contains(tenantId));
         }
 
     }
