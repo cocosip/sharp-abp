@@ -9,5 +9,9 @@ namespace SharpAbp.Abp.TenantGroupManagement
         [DynamicStringLength(typeof(TenantGroupConsts), nameof(TenantGroupConsts.MaxNameLength))]
         [Display(Name = "TenantGroupName")]
         public string Name { get; set; }
+
+
+        [Required]
+        public bool IsActive { get; set; }
     }
 }

@@ -13,6 +13,8 @@ namespace SharpAbp.Abp.TenantGroupManagement
     {
         public virtual string Name { get; set; }
 
+        public virtual bool IsActive { get; set; }
+
         public int EntityVersion { get; protected set; }
 
         public virtual ICollection<TenantGroupConnectionString> ConnectionStrings { get; protected set; }
@@ -25,10 +27,11 @@ namespace SharpAbp.Abp.TenantGroupManagement
             Tenants = new List<TenantGroupTenant>();
         }
 
-        public TenantGroup(Guid id, [NotNull] string name) : this()
+        public TenantGroup(Guid id, [NotNull] string name, bool isActive) : this()
         {
             Id = id;
             Name = name;
+            IsActive = isActive;
         }
 
         public virtual void AddTenant(TenantGroupTenant tenant)

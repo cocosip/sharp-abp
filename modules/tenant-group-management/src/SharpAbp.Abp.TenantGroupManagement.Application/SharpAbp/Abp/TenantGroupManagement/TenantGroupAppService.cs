@@ -55,15 +55,15 @@ namespace SharpAbp.Abp.TenantGroupManagement
         [Authorize(TenantGroupManagementPermissions.TenantGroups.Create)]
         public virtual async Task<TenantGroupDto> CreateAsync(CreateTenantGroupDto input)
         {
-            var tenantGroup = new TenantGroup(GuidGenerator.Create(), input.Name);
+            var tenantGroup = new TenantGroup(GuidGenerator.Create(), input.Name, input.IsActive);
             var created = await TenantGroupManager.CreateAsync(tenantGroup);
             return ObjectMapper.Map<TenantGroup, TenantGroupDto>(created);
         }
 
         [Authorize(TenantGroupManagementPermissions.TenantGroups.Update)]
-        public virtual async Task<TenantGroupDto> UpdateAsync(Guid id, CreateTenantGroupDto input)
+        public virtual async Task<TenantGroupDto> UpdateAsync(Guid id, UpdateTenantGroupDto input)
         {
-            var updated = await TenantGroupManager.UpdateAsync(id, input.Name);
+            var updated = await TenantGroupManager.UpdateAsync(id, input.Name, input.IsActive);
             return ObjectMapper.Map<TenantGroup, TenantGroupDto>(updated);
         }
 
@@ -81,7 +81,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
         }
 
         [Authorize(TenantGroupManagementPermissions.TenantGroups.ManageTenants)]
-        public virtual async Task<TenantGroupDto> RemoveTenantAsync(Guid id,Guid tenantGroupTenantId)
+        public virtual async Task<TenantGroupDto> RemoveTenantAsync(Guid id, Guid tenantGroupTenantId)
         {
             var tenantGroup = await TenantGroupManager.RemoveTenantAsync(id, tenantGroupTenantId);
             return ObjectMapper.Map<TenantGroup, TenantGroupDto>(tenantGroup);

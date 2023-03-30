@@ -53,10 +53,11 @@ namespace SharpAbp.Abp.TenantGroupManagement
         /// </summary>
         /// <param name="sorting"></param>
         /// <param name="name"></param>
+        /// <param name="isActive"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<List<TenantGroup>> GetListAsync(string sorting = null, string name = "", bool includeDetails = false, CancellationToken cancellationToken = default);
+        Task<List<TenantGroup>> GetListAsync(string sorting = null, string name = "", bool? isActive = null, bool includeDetails = false, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get paged list
@@ -65,17 +66,19 @@ namespace SharpAbp.Abp.TenantGroupManagement
         /// <param name="maxResultCount"></param>
         /// <param name="sorting"></param>
         /// <param name="name"></param>
+        /// <param name="isActive"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<List<TenantGroup>> GetPagedListAsync(int skipCount, int maxResultCount, string sorting = null, string name = "", bool includeDetails = false, CancellationToken cancellationToken = default);
+        Task<List<TenantGroup>> GetPagedListAsync(int skipCount, int maxResultCount, string sorting = null, string name = "", bool? isActive = null, bool includeDetails = false, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get count
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="isActive"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<int> GetCountAsync(string name = "", CancellationToken cancellationToken = default);
+        Task<int> GetCountAsync(string name = "", bool? isActive = null, CancellationToken cancellationToken = default);
     }
 }

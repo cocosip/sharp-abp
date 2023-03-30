@@ -5,7 +5,6 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -96,22 +95,25 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
         }
 
         /// <summary>
-        /// Get list
+        ///  Get list
         /// </summary>
         /// <param name="sorting"></param>
         /// <param name="name"></param>
+        /// <param name="isActive"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<List<TenantGroup>> GetListAsync(
             string sorting = null,
             string name = "",
+            bool? isActive = null,
             bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
                 .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+                .WhereIf(isActive.HasValue, item => item.IsActive == isActive.Value)
                 .OrderBy(sorting ?? nameof(TenantGroup.Id))
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
@@ -124,6 +126,7 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
         /// <param name="maxResultCount"></param>
         /// <param name="sorting"></param>
         /// <param name="name"></param>
+        /// <param name="isActive"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
@@ -132,12 +135,14 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
             int maxResultCount,
             string sorting = null,
             string name = "",
+            bool? isActive = null,
             bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
                 .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+                .WhereIf(isActive.HasValue, item => item.IsActive == isActive.Value)
                 .OrderBy(sorting ?? nameof(TenantGroup.Id))
                 .Skip(skipCount)
                 .Take(maxResultCount)
@@ -148,14 +153,17 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
         /// Get count
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="isActive"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<int> GetCountAsync(
             string name = "",
+            bool? isActive = null,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+                .WhereIf(isActive.HasValue, item => item.IsActive == isActive.Value)
                 .CountAsync(GetCancellationToken(cancellationToken));
         }
 

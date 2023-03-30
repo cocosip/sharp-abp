@@ -28,11 +28,12 @@ namespace SharpAbp.Abp.TenantGroupManagement
             return await TenantGroupRepository.InsertAsync(tenantGroup);
         }
 
-        public virtual async Task<TenantGroup> UpdateAsync(Guid id, string name)
+        public virtual async Task<TenantGroup> UpdateAsync(Guid id, string name, bool isActive)
         {
             await ValidateNameAsync(name, id);
             var tenantGroup = await TenantGroupRepository.GetAsync(id);
             tenantGroup.SetName(name);
+            tenantGroup.IsActive = isActive;
             return await TenantGroupRepository.UpdateAsync(tenantGroup);
         }
 
