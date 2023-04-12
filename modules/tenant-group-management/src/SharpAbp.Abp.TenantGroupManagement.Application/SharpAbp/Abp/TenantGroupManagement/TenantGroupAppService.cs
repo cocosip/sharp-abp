@@ -86,5 +86,31 @@ namespace SharpAbp.Abp.TenantGroupManagement
             var tenantGroup = await TenantGroupManager.RemoveTenantAsync(id, tenantGroupTenantId);
             return ObjectMapper.Map<TenantGroup, TenantGroupDto>(tenantGroup);
         }
+
+        [Authorize(TenantGroupManagementPermissions.TenantGroups.ManageTenants)]
+        public virtual async Task<string> GetDefaultConnectionStringAsync(Guid id)
+        {
+            var tenantGroup = await TenantGroupRepository.GetAsync(id);
+            var connectionString = tenantGroup.GetDefaultConnectionString();
+            return connectionString?.Value ?? "";
+        }
+
+        [Authorize(TenantGroupManagementPermissions.TenantGroups.ManageTenants)]
+        public virtual async Task UpdateDefaultConnectionStringAsync(Guid id, string defaultConnectionString)
+        {
+            var tenantGroup = await TenantGroupRepository.GetAsync(id);
+            tenantGroup.SetDefaultConnectionString(defaultConnectionString);
+            await TenantGroupRepository.UpdateAsync(tenantGroup);
+        }
+
+        [Authorize(TenantGroupManagementPermissions.TenantGroups.ManageTenants)]
+        public virtual async Task DeleteDefaultConnectionStringAsync(Guid id)
+        {
+            var tenantGroup = await TenantGroupRepository.GetAsync(id);
+            tenantGroup.RemoveDefaultConnectionString();
+            await TenantGroupRepository.UpdateAsync(tenantGroup);
+        }
+
+
     }
 }

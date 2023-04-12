@@ -1,28 +1,36 @@
 ﻿using JetBrains.Annotations;
 using SharpAbp.Abp.TenancyGrouping;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Volo.Abp;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.ObjectMapping;
+using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.TenantGroupManagement
 {
     public class TenantGroupStore : ITenantGroupStore, ITransientDependency
     {
-        protected ITenantGroupRepository TenantGroupRepository { get; }
         protected ICurrentTenant CurrentTenant { get; }
+        protected IObjectMapper ObjectMapper { get; }
+        protected ITenantGroupRepository TenantGroupRepository { get; }
         protected IDistributedCache<TenantGroupCacheItem> Cache { get; }
         protected IDistributedCache<TenantGroupTenantCacheItem> TenantCache { get; }
-        protected IObjectMapper ObjectMapper { get; }
 
-        public TenantGroupStore()
+        public TenantGroupStore(
+            ICurrentTenant currentTenant,
+            IObjectMapper objectMapper,
+            ITenantGroupRepository tenantGroupRepository,
+            IDistributedCache<TenantGroupCacheItem> cache,
+            IDistributedCache<TenantGroupTenantCacheItem> tenantCache)
         {
-
+            CurrentTenant = currentTenant;
+            ObjectMapper = objectMapper;
+            TenantGroupRepository = tenantGroupRepository;
+            Cache = cache;
+            TenantCache = tenantCache;
         }
 
 
@@ -41,24 +49,29 @@ namespace SharpAbp.Abp.TenantGroupManagement
             return (await GetTenantCacheItemAsync(tenantId)).Value;
         }
 
-
         public TenantGroupConfiguration Find(string name)
         {
-            throw new NotImplementedException();
+            return AsyncHelper.RunSync(() =>
+            {
+                return GetCacheItemAsync(null, name);
+            }).Value;
         }
 
         public TenantGroupConfiguration Find(Guid id)
         {
-            throw new NotImplementedException();
+            return AsyncHelper.RunSync(() =>
+            {
+                return GetCacheItemAsync(id, null);
+            }).Value;
         }
-
 
         public TenantGroupConfiguration FindByTenantId(Guid tenantId)
         {
-            throw new NotImplementedException();
+            return AsyncHelper.RunSync(() =>
+            {
+                return GetTenantCacheItemAsync(tenantId);
+            }).Value;
         }
-
-
 
         protected virtual async Task<TenantGroupCacheItem> GetTenantCacheItemAsync(Guid tenantId)
         {
@@ -109,7 +122,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
 
             if (id.HasValue)
             {
-                using (CurrentTenant.Change(null)) //TODO: No need this if we can implement to define host side (or tenant-independent) entities!
+                using (CurrentTenant.Change(null))
                 {
                     var tenantGroup = await TenantGroupRepository.FindAsync(id.Value);
                     return await SetCacheItemAsync(cacheKey, tenantGroup);

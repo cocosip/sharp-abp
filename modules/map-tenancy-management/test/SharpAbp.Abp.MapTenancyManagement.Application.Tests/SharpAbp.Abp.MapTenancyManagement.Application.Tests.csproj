@@ -6,7 +6,7 @@
     <IsPackable>false</IsPackable>
     <RootNamespace />
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(MicrosoftPackageVersion)" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkPackageVersion)" />
@@ -24,7 +24,7 @@
     <PackageReference Include="Volo.Abp.TestBase" Version="$(VoloAbpPackageVersion)" />
     <PackageReference Include="Volo.Abp.TenantManagement.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\SharpAbp.Abp.MapTenancyManagement.Application\SharpAbp.Abp.MapTenancyManagement.Application.csproj" />
     <ProjectReference Include="..\..\src\SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore\SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore.csproj" />

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Volo.Abp.TenantManagement;
 
 namespace SharpAbp.Abp.TenantGroupManagement
 {
@@ -6,7 +7,9 @@ namespace SharpAbp.Abp.TenantGroupManagement
     {
         public TenantGroupManagementApplicationAutoMapperProfile()
         {
-            
+            CreateMap<TenantGroup, TenantGroupDto>();
+            CreateMap<TenantGroupConnectionString, TenantGroupConnectionStringDto>();
+            CreateMap<TenantGroupTenant, TenantGroupTenantDto>();
         }
     }
 }

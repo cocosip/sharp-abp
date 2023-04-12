@@ -5,18 +5,22 @@ using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Domain.Services;
+using Volo.Abp.EventBus.Local;
 
 namespace SharpAbp.Abp.TenantGroupManagement
 {
     public class TenantGroupManager : DomainService
     {
+        protected ILocalEventBus LocalEventBus { get; }
         protected IStringLocalizer<TenantGroupManagementResource> Localizer { get; }
         protected ITenantGroupRepository TenantGroupRepository { get; }
 
         public TenantGroupManager(
+            ILocalEventBus localEventBus,
             IStringLocalizer<TenantGroupManagementResource> localizer,
             ITenantGroupRepository tenantGroupRepository)
         {
+            LocalEventBus = localEventBus;
             Localizer = localizer;
             TenantGroupRepository = tenantGroupRepository;
         }
@@ -36,6 +40,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
             tenantGroup.IsActive = isActive;
             return await TenantGroupRepository.UpdateAsync(tenantGroup);
         }
+
 
         public virtual async Task<TenantGroup> AddTenantAsync(Guid id, Guid tenantId)
         {

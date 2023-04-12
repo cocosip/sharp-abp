@@ -3,6 +3,7 @@ using SharpAbp.Abp.TenancyGrouping;
 using System;
 using System.Collections.Generic;
 using Volo.Abp.Data;
+using Volo.Abp.TenantManagement;
 
 namespace SharpAbp.Abp.TenantGroupManagement
 {
@@ -25,6 +26,21 @@ namespace SharpAbp.Abp.TenantGroupManagement
                         return connStrings;
                     });
                 })
+                .ForMember(ti => ti.Tenants, opts =>
+                {
+                    opts.MapFrom((tenantGroup, ti) =>
+                    {
+                        var tenants = new List<Guid>();
+
+                        foreach (var tenant in tenantGroup.Tenants)
+                        {
+                            tenants.Add(tenant.TenantId);
+                        }
+                        return tenants;
+                    });
+                });
+
+            CreateMap<TenantGroup, TenantGroupEto>()
                 .ForMember(ti => ti.Tenants, opts =>
                 {
                     opts.MapFrom((tenantGroup, ti) =>

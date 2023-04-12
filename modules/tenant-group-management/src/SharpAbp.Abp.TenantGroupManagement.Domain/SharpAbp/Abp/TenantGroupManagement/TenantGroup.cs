@@ -62,6 +62,16 @@ namespace SharpAbp.Abp.TenantGroupManagement
             }
         }
 
+        public virtual TenantGroupConnectionString GetConnectionString(string name)
+        {
+            return ConnectionStrings.FirstOrDefault(x => x.Name == name);
+        }
+
+        public virtual TenantGroupConnectionString GetDefaultConnectionString()
+        {
+            return GetConnectionString(Volo.Abp.Data.ConnectionStrings.DefaultConnectionStringName);
+        }
+
 
         public virtual void SetConnectionString(string name, string connectionString)
         {
@@ -75,6 +85,11 @@ namespace SharpAbp.Abp.TenantGroupManagement
             {
                 ConnectionStrings.Add(new TenantGroupConnectionString(Id, name, connectionString));
             }
+        }
+
+        public virtual void SetDefaultConnectionString(string connectionString)
+        {
+            SetConnectionString(Volo.Abp.Data.ConnectionStrings.DefaultConnectionStringName, connectionString);
         }
 
 

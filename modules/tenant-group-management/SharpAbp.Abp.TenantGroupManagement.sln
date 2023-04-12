@@ -13,11 +13,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.TenantGroupMan
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.TenantGroupManagement.MongoDB", "src\SharpAbp.Abp.TenantGroupManagement.MongoDB\SharpAbp.Abp.TenantGroupManagement.MongoDB.csproj", "{7ADC9E3E-8DD1-44AA-9A50-D2C955AEB3A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.TenantGroupManagement.Application.Contracts", "src\SharpAbp.Abp.TenantGroupManagement.Application.Contracts\SharpAbp.Abp.TenantGroupManagement.Application.Contracts.csproj", "{7CD16A9A-4610-48C2-AAB3-910D19A16B27}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.TenantGroupManagement.Application.Contracts", "src\SharpAbp.Abp.TenantGroupManagement.Application.Contracts\SharpAbp.Abp.TenantGroupManagement.Application.Contracts.csproj", "{7CD16A9A-4610-48C2-AAB3-910D19A16B27}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.TenantGroupManagement.Application", "src\SharpAbp.Abp.TenantGroupManagement.Application\SharpAbp.Abp.TenantGroupManagement.Application.csproj", "{883069EB-0E54-4475-8138-780D1DF0FC7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.TenantGroupManagement.Application", "src\SharpAbp.Abp.TenantGroupManagement.Application\SharpAbp.Abp.TenantGroupManagement.Application.csproj", "{883069EB-0E54-4475-8138-780D1DF0FC7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.TenantGroupManagement.HttpApi", "src\SharpAbp.Abp.TenantGroupManagement.HttpApi\SharpAbp.Abp.TenantGroupManagement.HttpApi.csproj", "{67A4CBD2-938F-4BDA-B9CD-FB74532F8278}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.TenantGroupManagement.HttpApi", "src\SharpAbp.Abp.TenantGroupManagement.HttpApi\SharpAbp.Abp.TenantGroupManagement.HttpApi.csproj", "{67A4CBD2-938F-4BDA-B9CD-FB74532F8278}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{05AD4878-5464-4DF6-AF64-AE36A0BFD491}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.TenantGroupManagement.Application.Tests", "test\SharpAbp.Abp.TenantGroupManagement.Application.Tests\SharpAbp.Abp.TenantGroupManagement.Application.Tests.csproj", "{A1789908-2858-44DA-8BFF-EED2662D8C94}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +57,10 @@ Global
 		{67A4CBD2-938F-4BDA-B9CD-FB74532F8278}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67A4CBD2-938F-4BDA-B9CD-FB74532F8278}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67A4CBD2-938F-4BDA-B9CD-FB74532F8278}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1789908-2858-44DA-8BFF-EED2662D8C94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1789908-2858-44DA-8BFF-EED2662D8C94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1789908-2858-44DA-8BFF-EED2662D8C94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1789908-2858-44DA-8BFF-EED2662D8C94}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -65,6 +73,7 @@ Global
 		{7CD16A9A-4610-48C2-AAB3-910D19A16B27} = {5DC8EBF8-1084-4005-8822-DB65FFFC0909}
 		{883069EB-0E54-4475-8138-780D1DF0FC7C} = {5DC8EBF8-1084-4005-8822-DB65FFFC0909}
 		{67A4CBD2-938F-4BDA-B9CD-FB74532F8278} = {5DC8EBF8-1084-4005-8822-DB65FFFC0909}
+		{A1789908-2858-44DA-8BFF-EED2662D8C94} = {05AD4878-5464-4DF6-AF64-AE36A0BFD491}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4650D0B6-DFBA-4C60-97B5-488DAAD6E6DD}

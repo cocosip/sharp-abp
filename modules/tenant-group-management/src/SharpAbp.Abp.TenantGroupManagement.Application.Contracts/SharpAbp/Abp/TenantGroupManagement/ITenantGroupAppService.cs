@@ -17,5 +17,8 @@ namespace SharpAbp.Abp.TenantGroupManagement
         Task DeleteAsync(Guid id);
         Task<TenantGroupDto> AddTenantAsync(Guid id, AddTenantDto input);
         Task<TenantGroupDto> RemoveTenantAsync(Guid id, Guid tenantGroupTenantId);
+        Task<string> GetDefaultConnectionStringAsync(Guid id);
+        Task UpdateDefaultConnectionStringAsync(Guid id, string defaultConnectionString);
+        Task DeleteDefaultConnectionStringAsync(Guid id);
     }
 }
