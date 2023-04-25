@@ -103,7 +103,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Swashbuckle.Ve
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoring.Abstractions", "src\SharpAbp.Abp.FileStoring.Abstractions\SharpAbp.Abp.FileStoring.Abstractions.csproj", "{CC1ECD6B-549B-4843-99D4-2B4FE773B892}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.TenancyGrouping", "src\SharpAbp.Abp.TenancyGrouping\SharpAbp.Abp.TenancyGrouping.csproj", "{50AF3958-8128-42E7-8A3A-73FC82F50ADC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.TenancyGrouping", "src\SharpAbp.Abp.TenancyGrouping\SharpAbp.Abp.TenancyGrouping.csproj", "{50AF3958-8128-42E7-8A3A-73FC82F50ADC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
