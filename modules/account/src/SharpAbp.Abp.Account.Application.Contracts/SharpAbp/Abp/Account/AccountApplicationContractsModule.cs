@@ -1,9 +1,11 @@
 ﻿using SharpAbp.Abp.Account.Localization;
 using SharpAbp.Abp.Identity;
+using System.Threading.Tasks;
 using Volo.Abp.Account;
 using Volo.Abp.Localization;
 using Volo.Abp.Localization.ExceptionHandling;
 using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 using Volo.Abp.Validation.Localization;
 using Volo.Abp.VirtualFileSystem;
 
@@ -16,6 +18,11 @@ namespace SharpAbp.Abp.Account
     public class AccountApplicationContractsModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
             Configure<AbpVirtualFileSystemOptions>(options =>
             {
@@ -34,6 +41,7 @@ namespace SharpAbp.Abp.Account
             {
                 options.MapCodeNamespace("SharpAbp.Account", typeof(AccountResource));
             });
+            return Task.CompletedTask;
         }
     }
 }

@@ -1,7 +1,9 @@
-﻿using System;
-using SharpAbp.Abp.FileStoring.Database.Localization;
+﻿using SharpAbp.Abp.FileStoring.Database.Localization;
+using System;
+using System.Threading.Tasks;
 using Volo.Abp.Domain;
 using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.FileStoring.Database
 {
@@ -14,15 +16,26 @@ namespace SharpAbp.Abp.FileStoring.Database
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task PreConfigureServicesAsync(ServiceConfigurationContext context)
+        {
             Configure<AbpFileStoringAbstractionsOptions>(c =>
             {
                 var configuration = GetFileProviderConfiguration();
                 c.Providers.TryAdd(configuration);
             });
+            return Task.CompletedTask;
         }
 
 
         public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
             Configure<AbpFileStoringOptions>(options =>
             {
@@ -34,7 +47,9 @@ namespace SharpAbp.Abp.FileStoring.Database
                     }
                 });
             });
+            return Task.CompletedTask;
         }
+
 
         private FileProviderConfiguration GetFileProviderConfiguration()
         {

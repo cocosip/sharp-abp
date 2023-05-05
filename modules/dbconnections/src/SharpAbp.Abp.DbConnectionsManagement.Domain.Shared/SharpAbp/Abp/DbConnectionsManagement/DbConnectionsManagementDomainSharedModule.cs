@@ -1,7 +1,9 @@
 ﻿using SharpAbp.Abp.DbConnectionsManagement.Localization;
+using System.Threading.Tasks;
 using Volo.Abp.Localization;
 using Volo.Abp.Localization.ExceptionHandling;
 using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 using Volo.Abp.Validation;
 using Volo.Abp.Validation.Localization;
 using Volo.Abp.VirtualFileSystem;
@@ -14,6 +16,11 @@ namespace SharpAbp.Abp.DbConnectionsManagement
     public class DbConnectionsManagementDomainSharedModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
             Configure<AbpVirtualFileSystemOptions>(options =>
             {
@@ -32,6 +39,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
             {
                 options.MapCodeNamespace("DbConnectionsManagement", typeof(DbConnectionsManagementResource));
             });
+            return Task.CompletedTask;
         }
     }
 }

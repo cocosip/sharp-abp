@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.IdentityServer;
+using System.Threading.Tasks;
 using Volo.Abp.Identity.AspNetCore;
 using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 using Volo.Abp.VirtualFileSystem;
 
 namespace SharpAbp.Abp.Account.Web
@@ -16,6 +18,11 @@ namespace SharpAbp.Abp.Account.Web
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
+            AsyncHelper.RunSync(() => PreConfigureServicesAsync(context));
+        }
+
+        public override Task PreConfigureServicesAsync(ServiceConfigurationContext context)
+        {
             context.Services.PreConfigure<AbpIdentityAspNetCoreOptions>(options =>
             {
                 options.ConfigureAuthentication = false;
@@ -25,9 +32,16 @@ namespace SharpAbp.Abp.Account.Web
             {
                 mvcBuilder.AddApplicationPartIfNotExists(typeof(AccountWebIdentityServerModule).Assembly);
             });
+            return Task.CompletedTask;
         }
 
+
         public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
             Configure<AbpVirtualFileSystemOptions>(options =>
             {
@@ -48,6 +62,8 @@ namespace SharpAbp.Abp.Account.Web
                     o.DefaultSignInScheme = IdentityConstants.ExternalScheme;
                 })
                 .AddIdentityCookies();
+            return Task.CompletedTask;
         }
+
     }
 }

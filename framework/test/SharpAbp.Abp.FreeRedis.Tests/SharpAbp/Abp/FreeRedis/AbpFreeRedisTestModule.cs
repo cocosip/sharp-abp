@@ -1,9 +1,11 @@
 ﻿using SharpAbp.Abp.FreeRedis.TestObjects;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Autofac;
 using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.FreeRedis
 {
@@ -15,6 +17,11 @@ namespace SharpAbp.Abp.FreeRedis
     public class AbpFreeRedisTestModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
             Configure<AbpFreeRedisOptions>(options =>
             {
@@ -46,7 +53,10 @@ namespace SharpAbp.Abp.FreeRedis
                         client.ReadOnly = false;
                     });
             });
+
+            return Task.CompletedTask;
         }
+
 
     }
 }

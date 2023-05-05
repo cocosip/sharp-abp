@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Tasks;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.Modularity;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
+using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
 {
@@ -14,11 +16,18 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
+        {
             context.Services.AddAbpDbContext<TenantGroupManagementDbContext>(options =>
             {
                 options.AddDefaultRepositories<ITenantGroupManagementDbContext>();
                 options.AddRepository<TenantGroup, EfCoreTenantGroupRepository>();
             });
+            return Task.CompletedTask;
         }
+
     }
 }

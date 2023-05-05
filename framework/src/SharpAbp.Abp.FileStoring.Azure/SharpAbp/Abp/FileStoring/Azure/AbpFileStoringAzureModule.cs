@@ -1,7 +1,9 @@
 ﻿using SharpAbp.Abp.FileStoring.Azure.Localization;
+using System.Threading.Tasks;
 using Volo.Abp.Localization;
 using Volo.Abp.Localization.ExceptionHandling;
 using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 using Volo.Abp.Validation.Localization;
 using Volo.Abp.VirtualFileSystem;
 
@@ -14,14 +16,26 @@ namespace SharpAbp.Abp.FileStoring.Azure
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
+            AsyncHelper.RunSync(() => PreConfigureServicesAsync(context));
+        }
+
+        public override Task PreConfigureServicesAsync(ServiceConfigurationContext context)
+        {
             PreConfigure<AbpFileStoringAbstractionsOptions>(c =>
             {
                 var configuration = GetFileProviderConfiguration();
                 c.Providers.TryAdd(configuration);
             });
+            return Task.CompletedTask;
         }
 
+
         public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
             Configure<AbpVirtualFileSystemOptions>(options =>
             {
@@ -40,7 +54,10 @@ namespace SharpAbp.Abp.FileStoring.Azure
             {
                 options.MapCodeNamespace("FileStoringAzure", typeof(FileStoringAzureResource));
             });
+
+            return Task.CompletedTask;
         }
+
 
         private FileProviderConfiguration GetFileProviderConfiguration()
         {

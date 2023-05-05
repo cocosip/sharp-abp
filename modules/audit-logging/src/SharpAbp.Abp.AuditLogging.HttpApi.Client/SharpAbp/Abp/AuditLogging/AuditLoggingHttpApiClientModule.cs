@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Tasks;
 using Volo.Abp.Http.Client;
 using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 using Volo.Abp.VirtualFileSystem;
 
 namespace SharpAbp.Abp.AuditLogging
@@ -14,6 +16,11 @@ namespace SharpAbp.Abp.AuditLogging
 
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
+        {
             context.Services.AddStaticHttpClientProxies(
                 typeof(AuditLoggingApplicationContractsModule).Assembly,
                 AuditLoggingRemoteServiceConsts.RemoteServiceName
@@ -23,6 +30,7 @@ namespace SharpAbp.Abp.AuditLogging
             {
                 options.FileSets.AddEmbedded<AuditLoggingHttpApiClientModule>();
             });
+            return Task.CompletedTask;
         }
     }
 }

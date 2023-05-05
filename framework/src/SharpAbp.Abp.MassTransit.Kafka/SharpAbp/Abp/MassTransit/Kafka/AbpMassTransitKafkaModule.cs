@@ -1,7 +1,9 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Threading.Tasks;
 using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.MassTransit.Kafka
 {
@@ -11,6 +13,11 @@ namespace SharpAbp.Abp.MassTransit.Kafka
     public class AbpMassTransitKafkaModule : AbpModule
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => PreConfigureServicesAsync(context));
+        }
+
+        public override Task PreConfigureServicesAsync(ServiceConfigurationContext context)
         {
             PreConfigure<AbpMassTransitOptions>(options =>
             {
@@ -48,10 +55,16 @@ namespace SharpAbp.Abp.MassTransit.Kafka
                 }));
 
             });
-
+            return Task.CompletedTask;
         }
 
+
         public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
             var massTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
             if (massTransitOptions.Provider.Equals(MassTransitKafkaConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
@@ -151,11 +164,16 @@ namespace SharpAbp.Abp.MassTransit.Kafka
                     }
                 });
             }
-
+            return Task.CompletedTask;
         }
 
 
         public override void PostConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => PostConfigureServicesAsync(context));
+        }
+
+        public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
         {
             Configure<AbpMassTransitKafkaOptions>(options =>
             {
@@ -165,6 +183,7 @@ namespace SharpAbp.Abp.MassTransit.Kafka
                     action(options);
                 }
             });
+            return Task.CompletedTask;
         }
 
     }

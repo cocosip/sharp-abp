@@ -4,9 +4,11 @@ using SharpAbp.Abp.DbConnections.Oracle.Drvart;
 using SharpAbp.Abp.DbConnections.PostgreSql;
 using SharpAbp.Abp.DbConnections.Sqlite;
 using SharpAbp.Abp.DbConnections.SqlServer;
+using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Autofac;
 using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.DbConnections
 {
@@ -23,13 +25,19 @@ namespace SharpAbp.Abp.DbConnections
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
 
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
+        {
             var configuration = context.Services.GetConfiguration();
 
             Configure<AbpDbConnectionsOptions>(options =>
             {
                 options.Configure(configuration);
             });
+            return Task.CompletedTask;
         }
+
     }
 }

@@ -2,7 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.MassTransit.RabbitMQ
 {
@@ -12,6 +14,11 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
     public class AbpMassTransitRabbitMqModule : AbpModule
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => PreConfigureServicesAsync(context));
+        }
+
+        public override Task PreConfigureServicesAsync(ServiceConfigurationContext context)
         {
             var configuration = context.Services.GetConfiguration();
             PreConfigure<AbpMassTransitRabbitMqOptions>(options => options.PreConfigure(configuration));
@@ -46,11 +53,16 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
                 //     cfg.ConfigureEndpoints(ctx);
                 // }));
             });
+            return Task.CompletedTask;
         }
 
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
 
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
+        {
             var massTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
 
             if (massTransitOptions.Provider.Equals(MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
@@ -148,9 +160,15 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
                 });
             }
 
+            return Task.CompletedTask;
         }
 
         public override void PostConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => PostConfigureServicesAsync(context));
+        }
+
+        public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
         {
             Configure<AbpMassTransitRabbitMqOptions>(options =>
             {
@@ -160,6 +178,7 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
                     action(options);
                 }
             });
+            return Task.CompletedTask;
         }
     }
 }

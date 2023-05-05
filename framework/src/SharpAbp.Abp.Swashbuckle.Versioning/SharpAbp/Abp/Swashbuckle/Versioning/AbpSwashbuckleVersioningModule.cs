@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Threading.Tasks;
 using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.Modularity;
 using Volo.Abp.Swashbuckle;
+using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.Swashbuckle.Versioning
 {
@@ -16,6 +18,11 @@ namespace SharpAbp.Abp.Swashbuckle.Versioning
     public class AbpSwashbuckleVersioningModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
             Configure<AbpSwashbuckleVersioningOptions>(options =>
             {
@@ -28,12 +35,14 @@ namespace SharpAbp.Abp.Swashbuckle.Versioning
 
             //ApiExplorer
             AddVersionedApiExplorer(context);
- 
+
             Configure<AbpAspNetCoreMvcOptions>(options =>
             {
                 options.ChangeControllerModelApiExplorerGroupName = false;
             });
+            return Task.CompletedTask;
         }
+
 
 
         protected virtual void AddApiVersioning(ServiceConfigurationContext context)

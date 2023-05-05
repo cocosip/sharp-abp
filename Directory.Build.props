@@ -16,6 +16,9 @@
     <!-- Microsoft.NET.Test.Sdk https://www.nuget.org/packages/Microsoft.NET.Test.Sdk -->
     <MicrosoftNETTestSdkPackageVersion>17.5.0</MicrosoftNETTestSdkPackageVersion>
 
+    <!--System.ComponentModel.Annotations-->
+    <SystemComponentModelAnnotationsPackageVersion>5.0.0</SystemComponentModelAnnotationsPackageVersion>
+
     <!-- NSubstitute  https://www.nuget.org/packages/NSubstitute -->
     <NSubstitutePackageVersion>4.3.0</NSubstitutePackageVersion>
 

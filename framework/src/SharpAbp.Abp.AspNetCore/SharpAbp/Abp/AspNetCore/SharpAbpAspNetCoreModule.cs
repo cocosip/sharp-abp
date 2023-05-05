@@ -8,10 +8,6 @@ namespace SharpAbp.Abp.AspNetCore
         )]
     public class SharpAbpAspNetCoreModule : AbpModule
     {
-        public override void ConfigureServices(ServiceConfigurationContext context)
-        {
-            
-        }
 
     }
 }

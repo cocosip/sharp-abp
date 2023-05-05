@@ -1,8 +1,10 @@
 ﻿using SharpAbp.Abp.AuditLogging.Localization;
+using System.Threading.Tasks;
 using Volo.Abp.AuditLogging;
 using Volo.Abp.Localization;
 using Volo.Abp.Localization.ExceptionHandling;
 using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 using Volo.Abp.Validation;
 using Volo.Abp.Validation.Localization;
 using Volo.Abp.VirtualFileSystem;
@@ -16,6 +18,11 @@ namespace SharpAbp.Abp.AuditLogging
     public class AuditLoggingDomainSharedModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
             Configure<AbpVirtualFileSystemOptions>(options =>
             {
@@ -34,6 +41,8 @@ namespace SharpAbp.Abp.AuditLogging
             {
                 options.MapCodeNamespace("SharpAbpAuditLogging", typeof(AuditLoggingResource));
             });
+            return Task.CompletedTask;
         }
+
     }
 }

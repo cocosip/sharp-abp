@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.FileStoring.Fakes;
 using SharpAbp.Abp.FileStoring.TestObjects;
+using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Autofac;
 using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.FileStoring
 {
@@ -15,6 +17,11 @@ namespace SharpAbp.Abp.FileStoring
     public class AbpFileStoringTestModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
             context.Services.AddTransient<IFileProvider, FakeFileProvider1>();
             context.Services.AddTransient<IFileProvider, FakeFileProvider2>();
@@ -38,6 +45,7 @@ namespace SharpAbp.Abp.FileStoring
                         container.Provider = nameof(FakeFileProvider2);
                     });
             });
+            return Task.CompletedTask;
         }
     }
 }

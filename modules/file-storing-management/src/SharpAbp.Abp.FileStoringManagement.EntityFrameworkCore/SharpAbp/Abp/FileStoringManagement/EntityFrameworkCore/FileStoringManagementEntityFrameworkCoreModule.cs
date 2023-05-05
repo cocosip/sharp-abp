@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Tasks;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
 {
@@ -12,11 +14,18 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
+        {
             context.Services.AddAbpDbContext<FileStoringManagementDbContext>(options =>
             {
                 options.AddDefaultRepositories<IFileStoringManagementDbContext>();
                 options.AddRepository<FileStoringContainer, EfCoreFileStoringContainerRepository>();
             });
+
+            return Task.CompletedTask;
         }
     }
 }

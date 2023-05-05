@@ -1,10 +1,17 @@
-﻿using Volo.Abp.Modularity;
+﻿using System.Threading.Tasks;
+using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.Snowflakes
 {
     public class AbpSnowflakesModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
             Configure<AbpSnowflakesOptions>(options =>
             {
@@ -14,6 +21,8 @@ namespace SharpAbp.Abp.Snowflakes
                     c.DatacenterId = 1L;
                 });
             });
+            return Task.CompletedTask;
         }
+
     }
 }

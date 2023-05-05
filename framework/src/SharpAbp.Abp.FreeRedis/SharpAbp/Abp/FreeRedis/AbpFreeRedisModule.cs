@@ -1,4 +1,6 @@
-﻿using Volo.Abp.Modularity;
+﻿using System.Threading.Tasks;
+using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.FreeRedis
 {
@@ -6,7 +8,15 @@ namespace SharpAbp.Abp.FreeRedis
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            Configure<AbpFreeRedisOptions>(options => { });
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
         }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
+        {
+            Configure<AbpFreeRedisOptions>(options => { });
+            return Task.CompletedTask;
+        }
+
+
     }
 }

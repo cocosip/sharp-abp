@@ -1,6 +1,8 @@
-﻿using Volo.Abp.AspNetCore.MultiTenancy;
+﻿using System.Threading.Tasks;
+using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.Modularity;
 using Volo.Abp.MultiTenancy;
+using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.AspNetCore.MapTenancy
 {
@@ -12,6 +14,11 @@ namespace SharpAbp.Abp.AspNetCore.MapTenancy
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
+        {
             Configure<AbpTenantResolveOptions>(options =>
             {
                 options.TenantResolvers.Add(new MapQueryStringTenantResolveContributor());
@@ -20,6 +27,7 @@ namespace SharpAbp.Abp.AspNetCore.MapTenancy
                 options.TenantResolvers.Add(new MapHeaderTenantResolveContributor());
                 options.TenantResolvers.Add(new MapCookieTenantResolveContributor());
             });
+            return Task.CompletedTask;
         }
     }
 }

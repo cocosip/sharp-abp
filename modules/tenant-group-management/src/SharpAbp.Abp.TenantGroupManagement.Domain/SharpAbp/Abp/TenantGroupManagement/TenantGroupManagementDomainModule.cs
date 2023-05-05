@@ -2,11 +2,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.TenancyGrouping;
 using System;
+using System.Threading.Tasks;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain.Entities.Events.Distributed;
 using Volo.Abp.Modularity;
 using Volo.Abp.TenantManagement;
+using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.TenantGroupManagement
 {
@@ -14,19 +16,24 @@ namespace SharpAbp.Abp.TenantGroupManagement
         typeof(AbpCachingModule),
         typeof(AbpTenancyGroupingModule),
         typeof(AbpTenantManagementDomainModule),
-        typeof(TenantGroupManagementDomainSharedModule)
+        typeof(TenantGroupManagementDomainSharedModule),
+        typeof(AbpAutoMapperModule)
         )]
     public class TenantGroupManagementDomainModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            context.Services.AddAutoMapperObjectMapper<TenantGroupManagementDomainModule>();
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
 
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
+        {
             Configure<AbpAutoMapperOptions>(options =>
             {
-                options.AddProfile<AbpTenantGroupManagementDomainMappingProfile>(validate: true);
+                options.AddMaps<TenantGroupManagementDomainModule>(validate: true);
             });
 
+            context.Services.AddAutoMapperObjectMapper<TenantGroupManagementDomainModule>();
 
             Configure<AbpDistributedCacheOptions>(options =>
             {
@@ -61,7 +68,10 @@ namespace SharpAbp.Abp.TenantGroupManagement
                 options.AutoEventSelectors.Add<TenantGroup>();
                 options.EtoMappings.Add<TenantGroup, TenantGroupEto>();
             });
+
+            return Task.CompletedTask;
         }
+
 
     }
 

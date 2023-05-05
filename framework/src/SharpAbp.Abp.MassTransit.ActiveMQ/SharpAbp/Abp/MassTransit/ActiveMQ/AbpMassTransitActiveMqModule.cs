@@ -1,7 +1,9 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Threading.Tasks;
 using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.MassTransit.ActiveMQ
 {
@@ -11,6 +13,11 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
     public class AbpMassTransitActiveMqModule : AbpModule
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => PreConfigureServicesAsync(context));
+        }
+
+        public override Task PreConfigureServicesAsync(ServiceConfigurationContext context)
         {
             var configuration = context.Services.GetConfiguration();
             PreConfigure<AbpMassTransitActiveMqOptions>(options => options.PreConfigure(configuration));
@@ -38,15 +45,21 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
                     //c.ExchangeType = rabbitMqOptions.DefaultExchangeType;
                 });
 
-
                 options.ActiveMqPostConfigures.Add(new Action<IBusRegistrationContext, IActiveMqBusFactoryConfigurator>((ctx, cfg) =>
                 {
                     cfg.ConfigureEndpoints(ctx);
                 }));
             });
+            return Task.CompletedTask;
         }
 
+
         public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
             var massTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
 
@@ -136,13 +149,18 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
                         }
 
                     });
-
-
                 });
             }
+            return Task.CompletedTask;
         }
 
+
         public override void PostConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => PostConfigureServicesAsync(context));
+        }
+
+        public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
         {
             Configure<AbpMassTransitActiveMqOptions>(options =>
             {
@@ -152,6 +170,7 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
                     action(options);
                 }
             });
+            return Task.CompletedTask;
         }
     }
 }

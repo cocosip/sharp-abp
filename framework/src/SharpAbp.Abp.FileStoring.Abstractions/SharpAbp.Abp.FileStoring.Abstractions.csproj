@@ -18,5 +18,5 @@
 	<ItemGroup>
 		<PackageReference Include="Volo.Abp.Validation" Version="$(VoloAbpPackageVersion)" />
 	</ItemGroup>
-	
+
 </Project>

@@ -1,7 +1,9 @@
 ﻿using SharpAbp.Abp.FileStoring.S3.Localization;
+using System.Threading.Tasks;
 using Volo.Abp.Localization;
 using Volo.Abp.Localization.ExceptionHandling;
 using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 using Volo.Abp.Validation.Localization;
 using Volo.Abp.VirtualFileSystem;
 
@@ -14,14 +16,27 @@ namespace SharpAbp.Abp.FileStoring.S3
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
+            AsyncHelper.RunSync(() => PreConfigureServicesAsync(context));
+        }
+
+        public override Task PreConfigureServicesAsync(ServiceConfigurationContext context)
+        {
             PreConfigure<AbpFileStoringAbstractionsOptions>(c =>
             {
                 var configuration = GetFileProviderConfiguration();
                 c.Providers.TryAdd(configuration);
             });
+            return Task.CompletedTask;
         }
 
+
+
         public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
             Configure<AbpVirtualFileSystemOptions>(options =>
             {
@@ -40,6 +55,8 @@ namespace SharpAbp.Abp.FileStoring.S3
             {
                 options.MapCodeNamespace("FileStoringS3", typeof(FileStoringS3Resource));
             });
+
+            return Task.CompletedTask;
         }
 
         private FileProviderConfiguration GetFileProviderConfiguration()

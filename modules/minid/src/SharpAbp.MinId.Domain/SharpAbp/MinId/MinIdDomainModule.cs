@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using System;
+using System.Threading.Tasks;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain;
 using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 
 namespace SharpAbp.MinId
 {
@@ -15,10 +17,13 @@ namespace SharpAbp.MinId
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            Configure<MinIdOptions>(options =>
-            {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
 
-            });
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
+        {
+            Configure<MinIdOptions>(options => { });
 
             Configure<AbpDistributedCacheOptions>(options =>
             {
@@ -34,6 +39,8 @@ namespace SharpAbp.MinId
                     return null;
                 });
             });
+            return Task.CompletedTask;
         }
+
     }
 }

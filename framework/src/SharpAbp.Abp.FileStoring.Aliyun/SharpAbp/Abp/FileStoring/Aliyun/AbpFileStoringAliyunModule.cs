@@ -1,8 +1,10 @@
 ﻿using SharpAbp.Abp.FileStoring.Aliyun.Localization;
+using System.Threading.Tasks;
 using Volo.Abp.Caching;
 using Volo.Abp.Localization;
 using Volo.Abp.Localization.ExceptionHandling;
 using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 using Volo.Abp.Validation.Localization;
 using Volo.Abp.VirtualFileSystem;
 
@@ -16,15 +18,27 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
+            AsyncHelper.RunSync(() => PreConfigureServicesAsync(context));
+        }
+
+        public override Task PreConfigureServicesAsync(ServiceConfigurationContext context)
+        {
             PreConfigure<AbpFileStoringAbstractionsOptions>(options =>
             {
                 var configuration = GetFileProviderConfiguration();
                 options.Providers.TryAdd(configuration);
             });
+
+            return Task.CompletedTask;
         }
 
 
         public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
             Configure<AbpVirtualFileSystemOptions>(options =>
             {
@@ -43,7 +57,9 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             {
                 options.MapCodeNamespace("FileStoringAliyun", typeof(FileStoringAliyunResource));
             });
+            return Task.CompletedTask;
         }
+
 
         private FileProviderConfiguration GetFileProviderConfiguration()
         {

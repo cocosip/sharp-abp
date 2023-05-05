@@ -48,14 +48,7 @@ namespace SharpAbp.Abp.Identity
             });
 
         }
-
-
-        private void AddDataSeed(IServiceProvider serviceProvider)
-        {
-            //var identityClaims=
-
-
-        }
+ 
 
     }
 }

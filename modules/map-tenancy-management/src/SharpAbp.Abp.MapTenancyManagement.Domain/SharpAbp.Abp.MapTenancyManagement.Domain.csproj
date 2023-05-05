@@ -1,28 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\..\..\common.props" />
-  <Import Project="..\..\..\..\configureawait.props" />
+	<Import Project="..\..\..\..\common.props" />
+	<Import Project="..\..\..\..\configureawait.props" />
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <AssemblyName>SharpAbp.Abp.MapTenancyManagement.Domain</AssemblyName>
-    <PackageId>SharpAbp.Abp.MapTenancyManagement.Domain</PackageId>
-    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Description>SharpAbp MapTenancy Management Module</Description>
-    <RootNamespace />
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<AssemblyName>SharpAbp.Abp.MapTenancyManagement.Domain</AssemblyName>
+		<PackageId>SharpAbp.Abp.MapTenancyManagement.Domain</PackageId>
+		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<Description>SharpAbp MapTenancy Management Module</Description>
+		<RootNamespace />
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Volo.Abp.TenantManagement.Domain" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.Caching" Version="$(VoloAbpPackageVersion)" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.TenantManagement.Domain" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.Caching" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.AutoMapper" Version="$(VoloAbpPackageVersion)" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SharpAbp.Abp.MapTenancyManagement.Domain.Shared\SharpAbp.Abp.MapTenancyManagement.Domain.Shared.csproj" />
-    <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.MapTenancy\SharpAbp.Abp.MapTenancy.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\SharpAbp.Abp.MapTenancyManagement.Domain.Shared\SharpAbp.Abp.MapTenancyManagement.Domain.Shared.csproj" />
+		<ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.MapTenancy\SharpAbp.Abp.MapTenancy.csproj" />
+	</ItemGroup>
 
 </Project>

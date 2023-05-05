@@ -50,17 +50,15 @@ namespace SharpAbp.Abp.AuditLogging
         }
         public override void OnApplicationInitialization(ApplicationInitializationContext context)
         {
-            using (var scope = context.ServiceProvider.CreateScope())
+            using var scope = context.ServiceProvider.CreateScope();
+            AsyncHelper.RunSync(() =>
             {
-                AsyncHelper.RunSync(() =>
-                {
-                    return scope.ServiceProvider
-                     .GetRequiredService<AuditLoggingDataSeedContributor>()
-                     .SeedAsync();
-                });
-            }
-
+                return scope.ServiceProvider
+                 .GetRequiredService<AuditLoggingDataSeedContributor>()
+                 .SeedAsync();
+            });
         }
+
 
     }
 }

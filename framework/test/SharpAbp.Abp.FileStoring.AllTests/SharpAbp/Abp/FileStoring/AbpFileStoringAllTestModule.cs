@@ -8,9 +8,11 @@ using SharpAbp.Abp.FileStoring.KS3;
 using SharpAbp.Abp.FileStoring.Minio;
 using SharpAbp.Abp.FileStoring.Obs;
 using SharpAbp.Abp.FileStoring.S3;
+using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Autofac;
 using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.FileStoring
 {
@@ -31,12 +33,18 @@ namespace SharpAbp.Abp.FileStoring
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
+        {
             var configuration = context.Services.GetConfiguration();
 
             Configure<AbpFileStoringOptions>(c =>
             {
                 c.Configure(configuration, context);
             });
+            return Task.CompletedTask;
         }
 
 

@@ -1,7 +1,9 @@
 ﻿using SharpAbp.Abp.Identity;
+using System.Threading.Tasks;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Emailing;
 using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 using Volo.Abp.UI.Navigation;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
@@ -18,6 +20,11 @@ namespace SharpAbp.Abp.Account
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
+        {
             Configure<AbpVirtualFileSystemOptions>(options =>
             {
                 options.FileSets.AddEmbedded<AccountApplicationModule>();
@@ -32,6 +39,8 @@ namespace SharpAbp.Abp.Account
             {
                 options.Applications["MVC"].Urls[AccountUrlNames.PasswordReset] = "Account/ResetPassword";
             });
+
+            return Task.CompletedTask;
         }
     }
 }

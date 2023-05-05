@@ -35,6 +35,8 @@ namespace MinIdApp
             MinIdAppModuleExtensionConfigurator.Configure();
         }
 
+
+
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             Configure<AbpVirtualFileSystemOptions>(options =>

@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Autofac;
 using Volo.Abp.Modularity;
+using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.Snowflakes
 {
@@ -14,6 +16,11 @@ namespace SharpAbp.Abp.Snowflakes
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
+        {
             var configuration = context.Services.GetConfiguration();
             Configure<AbpSnowflakesOptions>(options =>
             {
@@ -25,8 +32,7 @@ namespace SharpAbp.Abp.Snowflakes
                     c.WorkerId = 3;
                 });
             });
-
-
+            return Task.CompletedTask;
         }
     }
 }
