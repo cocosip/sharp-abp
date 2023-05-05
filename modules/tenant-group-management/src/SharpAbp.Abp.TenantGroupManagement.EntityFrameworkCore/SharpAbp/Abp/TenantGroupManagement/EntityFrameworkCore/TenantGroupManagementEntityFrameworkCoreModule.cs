@@ -23,7 +23,7 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
         {
             context.Services.AddAbpDbContext<TenantGroupManagementDbContext>(options =>
             {
-                options.AddDefaultRepositories<ITenantGroupManagementDbContext>();
+                options.AddDefaultRepositories<ITenantGroupManagementDbContext>(includeAllEntities: true);
                 options.AddRepository<TenantGroup, EfCoreTenantGroupRepository>();
             });
             return Task.CompletedTask;

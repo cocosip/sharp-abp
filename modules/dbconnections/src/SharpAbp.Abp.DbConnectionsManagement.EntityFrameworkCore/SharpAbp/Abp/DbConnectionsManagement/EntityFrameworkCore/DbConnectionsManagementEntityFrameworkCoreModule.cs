@@ -14,7 +14,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore
         {
             context.Services.AddAbpDbContext<DbConnectionsManagementDbContext>(options =>
             {
-                options.AddDefaultRepositories<IDbConnectionsManagementDbContext>();
+                options.AddDefaultRepositories<IDbConnectionsManagementDbContext>(includeAllEntities: true);
                 options.AddRepository<DatabaseConnectionInfo, EfCoreDatabaseConnectionInfoRepository>();
             });
         }

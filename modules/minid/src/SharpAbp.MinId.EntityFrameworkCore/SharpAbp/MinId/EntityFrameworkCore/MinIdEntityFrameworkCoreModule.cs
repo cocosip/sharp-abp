@@ -23,7 +23,7 @@ namespace SharpAbp.MinId.EntityFrameworkCore
             {
                 options.AddRepository<MinIdInfo, EfCoreMinIdInfoRepository>();
                 options.AddRepository<MinIdToken, EfCoreMinIdTokenRepository>();
-                options.AddDefaultRepositories<IMinIdDbContext>(true);
+                options.AddDefaultRepositories<IMinIdDbContext>(includeAllEntities: true);
             });
             return Task.CompletedTask;
         }

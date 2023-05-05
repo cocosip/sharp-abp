@@ -23,7 +23,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         {
             context.Services.AddAbpDbContext<MapTenancyManagementDbContext>(options =>
             {
-                options.AddDefaultRepositories<IMapTenancyManagementDbContext>();
+                options.AddDefaultRepositories<IMapTenancyManagementDbContext>(includeAllEntities: true);
                 options.AddRepository<MapTenant, EfCoreMapTenantRepository>();
             });
             return Task.CompletedTask;

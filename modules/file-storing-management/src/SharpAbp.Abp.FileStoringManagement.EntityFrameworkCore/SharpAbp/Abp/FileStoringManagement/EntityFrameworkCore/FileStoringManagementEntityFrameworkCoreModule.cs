@@ -21,7 +21,7 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
         {
             context.Services.AddAbpDbContext<FileStoringManagementDbContext>(options =>
             {
-                options.AddDefaultRepositories<IFileStoringManagementDbContext>();
+                options.AddDefaultRepositories<IFileStoringManagementDbContext>(includeAllEntities: true);
                 options.AddRepository<FileStoringContainer, EfCoreFileStoringContainerRepository>();
             });
 
