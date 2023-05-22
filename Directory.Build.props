@@ -2,7 +2,7 @@
   <PropertyGroup>
 
     <!--Volo ABP packages-->
-    <VoloAbpPackageVersion>7.2.1</VoloAbpPackageVersion>
+    <VoloAbpPackageVersion>7.2.2</VoloAbpPackageVersion>
 
     <!-- All Microsoft EntityFrameworkCore packages -->
     <MicrosoftEntityFrameworkCorePackageVersion>7.0.1</MicrosoftEntityFrameworkCorePackageVersion>
@@ -14,7 +14,7 @@
     <MicrosoftPackageVersion>7.0.*</MicrosoftPackageVersion>
 
     <!-- Microsoft.NET.Test.Sdk https://www.nuget.org/packages/Microsoft.NET.Test.Sdk -->
-    <MicrosoftNETTestSdkPackageVersion>17.5.0</MicrosoftNETTestSdkPackageVersion>
+    <MicrosoftNETTestSdkPackageVersion>17.6.0</MicrosoftNETTestSdkPackageVersion>
 
     <!--System.ComponentModel.Annotations-->
     <SystemComponentModelAnnotationsPackageVersion>5.0.0</SystemComponentModelAnnotationsPackageVersion>
@@ -38,7 +38,7 @@
     <xUnitRunnerVisualstudioPackageVersion>2.4.5</xUnitRunnerVisualstudioPackageVersion>
 
     <!--coverlet.collector-->
-    <CoverletCollectorPackageVersion>3.2.0</CoverletCollectorPackageVersion>
+    <CoverletCollectorPackageVersion>6.0.0</CoverletCollectorPackageVersion>
 
   </PropertyGroup>
 </Project>
