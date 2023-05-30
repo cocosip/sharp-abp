@@ -11,7 +11,7 @@
         /// <summary>
         /// Default value: 32
         /// </summary>
-        public static int MaxBizTypeLength { get; set; } = 32;
+        public static int MaxBizTypeLength { get; set; } = 64;
 
         /// <summary>
         /// Default value: 256
