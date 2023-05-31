@@ -9,7 +9,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
         public Guid? TenantId { get; set; }
         public Guid? TenantGroupId { get; set; }
 
-        public TenantGroupTenantCacheItem(Guid? tenantId, Guid ?tenantGroupId)
+        public TenantGroupTenantCacheItem(Guid? tenantId, Guid? tenantGroupId)
         {
             TenantId = tenantId;
             TenantGroupId = tenantGroupId;
@@ -24,7 +24,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
 
             return string.Format(CacheKeyFormat,
                 tenantId?.ToString() ?? "null",
-                tenantGroupId?.ToString() ?? "null" );
+                tenantGroupId?.ToString() ?? "null");
         }
 
     }

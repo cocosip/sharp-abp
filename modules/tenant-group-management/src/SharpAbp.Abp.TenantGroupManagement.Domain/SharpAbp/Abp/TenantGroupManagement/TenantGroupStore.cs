@@ -86,14 +86,9 @@ namespace SharpAbp.Abp.TenantGroupManagement
             using (CurrentTenant.Change(null))
             {
                 var tenantGroup = await TenantGroupRepository.FindByTenantIdAsync(tenantId);
-                if (tenantGroup != null)
-                {
-                    await SetTenantCacheItemAsync(cacheKey, new TenantGroupTenantCacheItem(tenantId, tenantGroup?.Id));
-                    return await GetCacheItemAsync(tenantGroup.Id, null);
-                }
+                await SetTenantCacheItemAsync(cacheKey, new TenantGroupTenantCacheItem(tenantId, tenantGroup?.Id));
+                return await GetCacheItemAsync(tenantGroup.Id, null);
             }
-
-            throw new AbpException("Could not find tenant group.");
         }
 
         protected virtual async Task SetTenantCacheItemAsync(
