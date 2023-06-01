@@ -4,6 +4,7 @@ using SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore;
 using System;
 using Volo.Abp;
 using Volo.Abp.Autofac;
+using Volo.Abp.Data;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.Modularity;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
@@ -40,6 +41,13 @@ namespace SharpAbp.Abp.TenantGroupManagement
             {
                 options.TransactionBehavior = UnitOfWorkTransactionBehavior.Disabled; //EF in-memory database does not support transactions
             });
+
+
+            Configure<AbpDbConnectionOptions>(options =>
+            {
+                options.ConnectionStrings.Default = "123";
+            });
+
         }
     }
 }

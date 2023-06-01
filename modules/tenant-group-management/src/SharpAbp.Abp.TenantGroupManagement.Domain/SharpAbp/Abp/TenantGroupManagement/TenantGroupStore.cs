@@ -75,19 +75,23 @@ namespace SharpAbp.Abp.TenantGroupManagement
 
         protected virtual async Task<TenantGroupCacheItem> GetTenantCacheItemAsync(Guid tenantId)
         {
-            var cacheKey = CalculateTenantCacheKey(tenantId);
-
-            var cacheItem = await TenantCache.GetAsync(cacheKey, considerUow: true);
-            if (cacheItem != null)
-            {
-                return await GetCacheItemAsync(cacheItem.TenantGroupId, null);
-            }
-
             using (CurrentTenant.Change(null))
             {
+                var cacheKey = CalculateTenantCacheKey(tenantId);
+                var cacheItem = await TenantCache.GetAsync(cacheKey, considerUow: true);
+                if (cacheItem != null)
+                {
+                    return await GetCacheItemAsync(cacheItem.TenantGroupId, null);
+                }
+
                 var tenantGroup = await TenantGroupRepository.FindByTenantIdAsync(tenantId);
-                await SetTenantCacheItemAsync(cacheKey, new TenantGroupTenantCacheItem(tenantId, tenantGroup?.Id));
-                return await GetCacheItemAsync(tenantGroup.Id, null);
+                if (tenantGroup != null)
+                {
+                    await SetTenantCacheItemAsync(cacheKey, new TenantGroupTenantCacheItem(tenantId, tenantGroup?.Id));
+                    return await GetCacheItemAsync(tenantGroup.Id, null);
+                }
+                //租户分组为null
+                return new TenantGroupCacheItem(null);
             }
         }
 
