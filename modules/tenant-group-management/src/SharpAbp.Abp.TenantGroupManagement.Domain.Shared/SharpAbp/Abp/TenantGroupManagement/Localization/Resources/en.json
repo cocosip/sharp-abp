@@ -1,13 +1,15 @@
 {
   "culture": "en",
   "texts": {
-    "MapTenancyManagement": "Map tenancy management",
-    "Permission:MapTenancyManagement.MapTenants": "Map tenancy management",
-    "Permission:MapTenancyManagement.MapTenants.Create": "Create map tenant",
-    "Permission:MapTenancyManagement.MapTenants.Update": "Update map tenant",
-    "Permission:MapTenancyManagement.MapTenants.Delete": "Delete map tenant",
-    "MapTenancyManagement.DuplicateTenantId": "Duplicate tenantId '{0}'.",
-    "MapTenancyManagement.DuplicateCode": "Duplicate code '{0}'.",
-    "MapTenancyManagement.DuplicateMapCode": "Duplicate map code '{0}'."
+    "TenantGroupManagement": "Tenant group management",
+    "Permission:TenantGroupManagement.TenantGroups": "tenant groups",
+    "Permission:TenantGroupManagement.TenantGroups.Create": "Create tenant group",
+    "Permission:TenantGroupManagement.TenantGroups.Update": "Update tenant group",
+    "Permission:TenantGroupManagement.TenantGroups.Delete": "Delete tenant group",
+    "Permission:TenantGroupManagement.TenantGroups.ManageFeatures": "Tenant group features",
+    "Permission:TenantGroupManagement.TenantGroups.ManageTenants": "Tenant group tenants",
+    "Permission:TenantGroupManagement.TenantGroups.ManageConnectionStrings": "Tenant group connection strings",
+    "TenantGroupManagement.DuplicateName": "Duplicate tenant group name '{0}'.",
+    "TenantGroupManagement.DuplicateTenantId": "Duplicate tenant id '{0}'."
   }
 }

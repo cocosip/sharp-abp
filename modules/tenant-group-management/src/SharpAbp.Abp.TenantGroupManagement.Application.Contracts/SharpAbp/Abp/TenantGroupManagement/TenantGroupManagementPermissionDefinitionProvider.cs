@@ -31,6 +31,10 @@ namespace SharpAbp.Abp.TenantGroupManagement
                 L($"Permission:{TenantGroupManagementPermissions.TenantGroups.ManageFeatures}"));
 
             tenantGroupPermission.AddChild(
+                TenantGroupManagementPermissions.TenantGroups.ManageTenants,
+                L($"Permission:{TenantGroupManagementPermissions.TenantGroups.ManageTenants}"));
+
+            tenantGroupPermission.AddChild(
                 TenantGroupManagementPermissions.TenantGroups.ManageConnectionStrings,
                 L($"Permission:{TenantGroupManagementPermissions.TenantGroups.ManageConnectionStrings}"));
         }

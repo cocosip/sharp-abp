@@ -1,13 +1,15 @@
 {
   "culture": "zh-Hans",
   "texts": {
-    "MapTenancyManagement": "映射租户管理",
-    "Permission:MapTenancyManagement.MapTenants": "映射租户管理",
-    "Permission:MapTenancyManagement.MapTenants.Create": "创建映射租户",
-    "Permission:MapTenancyManagement.MapTenants.Update": "修改映射租户",
-    "Permission:MapTenancyManagement.MapTenants.Delete": "删除映射租户",
-    "MapTenancyManagement.DuplicateTenantId": "重复的租户 '{0}'.",
-    "MapTenancyManagement.DuplicateCode": "重复的租户编码'{0}'.",
-    "MapTenancyManagement.DuplicateMapCode": "重复的租户映射编码'{0}'."
+    "TenantGroupManagement": "租户分组管理",
+    "Permission:TenantGroupManagement.TenantGroups": "租户分组管理",
+    "Permission:TenantGroupManagement.TenantGroups.Create": "创建租户分组",
+    "Permission:TenantGroupManagement.TenantGroups.Update": "修改租户分组",
+    "Permission:TenantGroupManagement.TenantGroups.Delete": "删除租户分组",
+    "Permission:TenantGroupManagement.TenantGroups.ManageFeatures": "租户分组特性管理",
+    "Permission:TenantGroupManagement.TenantGroups.ManageTenants": "租户分组租户管理",
+    "Permission:TenantGroupManagement.TenantGroups.ManageConnectionStrings": "租户分组连接管理",
+    "TenantGroupManagement.DuplicateName": "重复的租户分组名称 '{0}'.",
+    "TenantGroupManagement.DuplicateTenantId": "重复的租户分组下的租户Id'{0}'."
   }
 }
