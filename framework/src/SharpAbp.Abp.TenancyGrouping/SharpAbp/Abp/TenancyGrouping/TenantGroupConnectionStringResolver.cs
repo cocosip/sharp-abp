@@ -53,23 +53,21 @@ namespace SharpAbp.Abp.TenancyGrouping
         [Obsolete("Use FindTenantConfigurationAsync method.")]
         protected override TenantConfiguration FindTenantConfiguration(Guid tenantId)
         {
-            using (var serviceScope = ServiceProvider.CreateScope())
+            using var serviceScope = ServiceProvider.CreateScope();
+            var tenantStore = serviceScope
+                .ServiceProvider
+                .GetRequiredService<ITenantStore>();
+
+            var tenant = tenantStore.Find(tenantId);
+
+            var tenantGroupStore = serviceScope.ServiceProvider.GetRequiredService<ITenantGroupStore>();
+            var tenantGroup = tenantGroupStore.FindByTenantId(tenantId);
+            if (tenantGroup != null && tenantGroup.IsActive)
             {
-                var tenantStore = serviceScope
-                    .ServiceProvider
-                    .GetRequiredService<ITenantStore>();
-
-                var tenant = tenantStore.Find(tenantId);
-
-                var tenantGroupStore = serviceScope.ServiceProvider.GetRequiredService<ITenantGroupStore>();
-                var tenantGroup = tenantGroupStore.FindByTenantId(tenantId);
-                if (tenantGroup != null && tenantGroup.IsActive)
-                {
-                    tenant.ConnectionStrings = tenantGroup.ConnectionStrings;
-                }
-
-                return tenant;
+                tenant.ConnectionStrings = tenantGroup.ConnectionStrings;
             }
+
+            return tenant;
         }
 
     }
