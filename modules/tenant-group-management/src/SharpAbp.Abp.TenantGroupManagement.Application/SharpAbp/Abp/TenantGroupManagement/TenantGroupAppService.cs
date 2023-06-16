@@ -91,8 +91,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
         public virtual async Task<string> GetDefaultConnectionStringAsync(Guid id)
         {
             var tenantGroup = await TenantGroupRepository.GetAsync(id);
-            var connectionString = tenantGroup.GetDefaultConnectionString();
-            return connectionString?.Value ?? "";
+            return tenantGroup?.GetDefaultConnectionString()?.Value;
         }
 
         [Authorize(TenantGroupManagementPermissions.TenantGroups.ManageTenants)]

@@ -18,8 +18,6 @@ namespace SharpAbp.Abp.TenantGroupManagement
             _tenantGroupAppService = tenantGroupAppService;
         }
 
-
-
         [HttpGet]
         public async Task<PagedResultDto<TenantGroupDto>> GetPagedListAsync(TenantGroupPagedRequestDto input)
         {
