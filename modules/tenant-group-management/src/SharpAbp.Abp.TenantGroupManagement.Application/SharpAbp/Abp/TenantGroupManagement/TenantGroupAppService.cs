@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.TenantManagement;
 
 namespace SharpAbp.Abp.TenantGroupManagement
 {
@@ -11,12 +13,15 @@ namespace SharpAbp.Abp.TenantGroupManagement
     {
         protected TenantGroupManager TenantGroupManager { get; }
         protected ITenantGroupRepository TenantGroupRepository { get; }
+        protected ITenantRepository TenantRepository { get; }
         public TenantGroupAppService(
             TenantGroupManager tenantGroupManager,
-            ITenantGroupRepository tenantGroupRepository)
+            ITenantGroupRepository tenantGroupRepository,
+            ITenantRepository tenantRepository)
         {
             TenantGroupManager = tenantGroupManager;
             TenantGroupRepository = tenantGroupRepository;
+            TenantRepository = tenantRepository;
         }
 
         public virtual async Task<TenantGroupDto> GetAsync(Guid id)
@@ -51,6 +56,24 @@ namespace SharpAbp.Abp.TenantGroupManagement
             var tenantGroups = await TenantGroupRepository.GetListAsync(sorting, name);
             return ObjectMapper.Map<List<TenantGroup>, List<TenantGroupDto>>(tenantGroups);
         }
+
+        public virtual async Task<List<TenantDto>> GetAvialableTenantsAsync()
+        {
+            var availableTenants = new List<Tenant>();
+            var tenants = await TenantRepository.GetListAsync();
+            var tenantGroups = await TenantGroupRepository.GetListAsync(includeDetails: true);
+
+            foreach (var tenant in tenants)
+            {
+                if (!tenantGroups.Any(x => x.Tenants.Any(y => y.TenantId == tenant.Id)))
+                {
+                    availableTenants.Add(tenant);
+                }
+            }
+
+            return ObjectMapper.Map<List<Tenant>, List<TenantDto>>(availableTenants);
+        }
+
 
         [Authorize(TenantGroupManagementPermissions.TenantGroups.Create)]
         public virtual async Task<TenantGroupDto> CreateAsync(CreateTenantGroupDto input)

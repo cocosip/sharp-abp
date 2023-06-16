@@ -41,11 +41,18 @@ namespace SharpAbp.Abp.TenantGroupManagement
             });
 
             await _tenantGroupAppService.UpdateDefaultConnectionStringAsync(g1.Id, "123456");
+            var availableTenants = await _tenantGroupAppService.GetAvialableTenantsAsync();
 
+            Assert.Equal(2, availableTenants.Count);
             await _tenantGroupAppService.AddTenantAsync(g1.Id, new AddTenantDto()
             {
                 TenantId = t1.Id
             });
+
+
+            availableTenants = await _tenantGroupAppService.GetAvialableTenantsAsync();
+            Assert.Single(availableTenants);
+
 
             await _tenantGroupAppService.AddTenantAsync(g1.Id, new AddTenantDto()
             {

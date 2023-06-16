@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.TenantManagement;
 
 namespace SharpAbp.Abp.TenantGroupManagement
 {
@@ -45,6 +46,13 @@ namespace SharpAbp.Abp.TenantGroupManagement
         public async Task<TenantGroupDto> FindByNameAsync(string name)
         {
             return await _tenantGroupAppService.FindByNameAsync(name);
+        }
+
+        [HttpGet]
+        [Route("available-tenants")]
+        public async Task<List<TenantDto>> GetAvialableTenantsAsync()
+        {
+            return await _tenantGroupAppService.GetAvialableTenantsAsync();
         }
 
         [HttpPost]
@@ -102,6 +110,6 @@ namespace SharpAbp.Abp.TenantGroupManagement
             await _tenantGroupAppService.DeleteDefaultConnectionStringAsync(id);
         }
 
-
+       
     }
 }

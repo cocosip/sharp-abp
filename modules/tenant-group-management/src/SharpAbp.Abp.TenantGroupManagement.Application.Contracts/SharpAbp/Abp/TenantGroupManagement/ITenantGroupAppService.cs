@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
+using Volo.Abp.TenantManagement;
 
 namespace SharpAbp.Abp.TenantGroupManagement
 {
@@ -12,6 +13,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
         Task<TenantGroupDto> FindByNameAsync(string name);
         Task<PagedResultDto<TenantGroupDto>> GetPagedListAsync(TenantGroupPagedRequestDto input);
         Task<List<TenantGroupDto>> GetListAsync(string sorting = null, string name = "");
+        Task<List<TenantDto>> GetAvialableTenantsAsync();
         Task<TenantGroupDto> CreateAsync(CreateTenantGroupDto input);
         Task<TenantGroupDto> UpdateAsync(Guid id, UpdateTenantGroupDto input);
         Task DeleteAsync(Guid id);
