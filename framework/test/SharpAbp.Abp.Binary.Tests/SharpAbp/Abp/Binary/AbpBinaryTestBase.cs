@@ -1,14 +1,13 @@
 ﻿using Volo.Abp;
 using Volo.Abp.Testing;
 
-namespace SharpAbp.Abp.FileStoring
+namespace SharpAbp.Abp.Binary
 {
-    public abstract class AbpFileStoringAllTestBase : AbpIntegratedTest<AbpFileStoringAllTestModule>
+    public abstract class AbpBinaryTestBase : AbpIntegratedTest<AbpBinaryTestModule>
     {
         protected override void SetAbpApplicationCreationOptions(AbpApplicationCreationOptions options)
         {
             options.UseAutofac();
         }
-     
     }
 }

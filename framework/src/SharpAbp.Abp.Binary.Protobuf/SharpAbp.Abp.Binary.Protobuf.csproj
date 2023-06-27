@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\..\..\common.props" />
+	<Import Project="..\..\..\configureawait.props" />
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<AssemblyName>SharpAbp.Abp.Binary.Protobuf</AssemblyName>
+		<PackageId>SharpAbp.Abp.Binary.Protobuf</PackageId>
+		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<Description>SharpAbp Binary Protobuf Module</Description>
+		<RootNamespace />
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="protobuf-net" Version="3.2.26" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <ProjectReference Include="..\SharpAbp.Abp.Binary.Abstractions\SharpAbp.Abp.Binary.Abstractions.csproj" />
+	</ItemGroup>
+	
+</Project>
