@@ -25,7 +25,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\src\SharpAbp.Abp.Binary\SharpAbp.Abp.Binary.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.Binary\SharpAbp.Abp.Binary.csproj" />
 	</ItemGroup>
 
 </Project>

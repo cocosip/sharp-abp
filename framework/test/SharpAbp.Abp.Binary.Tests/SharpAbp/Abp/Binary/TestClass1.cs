@@ -1,12 +1,19 @@
-﻿using System;
+﻿using ProtoBuf;
 
 namespace SharpAbp.Abp.Binary
 {
-    [Serializable]
+    [ProtoContract]
     public class TestClass1
     {
+        [ProtoMember(1)]
         public int Id { get; set; }
 
+        [ProtoMember(2)]
         public string Name { get; set; }
+
+        public TestClass1()
+        {
+
+        }
     }
 }

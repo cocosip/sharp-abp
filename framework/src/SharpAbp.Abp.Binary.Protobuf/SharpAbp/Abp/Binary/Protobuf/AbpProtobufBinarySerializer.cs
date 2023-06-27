@@ -7,10 +7,10 @@ using Volo.Abp.DependencyInjection;
 namespace SharpAbp.Abp.Binary.Protobuf
 {
 
-    public class AbpProtobufSerializer : IBinarySerializer, ITransientDependency
+    public class AbpProtobufBinarySerializer : IBinarySerializer, ITransientDependency
     {
         protected AbpProtobufSerializerOptions Options { get; }
-        public AbpProtobufSerializer(IOptions<AbpProtobufSerializerOptions> options)
+        public AbpProtobufBinarySerializer(IOptions<AbpProtobufSerializerOptions> options)
         {
             Options = options.Value;
         }
