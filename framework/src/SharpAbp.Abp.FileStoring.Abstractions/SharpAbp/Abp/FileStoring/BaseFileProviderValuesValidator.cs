@@ -20,11 +20,7 @@ namespace SharpAbp.Abp.FileStoring
 
         protected virtual void ValidateBasic(IAbpValidationResult result, Dictionary<string, string> keyValuePairs)
         {
-            var providerConfiguration = Options.Providers.GetConfiguration(Provider);
-            if (providerConfiguration == null)
-            {
-                throw new AbpException($"Could not find any provider configuration for provider '{Provider}'.");
-            }
+            var providerConfiguration = Options.Providers.GetConfiguration(Provider) ?? throw new AbpException($"Could not find any provider configuration for provider '{Provider}'.");
 
             foreach (var itemKeyValuePair in providerConfiguration.GetItems())
             {

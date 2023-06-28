@@ -4,7 +4,7 @@
   <Import Project="..\..\..\..\configureawait.props" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFrameworks>netstandard2.1;net7.0</TargetFrameworks>
     <AssemblyName>SharpAbp.Abp.FileStoringManagement.MongoDB</AssemblyName>
     <PackageId>SharpAbp.Abp.FileStoringManagement.MongoDB</PackageId>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>

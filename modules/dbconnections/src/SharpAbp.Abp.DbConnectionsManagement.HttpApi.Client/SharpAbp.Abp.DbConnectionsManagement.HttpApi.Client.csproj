@@ -4,7 +4,7 @@
 	<Import Project="..\..\..\..\configureawait.props" />
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
+		<TargetFrameworks>netstandard2.0;netstandard2.1;net7.0</TargetFrameworks>
 		<AssemblyName>SharpAbp.Abp.DbConnectionsManagement.HttpApi.Client</AssemblyName>
 		<PackageId>SharpAbp.Abp.DbConnectionsManagement.HttpApi.Client</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
@@ -20,11 +20,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\SharpAbp.Abp.DbConnectionsManagement.Application.Contracts\SharpAbp.Abp.DbConnectionsManagement.Application.Contracts.csproj" />
+		<ProjectReference Include="..\SharpAbp.Abp.DbConnectionsManagement.Application.Contracts\SharpAbp.Abp.DbConnectionsManagement.Application.Contracts.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="ClientProxies\" />
+		<Folder Include="ClientProxies\" />
 	</ItemGroup>
 
 </Project>
