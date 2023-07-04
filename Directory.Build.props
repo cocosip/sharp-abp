@@ -2,7 +2,7 @@
   <PropertyGroup>
 
     <!--Volo ABP packages-->
-    <VoloAbpPackageVersion>7.2.2</VoloAbpPackageVersion>
+    <VoloAbpPackageVersion>7.2.3</VoloAbpPackageVersion>
 
     <!-- All Microsoft EntityFrameworkCore packages -->
     <MicrosoftEntityFrameworkCorePackageVersion>7.0.1</MicrosoftEntityFrameworkCorePackageVersion>
@@ -24,6 +24,9 @@
 
     <!-- Shouldly https://www.nuget.org/packages/Shouldly -->
     <ShouldlyPackageVersion>4.1.0</ShouldlyPackageVersion>
+
+    <!-- Polly https://www.nuget.org/packages/Polly -->
+    <PollyPackageVersion>7.2.3</PollyPackageVersion>
 
     <!-- Moq package-->
     <MoqPackageVersion>4.18.4</MoqPackageVersion>
