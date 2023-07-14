@@ -1,12 +1,14 @@
 ﻿
-using MassTransitSample.ActiveMqProducer;
+using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
 using System;
 using System.Threading.Tasks;
+using Volo.Abp;
 
+namespace MassTransitSample.Producer;
 public class Program
 {
     public async static Task<int> Main(string[] args)
@@ -27,19 +29,32 @@ public class Program
         {
             Log.Information("Starting console host.");
 
-            await Host.CreateDefaultBuilder(args)
-                .ConfigureServices(services =>
+            var builder = Host.CreateDefaultBuilder(args);
+
+            builder.ConfigureServices(services =>
+            {
+                services.AddHostedService<MassTransitSampleProducerHostedService>();
+                services.AddApplicationAsync<MassTransitSampleProducerModule>(options =>
                 {
-                    services.AddApplication<MassTransitSampleActiveMqProducerModule>();
-                })
-                .UseSerilog()
-                .UseAutofac()
-                .RunConsoleAsync();
+                    options.Services.ReplaceConfiguration(services.GetConfiguration());
+                    options.Services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog());
+                });
+            }).AddAppSettingsSecretsJson().UseAutofac().UseConsoleLifetime();
+
+            var host = builder.Build();
+            await host.Services.GetRequiredService<IAbpApplicationWithExternalServiceProvider>().InitializeAsync(host.Services);
+
+            await host.RunAsync();
 
             return 0;
         }
         catch (Exception ex)
         {
+            if (ex is HostAbortedException)
+            {
+                throw;
+            }
+
             Log.Fatal(ex, "Host terminated unexpectedly!");
             return 1;
         }

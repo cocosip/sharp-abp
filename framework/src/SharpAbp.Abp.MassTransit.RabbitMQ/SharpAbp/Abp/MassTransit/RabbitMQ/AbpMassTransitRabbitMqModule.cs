@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -21,38 +22,44 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
         public override Task PreConfigureServicesAsync(ServiceConfigurationContext context)
         {
             var configuration = context.Services.GetConfiguration();
-            PreConfigure<AbpMassTransitRabbitMqOptions>(options => options.PreConfigure(configuration));
-
-            var rabbitMqOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitRabbitMqOptions>();
-
-            PreConfigure<AbpMassTransitRabbitMqOptions>(options =>
+            var abpMassTransitOptions = configuration
+                .GetSection("MassTransitOptions")
+                .Get<AbpMassTransitOptions>();
+            if (abpMassTransitOptions.Provider.Equals(MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
-                options.DefaultExchangeNameFormatFunc = RabbitMqUtil.ExchangeNameFormat;
-                options.DefaultQueueNameFormatFunc = RabbitMqUtil.QueueNameFormat;
+                PreConfigure<AbpMassTransitRabbitMqOptions>(options => options.PreConfigure(configuration));
 
-                options.DefaultPublishTopologyConfigure = new Action<IRabbitMqMessagePublishTopologyConfigurator>(c =>
+                var rabbitMqOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitRabbitMqOptions>();
+
+                PreConfigure<AbpMassTransitRabbitMqOptions>(options =>
                 {
-                    c.AutoDelete = rabbitMqOptions.DefaultAutoDelete;
-                    c.Durable = rabbitMqOptions.DefaultDurable;
-                    c.ExchangeType = rabbitMqOptions.DefaultExchangeType;
+                    options.DefaultExchangeNameFormatFunc = RabbitMqUtil.ExchangeNameFormat;
+                    options.DefaultQueueNameFormatFunc = RabbitMqUtil.QueueNameFormat;
+
+                    options.DefaultPublishTopologyConfigure = new Action<IRabbitMqMessagePublishTopologyConfigurator>(c =>
+                    {
+                        c.AutoDelete = rabbitMqOptions.DefaultAutoDelete;
+                        c.Durable = rabbitMqOptions.DefaultDurable;
+                        c.ExchangeType = rabbitMqOptions.DefaultExchangeType;
+                    });
+
+                    options.DefaultReceiveEndpointConfigure = new Action<string, string, IRabbitMqReceiveEndpointConfigurator>((exchangeName, queueName, c) =>
+                    {
+                        //c.Bind(exchangeName);
+                        c.ConcurrentMessageLimit = rabbitMqOptions.DefaultConcurrentMessageLimit;
+                        c.PrefetchCount = rabbitMqOptions.DefaultPrefetchCount;
+                        c.AutoDelete = rabbitMqOptions.DefaultAutoDelete;
+                        c.Durable = rabbitMqOptions.DefaultDurable;
+                        c.ExchangeType = rabbitMqOptions.DefaultExchangeType;
+                    });
+
+
+                    // options.RabbitMqPostConfigures.Add(new Action<IBusRegistrationContext, IRabbitMqBusFactoryConfigurator>((ctx, cfg) =>
+                    // {
+                    //     cfg.ConfigureEndpoints(ctx);
+                    // }));
                 });
-
-                options.DefaultReceiveEndpointConfigure = new Action<string, string, IRabbitMqReceiveEndpointConfigurator>((exchangeName, queueName, c) =>
-                {
-                    //c.Bind(exchangeName);
-                    c.ConcurrentMessageLimit = rabbitMqOptions.DefaultConcurrentMessageLimit;
-                    c.PrefetchCount = rabbitMqOptions.DefaultPrefetchCount;
-                    c.AutoDelete = rabbitMqOptions.DefaultAutoDelete;
-                    c.Durable = rabbitMqOptions.DefaultDurable;
-                    c.ExchangeType = rabbitMqOptions.DefaultExchangeType;
-                });
-
-
-                // options.RabbitMqPostConfigures.Add(new Action<IBusRegistrationContext, IRabbitMqBusFactoryConfigurator>((ctx, cfg) =>
-                // {
-                //     cfg.ConfigureEndpoints(ctx);
-                // }));
-            });
+            }
             return Task.CompletedTask;
         }
 
@@ -63,13 +70,14 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            var massTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
-
-            if (massTransitOptions.Provider.Equals(MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            var configuration = context.Services.GetConfiguration();
+            var abpMassTransitOptions = configuration
+                .GetSection("MassTransitOptions")
+                .Get<AbpMassTransitOptions>();
+            if (abpMassTransitOptions.Provider.Equals(MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
-
+                var massTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
                 var rabbitMqOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitRabbitMqOptions>();
-
                 context.Services.AddMassTransit(x =>
                 {
                     //Masstransit preConfigure
@@ -170,14 +178,21 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
 
         public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            Configure<AbpMassTransitRabbitMqOptions>(options =>
+            var configuration = context.Services.GetConfiguration();
+            var abpMassTransitOptions = configuration
+                .GetSection("MassTransitOptions")
+                .Get<AbpMassTransitOptions>();
+            if (abpMassTransitOptions.Provider.Equals(MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
-                var actions = context.Services.GetPreConfigureActions<AbpMassTransitRabbitMqOptions>();
-                foreach (var action in actions)
+                Configure<AbpMassTransitRabbitMqOptions>(options =>
                 {
-                    action(options);
-                }
-            });
+                    var actions = context.Services.GetPreConfigureActions<AbpMassTransitRabbitMqOptions>();
+                    foreach (var action in actions)
+                    {
+                        action(options);
+                    }
+                });
+            }
             return Task.CompletedTask;
         }
     }

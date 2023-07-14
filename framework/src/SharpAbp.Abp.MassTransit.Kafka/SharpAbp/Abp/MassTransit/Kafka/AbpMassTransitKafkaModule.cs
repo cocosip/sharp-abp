@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
@@ -19,42 +20,49 @@ namespace SharpAbp.Abp.MassTransit.Kafka
 
         public override Task PreConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            PreConfigure<AbpMassTransitOptions>(options =>
-            {
-                options.PreConfigures.Add(new Action<IBusRegistrationConfigurator>(c =>
-                {
-                    c.UsingInMemory();
-                }));
-            });
-
             var configuration = context.Services.GetConfiguration();
-            PreConfigure<AbpMassTransitKafkaOptions>(options => options.PreConfigure(configuration));
-
-            var kafkaOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitKafkaOptions>();
-
-            PreConfigure<AbpMassTransitKafkaOptions>(options =>
+            var abpMassTransitOptions = configuration
+                .GetSection("MassTransitOptions")
+                .Get<AbpMassTransitOptions>();
+            if (abpMassTransitOptions.Provider.Equals(MassTransitKafkaConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
-                options.DefaultTopicFormatFunc = KafkaUtil.TopicFormat;
-
-                options.DefaultReceiveEndpointConfigure = new Action<IKafkaTopicReceiveEndpointConfigurator>(c =>
+                PreConfigure<AbpMassTransitOptions>(options =>
                 {
-                    c.ConcurrentMessageLimit = kafkaOptions.DefaultConcurrentMessageLimit;
-                    c.MaxPollInterval = TimeSpan.FromMilliseconds(kafkaOptions.DefaultMaxPollInterval);
-                    c.SessionTimeout = TimeSpan.FromSeconds(kafkaOptions.DefaultSessionTimeout);
-                    c.EnableAutoOffsetStore = kafkaOptions.DefaultEnableAutoOffsetStore;
-                    c.AutoOffsetReset = kafkaOptions.DefaultAutoOffsetReset;
+                    options.PreConfigures.Add(new Action<IBusRegistrationConfigurator>(c =>
+                    {
+                        c.UsingInMemory();
+                    }));
                 });
 
-                //Kafka keep alive
-                options.KafkaConfigures.Add(new Action<IRiderRegistrationContext, IKafkaFactoryConfigurator>((ctx, k) =>
-                {
-                    k.ConfigureSocket(s =>
-                    {
-                        s.KeepaliveEnable = true;
-                    });
-                }));
+                PreConfigure<AbpMassTransitKafkaOptions>(options => options.PreConfigure(configuration));
 
-            });
+                var kafkaOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitKafkaOptions>();
+
+                PreConfigure<AbpMassTransitKafkaOptions>(options =>
+                {
+                    options.DefaultTopicFormatFunc = KafkaUtil.TopicFormat;
+
+                    options.DefaultReceiveEndpointConfigure = new Action<IKafkaTopicReceiveEndpointConfigurator>(c =>
+                    {
+                        c.ConcurrentMessageLimit = kafkaOptions.DefaultConcurrentMessageLimit;
+                        c.MaxPollInterval = TimeSpan.FromMilliseconds(kafkaOptions.DefaultMaxPollInterval);
+                        c.SessionTimeout = TimeSpan.FromSeconds(kafkaOptions.DefaultSessionTimeout);
+                        c.EnableAutoOffsetStore = kafkaOptions.DefaultEnableAutoOffsetStore;
+                        c.AutoOffsetReset = kafkaOptions.DefaultAutoOffsetReset;
+                    });
+
+                    //Kafka keep alive
+                    options.KafkaConfigures.Add(new Action<IRiderRegistrationContext, IKafkaFactoryConfigurator>((ctx, k) =>
+                    {
+                        k.ConfigureSocket(s =>
+                        {
+                            s.KeepaliveEnable = true;
+                        });
+                    }));
+
+                });
+            }
+
             return Task.CompletedTask;
         }
 
@@ -66,11 +74,14 @@ namespace SharpAbp.Abp.MassTransit.Kafka
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            var massTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
-            if (massTransitOptions.Provider.Equals(MassTransitKafkaConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            var configuration = context.Services.GetConfiguration();
+            var abpMassTransitOptions = configuration
+                .GetSection("MassTransitOptions")
+                .Get<AbpMassTransitOptions>();
+            if (abpMassTransitOptions.Provider.Equals(MassTransitKafkaConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
+                var massTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
                 var kafkaOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitKafkaOptions>();
-
                 context.Services.AddMassTransit(x =>
                 {
                     //PreConfigure
@@ -164,9 +175,9 @@ namespace SharpAbp.Abp.MassTransit.Kafka
                     }
                 });
             }
+
             return Task.CompletedTask;
         }
-
 
         public override void PostConfigureServices(ServiceConfigurationContext context)
         {
@@ -175,14 +186,22 @@ namespace SharpAbp.Abp.MassTransit.Kafka
 
         public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            Configure<AbpMassTransitKafkaOptions>(options =>
+            var configuration = context.Services.GetConfiguration();
+            var abpMassTransitOptions = configuration
+                .GetSection("MassTransitOptions")
+                .Get<AbpMassTransitOptions>();
+            if (abpMassTransitOptions.Provider.Equals(MassTransitKafkaConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
-                var actions = context.Services.GetPreConfigureActions<AbpMassTransitKafkaOptions>();
-                foreach (var action in actions)
+                Configure<AbpMassTransitKafkaOptions>(options =>
                 {
-                    action(options);
-                }
-            });
+                    var actions = context.Services.GetPreConfigureActions<AbpMassTransitKafkaOptions>();
+                    foreach (var action in actions)
+                    {
+                        action(options);
+                    }
+                });
+            }
+
             return Task.CompletedTask;
         }
 

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<Import Project="..\..\common.props" />
 
@@ -8,9 +8,23 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\MassTransitSample.Common\MassTransitSample.Common.csproj" />
-		<ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.MassTransit.Kafka\SharpAbp.Abp.MassTransit.Kafka.csproj" />
+		<None Remove="appsettings.json" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="appsettings.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\MassTransitSample.Common\MassTransitSample.Common.csproj" />
+		<ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.MassTransit.RabbitMQ\SharpAbp.Abp.MassTransit.RabbitMQ.csproj" />
+		<ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.MassTransit.Kafka\SharpAbp.Abp.MassTransit.Kafka.csproj" />
+		<ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.MassTransit.ActiveMQ\SharpAbp.Abp.MassTransit.ActiveMQ.csproj" />
+	</ItemGroup>
+
 
 	<ItemGroup>
 		<PackageReference Include="Volo.Abp.Autofac" Version="$(VoloAbpPackageVersion)" />
@@ -23,24 +37,6 @@
 		<PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
 		<PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
 		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Content Include="appsettings.json">
-			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Remove="appsettings.json" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Content Include="appsettings.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-	  </Content>
 	</ItemGroup>
 
 </Project>

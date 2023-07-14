@@ -1,34 +1,31 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
 
-namespace MassTransitSample.ActiveMqProducer
+namespace MassTransitSample.Producer
 {
-    public class MassTransitSampleActiveMqProducerHostedService : IHostedService
+    public class MassTransitSampleProducerHostedService : IHostedService
     {
         private IAbpApplicationWithExternalServiceProvider _abpApplication;
         private readonly IServiceProvider _serviceProvider;
-        private readonly ActiveMqProducerService _rabbitMqProducerService;
+        private readonly ProducerService _producerService;
 
         private readonly IConfiguration _configuration;
         private readonly IHostEnvironment _hostEnvironment;
 
-        public MassTransitSampleActiveMqProducerHostedService(
+        public MassTransitSampleProducerHostedService(
             IAbpApplicationWithExternalServiceProvider abpApplication,
             IServiceProvider serviceProvider,
-            ActiveMqProducerService rabbitMqProducerService,
+            ProducerService producerService,
             IConfiguration configuration,
             IHostEnvironment hostEnvironment)
         {
             _abpApplication = abpApplication;
             _serviceProvider = serviceProvider;
-            _rabbitMqProducerService = rabbitMqProducerService;
+            _producerService = producerService;
 
             _configuration = configuration;
             _hostEnvironment = hostEnvironment;
@@ -38,7 +35,7 @@ namespace MassTransitSample.ActiveMqProducer
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             await _abpApplication.InitializeAsync(_serviceProvider);
-            _rabbitMqProducerService.Run();
+            _producerService.Run();
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)

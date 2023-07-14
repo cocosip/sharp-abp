@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
@@ -20,36 +21,42 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
         public override Task PreConfigureServicesAsync(ServiceConfigurationContext context)
         {
             var configuration = context.Services.GetConfiguration();
-            PreConfigure<AbpMassTransitActiveMqOptions>(options => options.PreConfigure(configuration));
-
-            var activeMqOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitActiveMqOptions>();
-
-            PreConfigure<AbpMassTransitActiveMqOptions>(options =>
+            var abpMassTransitOptions = configuration
+                .GetSection("MassTransitOptions")
+                .Get<AbpMassTransitOptions>();
+            if (abpMassTransitOptions.Provider.Equals(MassTransitActiveMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
-                options.DefaultQueueNameFormatFunc = ActiveMqUtil.QueueNameFormat;
+                PreConfigure<AbpMassTransitActiveMqOptions>(options => options.PreConfigure(configuration));
 
-                options.DefaultPublishTopologyConfigure = new Action<IActiveMqMessagePublishTopologyConfigurator>(c =>
+                var activeMqOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitActiveMqOptions>();
+
+                PreConfigure<AbpMassTransitActiveMqOptions>(options =>
                 {
-                    c.AutoDelete = activeMqOptions.DefaultAutoDelete;
-                    c.Durable = activeMqOptions.DefaultDurable;
-                    c.Exclude = activeMqOptions.DefaultExclude;
+                    options.DefaultQueueNameFormatFunc = ActiveMqUtil.QueueNameFormat;
+
+                    options.DefaultPublishTopologyConfigure = new Action<IActiveMqMessagePublishTopologyConfigurator>(c =>
+                    {
+                        c.AutoDelete = activeMqOptions.DefaultAutoDelete;
+                        c.Durable = activeMqOptions.DefaultDurable;
+                        c.Exclude = activeMqOptions.DefaultExclude;
+                    });
+
+                    options.DefaultReceiveEndpointConfigure = new Action<string, IActiveMqReceiveEndpointConfigurator>((queueName, c) =>
+                    {
+                        //c.Bind(exchangeName);
+                        c.ConcurrentMessageLimit = activeMqOptions.DefaultConcurrentMessageLimit;
+                        c.PrefetchCount = activeMqOptions.DefaultPrefetchCount;
+                        c.AutoDelete = activeMqOptions.DefaultAutoDelete;
+                        c.Durable = activeMqOptions.DefaultDurable;
+                        //c.ExchangeType = rabbitMqOptions.DefaultExchangeType;
+                    });
+
+                    options.ActiveMqPostConfigures.Add(new Action<IBusRegistrationContext, IActiveMqBusFactoryConfigurator>((ctx, cfg) =>
+                    {
+                        cfg.ConfigureEndpoints(ctx);
+                    }));
                 });
-
-                options.DefaultReceiveEndpointConfigure = new Action<string, IActiveMqReceiveEndpointConfigurator>((queueName, c) =>
-                {
-                    //c.Bind(exchangeName);
-                    c.ConcurrentMessageLimit = activeMqOptions.DefaultConcurrentMessageLimit;
-                    c.PrefetchCount = activeMqOptions.DefaultPrefetchCount;
-                    c.AutoDelete = activeMqOptions.DefaultAutoDelete;
-                    c.Durable = activeMqOptions.DefaultDurable;
-                    //c.ExchangeType = rabbitMqOptions.DefaultExchangeType;
-                });
-
-                options.ActiveMqPostConfigures.Add(new Action<IBusRegistrationContext, IActiveMqBusFactoryConfigurator>((ctx, cfg) =>
-                {
-                    cfg.ConfigureEndpoints(ctx);
-                }));
-            });
+            }
             return Task.CompletedTask;
         }
 
@@ -61,10 +68,13 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            var massTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
-
-            if (massTransitOptions.Provider.Equals(MassTransitActiveMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            var configuration = context.Services.GetConfiguration();
+            var abpMassTransitOptions = configuration
+                .GetSection("MassTransitOptions")
+                .Get<AbpMassTransitOptions>();
+            if (abpMassTransitOptions.Provider.Equals(MassTransitActiveMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
+                var massTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
                 var activeMqOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitActiveMqOptions>();
 
                 context.Services.AddMassTransit(x =>
@@ -151,6 +161,7 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
                     });
                 });
             }
+
             return Task.CompletedTask;
         }
 
@@ -162,14 +173,22 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
 
         public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            Configure<AbpMassTransitActiveMqOptions>(options =>
+            var configuration = context.Services.GetConfiguration();
+            var abpMassTransitOptions = configuration
+                .GetSection("MassTransitOptions")
+                .Get<AbpMassTransitOptions>();
+            if (abpMassTransitOptions.Provider.Equals(MassTransitActiveMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
-                var actions = context.Services.GetPreConfigureActions<AbpMassTransitActiveMqOptions>();
-                foreach (var action in actions)
+                Configure<AbpMassTransitActiveMqOptions>(options =>
                 {
-                    action(options);
-                }
-            });
+                    var actions = context.Services.GetPreConfigureActions<AbpMassTransitActiveMqOptions>();
+                    foreach (var action in actions)
+                    {
+                        action(options);
+                    }
+                });
+            }
+             
             return Task.CompletedTask;
         }
     }

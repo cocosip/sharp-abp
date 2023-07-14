@@ -2,7 +2,7 @@
   <PropertyGroup>
 
     <!--Volo ABP packages-->
-    <VoloAbpPackageVersion>7.2.3</VoloAbpPackageVersion>
+    <VoloAbpPackageVersion>7.3.0</VoloAbpPackageVersion>
 
     <!-- All Microsoft EntityFrameworkCore packages -->
     <MicrosoftEntityFrameworkCorePackageVersion>7.0.1</MicrosoftEntityFrameworkCorePackageVersion>
@@ -32,13 +32,13 @@
     <MoqPackageVersion>4.18.4</MoqPackageVersion>
 
     <!-- xunit https://www.nuget.org/packages/xUnit -->
-    <xUnitPackageVersion>2.4.2</xUnitPackageVersion>
+    <xUnitPackageVersion>2.5.0</xUnitPackageVersion>
 
     <!-- xunit.extensibility.execution https://www.nuget.org/packages/xunit.extensibility.execution -->
     <xUnitExtensibilityExecutionPackageVersion>2.4.1</xUnitExtensibilityExecutionPackageVersion>
 
     <!-- xunit.runner.visualstudio https://www.nuget.org/packages/xunit.runner.visualstudio -->
-    <xUnitRunnerVisualstudioPackageVersion>2.4.5</xUnitRunnerVisualstudioPackageVersion>
+    <xUnitRunnerVisualstudioPackageVersion>2.5.0</xUnitRunnerVisualstudioPackageVersion>
 
     <!--coverlet.collector-->
     <CoverletCollectorPackageVersion>6.0.0</CoverletCollectorPackageVersion>

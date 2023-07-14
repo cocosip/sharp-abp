@@ -25,8 +25,6 @@ namespace SharpAbp.Abp.MassTransit
             return Task.CompletedTask;
         }
 
-
-
         public override void PostConfigureServices(ServiceConfigurationContext context)
         {
             AsyncHelper.RunSync(() => PostConfigureServicesAsync(context));

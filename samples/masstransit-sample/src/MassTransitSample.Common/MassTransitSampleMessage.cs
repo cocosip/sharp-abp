@@ -2,7 +2,7 @@
 
 namespace MassTransitSample.Common
 {
-    public class KafkaMessage
+    public class MassTransitSampleMessage
     {
         /// <summary>
         /// 消息Id
@@ -19,5 +19,4 @@ namespace MassTransitSample.Common
         /// </summary>
         public DateTime PublishTime { get; set; }
     }
-
 }

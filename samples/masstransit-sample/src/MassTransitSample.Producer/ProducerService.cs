@@ -1,6 +1,5 @@
 ﻿using MassTransitSample.Common;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using SharpAbp.Abp.MassTransit;
 using System;
 using System.Threading;
@@ -9,27 +8,22 @@ using Volo.Abp.DependencyInjection;
 using Volo.Abp.Threading;
 using Volo.Abp.Timing;
 
-namespace MassTransitSample.KafkaProducer
+namespace MassTransitSample.Producer
 {
-    public class KafkaProducerService : ISingletonDependency
+    public class ProducerService : ISingletonDependency
     {
         static int Sequence1 = 1;
         protected ILogger Logger { get; }
         protected ICancellationTokenProvider CancellationTokenProvider { get; }
         protected IClock Clock { get; }
         protected IMassTransitPublisher MassTransitPublisher { get; }
-
-        protected AbpMassTransitOptions Options { get; }
-        public KafkaProducerService(
-            ILogger<KafkaProducerService> logger,
-            IOptions<AbpMassTransitOptions> options,
+        public ProducerService(
+            ILogger<ProducerService> logger,
             ICancellationTokenProvider cancellationTokenProvider,
             IClock clock,
             IMassTransitPublisher massTransitPublisher)
         {
             Logger = logger;
-            Options = options.Value;
-
             CancellationTokenProvider = cancellationTokenProvider;
             Clock = clock;
             MassTransitPublisher = massTransitPublisher;
@@ -37,35 +31,37 @@ namespace MassTransitSample.KafkaProducer
 
         public virtual void Run()
         {
-            Task.Factory.StartNew(async () =>
+            for (var i = 0; i < 9; i++)
             {
-                while (!CancellationTokenProvider.Token.IsCancellationRequested)
+                Task.Factory.StartNew(async () =>
                 {
-                    try
+                    while (!CancellationTokenProvider.Token.IsCancellationRequested)
                     {
-                        await PublishAsync();
+                        try
+                        {
+                            await PublishAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogError(ex, "发送消息出错了,异常信息:{Message}", ex.Message);
+                        }
+                        await Task.Delay(5);
                     }
-                    catch (Exception ex)
-                    {
-                        Logger.LogError(ex, "发送消息出错了,异常信息:{Message}", ex.Message);
-                    }
-                    await Task.Delay(200);
-                }
 
-            }, TaskCreationOptions.LongRunning);
+                }, TaskCreationOptions.LongRunning);
+            }
         }
 
 
         public virtual async Task PublishAsync()
         {
             var sequence = Interlocked.Increment(ref Sequence1);
-            await MassTransitPublisher.PublishAsync<KafkaMessage>(new KafkaMessage()
+            await MassTransitPublisher.PublishAsync(new MassTransitSampleMessage()
             {
                 Sequence = sequence,
                 MessageId = Guid.NewGuid().ToString("D"),
                 PublishTime = Clock.Now
             });
         }
-
     }
 }
