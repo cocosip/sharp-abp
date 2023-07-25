@@ -112,7 +112,7 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
         {
             return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
-                .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+                .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name.Contains(name))
                 .WhereIf(isActive.HasValue, item => item.IsActive == isActive.Value)
                 .OrderBy(sorting ?? nameof(TenantGroup.Id))
                 .ToListAsync(GetCancellationToken(cancellationToken));
@@ -141,7 +141,7 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
         {
             return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
-                .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+                .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name.Contains(name))
                 .WhereIf(isActive.HasValue, item => item.IsActive == isActive.Value)
                 .OrderBy(sorting ?? nameof(TenantGroup.Id))
                 .Skip(skipCount)
@@ -162,7 +162,7 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
-                .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+                .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name.Contains(name))
                 .WhereIf(isActive.HasValue, item => item.IsActive == isActive.Value)
                 .CountAsync(GetCancellationToken(cancellationToken));
         }
