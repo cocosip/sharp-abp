@@ -105,13 +105,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FileStoring.Ab
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.TenancyGrouping", "src\SharpAbp.Abp.TenancyGrouping\SharpAbp.Abp.TenancyGrouping.csproj", "{50AF3958-8128-42E7-8A3A-73FC82F50ADC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Binary.Abstractions", "src\SharpAbp.Abp.Binary.Abstractions\SharpAbp.Abp.Binary.Abstractions.csproj", "{C5D1FF6D-0887-4282-8B67-09E10CD0CDFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Binary.Abstractions", "src\SharpAbp.Abp.Binary.Abstractions\SharpAbp.Abp.Binary.Abstractions.csproj", "{C5D1FF6D-0887-4282-8B67-09E10CD0CDFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Binary.Protobuf", "src\SharpAbp.Abp.Binary.Protobuf\SharpAbp.Abp.Binary.Protobuf.csproj", "{A399F72E-CD67-4D0A-8631-233AE92A8A94}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Binary.Protobuf", "src\SharpAbp.Abp.Binary.Protobuf\SharpAbp.Abp.Binary.Protobuf.csproj", "{A399F72E-CD67-4D0A-8631-233AE92A8A94}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Binary", "src\SharpAbp.Abp.Binary\SharpAbp.Abp.Binary.csproj", "{0C12F8A7-D0D0-4912-A735-E8E03B51D3A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Binary", "src\SharpAbp.Abp.Binary\SharpAbp.Abp.Binary.csproj", "{0C12F8A7-D0D0-4912-A735-E8E03B51D3A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Binary.Tests", "test\SharpAbp.Abp.Binary.Tests\SharpAbp.Abp.Binary.Tests.csproj", "{1FB2E699-5019-4637-89ED-DD0C16B4CE8D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Binary.Tests", "test\SharpAbp.Abp.Binary.Tests\SharpAbp.Abp.Binary.Tests.csproj", "{1FB2E699-5019-4637-89ED-DD0C16B4CE8D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
