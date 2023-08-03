@@ -25,7 +25,7 @@ namespace SharpAbp.Abp.FileStoring
         {
             ContainerName = Check.NotNullOrWhiteSpace(containerName, nameof(containerName));
             Configuration = Check.NotNull(configuration, nameof(configuration));
-            FileId = fileId;
+            FileId = Check.NotNullOrWhiteSpace(fileId, nameof(fileId));
             CancellationToken = cancellationToken;
         }
     }
