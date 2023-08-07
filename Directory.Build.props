@@ -2,7 +2,7 @@
   <PropertyGroup>
 
     <!--Volo ABP packages-->
-    <VoloAbpPackageVersion>7.3.1</VoloAbpPackageVersion>
+    <VoloAbpPackageVersion>7.3.2</VoloAbpPackageVersion>
 
     <!-- All Microsoft EntityFrameworkCore packages -->
     <MicrosoftEntityFrameworkCorePackageVersion>7.0.1</MicrosoftEntityFrameworkCorePackageVersion>
@@ -14,7 +14,7 @@
     <MicrosoftPackageVersion>7.0.*</MicrosoftPackageVersion>
 
     <!-- Microsoft.NET.Test.Sdk https://www.nuget.org/packages/Microsoft.NET.Test.Sdk -->
-    <MicrosoftNETTestSdkPackageVersion>17.6.3</MicrosoftNETTestSdkPackageVersion>
+    <MicrosoftNETTestSdkPackageVersion>17.7.0</MicrosoftNETTestSdkPackageVersion>
 
     <!--System.ComponentModel.Annotations-->
     <SystemComponentModelAnnotationsPackageVersion>6.0.0-preview.4.21253.7</SystemComponentModelAnnotationsPackageVersion>
