@@ -52,8 +52,8 @@ namespace SharpAbp.Abp.AuditLogging
 
             var auditLogs = await AuditLogRepository.GetListAsync(
                 input.Sorting,
-                input.MaxResultCount,
                 input.SkipCount,
+                input.MaxResultCount,
                 input.StartTime,
                 input.EndTime,
                 input.HttpMethod,
