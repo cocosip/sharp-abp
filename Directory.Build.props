@@ -29,7 +29,7 @@
     <PollyPackageVersion>7.2.3</PollyPackageVersion>
 
     <!-- Moq package-->
-    <MoqPackageVersion>4.20.2</MoqPackageVersion>
+    <MoqPackageVersion>4.20.69</MoqPackageVersion>
 
     <!-- xunit https://www.nuget.org/packages/xUnit -->
     <xUnitPackageVersion>2.5.0</xUnitPackageVersion>
