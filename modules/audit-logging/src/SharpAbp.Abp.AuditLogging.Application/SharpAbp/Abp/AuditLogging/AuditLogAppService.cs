@@ -91,8 +91,8 @@ namespace SharpAbp.Abp.AuditLogging
 
             var entityChanges = await AuditLogRepository.GetEntityChangeListAsync(
                 input.Sorting,
-                input.SkipCount,
                 input.MaxResultCount,
+                input.SkipCount,
                 input.AuditLogId,
                 input.StartTime,
                 input.EndTime,
