@@ -21,7 +21,7 @@ namespace SharpAbp.Abp.SM
 
             Configure<AbpSm4EncryptionOptions>(options =>
             {
-                options.DefaultIV = Encoding.UTF8.GetBytes("1234567890abcdef");
+                options.DefaultIv = Encoding.UTF8.GetBytes("1234567890abcdef");
                 options.DefaultMode = Sm4EncryptionNames.ModeECB;
                 options.DefaultPadding = Sm4EncryptionNames.NoPadding;
             });

@@ -22,10 +22,10 @@ namespace SharpAbp.Abp.SM
         {
             var keyPair = sm2EncryptionService.GenerateKeyPair(curve, rd);
             var aPub = ((ECPublicKeyParameters)keyPair.Public).Q.GetEncoded();
-            var aPriv = ((ECPrivateKeyParameters)keyPair.Private).D.ToByteArray();
+            var aPrivy = ((ECPrivateKeyParameters)keyPair.Private).D.ToByteArray();
 
             var publicKey = Hex.ToHexString(aPub);
-            var privateKey = Hex.ToHexString(aPriv);
+            var privateKey = Hex.ToHexString(aPrivy);
             return (publicKey, privateKey);
         }
 
@@ -71,9 +71,9 @@ namespace SharpAbp.Abp.SM
             string curve = Sm2EncryptionNames.CurveSm2p256v1,
             Mode mode = Mode.C1C2C3)
         {
-            var aPriv = Hex.DecodeStrict(privateKey.ToLower());
+            var aPrivy = Hex.DecodeStrict(privateKey.ToLower());
             var buffer = Hex.DecodeStrict(cipherText);
-            var v = sm2EncryptionService.Decrypt(aPriv, buffer, curve, mode);
+            var v = sm2EncryptionService.Decrypt(aPrivy, buffer, curve, mode);
             return Encoding.GetEncoding(codeName).GetString(v);
         }
 
@@ -95,9 +95,9 @@ namespace SharpAbp.Abp.SM
             string curve = Sm2EncryptionNames.CurveSm2p256v1,
             byte[] id = null)
         {
-            var aPriv = Hex.Decode(Encoding.Default.GetBytes(privateKey));
+            var aPrivy = Hex.Decode(Encoding.Default.GetBytes(privateKey));
             var buffer = Encoding.GetEncoding(codeName).GetBytes(plainText);
-            var v = sm2EncryptionService.Sign(aPriv, buffer, curve, id);
+            var v = sm2EncryptionService.Sign(aPrivy, buffer, curve, id);
             return Hex.ToHexString(v);
         }
 

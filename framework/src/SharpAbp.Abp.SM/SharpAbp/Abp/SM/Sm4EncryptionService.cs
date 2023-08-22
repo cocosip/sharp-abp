@@ -9,7 +9,6 @@ namespace SharpAbp.Abp.SM
     public class Sm4EncryptionService : ISm4EncryptionService, ITransientDependency
     {
         protected AbpSm4EncryptionOptions Options { get; }
-
         public Sm4EncryptionService(IOptions<AbpSm4EncryptionOptions> options)
         {
             Options = options.Value;
@@ -41,7 +40,7 @@ namespace SharpAbp.Abp.SM
             //CBC模式下,iv不为空
             if (mode.Equals(Sm4EncryptionNames.ModeCBC, StringComparison.OrdinalIgnoreCase))
             {
-                iv ??= Options.DefaultIV;
+                iv ??= Options.DefaultIv;
 
                 if (iv.Length != 16)
                 {
@@ -92,7 +91,7 @@ namespace SharpAbp.Abp.SM
             //CBC模式下,iv不为空
             if (mode.Equals(Sm4EncryptionNames.ModeCBC, StringComparison.OrdinalIgnoreCase))
             {
-                iv ??= Options.DefaultIV;
+                iv ??= Options.DefaultIv;
 
                 if (iv.Length != 16)
                 {

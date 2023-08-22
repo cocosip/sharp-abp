@@ -28,7 +28,9 @@ namespace SharpAbp.Abp.SM
         /// <param name="curve">曲率名称,默认使用:Sm2p256v1</param>
         /// <param name="rd">随机数</param>
         /// <returns></returns>
-        public virtual AsymmetricCipherKeyPair GenerateKeyPair(string curve = Sm2EncryptionNames.CurveSm2p256v1, SecureRandom rd = null)
+        public virtual AsymmetricCipherKeyPair GenerateKeyPair(
+            string curve = Sm2EncryptionNames.CurveSm2p256v1,
+            SecureRandom rd = null)
         {
             rd ??= new SecureRandom();
             if (curve.IsNullOrWhiteSpace())
@@ -49,7 +51,11 @@ namespace SharpAbp.Abp.SM
         /// <param name="curve">曲率名称</param>
         /// <param name="mode">加密模式,默认使用:C1C2C3</param>
         /// <returns></returns>
-        public virtual byte[] Encrypt(byte[] publicKey, byte[] plainText, string curve = Sm2EncryptionNames.CurveSm2p256v1, Mode mode = Mode.C1C2C3)
+        public virtual byte[] Encrypt(
+            byte[] publicKey,
+            byte[] plainText,
+            string curve = Sm2EncryptionNames.CurveSm2p256v1,
+            Mode mode = Mode.C1C2C3)
         {
             if (curve.IsNullOrWhiteSpace())
             {
@@ -57,8 +63,8 @@ namespace SharpAbp.Abp.SM
             }
 
             var engine = new SM2Engine(mode);
-            var x9ec = GMNamedCurves.GetByName(curve);
-            var p = new ECPublicKeyParameters(x9ec.Curve.DecodePoint(publicKey), new ECDomainParameters(x9ec));
+            var x9Ec = GMNamedCurves.GetByName(curve);
+            var p = new ECPublicKeyParameters(x9Ec.Curve.DecodePoint(publicKey), new ECDomainParameters(x9Ec));
             engine.Init(true, new ParametersWithRandom(p));
             var v = engine.ProcessBlock(plainText, 0, plainText.Length);
             return v;
@@ -72,7 +78,11 @@ namespace SharpAbp.Abp.SM
         /// <param name="curve">曲率名称</param>
         /// <param name="mode">加密模式</param>
         /// <returns></returns>
-        public virtual byte[] Decrypt(byte[] privateKey, byte[] cipherText, string curve = Sm2EncryptionNames.CurveSm2p256v1, Mode mode = Mode.C1C2C3)
+        public virtual byte[] Decrypt(
+            byte[] privateKey,
+            byte[] cipherText,
+            string curve = Sm2EncryptionNames.CurveSm2p256v1,
+            Mode mode = Mode.C1C2C3)
         {
             if (curve.IsNullOrWhiteSpace())
             {
@@ -80,8 +90,8 @@ namespace SharpAbp.Abp.SM
             }
 
             var engine = new SM2Engine(mode);
-            var x9ec = GMNamedCurves.GetByName(curve);
-            var p = new ECPrivateKeyParameters(new BigInteger(privateKey), new ECDomainParameters(x9ec));
+            var x9Ec = GMNamedCurves.GetByName(curve);
+            var p = new ECPrivateKeyParameters(new BigInteger(privateKey), new ECDomainParameters(x9Ec));
             engine.Init(false, p);
 
             var v = engine.ProcessBlock(cipherText, 0, cipherText.Length);
@@ -96,18 +106,24 @@ namespace SharpAbp.Abp.SM
         /// <param name="curve">曲率名称</param>
         /// <param name="id">id</param>
         /// <returns></returns>
-        public virtual byte[] Sign(byte[] privateKey, byte[] plainText, string curve = Sm2EncryptionNames.CurveSm2p256v1, byte[] id = null)
+        public virtual byte[] Sign(
+            byte[] privateKey, 
+            byte[] plainText,
+            string curve = Sm2EncryptionNames.CurveSm2p256v1, 
+            byte[] id = null)
         {
             if (curve.IsNullOrWhiteSpace())
             {
                 curve = Options.DefaultCurve;
             }
 
-            var x9ec = GMNamedCurves.GetByName(curve);
-            var p = new ECPrivateKeyParameters(new BigInteger(privateKey), new ECDomainParameters(x9ec));
+            var x9Ec = GMNamedCurves.GetByName(curve);
+            var p = new ECPrivateKeyParameters(new BigInteger(privateKey), new ECDomainParameters(x9Ec));
 
             var signer = new SM2Signer();
-            ICipherParameters cp = id != null ? new ParametersWithID(new ParametersWithRandom(p), id) : new ParametersWithRandom(p);
+            ICipherParameters cp = id != null
+                ? new ParametersWithID(new ParametersWithRandom(p), id)
+                : new ParametersWithRandom(p);
 
             signer.Init(true, cp);
             signer.BlockUpdate(plainText, 0, plainText.Length);
@@ -123,17 +139,25 @@ namespace SharpAbp.Abp.SM
         /// <param name="curve">曲率名称</param>
         /// <param name="id">id</param>
         /// <returns></returns>
-        public virtual bool VerifySign(byte[] publicKey, byte[] plainText, byte[] signature, string curve = Sm2EncryptionNames.CurveSm2p256v1, byte[] id = null)
+        public virtual bool VerifySign(
+            byte[] publicKey, 
+            byte[] plainText, 
+            byte[] signature,
+            string curve = Sm2EncryptionNames.CurveSm2p256v1,
+            byte[] id = null)
         {
             if (curve.IsNullOrWhiteSpace())
             {
                 curve = Options.DefaultCurve;
             }
-            var x9ec = GMNamedCurves.GetByName(curve);
-            var p = new ECPublicKeyParameters(x9ec.Curve.DecodePoint(publicKey), new ECDomainParameters(x9ec));
+
+            var x9Ec = GMNamedCurves.GetByName(curve);
+            var p = new ECPublicKeyParameters(x9Ec.Curve.DecodePoint(publicKey), new ECDomainParameters(x9Ec));
             var signer = new SM2Signer();
 
-            ICipherParameters cp = id != null ? new ParametersWithID(new ParametersWithRandom(p), id) : new ParametersWithRandom(p);
+            ICipherParameters cp = id != null
+                ? new ParametersWithID(new ParametersWithRandom(p), id)
+                : p;
             signer.Init(false, cp);
             signer.BlockUpdate(plainText, 0, plainText.Length);
             return signer.VerifySignature(signature);
@@ -145,14 +169,17 @@ namespace SharpAbp.Abp.SM
         /// <param name="c1c2c3">C1C2C3</param>
         /// <param name="curve">曲率名称</param>
         /// <returns></returns>
-        public virtual byte[] C123ToC132(byte[] c1c2c3, string curve = Sm2EncryptionNames.CurveSm2p256v1)
+        public virtual byte[] C123ToC132(
+            byte[] c1c2c3,
+            string curve = Sm2EncryptionNames.CurveSm2p256v1)
         {
             if (curve.IsNullOrWhiteSpace())
             {
                 curve = Options.DefaultCurve;
             }
-            var x9ec = GMNamedCurves.GetByName(curve);
-            var c1Len = (x9ec.Curve.FieldSize + 7) / 8 * 2 + 1;
+
+            var x9Ec = GMNamedCurves.GetByName(curve);
+            var c1Len = (x9Ec.Curve.FieldSize + 7) / 8 * 2 + 1;
             var c3Len = 32;
             var result = new byte[c1c2c3.Length];
             Array.Copy(c1c2c3, 0, result, 0, c1Len);
@@ -173,8 +200,9 @@ namespace SharpAbp.Abp.SM
             {
                 curve = Options.DefaultCurve;
             }
-            var x9ec = GMNamedCurves.GetByName(curve);
-            var c1Len = (x9ec.Curve.FieldSize + 7) / 8 * 2 + 1;
+
+            var x9Ec = GMNamedCurves.GetByName(curve);
+            var c1Len = (x9Ec.Curve.FieldSize + 7) / 8 * 2 + 1;
             var c3Len = 32;
             var result = new byte[c1c3c2.Length];
             Array.Copy(c1c3c2, 0, result, 0, c1Len);
