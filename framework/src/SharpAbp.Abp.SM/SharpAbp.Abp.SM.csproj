@@ -1,26 +1,23 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<Import Project="..\..\..\common.props" />
 	<Import Project="..\..\..\configureawait.props" />
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netstandard2.1;net7.0</TargetFrameworks>
-		<AssemblyName>SharpAbp.Abp.MassTransit.RabbitMQ</AssemblyName>
-		<PackageId>SharpAbp.Abp.MassTransit.RabbitMQ</PackageId>
+		<AssemblyName>SharpAbp.Abp.SM</AssemblyName>
+		<PackageId>SharpAbp.Abp.SM</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
 		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-		<Description>SharpAbp MassTransit Module</Description>
+		<Description>SharpAbp SM Module(SM2,SM3,SM4)</Description>
 		<RootNamespace />
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="MassTransit.RabbitMQ" Version="8.1.0" />
+		<PackageReference Include="BouncyCastle.Cryptography" Version="2.2.1" />
+		<PackageReference Include="Volo.Abp" Version="$(VoloAbpPackageVersion)" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\SharpAbp.Abp.MassTransit\SharpAbp.Abp.MassTransit.csproj" />
-	</ItemGroup>
- 
 </Project>

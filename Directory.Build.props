@@ -14,7 +14,7 @@
     <MicrosoftPackageVersion>7.0.*</MicrosoftPackageVersion>
 
     <!-- Microsoft.NET.Test.Sdk https://www.nuget.org/packages/Microsoft.NET.Test.Sdk -->
-    <MicrosoftNETTestSdkPackageVersion>17.7.0</MicrosoftNETTestSdkPackageVersion>
+    <MicrosoftNETTestSdkPackageVersion>17.7.1</MicrosoftNETTestSdkPackageVersion>
 
     <!--System.ComponentModel.Annotations-->
     <SystemComponentModelAnnotationsPackageVersion>6.0.0-preview.4.21253.7</SystemComponentModelAnnotationsPackageVersion>
