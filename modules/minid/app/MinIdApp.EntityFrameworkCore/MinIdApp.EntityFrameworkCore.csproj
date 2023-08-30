@@ -3,7 +3,7 @@
 	<Import Project="..\..\..\..\common.props" />
 
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>$(NetCoreFx)</TargetFramework>
 		<RootNamespace>MinIdApp</RootNamespace>
 		<IsPackable>false</IsPackable>
 	</PropertyGroup>

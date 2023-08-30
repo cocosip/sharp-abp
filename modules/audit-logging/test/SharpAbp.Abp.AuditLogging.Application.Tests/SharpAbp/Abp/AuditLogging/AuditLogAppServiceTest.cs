@@ -20,8 +20,8 @@ namespace SharpAbp.Abp.AuditLogging
 
            var auditLogs = await _auditLogAppService.GetPagedListAsync(new AuditLogPagedRequestDto());
 
-           Assert.Equal(1, auditLogs.TotalCount);
-           Assert.Equal(1, auditLogs.Items.Count);
+           Assert.Single(1, auditLogs.TotalCount);
+           Assert.Single(1, auditLogs.Items.Count);
 
         //    var auditLogId = auditLogs.Items.FirstOrDefault().Id;
         //    var auditLog = await _auditLogAppService.GetAsync(auditLogId);

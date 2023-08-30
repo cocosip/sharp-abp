@@ -1,6 +1,12 @@
 <Project>
   <PropertyGroup>
 
+    <!--Project Frameworks-->
+    <ProjectFrameworks>netstandard2.0;netstandard2.1;$(NetCoreFx)</ProjectFrameworks>
+
+    <!--Net Core Framework-->
+    <NetCoreFx>net7.0</NetCoreFx>
+
     <!--Volo ABP packages-->
     <VoloAbpPackageVersion>7.3.2</VoloAbpPackageVersion>
 
@@ -14,7 +20,7 @@
     <MicrosoftPackageVersion>7.0.*</MicrosoftPackageVersion>
 
     <!-- Microsoft.NET.Test.Sdk https://www.nuget.org/packages/Microsoft.NET.Test.Sdk -->
-    <MicrosoftNETTestSdkPackageVersion>17.7.1</MicrosoftNETTestSdkPackageVersion>
+    <MicrosoftNETTestSdkPackageVersion>17.7.2</MicrosoftNETTestSdkPackageVersion>
 
     <!--System.ComponentModel.Annotations-->
     <SystemComponentModelAnnotationsPackageVersion>6.0.0-preview.4.21253.7</SystemComponentModelAnnotationsPackageVersion>
@@ -34,7 +40,7 @@
     <!-- xunit https://www.nuget.org/packages/xUnit -->
     <xUnitPackageVersion>2.5.0</xUnitPackageVersion>
 
-     <!-- xunit.extensibility.execution https://www.nuget.org/packages/xunit.extensibility.execution -->
+    <!-- xunit.extensibility.execution https://www.nuget.org/packages/xunit.extensibility.execution -->
     <xUnitExtensibilityExecutionPackageVersion>2.5.0</xUnitExtensibilityExecutionPackageVersion>
 
     <!-- xunit.runner.visualstudio https://www.nuget.org/packages/xunit.runner.visualstudio -->

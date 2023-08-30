@@ -4,7 +4,7 @@
 	<Import Project="..\..\..\configureawait.props" />
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;netstandard2.1;net7.0</TargetFrameworks>
+		<TargetFrameworks>$(ProjectFrameworks)</TargetFrameworks>
 		<AssemblyName>SharpAbp.Abp.FileStoring.S3</AssemblyName>
 		<PackageId>SharpAbp.Abp.FileStoring.S3</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
@@ -20,7 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AWSSDK.S3" Version="3.7.202.1" />
+		<PackageReference Include="AWSSDK.S3" Version="3.7.203.2" />
 		<PackageReference Include="Volo.Abp.Timing" Version="$(VoloAbpPackageVersion)" />
 	</ItemGroup>
 

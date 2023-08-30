@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using MassTransit.KafkaIntegration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -45,19 +46,38 @@ namespace SharpAbp.Abp.MassTransit.Kafka
                     options.DefaultReceiveEndpointConfigure = new Action<IKafkaTopicReceiveEndpointConfigurator>(c =>
                     {
                         c.ConcurrentMessageLimit = kafkaOptions.DefaultConcurrentMessageLimit;
-                        c.MaxPollInterval = TimeSpan.FromMilliseconds(kafkaOptions.DefaultMaxPollInterval);
-                        c.SessionTimeout = TimeSpan.FromSeconds(kafkaOptions.DefaultSessionTimeout);
+                        c.MessageLimit = kafkaOptions.DefaultMessageLimit;
+                        c.PrefetchCount = kafkaOptions.DefaultPrefetchCount;
+                        c.MaxPollInterval = kafkaOptions.DefaultMaxPollInterval;
+                        c.SessionTimeout = kafkaOptions.DefaultSessionTimeout;
+                        c.CheckpointInterval = kafkaOptions.DefaultCheckpointInterval;
+                        c.CheckpointMessageCount = kafkaOptions.DefaultCheckpointMessageCount;
                         c.EnableAutoOffsetStore = kafkaOptions.DefaultEnableAutoOffsetStore;
+                        c.ConcurrentConsumerLimit = kafkaOptions.DefaultConcurrentConsumerLimit;
                         c.AutoOffsetReset = kafkaOptions.DefaultAutoOffsetReset;
+                        c.HeartbeatInterval = kafkaOptions.DefaultHeartbeatInterval;
+
+                        if (options.AutoCreateTopic)
+                        {
+                            c.CreateIfMissing(new Action<KafkaTopicOptions>(o =>
+                            {
+                                o.NumPartitions = options.DefaultNumPartitions;
+                                o.ReplicationFactor = options.DefaultReplicationFactor;
+                            }));
+                        }
                     });
 
-                    //Kafka keep alive
+                    //Kafka default configure
                     options.KafkaConfigures.Add(new Action<IRiderRegistrationContext, IKafkaFactoryConfigurator>((ctx, k) =>
                     {
-                        k.ConfigureSocket(s =>
+                        //ClientId
+                        if (!options.DefaultClientId.IsNullOrWhiteSpace())
                         {
-                            s.KeepaliveEnable = true;
-                        });
+                            k.ClientId = options.DefaultClientId;
+                        }
+
+                        k.ReconnectBackoff = options.DefaultReconnectBackoff;
+                        k.ReconnectBackoffMax = options.DefaultReconnectBackoffMax;
                     }));
 
                 });
@@ -119,7 +139,7 @@ namespace SharpAbp.Abp.MassTransit.Kafka
 
                         rider.UsingKafka((ctx, k) =>
                         {
-                            //Kafka preConfigure
+
                             foreach (var preConfigure in kafkaOptions.KafkaPreConfigures)
                             {
                                 preConfigure(ctx, k);
@@ -127,7 +147,7 @@ namespace SharpAbp.Abp.MassTransit.Kafka
 
                             k.Host(kafkaOptions.Server, c =>
                             {
-                                if (kafkaOptions.UseSsl && kafkaOptions.ConfigureSsl != null)
+                                if (kafkaOptions.UseSSL && kafkaOptions.ConfigureSsl != null)
                                 {
                                     c.UseSsl(kafkaOptions.ConfigureSsl);
                                 }
@@ -147,10 +167,8 @@ namespace SharpAbp.Abp.MassTransit.Kafka
                                 kafkaOptions.DefaultGroupId : consumer.GroupId;
 
                                 var receiveEndpointConfigure = consumer.ReceiveEndpointConfigure ?? kafkaOptions.DefaultReceiveEndpointConfigure;
-
                                 consumer.TopicEndpointConfigure?.Invoke(topic, groupId, receiveEndpointConfigure, ctx, k);
                             }
-
 
                             //Kafka postConfigure
                             foreach (var postConfigure in kafkaOptions.KafkaPostConfigures)

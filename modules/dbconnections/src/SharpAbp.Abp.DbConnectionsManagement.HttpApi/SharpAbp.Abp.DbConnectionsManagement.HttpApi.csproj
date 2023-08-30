@@ -4,7 +4,7 @@
 	<Import Project="..\..\..\..\configureawait.props" />
 
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>$(NetCoreFx)</TargetFramework>
 		<AssemblyName>SharpAbp.Abp.DbConnectionsManagement.HttpApi</AssemblyName>
 		<PackageId>SharpAbp.Abp.DbConnectionsManagement.HttpApi</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
