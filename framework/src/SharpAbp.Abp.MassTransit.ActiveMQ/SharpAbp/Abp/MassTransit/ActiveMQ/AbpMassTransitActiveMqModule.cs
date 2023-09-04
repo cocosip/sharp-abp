@@ -107,7 +107,7 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
                             h.Username(activeMqOptions.Username);
                             h.Password(activeMqOptions.Password);
 
-                            if (activeMqOptions.UseSsl)
+                            if (activeMqOptions.UseSSL)
                             {
                                 h.UseSsl();
                             }

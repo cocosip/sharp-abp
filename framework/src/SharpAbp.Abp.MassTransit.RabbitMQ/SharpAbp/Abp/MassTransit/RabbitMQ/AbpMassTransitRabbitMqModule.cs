@@ -108,7 +108,7 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
                             h.Username(rabbitMqOptions.Username);
                             h.Password(rabbitMqOptions.Password);
                             //SSL
-                            if (rabbitMqOptions.UseSsl && rabbitMqOptions.ConfigureSsl != null)
+                            if (rabbitMqOptions.UseSSL && rabbitMqOptions.ConfigureSsl != null)
                             {
                                 h.UseSsl(rabbitMqOptions.ConfigureSsl);
                             }

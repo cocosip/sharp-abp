@@ -11,7 +11,7 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
         public ushort Port { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        public bool UseSsl { get; set; }
+        public bool UseSSL { get; set; }
 
         public int DefaultConcurrentMessageLimit { get; set; } = 1;
         public int DefaultPrefetchCount { get; set; } = 4;
@@ -55,7 +55,7 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
                 Port = massTransitRabbitMqOptions.Port;
                 Username = massTransitRabbitMqOptions.Username;
                 Password = massTransitRabbitMqOptions.Password;
-                UseSsl = massTransitRabbitMqOptions.UseSsl;
+                UseSSL = massTransitRabbitMqOptions.UseSSL;
 
                 DefaultConcurrentMessageLimit = massTransitRabbitMqOptions.DefaultConcurrentMessageLimit;
                 DefaultPrefetchCount = massTransitRabbitMqOptions.DefaultPrefetchCount;
