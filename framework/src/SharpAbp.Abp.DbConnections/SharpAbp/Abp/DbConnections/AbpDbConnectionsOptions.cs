@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using SharpAbp.Abp.Data;
 using System.Collections.Generic;
 using Volo.Abp.Collections;
 

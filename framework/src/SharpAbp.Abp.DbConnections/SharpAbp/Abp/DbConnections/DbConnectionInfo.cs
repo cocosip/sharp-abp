@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SharpAbp.Abp.Data;
+using System;
 
 namespace SharpAbp.Abp.DbConnections
 {

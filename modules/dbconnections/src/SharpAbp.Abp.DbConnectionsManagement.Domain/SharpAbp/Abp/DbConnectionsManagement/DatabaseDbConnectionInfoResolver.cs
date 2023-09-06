@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SharpAbp.Abp.Data;
 using SharpAbp.Abp.DbConnections;
 using System;
 using System.Threading.Tasks;

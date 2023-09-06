@@ -1,4 +1,4 @@
-﻿namespace SharpAbp.Abp.DbConnections
+﻿namespace SharpAbp.Abp.Data
 {
     public enum DatabaseProvider
     {

@@ -19,9 +19,6 @@
 		<PackageReference Include="FreeSql" Version="3.2.700" />
 		<PackageReference Include="Volo.Abp.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\SharpAbp.Abp.MassTransit\SharpAbp.Abp.MassTransit.csproj" />
-	</ItemGroup>
+ 
 
 </Project>

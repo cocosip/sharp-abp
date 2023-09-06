@@ -1,4 +1,5 @@
 ﻿using Devart.Data.Oracle;
+using SharpAbp.Abp.Data;
 using System.Data;
 using Volo.Abp.DependencyInjection;
 

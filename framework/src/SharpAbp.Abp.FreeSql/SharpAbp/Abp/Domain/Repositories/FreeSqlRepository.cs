@@ -10,15 +10,16 @@ namespace SharpAbp.Abp.Domain.Repositories
     public class FreeSqlRepository<TDbContext> : IFreeSqlRepository, IUnitOfWorkEnabled
           where TDbContext : IEfCoreDbContext
     {
-        private readonly IDbContextProvider<TDbContext> _dbContextProvider;
+
+        protected IDbContextProvider<TDbContext> DbContextProvider { get; }
 
         public FreeSqlRepository(IDbContextProvider<TDbContext> dbContextProvider)
         {
-            _dbContextProvider = dbContextProvider;
+            DbContextProvider = dbContextProvider;
         }
 
-        public async Task<IDbConnection> GetDbConnectionAsync() => (await _dbContextProvider.GetDbContextAsync()).Database.GetDbConnection();
+        public virtual async Task<IDbConnection> GetDbConnectionAsync() => (await DbContextProvider.GetDbContextAsync()).Database.GetDbConnection();
 
-        public async Task<IDbTransaction> GetDbTransactionAsync() => (await _dbContextProvider.GetDbContextAsync()).Database.CurrentTransaction?.GetDbTransaction();
+        public virtual async Task<IDbTransaction> GetDbTransactionAsync() => (await DbContextProvider.GetDbContextAsync()).Database.CurrentTransaction?.GetDbTransaction();
     }
 }

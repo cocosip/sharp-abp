@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using SharpAbp.Abp.Data;
 using SharpAbp.Abp.DbConnections;
 using System;
 using System.Collections.Generic;

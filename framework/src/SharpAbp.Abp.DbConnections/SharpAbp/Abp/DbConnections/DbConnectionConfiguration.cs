@@ -1,4 +1,6 @@
-﻿namespace SharpAbp.Abp.DbConnections
+﻿using SharpAbp.Abp.Data;
+
+namespace SharpAbp.Abp.DbConnections
 {
     public class DbConnectionConfiguration
     {

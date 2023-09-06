@@ -1,4 +1,5 @@
 ﻿using Oracle.ManagedDataAccess.Client;
+using SharpAbp.Abp.Data;
 using System.Data;
 using Volo.Abp.DependencyInjection;
 

@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using SharpAbp.Abp.Data;
 using System;
 using System.Collections.Generic;
 using Volo.Abp;

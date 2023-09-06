@@ -1,4 +1,5 @@
-﻿using SharpAbp.Abp.DbConnections;
+﻿using SharpAbp.Abp.Data;
+using SharpAbp.Abp.DbConnections;
 using System.Threading.Tasks;
 using Xunit;
 
