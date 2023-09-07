@@ -41,16 +41,12 @@ namespace SharpAbp.MinId
             {
                 SegmentId segmentId = null;
 
+                using var uow = UnitOfWorkManager.Begin(true, true, IsolationLevel.ReadCommitted, timeout);
+
                 try
                 {
 
-                    using var uow = UnitOfWorkManager.Begin(true, true, IsolationLevel.ReadCommitted, timeout);
-
-                    var minIdInfo = await MinIdInfoRepository.FindByBizTypeAsync(bizType);
-                    if (minIdInfo == null)
-                    {
-                        throw new AbpException($"Can not find bizType '{bizType}'.");
-                    }
+                    var minIdInfo = await MinIdInfoRepository.FindByBizTypeAsync(bizType) ?? throw new AbpException($"Can not find bizType '{bizType}'.");
 
                     //New id
                     var newMaxId = minIdInfo.MaxId + minIdInfo.Step;
@@ -65,6 +61,7 @@ namespace SharpAbp.MinId
                 }
                 catch (AbpDbConcurrencyException ex)
                 {
+                    await uow?.RollbackAsync();
                     Logger.LogError(ex, "Get next segmentId conflict. {0}", ex.Message);
                     segmentId = null;
                 }
