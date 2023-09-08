@@ -1,24 +1,23 @@
-﻿using MassTransit;
-using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
 
-namespace SharpAbp.Abp.MassTransit
+namespace SharpAbp.Abp.OpenTelemetry
 {
-    public class AbpMassTransitModule : AbpModule
+    public class AbpOpenTelemetryAbstractionsModule : AbpModule
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
             AsyncHelper.RunSync(() => PreConfigureServicesAsync(context));
         }
 
+
         public override Task PreConfigureServicesAsync(ServiceConfigurationContext context)
         {
             var configuration = context.Services.GetConfiguration();
 
-            PreConfigure<AbpMassTransitOptions>(options =>
+            PreConfigure<AbpOpenTelemetryBuilderOptions>(options =>
             {
                 options.PreConfigure(configuration);
             });
@@ -32,24 +31,13 @@ namespace SharpAbp.Abp.MassTransit
 
         public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            var actions = context.Services.GetPreConfigureActions<AbpMassTransitOptions>();
-            Configure<AbpMassTransitOptions>(options =>
+            var actions = context.Services.GetPreConfigureActions<AbpOpenTelemetryBuilderOptions>();
+            Configure<AbpOpenTelemetryBuilderOptions>(options =>
             {
                 foreach (var action in actions)
                 {
                     action(options);
                 }
-            });
-
-            var massTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
-            var startTimeout = TimeSpan.FromMilliseconds(massTransitOptions.StartTimeoutMilliSeconds);
-            var stopTimeout = TimeSpan.FromMilliseconds(massTransitOptions.StopTimeoutMilliSeconds);
-
-            Configure<MassTransitHostOptions>(options =>
-            {
-                options.WaitUntilStarted = massTransitOptions.WaitUntilStarted;
-                options.StartTimeout = startTimeout;
-                options.StopTimeout = stopTimeout;
             });
             return Task.CompletedTask;
         }

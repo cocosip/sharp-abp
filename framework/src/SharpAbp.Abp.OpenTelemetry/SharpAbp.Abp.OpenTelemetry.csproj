@@ -4,23 +4,27 @@
 	<Import Project="..\..\..\configureawait.props" />
 
 	<PropertyGroup>
-		<TargetFramework>$(NetCoreFx)</TargetFramework>
-		<AssemblyName>SharpAbp.Abp.FreeSql.SqlServer</AssemblyName>
-		<PackageId>SharpAbp.Abp.FreeSql.SqlServer</PackageId>
+		<TargetFrameworks>$(ProjectFrameworks)</TargetFrameworks>
+		<AssemblyName>SharpAbp.Abp.OpenTelemetry</AssemblyName>
+		<PackageId>SharpAbp.Abp.OpenTelemetry</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
 		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-		<Description>SharpAbp FreeSql Module</Description>
+		<Description>SharpAbp OpenTelemetry Module</Description>
 		<RootNamespace />
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FreeSql.Provider.SqlServer" Version="3.2.800" />
+	  <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.6.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\SharpAbp.Abp.FreeSql\SharpAbp.Abp.FreeSql.csproj" />
+		<ProjectReference Include="..\SharpAbp.Abp.OpenTelemetry.Abstractions\SharpAbp.Abp.OpenTelemetry.Abstractions.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="SharpAbp\" />
 	</ItemGroup>
 
 </Project>
