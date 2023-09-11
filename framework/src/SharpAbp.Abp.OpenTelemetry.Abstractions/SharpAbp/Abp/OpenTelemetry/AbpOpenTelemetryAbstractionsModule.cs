@@ -12,7 +12,6 @@ namespace SharpAbp.Abp.OpenTelemetry
             AsyncHelper.RunSync(() => PreConfigureServicesAsync(context));
         }
 
-
         public override Task PreConfigureServicesAsync(ServiceConfigurationContext context)
         {
             var configuration = context.Services.GetConfiguration();
@@ -21,6 +20,7 @@ namespace SharpAbp.Abp.OpenTelemetry
             {
                 options.PreConfigure(configuration);
             });
+
             return Task.CompletedTask;
         }
 

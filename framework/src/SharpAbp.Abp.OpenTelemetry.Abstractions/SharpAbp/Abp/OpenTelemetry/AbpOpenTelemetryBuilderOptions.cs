@@ -6,7 +6,9 @@ namespace SharpAbp.Abp.OpenTelemetry
     {
         public bool IsEnabled { get; set; }
         public string ServiceName { get; set; }
+        public string ServiceNamespace { get; set; }
         public string ServiceVersion { get; set; }
+        public bool AutoGenerateServiceInstanceId { get; set; }
         public string ServiceInstanceId { get; set; }
 
         public AbpOpenTelemetryBuilderOptions PreConfigure(IConfiguration configuration)
@@ -19,7 +21,9 @@ namespace SharpAbp.Abp.OpenTelemetry
             {
                 IsEnabled = openTelemetryBuilderOptions.IsEnabled;
                 ServiceName = openTelemetryBuilderOptions.ServiceName;
+                ServiceNamespace = openTelemetryBuilderOptions.ServiceNamespace;
                 ServiceVersion = openTelemetryBuilderOptions.ServiceVersion;
+                AutoGenerateServiceInstanceId = openTelemetryBuilderOptions.AutoGenerateServiceInstanceId;
                 ServiceInstanceId = openTelemetryBuilderOptions.ServiceInstanceId;
             }
 
