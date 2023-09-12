@@ -37,6 +37,7 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
+
             var openTelemetryExporterPrometheusHttpListenerOptions = context.Services.ExecutePreConfiguredActions<AbpOpenTelemetryExporterPrometheusHttpListenerOptions>();
 
             PreConfigure<AbpOpenTelemetryOptions>(options =>

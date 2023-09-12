@@ -1,4 +1,6 @@
-﻿using OpenTelemetry;
+﻿using Microsoft.Extensions.Configuration;
+using OpenTelemetry;
+using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using System;
@@ -88,8 +90,24 @@ namespace SharpAbp.Abp.OpenTelemetry
         /// </summary>
         public List<Action<MeterProviderBuilder>> MetricsConfigures { get; set; }
 
+        /// <summary>
+        /// With logging
+        /// </summary>
+        public bool WithLogging { get; set; }
+
+        /// <summary>
+        /// Logging exporter
+        /// </summary>
+        public string UseLoggingExporter { get; set; }
+
+        /// <summary>
+        /// Logging exporter
+        /// </summary>
+        public Action<OpenTelemetryLoggerOptions> LoggingExporter { get; set; }
+
         public Dictionary<string, Action<TracerProviderBuilder>> TracingExporters { get; set; }
         public Dictionary<string, Action<MeterProviderBuilder>> MetricsExporters { get; set; }
+        public Dictionary<string, Action<OpenTelemetryLoggerOptions>> LoggingExporters { get; set; }
 
         public List<Action<OpenTelemetryBuilder>> OpenTelemetryBuilderPreConfigures { get; set; }
         public List<Action<OpenTelemetryBuilder>> OpenTelemetryBuilderPostConfigures { get; set; }
@@ -108,8 +126,33 @@ namespace SharpAbp.Abp.OpenTelemetry
             OpenTelemetryBuilderPreConfigures = new List<Action<OpenTelemetryBuilder>>();
             OpenTelemetryBuilderPostConfigures = new List<Action<OpenTelemetryBuilder>>();
 
+
             TracingExporters = new Dictionary<string, Action<TracerProviderBuilder>>();
             MetricsExporters = new Dictionary<string, Action<MeterProviderBuilder>>();
+            LoggingExporters = new Dictionary<string, Action<OpenTelemetryLoggerOptions>>();
         }
+
+
+        public AbpOpenTelemetryOptions PreConfigure(IConfiguration configuration)
+        {
+            var openTelemetryOptions = configuration
+                .GetSection("OpenTelemetryOptions")
+                .Get<AbpOpenTelemetryOptions>();
+
+            if (openTelemetryOptions != null)
+            {
+                WithTracing = openTelemetryOptions.WithTracing;
+                SourceNames = openTelemetryOptions.SourceNames;
+                OperationName = openTelemetryOptions.OperationName;
+                UseTracingExporter = openTelemetryOptions.UseTracingExporter;
+                WithMetrics = openTelemetryOptions.WithMetrics;
+                MeterNames = openTelemetryOptions.MeterNames;
+                UseMetricsExporter = openTelemetryOptions.UseMetricsExporter;
+                WithLogging = openTelemetryOptions.WithLogging;
+                UseLoggingExporter = openTelemetryOptions.UseLoggingExporter;
+            }
+            return this;
+        }
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -21,8 +22,13 @@ namespace SharpAbp.Abp.OpenTelemetry
 
         public override Task PreConfigureServicesAsync(ServiceConfigurationContext context)
         {
+            var configuration = context.Services.GetConfiguration();
+
             PreConfigure<AbpOpenTelemetryOptions>(options =>
             {
+                //read from configuration
+                options.PreConfigure(configuration);
+
                 options.SamplerConfigure = new Action<TracerProviderBuilder>(builder =>
                 {
                     builder.SetSampler(new AlwaysOnSampler());
@@ -35,7 +41,6 @@ namespace SharpAbp.Abp.OpenTelemetry
 #endif
                 });
             });
-
 
             return Task.CompletedTask;
         }
@@ -79,6 +84,20 @@ namespace SharpAbp.Abp.OpenTelemetry
                 }
             }
 
+            if (openTelemetryOptions.WithLogging)
+            {
+                foreach (var keyValuePair in openTelemetryOptions.LoggingExporters)
+                {
+                    if (openTelemetryOptions.UseLoggingExporter.Equals(keyValuePair.Key, StringComparison.OrdinalIgnoreCase))
+                    {
+                        PreConfigure<AbpOpenTelemetryOptions>(options =>
+                        {
+                            options.LoggingExporter = keyValuePair.Value;
+                        });
+                        break;
+                    }
+                }
+            }
             return Task.CompletedTask;
         }
 
@@ -182,7 +201,7 @@ namespace SharpAbp.Abp.OpenTelemetry
                         }
 
                         //view
-                        foreach(var viewConfigure in openTelemetryOptions.MetricsViewConfigures)
+                        foreach (var viewConfigure in openTelemetryOptions.MetricsViewConfigures)
                         {
                             viewConfigure?.Invoke(builder);
                         }
@@ -196,6 +215,28 @@ namespace SharpAbp.Abp.OpenTelemetry
                             configure?.Invoke(builder);
                         }
                     });
+                }
+
+                if (openTelemetryOptions.WithLogging)
+                {
+                    context.Services.AddLogging(builder =>
+                    {
+                        if (openTelemetryOptions.LoggingExporter != null)
+                        {
+                            //ClearProviders
+                            builder.ClearProviders();
+
+                            builder.AddOpenTelemetry(options =>
+                            {
+                                var resourceBuilder = ResourceBuilder.CreateDefault();
+                                configureResource(resourceBuilder);
+                                options.SetResourceBuilder(resourceBuilder);
+
+                                openTelemetryOptions.LoggingExporter?.Invoke(options);
+                            });
+                        }
+                    });
+
                 }
 
                 foreach (var postConfigure in openTelemetryOptions.OpenTelemetryBuilderPostConfigures)

@@ -1,6 +1,8 @@
-﻿using global::OpenTelemetry.Metrics;
+﻿using global::OpenTelemetry.Logs;
+using global::OpenTelemetry.Metrics;
 using global::OpenTelemetry.Trace;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using OpenTelemetry.Exporter;
 using System;
 using System.Threading.Tasks;
@@ -45,7 +47,6 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Otlp
                 var action = new Action<OtlpExporterOptions>(c =>
                 {
                     c.Endpoint = new Uri(openTelemetryExporterOtlpOptions.Endpoint);
-
                 });
 
                 options.TracingExporters.Add(OpenTelemetryExporterNames.Otlp, new Action<TracerProviderBuilder>(builder =>
@@ -56,6 +57,14 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Otlp
                 options.MetricsExporters.Add(OpenTelemetryExporterNames.Otlp, new Action<MeterProviderBuilder>(builder =>
                 {
                     builder.AddOtlpExporter(openTelemetryExporterOtlpOptions.Name, action);
+                }));
+
+                options.LoggingExporters.Add(OpenTelemetryExporterNames.Otlp, new Action<OpenTelemetryLoggerOptions>(builder =>
+                {
+                    builder.AddOtlpExporter((exporterOptions, processorOptions) =>
+                    {
+                        exporterOptions.Endpoint = new Uri(openTelemetryExporterOtlpOptions.Endpoint);
+                    });
                 }));
             });
 

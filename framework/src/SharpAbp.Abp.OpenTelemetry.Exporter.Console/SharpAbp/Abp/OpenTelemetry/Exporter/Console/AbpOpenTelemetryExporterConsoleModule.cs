@@ -1,4 +1,5 @@
-﻿using global::OpenTelemetry.Metrics;
+﻿using global::OpenTelemetry.Logs;
+using global::OpenTelemetry.Metrics;
 using global::OpenTelemetry.Trace;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Exporter;
@@ -55,6 +56,11 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Console
                 options.MetricsExporters.Add(OpenTelemetryExporterNames.Console, new Action<MeterProviderBuilder>(builder =>
                 {
                     builder.AddConsoleExporter(openTelemetryExporterConsoleOptions.Name, action);
+                }));
+
+                options.LoggingExporters.Add(OpenTelemetryExporterNames.Console, new Action<OpenTelemetryLoggerOptions>(builder =>
+                {
+                    builder.AddConsoleExporter(action);
                 }));
 
             });
