@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\..\..\common.props" />
+	<Import Project="..\..\..\configureawait.props" />
+
+	<PropertyGroup>
+		<TargetFrameworks>$(ProjectFrameworks)</TargetFrameworks>
+		<AssemblyName>SharpAbp.Abp.OpenTelemetry.Abstractions</AssemblyName>
+		<PackageId>SharpAbp.Abp.OpenTelemetry.Abstractions</PackageId>
+		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<Description>SharpAbp OpenTelemetry Module</Description>
+		<RootNamespace />
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="OpenTelemetry" Version="$(OpenTelemetryPackageVersion)" />
+		<PackageReference Include="Volo.Abp" Version="$(VoloAbpPackageVersion)" />
+	</ItemGroup>
+
+</Project>

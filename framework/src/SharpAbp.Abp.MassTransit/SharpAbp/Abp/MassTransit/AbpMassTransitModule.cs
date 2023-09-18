@@ -32,9 +32,9 @@ namespace SharpAbp.Abp.MassTransit
 
         public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
         {
+            var actions = context.Services.GetPreConfigureActions<AbpMassTransitOptions>();
             Configure<AbpMassTransitOptions>(options =>
             {
-                var actions = context.Services.GetPreConfigureActions<AbpMassTransitOptions>();
                 foreach (var action in actions)
                 {
                     action(options);

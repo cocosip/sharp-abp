@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\..\..\common.props" />
+	<Import Project="..\..\..\configureawait.props" />
+
+	<PropertyGroup>
+		<TargetFrameworks>$(ProjectFrameworks)</TargetFrameworks>
+		<AssemblyName>SharpAbp.Abp.OpenTelemetry.Exporter.Zipkin</AssemblyName>
+		<PackageId>SharpAbp.Abp.OpenTelemetry.Exporter.Zipkin</PackageId>
+		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<Description>SharpAbp OpenTelemetry Module</Description>
+		<RootNamespace />
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="$(OpenTelemetryPackageVersion)" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SharpAbp.Abp.OpenTelemetry\SharpAbp.Abp.OpenTelemetry.csproj" />
+	</ItemGroup>
+
+
+</Project>

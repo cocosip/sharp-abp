@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\..\..\common.props" />
+	<Import Project="..\..\..\configureawait.props" />
+
+	<PropertyGroup>
+		<TargetFramework>$(NetCoreFx)</TargetFramework>
+		<AssemblyName>SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.AspNetCore</AssemblyName>
+		<PackageId>SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.AspNetCore</PackageId>
+		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<Description>SharpAbp OpenTelemetry Module</Description>
+		<RootNamespace />
+		<IsPackable>true</IsPackable>
+		<OutputType>Library</OutputType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.AspNetCore" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.6.0-rc.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SharpAbp.Abp.OpenTelemetry\SharpAbp.Abp.OpenTelemetry.csproj" />
+	</ItemGroup>
+
+
+</Project>

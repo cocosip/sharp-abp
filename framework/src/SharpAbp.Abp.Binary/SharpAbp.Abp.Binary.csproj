@@ -16,8 +16,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\SharpAbp.Abp.Binary.Protobuf\SharpAbp.Abp.Binary.Protobuf.csproj" />
+		<ProjectReference Include="..\SharpAbp.Abp.Binary.Protobuf\SharpAbp.Abp.Binary.Protobuf.csproj" />
 	</ItemGroup>
- 
 
 </Project>
