@@ -41,13 +41,13 @@
 		<MoqPackageVersion>4.20.69</MoqPackageVersion>
 
 		<!-- xunit https://www.nuget.org/packages/xUnit -->
-		<xUnitPackageVersion>2.5.0</xUnitPackageVersion>
+		<xUnitPackageVersion>2.5.1</xUnitPackageVersion>
 
 		<!-- xunit.extensibility.execution https://www.nuget.org/packages/xunit.extensibility.execution -->
 		<xUnitExtensibilityExecutionPackageVersion>2.5.0</xUnitExtensibilityExecutionPackageVersion>
 
 		<!-- xunit.runner.visualstudio https://www.nuget.org/packages/xunit.runner.visualstudio -->
-		<xUnitRunnerVisualstudioPackageVersion>2.5.0</xUnitRunnerVisualstudioPackageVersion>
+		<xUnitRunnerVisualstudioPackageVersion>2.5.1</xUnitRunnerVisualstudioPackageVersion>
 
 		<!--coverlet.collector-->
 		<CoverletCollectorPackageVersion>6.0.0</CoverletCollectorPackageVersion>
