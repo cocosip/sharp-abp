@@ -1,13 +1,14 @@
 ﻿using Microsoft.Extensions.Logging;
 using Minio;
+using Minio.DataModel.Args;
 using Minio.Exceptions;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Timing;
-using System.Threading;
-using Volo.Abp;
 
 namespace SharpAbp.Abp.FileStoring.Minio
 {
@@ -172,7 +173,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
         }
 
 
-        protected virtual MinioClient GetMinioClient(FileProviderArgs args)
+        protected virtual IMinioClient GetMinioClient(FileProviderArgs args)
         {
             var minioConfiguration = args.Configuration.GetMinioConfiguration();
             var client = new MinioClient()
@@ -187,7 +188,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
         }
 
         protected virtual async Task CreateBucketIfNotExists(
-            MinioClient client,
+            IMinioClient client,
             string containerName,
             CancellationToken cancellationToken = default)
         {
@@ -203,7 +204,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
         }
 
         private async Task<bool> FileExistsAsync(
-            MinioClient client,
+            IMinioClient client,
             string containerName,
             string fileName,
             CancellationToken cancellationToken = default)
