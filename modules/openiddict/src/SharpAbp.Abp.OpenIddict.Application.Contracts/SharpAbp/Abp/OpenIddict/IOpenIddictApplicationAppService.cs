@@ -10,7 +10,7 @@ namespace SharpAbp.Abp.OpenIddict
     {
         Task<OpenIddictApplicationDto> GetAsync(Guid id);
         Task<OpenIddictApplicationDto> FindByClientIdAsync(string clientId);
-        Task<PagedResultDto<OpenIddictApplicationDto>> GetPagedListAsync(PagedAndSortedResultRequestDto input);
+        Task<PagedResultDto<OpenIddictApplicationDto>> GetPagedListAsync(OpenIddictApplicationPagedRequestDto input);
         Task<List<OpenIddictApplicationDto>> GetListAsync();
         Task<OpenIddictApplicationDto> CreateAsync(CreateOrUpdateOpenIddictApplicationDto input);
         Task<OpenIddictApplicationDto> UpdateAsync(Guid id, CreateOrUpdateOpenIddictApplicationDto input);

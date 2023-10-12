@@ -33,7 +33,7 @@ namespace SharpAbp.Abp.OpenIddict
         }
 
         [HttpGet]
-        public async Task<PagedResultDto<OpenIddictApplicationDto>> GetPagedListAsync(PagedAndSortedResultRequestDto input)
+        public async Task<PagedResultDto<OpenIddictApplicationDto>> GetPagedListAsync(OpenIddictApplicationPagedRequestDto input)
         {
             return await _openIddictApplicationAppService.GetPagedListAsync(input);
         }

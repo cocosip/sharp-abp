@@ -19,36 +19,39 @@ namespace SharpAbp.Abp.OpenIddict
     public class OpenIddictScopeAppService : OpenIddictAppServiceBase, IOpenIddictScopeAppService
     {
         protected IOpenIddictScopeStore<OpenIddictScopeModel> OpenIddictScopeStore { get; }
-        public OpenIddictScopeAppService(IOpenIddictScopeStore<OpenIddictScopeModel> openIddictScopeStore)
+        protected IOpenIddictScopeRepository OpenIddictScopeRepository { get; }
+        public OpenIddictScopeAppService(
+            IOpenIddictScopeStore<OpenIddictScopeModel> openIddictScopeStore,
+            IOpenIddictScopeRepository openIddictScopeRepository)
         {
             OpenIddictScopeStore = openIddictScopeStore;
+            OpenIddictScopeRepository = openIddictScopeRepository;
         }
 
         [Authorize(OpenIddictPermissions.Scopes.Default)]
         public virtual async Task<OpenIddictScopeDto> GetAsync(Guid id)
         {
-            var model = await OpenIddictScopeStore.FindByIdAsync(id.ToString("D"), CancellationToken.None);
-            return await ToScopeDtoAsync(model);
+            var scope = await OpenIddictScopeRepository.GetAsync(id);
+            return await ToScopeDtoAsync(scope.ToModel());
         }
 
         [Authorize(OpenIddictPermissions.Scopes.Default)]
         public virtual async Task<OpenIddictScopeDto> FindByNameAsync(string name)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            var model = await OpenIddictScopeStore.FindByNameAsync(name, CancellationToken.None);
-            return await ToScopeDtoAsync(model);
+            var scope = await OpenIddictScopeRepository.FindByNameAsync(name);
+            return await ToScopeDtoAsync(scope.ToModel());
         }
 
         [Authorize(OpenIddictPermissions.Scopes.Default)]
-        public virtual async Task<PagedResultDto<OpenIddictScopeDto>> GetPagedListAsync(PagedAndSortedResultRequestDto input)
+        public virtual async Task<PagedResultDto<OpenIddictScopeDto>> GetPagedListAsync(OpenIddictScopePagedRequestDto input)
         {
-            var count = await OpenIddictScopeStore.CountAsync(CancellationToken.None);
-            var scopes = OpenIddictScopeStore.ListAsync(input.MaxResultCount, input.SkipCount, CancellationToken.None);
-
+            var count = await OpenIddictScopeRepository.GetCountAsync(input.Filter);
+            var scopes = await OpenIddictScopeRepository.GetListAsync(input.Sorting, input.SkipCount, input.MaxResultCount, input.Filter);
             var scopeDtos = new List<OpenIddictScopeDto>();
-            await foreach (var model in scopes)
+            foreach (var scope in scopes)
             {
-                scopeDtos.Add(await ToScopeDtoAsync(model));
+                scopeDtos.Add(await ToScopeDtoAsync(scope.ToModel()));
             }
 
             return new PagedResultDto<OpenIddictScopeDto>(count, scopeDtos);
@@ -57,11 +60,11 @@ namespace SharpAbp.Abp.OpenIddict
         [Authorize(OpenIddictPermissions.Scopes.Default)]
         public virtual async Task<List<OpenIddictScopeDto>> GetListAsync()
         {
-            var scopes = OpenIddictScopeStore.ListAsync(int.MaxValue, 0, CancellationToken.None);
+            var scopes = await OpenIddictScopeRepository.GetListAsync();
             var scopeDtos = new List<OpenIddictScopeDto>();
-            await foreach (var model in scopes)
+            foreach (var scope in scopes)
             {
-                scopeDtos.Add(await ToScopeDtoAsync(model));
+                scopeDtos.Add(await ToScopeDtoAsync(scope.ToModel()));
             }
             return scopeDtos;
         }
@@ -126,12 +129,7 @@ namespace SharpAbp.Abp.OpenIddict
         [Authorize(OpenIddictPermissions.Scopes.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {
-            var model = await OpenIddictScopeStore.FindByIdAsync(id.ToString("D"), CancellationToken.None);
-            if (model == null)
-            {
-                throw new EntityNotFoundException(typeof(OpenIddictScope), id);
-            }
-            await OpenIddictScopeStore.DeleteAsync(model, CancellationToken.None);
+            await OpenIddictScopeRepository.DeleteAsync(id);
         }
 
         protected virtual async Task<OpenIddictScopeDto> ToScopeDtoAsync(OpenIddictScopeModel model, CancellationToken cancellationToken = default)

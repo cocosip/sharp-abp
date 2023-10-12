@@ -27,7 +27,7 @@ namespace SharpAbp.Abp.OpenIddict
         }
 
         [HttpGet]
-        public async Task<PagedResultDto<OpenIddictScopeDto>> GetPagedListAsync(PagedAndSortedResultRequestDto input)
+        public async Task<PagedResultDto<OpenIddictScopeDto>> GetPagedListAsync(OpenIddictScopePagedRequestDto input)
         {
             return await _openIddictScopeAppService.GetPagedListAsync(input);
         }

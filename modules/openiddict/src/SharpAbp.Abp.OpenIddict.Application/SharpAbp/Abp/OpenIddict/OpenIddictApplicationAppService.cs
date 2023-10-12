@@ -15,24 +15,24 @@ using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.OpenIddict.Applications;
 using Volo.Abp.PermissionManagement;
 
-
 namespace SharpAbp.Abp.OpenIddict
 {
     [Authorize(OpenIddictPermissions.Applications.Default)]
     public class OpenIddictApplicationAppService : OpenIddictAppServiceBase, IOpenIddictApplicationAppService
     {
-
         protected IOpenIddictApplicationStoreResolver Resolver { get; }
         protected IAbpOpenIdApplicationStore OpenIdApplicationStore { get; }
         protected IAbpApplicationManager ApplicationManager { get; }
         protected IPermissionDataSeeder PermissionDataSeeder { get; }
         protected IPermissionManager PermissionManager { get; }
+        protected IOpenIddictApplicationRepository OpenIdApplicationRepository { get; }
         protected IStringLocalizer<OpenIddictResponse> LL { get; }
         public OpenIddictApplicationAppService(
             IOpenIddictApplicationStoreResolver resolver,
             IAbpApplicationManager applicationManager,
             IPermissionDataSeeder permissionDataSeeder,
             IPermissionManager permissionManager,
+            IOpenIddictApplicationRepository openIddictApplicationRepository,
             IStringLocalizer<OpenIddictResponse> ll)
         {
             Resolver = resolver;
@@ -40,46 +40,46 @@ namespace SharpAbp.Abp.OpenIddict
             ApplicationManager = applicationManager;
             PermissionDataSeeder = permissionDataSeeder;
             PermissionManager = permissionManager;
+            OpenIdApplicationRepository = openIddictApplicationRepository;
             LL = ll;
         }
 
         [Authorize(OpenIddictPermissions.Applications.Default)]
         public virtual async Task<OpenIddictApplicationDto> GetAsync(Guid id)
         {
-            var application = await ApplicationManager.FindByIdAsync(id.ToString("D"));
-            return await ToApplicationDtoAsync(application.As<OpenIddictApplicationModel>());
+            var application = await OpenIdApplicationRepository.GetAsync(id);
+            return await ToApplicationDtoAsync(application.ToModel());
         }
 
         [Authorize(OpenIddictPermissions.Applications.Default)]
         public virtual async Task<OpenIddictApplicationDto> FindByClientIdAsync(string clientId)
         {
-            var application = await ApplicationManager.FindByClientIdAsync(clientId);
-            return await ToApplicationDtoAsync(application.As<OpenIddictApplicationModel>());
+            Check.NotNullOrWhiteSpace(clientId, nameof(clientId));
+            var application = await OpenIdApplicationRepository.FindByClientIdAsync(clientId);
+            return await ToApplicationDtoAsync(application.ToModel());
         }
 
         [Authorize(OpenIddictPermissions.Applications.Default)]
-        public virtual async Task<PagedResultDto<OpenIddictApplicationDto>> GetPagedListAsync(PagedAndSortedResultRequestDto input)
+        public virtual async Task<PagedResultDto<OpenIddictApplicationDto>> GetPagedListAsync(OpenIddictApplicationPagedRequestDto input)
         {
-            var count = await ApplicationManager.CountAsync();
-            var applications = ApplicationManager.ListAsync(input.MaxResultCount, input.SkipCount);
-
+            var count = await OpenIdApplicationRepository.GetCountAsync(input.Filter);
+            var applications = await OpenIdApplicationRepository.GetListAsync(input.Sorting, input.SkipCount, input.MaxResultCount, input.Filter);
             var applicationDtos = new List<OpenIddictApplicationDto>();
-            await foreach (var application in applications)
+            foreach (var application in applications)
             {
-                applicationDtos.Add(await ToApplicationDtoAsync(application.As<OpenIddictApplicationModel>()));
+                applicationDtos.Add(await ToApplicationDtoAsync(application.ToModel()));
             }
-
             return new PagedResultDto<OpenIddictApplicationDto>(count, applicationDtos);
         }
 
         [Authorize(OpenIddictPermissions.Applications.Default)]
         public virtual async Task<List<OpenIddictApplicationDto>> GetListAsync()
         {
-            var applications = ApplicationManager.ListAsync(int.MaxValue, 0);
+            var applications = await OpenIdApplicationRepository.GetListAsync();
             var applicationDtos = new List<OpenIddictApplicationDto>();
-            await foreach (var application in applications)
+            foreach (var application in applications)
             {
-                applicationDtos.Add(await ToApplicationDtoAsync(application.As<OpenIddictApplicationModel>()));
+                applicationDtos.Add(await ToApplicationDtoAsync(application.ToModel()));
             }
             return applicationDtos;
         }
@@ -165,8 +165,7 @@ namespace SharpAbp.Abp.OpenIddict
         [Authorize(OpenIddictPermissions.Applications.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {
-            var model = await ApplicationManager.FindByIdAsync(id.ToString("D"));
-            await ApplicationManager.DeleteAsync(model);
+            await OpenIdApplicationRepository.DeleteAsync(id);
         }
 
         protected virtual async Task<OpenIddictApplicationModel> BuildModel(CreateOrUpdateOpenIddictApplicationDto input)
