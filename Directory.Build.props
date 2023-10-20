@@ -2,7 +2,7 @@
   <PropertyGroup>
 
     <!--Volo ABP packages-->
-    <VoloAbpPackageVersion>6.0.2</VoloAbpPackageVersion>
+    <VoloAbpPackageVersion>6.0.3</VoloAbpPackageVersion>
 
     <!-- All Microsoft packages -->
     <MicrosoftPackageVersion>6.0.*</MicrosoftPackageVersion>
