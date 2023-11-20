@@ -20,7 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Polly" Version="8.2.0" />
+		<PackageReference Include="Polly" />
 	</ItemGroup>
 
 	<ItemGroup>

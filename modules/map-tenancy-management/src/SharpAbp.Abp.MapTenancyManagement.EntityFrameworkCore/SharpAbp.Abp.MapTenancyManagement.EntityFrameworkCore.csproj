@@ -16,8 +16,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
-    <PackageReference Include="Volo.Abp.TenantManagement.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
+    <PackageReference Include="Volo.Abp.EntityFrameworkCore"/>
+    <PackageReference Include="Volo.Abp.TenantManagement.EntityFrameworkCore"/>
   </ItemGroup>
 
   <ItemGroup>

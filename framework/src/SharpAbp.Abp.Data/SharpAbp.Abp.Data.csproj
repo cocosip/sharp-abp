@@ -16,7 +16,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Volo.Abp" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp" />
 	</ItemGroup>
 
 </Project>

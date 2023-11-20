@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.AspNetCore.MultiTenancy" Version="$(VoloAbpPackageVersion)" />
+    <PackageReference Include="Volo.Abp.AspNetCore.MultiTenancy" />
   </ItemGroup>
 
 </Project>

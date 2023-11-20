@@ -18,8 +18,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Volo.Abp.AspNetCore" Version="$(VoloAbpPackageVersion)" />
-		<PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.6.0-rc.1" />
+		<PackageReference Include="Volo.Abp.AspNetCore" />
+		<PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" />
 	</ItemGroup>
 
 	<ItemGroup>

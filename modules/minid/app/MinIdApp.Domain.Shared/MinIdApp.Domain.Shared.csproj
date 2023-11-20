@@ -3,32 +3,32 @@
 	<Import Project="..\..\..\..\common.props" />
 
 	<PropertyGroup>
-		<TargetFrameworks>$(ProjectFrameworks)</TargetFrameworks>
+		<TargetFrameworks>netstandard2.1;$(NetCoreFx)</TargetFrameworks>
 		<RootNamespace>MinIdApp</RootNamespace>
 		<GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
 		<IsPackable>false</IsPackable>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Volo.Abp.Identity.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
-		<PackageReference Include="Volo.Abp.IdentityServer.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
-		<PackageReference Include="Volo.Abp.BackgroundJobs.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
-		<PackageReference Include="Volo.Abp.AuditLogging.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
-		<PackageReference Include="Volo.Abp.TenantManagement.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
-		<PackageReference Include="Volo.Abp.FeatureManagement.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
-		<PackageReference Include="Volo.Abp.PermissionManagement.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
-		<PackageReference Include="Volo.Abp.SettingManagement.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.Identity.Domain.Shared" />
+		<PackageReference Include="Volo.Abp.IdentityServer.Domain.Shared" />
+		<PackageReference Include="Volo.Abp.BackgroundJobs.Domain.Shared" />
+		<PackageReference Include="Volo.Abp.AuditLogging.Domain.Shared" />
+		<PackageReference Include="Volo.Abp.TenantManagement.Domain.Shared" />
+		<PackageReference Include="Volo.Abp.FeatureManagement.Domain.Shared" />
+		<PackageReference Include="Volo.Abp.PermissionManagement.Domain.Shared" />
+		<PackageReference Include="Volo.Abp.SettingManagement.Domain.Shared" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="$(MicrosoftPackageVersion)" />
+		<PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\SharpAbp.MinId.Domain.Shared\SharpAbp.MinId.Domain.Shared.csproj" />
 	</ItemGroup>
 
-    <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETStandard' And $([MSBuild]::VersionGreaterThanOrEquals($(TargetFrameworkVersion), '2.1')) ">
+	<ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETStandard' And $([MSBuild]::VersionGreaterThanOrEquals($(TargetFrameworkVersion), '2.1')) ">
 		<PackageReference Include="System.ComponentModel.Annotations" Version="$(SystemComponentModelAnnotationsPackageVersion)" />
 	</ItemGroup>
 

@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
+    <PackageReference Include="Volo.Abp.EntityFrameworkCore" />
   </ItemGroup>
 
 </Project>

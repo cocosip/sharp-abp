@@ -26,10 +26,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Volo.Abp.UI.Navigation" Version="$(VoloAbpPackageVersion)" />
-		<PackageReference Include="Volo.Abp.Emailing" Version="$(VoloAbpPackageVersion)" />
-		<PackageReference Include="System.Text.Encodings.Web" Version="$(MicrosoftPackageVersion)" />
-		<PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="$(MicrosoftPackageVersion)" />
+		<PackageReference Include="Volo.Abp.UI.Navigation" />
+		<PackageReference Include="Volo.Abp.Emailing" />
+		<PackageReference Include="System.Text.Encodings.Web" />
+		<PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" />
 	</ItemGroup>
 
 

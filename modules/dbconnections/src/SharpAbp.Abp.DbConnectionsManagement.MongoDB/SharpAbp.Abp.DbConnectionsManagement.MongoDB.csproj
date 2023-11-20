@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.MongoDB" Version="$(VoloAbpPackageVersion)" />
+    <PackageReference Include="Volo.Abp.MongoDB" />
   </ItemGroup>
 
   <ItemGroup>

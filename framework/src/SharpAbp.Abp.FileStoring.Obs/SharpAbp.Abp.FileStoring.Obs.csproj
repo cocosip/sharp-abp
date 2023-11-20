@@ -16,8 +16,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="HuaweiCloud.OBS.SDK" Version="3.20.7" />
-		<PackageReference Include="Volo.Abp.Timing" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="HuaweiCloud.OBS.SDK" />
+		<PackageReference Include="Volo.Abp.Timing"  />
 	</ItemGroup>
 
 	<ItemGroup>

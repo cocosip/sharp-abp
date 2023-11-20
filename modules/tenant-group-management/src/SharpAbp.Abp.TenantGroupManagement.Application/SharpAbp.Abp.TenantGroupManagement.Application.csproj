@@ -16,14 +16,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Volo.Abp.AutoMapper" Version="$(VoloAbpPackageVersion)" />
-		<PackageReference Include="Volo.Abp.Ddd.Application" Version="$(VoloAbpPackageVersion)" />
-		<PackageReference Include="Volo.Abp.TenantManagement.Application" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.AutoMapper" />
+		<PackageReference Include="Volo.Abp.Ddd.Application" />
+		<PackageReference Include="Volo.Abp.TenantManagement.Application" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\SharpAbp.Abp.TenantGroupManagement.Application.Contracts\SharpAbp.Abp.TenantGroupManagement.Application.Contracts.csproj" />
-	  <ProjectReference Include="..\SharpAbp.Abp.TenantGroupManagement.Domain\SharpAbp.Abp.TenantGroupManagement.Domain.csproj" />
+		<ProjectReference Include="..\SharpAbp.Abp.TenantGroupManagement.Application.Contracts\SharpAbp.Abp.TenantGroupManagement.Application.Contracts.csproj" />
+		<ProjectReference Include="..\SharpAbp.Abp.TenantGroupManagement.Domain\SharpAbp.Abp.TenantGroupManagement.Domain.csproj" />
 	</ItemGroup>
 
 </Project>

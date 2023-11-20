@@ -16,8 +16,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BouncyCastle.Cryptography" Version="2.2.1" />
-		<PackageReference Include="Volo.Abp" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="BouncyCastle.Cryptography"  />
+		<PackageReference Include="Volo.Abp" />
 	</ItemGroup>
 
 </Project>

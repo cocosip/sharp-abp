@@ -5,52 +5,10 @@
 		<ProjectFrameworks>netstandard2.0;netstandard2.1;$(NetCoreFx)</ProjectFrameworks>
 
 		<!--Net Core Framework-->
-		<NetCoreFx>net7.0</NetCoreFx>
+		<NetCoreFx>net8.0</NetCoreFx>
 
 		<!--Volo ABP packages-->
 		<VoloAbpPackageVersion>7.4.2</VoloAbpPackageVersion>
-
-		<!-- All Microsoft EntityFrameworkCore packages -->
-		<MicrosoftEntityFrameworkCorePackageVersion>7.0.10</MicrosoftEntityFrameworkCorePackageVersion>
-
-		<!-- All Microsoft AspNetCore packages -->
-		<MicrosoftAspNetCorePackageVersion>7.0.0</MicrosoftAspNetCorePackageVersion>
-
-		<!-- All Microsoft packages -->
-		<MicrosoftPackageVersion>7.0.*</MicrosoftPackageVersion>
-
-		<!--OpenTelemetry packages-->
-		<OpenTelemetryPackageVersion>1.6.0</OpenTelemetryPackageVersion>
-
-		<!-- Microsoft.NET.Test.Sdk https://www.nuget.org/packages/Microsoft.NET.Test.Sdk -->
-		<MicrosoftNETTestSdkPackageVersion>17.8.0</MicrosoftNETTestSdkPackageVersion>
-
-		<!--System.ComponentModel.Annotations-->
-		<SystemComponentModelAnnotationsPackageVersion>6.0.0-preview.4.21253.7</SystemComponentModelAnnotationsPackageVersion>
-
-		<!-- NSubstitute  https://www.nuget.org/packages/NSubstitute -->
-		<NSubstitutePackageVersion>4.3.0</NSubstitutePackageVersion>
-
-		<!-- Shouldly https://www.nuget.org/packages/Shouldly -->
-		<ShouldlyPackageVersion>4.1.0</ShouldlyPackageVersion>
-
-		<!-- Polly https://www.nuget.org/packages/Polly -->
-		<PollyPackageVersion>7.2.3</PollyPackageVersion>
-
-		<!-- Moq package-->
-		<MoqPackageVersion>4.20.69</MoqPackageVersion>
-
-		<!-- xunit https://www.nuget.org/packages/xUnit -->
-		<xUnitPackageVersion>2.6.1</xUnitPackageVersion>
-
-		<!-- xunit.extensibility.execution https://www.nuget.org/packages/xunit.extensibility.execution -->
-		<xUnitExtensibilityExecutionPackageVersion>2.5.0</xUnitExtensibilityExecutionPackageVersion>
-
-		<!-- xunit.runner.visualstudio https://www.nuget.org/packages/xunit.runner.visualstudio -->
-		<xUnitRunnerVisualstudioPackageVersion>2.5.3</xUnitRunnerVisualstudioPackageVersion>
-
-		<!--coverlet.collector-->
-		<CoverletCollectorPackageVersion>6.0.0</CoverletCollectorPackageVersion>
-
+ 
 	</PropertyGroup>
 </Project>

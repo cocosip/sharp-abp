@@ -16,8 +16,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="OpenTelemetry" Version="$(OpenTelemetryPackageVersion)" />
-		<PackageReference Include="Volo.Abp" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="OpenTelemetry" />
+		<PackageReference Include="Volo.Abp" />
 	</ItemGroup>
 
 </Project>

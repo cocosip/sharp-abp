@@ -16,7 +16,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="OpenTelemetry.Exporter.Prometheus.HttpListener" Version="1.6.0-rc.1" />
+		<PackageReference Include="OpenTelemetry.Exporter.Prometheus.HttpListener" />
 	</ItemGroup>
 
 	<ItemGroup>

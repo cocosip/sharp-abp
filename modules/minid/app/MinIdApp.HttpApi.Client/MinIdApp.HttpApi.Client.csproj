@@ -3,7 +3,7 @@
 	<Import Project="..\..\..\..\common.props" />
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
+		<TargetFrameworks>netstandard2.1;$(NetCoreFx)</TargetFrameworks>
 		<RootNamespace>MinIdApp</RootNamespace>
 		<IsPackable>false</IsPackable>
 	</PropertyGroup>
@@ -13,12 +13,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Volo.Abp.Account.HttpApi.Client" Version="$(VoloAbpPackageVersion)" />
-		<PackageReference Include="Volo.Abp.Identity.HttpApi.Client" Version="$(VoloAbpPackageVersion)" />
-		<PackageReference Include="Volo.Abp.PermissionManagement.HttpApi.Client" Version="$(VoloAbpPackageVersion)" />
-		<PackageReference Include="Volo.Abp.TenantManagement.HttpApi.Client" Version="$(VoloAbpPackageVersion)" />
-		<PackageReference Include="Volo.Abp.FeatureManagement.HttpApi.Client" Version="$(VoloAbpPackageVersion)" />
-		<PackageReference Include="Volo.Abp.SettingManagement.HttpApi.Client" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.Account.HttpApi.Client" />
+		<PackageReference Include="Volo.Abp.Identity.HttpApi.Client" />
+		<PackageReference Include="Volo.Abp.PermissionManagement.HttpApi.Client" />
+		<PackageReference Include="Volo.Abp.TenantManagement.HttpApi.Client" />
+		<PackageReference Include="Volo.Abp.FeatureManagement.HttpApi.Client" />
+		<PackageReference Include="Volo.Abp.SettingManagement.HttpApi.Client" />
 	</ItemGroup>
 
 </Project>
