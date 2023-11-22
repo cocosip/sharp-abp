@@ -2,7 +2,6 @@
     <PropertyGroup>
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     </PropertyGroup>
-
     <ItemGroup>
         <PackageVersion Include="Volo.Abp" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.AutoMapper" Version="$(VoloAbpPackageVersion)" />
@@ -18,7 +17,6 @@
         <PackageVersion Include="Volo.Abp.AspNetCore.MultiTenancy" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.AspNetCore.Mvc" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.AspNetCore.Authentication.JwtBearer" Version="$(VoloAbpPackageVersion)" />
-
         <PackageVersion Include="Volo.Abp.Swashbuckle" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.UI.Navigation" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared" Version="$(VoloAbpPackageVersion)" />
@@ -28,7 +26,6 @@
         <PackageVersion Include="Volo.Abp.Ddd.Application" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Ddd.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Http.Client" Version="$(VoloAbpPackageVersion)" />
-
         <PackageVersion Include="Volo.Abp.MongoDB" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.EntityFrameworkCore.MySQL" Version="$(VoloAbpPackageVersion)" />
@@ -37,8 +34,6 @@
         <PackageVersion Include="Volo.Abp.EntityFrameworkCore.PostgreSql" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.EntityFrameworkCore.Sqlite" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.EntityFrameworkCore.SqlServer" Version="$(VoloAbpPackageVersion)" />
-
-
         <PackageVersion Include="Volo.Abp.SettingManagement.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.SettingManagement.Domain" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.SettingManagement.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
@@ -46,7 +41,6 @@
         <PackageVersion Include="Volo.Abp.SettingManagement.Application" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.SettingManagement.HttpApi" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.SettingManagement.HttpApi.Client" Version="$(VoloAbpPackageVersion)" />
-
         <PackageVersion Include="Volo.Abp.PermissionManagement.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.PermissionManagement.Domain" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.PermissionManagement.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
@@ -57,16 +51,13 @@
         <PackageVersion Include="Volo.Abp.PermissionManagement.Domain.OpenIddict" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.PermissionManagement.HttpApi" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.PermissionManagement.HttpApi.Client" Version="$(VoloAbpPackageVersion)" />
-
         <PackageVersion Include="Volo.Abp.IdentityServer.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.IdentityServer.Domain" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.IdentityServer.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Identity.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
-
         <PackageVersion Include="Volo.Abp.OpenIddict.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.OpenIddict.Domain" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.OpenIddict.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
-
         <PackageVersion Include="Volo.Abp.Identity.Domain" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Identity.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Identity.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
@@ -74,17 +65,14 @@
         <PackageVersion Include="Volo.Abp.Identity.AspNetCore" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Identity.HttpApi" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Identity.HttpApi.Client" Version="$(VoloAbpPackageVersion)" />
-
         <PackageVersion Include="Volo.Abp.Account.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Account.Application" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Account.Web.IdentityServer" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Account.HttpApi" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Account.HttpApi.Client" Version="$(VoloAbpPackageVersion)" />
-
         <PackageVersion Include="Volo.Abp.AuditLogging.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.AuditLogging.Domain" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.AuditLogging.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
-
         <PackageVersion Include="Volo.Abp.TenantManagement.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.TenantManagement.Domain" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.TenantManagement.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
@@ -92,11 +80,9 @@
         <PackageVersion Include="Volo.Abp.TenantManagement.Application" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.TenantManagement.HttpApi" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.TenantManagement.HttpApi.Client" Version="$(VoloAbpPackageVersion)" />
-
         <PackageVersion Include="Volo.Abp.BackgroundJobs.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.BackgroundJobs.Domain" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.BackgroundJobs.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
-
         <PackageVersion Include="Volo.Abp.FeatureManagement.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.FeatureManagement.Domain" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.FeatureManagement.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
@@ -104,7 +90,6 @@
         <PackageVersion Include="Volo.Abp.FeatureManagement.Application" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.FeatureManagement.HttpApi" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.FeatureManagement.HttpApi.Client" Version="$(VoloAbpPackageVersion)" />
-
         <PackageVersion Include="Volo.Abp.AspNetCore.Serilog" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Autofac" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.TestBase" Version="$(VoloAbpPackageVersion)" />
@@ -114,19 +99,19 @@
         <RuntimeHostConfigurationOption Include="System.Runtime.Loader.UseRidGraph" Value="true" />
         <PackageVersion Include="aliyun-net-sdk-sts" Version="3.1.2" />
         <PackageVersion Include="Aliyun.OSS.SDK.NetCore" Version="2.13.0" />
-        <PackageVersion Include="AWSSDK.S3" Version="3.7.300.4" />
-        <PackageVersion Include="AWSSDK.SecurityToken" Version="3.7.300.4" />
+        <PackageVersion Include="AWSSDK.S3" Version="3.7.302" />
+        <PackageVersion Include="AWSSDK.SecurityToken" Version="3.7.300.7" />
         <PackageVersion Include="Azure.Messaging.ServiceBus" Version="7.17.0" />
         <PackageVersion Include="Azure.Storage.Blobs" Version="12.19.1" />
         <PackageVersion Include="AutoS3" Version="2.0.1" />
         <PackageVersion Include="AutoS3.KS3" Version="2.0.1" />
         <PackageVersion Include="BouncyCastle.Cryptography" Version="2.2.1" />
         <PackageVersion Include="Cocosip.KS3SDK" Version="1.0.0" />
-        <PackageVersion Include="DotCommon" Version="5.1.2" />
+        <PackageVersion Include="DotCommon" Version="6.0.0" />
         <PackageVersion Include="FastDFSCore" Version="1.7.0" />
         <PackageVersion Include="FastDFSCore.Transport.SuperSocket" Version="1.7.0" />
         <PackageVersion Include="FastDFSCore.Transport.DotNetty" Version="1.7.0" />
-        <PackageVersion Include="FreeRedis" Version="1.2.5" />
+        <PackageVersion Include="FreeRedis" Version="1.2.6" />
         <PackageVersion Include="FreeSql" Version="3.2.805" />
         <PackageVersion Include="FreeSql.Provider.MySql" Version="3.2.805" />
         <PackageVersion Include="FreeSql.Provider.Oracle" Version="3.2.805" />
@@ -160,7 +145,6 @@
         <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
         <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" />
         <PackageVersion Include="Microsoft.CSharp" Version="4.7.0" />
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Abstractions" Version="8.0.0" />
         <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
         <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0" />
         <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0" />
@@ -193,7 +177,7 @@
         <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
         <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
         <PackageVersion Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.0" />
-        <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
+        <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
         <PackageVersion Include="Minio" Version="6.0.1" />
         <PackageVersion Include="NSubstitute" Version="5.1.0" />
         <PackageVersion Include="NuGet.Versioning" Version="6.7.0" />
@@ -234,9 +218,9 @@
         <PackageVersion Include="System.Text.Encodings.Web" Version="8.0.0" />
         <PackageVersion Include="System.Text.Json" Version="8.0.0" />
         <PackageVersion Include="Moq" Version="4.20.69" />
-        <PackageVersion Include="xunit" Version="2.6.1" />
-        <PackageVersion Include="xunit.extensibility.execution" Version="2.6.1" />
-        <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.3" />
+        <PackageVersion Include="xunit" Version="2.6.2" />
+        <PackageVersion Include="xunit.extensibility.execution" Version="2.6.2" />
+        <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.4" />
         <PackageVersion Include="coverlet.collector" Version="6.0.0" />
         <PackageVersion Include="ConfigureAwait.Fody" Version="3.3.2" />
         <PackageVersion Include="Fody" Version="6.8.0" />

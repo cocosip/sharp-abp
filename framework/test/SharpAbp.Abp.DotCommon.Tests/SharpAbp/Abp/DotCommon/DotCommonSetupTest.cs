@@ -7,12 +7,10 @@ namespace SharpAbp.Abp.DotCommon
     {
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IXmlSerializer _xmlSerializer;
-        private readonly IObjectSerializer _objectSerializer;
         public DotCommonSetupTest()
         {
             _jsonSerializer = GetRequiredService<IJsonSerializer>();
             _xmlSerializer = GetRequiredService<IXmlSerializer>();
-            _objectSerializer = GetRequiredService<IObjectSerializer>();
         }
 
         [Fact]
@@ -20,7 +18,6 @@ namespace SharpAbp.Abp.DotCommon
         {
             Assert.NotNull(_jsonSerializer);
             Assert.NotNull(_xmlSerializer);
-            Assert.NotNull(_objectSerializer);
         }
     }
 }

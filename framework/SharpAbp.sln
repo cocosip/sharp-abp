@@ -141,9 +141,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.OpenTelemetry.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.OpenTelemetry.Exporter.Otlp", "src\SharpAbp.Abp.OpenTelemetry.Exporter.Otlp\SharpAbp.Abp.OpenTelemetry.Exporter.Otlp.csproj", "{5A3914AA-EE78-432D-8979-E5F5CE19524D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.HttpListener", "src\SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.HttpListener\SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.HttpListener.csproj", "{17A01DB5-D064-4E94-990B-2A6F06305F64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.HttpListener", "src\SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.HttpListener\SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.HttpListener.csproj", "{17A01DB5-D064-4E94-990B-2A6F06305F64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.AspNetCore", "src\SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.AspNetCore\SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.AspNetCore.csproj", "{AD630688-3BAC-49D7-8D93-7CB2FE70BAB0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.AspNetCore", "src\SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.AspNetCore\SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.AspNetCore.csproj", "{AD630688-3BAC-49D7-8D93-7CB2FE70BAB0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
