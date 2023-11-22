@@ -4,6 +4,7 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageVersion Include="Volo.Abp" Version="$(VoloAbpPackageVersion)" />
+        <PackageVersion Include="Volo.Abp.Json" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.AutoMapper" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Authorization" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.MultiTenancy" Version="$(VoloAbpPackageVersion)" />
@@ -12,6 +13,7 @@
         <PackageVersion Include="Volo.Abp.Threading" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Timing" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Validation" Version="$(VoloAbpPackageVersion)" />
+        <PackageVersion Include="Volo.Abp.Guids" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.IdentityModel" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.AspNetCore" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.AspNetCore.MultiTenancy" Version="$(VoloAbpPackageVersion)" />
@@ -27,6 +29,7 @@
         <PackageVersion Include="Volo.Abp.Ddd.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Http.Client" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.MongoDB" Version="$(VoloAbpPackageVersion)" />
+        <PackageVersion Include="Volo.Abp.Dapper" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.EntityFrameworkCore.MySQL" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.EntityFrameworkCore.Oracle" Version="$(VoloAbpPackageVersion)" />
@@ -58,6 +61,8 @@
         <PackageVersion Include="Volo.Abp.OpenIddict.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.OpenIddict.Domain" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.OpenIddict.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
+        <PackageVersion Include="Volo.Abp.OpenIddict.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
+        <PackageVersion Include="Volo.Abp.OpenIddict.Application" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Identity.Domain" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Identity.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Identity.Application.Contracts" Version="$(VoloAbpPackageVersion)" />
@@ -70,6 +75,7 @@
         <PackageVersion Include="Volo.Abp.Account.Web.IdentityServer" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Account.HttpApi" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Account.HttpApi.Client" Version="$(VoloAbpPackageVersion)" />
+        <PackageVersion Include="Volo.Abp.Account.Web.OpenIddict" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.AuditLogging.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.AuditLogging.Domain" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.AuditLogging.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
@@ -93,6 +99,8 @@
         <PackageVersion Include="Volo.Abp.AspNetCore.Serilog" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Autofac" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.TestBase" Version="$(VoloAbpPackageVersion)" />
+        <PackageVersion Include="Volo.Abp.AspNetCore.TestBase" Version="$(VoloAbpPackageVersion)" />
+        <PackageVersion Include="Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite" Version="2.0.0" />
     </ItemGroup>
 
     <ItemGroup>
