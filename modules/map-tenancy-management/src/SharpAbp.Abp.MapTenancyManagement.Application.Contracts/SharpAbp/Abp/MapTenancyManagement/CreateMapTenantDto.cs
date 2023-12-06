@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Volo.Abp.TenantManagement;
 using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.MapTenancyManagement
@@ -7,11 +8,17 @@ namespace SharpAbp.Abp.MapTenancyManagement
     public class CreateMapTenantDto
     {
         [Required]
+        public Guid TenantId { get; set; }
+
+        [Required]
+        [DynamicStringLength(typeof(TenantConsts), nameof(TenantConsts.MaxNameLength))]
+        public string TenantName { get; set; }
+
+        [Required]
         [DynamicStringLength(typeof(MapTenantConsts), nameof(MapTenantConsts.MaxCodeLength))]
         public string Code { get; set; }
 
-        [Required]
-        public Guid TenantId { get; set; }
+
 
         [DynamicStringLength(typeof(MapTenantConsts), nameof(MapTenantConsts.MaxMapCodeLength))]
         public string MapCode { get; set; }
@@ -21,10 +28,11 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
         }
 
-        public CreateMapTenantDto(string code, Guid tenantId, string mapCode)
+        public CreateMapTenantDto(Guid tenantId, string tenantName, string code, string mapCode)
         {
-            Code = code;
             TenantId = tenantId;
+            TenantName = tenantName;
+            Code = code;
             MapCode = mapCode;
         }
     }

@@ -4,8 +4,9 @@ namespace SharpAbp.Abp.MapTenancyManagement
 {
     public class MapTenantCacheItem
     {
-        public string Code { get; set; }
         public Guid? TenantId { get; set; }
+        public string TenantName { get; set; }
+        public string Code { get; set; }
         public string MapCode { get; set; }
 
         public MapTenantCacheItem()
@@ -13,10 +14,11 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
         }
 
-        public MapTenantCacheItem(string code, Guid? tenantId, string mapCode)
+        public MapTenantCacheItem(Guid? tenantId, string tenantName, string code, string mapCode)
         {
-            Code = code;
             TenantId = tenantId;
+            TenantName = tenantName;
+            Code = code;
             MapCode = mapCode;
         }
     }

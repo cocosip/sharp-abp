@@ -79,14 +79,15 @@ namespace SharpAbp.Abp.MapTenancyManagement
         [Authorize(MapTenancyManagementPermissions.MapTenants.Default)]
         public virtual async Task<PagedResultDto<MapTenantDto>> GetPagedListAsync(MapTenantPagedRequestDto input)
         {
-            var count = await MapTenantRepository.GetCountAsync(input.Code, input.TenantId, input.MapCode);
+            var count = await MapTenantRepository.GetCountAsync(input.TenantId, input.TenantName, input.Code, input.MapCode);
 
             var mapTenants = await MapTenantRepository.GetPagedListAsync(
                 input.SkipCount,
                 input.MaxResultCount,
                 input.Sorting,
-                input.Code,
                 input.TenantId,
+                input.TenantName,
+                input.Code,
                 input.MapCode);
 
             return new PagedResultDto<MapTenantDto>(
@@ -105,8 +106,9 @@ namespace SharpAbp.Abp.MapTenancyManagement
         {
             var mapTenant = new MapTenant(
                 GuidGenerator.Create(),
-                input.Code,
                 input.TenantId,
+                input.TenantName,
+                input.Code,
                 input.MapCode);
 
             await MapTenantManager.CreateAsync(mapTenant);
@@ -124,8 +126,9 @@ namespace SharpAbp.Abp.MapTenancyManagement
         {
             var mapTenant = await MapTenantManager.UpdateAsync(
                 id,
-                input.Code,
                 input.TenantId,
+                input.TenantName,
+                input.Code,
                 input.MapCode);
             return ObjectMapper.Map<MapTenant, MapTenantDto>(mapTenant);
         }

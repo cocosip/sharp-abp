@@ -200,8 +200,9 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         /// <param name="skipCount"></param>
         /// <param name="maxResultCount"></param>
         /// <param name="sorting"></param>
-        /// <param name="code"></param>
         /// <param name="tenantId"></param>
+        /// <param name="tenantName"></param>
+        /// <param name="code"></param>
         /// <param name="mapCode"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
@@ -210,17 +211,19 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
             int skipCount,
             int maxResultCount,
             string sorting = null,
-            string code = "",
             Guid? tenantId = null,
+            string tenantName = "",
+            string code = "",
             string mapCode = "",
             bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
-                .WhereIf(!code.IsNullOrWhiteSpace(), item => item.Code == code)
                 .WhereIf(tenantId.HasValue, item => item.TenantId == tenantId.Value)
-                .WhereIf(!mapCode.IsNullOrWhiteSpace(), item => item.MapCode == mapCode)
+                .WhereIf(!tenantName.IsNullOrWhiteSpace(), item => item.TenantName.Contains(tenantName))
+                .WhereIf(!code.IsNullOrWhiteSpace(), item => item.Code.Contains(code))
+                .WhereIf(!mapCode.IsNullOrWhiteSpace(), item => item.MapCode.Contains(mapCode))
                 .OrderBy(sorting ?? nameof(MapTenant.Code))
                 .Skip(skipCount)
                 .Take(maxResultCount)
@@ -230,21 +233,24 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         /// <summary>
         /// Get count async
         /// </summary>
-        /// <param name="code"></param>
         /// <param name="tenantId"></param>
+        /// <param name="tenantName"></param>
+        /// <param name="code"></param>
         /// <param name="mapCode"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<int> GetCountAsync(
-            string code = "",
             Guid? tenantId = null,
+            string tenantName = "",
+            string code = "",
             string mapCode = "",
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
-                .WhereIf(!code.IsNullOrWhiteSpace(), item => item.Code == code)
                 .WhereIf(tenantId.HasValue, item => item.TenantId == tenantId.Value)
-                .WhereIf(!mapCode.IsNullOrWhiteSpace(), item => item.MapCode == mapCode)
+                .WhereIf(!tenantName.IsNullOrWhiteSpace(), item => item.TenantName.Contains(tenantName))
+                .WhereIf(!code.IsNullOrWhiteSpace(), item => item.Code.Contains(code))
+                .WhereIf(!mapCode.IsNullOrWhiteSpace(), item => item.MapCode.Contains(code))
                 .CountAsync(GetCancellationToken(cancellationToken));
         }
     }

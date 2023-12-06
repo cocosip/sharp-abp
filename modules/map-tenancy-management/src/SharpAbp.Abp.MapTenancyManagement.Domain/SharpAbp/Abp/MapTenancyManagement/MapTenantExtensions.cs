@@ -14,8 +14,9 @@ namespace SharpAbp.Abp.MapTenancyManagement
             }
 
             var cacheItem = new MapTenantCacheItem(
-                mapTenant.Code,
                 mapTenant.TenantId,
+                mapTenant.TenantName,
+                mapTenant.Code,
                 mapTenant.MapCode);
 
             return cacheItem;
@@ -30,8 +31,9 @@ namespace SharpAbp.Abp.MapTenancyManagement
             }
 
             var mapCodeCacheItem = new MapTenantMapCodeCacheItem(
-                mapTenant.Code,
                 mapTenant.TenantId,
+                mapTenant.TenantName,
+                mapTenant.Code,
                 mapTenant.MapCode);
 
             return mapCodeCacheItem;

@@ -99,22 +99,24 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <param name="skipCount"></param>
         /// <param name="maxResultCount"></param>
         /// <param name="sorting"></param>
-        /// <param name="code"></param>
         /// <param name="tenantId"></param>
+        /// <param name="tenantName"></param>
+        /// <param name="code"></param>
         /// <param name="mapCode"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<List<MapTenant>> GetPagedListAsync(int skipCount, int maxResultCount, string sorting = null, string code = "", Guid? tenantId = null, string mapCode = "", bool includeDetails = false, CancellationToken cancellationToken = default);
+        Task<List<MapTenant>> GetPagedListAsync(int skipCount, int maxResultCount, string sorting = null, Guid? tenantId = null, string tenantName = "", string code = "", string mapCode = "", bool includeDetails = false, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get count async
         /// </summary>
-        /// <param name="code"></param>
         /// <param name="tenantId"></param>
+        /// <param name="tenantName"></param>
+        /// <param name="code"></param>
         /// <param name="mapCode"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<int> GetCountAsync(string code = "", Guid? tenantId = null, string mapCode = "", CancellationToken cancellationToken = default);
+        Task<int> GetCountAsync(Guid? tenantId = null, string tenantName = "", string code = "", string mapCode = "", CancellationToken cancellationToken = default);
     }
 }

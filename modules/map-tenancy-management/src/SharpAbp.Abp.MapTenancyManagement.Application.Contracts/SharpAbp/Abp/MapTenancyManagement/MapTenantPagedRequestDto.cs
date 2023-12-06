@@ -5,8 +5,9 @@ namespace SharpAbp.Abp.MapTenancyManagement
 {
     public class MapTenantPagedRequestDto : PagedAndSortedResultRequestDto
     {
-        public string Code { get; set; }
         public Guid? TenantId { get; set; }
+        public string TenantName { get; set; }
+        public string Code { get; set; }
         public string MapCode { get; set; }
     }
 }

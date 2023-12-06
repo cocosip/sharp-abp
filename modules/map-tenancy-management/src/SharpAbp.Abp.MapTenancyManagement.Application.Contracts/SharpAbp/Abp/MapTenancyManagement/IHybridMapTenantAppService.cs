@@ -27,14 +27,14 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        Task<PagedResultDto<HybridMapTenantDto>> GetListAsync(HybridMapTenantPagedRequestDto input);
+        Task<PagedResultDto<HybridMapTenantDto>> GetListAsync(MapTenantPagedRequestDto input);
 
         /// <summary>
         /// Search HybridMapTenant paged
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        Task<PagedResultDto<HybridMapTenantDto>> SearchAsync(HybridMapTenantPagedRequestDto input);
+        Task<PagedResultDto<HybridMapTenantDto>> SearchAsync(MapTenantPagedRequestDto input);
 
         /// <summary>
         /// Current HybridMapTenant

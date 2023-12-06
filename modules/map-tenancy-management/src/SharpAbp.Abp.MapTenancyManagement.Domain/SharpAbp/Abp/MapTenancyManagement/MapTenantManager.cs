@@ -42,20 +42,21 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// Update MapTenant
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="code"></param>
         /// <param name="tenantId"></param>
+        /// <param name="tenantName"></param>
+        /// <param name="code"></param>
         /// <param name="mapCode"></param>
         /// <returns></returns>
-        public virtual async Task<MapTenant> UpdateAsync(Guid id, string code, Guid tenantId, string mapCode)
+        public virtual async Task<MapTenant> UpdateAsync(Guid id, Guid tenantId, string tenantName, string code, string mapCode)
         {
             var mapTenant = await MapTenantRepository.GetAsync(id);
 
             //Validate
-            await ValidateTenantAsync(tenantId, id);
+            var tenant = await ValidateTenantAsync(tenantId, id);
             await ValidateCodeAsync(code, id);
             await ValidateMapCodeAsync(mapCode, id);
 
-            mapTenant.Update(code, tenantId, mapCode);
+            mapTenant.Update(tenant.Id, tenant.Name, code, mapCode);
 
             return await MapTenantRepository.UpdateAsync(mapTenant);
         }
@@ -67,7 +68,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <param name="tenantId"></param>
         /// <param name="expectedId"></param>
         /// <returns></returns>
-        public virtual async Task ValidateTenantAsync(Guid tenantId, Guid? expectedId = null)
+        public virtual async Task<Tenant> ValidateTenantAsync(Guid tenantId, Guid? expectedId = null)
         {
             var tenant = await TenantRepository.GetAsync(tenantId, false);
             var mapTenant = await MapTenantRepository.FindExpectedTenantIdAsync(tenantId, expectedId);
@@ -75,6 +76,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
             {
                 throw new UserFriendlyException(Localizer["MapTenancyManagement.DuplicateTenantId", tenantId]);
             }
+            return tenant;
         }
 
         /// <summary>

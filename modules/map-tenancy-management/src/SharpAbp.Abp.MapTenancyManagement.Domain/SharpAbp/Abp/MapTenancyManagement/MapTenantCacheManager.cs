@@ -1,11 +1,10 @@
 using JetBrains.Annotations;
 using System;
-using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
-using System.Threading;
 using Volo.Abp.MultiTenancy;
 
 namespace SharpAbp.Abp.MapTenancyManagement

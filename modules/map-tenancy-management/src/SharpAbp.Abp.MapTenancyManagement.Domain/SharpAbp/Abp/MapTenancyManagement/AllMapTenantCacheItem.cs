@@ -8,7 +8,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
         public AllMapTenantCacheItem()
         {
-            MapTenants = new List<MapTenantCacheItem>();
+            MapTenants = [];
         }
 
         public void AddMapTenant(MapTenantCacheItem mapTenantCacheItem)

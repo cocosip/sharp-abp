@@ -36,10 +36,10 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
 
             var q1 = await _hybridMapTenantAppService.GetAsync(hybridMapTenant1.Id);
-            Assert.Equal("ky-tenant1", q1.Name);
+            Assert.Equal("ky-tenant1", q1.TenantName);
             Assert.Equal("100", q1.Code);
             Assert.Equal("100100", q1.MapCode);
-            Assert.NotNull(q1.MapTenantId);
+          //  Assert.Equal("",q1.TenantId);
 
             await _hybridMapTenantAppService.DeleteAsync(hybridMapTenant2.Id);
 

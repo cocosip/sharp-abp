@@ -12,12 +12,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
             CreateMap<UpdateMapTenantDto, MapTenant>();
 
             CreateMap<Tenant, HybridMapTenantDto>();
-
-            CreateMap<MapTenant, HybridMapTenantDto>()
-                .ForMember(dest => dest.MapTenantId, opt => opt.MapFrom(o => o.Id))
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(o => o.TenantId))
-                .ForMember(dest => dest.ConcurrencyStamp, opt => opt.Ignore())
-                .ForMember(dest => dest.ExtraProperties, opt => opt.Ignore());
+            CreateMap<MapTenant, HybridMapTenantDto>();
         }
     }
 }

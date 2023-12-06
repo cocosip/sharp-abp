@@ -8,7 +8,9 @@ using Volo.Abp.Data;
 using Volo.Abp.EventBus.Distributed;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.ObjectExtending;
+using Volo.Abp.ObjectMapping;
 using Volo.Abp.TenantManagement;
+using static Volo.Abp.TenantManagement.TenantManagementPermissions;
 
 namespace SharpAbp.Abp.MapTenancyManagement
 {
@@ -47,12 +49,8 @@ namespace SharpAbp.Abp.MapTenancyManagement
         [Authorize(MapTenancyManagementPermissions.MapTenants.Default)]
         public virtual async Task<HybridMapTenantDto> GetAsync(Guid id)
         {
-            var tenant = await TenantRepository.GetAsync(id);
-            var hybridMapTenant = ObjectMapper.Map<Tenant, HybridMapTenantDto>(tenant);
-            var mapTenant = await MapTenantRepository.FindByTenantIdAsync(id);
-
-            ObjectMapper.Map(mapTenant, hybridMapTenant);
-
+            var mapTenant = await MapTenantRepository.GetAsync(id);
+            var hybridMapTenant = ObjectMapper.Map<MapTenant, HybridMapTenantDto>(mapTenant);
             return hybridMapTenant;
         }
 
@@ -63,17 +61,8 @@ namespace SharpAbp.Abp.MapTenancyManagement
         [AllowAnonymous]
         public virtual async Task<List<HybridMapTenantDto>> GetAllAsync()
         {
-            var tenants = await TenantRepository.GetListAsync(false, default);
-            var hybridMapTenants = ObjectMapper.Map<List<Tenant>, List<HybridMapTenantDto>>(tenants);
-
-            var tenantIds = tenants.Select(x => x.Id).ToList();
-            var mapTenants = await MapTenantRepository.GetListByTenantIdsAsync(tenantIds);
-            foreach (var hybridMapTenant in hybridMapTenants)
-            {
-                var mapTenant = mapTenants.FirstOrDefault(x => x.TenantId == hybridMapTenant.Id);
-                ObjectMapper.Map(mapTenant, hybridMapTenant);
-            }
-
+            var mapTenants = await MapTenantRepository.GetListAsync();
+            var hybridMapTenants = ObjectMapper.Map<List<MapTenant>, List<HybridMapTenantDto>>(mapTenants);
             return hybridMapTenants;
         }
 
@@ -84,29 +73,25 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <returns></returns>
         [Authorize(TenantManagementPermissions.Tenants.Default)]
         [Authorize(MapTenancyManagementPermissions.MapTenants.Default)]
-        public virtual async Task<PagedResultDto<HybridMapTenantDto>> GetListAsync(HybridMapTenantPagedRequestDto input)
+        public virtual async Task<PagedResultDto<HybridMapTenantDto>> GetListAsync(MapTenantPagedRequestDto input)
         {
             if (input.Sorting.IsNullOrWhiteSpace())
             {
                 input.Sorting = nameof(Tenant.Name);
             }
 
-            var count = await TenantRepository.GetCountAsync(input.Filter);
-            var tenants = await TenantRepository.GetListAsync(
-                input.Sorting,
-                input.MaxResultCount,
+            var count = await MapTenantRepository.GetCountAsync(input.TenantId, input.TenantName, input.Code, input.MapCode);
+            var mapTenants = await MapTenantRepository.GetPagedListAsync(
                 input.SkipCount,
-                input.Filter
+                input.MaxResultCount,
+                input.Sorting,
+                input.TenantId,
+                input.TenantName,
+                input.Code,
+                input.MapCode
             );
-            var hybridMapTenants = ObjectMapper.Map<List<Tenant>, List<HybridMapTenantDto>>(tenants);
-            var tenantIds = tenants.Select(x => x.Id).ToList();
-            var mapTenants = await MapTenantRepository.GetListByTenantIdsAsync(tenantIds);
-            foreach (var hybridMapTenant in hybridMapTenants)
-            {
-                var mapTenant = mapTenants.FirstOrDefault(x => x.TenantId == hybridMapTenant.Id);
-                ObjectMapper.Map(mapTenant, hybridMapTenant);
-            }
 
+            var hybridMapTenants = ObjectMapper.Map<List<MapTenant>, List<HybridMapTenantDto>>(mapTenants);
             return new PagedResultDto<HybridMapTenantDto>(count, hybridMapTenants);
         }
 
@@ -116,29 +101,24 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <param name="input"></param>
         /// <returns></returns>
         [AllowAnonymous]
-        public virtual async Task<PagedResultDto<HybridMapTenantDto>> SearchAsync(HybridMapTenantPagedRequestDto input)
+        public virtual async Task<PagedResultDto<HybridMapTenantDto>> SearchAsync(MapTenantPagedRequestDto input)
         {
             if (input.Sorting.IsNullOrWhiteSpace())
             {
                 input.Sorting = nameof(Tenant.Name);
             }
 
-            var count = await TenantRepository.GetCountAsync(input.Filter);
-            var tenants = await TenantRepository.GetListAsync(
-                input.Sorting,
-                input.MaxResultCount,
+            var count = await MapTenantRepository.GetCountAsync(input.TenantId, input.TenantName, input.Code, input.MapCode);
+            var mapTenants = await MapTenantRepository.GetPagedListAsync(
                 input.SkipCount,
-                input.Filter
-            );
-            var hybridMapTenants = ObjectMapper.Map<List<Tenant>, List<HybridMapTenantDto>>(tenants);
-            var tenantIds = tenants.Select(x => x.Id).ToList();
-            var mapTenants = await MapTenantRepository.GetListByTenantIdsAsync(tenantIds);
-            foreach (var hybridMapTenant in hybridMapTenants)
-            {
-                var mapTenant = mapTenants.FirstOrDefault(x => x.TenantId == hybridMapTenant.Id);
-                ObjectMapper.Map(mapTenant, hybridMapTenant);
-            }
+                input.MaxResultCount,
+                input.Sorting,
+                input.TenantId,
+                input.TenantName,
+                input.Code,
+                input.MapCode);
 
+            var hybridMapTenants = ObjectMapper.Map<List<MapTenant>, List<HybridMapTenantDto>>(mapTenants);
             return new PagedResultDto<HybridMapTenantDto>(count, hybridMapTenants);
         }
 
@@ -151,16 +131,8 @@ namespace SharpAbp.Abp.MapTenancyManagement
             var hybridMapTenant = new HybridMapTenantDto();
             if (CurrentTenant.IsAvailable)
             {
-                var tenant = await TenantRepository.FindAsync(CurrentTenant.Id.Value);
-                if (tenant != null)
-                {
-                    ObjectMapper.Map(tenant, hybridMapTenant);
-                    var mapTenant = await MapTenantRepository.FindByTenantIdAsync(tenant.Id);
-                    if (mapTenant != null)
-                    {
-                        ObjectMapper.Map(mapTenant, hybridMapTenant);
-                    }
-                }
+                var mapTenant = await MapTenantRepository.FindByTenantIdAsync(CurrentTenant.Id.Value);
+                ObjectMapper.Map(mapTenant, hybridMapTenant);
             }
             return hybridMapTenant;
         }
@@ -182,8 +154,9 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
             var mapTenant = new MapTenant(
                  GuidGenerator.Create(),
-                 input.Code,
                  tenant.Id,
+                 tenant.Name,
+                 input.Code,
                  input.MapCode);
 
             await MapTenantManager.CreateAsync(mapTenant);
@@ -213,8 +186,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
                                 );
             }
 
-            var hybridMapTenant = ObjectMapper.Map<Tenant, HybridMapTenantDto>(tenant);
-            ObjectMapper.Map(mapTenant, hybridMapTenant);
+            var hybridMapTenant = ObjectMapper.Map<MapTenant, HybridMapTenantDto>(mapTenant);
 
             return hybridMapTenant;
         }
@@ -229,33 +201,17 @@ namespace SharpAbp.Abp.MapTenancyManagement
         [Authorize(MapTenancyManagementPermissions.MapTenants.Update)]
         public virtual async Task<HybridMapTenantDto> UpdateAsync(Guid id, UpdateHybridMapTenantDto input)
         {
-            var tenant = await TenantRepository.GetAsync(id);
-
+            var mapTenant = await MapTenantRepository.GetAsync(id);
+            var tenant = await TenantRepository.GetAsync(mapTenant.TenantId);
             await TenantManager.ChangeNameAsync(tenant, input.Name);
 
             //tenant.SetConcurrencyStampIfNotNull(input.ConcurrencyStamp);
             input.MapExtraPropertiesTo(tenant);
-
             await TenantRepository.UpdateAsync(tenant);
 
-            var mapTenant = await MapTenantRepository.FindByTenantIdAsync(id);
-            if (mapTenant == null)
-            {
-                mapTenant = new MapTenant(
-                    GuidGenerator.Create(),
-                    input.Code,
-                    tenant.Id,
-                    input.MapCode
-                );
-                await MapTenantManager.CreateAsync(mapTenant);
-            }
-            else
-            {
-                await MapTenantManager.UpdateAsync(mapTenant.Id, input.Code, id, input.MapCode);
-            }
+            await MapTenantManager.UpdateAsync(id, tenant.Id, tenant.Name, input.Code, input.MapCode);
 
-            var hybridMapTenant = ObjectMapper.Map<Tenant, HybridMapTenantDto>(tenant);
-            ObjectMapper.Map(mapTenant, hybridMapTenant);
+            var hybridMapTenant = ObjectMapper.Map<MapTenant, HybridMapTenantDto>(mapTenant);
 
             return hybridMapTenant;
         }
@@ -269,18 +225,9 @@ namespace SharpAbp.Abp.MapTenancyManagement
         [Authorize(MapTenancyManagementPermissions.MapTenants.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {
-            var tenant = await TenantRepository.FindAsync(id);
-            if (tenant == null)
-            {
-                return;
-            }
+            var mapTenant = await MapTenantRepository.GetAsync(id);
+            var tenant = await TenantRepository.GetAsync(mapTenant.TenantId);
             await TenantRepository.DeleteAsync(tenant);
-
-            var mapTenant = await MapTenantRepository.FindByTenantIdAsync(id);
-            if (mapTenant == null)
-            {
-                return;
-            }
             await MapTenantRepository.DeleteAsync(mapTenant);
         }
 
@@ -292,7 +239,8 @@ namespace SharpAbp.Abp.MapTenancyManagement
         [Authorize(TenantManagementPermissions.Tenants.ManageConnectionStrings)]
         public virtual async Task<string> GetDefaultConnectionStringAsync(Guid id)
         {
-            var tenant = await TenantRepository.GetAsync(id);
+            var mapTenant = await MapTenantRepository.GetAsync(id);
+            var tenant = await TenantRepository.GetAsync(mapTenant.TenantId);
             return tenant?.FindDefaultConnectionString();
         }
 
@@ -305,7 +253,8 @@ namespace SharpAbp.Abp.MapTenancyManagement
         [Authorize(TenantManagementPermissions.Tenants.ManageConnectionStrings)]
         public virtual async Task UpdateDefaultConnectionStringAsync(Guid id, string defaultConnectionString)
         {
-            var tenant = await TenantRepository.GetAsync(id);
+            var mapTenant = await MapTenantRepository.GetAsync(id);
+            var tenant = await TenantRepository.GetAsync(mapTenant.TenantId);
             tenant.SetDefaultConnectionString(defaultConnectionString);
             await TenantRepository.UpdateAsync(tenant);
         }
@@ -318,7 +267,8 @@ namespace SharpAbp.Abp.MapTenancyManagement
         [Authorize(TenantManagementPermissions.Tenants.ManageConnectionStrings)]
         public virtual async Task DeleteDefaultConnectionStringAsync(Guid id)
         {
-            var tenant = await TenantRepository.GetAsync(id);
+            var mapTenant = await MapTenantRepository.GetAsync(id);
+            var tenant = await TenantRepository.GetAsync(mapTenant.TenantId);
             tenant.RemoveDefaultConnectionString();
             await TenantRepository.UpdateAsync(tenant);
         }
