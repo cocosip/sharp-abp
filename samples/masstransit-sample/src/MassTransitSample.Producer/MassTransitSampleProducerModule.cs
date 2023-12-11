@@ -1,6 +1,5 @@
 ﻿using MassTransit;
 using MassTransitSample.Common;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.MassTransit;
 using SharpAbp.Abp.MassTransit.ActiveMQ;
@@ -23,17 +22,15 @@ namespace MassTransitSample.Producer
         )]
     public class MassTransitSampleProducerModule : AbpModule
     {
-        public override void PreConfigureServices(ServiceConfigurationContext context)
+        public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            AsyncHelper.RunSync(() => PreConfigureServicesAsync(context));
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
         }
 
-        public override Task PreConfigureServicesAsync(ServiceConfigurationContext context)
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
             var configuration = context.Services.GetConfiguration();
-            var abpMassTransitOptions = configuration
-                .GetSection("MassTransitOptions")
-                .Get<AbpMassTransitOptions>();
+            var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
 
             if (abpMassTransitOptions.Provider.Equals(MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {

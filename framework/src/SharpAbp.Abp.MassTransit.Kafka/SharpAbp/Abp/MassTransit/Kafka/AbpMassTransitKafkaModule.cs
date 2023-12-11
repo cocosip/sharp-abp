@@ -83,20 +83,27 @@ namespace SharpAbp.Abp.MassTransit.Kafka
 
             return Task.CompletedTask;
         }
+ 
 
-
-        public override void ConfigureServices(ServiceConfigurationContext context)
+        public override void PostConfigureServices(ServiceConfigurationContext context)
         {
-            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+            AsyncHelper.RunSync(() => PostConfigureServicesAsync(context));
         }
 
-        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
+        public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            var configuration = context.Services.GetConfiguration();
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
-
             if (abpMassTransitOptions.Provider.Equals(MassTransitKafkaConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
+                Configure<AbpMassTransitKafkaOptions>(options =>
+                {
+                    var actions = context.Services.GetPreConfigureActions<AbpMassTransitKafkaOptions>();
+                    foreach (var action in actions)
+                    {
+                        action(options);
+                    }
+                });
+
                 var kafkaOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitKafkaOptions>();
                 context.Services.AddMassTransit(x =>
                 {
@@ -187,29 +194,9 @@ namespace SharpAbp.Abp.MassTransit.Kafka
                         postConfigure(x);
                     }
                 });
-            }
 
-            return Task.CompletedTask;
-        }
-
-        public override void PostConfigureServices(ServiceConfigurationContext context)
-        {
-            AsyncHelper.RunSync(() => PostConfigureServicesAsync(context));
-        }
-
-        public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
-        {
-            var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
-            if (abpMassTransitOptions.Provider.Equals(MassTransitKafkaConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
-            {
-                Configure<AbpMassTransitKafkaOptions>(options =>
-                {
-                    var actions = context.Services.GetPreConfigureActions<AbpMassTransitKafkaOptions>();
-                    foreach (var action in actions)
-                    {
-                        action(options);
-                    }
-                });
+                //Host
+                MassTransitSetupUtil.ConfigureMassTransitHost(context);
             }
 
             return Task.CompletedTask;
