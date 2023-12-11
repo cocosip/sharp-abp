@@ -124,16 +124,16 @@ namespace SharpAbp.Abp.MassTransit.Kafka
         public AbpMassTransitKafkaOptions()
         {
 
-            RiderPreConfigures = new List<Action<IRiderRegistrationConfigurator>>();
-            RiderConfigures = new List<Action<IRiderRegistrationConfigurator>>();
-            RiderPostConfigures = new List<Action<IRiderRegistrationConfigurator>>();
+            RiderPreConfigures = [];
+            RiderConfigures = [];
+            RiderPostConfigures = [];
 
-            KafkaPreConfigures = new List<Action<IRiderRegistrationContext, IKafkaFactoryConfigurator>>();
-            KafkaConfigures = new List<Action<IRiderRegistrationContext, IKafkaFactoryConfigurator>>();
-            KafkaPostConfigures = new List<Action<IRiderRegistrationContext, IKafkaFactoryConfigurator>>();
+            KafkaPreConfigures = [];
+            KafkaConfigures = [];
+            KafkaPostConfigures = [];
 
-            Producers = new List<KafkaProducerConfiguration>();
-            Consumers = new List<KafkaConsumerConfiguration>();
+            Producers = [];
+            Consumers = [];
         }
 
         public AbpMassTransitKafkaOptions PreConfigure(IConfiguration configuration)

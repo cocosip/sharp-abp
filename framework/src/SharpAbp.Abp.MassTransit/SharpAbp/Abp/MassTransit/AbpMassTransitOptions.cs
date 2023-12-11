@@ -38,8 +38,8 @@ namespace SharpAbp.Abp.MassTransit
 
         public AbpMassTransitOptions()
         {
-            PreConfigures = new List<Action<IBusRegistrationConfigurator>>();
-            PostConfigures = new List<Action<IBusRegistrationConfigurator>>();
+            PreConfigures = [];
+            PostConfigures = [];
         }
 
 

@@ -5,8 +5,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Volo.Abp.Timing" Version="$(VoloAbpPackageVersion)" />
-		<PackageReference Include="Volo.Abp.Threading" Version="$(VoloAbpPackageVersion)" />
+		<PackageReference Include="Volo.Abp.Timing" />
+		<PackageReference Include="Volo.Abp.Threading" />
 	</ItemGroup>
 
 	<ItemGroup>

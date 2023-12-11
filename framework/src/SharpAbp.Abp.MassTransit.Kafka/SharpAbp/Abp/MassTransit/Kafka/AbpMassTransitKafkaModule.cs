@@ -1,6 +1,5 @@
 ﻿using MassTransit;
 using MassTransit.KafkaIntegration;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
@@ -22,9 +21,8 @@ namespace SharpAbp.Abp.MassTransit.Kafka
         public override Task PreConfigureServicesAsync(ServiceConfigurationContext context)
         {
             var configuration = context.Services.GetConfiguration();
-            var abpMassTransitOptions = configuration
-                .GetSection("MassTransitOptions")
-                .Get<AbpMassTransitOptions>();
+            var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
+
             if (abpMassTransitOptions.Provider.Equals(MassTransitKafkaConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
                 PreConfigure<AbpMassTransitOptions>(options =>
@@ -85,27 +83,32 @@ namespace SharpAbp.Abp.MassTransit.Kafka
 
             return Task.CompletedTask;
         }
+ 
 
-
-        public override void ConfigureServices(ServiceConfigurationContext context)
+        public override void PostConfigureServices(ServiceConfigurationContext context)
         {
-            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+            AsyncHelper.RunSync(() => PostConfigureServicesAsync(context));
         }
 
-        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
+        public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            var configuration = context.Services.GetConfiguration();
-            var abpMassTransitOptions = configuration
-                .GetSection("MassTransitOptions")
-                .Get<AbpMassTransitOptions>();
+            var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
             if (abpMassTransitOptions.Provider.Equals(MassTransitKafkaConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
-                var massTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
+                Configure<AbpMassTransitKafkaOptions>(options =>
+                {
+                    var actions = context.Services.GetPreConfigureActions<AbpMassTransitKafkaOptions>();
+                    foreach (var action in actions)
+                    {
+                        action(options);
+                    }
+                });
+
                 var kafkaOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitKafkaOptions>();
                 context.Services.AddMassTransit(x =>
                 {
                     //PreConfigure
-                    foreach (var preConfigure in massTransitOptions.PreConfigures)
+                    foreach (var preConfigure in abpMassTransitOptions.PreConfigures)
                     {
                         preConfigure(x);
                     }
@@ -121,7 +124,7 @@ namespace SharpAbp.Abp.MassTransit.Kafka
                         //Producer
                         foreach (var producer in kafkaOptions.Producers)
                         {
-                            var topic = kafkaOptions.DefaultTopicFormatFunc(massTransitOptions.Prefix, producer.Topic);
+                            var topic = kafkaOptions.DefaultTopicFormatFunc(abpMassTransitOptions.Prefix, producer.Topic);
                             producer.Configure?.Invoke(topic, rider);
                         }
 
@@ -161,7 +164,7 @@ namespace SharpAbp.Abp.MassTransit.Kafka
 
                             foreach (var consumer in kafkaOptions.Consumers)
                             {
-                                var topic = kafkaOptions.DefaultTopicFormatFunc(massTransitOptions.Prefix, consumer.Topic);
+                                var topic = kafkaOptions.DefaultTopicFormatFunc(abpMassTransitOptions.Prefix, consumer.Topic);
 
                                 var groupId = consumer.GroupId.IsNullOrWhiteSpace() ?
                                 kafkaOptions.DefaultGroupId : consumer.GroupId;
@@ -175,7 +178,6 @@ namespace SharpAbp.Abp.MassTransit.Kafka
                             {
                                 postConfigure(ctx, k);
                             }
-
                         });
 
                         //Rider postConfigure
@@ -187,37 +189,14 @@ namespace SharpAbp.Abp.MassTransit.Kafka
                     });
 
                     //PostConfigure
-                    foreach (var postConfigure in massTransitOptions.PostConfigures)
+                    foreach (var postConfigure in abpMassTransitOptions.PostConfigures)
                     {
                         postConfigure(x);
                     }
                 });
-            }
 
-            return Task.CompletedTask;
-        }
-
-        public override void PostConfigureServices(ServiceConfigurationContext context)
-        {
-            AsyncHelper.RunSync(() => PostConfigureServicesAsync(context));
-        }
-
-        public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
-        {
-            var configuration = context.Services.GetConfiguration();
-            var abpMassTransitOptions = configuration
-                .GetSection("MassTransitOptions")
-                .Get<AbpMassTransitOptions>();
-            if (abpMassTransitOptions.Provider.Equals(MassTransitKafkaConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
-            {
-                Configure<AbpMassTransitKafkaOptions>(options =>
-                {
-                    var actions = context.Services.GetPreConfigureActions<AbpMassTransitKafkaOptions>();
-                    foreach (var action in actions)
-                    {
-                        action(options);
-                    }
-                });
+                //Host
+                MassTransitSetupUtil.ConfigureMassTransitHost(context);
             }
 
             return Task.CompletedTask;

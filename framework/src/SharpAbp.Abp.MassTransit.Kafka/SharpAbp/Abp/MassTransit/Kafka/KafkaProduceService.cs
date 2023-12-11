@@ -51,5 +51,8 @@ namespace SharpAbp.Abp.MassTransit.Kafka
             await topicProducer.Produce(key, value, cancellationToken);
         }
 
+
+
+
     }
 }

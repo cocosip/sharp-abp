@@ -20,8 +20,10 @@ namespace SharpAbp.Abp.MassTransit
 
             PreConfigure<AbpMassTransitOptions>(options =>
             {
+                options.Prefix = "SharpAbp";
                 options.PreConfigure(configuration);
             });
+
             return Task.CompletedTask;
         }
 
@@ -41,16 +43,7 @@ namespace SharpAbp.Abp.MassTransit
                 }
             });
 
-            var massTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
-            var startTimeout = TimeSpan.FromMilliseconds(massTransitOptions.StartTimeoutMilliSeconds);
-            var stopTimeout = TimeSpan.FromMilliseconds(massTransitOptions.StopTimeoutMilliSeconds);
 
-            Configure<MassTransitHostOptions>(options =>
-            {
-                options.WaitUntilStarted = massTransitOptions.WaitUntilStarted;
-                options.StartTimeout = startTimeout;
-                options.StopTimeout = stopTimeout;
-            });
             return Task.CompletedTask;
         }
 
