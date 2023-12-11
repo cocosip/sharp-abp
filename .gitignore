@@ -43,6 +43,8 @@ nupkgs/
 # tools
 tools/
 
+*.secrets.json
+
 # Visual Studio 2017 auto generated files
 Generated\ Files/
 
