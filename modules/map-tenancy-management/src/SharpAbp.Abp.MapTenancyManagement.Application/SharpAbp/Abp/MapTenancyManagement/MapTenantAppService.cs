@@ -79,12 +79,18 @@ namespace SharpAbp.Abp.MapTenancyManagement
         [Authorize(MapTenancyManagementPermissions.MapTenants.Default)]
         public virtual async Task<PagedResultDto<MapTenantDto>> GetPagedListAsync(MapTenantPagedRequestDto input)
         {
-            var count = await MapTenantRepository.GetCountAsync(input.TenantId, input.TenantName, input.Code, input.MapCode);
+            var count = await MapTenantRepository.GetCountAsync(
+                input.Filter,
+                input.TenantId,
+                input.TenantName,
+                input.Code,
+                input.MapCode);
 
             var mapTenants = await MapTenantRepository.GetPagedListAsync(
                 input.SkipCount,
                 input.MaxResultCount,
                 input.Sorting,
+                input.Filter,
                 input.TenantId,
                 input.TenantName,
                 input.Code,

@@ -107,8 +107,8 @@
         <RuntimeHostConfigurationOption Include="System.Runtime.Loader.UseRidGraph" Value="true" />
         <PackageVersion Include="aliyun-net-sdk-sts" Version="3.1.2" />
         <PackageVersion Include="Aliyun.OSS.SDK.NetCore" Version="2.13.0" />
-        <PackageVersion Include="AWSSDK.S3" Version="3.7.304" />
-        <PackageVersion Include="AWSSDK.SecurityToken" Version="3.7.300.11" />
+        <PackageVersion Include="AWSSDK.S3" Version="3.7.304.5" />
+        <PackageVersion Include="AWSSDK.SecurityToken" Version="3.7.300.17" />
         <PackageVersion Include="Azure.Messaging.ServiceBus" Version="7.17.0" />
         <PackageVersion Include="Azure.Storage.Blobs" Version="12.19.1" />
         <PackageVersion Include="AutoS3" Version="2.0.1" />
@@ -119,7 +119,7 @@
         <PackageVersion Include="FastDFSCore" Version="1.7.0" />
         <PackageVersion Include="FastDFSCore.Transport.SuperSocket" Version="1.7.0" />
         <PackageVersion Include="FastDFSCore.Transport.DotNetty" Version="1.7.0" />
-        <PackageVersion Include="FreeRedis" Version="1.2.7" />
+        <PackageVersion Include="FreeRedis" Version="1.2.9" />
         <PackageVersion Include="FreeSql" Version="3.2.805" />
         <PackageVersion Include="FreeSql.Provider.MySql" Version="3.2.805" />
         <PackageVersion Include="FreeSql.Provider.Oracle" Version="3.2.805" />
@@ -191,13 +191,13 @@
         <PackageVersion Include="NuGet.Versioning" Version="6.7.0" />
         <PackageVersion Include="NUglify" Version="1.21.0" />
         <PackageVersion Include="Nullable" Version="1.3.1" />
-        <PackageVersion Include="OpenTelemetry" Version="1.6.0" />
-        <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.6.0" />
-        <PackageVersion Include="OpenTelemetry.Exporter.Console" Version="1.6.0" />
-        <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.6.0" />
-        <PackageVersion Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.6.0-rc.1" />
-        <PackageVersion Include="OpenTelemetry.Exporter.Prometheus.HttpListener" Version="1.6.0-rc.1" />
-        <PackageVersion Include="OpenTelemetry.Exporter.Zipkin" Version="1.6.0" />
+        <PackageVersion Include="OpenTelemetry" Version="1.7.0" />
+        <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.7.0" />
+        <PackageVersion Include="OpenTelemetry.Exporter.Console" Version="1.7.0" />
+        <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.7.0" />
+        <PackageVersion Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.7.0-rc.1" />
+        <PackageVersion Include="OpenTelemetry.Exporter.Prometheus.HttpListener" Version="1.7.0-rc.1" />
+        <PackageVersion Include="OpenTelemetry.Exporter.Zipkin" Version="1.7.0" />
         <PackageVersion Include="protobuf-net" Version="3.2.30" />
         <PackageVersion Include="Polly" Version="8.2.0" />
         <PackageVersion Include="Polly.Extensions.Http" Version="3.0.0" />
@@ -226,9 +226,9 @@
         <PackageVersion Include="System.Text.Encodings.Web" Version="8.0.0" />
         <PackageVersion Include="System.Text.Json" Version="8.0.0" />
         <PackageVersion Include="Moq" Version="4.20.70" />
-        <PackageVersion Include="xunit" Version="2.6.2" />
+        <PackageVersion Include="xunit" Version="2.6.3" />
         <PackageVersion Include="xunit.extensibility.execution" Version="2.6.2" />
-        <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.4" />
+        <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.5" />
         <PackageVersion Include="coverlet.collector" Version="6.0.0" />
         <PackageVersion Include="ConfigureAwait.Fody" Version="3.3.2" />
         <PackageVersion Include="Fody" Version="6.8.0" />

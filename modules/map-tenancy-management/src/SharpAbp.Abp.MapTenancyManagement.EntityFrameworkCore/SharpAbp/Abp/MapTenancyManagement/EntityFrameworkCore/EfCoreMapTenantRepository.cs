@@ -200,6 +200,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         /// <param name="skipCount"></param>
         /// <param name="maxResultCount"></param>
         /// <param name="sorting"></param>
+        /// <param name="filter"></param>
         /// <param name="tenantId"></param>
         /// <param name="tenantName"></param>
         /// <param name="code"></param>
@@ -211,6 +212,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
             int skipCount,
             int maxResultCount,
             string sorting = null,
+            string filter = "",
             Guid? tenantId = null,
             string tenantName = "",
             string code = "",
@@ -220,6 +222,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         {
             return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
+                .WhereIf(!filter.IsNullOrWhiteSpace(), item => item.TenantName.Contains(tenantName) || item.Code.Contains(filter))
                 .WhereIf(tenantId.HasValue, item => item.TenantId == tenantId.Value)
                 .WhereIf(!tenantName.IsNullOrWhiteSpace(), item => item.TenantName.Contains(tenantName))
                 .WhereIf(!code.IsNullOrWhiteSpace(), item => item.Code.Contains(code))
@@ -233,6 +236,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         /// <summary>
         /// Get count async
         /// </summary>
+        /// <param name="filter"></param>
         /// <param name="tenantId"></param>
         /// <param name="tenantName"></param>
         /// <param name="code"></param>
@@ -240,6 +244,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<int> GetCountAsync(
+            string filter = "",
             Guid? tenantId = null,
             string tenantName = "",
             string code = "",
@@ -247,6 +252,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
+                .WhereIf(!filter.IsNullOrWhiteSpace(), item => item.TenantName.Contains(filter) || item.Code.Contains(filter))
                 .WhereIf(tenantId.HasValue, item => item.TenantId == tenantId.Value)
                 .WhereIf(!tenantName.IsNullOrWhiteSpace(), item => item.TenantName.Contains(tenantName))
                 .WhereIf(!code.IsNullOrWhiteSpace(), item => item.Code.Contains(code))

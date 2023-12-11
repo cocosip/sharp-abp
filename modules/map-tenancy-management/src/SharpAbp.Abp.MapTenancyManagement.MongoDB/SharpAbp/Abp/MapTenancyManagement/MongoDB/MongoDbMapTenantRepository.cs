@@ -191,6 +191,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
         /// <param name="skipCount"></param>
         /// <param name="maxResultCount"></param>
         /// <param name="sorting"></param>
+        /// <param name="filter"></param>
         /// <param name="tenantId"></param>
         /// <param name="tenantName"></param>
         /// <param name="code"></param>
@@ -202,6 +203,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
             int skipCount,
             int maxResultCount,
             string sorting = null,
+            string filter = "",
             Guid? tenantId = null,
             string tenantName = "",
             string code = "",
@@ -210,6 +212,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
             CancellationToken cancellationToken = default)
         {
             return await (await GetMongoQueryableAsync())
+                .WhereIf<MapTenant, IMongoQueryable<MapTenant>>(!filter.IsNullOrWhiteSpace(), item => item.TenantName.Contains(tenantName) || item.Code.Contains(filter))
                 .WhereIf<MapTenant, IMongoQueryable<MapTenant>>(tenantId.HasValue, item => item.TenantId == tenantId.Value)
                 .WhereIf<MapTenant, IMongoQueryable<MapTenant>>(!tenantName.IsNullOrWhiteSpace(), item => item.TenantName.Contains(tenantName))
                 .WhereIf<MapTenant, IMongoQueryable<MapTenant>>(!code.IsNullOrWhiteSpace(), item => item.Code.Contains(code))
@@ -221,8 +224,9 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
         }
 
         /// <summary>
-        /// Get count async
+        ///  Get count async
         /// </summary>
+        /// <param name="filter"></param>
         /// <param name="tenantId"></param>
         /// <param name="tenantName"></param>
         /// <param name="code"></param>
@@ -230,6 +234,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<int> GetCountAsync(
+            string filter = "",
             Guid? tenantId = null,
             string tenantName = "",
             string code = "",
@@ -237,6 +242,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
             CancellationToken cancellationToken = default)
         {
             return await (await GetMongoQueryableAsync())
+                .WhereIf<MapTenant, IMongoQueryable<MapTenant>>(!filter.IsNullOrWhiteSpace(), item => item.TenantName.Contains(tenantName) || item.Code.Contains(filter))
                 .WhereIf<MapTenant, IMongoQueryable<MapTenant>>(tenantId.HasValue, item => item.TenantId == tenantId.Value)
                 .WhereIf<MapTenant, IMongoQueryable<MapTenant>>(!tenantName.IsNullOrWhiteSpace(), item => item.TenantName.Contains(tenantName))
                 .WhereIf<MapTenant, IMongoQueryable<MapTenant>>(!code.IsNullOrWhiteSpace(), item => item.Code.Contains(code))

@@ -1,16 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Data;
 using Volo.Abp.EventBus.Distributed;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.ObjectExtending;
-using Volo.Abp.ObjectMapping;
 using Volo.Abp.TenantManagement;
-using static Volo.Abp.TenantManagement.TenantManagementPermissions;
 
 namespace SharpAbp.Abp.MapTenancyManagement
 {
@@ -80,11 +77,18 @@ namespace SharpAbp.Abp.MapTenancyManagement
                 input.Sorting = nameof(Tenant.Name);
             }
 
-            var count = await MapTenantRepository.GetCountAsync(input.TenantId, input.TenantName, input.Code, input.MapCode);
+            var count = await MapTenantRepository.GetCountAsync(
+                input.Filter,
+                input.TenantId,
+                input.TenantName,
+                input.Code,
+                input.MapCode);
+
             var mapTenants = await MapTenantRepository.GetPagedListAsync(
                 input.SkipCount,
                 input.MaxResultCount,
                 input.Sorting,
+                input.Filter,
                 input.TenantId,
                 input.TenantName,
                 input.Code,
@@ -108,11 +112,17 @@ namespace SharpAbp.Abp.MapTenancyManagement
                 input.Sorting = nameof(Tenant.Name);
             }
 
-            var count = await MapTenantRepository.GetCountAsync(input.TenantId, input.TenantName, input.Code, input.MapCode);
+            var count = await MapTenantRepository.GetCountAsync(
+                input.Filter,
+                input.TenantId,
+                input.TenantName,
+                input.Code,
+                input.MapCode);
             var mapTenants = await MapTenantRepository.GetPagedListAsync(
                 input.SkipCount,
                 input.MaxResultCount,
                 input.Sorting,
+                input.Filter,
                 input.TenantId,
                 input.TenantName,
                 input.Code,
