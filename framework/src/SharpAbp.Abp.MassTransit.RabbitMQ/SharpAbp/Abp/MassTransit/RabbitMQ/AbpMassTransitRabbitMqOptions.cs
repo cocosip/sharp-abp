@@ -47,14 +47,14 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
 
         public AbpMassTransitRabbitMqOptions()
         {
-            ClusterNodes = new List<string>();
+            ClusterNodes = [];
 
-            RabbitMqPreConfigures = new List<Action<IBusRegistrationContext, IRabbitMqBusFactoryConfigurator>>();
-            RabbitMqConfigures = new List<Action<IBusRegistrationContext, IRabbitMqBusFactoryConfigurator>>();
-            RabbitMqPostConfigures = new List<Action<IBusRegistrationContext, IRabbitMqBusFactoryConfigurator>>();
+            RabbitMqPreConfigures = [];
+            RabbitMqConfigures = [];
+            RabbitMqPostConfigures = [];
 
-            Producers = new List<RabbitMqProducerConfiguration>();
-            Consumers = new List<RabbitMqConsumerConfiguration>();
+            Producers = [];
+            Consumers = [];
         }
 
         public AbpMassTransitRabbitMqOptions PreConfigure(IConfiguration configuration)

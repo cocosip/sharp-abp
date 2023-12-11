@@ -1,5 +1,4 @@
 ﻿using MassTransit;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -22,9 +21,8 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
         public override Task PreConfigureServicesAsync(ServiceConfigurationContext context)
         {
             var configuration = context.Services.GetConfiguration();
-            var abpMassTransitOptions = configuration
-                .GetSection("MassTransitOptions")
-                .Get<AbpMassTransitOptions>();
+            var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
+
             if (abpMassTransitOptions.Provider.Equals(MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
                 PreConfigure<AbpMassTransitRabbitMqOptions>(options => options.PreConfigure(configuration));
@@ -45,21 +43,15 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
 
                     options.DefaultReceiveEndpointConfigure = new Action<string, string, IRabbitMqReceiveEndpointConfigurator>((exchangeName, queueName, c) =>
                     {
-                        //c.Bind(exchangeName);
                         c.ConcurrentMessageLimit = rabbitMqOptions.DefaultConcurrentMessageLimit;
                         c.PrefetchCount = rabbitMqOptions.DefaultPrefetchCount;
                         c.AutoDelete = rabbitMqOptions.DefaultAutoDelete;
                         c.Durable = rabbitMqOptions.DefaultDurable;
                         c.ExchangeType = rabbitMqOptions.DefaultExchangeType;
                     });
-
-
-                    // options.RabbitMqPostConfigures.Add(new Action<IBusRegistrationContext, IRabbitMqBusFactoryConfigurator>((ctx, cfg) =>
-                    // {
-                    //     cfg.ConfigureEndpoints(ctx);
-                    // }));
                 });
             }
+
             return Task.CompletedTask;
         }
 
@@ -71,9 +63,8 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
             var configuration = context.Services.GetConfiguration();
-            var abpMassTransitOptions = configuration
-                .GetSection("MassTransitOptions")
-                .Get<AbpMassTransitOptions>();
+            var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
+
             if (abpMassTransitOptions.Provider.Equals(MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
                 var massTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
@@ -171,6 +162,7 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
             return Task.CompletedTask;
         }
 
+
         public override void PostConfigureServices(ServiceConfigurationContext context)
         {
             AsyncHelper.RunSync(() => PostConfigureServicesAsync(context));
@@ -178,20 +170,20 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
 
         public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            var configuration = context.Services.GetConfiguration();
-            var abpMassTransitOptions = configuration
-                .GetSection("MassTransitOptions")
-                .Get<AbpMassTransitOptions>();
-            if (abpMassTransitOptions.Provider.Equals(MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
+            if (abpMassTransitOptions != null)
             {
-                Configure<AbpMassTransitRabbitMqOptions>(options =>
+                if (abpMassTransitOptions.Provider.Equals(MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
                 {
-                    var actions = context.Services.GetPreConfigureActions<AbpMassTransitRabbitMqOptions>();
-                    foreach (var action in actions)
+                    Configure<AbpMassTransitRabbitMqOptions>(options =>
                     {
-                        action(options);
-                    }
-                });
+                        var actions = context.Services.GetPreConfigureActions<AbpMassTransitRabbitMqOptions>();
+                        foreach (var action in actions)
+                        {
+                            action(options);
+                        }
+                    });
+                }
             }
             return Task.CompletedTask;
         }

@@ -35,12 +35,12 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
 
         public AbpMassTransitActiveMqOptions()
         {
-            ActiveMqPreConfigures = new List<Action<IBusRegistrationContext, IActiveMqBusFactoryConfigurator>>();
-            ActiveMqConfigures = new List<Action<IBusRegistrationContext, IActiveMqBusFactoryConfigurator>>();
-            ActiveMqPostConfigures = new List<Action<IBusRegistrationContext, IActiveMqBusFactoryConfigurator>>();
+            ActiveMqPreConfigures = [];
+            ActiveMqConfigures = [];
+            ActiveMqPostConfigures = [];
 
-            Producers = new List<ActiveMqProducerConfiguration>();
-            Consumers = new List<ActiveMqConsumerConfiguration>();
+            Producers = [];
+            Consumers = [];
         }
 
         public AbpMassTransitActiveMqOptions PreConfigure(IConfiguration configuration)

@@ -1,4 +1,5 @@
-﻿using SharpAbp.Abp.MassTransit.Kafka;
+﻿using SharpAbp.Abp.MassTransit.ActiveMQ;
+using SharpAbp.Abp.MassTransit.Kafka;
 using SharpAbp.Abp.MassTransit.RabbitMQ;
 using Volo.Abp;
 using Volo.Abp.Autofac;
@@ -9,6 +10,7 @@ namespace SharpAbp.Abp.MassTransit
     [DependsOn(
         typeof(AbpMassTransitKafkaModule),
         typeof(AbpMassTransitRabbitMqModule),
+        typeof(AbpMassTransitActiveMqModule),
         typeof(AbpTestBaseModule),
         typeof(AbpAutofacModule)
       )]
