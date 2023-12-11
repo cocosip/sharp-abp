@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\..\..\common.props" />
+	<Import Project="..\..\..\configureawait.props" />
+
+	<PropertyGroup>
+		<TargetFrameworks>$(ProjectFrameworks)</TargetFrameworks>
+		<AssemblyName>SharpAbp.Abp.EventBus.MassTransit</AssemblyName>
+		<PackageId>SharpAbp.Abp.EventBus.MassTransit</PackageId>
+		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<Description>SharpAbp EventBus MassTransit Module</Description>
+		<RootNamespace />
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.EventBus" />
+		<ProjectReference Include="..\SharpAbp.Abp.MassTransit\SharpAbp.Abp.MassTransit.csproj" />
+	</ItemGroup>
+
+</Project>
