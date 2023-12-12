@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\..\..\common.props" />
+	<Import Project="..\..\..\configureawait.props" />
+
+	<PropertyGroup>
+		<TargetFrameworks>$(ProjectFrameworks)</TargetFrameworks>
+		<AssemblyName>SharpAbp.Abp.EventBus.MassTransit.RabbitMQ</AssemblyName>
+		<PackageId>SharpAbp.Abp.EventBus.MassTransit.RabbitMQ</PackageId>
+		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<Description>SharpAbp EventBus MassTransit RabbitMQ Module</Description>
+		<RootNamespace />
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SharpAbp.Abp.EventBus.MassTransit\SharpAbp.Abp.EventBus.MassTransit.csproj" />
+		<ProjectReference Include="..\SharpAbp.Abp.MassTransit.RabbitMQ\SharpAbp.Abp.MassTransit.RabbitMQ.csproj" />
+	</ItemGroup>
+</Project>
