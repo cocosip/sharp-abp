@@ -8,7 +8,7 @@
 		<NetCoreFx>net8.0</NetCoreFx>
 
 		<!--Volo ABP packages-->
-		<VoloAbpPackageVersion>8.0.0-rc.3</VoloAbpPackageVersion>
+		<VoloAbpPackageVersion>8.0.0</VoloAbpPackageVersion>
  
 	</PropertyGroup>
 </Project>

@@ -20,8 +20,8 @@ namespace SharpAbp.Abp.OpenIddict
         /// Gets or sets the application type associated with the current application.
         /// </summary>
         [Required]
-        [DynamicStringLength(typeof(OpenIddictApplicationConsts), nameof(OpenIddictApplicationConsts.TypeMaxLength))]
-        public string Type { get; set; }
+        [DynamicStringLength(typeof(OpenIddictApplicationConsts), nameof(OpenIddictApplicationConsts.ClientTypeMaxLength))]
+        public string ClientType { get; set; }
 
         /// <summary>
         /// Gets or sets the consent type associated with the current application.

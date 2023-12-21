@@ -15,7 +15,7 @@ namespace SharpAbp.Abp.OpenIddict
         /// <summary>
         /// Gets or sets the application type associated with the current application.
         /// </summary>
-        public string Type { get; set; }
+        public string ClientType { get; set; }
 
         /// <summary>
         /// Gets or sets the consent type associated with the current application.

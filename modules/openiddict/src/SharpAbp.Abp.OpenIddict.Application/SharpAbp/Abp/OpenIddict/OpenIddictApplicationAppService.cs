@@ -87,12 +87,12 @@ namespace SharpAbp.Abp.OpenIddict
         [Authorize(OpenIddictPermissions.Applications.Create)]
         public virtual async Task<OpenIddictApplicationDto> CreateAsync(CreateOrUpdateOpenIddictApplicationDto input)
         {
-            if (!string.IsNullOrEmpty(input.ClientSecret) && string.Equals(input.Type, OpenIddictConstants.ClientTypes.Public, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(input.ClientSecret) && string.Equals(input.ClientType, OpenIddictConstants.ClientTypes.Public, StringComparison.OrdinalIgnoreCase))
             {
                 throw new BusinessException(LL["NoClientSecretCanBeSetForPublicApplications"]);
             }
 
-            if (string.IsNullOrEmpty(input.ClientSecret) && string.Equals(input.Type, OpenIddictConstants.ClientTypes.Confidential, StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrEmpty(input.ClientSecret) && string.Equals(input.ClientType, OpenIddictConstants.ClientTypes.Confidential, StringComparison.OrdinalIgnoreCase))
             {
                 throw new BusinessException(LL["TheClientSecretIsRequiredForConfidentialApplications"]);
             }
@@ -121,7 +121,7 @@ namespace SharpAbp.Abp.OpenIddict
         [Authorize(OpenIddictPermissions.Applications.Update)]
         public virtual async Task<OpenIddictApplicationDto> UpdateAsync(Guid id, CreateOrUpdateOpenIddictApplicationDto input)
         {
-            if (!string.IsNullOrEmpty(input.ClientSecret) && string.Equals(input.Type, OpenIddictConstants.ClientTypes.Public, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(input.ClientSecret) && string.Equals(input.ClientType, OpenIddictConstants.ClientTypes.Public, StringComparison.OrdinalIgnoreCase))
             {
                 throw new BusinessException(LL["NoClientSecretCanBeSetForPublicApplications"]);
             }
@@ -173,7 +173,7 @@ namespace SharpAbp.Abp.OpenIddict
             var model = new OpenIddictApplicationModel()
             {
                 ClientId = input.ClientId,
-                Type = input.Type,
+                ClientType = input.ClientType,
                 ClientSecret = input.ClientSecret,
                 ConsentType = input.ConsentType,
                 DisplayName = input.DisplayName,
@@ -217,7 +217,7 @@ namespace SharpAbp.Abp.OpenIddict
             {
                 permissions.Add(OpenIddictConstants.Permissions.ResponseTypes.CodeIdToken);
 
-                if (string.Equals(input.Type, OpenIddictConstants.ClientTypes.Public, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(input.ClientType, OpenIddictConstants.ClientTypes.Public, StringComparison.OrdinalIgnoreCase))
                 {
                     permissions.Add(OpenIddictConstants.Permissions.ResponseTypes.CodeIdTokenToken);
                     permissions.Add(OpenIddictConstants.Permissions.ResponseTypes.CodeToken);
@@ -282,7 +282,7 @@ namespace SharpAbp.Abp.OpenIddict
                 if (grantType == OpenIddictConstants.GrantTypes.Implicit)
                 {
                     permissions.Add(OpenIddictConstants.Permissions.ResponseTypes.IdToken);
-                    if (string.Equals(input.Type, OpenIddictConstants.ClientTypes.Public, StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(input.ClientType, OpenIddictConstants.ClientTypes.Public, StringComparison.OrdinalIgnoreCase))
                     {
                         permissions.Add(OpenIddictConstants.Permissions.ResponseTypes.IdTokenToken);
                         permissions.Add(OpenIddictConstants.Permissions.ResponseTypes.Token);
@@ -318,11 +318,10 @@ namespace SharpAbp.Abp.OpenIddict
                 ClientSecret = model.ClientSecret,
                 ConsentType = model.ConsentType,
                 DisplayName = model.DisplayName,
-                Type = model.Type,
+                ClientType = model.ClientType,
                 ClientUri = model.ClientUri,
                 LogoUri = model.LogoUri,
             };
-
 
             foreach (var extraProperty in model.ExtraProperties)
             {

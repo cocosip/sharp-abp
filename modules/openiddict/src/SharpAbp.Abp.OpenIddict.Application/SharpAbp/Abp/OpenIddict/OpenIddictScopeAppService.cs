@@ -10,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
-using Volo.Abp.Domain.Entities;
 using Volo.Abp.OpenIddict.Scopes;
 
 namespace SharpAbp.Abp.OpenIddict

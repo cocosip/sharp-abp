@@ -1,7 +1,7 @@
-﻿using Devart.Data.Oracle;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using MySqlConnector;
 using Npgsql;
+using Oracle.ManagedDataAccess.Client;
 using System.Threading.Tasks;
 using Xunit;
 

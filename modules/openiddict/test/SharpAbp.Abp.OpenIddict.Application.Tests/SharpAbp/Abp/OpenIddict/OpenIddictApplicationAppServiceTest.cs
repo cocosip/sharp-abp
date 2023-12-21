@@ -24,7 +24,7 @@ namespace SharpAbp.Abp.OpenIddict
             {
                 ClientId = "Client1",
                 ClientSecret = "123",
-                Type = OpenIddictConstants.ClientTypes.Confidential,
+                ClientType = OpenIddictConstants.ClientTypes.Confidential,
                 ConsentType = OpenIddictConstants.ConsentTypes.Implicit,
                 DisplayName = "Test",
                 ClientUri = "111",
@@ -64,7 +64,7 @@ namespace SharpAbp.Abp.OpenIddict
 
             var app1_1 = await _openIddictApplicationAppService.GetAsync(app1.Id);
             Assert.Equal("Client1", app1_1.ClientId);
-            Assert.Equal(OpenIddictConstants.ClientTypes.Confidential, app1_1.Type);
+            Assert.Equal(OpenIddictConstants.ClientTypes.Confidential, app1_1.ClientType);
             Assert.Equal(OpenIddictConstants.ConsentTypes.Implicit, app1_1.ConsentType);
             Assert.Equal("111", app1_1.ClientUri);
             Assert.Equal("222", app1_1.LogoUri);
@@ -80,7 +80,7 @@ namespace SharpAbp.Abp.OpenIddict
             {
                 ClientId = "Client1",
                 ClientSecret = "456",
-                Type = OpenIddictConstants.ClientTypes.Confidential,
+                ClientType = OpenIddictConstants.ClientTypes.Confidential,
                 ConsentType = OpenIddictConstants.ConsentTypes.Explicit,
                 DisplayName = "Test2",
                 ClientUri = "xxx",
@@ -117,7 +117,7 @@ namespace SharpAbp.Abp.OpenIddict
 
             var app2_1 = await _openIddictApplicationAppService.FindByClientIdAsync("Client1");
             Assert.Equal("Client1", app2_1.ClientId);
-            Assert.Equal(OpenIddictConstants.ClientTypes.Confidential, app2_1.Type);
+            Assert.Equal(OpenIddictConstants.ClientTypes.Confidential, app2_1.ClientType);
             Assert.Equal(OpenIddictConstants.ConsentTypes.Explicit, app2_1.ConsentType);
             Assert.Equal("xxx", app2_1.ClientUri);
             Assert.Equal("yyy", app2_1.LogoUri);
