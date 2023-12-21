@@ -22,11 +22,17 @@
 
 		<PackageReference Include="Volo.Abp.IdentityServer.EntityFrameworkCore" />
 		<PackageReference Include="Volo.Abp.Autofac" />
-		<PackageReference Include="Volo.Abp.TestBase"/>
+		<PackageReference Include="Volo.Abp.TestBase" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\src\SharpAbp.Abp.IdentityServer.Application\SharpAbp.Abp.IdentityServer.Application.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="tempkey.jwk">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 </Project>
