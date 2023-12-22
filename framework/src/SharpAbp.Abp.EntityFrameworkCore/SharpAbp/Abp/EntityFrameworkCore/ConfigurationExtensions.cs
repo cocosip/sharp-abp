@@ -30,9 +30,17 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             var properties = configuration.GetProperties();
             if (properties.ContainsKey("OracleSQLCompatibility"))
             {
+                switch (properties["OracleSQLCompatibility"])
+                {
+                    case "DatabaseVersion19":
+                    case "DatabaseVersion21":
+                    case "DatabaseVersion23":
+                        return properties["OracleSQLCompatibility"];
+                }
+
                 return properties["OracleSQLCompatibility"];
             }
-            return "11";
+            return "DatabaseVersion19";
         }
     }
 }
