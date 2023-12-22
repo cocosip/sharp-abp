@@ -74,7 +74,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         {
             if (input.Sorting.IsNullOrWhiteSpace())
             {
-                input.Sorting = nameof(Tenant.Name);
+                input.Sorting = nameof(MapTenant.TenantName);
             }
 
             var count = await MapTenantRepository.GetCountAsync(
