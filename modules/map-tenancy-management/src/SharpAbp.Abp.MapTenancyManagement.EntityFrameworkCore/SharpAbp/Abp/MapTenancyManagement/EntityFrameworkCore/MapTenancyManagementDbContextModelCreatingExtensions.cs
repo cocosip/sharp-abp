@@ -2,6 +2,7 @@
 using System;
 using Volo.Abp;
 using Volo.Abp.EntityFrameworkCore.Modeling;
+using Volo.Abp.TenantManagement;
 
 namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
 {
@@ -25,6 +26,8 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
                 b.ToTable(options.TablePrefix + "MapTenants", options.Schema);
 
                 b.ConfigureByConvention();
+
+                b.Property(p => p.TenantName).HasMaxLength(TenantConsts.MaxNameLength);
 
                 b.Property(p => p.Code).IsRequired().HasMaxLength(MapTenantConsts.MaxCodeLength);
 
