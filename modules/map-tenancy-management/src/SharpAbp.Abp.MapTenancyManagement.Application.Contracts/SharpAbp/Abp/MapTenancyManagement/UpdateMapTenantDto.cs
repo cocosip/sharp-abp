@@ -9,10 +9,8 @@ namespace SharpAbp.Abp.MapTenancyManagement
     public class UpdateMapTenantDto : ExtensibleEntityDto
     {
 
-
         [Required]
         public Guid TenantId { get; set; }
-
 
         [Required]
         [DynamicStringLength(typeof(TenantConsts), nameof(TenantConsts.MaxNameLength))]

@@ -18,8 +18,6 @@ namespace SharpAbp.Abp.MapTenancyManagement
         [DynamicStringLength(typeof(MapTenantConsts), nameof(MapTenantConsts.MaxCodeLength))]
         public string Code { get; set; }
 
-
-
         [DynamicStringLength(typeof(MapTenantConsts), nameof(MapTenantConsts.MaxMapCodeLength))]
         public string MapCode { get; set; }
 
