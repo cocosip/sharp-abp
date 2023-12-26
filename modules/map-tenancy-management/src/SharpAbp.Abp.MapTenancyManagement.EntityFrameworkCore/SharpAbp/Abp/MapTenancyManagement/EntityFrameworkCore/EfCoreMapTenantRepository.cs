@@ -222,7 +222,7 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
         {
             return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
-                .WhereIf(!filter.IsNullOrWhiteSpace(), item => item.TenantName.Contains(tenantName) || item.Code.Contains(filter))
+                .WhereIf(!filter.IsNullOrWhiteSpace(), item => item.TenantName.Contains(filter) || item.Code.Contains(filter))
                 .WhereIf(tenantId.HasValue, item => item.TenantId == tenantId.Value)
                 .WhereIf(!tenantName.IsNullOrWhiteSpace(), item => item.TenantName.Contains(tenantName))
                 .WhereIf(!code.IsNullOrWhiteSpace(), item => item.Code.Contains(code))
