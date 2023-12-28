@@ -46,6 +46,7 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
 
                 b.HasIndex(p => new { p.TenantId, p.Name }).IsUnique();
 
+                b.ApplyObjectExtensionMappings();
             });
 
             builder.Entity<FileStoringContainerItem>(b =>
@@ -61,6 +62,8 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
                 b.Property(p => p.Value).IsRequired().HasMaxLength(FileStoringContainerItemConsts.MaxValueLength);
 
                 b.HasIndex(p => new { p.ContainerId, p.Name });
+
+                b.ApplyObjectExtensionMappings();
             });
         }
     }

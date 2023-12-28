@@ -48,6 +48,8 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
                 b.Property(p => p.TenantId).IsRequired();
 
                 b.HasIndex(p => new { p.TenantGroupId, p.TenantId }).IsUnique();
+
+                b.ApplyObjectExtensionMappings();
             });
 
             builder.Entity<TenantGroupConnectionString>(b =>
