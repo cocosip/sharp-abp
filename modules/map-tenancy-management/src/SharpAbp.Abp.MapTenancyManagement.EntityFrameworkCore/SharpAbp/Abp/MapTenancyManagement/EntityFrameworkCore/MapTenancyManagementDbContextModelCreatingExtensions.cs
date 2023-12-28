@@ -39,6 +39,8 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
 
                 b.ApplyObjectExtensionMappings();
             });
+
+            builder.TryConfigureObjectExtensions<MapTenancyManagementDbContext>();
         }
     }
 }

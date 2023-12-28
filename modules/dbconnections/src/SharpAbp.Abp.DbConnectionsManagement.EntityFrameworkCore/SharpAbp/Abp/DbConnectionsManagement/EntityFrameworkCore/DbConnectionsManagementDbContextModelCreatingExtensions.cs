@@ -36,6 +36,8 @@ namespace SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore
 
                 b.ApplyObjectExtensionMappings();
             });
+
+            builder.TryConfigureObjectExtensions<DbConnectionsManagementDbContext>();
         }
     }
 }

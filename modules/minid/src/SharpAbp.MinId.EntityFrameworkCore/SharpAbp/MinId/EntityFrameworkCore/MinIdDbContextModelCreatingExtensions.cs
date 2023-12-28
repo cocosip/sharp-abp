@@ -64,6 +64,7 @@ namespace SharpAbp.MinId.EntityFrameworkCore
             });
             #endregion
 
+            builder.TryConfigureObjectExtensions<MinIdDbContext>();
         }
     }
 }

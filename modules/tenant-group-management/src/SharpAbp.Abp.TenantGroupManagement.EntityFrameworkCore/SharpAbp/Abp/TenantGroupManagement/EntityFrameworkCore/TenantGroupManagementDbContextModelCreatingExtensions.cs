@@ -67,7 +67,7 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
                 b.ApplyObjectExtensionMappings();
             });
 
-
+            builder.TryConfigureObjectExtensions<TenantGroupManagementDbContext>();
         }
     }
 }

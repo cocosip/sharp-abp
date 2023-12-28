@@ -65,6 +65,8 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
 
                 b.ApplyObjectExtensionMappings();
             });
+
+            builder.TryConfigureObjectExtensions<FileStoringManagementDbContext>();
         }
     }
 }
