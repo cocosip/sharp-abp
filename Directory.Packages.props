@@ -108,8 +108,8 @@
         <RuntimeHostConfigurationOption Include="System.Runtime.Loader.UseRidGraph" Value="true" />
         <PackageVersion Include="aliyun-net-sdk-sts" Version="3.1.2" />
         <PackageVersion Include="Aliyun.OSS.SDK.NetCore" Version="2.13.0" />
-        <PackageVersion Include="AWSSDK.S3" Version="3.7.305.6" />
-        <PackageVersion Include="AWSSDK.SecurityToken" Version="3.7.300.32" />
+        <PackageVersion Include="AWSSDK.S3" Version="3.7.305.11" />
+        <PackageVersion Include="AWSSDK.SecurityToken" Version="3.7.300.37" />
         <PackageVersion Include="Azure.Messaging.ServiceBus" Version="7.17.0" />
         <PackageVersion Include="Azure.Storage.Blobs" Version="12.19.1" />
         <PackageVersion Include="AutoS3" Version="2.0.1" />
@@ -120,13 +120,13 @@
         <PackageVersion Include="FastDFSCore" Version="1.7.0" />
         <PackageVersion Include="FastDFSCore.Transport.SuperSocket" Version="1.7.0" />
         <PackageVersion Include="FastDFSCore.Transport.DotNetty" Version="1.7.0" />
-        <PackageVersion Include="FreeRedis" Version="1.2.12" />
-        <PackageVersion Include="FreeSql" Version="3.2.808" />
-        <PackageVersion Include="FreeSql.Provider.MySql" Version="3.2.808" />
-        <PackageVersion Include="FreeSql.Provider.Oracle" Version="3.2.808" />
-        <PackageVersion Include="FreeSql.Provider.PostgreSQL" Version="3.2.808" />
-        <PackageVersion Include="FreeSql.Provider.Sqlite" Version="3.2.808" />
-        <PackageVersion Include="FreeSql.Provider.SqlServer" Version="3.2.808" />
+        <PackageVersion Include="FreeRedis" Version="1.2.13" />
+        <PackageVersion Include="FreeSql" Version="3.2.810" />
+        <PackageVersion Include="FreeSql.Provider.MySql" Version="3.2.810" />
+        <PackageVersion Include="FreeSql.Provider.Oracle" Version="3.2.810" />
+        <PackageVersion Include="FreeSql.Provider.PostgreSQL" Version="3.2.810" />
+        <PackageVersion Include="FreeSql.Provider.Sqlite" Version="3.2.810" />
+        <PackageVersion Include="FreeSql.Provider.SqlServer" Version="3.2.810" />
         <PackageVersion Include="HuaweiCloud.OBS.SDK" Version="3.20.7" />
         <PackageVersion Include="MassTransit" Version="8.1.3" />
         <PackageVersion Include="MassTransit.ActiveMQ" Version="8.1.3" />
