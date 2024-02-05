@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.Modularity;
 
-namespace SharpAbp.Abp.AspNetCore
+namespace SharpAbp.Abp.AspNetCore.Http
 {
     public static class CookiePolicyOptionsExtensions
     {

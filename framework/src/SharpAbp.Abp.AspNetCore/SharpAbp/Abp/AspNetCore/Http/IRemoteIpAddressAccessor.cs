@@ -1,4 +1,4 @@
-namespace SharpAbp.Abp.AspNetCore
+namespace SharpAbp.Abp.AspNetCore.Http
 {
     public interface IRemoteIpAddressAccessor
     {

@@ -1,10 +1,10 @@
-using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System;
 using Volo.Abp.DependencyInjection;
 
-namespace SharpAbp.Abp.AspNetCore
+namespace SharpAbp.Abp.AspNetCore.Http
 {
     public class RemoteIpAddressAccessor : IRemoteIpAddressAccessor, ITransientDependency
     {
