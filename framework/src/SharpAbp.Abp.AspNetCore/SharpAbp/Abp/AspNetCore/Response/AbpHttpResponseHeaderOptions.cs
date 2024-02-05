@@ -18,10 +18,12 @@ namespace SharpAbp.Abp.AspNetCore.Response
             var headers = configuration
                 .GetSection("ResponseHeaderOptions")
                 .Get<Dictionary<string, string[]>>();
-
-            foreach (var header in headers)
+            if (headers != null)
             {
-                Headers.Add(header.Key, new StringValues(header.Value));
+                foreach (var header in headers)
+                {
+                    Headers.Add(header.Key, new StringValues(header.Value));
+                }
             }
             return this;
         }
