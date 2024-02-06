@@ -21,7 +21,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="SharpAbp\Abp\DbConnectionsManagement\Localization\Resources\" />
+		<EmbeddedResource Include="SharpAbp\Abp\DbConnectionsManagement\Localization\Resources\*.json" />
+		<Content Remove="SharpAbp\Abp\DbConnectionsManagement\Localization\Resources\*.json" />
 	</ItemGroup>
 
 </Project>

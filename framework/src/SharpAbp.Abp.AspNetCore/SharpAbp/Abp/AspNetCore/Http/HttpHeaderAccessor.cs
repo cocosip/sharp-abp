@@ -55,7 +55,7 @@ namespace SharpAbp.Abp.AspNetCore.Http
                 }
                 else
                 {
-                    routeTranslationHeader.Extends.Add(headerKv.Key, headerKv.Value);
+                    routeTranslationHeader.Extends.TryAdd(headerKv.Key, headerKv.Value);
                 }
             }
 

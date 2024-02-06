@@ -1,0 +1,11 @@
+{
+  "culture": "zh-Hant",
+  "texts": {
+    "DbConnectionsManagement": "數據庫連接管理",
+    "Permission:DbConnectionsManagement.DatabaseConnectionInfos": "數據庫連接信息管理",
+    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Create": "創建數據庫連接信息",
+    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Update": "修改數據庫連接信息",
+    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Delete": "刪除數據庫連接信息",
+    "DbConnectionsManagement.DuplicateName": "重複的數據庫連接名稱 '{0}'."
+  }
+}

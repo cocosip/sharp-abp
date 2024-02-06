@@ -26,8 +26,8 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
 
         public FrontApplication()
         {
-            Pages = new List<FrontApplicationPage>();
-            StaticDirs = new List<FrontApplicationStaticDirectory>();
+            Pages = [];
+            StaticDirs = [];
         }
     }
 

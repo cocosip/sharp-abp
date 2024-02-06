@@ -4,7 +4,7 @@
 	<Import Project="..\..\..\..\configureawait.props" />
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.1;net7.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.1;$(NetCoreFx)</TargetFrameworks>
 		<AssemblyName>SharpAbp.Abp.TenantGroupManagement.Domain</AssemblyName>
 		<PackageId>SharpAbp.Abp.TenantGroupManagement.Domain</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>

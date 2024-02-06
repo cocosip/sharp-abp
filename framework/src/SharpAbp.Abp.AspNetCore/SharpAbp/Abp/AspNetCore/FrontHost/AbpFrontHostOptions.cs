@@ -11,7 +11,7 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
 
         public AbpFrontHostOptions()
         {
-            Apps = new List<FrontApplication>();
+            Apps = [];
         }
 
         public AbpFrontHostOptions Configure(IConfiguration configuration, string contentRootPath)
@@ -20,37 +20,39 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
                 .GetSection("FrontHostOptions:Apps")
                 .Get<List<FrontApplicationEntry>>();
 
-            foreach (var appConfiguration in appConfigurations)
+            if (appConfigurations != null)
             {
-                var app = new FrontApplication()
+                foreach (var appConfiguration in appConfigurations)
                 {
-                    Name = appConfiguration.Name,
-                    RootPath = PathCombine(contentRootPath, appConfiguration.RootPath),
-                };
-                Apps.Add(app);
-
-                foreach (var p in appConfiguration.Pages)
-                {
-                    var page = new FrontApplicationPage
+                    var app = new FrontApplication()
                     {
-                        Route = p.Route,
-                        ContentType = p.ContentType,
-                        Path = PathCombine(app.RootPath, p.Path)
+                        Name = appConfiguration.Name,
+                        RootPath = PathCombine(contentRootPath, appConfiguration.RootPaths),
                     };
-                    app.Pages.Add(page);
-                }
+                    Apps.Add(app);
 
-                foreach (var s in appConfiguration.StaticDirs)
-                {
-                    var staticDir = new FrontApplicationStaticDirectory()
+                    foreach (var p in appConfiguration.Pages)
                     {
-                        RequestPath = s.RequestPath,
-                        Path = PathCombine(app.RootPath, s.Path)
-                    };
-                    app.StaticDirs.Add(staticDir);
+                        var page = new FrontApplicationPage
+                        {
+                            Route = p.Route,
+                            ContentType = p.ContentType,
+                            Path = PathCombine(app.RootPath, p.Paths)
+                        };
+                        app.Pages.Add(page);
+                    }
+
+                    foreach (var s in appConfiguration.StaticDirs)
+                    {
+                        var staticDir = new FrontApplicationStaticDirectory()
+                        {
+                            RequestPath = s.RequestPath,
+                            Path = PathCombine(app.RootPath, s.Paths)
+                        };
+                        app.StaticDirs.Add(staticDir);
+                    }
                 }
             }
-
             return this;
         }
 

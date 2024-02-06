@@ -1,0 +1,79 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C784232A-8754-4CAD-83DC-8D6FC7E97423}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.CryptoVault.Domain.Shared", "src\SharpAbp.Abp.CryptoVault.Domain.Shared\SharpAbp.Abp.CryptoVault.Domain.Shared.csproj", "{FE11BF15-AE18-4AF5-9247-673F8E559414}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.CryptoVault.Domain", "src\SharpAbp.Abp.CryptoVault.Domain\SharpAbp.Abp.CryptoVault.Domain.csproj", "{0C566290-C326-41BD-8C8D-8566FA00DD63}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.CryptoVault.EntityFrameworkCore", "src\SharpAbp.Abp.CryptoVault.EntityFrameworkCore\SharpAbp.Abp.CryptoVault.EntityFrameworkCore.csproj", "{80B2C64B-3CBF-4E03-83D4-A227A8EAE72B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.CryptoVault.Application.Contracts", "src\SharpAbp.Abp.CryptoVault.Application.Contracts\SharpAbp.Abp.CryptoVault.Application.Contracts.csproj", "{7440EE9F-C52D-4F1C-BBE1-7F8B406801BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.CryptoVault.Application", "src\SharpAbp.Abp.CryptoVault.Application\SharpAbp.Abp.CryptoVault.Application.csproj", "{5DD36ED2-A88B-4816-8BF0-F9A53E3E0F41}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.CryptoVault.HttpApi", "src\SharpAbp.Abp.CryptoVault.HttpApi\SharpAbp.Abp.CryptoVault.HttpApi.csproj", "{CE49DB2C-6414-4A22-B58D-C7A889FA93A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.CryptoVault.HttpApi.Client", "src\SharpAbp.Abp.CryptoVault.HttpApi.Client\SharpAbp.Abp.CryptoVault.HttpApi.Client.csproj", "{B730DFAC-9AA8-4010-A534-9C4EAF4E3B2D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.CryptoVault.MongoDB", "src\SharpAbp.Abp.CryptoVault.MongoDB\SharpAbp.Abp.CryptoVault.MongoDB.csproj", "{80CFD206-9843-4B6A-8937-DFAE9ED28D6F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FE11BF15-AE18-4AF5-9247-673F8E559414}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE11BF15-AE18-4AF5-9247-673F8E559414}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE11BF15-AE18-4AF5-9247-673F8E559414}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE11BF15-AE18-4AF5-9247-673F8E559414}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C566290-C326-41BD-8C8D-8566FA00DD63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C566290-C326-41BD-8C8D-8566FA00DD63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C566290-C326-41BD-8C8D-8566FA00DD63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C566290-C326-41BD-8C8D-8566FA00DD63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80B2C64B-3CBF-4E03-83D4-A227A8EAE72B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80B2C64B-3CBF-4E03-83D4-A227A8EAE72B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80B2C64B-3CBF-4E03-83D4-A227A8EAE72B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80B2C64B-3CBF-4E03-83D4-A227A8EAE72B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7440EE9F-C52D-4F1C-BBE1-7F8B406801BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7440EE9F-C52D-4F1C-BBE1-7F8B406801BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7440EE9F-C52D-4F1C-BBE1-7F8B406801BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7440EE9F-C52D-4F1C-BBE1-7F8B406801BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DD36ED2-A88B-4816-8BF0-F9A53E3E0F41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DD36ED2-A88B-4816-8BF0-F9A53E3E0F41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DD36ED2-A88B-4816-8BF0-F9A53E3E0F41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DD36ED2-A88B-4816-8BF0-F9A53E3E0F41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE49DB2C-6414-4A22-B58D-C7A889FA93A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE49DB2C-6414-4A22-B58D-C7A889FA93A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE49DB2C-6414-4A22-B58D-C7A889FA93A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE49DB2C-6414-4A22-B58D-C7A889FA93A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B730DFAC-9AA8-4010-A534-9C4EAF4E3B2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B730DFAC-9AA8-4010-A534-9C4EAF4E3B2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B730DFAC-9AA8-4010-A534-9C4EAF4E3B2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B730DFAC-9AA8-4010-A534-9C4EAF4E3B2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80CFD206-9843-4B6A-8937-DFAE9ED28D6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80CFD206-9843-4B6A-8937-DFAE9ED28D6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80CFD206-9843-4B6A-8937-DFAE9ED28D6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80CFD206-9843-4B6A-8937-DFAE9ED28D6F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FE11BF15-AE18-4AF5-9247-673F8E559414} = {C784232A-8754-4CAD-83DC-8D6FC7E97423}
+		{0C566290-C326-41BD-8C8D-8566FA00DD63} = {C784232A-8754-4CAD-83DC-8D6FC7E97423}
+		{80B2C64B-3CBF-4E03-83D4-A227A8EAE72B} = {C784232A-8754-4CAD-83DC-8D6FC7E97423}
+		{7440EE9F-C52D-4F1C-BBE1-7F8B406801BC} = {C784232A-8754-4CAD-83DC-8D6FC7E97423}
+		{5DD36ED2-A88B-4816-8BF0-F9A53E3E0F41} = {C784232A-8754-4CAD-83DC-8D6FC7E97423}
+		{CE49DB2C-6414-4A22-B58D-C7A889FA93A0} = {C784232A-8754-4CAD-83DC-8D6FC7E97423}
+		{B730DFAC-9AA8-4010-A534-9C4EAF4E3B2D} = {C784232A-8754-4CAD-83DC-8D6FC7E97423}
+		{80CFD206-9843-4B6A-8937-DFAE9ED28D6F} = {C784232A-8754-4CAD-83DC-8D6FC7E97423}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D4F74949-FFEE-4186-9808-573F77D0E7C5}
+	EndGlobalSection
+EndGlobal

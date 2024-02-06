@@ -1,0 +1,11 @@
+{
+  "culture": "zh-Hans",
+  "texts": {
+    "DbConnectionsManagement": "数据库连接管理",
+    "Permission:DbConnectionsManagement.DatabaseConnectionInfos": "数据库连接信息管理",
+    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Create": "创建数据库连接信息",
+    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Update": "修改数据库连接信息",
+    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Delete": "删除数据库连接信息",
+    "DbConnectionsManagement.DuplicateName": "重复的数据库连接名称 '{0}'."
+  }
+}

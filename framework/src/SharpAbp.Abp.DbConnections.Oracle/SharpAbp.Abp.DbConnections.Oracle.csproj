@@ -24,4 +24,5 @@
 	<ItemGroup>
 		<ProjectReference Include="..\SharpAbp.Abp.DbConnections\SharpAbp.Abp.DbConnections.csproj" />
 	</ItemGroup>
+
 </Project>

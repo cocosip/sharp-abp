@@ -22,7 +22,8 @@ $solutionPaths = @(
 		"../modules/openiddict",
 		"../modules/audit-logging",
 		"../modules/account",
-		"../modules/minid"
+		"../modules/minid",
+		"../modules/crypto-vault"
 	)
 
 if ($full -eq "-f")

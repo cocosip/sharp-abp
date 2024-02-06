@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\..\..\..\common.props" />
+	<Import Project="..\..\..\..\configureawait.props" />
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.1;$(NetCoreFx)</TargetFrameworks>
+		<AssemblyName>SharpAbp.Abp.CryptoVault.Application</AssemblyName>
+		<PackageId>SharpAbp.Abp.CryptoVault.Application</PackageId>
+		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<Description>SharpAbp CryptoVault Module</Description>
+		<RootNamespace />
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.AutoMapper" />
+		<PackageReference Include="Volo.Abp.Ddd.Application" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SharpAbp.Abp.CryptoVault.Application.Contracts\SharpAbp.Abp.CryptoVault.Application.Contracts.csproj" />
+		<ProjectReference Include="..\SharpAbp.Abp.CryptoVault.Domain\SharpAbp.Abp.CryptoVault.Domain.csproj" />
+	</ItemGroup>
+
+</Project>

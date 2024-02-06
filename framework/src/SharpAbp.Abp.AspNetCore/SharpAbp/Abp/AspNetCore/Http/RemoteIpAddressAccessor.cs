@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 using System;
 using Volo.Abp.DependencyInjection;
 
@@ -33,9 +34,9 @@ namespace SharpAbp.Abp.AspNetCore.Http
                 }
 
                 var headers = httpContext.Request.Headers;
-                if (headers.ContainsKey("X-Forwarded-For"))
+                if (headers.TryGetValue("X-Forwarded-For", out StringValues value))
                 {
-                    var xForwardedFor = headers["X-Forwarded-For"].ToString();
+                    var xForwardedFor = value.ToString();
                     var xForwardedForArray = xForwardedFor.Split(',', StringSplitOptions.RemoveEmptyEntries);
                     if (xForwardedForArray.Length > 0)
                     {
@@ -43,9 +44,9 @@ namespace SharpAbp.Abp.AspNetCore.Http
                     }
                 }
 
-                if (headers.ContainsKey("X-Real-IP"))
+                if (headers.TryGetValue("X-Real-IP", out StringValues realIPValue))
                 {
-                    var xRealIP = headers["X-Real-IP"].ToString();
+                    var xRealIP = realIPValue.ToString();
                     if (!xRealIP.IsNullOrWhiteSpace())
                     {
                         return xRealIP;
@@ -59,7 +60,7 @@ namespace SharpAbp.Abp.AspNetCore.Http
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Get real remote ip failed.{0}", ex.Message);
+                Logger.LogError(ex, "Get real remote ip failed. {Message}", ex.Message);
             }
 
             return string.Empty;
@@ -80,9 +81,9 @@ namespace SharpAbp.Abp.AspNetCore.Http
                 }
 
                 var headers = httpContext.Request.Headers;
-                if (headers.ContainsKey("X-Forwarded-For"))
+                if (headers.TryGetValue("X-Forwarded-For", out StringValues value))
                 {
-                    var xForwardedFor = headers["X-Forwarded-For"].ToString();
+                    var xForwardedFor = value.ToString();
                     var xForwardedForArray = xForwardedFor.Split(',', StringSplitOptions.RemoveEmptyEntries);
                     if (xForwardedForArray.Length > 0)
                     {
@@ -92,7 +93,7 @@ namespace SharpAbp.Abp.AspNetCore.Http
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Get real remote ip failed.{0}", ex.Message);
+                Logger.LogError(ex, "Get real remote ip failed. {Message}", ex.Message);
             }
 
             return string.Empty;
@@ -114,9 +115,9 @@ namespace SharpAbp.Abp.AspNetCore.Http
 
                 var headers = httpContext.Request.Headers;
 
-                if (headers.ContainsKey("X-Real-IP"))
+                if (headers.TryGetValue("X-Real-IP", out StringValues value))
                 {
-                    var xRealIP = headers["X-Real-IP"].ToString();
+                    var xRealIP = value.ToString();
                     if (!xRealIP.IsNullOrWhiteSpace())
                     {
                         return xRealIP;
@@ -125,7 +126,7 @@ namespace SharpAbp.Abp.AspNetCore.Http
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Get real remote ip failed.{0}", ex.Message);
+                Logger.LogError(ex, "Get real remote ip failed. {Message}", ex.Message);
             }
 
             return string.Empty;
