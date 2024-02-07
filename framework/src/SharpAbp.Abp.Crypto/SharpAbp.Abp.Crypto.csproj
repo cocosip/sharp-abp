@@ -16,7 +16,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BouncyCastle.Cryptography"  />
+		<PackageReference Include="BouncyCastle.Cryptography" />
 		<PackageReference Include="Volo.Abp" />
 	</ItemGroup>
 
