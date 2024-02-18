@@ -62,33 +62,24 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <returns></returns>
         public virtual AsymmetricKeyParameter ImportPrivateKey(Stream stream)
         {
-
-            //Asn1Object asn1Object = Asn1Object.FromStream(stream);
-
-            var pkcs1PrivateKeyStructure = RsaPrivateKeyStructure.GetInstance(stream);
-
+            // 创建一个Asn1Sequence对象
+            Asn1Sequence seq = (Asn1Sequence)Asn1Object.FromStream(stream);
+            // 创建一个RsaPrivateKeyStructure对象
+            var rsa = RsaPrivateKeyStructure.GetInstance(seq);
+            // 创建一个RsaPrivateCrtKeyParameters对象
             var privateKeyParam = new RsaPrivateCrtKeyParameters(
-                pkcs1PrivateKeyStructure.Modulus,
-                pkcs1PrivateKeyStructure.PublicExponent,
-                pkcs1PrivateKeyStructure.PrivateExponent,
-                pkcs1PrivateKeyStructure.Prime1,
-                pkcs1PrivateKeyStructure.Prime2,
-                pkcs1PrivateKeyStructure.Exponent1,
-                pkcs1PrivateKeyStructure.Exponent2,
-                pkcs1PrivateKeyStructure.Coefficient);
+                rsa.Modulus,
+                rsa.PublicExponent,
+                rsa.PrivateExponent,
+                rsa.Prime1,
+                rsa.Prime2,
+                rsa.Exponent1,
+                rsa.Exponent2,
+                rsa.Coefficient);
+
             return privateKeyParam;
-
-
-            //var publicKeyParam = PublicKeyFactory.CreateKey(privateKeyParam);
-
-            //var publicKeyParam = new Publick(pkcs1PrivateKeyStructure.Modulus, pkcs1PrivateKeyStructure.PublicExponent);
-
+            //var publicKeyParam = new RsaKeyParameters(false, privateKeyParam.Modulus, privateKeyParam.PublicExponent);
             //return new AsymmetricCipherKeyPair(publicKeyParam, privateKeyParam);
-
-            //Asn1Object asn1Object = Asn1Object.FromStream(stream);
-            //var privateKeyInfo = PrivateKeyInfo.GetInstance(asn1Object);
-            //var privateKeyParam = PrivateKeyFactory.CreateKey(privateKeyInfo);
-            //return privateKeyParam;
         }
 
         /// <summary>
@@ -113,7 +104,8 @@ namespace SharpAbp.Abp.Crypto.RSA
         {
             using var stringReader = new StringReader(privateKeyPem);
             using var pemReader = new PemReader(stringReader);
-            return (AsymmetricKeyParameter)pemReader.ReadObject();
+            var keyPair = (AsymmetricCipherKeyPair)pemReader.ReadObject();
+            return keyPair.Private;
         }
 
         /// <summary>
@@ -121,7 +113,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// </summary>
         /// <param name="privateKeyPem"></param>
         /// <returns></returns>
-        public virtual AsymmetricKeyParameter ImportPrivateKeyPemPkcs8(string privateKeyPem)
+        public virtual AsymmetricKeyParameter ImportPrivateKeyPkcs8Pem(string privateKeyPem)
         {
             using var stringReader = new StringReader(privateKeyPem);
             using var pemReader = new PemReader(stringReader);
@@ -203,7 +195,7 @@ namespace SharpAbp.Abp.Crypto.RSA
             }
 
             ISigner signer = SignerUtilities.GetSigner(algorithm);
-            signer.Init(true, privateKeyParam);
+            signer.Init(false, privateKeyParam);
             signer.BlockUpdate(data, 0, data.Length);
             return signer.VerifySignature(signature);
         }

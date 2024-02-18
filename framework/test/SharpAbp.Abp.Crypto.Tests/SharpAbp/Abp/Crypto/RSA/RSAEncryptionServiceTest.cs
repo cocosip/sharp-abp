@@ -1,6 +1,4 @@
-﻿
-using Org.BouncyCastle.Utilities.Encoders;
-using System.Text;
+﻿using System.Text;
 using Xunit;
 
 namespace SharpAbp.Abp.Crypto.RSA
@@ -35,7 +33,25 @@ namespace SharpAbp.Abp.Crypto.RSA
 
             _rsaEncryptionService.ImportPublicKey(pub1);
             _rsaEncryptionService.ImportPrivateKey(priv1);
+            _rsaEncryptionService.ImportPublicKeyPem(pub1_pem);
+            _rsaEncryptionService.ImportPrivateKeyPem(priv1_pem);
+            _rsaEncryptionService.ImportPrivateKeyPkcs8(priv1_pkcs8);
+            _rsaEncryptionService.ImportPrivateKeyPkcs8Pem(priv1_pkcs8_pem);
         }
+
+        [Fact]
+        public void Key_Import_Export_Test()
+        {
+            var pkcs8Key = @"MIICeQIBADANBgkqhkiG9w0BAQEFAASCAmMwggJfAgEAAoGBAMz0Czg6QUtTISa2pUkloeQB/TEpHdqrfyroWpKLW9B/LWFSOGH9nyTk1pPZaeadyEZQ6gay/C0pUAetLraq9bMA/Luxq68b87uG7WX7dKytEO2/87qGpGMRs97H+GlkzWil2QO2KK4cHnAcVicPsmi5aZ72U0BWJFyPhtd+qdmrAgMBAAECgYEAvW67iAbgHt0BASVD9C3iSjpEaVHVlC165o/IVzaTcEx8Bz3Ve0zN8W3JnvIO3ebsG4HiLLr2Nk++9rltOc0eNeGMv7F1e/OFot1wN0ON6s1g4bYh1z5Uz8FcYiMWcqHHICrx+oSFeK9x+I2Zge7enQXcsVnqEhm77ZE5YczSryECQQD9nB58e5efYchF+cYbmURioX18cUMuhQbB9Aq2N55cd689Lg35KZqT8JQTp/8tQSdCJG8d2nU8VKspUKTEAuaDAkEAzuKIIoc9PVJvy90LhIPA9c1S8BPCI7EMCaTZqJ5o3VaR2dqvUZDGX7kL3kYkQ+n7mq3KIECvkEFzA+FOP96XuQJBAJQTKHW0T/YeSKoayUHp/lS8R6F2HCy4PRbXn71+wfbpZqcJEd2OHhQM3tiPOV258esbjMlYeSUNppZL4LgVnXMCQQC7Lvs9Ql+GPDAqo7ToEM1lmICR906QPIBHuX+1sJ3wpYMROWumwPa7ZRH36j6ls+6R5OwcgmpWeuE1gYTrBNsBAkEAn2pEtAljX1foQff6CLozYg/J6J9RmVFcJ6qz0LX3052qNFBQYw8CMHB7VkVNzsDIDC8LX5uP2pzTrdPLew+pPA==";
+
+            var pkcs1Key = @"MIICXwIBAAKBgQDM9As4OkFLUyEmtqVJJaHkAf0xKR3aq38q6FqSi1vQfy1hUjhh/Z8k5NaT2WnmnchGUOoGsvwtKVAHrS62qvWzAPy7sauvG/O7hu1l+3SsrRDtv/O6hqRjEbPex/hpZM1opdkDtiiuHB5wHFYnD7JouWme9lNAViRcj4bXfqnZqwIDAQABAoGBAL1uu4gG4B7dAQElQ/Qt4ko6RGlR1ZQteuaPyFc2k3BMfAc91XtMzfFtyZ7yDt3m7BuB4iy69jZPvva5bTnNHjXhjL+xdXvzhaLdcDdDjerNYOG2Idc+VM/BXGIjFnKhxyAq8fqEhXivcfiNmYHu3p0F3LFZ6hIZu+2ROWHM0q8hAkEA/ZwefHuXn2HIRfnGG5lEYqF9fHFDLoUGwfQKtjeeXHevPS4N+Smak/CUE6f/LUEnQiRvHdp1PFSrKVCkxALmgwJBAM7iiCKHPT1Sb8vdC4SDwPXNUvATwiOxDAmk2aieaN1Wkdnar1GQxl+5C95GJEPp+5qtyiBAr5BBcwPhTj/el7kCQQCUEyh1tE/2HkiqGslB6f5UvEehdhwsuD0W15+9fsH26WanCRHdjh4UDN7YjzldufHrG4zJWHklDaaWS+C4FZ1zAkEAuy77PUJfhjwwKqO06BDNZZiAkfdOkDyAR7l/tbCd8KWDETlrpsD2u2UR9+o+pbPukeTsHIJqVnrhNYGE6wTbAQJBAJ9qRLQJY19X6EH3+gi6M2IPyeifUZlRXCeqs9C199OdqjRQUGMPAjBwe1ZFTc7AyAwvC1+bj9qc063Ty3sPqTw=";
+
+
+            var privateKey1 = _rsaEncryptionService.ImportPrivateKeyPkcs8(pkcs8Key);
+            var privateKey2 = _rsaEncryptionService.ImportPrivateKey(pkcs1Key);
+        }
+
+
 
         [Fact]
         public void Encrypt_Decrypt_Test()
@@ -45,17 +61,13 @@ namespace SharpAbp.Abp.Crypto.RSA
             var priv = keyPair.ExportPrivateKeyToPem();
             var priv_pkcs8 = keyPair.ExportPrivateKeyPkcs8ToPem();
 
-            var pub1 = keyPair.ExportPublicKey();
-            var priv1 = keyPair.ExportPrivateKey();
-            var priv1_pkcs8 = keyPair.ExportPrivateKeyPkcs8();
-
             var plainText = "这是中国!";
 
             var encrypted = _rsaEncryptionService.EncryptFromPem(pub, plainText, Encoding.UTF8);
             var decrypted = _rsaEncryptionService.DecryptFromPem(priv, encrypted, Encoding.UTF8);
             Assert.Equal(plainText, decrypted);
 
-            var decrypted2 = _rsaEncryptionService.DecryptFromPemPkcs8(priv_pkcs8, encrypted, Encoding.UTF8);
+            var decrypted2 = _rsaEncryptionService.DecryptFromPkcs8Pem(priv_pkcs8, encrypted, Encoding.UTF8);
             Assert.Equal(plainText, decrypted2);
         }
 
@@ -77,14 +89,14 @@ namespace SharpAbp.Abp.Crypto.RSA
             var decrypted = _rsaEncryptionService.DecryptFromPem(priv, encrypted, Encoding.UTF8);
             Assert.Equal(plainText, decrypted);
 
-            var decrypted2 = _rsaEncryptionService.DecryptFromPemPkcs8(priv_pkcs8, encrypted, Encoding.UTF8);
+            var decrypted2 = _rsaEncryptionService.DecryptFromPkcs8Pem(priv_pkcs8, encrypted, Encoding.UTF8);
             Assert.Equal(plainText, decrypted2);
 
             var encrypted11 = _rsaEncryptionService.Encrypt(pub1, plainText, Encoding.UTF8);
             var decrypted11 = _rsaEncryptionService.Decrypt(priv1, encrypted11, Encoding.UTF8);
-            // Assert.Equal(plainText, decrypted11);
-            //var decrypted12 = _rsaEncryptionService.DecryptFromPkcs8(priv1_pkcs8, encrypted11, Encoding.UTF8);
-
+            Assert.Equal(plainText, decrypted11);
+            var decrypted12 = _rsaEncryptionService.DecryptFromPkcs8(priv1_pkcs8, encrypted11, Encoding.UTF8);
+            Assert.Equal(plainText, decrypted12);
         }
 
 
@@ -92,26 +104,29 @@ namespace SharpAbp.Abp.Crypto.RSA
         public void Sign_Verify_Test()
         {
             var keyPair = _rsaEncryptionService.GenerateRSAKeyPair(1024);
-            var pub = keyPair.ExportPublicKeyToPem();
-            var priv = keyPair.ExportPrivateKeyToPem();
-            var priv_pkcs8 = keyPair.ExportPrivateKeyPkcs8ToPem();
-        }
+            var pub = keyPair.ExportPublicKey();
+            var priv = keyPair.ExportPrivateKey();
+            var priv_pkcs8 = keyPair.ExportPrivateKeyPkcs8();
+            var pub_pem = keyPair.ExportPublicKeyToPem();
+            var priv_pem = keyPair.ExportPrivateKeyToPem();
+            var priv_pkcs8_pem = keyPair.ExportPrivateKeyPkcs8ToPem();
 
-        [Fact]
-        public void Test1()
-        {
-            var privateKeyPem = @"-----BEGIN PRIVATE KEY-----
-MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBANRK3ZsgQHcfhCJRxa7wks4ekOedHJOaDQbf1ROZQ/EvsbBSdgvfZDTY/i9Tv4owkb2+CnRUMi2L+YC/DQGMq9L/4N18wOLv9nQTOzwV9bDyacD9Dd8sSBRkiRfp/9578+nNVYGaPLzgiRd3TVRc4I1KUzeZOaw2358QxuhvmSgFAgMBAAECgYBgwdaLE4IOSTECK178Qu3GQCwvRG5336i8T1xgWGSdEu3bvVnMQ376j0Qa8gLEyypB3tII/y73j2qigXE+GY1eAwhagxgiqpqvBTf+MlfCytLfvH/DmsZATVjcaovzSXexYzwwXNfxAxuEhQdy1hdatBD9omCxcSyamnfSds6fAQJBAPjVwcP773da0z4EquYQ2Bl91pxYHV8YhnKdp4f6IaqfrLPOnaZ7QQaKzcR1YLSr84bC6bv3ol/43uyfgwVwx2UCQQDaZ73qAn01nAr4bdoIgSDivwTDV+AM9+xCBsfkep+C/I4vgVcYn5SK6ueYpwheBJCdmV/Q9xDD+jUaEkVAvGQhAkEA3LJJzxdOBqAJp4HgSXk7ETDo/XWxZzyLUnC9u/5/iaNhO4DPlm7O94x4f/xTLysrLKUHRW2XGGPU5C19uX+TeQJANiaMns2ZL8aNrcTGz178wVttGeXaxjxeFozJ2OtSS07FDiA6cP93++18GIwpde4Z0QlrCUuIm56Ytesbwo4zIQJBAMYi4Zf+0EcS3BPk+o/tCkyBvWBXfycUryEWOge5tL10IJoGFkNzItURsGcR3GqHlESMhvnVFhXq9RFBfsX+aNI=
------END PRIVATE KEY-----";
+            var data = "This is ZHANGSAN";
+            var signature1 = _rsaEncryptionService.Sign(priv, data);
+            var r1 = _rsaEncryptionService.VerifySign(pub, data, signature1);
+            Assert.True(r1);
 
+            var signature2 = _rsaEncryptionService.SignFromPkcs8(priv_pkcs8, data);
+            var r2 = _rsaEncryptionService.VerifySign(pub, data, signature2);
+            Assert.True(r2);
 
+            var signature3 = _rsaEncryptionService.SignFromPem(priv_pem, data);
+            var r3 = _rsaEncryptionService.VerifySign(pub, data, signature3);
+            Assert.True(r3);
 
-            var a = "YXJnZN4RiH7OjZjt3GnYBAOAdsqyKhToLIbm3JnzIwxlx1lhtUoA7hmTsiG839FAyy5B+mCSHgSZ+YZCs6QXxJFlZOXzDDhYZCbrUdFVoujJZnsg4SNC++vhdHPfxbA0U1ozTZGjIBcGOV0vqVQJci+Ds9mN352wui02toO0OcQ=";
-
-            var v = _rsaEncryptionService.DecryptFromPem(privateKeyPem, a, Encoding.UTF8);
-
-            Assert.NotEqual("", v);
-
+            var signature4 = _rsaEncryptionService.SignFromPkcs8Pem(priv_pkcs8_pem, data);
+            var r4 = _rsaEncryptionService.VerifySign(pub, data, signature4);
+            Assert.True(r4);
         }
 
 

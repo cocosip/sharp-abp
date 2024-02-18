@@ -1,4 +1,6 @@
-﻿using Org.BouncyCastle.Crypto;
+﻿using Org.BouncyCastle.Asn1.Pkcs;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Utilities.Encoders;
@@ -57,8 +59,23 @@ namespace SharpAbp.Abp.Crypto.RSA
             {
                 throw new ArgumentException("AsymmetricKeyParameter is not private key");
             }
-            var privateKeyInfo = PrivateKeyInfoFactory.CreatePrivateKeyInfo(privateKeyParam);
-            return Base64.ToBase64String(privateKeyInfo.GetDerEncoded());
+
+            //var privateKeyInfo = PrivateKeyInfoFactory.CreatePrivateKeyInfo(privateKeyParam);
+            //return Base64.ToBase64String(privateKeyInfo.GetEncoded());
+
+            // 创建PrivateKeyInfo对象
+            var rsaPrivateCrtKeyParameters = (RsaPrivateCrtKeyParameters)privateKeyParam;
+            var rsaPrivateKeyStructure = new RsaPrivateKeyStructure(
+                rsaPrivateCrtKeyParameters.Modulus,
+                rsaPrivateCrtKeyParameters.PublicExponent,
+                rsaPrivateCrtKeyParameters.Exponent,
+                rsaPrivateCrtKeyParameters.P,
+                rsaPrivateCrtKeyParameters.Q,
+                rsaPrivateCrtKeyParameters.DP,
+                rsaPrivateCrtKeyParameters.DQ,
+                rsaPrivateCrtKeyParameters.QInv);
+
+            return Convert.ToBase64String(rsaPrivateKeyStructure.GetDerEncoded());
         }
 
 
@@ -89,9 +106,9 @@ namespace SharpAbp.Abp.Crypto.RSA
                 throw new ArgumentException("AsymmetricKeyParameter is not private key");
             }
             var privateKeyInfo = PrivateKeyInfoFactory.CreatePrivateKeyInfo(privateKeyParam);
-            return Base64.ToBase64String(privateKeyInfo.PrivateKey.GetDerEncoded());
+            return Base64.ToBase64String(privateKeyInfo.GetDerEncoded());
         }
- 
+
         /// <summary>
         /// 导出私钥的Pem格式 (PKCS8)
         /// </summary>
@@ -167,5 +184,24 @@ namespace SharpAbp.Abp.Crypto.RSA
         {
             return keyPair.Private.ExportPrivateKeyPkcs8ToPem();
         }
+
+        /// <summary>
+        /// 从私钥参数中获取公钥参数
+        /// </summary>
+        /// <param name="privateKeyParam"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static AsymmetricKeyParameter GetPublic(this AsymmetricKeyParameter privateKeyParam)
+        {
+            if (!privateKeyParam.IsPrivate)
+            {
+                throw new ArgumentException("AsymmetricKeyParameter is not private");
+            }
+
+            var p = (RsaPrivateCrtKeyParameters)privateKeyParam;
+            var publicKeyParam = new RsaKeyParameters(false, p.Modulus, p.PublicExponent);
+            return publicKeyParam;
+        }
+
     }
 }

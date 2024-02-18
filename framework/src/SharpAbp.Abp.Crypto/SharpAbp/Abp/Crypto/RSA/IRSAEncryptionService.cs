@@ -55,7 +55,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// </summary>
         /// <param name="privateKeyPem"></param>
         /// <returns></returns>
-        AsymmetricKeyParameter ImportPrivateKeyPemPkcs8(string privateKeyPem);
+        AsymmetricKeyParameter ImportPrivateKeyPkcs8Pem(string privateKeyPem);
 
         /// <summary>
         /// RSA加密

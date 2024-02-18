@@ -184,9 +184,9 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="cipherText"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>
-        public static string DecryptFromPemPkcs8(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string cipherText, Encoding encoding = null)
+        public static string DecryptFromPkcs8Pem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string cipherText, Encoding encoding = null)
         {
-            var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPemPkcs8(privateKeyPem);
+            var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPkcs8Pem(privateKeyPem);
             return rsaEncryptionService.Decrypt(privateKeyParam, cipherText, encoding);
         }
 
@@ -238,6 +238,21 @@ namespace SharpAbp.Abp.Crypto.RSA
         }
 
         /// <summary>
+        /// RSA使用PKCS8格式私钥加签为Base64
+        /// </summary>
+        /// <param name="rsaEncryptionService"></param>
+        /// <param name="privateKey"></param>
+        /// <param name="data"></param>
+        /// <param name="algorithm"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static string SignFromPkcs8(this IRSAEncryptionService rsaEncryptionService, string privateKey, string data, string algorithm = "SHA256WITHRSA", Encoding encoding = null)
+        {
+            var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPkcs8(privateKey);
+            return rsaEncryptionService.Sign(privateKeyParam, data, algorithm, encoding);
+        }
+
+        /// <summary>
         /// RSA使用PKCS8格式Pem私钥加签为Base64
         /// </summary>
         /// <param name="rsaEncryptionService"></param>
@@ -246,9 +261,9 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="algorithm"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>
-        public static string SignFromPemPkcs8(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string data, string algorithm = "SHA256WITHRSA", Encoding encoding = null)
+        public static string SignFromPkcs8Pem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string data, string algorithm = "SHA256WITHRSA", Encoding encoding = null)
         {
-            var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPemPkcs8(privateKeyPem);
+            var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPkcs8Pem(privateKeyPem);
             return rsaEncryptionService.Sign(privateKeyParam, data, algorithm, encoding);
         }
 
