@@ -1,8 +1,9 @@
 ﻿using System;
 using Volo.Abp.Domain.Entities.Auditing;
+
 namespace SharpAbp.Abp.CryptoVault
 {
-    public class RSACreds : AuditedAggregateRoot<Guid>
+    public class SM2Creds : AuditedAggregateRoot<Guid>
     {
         /// <summary>
         /// 唯一标志
@@ -10,9 +11,9 @@ namespace SharpAbp.Abp.CryptoVault
         public virtual string Identifier { get; set; }
 
         /// <summary>
-        /// RSA密钥长度 (1024,2048)
+        /// 曲率名称,默认:sm2p256v1  (wapip192v1,sm2p256v1)
         /// </summary>
-        public virtual int Size { get; set; }
+        public virtual string Curve { get; set; }
 
         /// <summary>
         /// RSA 公钥(加密后)
@@ -39,16 +40,15 @@ namespace SharpAbp.Abp.CryptoVault
         /// </summary>
         public virtual string Description { get; set; }
 
-
-        public RSACreds()
+        public SM2Creds()
         {
 
         }
 
-        public RSACreds(
+        public SM2Creds(
             Guid id,
             string identifier,
-            int size,
+            string curve,
             string publicKey,
             string privateKey,
             string secretPassPhrase,
@@ -57,7 +57,7 @@ namespace SharpAbp.Abp.CryptoVault
         {
             Id = id;
             Identifier = identifier;
-            Size = size;
+            Curve = curve;
             PublicKey = publicKey;
             PrivateKey = privateKey;
             SecretPassPhrase = secretPassPhrase;

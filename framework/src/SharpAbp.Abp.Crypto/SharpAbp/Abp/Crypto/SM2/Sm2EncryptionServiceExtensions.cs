@@ -1,6 +1,4 @@
-﻿using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Security;
-using Org.BouncyCastle.Utilities.Encoders;
+﻿using Org.BouncyCastle.Utilities.Encoders;
 using System.Text;
 using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
@@ -8,27 +6,6 @@ namespace SharpAbp.Abp.Crypto.SM2
 {
     public static class Sm2EncryptionServiceExtensions
     {
-        /// <summary>
-        /// 生成SM2密钥对
-        /// </summary>
-        /// <param name="sm2EncryptionService"></param>
-        /// <param name="curve">曲率名称,默认使用:Sm2p256v1</param>
-        /// <param name="rd">随机数</param>
-        /// <returns></returns>
-        public static (string, string) GenerateStringKeyPair(
-            this ISm2EncryptionService sm2EncryptionService,
-            string curve = Sm2EncryptionNames.CurveSm2p256v1,
-            SecureRandom rd = null)
-        {
-            var keyPair = sm2EncryptionService.GenerateKeyPair(curve, rd);
-            var aPub = ((ECPublicKeyParameters)keyPair.Public).Q.GetEncoded();
-            var aPrivy = ((ECPrivateKeyParameters)keyPair.Private).D.ToByteArray();
-
-            var publicKey = Hex.ToHexString(aPub);
-            var privateKey = Hex.ToHexString(aPrivy);
-            return (publicKey, privateKey);
-        }
-
         /// <summary>
         /// 使用公钥进行加密
         /// </summary>

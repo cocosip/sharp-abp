@@ -7,7 +7,11 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
     [ConnectionStringName(AbpCryptoVaultDbProperties.ConnectionStringName)]
     public class AbpCryptoVaultDbContext : AbpDbContext<AbpCryptoVaultDbContext>, IAbpCryptoVaultDbContext
     {
-        public AbpCryptoVaultDbContext(DbContextOptions<AbpCryptoVaultDbContext> options) 
+
+        public DbSet<RSACreds> RSACreds { get; set; }
+        public DbSet<SM2Creds> SM2Creds { get; set; }
+
+        public AbpCryptoVaultDbContext(DbContextOptions<AbpCryptoVaultDbContext> options)
             : base(options)
         {
 
