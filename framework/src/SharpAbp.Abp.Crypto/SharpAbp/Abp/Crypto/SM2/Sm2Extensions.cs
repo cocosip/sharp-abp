@@ -58,7 +58,7 @@ namespace SharpAbp.Abp.Crypto.SM2
         /// <returns></returns>
         public static string ExportPrivateKey(this AsymmetricCipherKeyPair keyPair)
         {
-            return keyPair.Public.ExportPrivateKey();
+            return keyPair.Private.ExportPrivateKey();
         }
 
     }

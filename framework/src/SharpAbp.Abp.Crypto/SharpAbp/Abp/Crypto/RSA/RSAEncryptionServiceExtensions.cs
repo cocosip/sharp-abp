@@ -81,11 +81,12 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="publicKeyParam"></param>
         /// <param name="plainText"></param>
         /// <param name="encoding"></param>
+        /// <param name="padding"></param>
         /// <returns></returns>
-        public static string Encrypt(this IRSAEncryptionService rsaEncryptionService, AsymmetricKeyParameter publicKeyParam, string plainText, Encoding encoding = null)
+        public static string Encrypt(this IRSAEncryptionService rsaEncryptionService, AsymmetricKeyParameter publicKeyParam, string plainText, Encoding encoding = null, string padding = RSAPaddingNames.None)
         {
             encoding ??= Encoding.UTF8;
-            var cipherText = rsaEncryptionService.Encrypt(publicKeyParam, encoding.GetBytes(plainText));
+            var cipherText = rsaEncryptionService.Encrypt(publicKeyParam, encoding.GetBytes(plainText), padding);
             return Base64.ToBase64String(cipherText);
         }
 
@@ -96,27 +97,29 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="publicKey"></param>
         /// <param name="plainText"></param>
         /// <param name="encoding"></param>
+        /// <param name="padding"></param>
         /// <returns></returns>
-        public static string Encrypt(this IRSAEncryptionService rsaEncryptionService, string publicKey, string plainText, Encoding encoding = null)
+        public static string Encrypt(this IRSAEncryptionService rsaEncryptionService, string publicKey, string plainText, Encoding encoding = null, string padding = RSAPaddingNames.None)
         {
             var publicKeyParam = rsaEncryptionService.ImportPublicKey(publicKey);
-            return rsaEncryptionService.Encrypt(publicKeyParam, plainText, encoding);
+            return rsaEncryptionService.Encrypt(publicKeyParam, plainText, encoding, padding);
         }
 
+
         /// <summary>
-        /// Pem格式RSA公钥进行加密为Base64字符串
+        ///  Pem格式RSA公钥进行加密为Base64字符串
         /// </summary>
         /// <param name="rsaEncryptionService"></param>
         /// <param name="publicKeyPem"></param>
         /// <param name="plainText"></param>
         /// <param name="encoding"></param>
+        /// <param name="padding"></param>
         /// <returns></returns>
-        public static string EncryptFromPem(this IRSAEncryptionService rsaEncryptionService, string publicKeyPem, string plainText, Encoding encoding = null)
+        public static string EncryptFromPem(this IRSAEncryptionService rsaEncryptionService, string publicKeyPem, string plainText, Encoding encoding = null, string padding = RSAPaddingNames.None)
         {
             var publicKeyParam = rsaEncryptionService.ImportPublicKeyPem(publicKeyPem);
-            return rsaEncryptionService.Encrypt(publicKeyParam, plainText, encoding);
+            return rsaEncryptionService.Encrypt(publicKeyParam, plainText, encoding, padding);
         }
-
 
         /// <summary>
         /// RSA从Base64加密字符串中解密
@@ -125,12 +128,13 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="privateKeyParam"></param>
         /// <param name="cipherText"></param>
         /// <param name="encoding"></param>
+        /// <param name="padding"></param>
         /// <returns></returns>
-        public static string Decrypt(this IRSAEncryptionService rsaEncryptionService, AsymmetricKeyParameter privateKeyParam, string cipherText, Encoding encoding = null)
+        public static string Decrypt(this IRSAEncryptionService rsaEncryptionService, AsymmetricKeyParameter privateKeyParam, string cipherText, Encoding encoding = null, string padding = RSAPaddingNames.None)
         {
             encoding ??= Encoding.UTF8;
             var cipherBytes = Base64.Decode(cipherText);
-            var plainText = rsaEncryptionService.Decrypt(privateKeyParam, cipherBytes);
+            var plainText = rsaEncryptionService.Decrypt(privateKeyParam, cipherBytes, padding);
             return encoding.GetString(plainText);
         }
 
@@ -141,11 +145,12 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="privateKey"></param>
         /// <param name="cipherText"></param>
         /// <param name="encoding"></param>
+        /// <param name="padding"></param>
         /// <returns></returns>
-        public static string Decrypt(this IRSAEncryptionService rsaEncryptionService, string privateKey, string cipherText, Encoding encoding = null)
+        public static string Decrypt(this IRSAEncryptionService rsaEncryptionService, string privateKey, string cipherText, Encoding encoding = null, string padding = RSAPaddingNames.None)
         {
             var privateKeyParam = rsaEncryptionService.ImportPrivateKey(privateKey);
-            return rsaEncryptionService.Decrypt(privateKeyParam, cipherText, encoding);
+            return rsaEncryptionService.Decrypt(privateKeyParam, cipherText, encoding, padding);
         }
 
         /// <summary>
@@ -155,11 +160,12 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="privateKey"></param>
         /// <param name="cipherText"></param>
         /// <param name="encoding"></param>
+        /// <param name="padding"></param>
         /// <returns></returns>
-        public static string DecryptFromPkcs8(this IRSAEncryptionService rsaEncryptionService, string privateKey, string cipherText, Encoding encoding = null)
+        public static string DecryptFromPkcs8(this IRSAEncryptionService rsaEncryptionService, string privateKey, string cipherText, Encoding encoding = null, string padding = RSAPaddingNames.None)
         {
             var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPkcs8(privateKey);
-            return rsaEncryptionService.Decrypt(privateKeyParam, cipherText, encoding);
+            return rsaEncryptionService.Decrypt(privateKeyParam, cipherText, encoding, padding);
         }
 
         /// <summary>
@@ -169,11 +175,12 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="privateKeyPem"></param>
         /// <param name="cipherText"></param>
         /// <param name="encoding"></param>
+        /// <param name="padding"></param>
         /// <returns></returns>
-        public static string DecryptFromPem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string cipherText, Encoding encoding = null)
+        public static string DecryptFromPem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string cipherText, Encoding encoding = null, string padding = RSAPaddingNames.None)
         {
             var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPem(privateKeyPem);
-            return rsaEncryptionService.Decrypt(privateKeyParam, cipherText, encoding);
+            return rsaEncryptionService.Decrypt(privateKeyParam, cipherText, encoding, padding);
         }
 
         /// <summary>
@@ -183,11 +190,12 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="privateKeyPem"></param>
         /// <param name="cipherText"></param>
         /// <param name="encoding"></param>
+        /// <param name="padding"></param>
         /// <returns></returns>
-        public static string DecryptFromPkcs8Pem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string cipherText, Encoding encoding = null)
+        public static string DecryptFromPkcs8Pem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string cipherText, Encoding encoding = null, string padding = RSAPaddingNames.None)
         {
             var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPkcs8Pem(privateKeyPem);
-            return rsaEncryptionService.Decrypt(privateKeyParam, cipherText, encoding);
+            return rsaEncryptionService.Decrypt(privateKeyParam, cipherText, encoding, padding);
         }
 
         /// <summary>

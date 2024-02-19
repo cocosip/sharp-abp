@@ -2,6 +2,7 @@
 using Org.BouncyCastle.Asn1.Pkcs;
 using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Encodings;
 using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Generators;
@@ -126,17 +127,19 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// </summary>
         /// <param name="publicKeyParam"></param>
         /// <param name="plainText"></param>
+        /// <param name="padding"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public virtual byte[] Encrypt(AsymmetricKeyParameter publicKeyParam, byte[] plainText)
+        public virtual byte[] Encrypt(AsymmetricKeyParameter publicKeyParam, byte[] plainText, string padding)
         {
             if (publicKeyParam.IsPrivate)
             {
                 throw new ArgumentException("AsymmetricKeyParameter is not public key");
             }
-            var encryptEngine = new Pkcs1Encoding(new RsaEngine());
-            encryptEngine.Init(true, publicKeyParam);
-            return encryptEngine.ProcessBlock(plainText, 0, plainText.Length);
+
+            var cipher = GetCipher(padding);
+            cipher.Init(true, publicKeyParam);
+            return cipher.ProcessBlock(plainText, 0, plainText.Length);
         }
 
         /// <summary>
@@ -144,17 +147,19 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// </summary>
         /// <param name="privateKeyParam"></param>
         /// <param name="cipherText"></param>
+        /// <param name="padding"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public virtual byte[] Decrypt(AsymmetricKeyParameter privateKeyParam, byte[] cipherText)
+        public virtual byte[] Decrypt(AsymmetricKeyParameter privateKeyParam, byte[] cipherText, string padding)
         {
             if (!privateKeyParam.IsPrivate)
             {
                 throw new ArgumentException("AsymmetricKeyParameter is not private key");
             }
-            var encryptEngine = new Pkcs1Encoding(new RsaEngine());
-            encryptEngine.Init(false, privateKeyParam);
-            return encryptEngine.ProcessBlock(cipherText, 0, cipherText.Length);
+
+            var cipher = GetCipher(padding);
+            cipher.Init(false, privateKeyParam);
+            return cipher.ProcessBlock(cipherText, 0, cipherText.Length);
         }
 
         /// <summary>
@@ -198,6 +203,34 @@ namespace SharpAbp.Abp.Crypto.RSA
             signer.Init(false, privateKeyParam);
             signer.BlockUpdate(data, 0, data.Length);
             return signer.VerifySignature(signature);
+        }
+
+
+        protected virtual IAsymmetricBlockCipher GetCipher(string padding)
+        {
+            //RSA/None
+            //RSA/PKCS1Padding
+            //RSA/OAEPPadding
+            //RSA/ISO9796-1Padding
+            switch (padding)
+            {
+                case RSAPaddingNames.None:
+                default:
+                    return new RsaEngine();
+                case RSAPaddingNames.PKCS1Padding:
+                    return new Pkcs1Encoding(new RsaEngine());
+                case RSAPaddingNames.OAEPPadding:
+                case RSAPaddingNames.OAEPSHA1Padding:
+                    return new OaepEncoding(new RsaEngine(), new Sha1Digest());
+                case RSAPaddingNames.OAEPSHA256Padding:
+                    return new OaepEncoding(new RsaEngine(), new Sha256Digest());
+                case RSAPaddingNames.OAEPSHA384Padding:
+                    return new OaepEncoding(new RsaEngine(), new Sha384Digest());
+                case RSAPaddingNames.OAEPSHA512Padding:
+                    return new OaepEncoding(new RsaEngine(), new Sha512Digest());
+                case RSAPaddingNames.ISO9796d1Padding:
+                    return new ISO9796d1Encoding(new RsaEngine());
+            }
         }
 
 

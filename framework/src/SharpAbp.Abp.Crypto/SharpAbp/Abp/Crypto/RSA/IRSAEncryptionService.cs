@@ -58,22 +58,22 @@ namespace SharpAbp.Abp.Crypto.RSA
         AsymmetricKeyParameter ImportPrivateKeyPkcs8Pem(string privateKeyPem);
 
         /// <summary>
-        /// RSA加密
+        ///  RSA加密
         /// </summary>
         /// <param name="publicKeyParam"></param>
         /// <param name="plainText"></param>
+        /// <param name="padding"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
-        byte[] Encrypt(AsymmetricKeyParameter publicKeyParam, byte[] plainText);
+        byte[] Encrypt(AsymmetricKeyParameter publicKeyParam, byte[] plainText, string padding);
 
         /// <summary>
         /// RSA解密
         /// </summary>
         /// <param name="privateKeyParam"></param>
         /// <param name="cipherText"></param>
+        /// <param name="padding"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
-        byte[] Decrypt(AsymmetricKeyParameter privateKeyParam, byte[] cipherText);
+        byte[] Decrypt(AsymmetricKeyParameter privateKeyParam, byte[] cipherText, string padding);
 
         /// <summary>
         /// RSA加签

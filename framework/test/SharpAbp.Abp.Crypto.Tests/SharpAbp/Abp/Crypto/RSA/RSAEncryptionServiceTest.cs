@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using Org.BouncyCastle.Tls;
+using System.Net;
+using System.Text;
 using Xunit;
 
 namespace SharpAbp.Abp.Crypto.RSA
@@ -129,6 +131,52 @@ namespace SharpAbp.Abp.Crypto.RSA
             Assert.True(r4);
         }
 
+        [Fact]
+        public void Encrypt_Decrypt_Test1()
+        {
 
+//            var pub = @"-----BEGIN PUBLIC KEY-----
+//MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnTHIt0Yyam+QKjC6TOeR
+//lpLUXH6HKX4NBNauEIluuafk7MVHL8rOCOdWGkF8DLgAGubyjYlXsav9RJcWi67j
+//qyxOAkloFHyrQbP3DcahQvUi+PB+gNhIpdEibohPXyPEkbRGTp7Zb1F13Ya9bZlT
+//dHsh+ge220pTtFnjYcC06cOZ1M7biDUMzCL/nhHbcXYYWIxPcDW3XMElQEBV9Ths
+//nnigiuFG9N/aWYbI+Ogr/JxqJdrO0DvMuvigXJGH2WYfhREtNyr1PUPd/9Kj2kkL
+//fOpihfVTjWeJ4cndkiFuLbyjZeRyUGVWp55Fn2ltFjMW89yAAfbIy4QYSM1KBmz7
+//ZwIDAQAB
+//-----END PUBLIC KEY-----";
+            var priv = @"-----BEGIN RSA PRIVATE KEY-----
+MIIEogIBAAKCAQEAnTHIt0Yyam+QKjC6TOeRlpLUXH6HKX4NBNauEIluuafk7MVH
+L8rOCOdWGkF8DLgAGubyjYlXsav9RJcWi67jqyxOAkloFHyrQbP3DcahQvUi+PB+
+gNhIpdEibohPXyPEkbRGTp7Zb1F13Ya9bZlTdHsh+ge220pTtFnjYcC06cOZ1M7b
+iDUMzCL/nhHbcXYYWIxPcDW3XMElQEBV9ThsnnigiuFG9N/aWYbI+Ogr/JxqJdrO
+0DvMuvigXJGH2WYfhREtNyr1PUPd/9Kj2kkLfOpihfVTjWeJ4cndkiFuLbyjZeRy
+UGVWp55Fn2ltFjMW89yAAfbIy4QYSM1KBmz7ZwIDAQABAoIBADN+8yejLfHzUVGY
++/ckp2uh90LDyoibvC0ZHRXax/S3HUY5jIwKDrwY+PqJ+Fb8UkB95vjaBOn2E3bM
+XjztUrUpQvb50Ehh3QKdr7IKH5sdTlMqCe8wq3/yxqpaKlJbF9K5sYyg+k8+6vNi
+6ByG7bGLgwJzU4J8U3aSOey0oi+v+nYLJEZQjk/bV3mfSKuc/pM4+q46Q25Ly9b8
+CElny+6noDyC5L2W0ILGJnyz4KiHKd2qmikTGWCnYkhXklORI9zhvTOQw/9sk2n4
+7iM+c+jm+UeEJX0/RwKa3RwDPbhsuK8nNIPkeLndN3YZ0WNgczrywVgcQP860Pjl
+b9zcO50CgYEAzRgx5KY/FVR8vf/+vhHxw/v9EwhpGkH8bYfbU2GrxlDiXWfu9wUq
+5anmw75S5LnQAC7Rr4HOvqHlcVkxUUvyuCAooCQK1zhrYfTO6uSkNDui0uDnOA2p
+OUca4mQFTkWIEpV8hymafXJvgGJYUsBQmRuEO9684MO2Tw30JZrsu1sCgYEAxDX/
+RGHskCv3d0sWVi+LjZyN7Oyew7IOWh7Pdp1NWoPw+wNh56sH0dfm7b8Z1PvFHiYh
+IhOYrFlMw88Joz49o8/xJzYTJLAmPHhgWhjRfO7pIjad7WiQ73e33KaE5CFvS6aq
+7EDaKc2ka2yLXt8njbFzAINKNH4dbF66cO0QmeUCgYAZ/XPtJsgdutwn87XjfkCl
+9lvmuo0fH7eOZcX8dgcflYZqEc6tjQEXo4Uzzv2QMJ/UNhqqZAfADqIV0Bi41agH
+f0PGr2qURXkOK8jA6YKJf/ktQgTrDIgiUwlsIQKvHY6V1E24jyQdu4+3tD6/FdHg
+5STHtX03+nUy5XDIBy7yuwKBgEUuELHIoQL4LYmHFPoQS3EDqNrHVvcC2aKWyGk2
+7yYh7R5jw+pN2DT5nbdnsLDykD6gDQCZzjO+TJ2havF+qXcPgyRjIX7HCMQ7YSWD
+KKGXDuX8QdSKEMgN+uq2X5ab30TaH9uqxgEFO5qQq9cocSa5USX2JHy7lp42DCBy
+xW6tAoGAVQSMdMIGh2/NVWIbarWD1l8oPyevaaiFC/Asvd859Ta8M6of8/rR/rIu
+ENJiZyEIpU8ewKzn+8/4p1keohkN4TSYAuAifZYL+ytDcak8P+Z5NbxHreSjN4ic
+YIJ480WXdUSxebxnoemJs+HYNM7m0vugOhdb8iTwijKYSRxyPLc=
+-----END RSA PRIVATE KEY-----
+";
+
+            var cipherText = @"YA5e9rEEgfV3cXT2bKwd88Ee7FwhFb7Q1AlPeHsjH2Ss9oXxP3Z2/az/Tb4dFPFfgRjNfg/Ye2w9i16MmFUD5LMhGcgRXcGCOWT8rWjq0uYi+vXH9hEAm4GfIAXgfnPtmfLtrffURd8yaEOYLu7AuaYu9THFFtC+YD55k8auixPLuCMxA9S/tIGF/CMcQSHV/MCAvNqLDTMkuHvzRgyRbKdRJlzl+mnZpWOF9cK/VPgc9kQnI+ZAgne/NKrm5bCQbe0qfrJ5+oYit6r0dTWQL/s99Z5HJKrrqDbqKXMxu3VbdWOsiux+XgVXjEMerQHWJU4hkajb623FSP3P+agjaw==";
+
+            var s = _rsaEncryptionService.DecryptFromPem(priv, cipherText);
+
+        }
     }
 }
