@@ -60,10 +60,11 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
         }
 
         /// <summary>
-        /// Get list
+        ///  Get list
         /// </summary>
         /// <param name="sorting"></param>
         /// <param name="identifier"></param>
+        /// <param name="sourceType"></param>
         /// <param name="size"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
@@ -71,13 +72,15 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
         public virtual async Task<List<RSACreds>> GetListAsync(
             string sorting = null,
             string identifier = "",
+            int? sourceType = null,
             int? size = null,
             bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .WhereIf(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
-                .WhereIf(size.HasValue,item=>item.Size==size.Value)
+                .WhereIf(sourceType.HasValue, item => item.SourceType == sourceType.Value)
+                .WhereIf(size.HasValue, item => item.Size == size.Value)
                 .OrderBy(sorting ?? nameof(RSACreds.Id))
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
@@ -89,6 +92,7 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
         /// <param name="maxResultCount"></param>
         /// <param name="sorting"></param>
         /// <param name="identifier"></param>
+        /// <param name="sourceType"></param>
         /// <param name="size"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
@@ -98,12 +102,14 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
             int maxResultCount,
             string sorting = null,
             string identifier = "",
+            int? sourceType = null,
             int? size = null,
             bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .WhereIf(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
+                .WhereIf(sourceType.HasValue, item => item.SourceType == sourceType.Value)
                 .WhereIf(size.HasValue, item => item.Size == size.Value)
                 .OrderBy(sorting ?? nameof(RSACreds.Id))
                 .Skip(skipCount)
@@ -115,16 +121,19 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
         /// Get count
         /// </summary>
         /// <param name="identifier"></param>
+        /// <param name="sourceType"></param>
         /// <param name="size"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<int> GetCountAsync(
             string identifier = "",
+            int? sourceType = null,
             int? size = null,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .WhereIf(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
+                .WhereIf(sourceType.HasValue, item => item.SourceType == sourceType.Value)
                 .WhereIf(size.HasValue, item => item.Size == size.Value)
                 .CountAsync(GetCancellationToken(cancellationToken));
         }

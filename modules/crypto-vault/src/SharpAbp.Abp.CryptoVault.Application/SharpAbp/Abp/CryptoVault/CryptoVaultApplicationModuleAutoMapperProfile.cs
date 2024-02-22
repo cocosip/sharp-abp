@@ -6,7 +6,8 @@ namespace SharpAbp.Abp.CryptoVault
     {
         public CryptoVaultApplicationModuleAutoMapperProfile()
         {
-                
+            CreateMap<RSACreds, RSACredsDto>();
+            CreateMap<SM2Creds, SM2CredsDto>();
         }
     }
 }

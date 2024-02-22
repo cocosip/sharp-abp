@@ -11,6 +11,11 @@ namespace SharpAbp.Abp.CryptoVault
         public virtual string Identifier { get; set; }
 
         /// <summary>
+        /// SourceType
+        /// </summary>
+        public virtual int SourceType { get; set; }
+
+        /// <summary>
         /// 曲率名称,默认:sm2p256v1  (wapip192v1,sm2p256v1)
         /// </summary>
         public virtual string Curve { get; set; }
@@ -28,12 +33,12 @@ namespace SharpAbp.Abp.CryptoVault
         /// <summary>
         /// 对公钥,私钥加密的密钥
         /// </summary>
-        public virtual string SecretPassPhrase { get; set; }
+        public virtual string PassPhrase { get; set; }
 
         /// <summary>
         /// 对公钥,私钥加密的盐
         /// </summary>
-        public virtual string SecretSalt { get; set; }
+        public virtual string Salt { get; set; }
 
         /// <summary>
         /// 描述信息
@@ -45,26 +50,31 @@ namespace SharpAbp.Abp.CryptoVault
 
         }
 
+        public SM2Creds(Guid id)
+        {
+            Id = id;
+        }
+
         public SM2Creds(
             Guid id,
             string identifier,
+            int sourceType,
             string curve,
             string publicKey,
             string privateKey,
-            string secretPassPhrase,
-            string secretSalt,
+            string passPhrase,
+            string salt,
             string description)
         {
             Id = id;
             Identifier = identifier;
+            SourceType = sourceType;
             Curve = curve;
             PublicKey = publicKey;
             PrivateKey = privateKey;
-            SecretPassPhrase = secretPassPhrase;
-            SecretSalt = secretSalt;
+            PassPhrase = passPhrase;
+            Salt = salt;
             Description = description;
         }
-
-
     }
 }

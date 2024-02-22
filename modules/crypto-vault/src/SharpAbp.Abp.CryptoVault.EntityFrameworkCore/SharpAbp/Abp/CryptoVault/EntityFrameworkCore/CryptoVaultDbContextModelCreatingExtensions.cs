@@ -28,7 +28,13 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
 
                 b.Property(p => p.Identifier).IsRequired().HasMaxLength(RSACredsConsts.MaxIdentifierLength);
 
+                b.Property(p => p.SourceType).IsRequired();
+
                 b.Property(p => p.Size).IsRequired();
+
+                b.Property(p => p.PassPhrase).IsRequired().HasMaxLength(RSACredsConsts.MaxPassPhraseLength);
+
+                b.Property(p => p.Salt).IsRequired().HasMaxLength(RSACredsConsts.MaxSaltLength);
 
                 b.Property(p => p.Description).HasMaxLength(RSACredsConsts.MaxDescriptionLength);
 
@@ -45,7 +51,13 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
 
                 b.Property(p => p.Identifier).IsRequired().HasMaxLength(SM2CredsConsts.MaxIdentifierLength);
 
+                b.Property(p => p.SourceType).IsRequired();
+
                 b.Property(p => p.Curve).IsRequired().HasMaxLength(SM2CredsConsts.MaxCurveLength);
+
+                b.Property(p => p.PassPhrase).IsRequired().HasMaxLength(SM2CredsConsts.MaxPassPhraseLength);
+
+                b.Property(p => p.Salt).IsRequired().HasMaxLength(SM2CredsConsts.MaxSaltLength);
 
                 b.Property(p => p.Description).HasMaxLength(SM2CredsConsts.MaxDescriptionLength);
 

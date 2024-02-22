@@ -1,5 +1,6 @@
 ﻿using System;
 using Volo.Abp.Domain.Entities.Auditing;
+
 namespace SharpAbp.Abp.CryptoVault
 {
     public class RSACreds : AuditedAggregateRoot<Guid>
@@ -8,6 +9,11 @@ namespace SharpAbp.Abp.CryptoVault
         /// 唯一标志
         /// </summary>
         public virtual string Identifier { get; set; }
+
+        /// <summary>
+        /// SourceType
+        /// </summary>
+        public virtual int SourceType { get; set; }
 
         /// <summary>
         /// RSA密钥长度 (1024,2048)
@@ -27,12 +33,12 @@ namespace SharpAbp.Abp.CryptoVault
         /// <summary>
         /// 对公钥,私钥加密的密钥
         /// </summary>
-        public virtual string SecretPassPhrase { get; set; }
+        public virtual string PassPhrase { get; set; }
 
         /// <summary>
         /// 对公钥,私钥加密的盐
         /// </summary>
-        public virtual string SecretSalt { get; set; }
+        public virtual string Salt { get; set; }
 
         /// <summary>
         /// 描述信息
@@ -45,26 +51,31 @@ namespace SharpAbp.Abp.CryptoVault
 
         }
 
+        public RSACreds(Guid id)
+        {
+            Id = id;
+        }
+
         public RSACreds(
             Guid id,
             string identifier,
+            int sourceType,
             int size,
             string publicKey,
             string privateKey,
-            string secretPassPhrase,
-            string secretSalt,
+            string passPhrase,
+            string salt,
             string description)
         {
             Id = id;
             Identifier = identifier;
+            SourceType = sourceType;
             Size = size;
             PublicKey = publicKey;
             PrivateKey = privateKey;
-            SecretPassPhrase = secretPassPhrase;
-            SecretSalt = secretSalt;
+            PassPhrase = passPhrase;
+            Salt = salt;
             Description = description;
         }
-
-
     }
 }

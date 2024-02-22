@@ -33,11 +33,12 @@ namespace SharpAbp.Abp.CryptoVault
         /// </summary>
         /// <param name="sorting"></param>
         /// <param name="identifier"></param>
+        /// <param name="sourceType"></param>
         /// <param name="curve"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<List<SM2Creds>> GetListAsync(string sorting = null, string identifier = "", string curve = "", bool includeDetails = false, CancellationToken cancellationToken = default);
+        Task<List<SM2Creds>> GetListAsync(string sorting = null, string identifier = "", int? sourceType = null, string curve = "", bool includeDetails = false, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get paged list
@@ -46,19 +47,21 @@ namespace SharpAbp.Abp.CryptoVault
         /// <param name="maxResultCount"></param>
         /// <param name="sorting"></param>
         /// <param name="identifier"></param>
+        /// <param name="sourceType"></param>
         /// <param name="curve"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<List<SM2Creds>> GetPagedListAsync(int skipCount, int maxResultCount, string sorting = null, string identifier = "", string curve = "", bool includeDetails = false, CancellationToken cancellationToken = default);
+        Task<List<SM2Creds>> GetPagedListAsync(int skipCount, int maxResultCount, string sorting = null, string identifier = "", int? sourceType = null, string curve = "", bool includeDetails = false, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get count
         /// </summary>
         /// <param name="identifier"></param>
+        /// <param name="sourceType"></param>
         /// <param name="curve"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<int> GetCountAsync(string identifier = "", string curve = "", CancellationToken cancellationToken = default);
+        Task<int> GetCountAsync(string identifier = "", int? sourceType = null, string curve = "", CancellationToken cancellationToken = default);
     }
 }

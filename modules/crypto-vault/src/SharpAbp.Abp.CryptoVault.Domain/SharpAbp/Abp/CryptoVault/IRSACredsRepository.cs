@@ -35,11 +35,12 @@ namespace SharpAbp.Abp.CryptoVault
         /// </summary>
         /// <param name="sorting"></param>
         /// <param name="identifier"></param>
+        /// <param name="sourceType"></param>
         /// <param name="size"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<List<RSACreds>> GetListAsync(string sorting = null, string identifier = "", int? size = null, bool includeDetails = false, CancellationToken cancellationToken = default);
+        Task<List<RSACreds>> GetListAsync(string sorting = null, string identifier = "", int? sourceType = null, int? size = null, bool includeDetails = false, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get paged list
@@ -48,19 +49,21 @@ namespace SharpAbp.Abp.CryptoVault
         /// <param name="maxResultCount"></param>
         /// <param name="sorting"></param>
         /// <param name="identifier"></param>
+        /// <param name="sourceType"></param>
         /// <param name="size"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<List<RSACreds>> GetPagedListAsync(int skipCount, int maxResultCount, string sorting = null, string identifier = "", int? size = null, bool includeDetails = false, CancellationToken cancellationToken = default);
+        Task<List<RSACreds>> GetPagedListAsync(int skipCount, int maxResultCount, string sorting = null, string identifier = "", int? sourceType = null, int? size = null, bool includeDetails = false, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get count
         /// </summary>
         /// <param name="identifier"></param>
+        /// <param name="sourceType"></param>
         /// <param name="size"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<int> GetCountAsync(string identifier = "", int? size = null, CancellationToken cancellationToken = default);
+        Task<int> GetCountAsync(string identifier = "", int? sourceType = null, int? size = null, CancellationToken cancellationToken = default);
     }
 }

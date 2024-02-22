@@ -11,6 +11,7 @@ namespace SharpAbp.Abp.CryptoVault
             public const string Default = GroupName + ".RSACreds";
             public const string Generate = Default + ".Generate";
             public const string Import = Default + ".Import";
+            public const string DecryptKey = Default + ".DecryptKey";
             public const string Delete = Default + ".Delete";
         }
 
@@ -19,6 +20,7 @@ namespace SharpAbp.Abp.CryptoVault
             public const string Default = GroupName + ".SM2Creds";
             public const string Generate = Default + ".Generate";
             public const string Import = Default + ".Import";
+            public const string DecryptKey = Default + ".DecryptKey";
             public const string Delete = Default + ".Delete";
         }
 

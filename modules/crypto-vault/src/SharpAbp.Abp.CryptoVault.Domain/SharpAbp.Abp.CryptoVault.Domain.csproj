@@ -23,6 +23,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\SharpAbp.Abp.CryptoVault.Domain.Shared\SharpAbp.Abp.CryptoVault.Domain.Shared.csproj" />
+		<ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.Crypto\SharpAbp.Abp.Crypto.csproj" />
 	</ItemGroup>
 
 </Project>
