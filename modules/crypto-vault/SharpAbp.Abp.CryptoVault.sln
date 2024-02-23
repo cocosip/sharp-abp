@@ -5,21 +5,25 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C784232A-8754-4CAD-83DC-8D6FC7E97423}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.CryptoVault.Domain.Shared", "src\SharpAbp.Abp.CryptoVault.Domain.Shared\SharpAbp.Abp.CryptoVault.Domain.Shared.csproj", "{FE11BF15-AE18-4AF5-9247-673F8E559414}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.CryptoVault.Domain.Shared", "src\SharpAbp.Abp.CryptoVault.Domain.Shared\SharpAbp.Abp.CryptoVault.Domain.Shared.csproj", "{FE11BF15-AE18-4AF5-9247-673F8E559414}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.CryptoVault.Domain", "src\SharpAbp.Abp.CryptoVault.Domain\SharpAbp.Abp.CryptoVault.Domain.csproj", "{0C566290-C326-41BD-8C8D-8566FA00DD63}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.CryptoVault.Domain", "src\SharpAbp.Abp.CryptoVault.Domain\SharpAbp.Abp.CryptoVault.Domain.csproj", "{0C566290-C326-41BD-8C8D-8566FA00DD63}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.CryptoVault.EntityFrameworkCore", "src\SharpAbp.Abp.CryptoVault.EntityFrameworkCore\SharpAbp.Abp.CryptoVault.EntityFrameworkCore.csproj", "{80B2C64B-3CBF-4E03-83D4-A227A8EAE72B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.CryptoVault.EntityFrameworkCore", "src\SharpAbp.Abp.CryptoVault.EntityFrameworkCore\SharpAbp.Abp.CryptoVault.EntityFrameworkCore.csproj", "{80B2C64B-3CBF-4E03-83D4-A227A8EAE72B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.CryptoVault.Application.Contracts", "src\SharpAbp.Abp.CryptoVault.Application.Contracts\SharpAbp.Abp.CryptoVault.Application.Contracts.csproj", "{7440EE9F-C52D-4F1C-BBE1-7F8B406801BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.CryptoVault.Application.Contracts", "src\SharpAbp.Abp.CryptoVault.Application.Contracts\SharpAbp.Abp.CryptoVault.Application.Contracts.csproj", "{7440EE9F-C52D-4F1C-BBE1-7F8B406801BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.CryptoVault.Application", "src\SharpAbp.Abp.CryptoVault.Application\SharpAbp.Abp.CryptoVault.Application.csproj", "{5DD36ED2-A88B-4816-8BF0-F9A53E3E0F41}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.CryptoVault.Application", "src\SharpAbp.Abp.CryptoVault.Application\SharpAbp.Abp.CryptoVault.Application.csproj", "{5DD36ED2-A88B-4816-8BF0-F9A53E3E0F41}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.CryptoVault.HttpApi", "src\SharpAbp.Abp.CryptoVault.HttpApi\SharpAbp.Abp.CryptoVault.HttpApi.csproj", "{CE49DB2C-6414-4A22-B58D-C7A889FA93A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.CryptoVault.HttpApi", "src\SharpAbp.Abp.CryptoVault.HttpApi\SharpAbp.Abp.CryptoVault.HttpApi.csproj", "{CE49DB2C-6414-4A22-B58D-C7A889FA93A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.CryptoVault.HttpApi.Client", "src\SharpAbp.Abp.CryptoVault.HttpApi.Client\SharpAbp.Abp.CryptoVault.HttpApi.Client.csproj", "{B730DFAC-9AA8-4010-A534-9C4EAF4E3B2D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.CryptoVault.HttpApi.Client", "src\SharpAbp.Abp.CryptoVault.HttpApi.Client\SharpAbp.Abp.CryptoVault.HttpApi.Client.csproj", "{B730DFAC-9AA8-4010-A534-9C4EAF4E3B2D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.CryptoVault.MongoDB", "src\SharpAbp.Abp.CryptoVault.MongoDB\SharpAbp.Abp.CryptoVault.MongoDB.csproj", "{80CFD206-9843-4B6A-8937-DFAE9ED28D6F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.CryptoVault.MongoDB", "src\SharpAbp.Abp.CryptoVault.MongoDB\SharpAbp.Abp.CryptoVault.MongoDB.csproj", "{80CFD206-9843-4B6A-8937-DFAE9ED28D6F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{C38150BB-337B-4107-A493-9EFD67C94C98}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.CryptoVault.Application.Tests", "test\SharpAbp.Abp.CryptoVault.Application.Tests\SharpAbp.Abp.CryptoVault.Application.Tests.csproj", "{C63C07A9-FBCE-49F8-83D8-A1C2FDCA6F5F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +63,10 @@ Global
 		{80CFD206-9843-4B6A-8937-DFAE9ED28D6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80CFD206-9843-4B6A-8937-DFAE9ED28D6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80CFD206-9843-4B6A-8937-DFAE9ED28D6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C63C07A9-FBCE-49F8-83D8-A1C2FDCA6F5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C63C07A9-FBCE-49F8-83D8-A1C2FDCA6F5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C63C07A9-FBCE-49F8-83D8-A1C2FDCA6F5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C63C07A9-FBCE-49F8-83D8-A1C2FDCA6F5F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -72,6 +80,7 @@ Global
 		{CE49DB2C-6414-4A22-B58D-C7A889FA93A0} = {C784232A-8754-4CAD-83DC-8D6FC7E97423}
 		{B730DFAC-9AA8-4010-A534-9C4EAF4E3B2D} = {C784232A-8754-4CAD-83DC-8D6FC7E97423}
 		{80CFD206-9843-4B6A-8937-DFAE9ED28D6F} = {C784232A-8754-4CAD-83DC-8D6FC7E97423}
+		{C63C07A9-FBCE-49F8-83D8-A1C2FDCA6F5F} = {C38150BB-337B-4107-A493-9EFD67C94C98}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D4F74949-FFEE-4186-9808-573F77D0E7C5}

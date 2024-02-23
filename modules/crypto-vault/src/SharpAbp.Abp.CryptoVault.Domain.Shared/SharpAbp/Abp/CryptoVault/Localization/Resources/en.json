@@ -1,11 +1,16 @@
 {
   "culture": "en",
   "texts": {
-    "DbConnectionsManagement": "Database connection management",
-    "Permission:DbConnectionsManagement.DatabaseConnectionInfos": "Database connection info",
-    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Create": "Create database connection info",
-    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Update": "Update database connection info",
-    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Delete": "Delete database connection info",
-    "DbConnectionsManagement.DuplicateName": "Dumplicate database connection name '{0}'."
+    "AbpCryptoVault": "Crypto vault",
+    "Permission:AbpCryptoVault.RSACreds": "RSA credentials",
+    "Permission:AbpCryptoVault.RSACreds.Generate": "RSA credentials generate",
+    "Permission:AbpCryptoVault.RSACreds.DecryptKey": "Decrypt RSA credentials",
+    "Permission:AbpCryptoVault.RSACreds.Create": "Create RSA credentials",
+    "Permission:AbpCryptoVault.RSACreds.Delete": "Delete RSA credentials",
+    "Permission:AbpCryptoVault.SM2Creds": "SM2 credentials",
+    "Permission:AbpCryptoVault.SM2Creds.Generate": "SM2 credentials generate",
+    "Permission:AbpCryptoVault.SM2Creds.DecryptKey": "Decrypt SM2 credentials",
+    "Permission:AbpCryptoVault.SM2Creds.Create": "Create SM2 credentials",
+    "Permission:AbpCryptoVault.SM2Creds.Delete": "Delete SM2 credentials"
   }
 }

@@ -3,6 +3,6 @@
     public enum KeySourceType
     {
         Generate = 1,
-        Import = 2
+        Create = 2
     }
 }

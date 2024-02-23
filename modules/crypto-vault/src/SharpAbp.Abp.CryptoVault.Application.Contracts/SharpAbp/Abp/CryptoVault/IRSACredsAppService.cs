@@ -47,11 +47,11 @@ namespace SharpAbp.Abp.CryptoVault
         Task GenerateAsync(GenerateRSACredsDto input);
 
         /// <summary>
-        /// Import key
+        /// Create key
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        Task<RSACredsDto> ImportAsync(ImportRSACredsDto input);
+        Task<RSACredsDto> CreateAsync(CreateRSACredsDto input);
 
         /// <summary>
         /// Delete

@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using SharpAbp.Abp.Crypto;
+using SharpAbp.Abp.Crypto.SM2;
+using System.Threading.Tasks;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain;
@@ -12,7 +14,8 @@ namespace SharpAbp.Abp.CryptoVault
         typeof(AbpDddDomainModule),
         typeof(AbpCachingModule),
         typeof(AbpAutoMapperModule),
-        typeof(AbpCryptoVaultDomainSharedModule)
+        typeof(AbpCryptoVaultDomainSharedModule),
+        typeof(AbpCryptoModule)
         )]
     public class AbpCryptoVaultDomainModule : AbpModule
     {
@@ -24,6 +27,14 @@ namespace SharpAbp.Abp.CryptoVault
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
+            Configure<AbpCryptoVaultOptions>(options =>
+            {
+                options.RSACount = 10;
+                options.RSAKeySize = 2048;
+                options.SM2Count = 10;
+                options.SM2Curve = Sm2EncryptionNames.CurveSm2p256v1;
+            });
+
             //Configure<AbpAutoMapperOptions>(options =>
             //{
             //    options.AddMaps<DbConnectionsManagementDomainModule>();

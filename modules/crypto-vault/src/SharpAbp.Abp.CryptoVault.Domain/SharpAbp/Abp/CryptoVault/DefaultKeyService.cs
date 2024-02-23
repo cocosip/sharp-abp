@@ -28,7 +28,6 @@ namespace SharpAbp.Abp.CryptoVault
             Sm2EncryptionService = sm2EncryptionService;
         }
 
-
         public virtual List<RSACreds> GenerateRSACreds(int size, int count)
         {
             var rsaCredsList = new List<RSACreds>();

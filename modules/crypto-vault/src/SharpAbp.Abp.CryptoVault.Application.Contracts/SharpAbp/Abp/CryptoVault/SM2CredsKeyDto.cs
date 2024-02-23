@@ -1,8 +1,7 @@
 ﻿namespace SharpAbp.Abp.CryptoVault
 {
-    public class ImportRSACredsDto
+    public class SM2CredsKeyDto
     {
-        public int Size { get; set; }
         public string PublicKey { get; set; }
         public string PrivateKey { get; set; }
     }

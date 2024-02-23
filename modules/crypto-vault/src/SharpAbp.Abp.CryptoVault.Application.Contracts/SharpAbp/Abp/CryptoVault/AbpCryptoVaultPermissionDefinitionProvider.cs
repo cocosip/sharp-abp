@@ -19,8 +19,12 @@ namespace SharpAbp.Abp.CryptoVault
                 L($"Permission:{CryptoVaultPermissions.RSACreds.Generate}"));
 
             rsaCredsPermission.AddChild(
-                CryptoVaultPermissions.RSACreds.Import,
-                L($"Permission:{CryptoVaultPermissions.RSACreds.Import}"));
+                CryptoVaultPermissions.RSACreds.Create,
+                L($"Permission:{CryptoVaultPermissions.RSACreds.Create}"));
+
+            rsaCredsPermission.AddChild(
+                CryptoVaultPermissions.RSACreds.DecryptKey,
+                L($"Permission:{CryptoVaultPermissions.RSACreds.DecryptKey}"));
 
             rsaCredsPermission.AddChild(
                 CryptoVaultPermissions.RSACreds.Delete,
@@ -35,8 +39,12 @@ namespace SharpAbp.Abp.CryptoVault
                 L($"Permission:{CryptoVaultPermissions.SM2Creds.Generate}"));
 
             sm2CredsPermission.AddChild(
-                CryptoVaultPermissions.SM2Creds.Import,
-                L($"Permission:{CryptoVaultPermissions.SM2Creds.Import}"));
+                CryptoVaultPermissions.SM2Creds.Create,
+                L($"Permission:{CryptoVaultPermissions.SM2Creds.Create}"));
+
+            sm2CredsPermission.AddChild(
+               CryptoVaultPermissions.SM2Creds.DecryptKey,
+               L($"Permission:{CryptoVaultPermissions.SM2Creds.DecryptKey}"));
 
             sm2CredsPermission.AddChild(
                 CryptoVaultPermissions.SM2Creds.Delete,

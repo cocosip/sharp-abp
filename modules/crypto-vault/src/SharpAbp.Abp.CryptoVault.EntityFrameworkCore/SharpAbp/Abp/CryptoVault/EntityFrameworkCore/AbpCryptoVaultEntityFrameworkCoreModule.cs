@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Tasks;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
@@ -21,11 +22,12 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            //context.Services.AddAbpDbContext<DbConnectionsManagementDbContext>(options =>
-            //{
-            //    options.AddDefaultRepositories<IDbConnectionsManagementDbContext>(includeAllEntities: true);
-            //    options.AddRepository<DatabaseConnectionInfo, EfCoreDatabaseConnectionInfoRepository>();
-            //});
+            context.Services.AddAbpDbContext<AbpCryptoVaultDbContext>(options =>
+            {
+                options.AddDefaultRepositories<IAbpCryptoVaultDbContext>(includeAllEntities: true);
+                options.AddRepository<RSACreds, EfCoreRSACredsRepository>();
+                options.AddRepository<SM2Creds, EfCoreSM2CredsRepository>();
+            });
 
             return Task.CompletedTask;
         }

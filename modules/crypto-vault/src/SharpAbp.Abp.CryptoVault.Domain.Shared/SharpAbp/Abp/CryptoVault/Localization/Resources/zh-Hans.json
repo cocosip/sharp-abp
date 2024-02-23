@@ -1,11 +1,16 @@
 {
   "culture": "zh-Hans",
   "texts": {
-    "DbConnectionsManagement": "数据库连接管理",
-    "Permission:DbConnectionsManagement.DatabaseConnectionInfos": "数据库连接信息管理",
-    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Create": "创建数据库连接信息",
-    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Update": "修改数据库连接信息",
-    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Delete": "删除数据库连接信息",
-    "DbConnectionsManagement.DuplicateName": "重复的数据库连接名称 '{0}'."
+    "AbpCryptoVault": "密钥管理",
+    "Permission:AbpCryptoVault.RSACreds": "RSA密钥管理",
+    "Permission:AbpCryptoVault.RSACreds.Generate": "RSA密钥生成",
+    "Permission:AbpCryptoVault.RSACreds.DecryptKey": "解密RSA密钥",
+    "Permission:AbpCryptoVault.RSACreds.Create": "创建RSA密钥",
+    "Permission:AbpCryptoVault.RSACreds.Delete": "删除RSA密钥",
+    "Permission:AbpCryptoVault.SM2Creds": "SM2密钥管理",
+    "Permission:AbpCryptoVault.SM2Creds.Generate": "SM2密钥生成",
+    "Permission:AbpCryptoVault.SM2Creds.DecryptKey": "解密SM2密钥",
+    "Permission:AbpCryptoVault.SM2Creds.Create": "创建SM2密钥",
+    "Permission:AbpCryptoVault.SM2Creds.Delete": "删除SM2密钥"
   }
 }

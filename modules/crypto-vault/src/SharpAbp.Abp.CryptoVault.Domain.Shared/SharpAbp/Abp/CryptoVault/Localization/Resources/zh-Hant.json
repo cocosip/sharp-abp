@@ -1,11 +1,16 @@
 {
   "culture": "zh-Hant",
   "texts": {
-    "DbConnectionsManagement": "數據庫連接管理",
-    "Permission:DbConnectionsManagement.DatabaseConnectionInfos": "數據庫連接信息管理",
-    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Create": "創建數據庫連接信息",
-    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Update": "修改數據庫連接信息",
-    "Permission:DbConnectionsManagement.DatabaseConnectionInfos.Delete": "刪除數據庫連接信息",
-    "DbConnectionsManagement.DuplicateName": "重複的數據庫連接名稱 '{0}'."
+    "AbpCryptoVault": "密鑰管理",
+    "Permission:AbpCryptoVault.RSACreds": "RSA密鑰管理",
+    "Permission:AbpCryptoVault.RSACreds.Generate": "RSA密鑰生成",
+    "Permission:AbpCryptoVault.RSACreds.DecryptKey": "解密RSA密鑰",
+    "Permission:AbpCryptoVault.RSACreds.Create": "創建RSA密鑰",
+    "Permission:AbpCryptoVault.RSACreds.Delete": "刪除RSA密鑰",
+    "Permission:AbpCryptoVault.SM2Creds": "SM2密鑰管理",
+    "Permission:AbpCryptoVault.SM2Creds.Generate": "SM2密鑰生成",
+    "Permission:AbpCryptoVault.SM2Creds.DecryptKey": "解密SM2密鑰",
+    "Permission:AbpCryptoVault.SM2Creds.Create": "創建SM2密鑰",
+    "Permission:AbpCryptoVault.SM2Creds.Delete": "刪除SM2密鑰"
   }
 }

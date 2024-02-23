@@ -94,17 +94,17 @@ namespace SharpAbp.Abp.CryptoVault
         }
 
         /// <summary>
-        /// Import key
+        /// Create key
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        [Authorize(CryptoVaultPermissions.RSACreds.Import)]
-        public virtual async Task<RSACredsDto> ImportAsync(ImportRSACredsDto input)
+        [Authorize(CryptoVaultPermissions.RSACreds.Create)]
+        public virtual async Task<RSACredsDto> CreateAsync(CreateRSACredsDto input)
         {
             var rsaCreds = new RSACreds(GuidGenerator.Create())
             {
                 Identifier = KeyService.GenerateIdentifier(),
-                SourceType = (int)KeySourceType.Import,
+                SourceType = (int)KeySourceType.Create,
                 Size = input.Size,
                 PassPhrase = KeyService.GeneratePassPhrase(),
                 Salt = KeyService.GenerateSalt(),
