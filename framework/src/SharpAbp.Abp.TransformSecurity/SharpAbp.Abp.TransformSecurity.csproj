@@ -16,7 +16,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\SharpAbp.Abp.TransformSecurity.Abstractions\SharpAbp.Abp.TransformSecurity.Abstractions.csproj" />
+		<PackageReference Include="Volo.Abp.ObjectExtending" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\SharpAbp.Abp.Crypto\SharpAbp.Abp.Crypto.csproj" />
 	</ItemGroup>
 
 </Project>

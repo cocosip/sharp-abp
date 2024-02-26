@@ -4,19 +4,25 @@
 	<Import Project="..\..\..\configureawait.props" />
 
 	<PropertyGroup>
-		<TargetFrameworks>$(ProjectFrameworks)</TargetFrameworks>
-		<AssemblyName>SharpAbp.Abp.TransformSecurity.Abstractions</AssemblyName>
-		<PackageId>SharpAbp.Abp.TransformSecurity.Abstractions</PackageId>
+		<TargetFramework>$(NetCoreFx)</TargetFramework>
+		<AssemblyName>SharpAbp.Abp.TransformSecurity.AspNetCore</AssemblyName>
+		<PackageId>SharpAbp.Abp.TransformSecurity.AspNetCore</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
 		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
 		<Description>SharpAbp TransformSecurity Module</Description>
+		<IsPackable>true</IsPackable>
+		<OutputType>Library</OutputType>
 		<RootNamespace />
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Volo.Abp" />
+		<PackageReference Include="Volo.Abp.AspNetCore" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SharpAbp.Abp.TransformSecurity\SharpAbp.Abp.TransformSecurity.csproj" />
 	</ItemGroup>
 
 </Project>

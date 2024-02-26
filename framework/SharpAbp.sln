@@ -153,9 +153,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Crypto", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.Crypto.Tests", "test\SharpAbp.Abp.Crypto.Tests\SharpAbp.Abp.Crypto.Tests.csproj", "{EEC8B2DB-B50C-4B71-BA5C-52DBE429F093}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.TransformSecurity.Abstractions", "src\SharpAbp.Abp.TransformSecurity.Abstractions\SharpAbp.Abp.TransformSecurity.Abstractions.csproj", "{DC1A27BB-2B93-4850-99AB-AC3A0DC249B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.TransformSecurity", "src\SharpAbp.Abp.TransformSecurity\SharpAbp.Abp.TransformSecurity.csproj", "{29C95C9A-2B4D-4AEF-BBA5-8873B45B9134}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.TransformSecurity", "src\SharpAbp.Abp.TransformSecurity\SharpAbp.Abp.TransformSecurity.csproj", "{29C95C9A-2B4D-4AEF-BBA5-8873B45B9134}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.TransformSecurity.AspNetCore", "src\SharpAbp.Abp.TransformSecurity.AspNetCore\SharpAbp.Abp.TransformSecurity.AspNetCore.csproj", "{8797CD9C-7070-450C-944E-736C9C15A273}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1043,18 +1043,6 @@ Global
 		{EEC8B2DB-B50C-4B71-BA5C-52DBE429F093}.Release|x64.Build.0 = Release|Any CPU
 		{EEC8B2DB-B50C-4B71-BA5C-52DBE429F093}.Release|x86.ActiveCfg = Release|Any CPU
 		{EEC8B2DB-B50C-4B71-BA5C-52DBE429F093}.Release|x86.Build.0 = Release|Any CPU
-		{DC1A27BB-2B93-4850-99AB-AC3A0DC249B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DC1A27BB-2B93-4850-99AB-AC3A0DC249B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DC1A27BB-2B93-4850-99AB-AC3A0DC249B3}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{DC1A27BB-2B93-4850-99AB-AC3A0DC249B3}.Debug|x64.Build.0 = Debug|Any CPU
-		{DC1A27BB-2B93-4850-99AB-AC3A0DC249B3}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{DC1A27BB-2B93-4850-99AB-AC3A0DC249B3}.Debug|x86.Build.0 = Debug|Any CPU
-		{DC1A27BB-2B93-4850-99AB-AC3A0DC249B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DC1A27BB-2B93-4850-99AB-AC3A0DC249B3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DC1A27BB-2B93-4850-99AB-AC3A0DC249B3}.Release|x64.ActiveCfg = Release|Any CPU
-		{DC1A27BB-2B93-4850-99AB-AC3A0DC249B3}.Release|x64.Build.0 = Release|Any CPU
-		{DC1A27BB-2B93-4850-99AB-AC3A0DC249B3}.Release|x86.ActiveCfg = Release|Any CPU
-		{DC1A27BB-2B93-4850-99AB-AC3A0DC249B3}.Release|x86.Build.0 = Release|Any CPU
 		{29C95C9A-2B4D-4AEF-BBA5-8873B45B9134}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{29C95C9A-2B4D-4AEF-BBA5-8873B45B9134}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29C95C9A-2B4D-4AEF-BBA5-8873B45B9134}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -1067,6 +1055,18 @@ Global
 		{29C95C9A-2B4D-4AEF-BBA5-8873B45B9134}.Release|x64.Build.0 = Release|Any CPU
 		{29C95C9A-2B4D-4AEF-BBA5-8873B45B9134}.Release|x86.ActiveCfg = Release|Any CPU
 		{29C95C9A-2B4D-4AEF-BBA5-8873B45B9134}.Release|x86.Build.0 = Release|Any CPU
+		{8797CD9C-7070-450C-944E-736C9C15A273}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8797CD9C-7070-450C-944E-736C9C15A273}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8797CD9C-7070-450C-944E-736C9C15A273}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8797CD9C-7070-450C-944E-736C9C15A273}.Debug|x64.Build.0 = Debug|Any CPU
+		{8797CD9C-7070-450C-944E-736C9C15A273}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8797CD9C-7070-450C-944E-736C9C15A273}.Debug|x86.Build.0 = Debug|Any CPU
+		{8797CD9C-7070-450C-944E-736C9C15A273}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8797CD9C-7070-450C-944E-736C9C15A273}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8797CD9C-7070-450C-944E-736C9C15A273}.Release|x64.ActiveCfg = Release|Any CPU
+		{8797CD9C-7070-450C-944E-736C9C15A273}.Release|x64.Build.0 = Release|Any CPU
+		{8797CD9C-7070-450C-944E-736C9C15A273}.Release|x86.ActiveCfg = Release|Any CPU
+		{8797CD9C-7070-450C-944E-736C9C15A273}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1145,8 +1145,8 @@ Global
 		{7F1957CE-3D61-46B6-B103-B9057378E551} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 		{2AF4DAE7-2A38-44C8-AA39-FB1F04DF83FB} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 		{EEC8B2DB-B50C-4B71-BA5C-52DBE429F093} = {51F9C36E-772F-4E52-A4AC-3EE8F13FDAD3}
-		{DC1A27BB-2B93-4850-99AB-AC3A0DC249B3} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 		{29C95C9A-2B4D-4AEF-BBA5-8873B45B9134} = {16E4EB45-D029-4743-99CD-D125C72AE383}
+		{8797CD9C-7070-450C-944E-736C9C15A273} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {30432CEA-45F2-4F5A-B44B-790A62AB73F1}

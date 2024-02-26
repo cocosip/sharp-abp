@@ -79,8 +79,6 @@ namespace SharpAbp.Abp.Crypto.RSA
                 rsa.Coefficient);
 
             return privateKeyParam;
-            //var publicKeyParam = new RsaKeyParameters(false, privateKeyParam.Modulus, privateKeyParam.PublicExponent);
-            //return new AsymmetricCipherKeyPair(publicKeyParam, privateKeyParam);
         }
 
         /// <summary>
