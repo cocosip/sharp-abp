@@ -121,12 +121,12 @@
         <PackageVersion Include="FastDFSCore.Transport.SuperSocket" Version="1.7.0" />
         <PackageVersion Include="FastDFSCore.Transport.DotNetty" Version="1.7.0" />
         <PackageVersion Include="FreeRedis" Version="1.2.13" />
-        <PackageVersion Include="FreeSql" Version="3.2.812" />
-        <PackageVersion Include="FreeSql.Provider.MySql" Version="3.2.812" />
-        <PackageVersion Include="FreeSql.Provider.Oracle" Version="3.2.812" />
-        <PackageVersion Include="FreeSql.Provider.PostgreSQL" Version="3.2.812" />
-        <PackageVersion Include="FreeSql.Provider.Sqlite" Version="3.2.812" />
-        <PackageVersion Include="FreeSql.Provider.SqlServer" Version="3.2.812" />
+        <PackageVersion Include="FreeSql" Version="3.2.813" />
+        <PackageVersion Include="FreeSql.Provider.MySql" Version="3.2.813" />
+        <PackageVersion Include="FreeSql.Provider.Oracle" Version="3.2.813" />
+        <PackageVersion Include="FreeSql.Provider.PostgreSQL" Version="3.2.813" />
+        <PackageVersion Include="FreeSql.Provider.Sqlite" Version="3.2.813" />
+        <PackageVersion Include="FreeSql.Provider.SqlServer" Version="3.2.813" />
         <PackageVersion Include="HuaweiCloud.OBS.SDK" Version="3.20.7" />
         <PackageVersion Include="MassTransit" Version="8.1.3" />
         <PackageVersion Include="MassTransit.ActiveMQ" Version="8.1.3" />
