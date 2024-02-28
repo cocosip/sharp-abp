@@ -17,10 +17,12 @@
 
 	<ItemGroup>
 		<PackageReference Include="Volo.Abp.ObjectExtending" />
+		<PackageReference Include="Volo.Abp.Caching" />
+		<PackageReference Include="Volo.Abp.Guids" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\SharpAbp.Abp.Crypto\SharpAbp.Abp.Crypto.csproj" />
+		<ProjectReference Include="..\SharpAbp.Abp.Crypto\SharpAbp.Abp.Crypto.csproj" />
 	</ItemGroup>
 
 </Project>

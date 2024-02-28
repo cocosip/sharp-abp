@@ -28,7 +28,7 @@ namespace SharpAbp.Abp.Crypto.SM2
         /// <param name="curve">曲率名称,默认使用:Sm2p256v1</param>
         /// <param name="rd">随机数</param>
         /// <returns></returns>
-        public virtual AsymmetricCipherKeyPair GenerateKeyPair(
+        public virtual AsymmetricCipherKeyPair GenerateSm2KeyPair(
             string curve = Sm2EncryptionNames.CurveSm2p256v1,
             SecureRandom rd = null)
         {

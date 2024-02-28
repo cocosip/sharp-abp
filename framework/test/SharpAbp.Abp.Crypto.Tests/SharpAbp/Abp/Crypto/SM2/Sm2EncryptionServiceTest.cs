@@ -14,7 +14,7 @@ namespace SharpAbp.Abp.Crypto.SM2
         [Fact]
         public void Encrypt_Decrypt_Test()
         {
-            var keyPair = _sm2EncryptionService.GenerateKeyPair();
+            var keyPair = _sm2EncryptionService.GenerateSm2KeyPair();
             var aPublic = keyPair.ExportPublicKey();
             var aPrivate = keyPair.ExportPrivateKey();
 
@@ -45,7 +45,7 @@ namespace SharpAbp.Abp.Crypto.SM2
         [Fact]
         public void Sign_Verify_Test()
         {
-            var keyPair = _sm2EncryptionService.GenerateKeyPair();
+            var keyPair = _sm2EncryptionService.GenerateSm2KeyPair();
             var aPublic = keyPair.ExportPublicKey();
             var aPrivate = keyPair.ExportPrivateKey();
 

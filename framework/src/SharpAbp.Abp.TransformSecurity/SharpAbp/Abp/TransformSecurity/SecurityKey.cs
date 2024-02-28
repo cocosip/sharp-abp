@@ -12,7 +12,7 @@ namespace SharpAbp.Abp.TransformSecurity
         /// <summary>
         /// 唯一编号
         /// </summary>
-        public string UniqueId { get; set; } 
+        public string UniqueId { get; set; }
 
         /// <summary>
         /// 密钥类型, RSA, SM2
@@ -33,5 +33,10 @@ namespace SharpAbp.Abp.TransformSecurity
         /// 密钥的过期时间
         /// </summary>
         public DateTime Expires { get; set; }
+
+        /// <summary>
+        /// 密钥的创建时间
+        /// </summary>
+        public DateTime CreationTime { get; set; }
     }
 }

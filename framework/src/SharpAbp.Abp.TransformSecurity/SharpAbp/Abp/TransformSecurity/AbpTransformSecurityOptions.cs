@@ -1,4 +1,6 @@
-﻿namespace SharpAbp.Abp.TransformSecurity
+﻿using System;
+
+namespace SharpAbp.Abp.TransformSecurity
 {
     public class AbpTransformSecurityOptions
     {
@@ -10,6 +12,11 @@
         /// <summary>
         /// Encryption algorithm. default: RSA  (RSA/SM2)
         /// </summary>
-        public string EncryptionAlgo { get; set; } = "RSA";
+        public string EncryptionAlgo { get; set; } = AbpTransformSecurityNames.RSA;
+
+        /// <summary>
+        /// Expires timespan
+        /// </summary>
+        public TimeSpan Expires { get; set; } = TimeSpan.FromSeconds(600);
     }
 }

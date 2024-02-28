@@ -2,6 +2,8 @@
 using SharpAbp.Abp.Crypto.RSA;
 using SharpAbp.Abp.Crypto.SM2;
 using System.Threading.Tasks;
+using Volo.Abp.Caching;
+using Volo.Abp.Guids;
 using Volo.Abp.Modularity;
 using Volo.Abp.ObjectExtending;
 using Volo.Abp.Threading;
@@ -10,7 +12,9 @@ namespace SharpAbp.Abp.TransformSecurity
 {
     [DependsOn(
         typeof(AbpCryptoModule),
-        typeof(AbpObjectExtendingModule)
+        typeof(AbpObjectExtendingModule),
+        typeof(AbpCachingModule),
+        typeof(AbpGuidsModule)
         )]
     public class AbpTransformSecurityModule : AbpModule
     {

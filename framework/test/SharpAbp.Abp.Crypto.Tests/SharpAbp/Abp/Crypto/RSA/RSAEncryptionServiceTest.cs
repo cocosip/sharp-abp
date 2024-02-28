@@ -1,4 +1,5 @@
 ﻿using Org.BouncyCastle.Tls;
+using System.IO;
 using System.Net;
 using System.Text;
 using Xunit;
