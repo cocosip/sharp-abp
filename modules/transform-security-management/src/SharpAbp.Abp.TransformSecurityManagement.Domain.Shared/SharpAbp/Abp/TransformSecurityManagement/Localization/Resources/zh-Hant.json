@@ -1,0 +1,16 @@
+{
+  "culture": "zh-Hant",
+  "texts": {
+    "AbpCryptoVault": "密鑰管理",
+    "Permission:AbpCryptoVault.RSACreds": "RSA密鑰管理",
+    "Permission:AbpCryptoVault.RSACreds.Generate": "RSA密鑰生成",
+    "Permission:AbpCryptoVault.RSACreds.DecryptKey": "解密RSA密鑰",
+    "Permission:AbpCryptoVault.RSACreds.Create": "創建RSA密鑰",
+    "Permission:AbpCryptoVault.RSACreds.Delete": "刪除RSA密鑰",
+    "Permission:AbpCryptoVault.SM2Creds": "SM2密鑰管理",
+    "Permission:AbpCryptoVault.SM2Creds.Generate": "SM2密鑰生成",
+    "Permission:AbpCryptoVault.SM2Creds.DecryptKey": "解密SM2密鑰",
+    "Permission:AbpCryptoVault.SM2Creds.Create": "創建SM2密鑰",
+    "Permission:AbpCryptoVault.SM2Creds.Delete": "刪除SM2密鑰"
+  }
+}

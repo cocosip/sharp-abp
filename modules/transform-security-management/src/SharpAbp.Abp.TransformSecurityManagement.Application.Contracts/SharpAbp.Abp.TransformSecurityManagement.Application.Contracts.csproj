@@ -5,13 +5,13 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>$(ProjectFrameworks)</TargetFrameworks>
-		<AssemblyName>SharpAbp.Abp.CryptoVault.Application.Contracts</AssemblyName>
-		<PackageId>SharpAbp.Abp.CryptoVault.Application.Contracts</PackageId>
+		<AssemblyName>SharpAbp.Abp.TransformSecurityManagement.Application.Contracts</AssemblyName>
+		<PackageId>SharpAbp.Abp.TransformSecurityManagement.Application.Contracts</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
 		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-		<Description>SharpAbp CryptoVault Module</Description>
+		<Description>SharpAbp TransformSecurityManagement Module</Description>
 		<RootNamespace />
 	</PropertyGroup>
 
@@ -21,12 +21,11 @@
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETStandard' And $([MSBuild]::VersionGreaterThanOrEquals($(TargetFrameworkVersion), '2.1')) ">
-		<PackageReference Include="System.ComponentModel.Annotations"/>
+		<PackageReference Include="System.ComponentModel.Annotations" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\SharpAbp.Abp.CryptoVault.Domain.Shared\SharpAbp.Abp.CryptoVault.Domain.Shared.csproj" />
+		<ProjectReference Include="..\SharpAbp.Abp.TransformSecurityManagement.Domain.Shared\SharpAbp.Abp.TransformSecurityManagement.Domain.Shared.csproj" />
 	</ItemGroup>
-
 
 </Project>

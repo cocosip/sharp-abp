@@ -1,0 +1,72 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2B1C5A47-7425-42F1-9B73-936E317AAAC4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.TransformSecurityManagement.Domain.Shared", "src\SharpAbp.Abp.TransformSecurityManagement.Domain.Shared\SharpAbp.Abp.TransformSecurityManagement.Domain.Shared.csproj", "{2A147A58-AB56-47F4-A457-B43E96B7D93B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.TransformSecurityManagement.Domain", "src\SharpAbp.Abp.TransformSecurityManagement.Domain\SharpAbp.Abp.TransformSecurityManagement.Domain.csproj", "{B67FBA6C-5B5A-4266-B11D-EDE514053097}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.TransformSecurityManagement.EntityFrameworkCore", "src\SharpAbp.Abp.TransformSecurityManagement.EntityFrameworkCore\SharpAbp.Abp.TransformSecurityManagement.EntityFrameworkCore.csproj", "{2BC27E9A-D4C2-4EA9-9C30-1A4945E7EA07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.TransformSecurityManagement.Application.Contracts", "src\SharpAbp.Abp.TransformSecurityManagement.Application.Contracts\SharpAbp.Abp.TransformSecurityManagement.Application.Contracts.csproj", "{ACE3DBF9-4E50-4DCA-977A-56F58F13D766}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.TransformSecurityManagement.HttpApi", "src\SharpAbp.Abp.TransformSecurityManagement.HttpApi\SharpAbp.Abp.TransformSecurityManagement.HttpApi.csproj", "{931DA9DD-DC94-49DD-BFA1-E62EFA65C56F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.TransformSecurityManagement.Application", "src\SharpAbp.Abp.TransformSecurityManagement.Application\SharpAbp.Abp.TransformSecurityManagement.Application.csproj", "{A746D5CF-E0DB-4091-9CD6-A93F5C4656CB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.TransformSecurityManagement.MongoDB", "src\SharpAbp.Abp.TransformSecurityManagement.MongoDB\SharpAbp.Abp.TransformSecurityManagement.MongoDB.csproj", "{CD84C9DA-CF9D-4FAA-9A1F-60CAB6D619BF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2A147A58-AB56-47F4-A457-B43E96B7D93B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A147A58-AB56-47F4-A457-B43E96B7D93B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A147A58-AB56-47F4-A457-B43E96B7D93B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A147A58-AB56-47F4-A457-B43E96B7D93B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B67FBA6C-5B5A-4266-B11D-EDE514053097}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B67FBA6C-5B5A-4266-B11D-EDE514053097}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B67FBA6C-5B5A-4266-B11D-EDE514053097}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B67FBA6C-5B5A-4266-B11D-EDE514053097}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BC27E9A-D4C2-4EA9-9C30-1A4945E7EA07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BC27E9A-D4C2-4EA9-9C30-1A4945E7EA07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BC27E9A-D4C2-4EA9-9C30-1A4945E7EA07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BC27E9A-D4C2-4EA9-9C30-1A4945E7EA07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACE3DBF9-4E50-4DCA-977A-56F58F13D766}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACE3DBF9-4E50-4DCA-977A-56F58F13D766}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACE3DBF9-4E50-4DCA-977A-56F58F13D766}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACE3DBF9-4E50-4DCA-977A-56F58F13D766}.Release|Any CPU.Build.0 = Release|Any CPU
+		{931DA9DD-DC94-49DD-BFA1-E62EFA65C56F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{931DA9DD-DC94-49DD-BFA1-E62EFA65C56F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{931DA9DD-DC94-49DD-BFA1-E62EFA65C56F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{931DA9DD-DC94-49DD-BFA1-E62EFA65C56F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A746D5CF-E0DB-4091-9CD6-A93F5C4656CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A746D5CF-E0DB-4091-9CD6-A93F5C4656CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A746D5CF-E0DB-4091-9CD6-A93F5C4656CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A746D5CF-E0DB-4091-9CD6-A93F5C4656CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD84C9DA-CF9D-4FAA-9A1F-60CAB6D619BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD84C9DA-CF9D-4FAA-9A1F-60CAB6D619BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD84C9DA-CF9D-4FAA-9A1F-60CAB6D619BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD84C9DA-CF9D-4FAA-9A1F-60CAB6D619BF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2A147A58-AB56-47F4-A457-B43E96B7D93B} = {2B1C5A47-7425-42F1-9B73-936E317AAAC4}
+		{B67FBA6C-5B5A-4266-B11D-EDE514053097} = {2B1C5A47-7425-42F1-9B73-936E317AAAC4}
+		{2BC27E9A-D4C2-4EA9-9C30-1A4945E7EA07} = {2B1C5A47-7425-42F1-9B73-936E317AAAC4}
+		{ACE3DBF9-4E50-4DCA-977A-56F58F13D766} = {2B1C5A47-7425-42F1-9B73-936E317AAAC4}
+		{931DA9DD-DC94-49DD-BFA1-E62EFA65C56F} = {2B1C5A47-7425-42F1-9B73-936E317AAAC4}
+		{A746D5CF-E0DB-4091-9CD6-A93F5C4656CB} = {2B1C5A47-7425-42F1-9B73-936E317AAAC4}
+		{CD84C9DA-CF9D-4FAA-9A1F-60CAB6D619BF} = {2B1C5A47-7425-42F1-9B73-936E317AAAC4}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5C68AD5E-D4FE-4EE2-8FA9-4F45627659CC}
+	EndGlobalSection
+EndGlobal
