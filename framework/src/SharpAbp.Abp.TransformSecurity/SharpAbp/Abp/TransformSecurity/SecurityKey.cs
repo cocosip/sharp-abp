@@ -20,6 +20,11 @@ namespace SharpAbp.Abp.TransformSecurity
         public string KeyType { get; set; }
 
         /// <summary>
+        /// 业务类型
+        /// </summary>
+        public string BizType { get; set; }
+
+        /// <summary>
         /// 公钥
         /// </summary>
         public string PublicKey { get; set; }

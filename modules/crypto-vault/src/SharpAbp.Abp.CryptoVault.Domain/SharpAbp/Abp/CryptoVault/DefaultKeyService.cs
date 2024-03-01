@@ -62,7 +62,7 @@ namespace SharpAbp.Abp.CryptoVault
             var sm2CredsList = new List<SM2Creds>();
             for (int i = 0; i < count; i++)
             {
-                var keyPair = Sm2EncryptionService.GenerateKeyPair(curve);
+                var keyPair = Sm2EncryptionService.GenerateSm2KeyPair(curve);
                 var pub = Sm2Extensions.ExportPublicKey(keyPair.Public);
                 var priv = Sm2Extensions.ExportPrivateKey(keyPair.Private);
 

@@ -5,6 +5,6 @@ namespace SharpAbp.Abp.TransformSecurity
 {
     public interface ISecurityKeyManager
     {
-        Task<SecurityKey> GenerateAsync(CancellationToken cancellationToken = default);
+        Task<SecurityKey> GenerateAsync(string bizType, CancellationToken cancellationToken = default);
     }
 }

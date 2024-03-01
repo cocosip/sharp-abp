@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Options;
 using SharpAbp.Abp.Crypto.RSA;
 using SharpAbp.Abp.Crypto.SM2;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Guids;
 using Volo.Abp.Timing;
@@ -39,11 +41,17 @@ namespace SharpAbp.Abp.TransformSecurity
             Sm2EncryptionService = sm2EncryptionService;
         }
 
-        public virtual async Task<SecurityKey> GenerateAsync(CancellationToken cancellationToken = default)
+        public virtual async Task<SecurityKey> GenerateAsync(string bizType, CancellationToken cancellationToken = default)
         {
+            if (!ValidateBizType(bizType))
+            {
+                throw new AbpException($"Unsupported bizType {bizType}");
+            }
+
             var securityKey = new SecurityKey()
             {
                 UniqueId = GuidGenerator.Create().ToString("N"),
+                BizType = bizType,
                 Expires = Clock.Now.Add(Options.Expires),
                 CreationTime = Clock.Now
             };
@@ -69,6 +77,19 @@ namespace SharpAbp.Abp.TransformSecurity
 
             await SecurityKeyStore.SetAsync(securityKey);
             return securityKey;
+        }
+
+
+        protected virtual bool ValidateBizType(string bizType)
+        {
+            foreach (var item in Options.BizTypes)
+            {
+                if (item.Equals(bizType, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
     }

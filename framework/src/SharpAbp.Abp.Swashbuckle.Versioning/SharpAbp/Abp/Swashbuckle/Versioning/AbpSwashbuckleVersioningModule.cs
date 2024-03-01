@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Versioning;
+﻿using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
+using Asp.Versioning.Builder;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -52,7 +53,7 @@ namespace SharpAbp.Abp.Swashbuckle.Versioning
             context.Services.AddAbpApiVersioning(options =>
             {
                 // Show neutral/versionless APIs.
-                options.UseApiBehavior = false;
+                //options.UseApiBehavior = false;
                 options.ReportApiVersions = true;
                 options.AssumeDefaultVersionWhenUnspecified = true;
                 options.DefaultApiVersion = new ApiVersion(1, 0);
@@ -71,19 +72,20 @@ namespace SharpAbp.Abp.Swashbuckle.Versioning
         protected virtual void AddVersionedApiExplorer(ServiceConfigurationContext context)
         {
             var apiExplorerConfigures = context.Services.GetPreConfigureActions<ApiExplorerOptions>();
-            context.Services.AddVersionedApiExplorer(options =>
-            {
-                options.GroupNameFormat = "'v'VVV";
-                options.SubstituteApiVersionInUrl = true;
 
-                if (apiExplorerConfigures != null)
+            context.Services.AddApiVersioning(options => { })
+                .AddApiExplorer(options =>
                 {
-                    foreach(var action in apiExplorerConfigures)
+                    options.GroupNameFormat = "'v'VVV";
+                    options.SubstituteApiVersionInUrl = true;
+                    if (apiExplorerConfigures != null)
                     {
-                        action(options);
+                        foreach (var action in apiExplorerConfigures)
+                        {
+                            action(options);
+                        }
                     }
-                }
-            });
+                });
         }
 
     }

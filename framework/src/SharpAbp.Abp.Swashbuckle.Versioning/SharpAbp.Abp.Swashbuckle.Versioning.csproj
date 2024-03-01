@@ -17,7 +17,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Volo.Abp.Swashbuckle" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" />
+		<PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
 	</ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SharpAbp.Abp.TransformSecurity
 {
@@ -18,5 +19,16 @@ namespace SharpAbp.Abp.TransformSecurity
         /// Expires timespan
         /// </summary>
         public TimeSpan Expires { get; set; } = TimeSpan.FromSeconds(600);
+
+        /// <summary>
+        /// 业务类型
+        /// </summary>
+        public List<string> BizTypes { get; set; }
+
+
+        public AbpTransformSecurityOptions()
+        {
+            BizTypes = [];
+        }
     }
 }

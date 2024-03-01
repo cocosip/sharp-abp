@@ -31,7 +31,7 @@ namespace SharpAbp.Abp.CryptoVault
             var sm2Creds = await _sm2CredsAppService.GetListAsync(curve: Sm2EncryptionNames.CurveWapip192v1);
             Assert.Equal(2, sm2Creds.Count);
 
-            var keyPair = _sm2EncryptionService.GenerateKeyPair(Sm2EncryptionNames.CurveWapip192v1);
+            var keyPair = _sm2EncryptionService.GenerateSm2KeyPair(Sm2EncryptionNames.CurveWapip192v1);
             var pub = keyPair.Public.ExportPublicKey();
             var priv = keyPair.Private.ExportPrivateKey();
 
@@ -61,7 +61,7 @@ namespace SharpAbp.Abp.CryptoVault
         [Fact]
         public async Task RSA_Encrypt_Decrypt_Async()
         {
-            var keyPair = _sm2EncryptionService.GenerateKeyPair();
+            var keyPair = _sm2EncryptionService.GenerateSm2KeyPair();
 
             var createDto = new CreateSM2CredsDto()
             {
