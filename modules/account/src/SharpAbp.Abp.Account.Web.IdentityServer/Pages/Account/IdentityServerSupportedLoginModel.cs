@@ -34,7 +34,7 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
             IClientStore clientStore,
             IEventService identityServerEvents,
             IOptions<IdentityOptions> identityOptions)
-            :base(
+            : base(
                 schemeProvider,
                 accountOptions,
                 identityOptions)
@@ -174,7 +174,7 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
             Debug.Assert(user != null, nameof(user) + " != null");
             await IdentityServerEvents.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id.ToString(), user.UserName)); //TODO: Use user's name once implemented
 
-            return RedirectSafely(ReturnUrl, ReturnUrlHash);
+            return await RedirectSafelyAsync(ReturnUrl, ReturnUrlHash);
         }
 
         public override async Task<IActionResult> OnPostExternalLogin(string provider)
@@ -194,7 +194,7 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
             {
                 var props = new AuthenticationProperties()
                 {
-                    RedirectUri = Url.Page("./Login", pageHandler: "ExternalLoginCallback", values: new {ReturnUrl, ReturnUrlHash}),
+                    RedirectUri = Url.Page("./Login", pageHandler: "ExternalLoginCallback", values: new { ReturnUrl, ReturnUrlHash }),
                     Items =
                     {
                         {

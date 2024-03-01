@@ -13,11 +13,10 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
         [BindProperty(SupportsGet = true)]
         public string ReturnUrlHash { get; set; }
 
-        public virtual Task<IActionResult> OnGetAsync()
+        public virtual async Task<IActionResult> OnGetAsync()
         {
-            ReturnUrl = GetRedirectUrl(ReturnUrl, ReturnUrlHash);
-
-            return Task.FromResult<IActionResult>(Page());
+            ReturnUrl = await GetRedirectUrlAsync(ReturnUrl, ReturnUrlHash);
+            return Page();
         }
     }
 }

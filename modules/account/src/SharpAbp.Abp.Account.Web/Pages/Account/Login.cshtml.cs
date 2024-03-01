@@ -139,7 +139,8 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
 
             Debug.Assert(user != null, nameof(user) + " != null");
 
-            return RedirectSafely(ReturnUrl, ReturnUrlHash);
+
+            return await RedirectSafelyAsync(ReturnUrl, ReturnUrlHash);
         }
 
         /// <summary>
@@ -225,7 +226,7 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
 
             if (result.Succeeded)
             {
-                return RedirectSafely(returnUrl, returnUrlHash);
+                return await RedirectSafelyAsync(returnUrl, returnUrlHash);
             }
 
             //TODO: Handle other cases for result!
@@ -263,7 +264,7 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
                 UserName = user.Name
             });
 
-            return RedirectSafely(returnUrl, returnUrlHash);
+            return await RedirectSafelyAsync(returnUrl, returnUrlHash);
         }
 
         protected virtual async Task<IdentityUser> CreateExternalUserAsync(ExternalLoginInfo info)

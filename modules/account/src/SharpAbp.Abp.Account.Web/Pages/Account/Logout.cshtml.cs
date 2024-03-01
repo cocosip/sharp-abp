@@ -25,7 +25,7 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
             await SignInManager.SignOutAsync();
             if (ReturnUrl != null)
             {
-                return RedirectSafely(ReturnUrl, ReturnUrlHash);
+                return await RedirectSafelyAsync(ReturnUrl, ReturnUrlHash);
             }
 
             return RedirectToPage("/Account/Login");

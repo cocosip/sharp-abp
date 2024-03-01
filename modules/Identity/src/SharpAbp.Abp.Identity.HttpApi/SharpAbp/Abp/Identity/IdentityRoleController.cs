@@ -9,7 +9,6 @@ namespace SharpAbp.Abp.Identity
 {
     [RemoteService(Name = IdentityRemoteServiceConsts.RemoteServiceName)]
     [Area("identity")]
-    [ControllerName("Role")]
     [Route("api/identity/roles")]
     public class IdentityRoleController : IdentityController, IIdentityRoleAppService
     {

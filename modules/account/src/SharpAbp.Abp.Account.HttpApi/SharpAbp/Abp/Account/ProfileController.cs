@@ -8,7 +8,6 @@ namespace SharpAbp.Abp.Account
 {
     [RemoteService(Name = AccountRemoteServiceConsts.RemoteServiceName)]
     [Area("identity")]
-    [ControllerName("Profile")]
     [Route("api/identity/my-profile")]
     public class ProfileController : AbpController, IProfileAppService
     {

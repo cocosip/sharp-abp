@@ -10,7 +10,6 @@ namespace SharpAbp.Abp.Identity
 {
     [RemoteService(Name = IdentityRemoteServiceConsts.RemoteServiceName)]
     [Area("identity")]
-    [ControllerName("User")]
     [Route("api/identity/users")]
     public class IdentityUserController : IdentityController, IIdentityUserAppService
     {
