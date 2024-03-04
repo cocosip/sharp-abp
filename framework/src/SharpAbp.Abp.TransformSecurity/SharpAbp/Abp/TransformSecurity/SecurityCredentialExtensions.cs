@@ -5,54 +5,54 @@ using Volo.Abp.Data;
 
 namespace SharpAbp.Abp.TransformSecurity
 {
-    public static class SecurityKeyExtensions
+    public static class SecurityCredentialExtensions
     {
-        public static bool IsRSA(this SecurityKey key)
+        public static bool IsRSA(this SecurityCredential key)
         {
             return key.KeyType == "RSA";
         }
 
-        public static bool IsSM2(this SecurityKey key)
+        public static bool IsSM2(this SecurityCredential key)
         {
             return key.KeyType == "SM2";
         }
 
-        public static int GetRSAKeySize(this SecurityKey key)
+        public static int GetRSAKeySize(this SecurityCredential key)
         {
             return key.GetProperty("RSA_KeySize", 2048);
         }
 
-        public static SecurityKey SetRSAKeySize(this SecurityKey key, int keySize)
+        public static SecurityCredential SetRSAKeySize(this SecurityCredential key, int keySize)
         {
             return key.SetProperty("RSA_KeySize", keySize, false);
         }
 
-        public static string GetRSAPadding(this SecurityKey key)
+        public static string GetRSAPadding(this SecurityCredential key)
         {
             return key.GetProperty("RSA_Padding", RSAPaddingNames.None);
         }
 
-        public static SecurityKey SetRSAPadding(this SecurityKey key, string padding)
+        public static SecurityCredential SetRSAPadding(this SecurityCredential key, string padding)
         {
             return key.SetProperty("RSA_Padding", padding);
         }
 
-        public static string GetSM2Curve(this SecurityKey key)
+        public static string GetSM2Curve(this SecurityCredential key)
         {
             return key.GetProperty("SM2_Curve", Sm2EncryptionNames.CurveSm2p256v1);
         }
 
-        public static SecurityKey SetSM2Curve(this SecurityKey key, string curve)
+        public static SecurityCredential SetSM2Curve(this SecurityCredential key, string curve)
         {
             return key.SetProperty("SM2_Curve", curve);
         }
 
-        public static SM2Engine.Mode GetSM2Mode(this SecurityKey key)
+        public static SM2Engine.Mode GetSM2Mode(this SecurityCredential key)
         {
             return key.GetProperty("SM2_Mode", SM2Engine.Mode.C1C2C3);
         }
 
-        public static SecurityKey SetSM2Mode(this SecurityKey key, SM2Engine.Mode mode)
+        public static SecurityCredential SetSM2Mode(this SecurityCredential key, SM2Engine.Mode mode)
         {
             return key.SetProperty("SM2_Mode", mode);
         }

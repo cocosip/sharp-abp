@@ -7,12 +7,12 @@ namespace SharpAbp.Abp.TransformSecurity
     /// 安全密钥对
     /// </summary>
     [Serializable]
-    public class SecurityKey : ExtensibleObject
+    public class SecurityCredential : ExtensibleObject
     {
         /// <summary>
         /// 唯一编号
         /// </summary>
-        public string UniqueId { get; set; }
+        public string Identifier { get; set; }
 
         /// <summary>
         /// 密钥类型, RSA, SM2
@@ -37,7 +37,7 @@ namespace SharpAbp.Abp.TransformSecurity
         /// <summary>
         /// 密钥的过期时间
         /// </summary>
-        public DateTime Expires { get; set; }
+        public DateTime? Expires { get; set; }
 
         /// <summary>
         /// 密钥的创建时间

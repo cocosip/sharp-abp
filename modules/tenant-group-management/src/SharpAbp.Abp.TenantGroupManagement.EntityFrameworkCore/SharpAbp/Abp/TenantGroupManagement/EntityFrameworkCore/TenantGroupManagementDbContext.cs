@@ -18,7 +18,6 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
             builder.ConfigureTenantGroupManagement();
         }
     }

@@ -60,6 +60,20 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
         }
 
         /// <summary>
+        /// Get random
+        /// </summary>
+        /// <param name="includeDetails"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<RSACreds> GetRandomAsync(bool includeDetails = true, CancellationToken cancellationToken = default)
+        {
+            return await (await GetDbSetAsync())
+                .IncludeDetails(includeDetails)
+                .OrderBy(x => Guid.NewGuid())
+                .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
+        }
+
+        /// <summary>
         ///  Get list
         /// </summary>
         /// <param name="sorting"></param>

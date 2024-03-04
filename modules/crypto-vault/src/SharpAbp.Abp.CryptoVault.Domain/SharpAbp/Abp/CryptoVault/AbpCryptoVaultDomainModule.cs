@@ -23,8 +23,7 @@ namespace SharpAbp.Abp.CryptoVault
         {
             AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
         }
-
-
+        
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
             Configure<AbpCryptoVaultOptions>(options =>

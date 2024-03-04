@@ -16,5 +16,11 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
         {
 
         }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+            builder.ConfigureCryptoVault();
+        }
     }
 }

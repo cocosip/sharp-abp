@@ -50,12 +50,10 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
         private static void SeedTestData(ApplicationInitializationContext context)
         {
-            using (var scope = context.ServiceProvider.CreateScope())
-            {
-                AsyncHelper.RunSync(() => scope.ServiceProvider
-                    .GetRequiredService<MapTenancyManagementTestDataBuilder>()
-                    .BuildAsync());
-            }
+            using var scope = context.ServiceProvider.CreateScope();
+            AsyncHelper.RunSync(() => scope.ServiceProvider
+                .GetRequiredService<MapTenancyManagementTestDataBuilder>()
+                .BuildAsync());
         }
     }
 }

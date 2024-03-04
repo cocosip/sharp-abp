@@ -10,11 +10,11 @@ using Volo.Abp;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 
-namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
+namespace SharpAbp.Abp.TransformSecurityManagement.EntityFrameworkCore
 {
-    public class EfCoreSM2CredsRepository : EfCoreRepository<IAbpCryptoVaultDbContext, SM2Creds, Guid>, ISM2CredsRepository
+    public class EfCoreSecurityCredentialInfoRepository : EfCoreRepository<IAbpTransformSecurityManagementDbContext, SecurityCredentialInfo, Guid>, ISecurityCredentialInfoRepository
     {
-        public EfCoreSM2CredsRepository(IDbContextProvider<IAbpCryptoVaultDbContext> dbContextProvider)
+        public EfCoreSecurityCredentialInfoRepository(IDbContextProvider<IAbpTransformSecurityManagementDbContext> dbContextProvider)
             : base(dbContextProvider)
         {
         }
@@ -26,7 +26,7 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<SM2Creds> FindByIdentifierAsync(
+        public virtual async Task<SecurityCredentialInfo> FindByIdentifierAsync(
             [NotNull] string identifier,
             bool includeDetails = true,
             CancellationToken cancellationToken = default)
@@ -45,7 +45,7 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<SM2Creds> FindExpectedByIdentifierAsync(
+        public virtual async Task<SecurityCredentialInfo> FindExpectedByIdentifierAsync(
             string identifier,
             Guid? expectedId = null,
             bool includeDetails = true,
@@ -59,42 +59,32 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
         }
 
         /// <summary>
-        /// Get random
-        /// </summary>
-        /// <param name="includeDetails"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public virtual async Task<SM2Creds> GetRandomAsync(bool includeDetails = true, CancellationToken cancellationToken = default)
-        {
-            return await (await GetDbSetAsync())
-                .IncludeDetails(includeDetails)
-                .OrderBy(x => Guid.NewGuid())
-                .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
-        }
-
-
-        /// <summary>
-        ///  Get list
+        /// Get list
         /// </summary>
         /// <param name="sorting"></param>
         /// <param name="identifier"></param>
-        /// <param name="sourceType"></param>
-        /// <param name="curve"></param>
-        /// <param name="includeDetails"></param>
+        /// <param name="keyType"></param>
+        /// <param name="bizType"></param>
+        /// <param name="expiresMin"></param>
+        /// <param name="expiresMax"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<List<SM2Creds>> GetListAsync(
+        public virtual async Task<List<SecurityCredentialInfo>> GetListAsync(
             string sorting = null,
             string identifier = "",
-            int? sourceType = null,
-            string curve = "",
-            bool includeDetails = false,
+            string keyType = "",
+            string bizType = "",
+            DateTime? expiresMin = null,
+            DateTime? expiresMax = null,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .WhereIf(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
-                .WhereIf(!curve.IsNullOrWhiteSpace(), item => item.Curve == curve)
-                .OrderBy(sorting ?? nameof(SM2Creds.Id))
+                .WhereIf(!keyType.IsNullOrWhiteSpace(), item => item.KeyType == keyType)
+                .WhereIf(!bizType.IsNullOrWhiteSpace(), item => item.BizType == bizType)
+                .WhereIf(expiresMin.HasValue, item => item.Expires >= expiresMin.Value)
+                .WhereIf(expiresMax.HasValue, item => item.Expires < expiresMax.Value)
+                .OrderBy(sorting ?? nameof(SecurityCredentialInfo.Id))
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -105,26 +95,30 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
         /// <param name="maxResultCount"></param>
         /// <param name="sorting"></param>
         /// <param name="identifier"></param>
-        /// <param name="sourceType"></param>
-        /// <param name="curve"></param>
-        /// <param name="includeDetails"></param>
+        /// <param name="keyType"></param>
+        /// <param name="bizType"></param>
+        /// <param name="expiresMin"></param>
+        /// <param name="expiresMax"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<List<SM2Creds>> GetPagedListAsync(
+        public virtual async Task<List<SecurityCredentialInfo>> GetPagedListAsync(
             int skipCount,
             int maxResultCount,
             string sorting = null,
             string identifier = "",
-            int? sourceType = null,
-            string curve = "",
-            bool includeDetails = false,
+            string keyType = "",
+            string bizType = "",
+            DateTime? expiresMin = null,
+            DateTime? expiresMax = null,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .WhereIf(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
-                .WhereIf(sourceType.HasValue, item => item.SourceType == sourceType.Value)
-                .WhereIf(!curve.IsNullOrWhiteSpace(), item => item.Curve == curve)
-                .OrderBy(sorting ?? nameof(RSACreds.Id))
+                .WhereIf(!keyType.IsNullOrWhiteSpace(), item => item.KeyType == keyType)
+                .WhereIf(!bizType.IsNullOrWhiteSpace(), item => item.BizType == bizType)
+                .WhereIf(expiresMin.HasValue, item => item.Expires >= expiresMin.Value)
+                .WhereIf(expiresMax.HasValue, item => item.Expires < expiresMax.Value)
+                .OrderBy(sorting ?? nameof(SecurityCredentialInfo.Id))
                 .Skip(skipCount)
                 .Take(maxResultCount)
                 .ToListAsync(GetCancellationToken(cancellationToken));
@@ -134,20 +128,26 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
         /// Get count
         /// </summary>
         /// <param name="identifier"></param>
-        /// <param name="sourceType"></param>
-        /// <param name="curve"></param>
+        /// <param name="keyType"></param>
+        /// <param name="bizType"></param>
+        /// <param name="expiresMin"></param>
+        /// <param name="expiresMax"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<int> GetCountAsync(
             string identifier = "",
-            int? sourceType = null,
-            string curve = "",
+            string keyType = "",
+            string bizType = "",
+            DateTime? expiresMin = null,
+            DateTime? expiresMax = null,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .WhereIf(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
-                .WhereIf(sourceType.HasValue, item => item.SourceType == sourceType.Value)
-                .WhereIf(!curve.IsNullOrWhiteSpace(), item => item.Curve == curve)
+                .WhereIf(!keyType.IsNullOrWhiteSpace(), item => item.KeyType == keyType)
+                .WhereIf(!bizType.IsNullOrWhiteSpace(), item => item.BizType == bizType)
+                .WhereIf(expiresMin.HasValue, item => item.Expires >= expiresMin.Value)
+                .WhereIf(expiresMax.HasValue, item => item.Expires < expiresMax.Value)
                 .CountAsync(GetCancellationToken(cancellationToken));
         }
     }

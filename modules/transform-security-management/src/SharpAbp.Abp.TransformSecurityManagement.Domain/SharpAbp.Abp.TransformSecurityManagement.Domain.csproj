@@ -25,4 +25,10 @@
 		<ProjectReference Include="..\SharpAbp.Abp.TransformSecurityManagement.Domain.Shared\SharpAbp.Abp.TransformSecurityManagement.Domain.Shared.csproj" />
 	</ItemGroup>
 
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\crypto-vault\src\SharpAbp.Abp.CryptoVault.Domain\SharpAbp.Abp.CryptoVault.Domain.csproj" />
+		<ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.TransformSecurity\SharpAbp.Abp.TransformSecurity.csproj" />
+	</ItemGroup>
+
 </Project>

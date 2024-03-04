@@ -5,14 +5,14 @@ using Volo.Abp.AspNetCore.Mvc;
 
 namespace SharpAbp.Abp.TransformSecurity.AspNetCore.Controllers
 {
-    [Route("api/SecurityKey")]
+    [Route("api/SecurityCredential")]
     [IgnoreAntiforgeryToken]
     public class SecurityKeyController : AbpController
     {
-        private readonly ISecurityKeyManager _securityKeyManager;
-        public SecurityKeyController(ISecurityKeyManager securityKeyManager)
+        private readonly ISecurityCredentialManager _securityCredentialManager;
+        public SecurityKeyController(ISecurityCredentialManager securityCredentialManager)
         {
-            _securityKeyManager = securityKeyManager;
+            _securityCredentialManager = securityCredentialManager;
         }
 
         /// <summary>
@@ -22,15 +22,15 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore.Controllers
         [HttpGet]
         [Route("Public")]
         [EnableRateLimiting(TransformSecurityRatelimitNames.SecurityKeyRateLimiting)]
-        public async Task<SecurityPublicKeyDto> GetSecurityKeyAsync(string bizType)
+        public async Task<SecurityCredentialPublicKeyDto> GetSecurityKeyAsync(string bizType)
         {
-            var securityKey = await _securityKeyManager.GenerateAsync(bizType);
-            var pub = new SecurityPublicKeyDto()
+            var credential = await _securityCredentialManager.GenerateAsync(bizType);
+            var pub = new SecurityCredentialPublicKeyDto()
             {
-                UniqueId = securityKey.UniqueId,
-                BizType = securityKey.BizType,
-                KeyType = securityKey.KeyType,
-                PublicKey = securityKey.PublicKey
+                Identifier = credential.Identifier,
+                BizType = credential.BizType,
+                KeyType = credential.KeyType,
+                PublicKey = credential.PublicKey
             };
             return pub;
         }

@@ -1,11 +1,11 @@
 ﻿namespace SharpAbp.Abp.TransformSecurity.AspNetCore
 {
-    public class SecurityPublicKeyDto  
+    public class SecurityCredentialPublicKeyDto
     {
         /// <summary>
         /// 唯一编号
         /// </summary>
-        public string UniqueId { get; set; }
+        public string Identifier { get; set; }
 
         /// <summary>
         /// 业务类型

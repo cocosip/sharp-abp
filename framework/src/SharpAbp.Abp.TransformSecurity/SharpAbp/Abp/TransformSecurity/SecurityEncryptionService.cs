@@ -18,7 +18,7 @@ namespace SharpAbp.Abp.TransformSecurity
         protected AbpTransformSecuritySM2Options SM2Options { get; }
         protected IGuidGenerator GuidGenerator { get; }
         protected IClock Clock { get; }
-        protected ISecurityKeyStore SecurityKeyStore { get; }
+        protected ISecurityCredentialStore  SecurityCredentialStore { get; }
         protected IRSAEncryptionService RSAEncryptionService { get; }
         protected ISm2EncryptionService Sm2EncryptionService { get; }
         public SecurityEncryptionService(
@@ -27,7 +27,7 @@ namespace SharpAbp.Abp.TransformSecurity
             IOptions<AbpTransformSecuritySM2Options> sm2Options,
             IGuidGenerator guidGenerator,
             IClock clock,
-            ISecurityKeyStore securityKeyStore,
+            ISecurityCredentialStore securityCredentialStore,
             IRSAEncryptionService rSAEncryptionService,
             ISm2EncryptionService sm2EncryptionService)
         {
@@ -36,63 +36,63 @@ namespace SharpAbp.Abp.TransformSecurity
             SM2Options = sm2Options.Value;
             GuidGenerator = guidGenerator;
             Clock = clock;
-            SecurityKeyStore = securityKeyStore;
+            SecurityCredentialStore = securityCredentialStore;
             RSAEncryptionService = rSAEncryptionService;
             Sm2EncryptionService = sm2EncryptionService;
         }
 
-        public virtual async Task<SecurityKey> GenerateAsync(CancellationToken cancellationToken = default)
+        public virtual async Task<SecurityCredential> GenerateAsync(CancellationToken cancellationToken = default)
         {
-            var securityKey = new SecurityKey()
+            var credential = new SecurityCredential()
             {
-                UniqueId = GuidGenerator.Create().ToString("N"),
+                Identifier = GuidGenerator.Create().ToString("N"),
                 Expires = Clock.Now.Add(Options.Expires),
                 CreationTime = Clock.Now
             };
 
             if (Options.EncryptionAlgo == AbpTransformSecurityNames.RSA)
             {
-                securityKey.KeyType = AbpTransformSecurityNames.RSA;
+                credential.KeyType = AbpTransformSecurityNames.RSA;
                 var keyPair = RSAEncryptionService.GenerateRSAKeyPair(RSAOptions.KeySize);
-                securityKey.PublicKey = RSAExtensions.ExportPublicKey(keyPair.Public);
-                securityKey.PrivateKey = RSAExtensions.ExportPrivateKey(keyPair.Private);
-                securityKey.SetRSAKeySize(RSAOptions.KeySize);
-                securityKey.SetRSAPadding(RSAOptions.Padding);
+                credential.PublicKey = RSAExtensions.ExportPublicKey(keyPair.Public);
+                credential.PrivateKey = RSAExtensions.ExportPrivateKey(keyPair.Private);
+                credential.SetRSAKeySize(RSAOptions.KeySize);
+                credential.SetRSAPadding(RSAOptions.Padding);
             }
             else if (Options.EncryptionAlgo == AbpTransformSecurityNames.SM2)
             {
-                securityKey.KeyType = AbpTransformSecurityNames.SM2;
+                credential.KeyType = AbpTransformSecurityNames.SM2;
                 var keyPair = Sm2EncryptionService.GenerateSm2KeyPair(SM2Options.Curve);
-                securityKey.PublicKey = Sm2Extensions.ExportPublicKey(keyPair.Public);
-                securityKey.PrivateKey = Sm2Extensions.ExportPrivateKey(keyPair.Private);
-                securityKey.SetSM2Curve(SM2Options.Curve);
-                securityKey.SetSM2Mode(SM2Options.Mode);
+                credential.PublicKey = Sm2Extensions.ExportPublicKey(keyPair.Public);
+                credential.PrivateKey = Sm2Extensions.ExportPrivateKey(keyPair.Private);
+                credential.SetSM2Curve(SM2Options.Curve);
+                credential.SetSM2Mode(SM2Options.Mode);
             }
 
-            await SecurityKeyStore.SetAsync(securityKey);
-            return securityKey;
+            await SecurityCredentialStore.SetAsync(credential);
+            return credential;
         }
 
         public virtual async Task<string> DecryptAsync(string cipherText, string id, CancellationToken cancellationToken = default)
         {
-            var securityKey = await SecurityKeyStore.GetAsync(id, cancellationToken);
-            if (securityKey == null)
+            var credential = await SecurityCredentialStore.GetAsync(id, cancellationToken);
+            if (credential == null)
             {
                 throw new AbpException($"Could not find security key by id: {id}");
             }
-            if (securityKey.IsRSA())
+            if (credential.IsRSA())
             {
-                var rsaParam = RSAEncryptionService.ImportPrivateKey(securityKey.PrivateKey);
-                return RSAEncryptionService.Decrypt(rsaParam, cipherText, Encoding.UTF8, securityKey.GetRSAPadding());
+                var rsaParam = RSAEncryptionService.ImportPrivateKey(credential.PrivateKey);
+                return RSAEncryptionService.Decrypt(rsaParam, cipherText, Encoding.UTF8, credential.GetRSAPadding());
 
             }
-            else if (securityKey.IsSM2())
+            else if (credential.IsSM2())
             {
-                return Sm2EncryptionService.Decrypt(securityKey.PrivateKey, cipherText, "utf-8", securityKey.GetSM2Curve(), securityKey.GetSM2Mode());
+                return Sm2EncryptionService.Decrypt(credential.PrivateKey, cipherText, "utf-8", credential.GetSM2Curve(), credential.GetSM2Mode());
             }
             else
             {
-                throw new AbpException("Invalid securityKey type");
+                throw new AbpException("Invalid credential key type");
             }
 
         }

@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using Volo.Abp;
+using Volo.Abp.MultiTenancy;
 using Volo.Abp.TenantManagement;
 using Xunit;
 
@@ -9,11 +10,13 @@ namespace SharpAbp.Abp.MapTenancyManagement
 {
     public class MapTenantAppServiceTest : MapTenancyManagementApplicationTestBase
     {
+        private readonly ITenantNormalizer _tenantNormalizer;
         private readonly ITenantRepository _tenantRepository;
         private readonly IMapTenantAppService _mapTenantAppService;
         private readonly IMapTenancyConfigurationProvider _mapTenancyConfigurationProvider;
         public MapTenantAppServiceTest()
         {
+            _tenantNormalizer = GetRequiredService<ITenantNormalizer>();
             _tenantRepository = GetRequiredService<ITenantRepository>();
             _mapTenantAppService = GetRequiredService<IMapTenantAppService>();
             _mapTenancyConfigurationProvider = GetRequiredService<IMapTenancyConfigurationProvider>();
@@ -22,8 +25,8 @@ namespace SharpAbp.Abp.MapTenancyManagement
         [Fact]
         public virtual async Task CreateAsync_UpdateAsync_DelteAsync_Test()
         {
-            var tenant1 = await _tenantRepository.FindByNameAsync("tenant1");
-            var tenant2 = await _tenantRepository.FindByNameAsync("tenant2");
+            var tenant1 = await _tenantRepository.FindByNameAsync(_tenantNormalizer.NormalizeName("tenant1"));
+            var tenant2 = await _tenantRepository.FindByNameAsync(_tenantNormalizer.NormalizeName("tenant2"));
 
             var m1 = await _mapTenantAppService.CreateAsync(new CreateMapTenantDto(tenant1.Id, tenant1.Name, "100", "200"));
             var mapTenant1 = await _mapTenantAppService.GetAsync(m1.Id);

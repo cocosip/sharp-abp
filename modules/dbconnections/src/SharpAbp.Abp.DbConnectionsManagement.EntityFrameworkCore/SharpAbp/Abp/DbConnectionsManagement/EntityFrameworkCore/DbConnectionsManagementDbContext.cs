@@ -13,5 +13,11 @@ namespace SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore
             : base(options)
         {
         }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+            builder.ConfigureDbConnectionsManagement();
+        }
     }
 }
