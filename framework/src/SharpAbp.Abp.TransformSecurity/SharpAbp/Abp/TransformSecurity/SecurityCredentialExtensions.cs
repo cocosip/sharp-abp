@@ -1,6 +1,7 @@
 ﻿using Org.BouncyCastle.Crypto.Engines;
 using SharpAbp.Abp.Crypto.RSA;
 using SharpAbp.Abp.Crypto.SM2;
+using System;
 using Volo.Abp.Data;
 
 namespace SharpAbp.Abp.TransformSecurity
@@ -59,12 +60,13 @@ namespace SharpAbp.Abp.TransformSecurity
 
         public static SM2Engine.Mode GetSM2Mode(this SecurityCredential key)
         {
-            return key.GetProperty("SM2_Mode", SM2Engine.Mode.C1C2C3);
+
+            return (SM2Engine.Mode)Enum.Parse(typeof(SM2Engine.Mode), key.GetProperty("SM2_Mode", SM2Engine.Mode.C1C2C3.ToString()));
         }
 
         public static SecurityCredential SetSM2Mode(this SecurityCredential key, SM2Engine.Mode mode)
         {
-            return key.SetProperty("SM2_Mode", mode);
+            return key.SetProperty("SM2_Mode", mode.ToString());
         }
     }
 }
