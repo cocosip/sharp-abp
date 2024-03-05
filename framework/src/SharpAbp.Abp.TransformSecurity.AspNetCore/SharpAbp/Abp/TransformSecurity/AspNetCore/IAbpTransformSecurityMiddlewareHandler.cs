@@ -6,6 +6,6 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
 {
     public interface IAbpTransformSecurityMiddlewareHandler
     {
-        Task HandleAsync(HttpContext context, string transformSecurityId, CancellationToken cancellationToken = default);
+        Task HandleAsync(HttpContext context, string identifier, CancellationToken cancellationToken = default);
     }
 }

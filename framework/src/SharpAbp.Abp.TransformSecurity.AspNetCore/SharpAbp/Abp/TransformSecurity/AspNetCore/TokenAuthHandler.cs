@@ -22,7 +22,7 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
             _securityEncryptionService = securityEncryptionService;
         }
 
-        public async Task HandleAsync(HttpContext context, string transformSecurityId, CancellationToken cancellationToken = default)
+        public async Task HandleAsync(HttpContext context, string identifier, CancellationToken cancellationToken = default)
         {
             //判断是否为登录这个方法
             if (context.Request.Method == HttpMethods.Post && context.Request.HasFormContentType && context.Request.Path.StartsWithSegments("/connect/token", StringComparison.OrdinalIgnoreCase))
@@ -38,9 +38,8 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
                         if (item.Key.Equals("password", StringComparison.OrdinalIgnoreCase))
                         {
                             var p = WebUtility.UrlDecode(item.Value.ToString());
-
                             //明文密码
-                            var plainPassword = await _securityEncryptionService.DecryptAsync(p, transformSecurityId, cancellationToken);
+                            var plainPassword = await _securityEncryptionService.DecryptAsync(p, identifier, cancellationToken);
                             form.Add(item.Key, plainPassword);
                         }
                         else

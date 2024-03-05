@@ -43,5 +43,11 @@ namespace SharpAbp.Abp.TransformSecurity
         /// 密钥的创建时间
         /// </summary>
         public DateTime CreationTime { get; set; }
+
+
+        public bool IsExpires(DateTime dateTime)
+        {
+            return Expires.HasValue && Expires.Value <= dateTime;
+        }
     }
 }

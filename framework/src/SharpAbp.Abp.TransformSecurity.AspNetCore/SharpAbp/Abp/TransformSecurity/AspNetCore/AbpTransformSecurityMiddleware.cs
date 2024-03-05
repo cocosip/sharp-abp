@@ -27,8 +27,8 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
         {
             if (Options.Enabled)
             {
-                var transformSecurityId = context.Request.Headers[AspNetCoreOptions.TransformSecurityIdName];
-                if (transformSecurityId.ToString().IsNullOrEmpty())
+                var identifier = context.Request.Headers[AspNetCoreOptions.TransformSecurityIdentifierName];
+                if (identifier.ToString().IsNullOrEmpty())
                 {
                     throw new AbpException("Could not find transformSecurityId");
                 }
@@ -36,7 +36,7 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
                 foreach (var type in AspNetCoreOptions.MiddlewareHandlers)
                 {
                     var handler = ServiceProvider.GetService(type).As<IAbpTransformSecurityMiddlewareHandler>();
-                    await handler.HandleAsync(context, transformSecurityId, default);
+                    await handler.HandleAsync(context, identifier, default);
                 }
             }
 

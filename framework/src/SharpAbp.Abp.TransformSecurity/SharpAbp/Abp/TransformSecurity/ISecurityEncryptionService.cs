@@ -5,7 +5,8 @@ namespace SharpAbp.Abp.TransformSecurity
 {
     public interface ISecurityEncryptionService
     {
-        Task<SecurityCredential> GenerateAsync(CancellationToken cancellationToken = default);
-        Task<string> DecryptAsync(string cipherText, string id, CancellationToken cancellationToken = default);
+        Task<SecurityCredentialValidateResult> ValidateAsync(string identifier, CancellationToken cancellationToken = default);
+        Task<string> EncryptAsync(string plainText, string identifier, CancellationToken cancellationToken = default);
+        Task<string> DecryptAsync(string cipherText, string identifier, CancellationToken cancellationToken = default);
     }
 }

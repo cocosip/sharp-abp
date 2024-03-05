@@ -4,7 +4,7 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
 {
     public class AbpTransformSecurityAspNetCoreOptions
     {
-        public string TransformSecurityIdName { get; set; } = "AbpTransformSecurityId";
+        public string TransformSecurityIdentifierName { get; set; } = "AbpTransformSecurityIdentifier";
 
         public ITypeList<IAbpTransformSecurityMiddlewareHandler> MiddlewareHandlers { get; protected set; }
 

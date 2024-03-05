@@ -1,6 +1,8 @@
-﻿using SharpAbp.Abp.Crypto;
+﻿using Microsoft.Extensions.Caching.Distributed;
+using SharpAbp.Abp.Crypto;
 using SharpAbp.Abp.Crypto.RSA;
 using SharpAbp.Abp.Crypto.SM2;
+using System;
 using System.Threading.Tasks;
 using Volo.Abp.Caching;
 using Volo.Abp.Guids;
@@ -41,6 +43,24 @@ namespace SharpAbp.Abp.TransformSecurity
             {
                 options.Enabled = false;
                 options.EncryptionAlgo = "RSA";
+                options.Expires = TimeSpan.FromSeconds(600);
+                options.BizTypes.Add("Login");
+            });
+
+            //Configure cache
+            Configure<AbpDistributedCacheOptions>(options =>
+            {
+                options.CacheConfigurators.Add(cacheName =>
+                {
+                    if (cacheName == CacheNameAttribute.GetCacheName(typeof(SecurityCredential)))
+                    {
+                        return new DistributedCacheEntryOptions()
+                        {
+                            SlidingExpiration = TimeSpan.FromSeconds(900)
+                        };
+                    }
+                    return null;
+                });
             });
 
             return Task.CompletedTask;
