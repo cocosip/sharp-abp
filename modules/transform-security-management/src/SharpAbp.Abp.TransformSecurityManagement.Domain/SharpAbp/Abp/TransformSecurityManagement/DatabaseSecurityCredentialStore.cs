@@ -52,6 +52,8 @@ namespace SharpAbp.Abp.TransformSecurityManagement
                 CreationTime = securityCredentialInfo.CreationTime,
             };
 
+            securityCredential.SetReferenceId(securityCredentialInfo.CredsId.ToString("N"));
+
             if (securityCredential.KeyType.Equals("RSA", StringComparison.OrdinalIgnoreCase))
             {
                 var rsaCreds = await RSACredsRepository.GetAsync(securityCredentialInfo.CredsId, cancellationToken: cancellationToken);
@@ -73,27 +75,16 @@ namespace SharpAbp.Abp.TransformSecurityManagement
 
         public virtual async Task SetAsync(SecurityCredential credential, CancellationToken cancellationToken = default)
         {
-            Guid credsId;
-            if (credential.KeyType.Equals("RSA", StringComparison.OrdinalIgnoreCase))
+            var referenceId = credential.GetReferenceId();
+            if (referenceId.IsNullOrWhiteSpace())
             {
-                var rsaCreds = await RSACredsRepository.GetRandomAsync(cancellationToken: cancellationToken);
-                credsId = rsaCreds.Id;
-
-            }
-            else if (credential.KeyType.Equals("SM2", StringComparison.OrdinalIgnoreCase))
-            {
-                var sm2Creds = await SM2CredsRepository.GetRandomAsync(cancellationToken: cancellationToken);
-                credsId = sm2Creds.Id;
-            }
-            else
-            {
-                throw new AbpException($"Invalid KeyType {credential.KeyType}");
+                throw new AbpException("Reference Identifier is null or empty");
             }
 
             var securityCredentialInfo = new SecurityCredentialInfo(
                 GuidGenerator.Create(),
                 credential.Identifier,
-                credsId,
+                Guid.Parse(referenceId),
                 credential.KeyType,
                 credential.BizType,
                 credential.Expires,

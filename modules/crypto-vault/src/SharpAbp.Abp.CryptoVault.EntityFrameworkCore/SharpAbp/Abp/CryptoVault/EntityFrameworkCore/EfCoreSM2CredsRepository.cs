@@ -58,16 +58,24 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
+
         /// <summary>
-        /// Get random
+        /// Get random sm2
         /// </summary>
+        /// <param name="sourceType"></param>
+        /// <param name="curve"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<SM2Creds> GetRandomAsync(bool includeDetails = true, CancellationToken cancellationToken = default)
+        public virtual async Task<SM2Creds> GetRandomAsync(
+            int? sourceType = null,
+            string curve = "",
+            bool includeDetails = true, CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
+                .WhereIf(sourceType.HasValue, item => item.SourceType == sourceType.Value)
+                .WhereIf(!curve.IsNullOrWhiteSpace(), item => item.Curve == curve)
                 .OrderBy(x => Guid.NewGuid())
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }

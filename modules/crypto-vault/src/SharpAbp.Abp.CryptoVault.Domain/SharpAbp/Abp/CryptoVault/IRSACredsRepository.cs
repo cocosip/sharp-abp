@@ -30,12 +30,14 @@ namespace SharpAbp.Abp.CryptoVault
         Task<RSACreds> FindExpectedByIdentifierAsync(string identifier, Guid? expectedId = null, bool includeDetails = true, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Get random
+        /// Get random rsa
         /// </summary>
+        /// <param name="sourceType"></param>
+        /// <param name="size"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<RSACreds> GetRandomAsync(bool includeDetails = true, CancellationToken cancellationToken = default);
+        Task<RSACreds> GetRandomAsync(int? sourceType = null, int? size = null, bool includeDetails = true, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get list

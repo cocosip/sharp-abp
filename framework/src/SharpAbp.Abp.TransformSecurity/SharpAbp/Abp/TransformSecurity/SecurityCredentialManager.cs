@@ -56,7 +56,7 @@ namespace SharpAbp.Abp.TransformSecurity
                 CreationTime = Clock.Now
             };
 
-            if (Options.EncryptionAlgo == "RSA")
+            if (Options.EncryptionAlgo.Equals("RSA", StringComparison.OrdinalIgnoreCase))
             {
                 credential.KeyType = AbpTransformSecurityNames.RSA;
                 var keyPair = RSAEncryptionService.GenerateRSAKeyPair(RSAOptions.KeySize);
@@ -65,7 +65,7 @@ namespace SharpAbp.Abp.TransformSecurity
                 credential.SetRSAKeySize(RSAOptions.KeySize);
                 credential.SetRSAPadding(RSAOptions.Padding);
             }
-            else if (Options.EncryptionAlgo == "SM2")
+            else if (Options.EncryptionAlgo.Equals("SM2", StringComparison.OrdinalIgnoreCase))
             {
                 credential.KeyType = AbpTransformSecurityNames.SM2;
                 var keyPair = Sm2EncryptionService.GenerateSm2KeyPair(SM2Options.Curve);

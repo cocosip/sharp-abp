@@ -23,7 +23,8 @@ $solutionPaths = @(
 		"../modules/audit-logging",
 		"../modules/account",
 		"../modules/minid",
-		"../modules/crypto-vault"
+		"../modules/crypto-vault",
+		"../modules/transform-security-management"
 	)
 
 if ($full -eq "-f")

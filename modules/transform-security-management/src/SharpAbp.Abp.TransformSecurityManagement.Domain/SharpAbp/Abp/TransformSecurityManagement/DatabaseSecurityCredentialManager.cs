@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using SharpAbp.Abp.Crypto.RSA;
-using SharpAbp.Abp.Crypto.SM2;
+using SharpAbp.Abp.CryptoVault;
 using SharpAbp.Abp.TransformSecurity;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Guids;
 using Volo.Abp.Timing;
@@ -22,15 +22,74 @@ namespace SharpAbp.Abp.TransformSecurityManagement
         protected IGuidGenerator GuidGenerator { get; }
         protected IClock Clock { get; }
         protected ISecurityCredentialStore SecurityCredentialStore { get; }
+        protected IRSACredsRepository RSACredsRepository { get; }
+        protected ISM2CredsRepository SM2CredsRepository { get; }
 
-        public DatabaseSecurityCredentialManager()
+        public DatabaseSecurityCredentialManager(
+            IOptions<AbpTransformSecurityOptions> options,
+            IOptions<AbpTransformSecurityRSAOptions> rsaOptions,
+            IOptions<AbpTransformSecuritySM2Options> sm2Options,
+            IGuidGenerator guidGenerator,
+            IClock clock,
+            ISecurityCredentialStore securityCredentialStore,
+            IRSACredsRepository rsaCredsRepository,
+            ISM2CredsRepository sm2CredsRepository)
         {
-                
+            Options = options.Value;
+            RSAOptions = rsaOptions.Value;
+            SM2Options = sm2Options.Value;
+            GuidGenerator = guidGenerator;
+            Clock = clock;
+            SecurityCredentialStore = securityCredentialStore;
+            RSACredsRepository = rsaCredsRepository;
+            SM2CredsRepository = sm2CredsRepository;
         }
 
         public virtual async Task<SecurityCredential> GenerateAsync(string bizType, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            if (!ValidateBizType(bizType))
+            {
+                throw new AbpException($"Unsupported bizType {bizType}");
+            }
+
+            var credential = new SecurityCredential()
+            {
+                Identifier = GuidGenerator.Create().ToString("N"),
+                BizType = bizType,
+                KeyType = Options.EncryptionAlgo,
+                Expires = Clock.Now.Add(Options.Expires),
+                CreationTime = Clock.Now
+            };
+            if (Options.EncryptionAlgo.Equals("RSA", StringComparison.OrdinalIgnoreCase))
+            {
+                credential.KeyType = "RSA";
+                var rsaCreds = await RSACredsRepository.GetRandomAsync(size: credential.GetRSAKeySize(), cancellationToken: cancellationToken);
+                if (rsaCreds == null)
+                {
+                    throw new ArgumentNullException(nameof(rsaCreds));
+                }
+                credential.SetReferenceId(rsaCreds.Id.ToString("N"));
+                credential.SetSM2Curve(SM2Options.Curve);
+                credential.SetSM2Mode(SM2Options.Mode);
+            }
+            else if (Options.EncryptionAlgo.Equals("SM2", StringComparison.OrdinalIgnoreCase))
+            {
+                credential.KeyType = "SM2";
+                var sm2Creds = await SM2CredsRepository.GetRandomAsync(curve: credential.GetSM2Curve(), cancellationToken: cancellationToken);
+                if (sm2Creds == null)
+                {
+                    throw new ArgumentNullException(nameof(sm2Creds));
+                }
+                credential.SetReferenceId(sm2Creds.Id.ToString("N"));
+                credential.SetRSAKeySize(RSAOptions.KeySize);
+                credential.SetRSAPadding(RSAOptions.Padding);
+            }
+            else
+            {
+                throw new AbpException($"Unsupport EncryptionAlgo {Options.EncryptionAlgo}");
+            }
+
+            return credential;
         }
 
         protected virtual bool ValidateBizType(string bizType)

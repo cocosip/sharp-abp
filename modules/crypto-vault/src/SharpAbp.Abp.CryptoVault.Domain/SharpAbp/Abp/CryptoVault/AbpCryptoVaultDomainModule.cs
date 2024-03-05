@@ -28,9 +28,9 @@ namespace SharpAbp.Abp.CryptoVault
         {
             Configure<AbpCryptoVaultOptions>(options =>
             {
-                options.RSACount = 10;
+                options.RSACount = 20;
                 options.RSAKeySize = 2048;
-                options.SM2Count = 10;
+                options.SM2Count = 20;
                 options.SM2Curve = Sm2EncryptionNames.CurveSm2p256v1;
             });
 

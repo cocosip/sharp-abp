@@ -17,6 +17,16 @@ namespace SharpAbp.Abp.TransformSecurity
             return key.KeyType == "SM2";
         }
 
+        public static string GetReferenceId(this SecurityCredential key)
+        {
+            return key.GetProperty("ReferenceId", "");
+        }
+
+        public static SecurityCredential SetReferenceId(this SecurityCredential key, string id)
+        {
+            return key.SetProperty("ReferenceId", id);
+        }
+
         public static int GetRSAKeySize(this SecurityCredential key)
         {
             return key.GetProperty("RSA_KeySize", 2048);

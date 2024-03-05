@@ -42,6 +42,20 @@ namespace SharpAbp.Abp.CryptoVault.MongoDB
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
+        public virtual async Task<SM2Creds> GetRandomAsync(
+            int? sourceType = null,
+            string curve = "",
+            bool includeDetails = true,
+            CancellationToken cancellationToken = default)
+        {
+            return await (await GetMongoQueryableAsync())
+                .WhereIf(sourceType.HasValue, item => item.SourceType == sourceType.Value)
+                .WhereIf(!curve.IsNullOrWhiteSpace(), item => item.Curve == curve)
+                .OrderBy(x => Guid.NewGuid())
+                .As<IMongoQueryable<SM2Creds>>()
+                .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
+        }
+
         public virtual async Task<List<SM2Creds>> GetListAsync(
             string sorting = null,
             string identifier = "",
@@ -60,10 +74,10 @@ namespace SharpAbp.Abp.CryptoVault.MongoDB
         }
 
         public virtual async Task<List<SM2Creds>> GetPagedListAsync(
-            int skipCount, 
+            int skipCount,
             int maxResultCount,
             string sorting = null,
-            string identifier = "", 
+            string identifier = "",
             int? sourceType = null,
             string curve = "",
             bool includeDetails = false,
@@ -92,6 +106,7 @@ namespace SharpAbp.Abp.CryptoVault.MongoDB
                 .As<IMongoQueryable<SM2Creds>>()
                 .CountAsync(GetCancellationToken(cancellationToken));
         }
-  
+
+
     }
 }

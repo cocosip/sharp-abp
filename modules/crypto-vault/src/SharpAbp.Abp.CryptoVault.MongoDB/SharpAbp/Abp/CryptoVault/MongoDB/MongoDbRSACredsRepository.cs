@@ -43,6 +43,20 @@ namespace SharpAbp.Abp.CryptoVault.MongoDB
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
+        public virtual async Task<RSACreds> GetRandomAsync(
+            int? sourceType = null,
+            int? size = null,
+            bool includeDetails = true,
+            CancellationToken cancellationToken = default)
+        {
+            return await (await GetMongoQueryableAsync())
+                .WhereIf(sourceType.HasValue, item => item.SourceType == sourceType.Value)
+                .WhereIf(size.HasValue, item => item.Size == size.Value)
+                .OrderBy(x => Guid.NewGuid())
+                .As<IMongoQueryable<RSACreds>>()
+                .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
+        }
+
         public virtual async Task<List<RSACreds>> GetListAsync(
             string sorting = null,
             string identifier = "",
@@ -93,5 +107,6 @@ namespace SharpAbp.Abp.CryptoVault.MongoDB
                 .As<IMongoQueryable<RSACreds>>()
                 .CountAsync(GetCancellationToken(cancellationToken));
         }
+
     }
 }

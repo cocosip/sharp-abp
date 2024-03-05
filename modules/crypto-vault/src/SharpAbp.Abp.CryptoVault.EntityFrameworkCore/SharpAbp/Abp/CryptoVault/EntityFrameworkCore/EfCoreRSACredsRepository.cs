@@ -60,15 +60,22 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
         }
 
         /// <summary>
-        /// Get random
+        /// Get random rsa
         /// </summary>
+        /// <param name="sourceType"></param>
+        /// <param name="size"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<RSACreds> GetRandomAsync(bool includeDetails = true, CancellationToken cancellationToken = default)
+        public virtual async Task<RSACreds> GetRandomAsync(
+            int? sourceType = null,
+            int? size = null,
+            bool includeDetails = true, CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
+                .WhereIf(sourceType.HasValue, item => item.SourceType == sourceType.Value)
+                .WhereIf(size.HasValue, item => item.Size == size.Value)
                 .OrderBy(x => Guid.NewGuid())
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }

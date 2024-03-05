@@ -29,12 +29,14 @@ namespace SharpAbp.Abp.CryptoVault
         Task<SM2Creds> FindExpectedByIdentifierAsync(string identifier, Guid? expectedId = null, bool includeDetails = true, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Get random
+        /// Get random sm2
         /// </summary>
+        /// <param name="sourceType"></param>
+        /// <param name="curve"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<SM2Creds> GetRandomAsync(bool includeDetails = true, CancellationToken cancellationToken = default);
+        Task<SM2Creds> GetRandomAsync(int? sourceType = null, string curve = "", bool includeDetails = true, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get list
