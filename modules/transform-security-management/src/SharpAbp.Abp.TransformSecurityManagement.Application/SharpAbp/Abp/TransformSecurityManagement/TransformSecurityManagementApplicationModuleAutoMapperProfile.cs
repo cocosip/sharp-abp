@@ -6,7 +6,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
     {
         public TransformSecurityManagementApplicationModuleAutoMapperProfile()
         {
-
+            CreateMap<SecurityCredentialInfo, SecurityCredentialInfoDto>();
         }
     }
 }

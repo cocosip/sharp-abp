@@ -63,11 +63,8 @@ namespace SharpAbp.Abp.TransformSecurityManagement
             if (Options.EncryptionAlgo.Equals("RSA", StringComparison.OrdinalIgnoreCase))
             {
                 credential.KeyType = "RSA";
-                var rsaCreds = await RSACredsRepository.GetRandomAsync(size: credential.GetRSAKeySize(), cancellationToken: cancellationToken);
-                if (rsaCreds == null)
-                {
-                    throw new ArgumentNullException(nameof(rsaCreds));
-                }
+                var rsaCreds = await RSACredsRepository.GetRandomAsync(size: credential.GetRSAKeySize(), cancellationToken: cancellationToken) ?? throw new AbpException("Get RSACreds failed");
+
                 credential.SetReferenceId(rsaCreds.Id.ToString("N"));
                 credential.SetSM2Curve(SM2Options.Curve);
                 credential.SetSM2Mode(SM2Options.Mode);
@@ -75,11 +72,8 @@ namespace SharpAbp.Abp.TransformSecurityManagement
             else if (Options.EncryptionAlgo.Equals("SM2", StringComparison.OrdinalIgnoreCase))
             {
                 credential.KeyType = "SM2";
-                var sm2Creds = await SM2CredsRepository.GetRandomAsync(curve: credential.GetSM2Curve(), cancellationToken: cancellationToken);
-                if (sm2Creds == null)
-                {
-                    throw new ArgumentNullException(nameof(sm2Creds));
-                }
+                var sm2Creds = await SM2CredsRepository.GetRandomAsync(curve: credential.GetSM2Curve(), cancellationToken: cancellationToken) ?? throw new AbpException("Get SM2Creds failed");
+
                 credential.SetReferenceId(sm2Creds.Id.ToString("N"));
                 credential.SetRSAKeySize(RSAOptions.KeySize);
                 credential.SetRSAPadding(RSAOptions.Padding);

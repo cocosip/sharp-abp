@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\..\..\common.test.props" />
+	<PropertyGroup>
+		<TargetFramework>$(NetCoreFx)</TargetFramework>
+		<IsPackable>false</IsPackable>
+		<RootNamespace />
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" />
+		<PackageReference Include="Moq" />
+		<PackageReference Include="xunit" />
+		<PackageReference Include="xunit.runner.visualstudio">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="coverlet.collector">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Volo.Abp.Autofac" />
+		<PackageReference Include="Volo.Abp.TestBase" />
+		<PackageReference Include="Volo.Abp.AspNetCore.TestBase" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.AspNetCore\SharpAbp.Abp.AspNetCore.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="appsettings.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
+</Project>
