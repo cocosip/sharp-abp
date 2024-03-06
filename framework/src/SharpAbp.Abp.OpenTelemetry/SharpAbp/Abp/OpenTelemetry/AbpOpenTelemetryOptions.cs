@@ -114,17 +114,17 @@ namespace SharpAbp.Abp.OpenTelemetry
 
         public AbpOpenTelemetryOptions()
         {
-            SourceNames = new List<string>();
-            TracingInstrumentationConfigures = new List<Action<TracerProviderBuilder>>();
-            TracingConfigures = new List<Action<TracerProviderBuilder>>();
+            SourceNames = [];
+            TracingInstrumentationConfigures = [];
+            TracingConfigures = [];
 
-            MeterNames = new List<string>();
-            MetricsInstrumentationConfigures = new List<Action<MeterProviderBuilder>>();
-            MetricsViewConfigures = new List<Action<MeterProviderBuilder>>();
-            MetricsConfigures = new List<Action<MeterProviderBuilder>>();
+            MeterNames = [];
+            MetricsInstrumentationConfigures = [];
+            MetricsViewConfigures = [];
+            MetricsConfigures = [];
 
-            OpenTelemetryBuilderPreConfigures = new List<Action<OpenTelemetryBuilder>>();
-            OpenTelemetryBuilderPostConfigures = new List<Action<OpenTelemetryBuilder>>();
+            OpenTelemetryBuilderPreConfigures = [];
+            OpenTelemetryBuilderPostConfigures = [];
 
 
             TracingExporters = new Dictionary<string, Action<TracerProviderBuilder>>();
