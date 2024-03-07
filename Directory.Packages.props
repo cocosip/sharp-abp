@@ -201,7 +201,7 @@
         <PackageVersion Include="OpenTelemetry.Exporter.Prometheus.HttpListener" Version="1.7.0-rc.1" />
         <PackageVersion Include="OpenTelemetry.Exporter.Zipkin" Version="1.7.0" />
         <PackageVersion Include="protobuf-net" Version="3.2.30" />
-        <PackageVersion Include="Polly" Version="8.3.0" />
+        <PackageVersion Include="Polly" Version="8.3.1" />
         <PackageVersion Include="Polly.Extensions.Http" Version="3.0.0" />
         <PackageVersion Include="Serilog" Version="3.1.1" />
         <PackageVersion Include="Serilog.AspNetCore" Version="8.0.0" />
