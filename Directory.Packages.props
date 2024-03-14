@@ -108,8 +108,8 @@
         <RuntimeHostConfigurationOption Include="System.Runtime.Loader.UseRidGraph" Value="true" />
         <PackageVersion Include="aliyun-net-sdk-sts" Version="3.1.2" />
         <PackageVersion Include="Aliyun.OSS.SDK.NetCore" Version="2.13.0" />
-        <PackageVersion Include="AWSSDK.S3" Version="3.7.305.31" />
-        <PackageVersion Include="AWSSDK.SecurityToken" Version="3.7.300.56" />
+        <PackageVersion Include="AWSSDK.S3" Version="3.7.306" />
+        <PackageVersion Include="AWSSDK.SecurityToken" Version="3.7.300.57" />
         <PackageVersion Include="Azure.Messaging.ServiceBus" Version="7.17.0" />
         <PackageVersion Include="Azure.Storage.Blobs" Version="12.19.1" />
         <PackageVersion Include="AutoS3" Version="2.0.1" />
@@ -120,7 +120,7 @@
         <PackageVersion Include="FastDFSCore" Version="1.7.0" />
         <PackageVersion Include="FastDFSCore.Transport.SuperSocket" Version="1.7.0" />
         <PackageVersion Include="FastDFSCore.Transport.DotNetty" Version="1.7.0" />
-        <PackageVersion Include="FreeRedis" Version="1.2.13" />
+        <PackageVersion Include="FreeRedis" Version="1.2.14" />
         <PackageVersion Include="FreeSql" Version="3.2.815" />
         <PackageVersion Include="FreeSql.Provider.MySql" Version="3.2.815" />
         <PackageVersion Include="FreeSql.Provider.Oracle" Version="3.2.815" />
@@ -231,7 +231,7 @@
         <PackageVersion Include="xunit" Version="2.7.0" />
         <PackageVersion Include="xunit.extensibility.execution" Version="2.6.2" />
         <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.7" />
-        <PackageVersion Include="coverlet.collector" Version="6.0.1" />
+        <PackageVersion Include="coverlet.collector" Version="6.0.2" />
         <PackageVersion Include="ConfigureAwait.Fody" Version="3.3.2" />
         <PackageVersion Include="Fody" Version="6.8.0" />
     </ItemGroup>
