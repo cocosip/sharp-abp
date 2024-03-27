@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.TransformSecurity.AspNetCore
@@ -26,7 +27,12 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
         {
             //判断是否为登录这个方法
             if (context.Request.Method == HttpMethods.Post && context.Request.HasFormContentType && context.Request.Path.StartsWithSegments("/connect/token", StringComparison.OrdinalIgnoreCase))
-            { 
+            {
+                if (identifier.IsNullOrWhiteSpace())
+                {
+                    throw new AbpException("TokenAuth handler identifier is null or empty");
+                }
+
                 using var reader = new StreamReader(context.Request.Body);
                 var body = await reader.ReadToEndAsync(cancellationToken);
                 if (!string.IsNullOrEmpty(body))
