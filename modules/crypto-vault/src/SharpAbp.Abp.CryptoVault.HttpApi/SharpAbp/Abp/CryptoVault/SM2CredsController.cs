@@ -20,7 +20,7 @@ namespace SharpAbp.Abp.CryptoVault
         }
 
         [HttpGet]
-        [Route("find-by-identifer/{identifier}")]
+        [Route("find-by-identifier/{identifier}")]
         public async Task<SM2CredsDto> FindByIdentifierAsync([NotNull] string identifier)
         {
             return await _sm2CredsAppService.FindByIdentifierAsync(identifier);

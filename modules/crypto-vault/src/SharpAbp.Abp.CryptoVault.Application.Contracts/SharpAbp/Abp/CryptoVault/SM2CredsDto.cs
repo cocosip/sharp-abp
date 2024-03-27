@@ -26,16 +26,6 @@ namespace SharpAbp.Abp.CryptoVault
         public string PrivateKey { get; set; }
 
         /// <summary>
-        /// 对公钥,私钥加密的密钥
-        /// </summary>
-        public string PassPhrase { get; set; }
-
-        /// <summary>
-        /// 对公钥,私钥加密的盐
-        /// </summary>
-        public string Salt { get; set; }
-
-        /// <summary>
         /// 描述信息
         /// </summary>
         public string Description { get; set; }
