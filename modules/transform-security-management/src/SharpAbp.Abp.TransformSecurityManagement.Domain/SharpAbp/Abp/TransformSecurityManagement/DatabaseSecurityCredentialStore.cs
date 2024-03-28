@@ -34,7 +34,6 @@ namespace SharpAbp.Abp.TransformSecurityManagement
             SM2CredsRepository = sm2CredsRepository;
         }
 
-
         public virtual async Task<SecurityCredential> GetAsync(string identifier, CancellationToken cancellationToken = default)
         {
             var securityCredentialInfo = await SecurityCredentialInfoRepository.FindByIdentifierAsync(identifier, cancellationToken: cancellationToken);

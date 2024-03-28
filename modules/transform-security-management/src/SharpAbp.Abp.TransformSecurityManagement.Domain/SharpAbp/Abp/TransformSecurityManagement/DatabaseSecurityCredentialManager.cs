@@ -21,16 +21,17 @@ namespace SharpAbp.Abp.TransformSecurityManagement
         protected AbpTransformSecuritySM2Options SM2Options { get; }
         protected IGuidGenerator GuidGenerator { get; }
         protected IClock Clock { get; }
+        protected IKeyService KeyService { get; }
         protected ISecurityCredentialStore SecurityCredentialStore { get; }
         protected IRSACredsRepository RSACredsRepository { get; }
         protected ISM2CredsRepository SM2CredsRepository { get; }
-
         public DatabaseSecurityCredentialManager(
             IOptions<AbpTransformSecurityOptions> options,
             IOptions<AbpTransformSecurityRSAOptions> rsaOptions,
             IOptions<AbpTransformSecuritySM2Options> sm2Options,
             IGuidGenerator guidGenerator,
             IClock clock,
+            IKeyService keyService,
             ISecurityCredentialStore securityCredentialStore,
             IRSACredsRepository rsaCredsRepository,
             ISM2CredsRepository sm2CredsRepository)
@@ -40,6 +41,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
             SM2Options = sm2Options.Value;
             GuidGenerator = guidGenerator;
             Clock = clock;
+            KeyService = keyService;
             SecurityCredentialStore = securityCredentialStore;
             RSACredsRepository = rsaCredsRepository;
             SM2CredsRepository = sm2CredsRepository;
@@ -68,6 +70,9 @@ namespace SharpAbp.Abp.TransformSecurityManagement
                 credential.SetReferenceId(rsaCreds.Id.ToString("N"));
                 credential.SetSM2Curve(SM2Options.Curve);
                 credential.SetSM2Mode(SM2Options.Mode);
+                credential.PublicKey = KeyService.DecryptKey(rsaCreds.PublicKey, rsaCreds.PassPhrase, rsaCreds.Salt);
+                credential.PrivateKey = KeyService.DecryptKey(rsaCreds.PrivateKey, rsaCreds.PassPhrase, rsaCreds.Salt);
+
             }
             else if (Options.EncryptionAlgo.Equals("SM2", StringComparison.OrdinalIgnoreCase))
             {
@@ -77,6 +82,8 @@ namespace SharpAbp.Abp.TransformSecurityManagement
                 credential.SetReferenceId(sm2Creds.Id.ToString("N"));
                 credential.SetRSAKeySize(RSAOptions.KeySize);
                 credential.SetRSAPadding(RSAOptions.Padding);
+                credential.PublicKey = KeyService.DecryptKey(sm2Creds.PublicKey, sm2Creds.PassPhrase, sm2Creds.Salt);
+                credential.PrivateKey = KeyService.DecryptKey(sm2Creds.PrivateKey, sm2Creds.PassPhrase, sm2Creds.Salt);
             }
             else
             {

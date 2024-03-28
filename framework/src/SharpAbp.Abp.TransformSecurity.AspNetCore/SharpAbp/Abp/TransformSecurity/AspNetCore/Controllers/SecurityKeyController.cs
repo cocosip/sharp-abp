@@ -5,7 +5,7 @@ using Volo.Abp.AspNetCore.Mvc;
 
 namespace SharpAbp.Abp.TransformSecurity.AspNetCore.Controllers
 {
-    [Route("api/SecurityCredential")]
+    [Route("api/security-credentials")]
     [IgnoreAntiforgeryToken]
     public class SecurityKeyController : AbpController
     {
@@ -20,7 +20,7 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("Public")]
+        [Route("public")]
         [EnableRateLimiting(TransformSecurityRatelimitNames.SecurityKeyRateLimiting)]
         public async Task<SecurityCredentialPublicKeyDto> GetSecurityKeyAsync(string bizType)
         {

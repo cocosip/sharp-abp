@@ -1,4 +1,5 @@
 ﻿using SharpAbp.Abp.CryptoVault;
+using SharpAbp.Abp.TransformSecurity;
 using System.Threading.Tasks;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Caching;
@@ -12,7 +13,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
         typeof(AbpDddDomainModule),
         typeof(AbpCachingModule),
         typeof(AbpAutoMapperModule),
-        typeof(AbpTransformSecurityManagementDomainSharedModule),
+        typeof(AbpTransformSecurityModule),
         typeof(AbpCryptoVaultDomainModule)
         )]
     public class AbpTransformSecurityManagementDomainModule : AbpModule
@@ -25,8 +26,6 @@ namespace SharpAbp.Abp.TransformSecurityManagement
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-           
- 
             return Task.CompletedTask;
         }
 
