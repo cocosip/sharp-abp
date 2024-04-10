@@ -89,7 +89,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
             {
                 throw new AbpException($"Unsupport EncryptionAlgo {Options.EncryptionAlgo}");
             }
-
+            await SecurityCredentialStore.SetAsync(credential);
             return credential;
         }
 

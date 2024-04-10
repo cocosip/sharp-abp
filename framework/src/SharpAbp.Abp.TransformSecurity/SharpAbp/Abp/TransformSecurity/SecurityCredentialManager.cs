@@ -28,7 +28,7 @@ namespace SharpAbp.Abp.TransformSecurity
             IGuidGenerator guidGenerator,
             IClock clock,
             ISecurityCredentialStore securityCredentialStore,
-            IRSAEncryptionService rSAEncryptionService,
+            IRSAEncryptionService rsaEncryptionService,
             ISm2EncryptionService sm2EncryptionService)
         {
             Options = options.Value;
@@ -37,7 +37,7 @@ namespace SharpAbp.Abp.TransformSecurity
             GuidGenerator = guidGenerator;
             Clock = clock;
             SecurityCredentialStore = securityCredentialStore;
-            RSAEncryptionService = rSAEncryptionService;
+            RSAEncryptionService = rsaEncryptionService;
             Sm2EncryptionService = sm2EncryptionService;
         }
 
