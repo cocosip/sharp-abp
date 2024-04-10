@@ -79,15 +79,11 @@ namespace SharpAbp.Abp.TransformSecurity
             return credential;
         }
 
-
         protected virtual bool ValidateBizType(string bizType)
         {
-            foreach (var item in Options.BizTypes)
+            if (Options.BizTypes.Contains(bizType))
             {
-                if (item.Equals(bizType, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
+                return true;
             }
             return false;
         }
