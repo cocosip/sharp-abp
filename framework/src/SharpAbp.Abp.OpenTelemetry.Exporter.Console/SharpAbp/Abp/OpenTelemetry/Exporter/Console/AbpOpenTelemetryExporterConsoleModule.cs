@@ -65,7 +65,7 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Console
 
             });
 
-            return base.ConfigureServicesAsync(context);
+            return Task.CompletedTask;
         }
 
     }

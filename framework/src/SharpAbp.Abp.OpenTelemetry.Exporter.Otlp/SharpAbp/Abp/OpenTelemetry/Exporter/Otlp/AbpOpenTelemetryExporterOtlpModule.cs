@@ -2,7 +2,6 @@
 using global::OpenTelemetry.Metrics;
 using global::OpenTelemetry.Trace;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using OpenTelemetry.Exporter;
 using System;
 using System.Threading.Tasks;
@@ -68,7 +67,7 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Otlp
                 }));
             });
 
-            return base.ConfigureServicesAsync(context);
+            return Task.CompletedTask;
         }
     }
 }

@@ -52,7 +52,7 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus
                 }));
             });
 
-            return base.ConfigureServicesAsync(context);
+            return Task.CompletedTask;
         }
     }
 }
