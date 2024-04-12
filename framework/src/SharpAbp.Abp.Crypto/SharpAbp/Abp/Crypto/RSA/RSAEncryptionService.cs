@@ -210,25 +210,16 @@ namespace SharpAbp.Abp.Crypto.RSA
             //RSA/PKCS1Padding
             //RSA/OAEPPadding
             //RSA/ISO9796-1Padding
-            switch (padding)
+            return padding switch
             {
-                case RSAPaddingNames.None:
-                default:
-                    return new RsaEngine();
-                case RSAPaddingNames.PKCS1Padding:
-                    return new Pkcs1Encoding(new RsaEngine());
-                case RSAPaddingNames.OAEPPadding:
-                case RSAPaddingNames.OAEPSHA1Padding:
-                    return new OaepEncoding(new RsaEngine(), new Sha1Digest());
-                case RSAPaddingNames.OAEPSHA256Padding:
-                    return new OaepEncoding(new RsaEngine(), new Sha256Digest());
-                case RSAPaddingNames.OAEPSHA384Padding:
-                    return new OaepEncoding(new RsaEngine(), new Sha384Digest());
-                case RSAPaddingNames.OAEPSHA512Padding:
-                    return new OaepEncoding(new RsaEngine(), new Sha512Digest());
-                case RSAPaddingNames.ISO9796d1Padding:
-                    return new ISO9796d1Encoding(new RsaEngine());
-            }
+                RSAPaddingNames.PKCS1Padding => new Pkcs1Encoding(new RsaEngine()),
+                RSAPaddingNames.OAEPPadding or RSAPaddingNames.OAEPSHA1Padding => new OaepEncoding(new RsaEngine(), new Sha1Digest()),
+                RSAPaddingNames.OAEPSHA256Padding => new OaepEncoding(new RsaEngine(), new Sha256Digest()),
+                RSAPaddingNames.OAEPSHA384Padding => new OaepEncoding(new RsaEngine(), new Sha384Digest()),
+                RSAPaddingNames.OAEPSHA512Padding => new OaepEncoding(new RsaEngine(), new Sha512Digest()),
+                RSAPaddingNames.ISO9796d1Padding => new ISO9796d1Encoding(new RsaEngine()),
+                _ => new RsaEngine(),
+            };
         }
 
 
