@@ -9,7 +9,7 @@ namespace SharpAbp.Abp.MassTransit.Kafka
 {
     public class KafkaProduceService : IKafkaProduceService, ITransientDependency
     {
-        protected IServiceScopeFactory  ServiceScopeFactory { get; }
+        protected IServiceScopeFactory ServiceScopeFactory { get; }
         public KafkaProduceService(IServiceScopeFactory serviceScopeFactory)
         {
             ServiceScopeFactory = serviceScopeFactory;
@@ -47,7 +47,7 @@ namespace SharpAbp.Abp.MassTransit.Kafka
         {
             using var scope = ServiceScopeFactory.CreateScope();
             var topicProducer = scope.ServiceProvider.GetService<ITopicProducer<string, TValue>>();
-            var key = Guid.NewGuid().ToString("D");
+            var key = NewId.Next().ToString("D").ToUpperInvariant();
             await topicProducer.Produce(key, value, cancellationToken);
         }
 
