@@ -13,7 +13,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
 
         public TenantGroupEto()
         {
-            Tenants = new List<Guid>();
+            Tenants = [];
         }
     }
 }

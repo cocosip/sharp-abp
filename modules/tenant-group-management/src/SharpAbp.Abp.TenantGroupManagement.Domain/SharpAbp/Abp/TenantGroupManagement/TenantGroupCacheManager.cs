@@ -37,7 +37,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
         {
             using (CurrentTenant.Change(null))
             {
-                var tenantGroup = await TenantGroupRepository.GetAsync(id, true, cancellationToken);
+                var tenantGroup = await TenantGroupRepository.FindAsync(id, true, cancellationToken);
                 if (tenantGroup != null)
                 {
                     var cacheKey = CalculateCacheKey(tenantGroup.Id, tenantGroup.Name);
