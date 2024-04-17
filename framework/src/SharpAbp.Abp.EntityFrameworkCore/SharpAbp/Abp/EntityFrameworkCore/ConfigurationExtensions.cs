@@ -42,5 +42,25 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             }
             return "DatabaseVersion19";
         }
+
+        public static string GetMySqlVersion(this IConfiguration configuration)
+        {
+            var properties = configuration.GetProperties();
+            if (properties.ContainsKey("MySqlVersion"))
+            {
+                return properties["MySqlVersion"];
+            }
+            return "5.6";
+        }
+
+        public static string GetMySqlServerType(this IConfiguration configuration)
+        {
+            var properties = configuration.GetProperties();
+            if (properties.ContainsKey("MySqlServerType"))
+            {
+                return properties["MySqlServerType"];
+            }
+            return "MySql";
+        }
     }
 }
