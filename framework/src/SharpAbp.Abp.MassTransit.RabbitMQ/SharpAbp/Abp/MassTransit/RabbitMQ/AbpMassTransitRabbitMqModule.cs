@@ -142,7 +142,6 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
                             foreach (var producer in rabbitMqOptions.Producers)
                             {
                                 var publishTopologyConfigure = producer.PublishTopologyConfigure ?? rabbitMqOptions.DefaultPublishTopologyConfigure;
-
                                 producer.PublishConfigure?.Invoke(publishTopologyConfigure, ctx, cfg);
                             }
 

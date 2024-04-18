@@ -146,7 +146,7 @@ namespace SharpAbp.Abp.OpenTelemetry
                         var sourceNames = openTelemetryOptions.SourceNames.ToArray();
                         if (sourceNames.Length == 0)
                         {
-                            sourceNames = new string[] { "SharpAbp" };
+                            sourceNames = ["SharpAbp"];
                         }
                         //addSource
                         builder.AddSource(sourceNames);
@@ -185,7 +185,7 @@ namespace SharpAbp.Abp.OpenTelemetry
                         var meterNames = openTelemetryOptions.MeterNames.ToArray();
                         if (meterNames.Length == 0)
                         {
-                            meterNames = new string[] { "SharpAbp" };
+                            meterNames = ["SharpAbp"];
                         }
 
                         //addMeter

@@ -163,7 +163,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.TransformSecur
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.TransformSecurity.AspNetCore.Tests", "test\SharpAbp.Abp.TransformSecurity.AspNetCore.Tests\SharpAbp.Abp.TransformSecurity.AspNetCore.Tests.csproj", "{54583587-C4A9-40F3-BC1F-EA8C8E3C4C96}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.AspNetCore.Tests", "test\SharpAbp.Abp.AspNetCore.Tests\SharpAbp.Abp.AspNetCore.Tests.csproj", "{7777C957-5A82-47D0-9DA9-9CB18FEADE0A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.AspNetCore.Tests", "test\SharpAbp.Abp.AspNetCore.Tests\SharpAbp.Abp.AspNetCore.Tests.csproj", "{7777C957-5A82-47D0-9DA9-9CB18FEADE0A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.MassTransit.PostgreSql", "src\SharpAbp.Abp.MassTransit.PostgreSql\SharpAbp.Abp.MassTransit.PostgreSql.csproj", "{FE5DB165-FA83-424D-9C65-197355B81620}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.MassTransit.SqlServer", "src\SharpAbp.Abp.MassTransit.SqlServer\SharpAbp.Abp.MassTransit.SqlServer.csproj", "{17D8E8A3-1BF4-4340-A6B9-ADB564EFC719}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1123,6 +1127,30 @@ Global
 		{7777C957-5A82-47D0-9DA9-9CB18FEADE0A}.Release|x64.Build.0 = Release|Any CPU
 		{7777C957-5A82-47D0-9DA9-9CB18FEADE0A}.Release|x86.ActiveCfg = Release|Any CPU
 		{7777C957-5A82-47D0-9DA9-9CB18FEADE0A}.Release|x86.Build.0 = Release|Any CPU
+		{FE5DB165-FA83-424D-9C65-197355B81620}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE5DB165-FA83-424D-9C65-197355B81620}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE5DB165-FA83-424D-9C65-197355B81620}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FE5DB165-FA83-424D-9C65-197355B81620}.Debug|x64.Build.0 = Debug|Any CPU
+		{FE5DB165-FA83-424D-9C65-197355B81620}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FE5DB165-FA83-424D-9C65-197355B81620}.Debug|x86.Build.0 = Debug|Any CPU
+		{FE5DB165-FA83-424D-9C65-197355B81620}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE5DB165-FA83-424D-9C65-197355B81620}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE5DB165-FA83-424D-9C65-197355B81620}.Release|x64.ActiveCfg = Release|Any CPU
+		{FE5DB165-FA83-424D-9C65-197355B81620}.Release|x64.Build.0 = Release|Any CPU
+		{FE5DB165-FA83-424D-9C65-197355B81620}.Release|x86.ActiveCfg = Release|Any CPU
+		{FE5DB165-FA83-424D-9C65-197355B81620}.Release|x86.Build.0 = Release|Any CPU
+		{17D8E8A3-1BF4-4340-A6B9-ADB564EFC719}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17D8E8A3-1BF4-4340-A6B9-ADB564EFC719}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17D8E8A3-1BF4-4340-A6B9-ADB564EFC719}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{17D8E8A3-1BF4-4340-A6B9-ADB564EFC719}.Debug|x64.Build.0 = Debug|Any CPU
+		{17D8E8A3-1BF4-4340-A6B9-ADB564EFC719}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{17D8E8A3-1BF4-4340-A6B9-ADB564EFC719}.Debug|x86.Build.0 = Debug|Any CPU
+		{17D8E8A3-1BF4-4340-A6B9-ADB564EFC719}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17D8E8A3-1BF4-4340-A6B9-ADB564EFC719}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17D8E8A3-1BF4-4340-A6B9-ADB564EFC719}.Release|x64.ActiveCfg = Release|Any CPU
+		{17D8E8A3-1BF4-4340-A6B9-ADB564EFC719}.Release|x64.Build.0 = Release|Any CPU
+		{17D8E8A3-1BF4-4340-A6B9-ADB564EFC719}.Release|x86.ActiveCfg = Release|Any CPU
+		{17D8E8A3-1BF4-4340-A6B9-ADB564EFC719}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1207,6 +1235,8 @@ Global
 		{12182804-2CD5-4323-BEC2-ACB619BB83C1} = {51F9C36E-772F-4E52-A4AC-3EE8F13FDAD3}
 		{54583587-C4A9-40F3-BC1F-EA8C8E3C4C96} = {51F9C36E-772F-4E52-A4AC-3EE8F13FDAD3}
 		{7777C957-5A82-47D0-9DA9-9CB18FEADE0A} = {51F9C36E-772F-4E52-A4AC-3EE8F13FDAD3}
+		{FE5DB165-FA83-424D-9C65-197355B81620} = {16E4EB45-D029-4743-99CD-D125C72AE383}
+		{17D8E8A3-1BF4-4340-A6B9-ADB564EFC719} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {30432CEA-45F2-4F5A-B44B-790A62AB73F1}

@@ -109,8 +109,8 @@ namespace SharpAbp.Abp.OpenTelemetry
         public Dictionary<string, Action<MeterProviderBuilder>> MetricsExporters { get; set; }
         public Dictionary<string, Action<OpenTelemetryLoggerOptions>> LoggingExporters { get; set; }
 
-        public List<Action<OpenTelemetryBuilder>> OpenTelemetryBuilderPreConfigures { get; set; }
-        public List<Action<OpenTelemetryBuilder>> OpenTelemetryBuilderPostConfigures { get; set; }
+        public List<Action<IOpenTelemetryBuilder>> OpenTelemetryBuilderPreConfigures { get; set; }
+        public List<Action<IOpenTelemetryBuilder>> OpenTelemetryBuilderPostConfigures { get; set; }
 
         public AbpOpenTelemetryOptions()
         {
@@ -127,9 +127,9 @@ namespace SharpAbp.Abp.OpenTelemetry
             OpenTelemetryBuilderPostConfigures = [];
 
 
-            TracingExporters = new Dictionary<string, Action<TracerProviderBuilder>>();
-            MetricsExporters = new Dictionary<string, Action<MeterProviderBuilder>>();
-            LoggingExporters = new Dictionary<string, Action<OpenTelemetryLoggerOptions>>();
+            TracingExporters = [];
+            MetricsExporters = [];
+            LoggingExporters = [];
         }
 
 
