@@ -4,9 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.MassTransit;
 using SharpAbp.Abp.MassTransit.ActiveMQ;
 using SharpAbp.Abp.MassTransit.Kafka;
+using SharpAbp.Abp.MassTransit.PostgreSql;
 using SharpAbp.Abp.MassTransit.RabbitMQ;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Autofac;
 using Volo.Abp.Modularity;
@@ -19,11 +19,12 @@ namespace MassTransitSample.Consumer
         typeof(AbpMassTransitRabbitMqModule),
         typeof(AbpMassTransitKafkaModule),
         typeof(AbpMassTransitActiveMqModule),
+        typeof(AbpMassTransitPostgreSqlModule),
         typeof(AbpAutofacModule)
         )]
     public class MassTransitSampleConsumerModule : AbpModule
     {
-   
+
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
@@ -114,6 +115,22 @@ namespace MassTransitSample.Consumer
                         {
                             EndpointConvention.Map<MassTransitSampleMessage>(u);
                         })
+                    });
+                });
+            }
+            else if (abpMassTransitOptions.Provider.Equals(MassTransitPostgreSqlConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            {
+                MessageCorrelation.UseCorrelationId<MassTransitSampleMessage>(x => Guid.Parse(x.MessageId));
+
+                PreConfigure<AbpMassTransitPostgreSqlOptions>(options =>
+                {
+                    options.Consumers.Add(new PostgreSqlConsumerConfiguration()
+                    {
+                        Configure = new Action<IBusRegistrationConfigurator>(c =>
+                        {
+                            c.AddConsumer<MassTransitSampleConsumer>();
+                        }),
+                        Types = [typeof(MassTransitSampleMessage)]
                     });
                 });
             }

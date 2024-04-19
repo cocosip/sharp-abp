@@ -1,6 +1,4 @@
-﻿using Confluent.Kafka;
-using MassTransit;
-using System;
+﻿using System;
 
 namespace SharpAbp.Abp.MassTransit.Kafka
 {

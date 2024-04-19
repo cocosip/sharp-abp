@@ -39,6 +39,7 @@ namespace MassTransitSample.Producer
                     {
                         try
                         {
+                            await Task.Delay(5000, CancellationTokenProvider.Token);
                             await PublishAsync();
                         }
                         catch (Exception ex)

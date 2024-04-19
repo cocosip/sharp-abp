@@ -4,8 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.MassTransit;
 using SharpAbp.Abp.MassTransit.ActiveMQ;
 using SharpAbp.Abp.MassTransit.Kafka;
+using SharpAbp.Abp.MassTransit.PostgreSql;
 using SharpAbp.Abp.MassTransit.RabbitMQ;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Autofac;
 using Volo.Abp.Modularity;
@@ -18,6 +20,7 @@ namespace MassTransitSample.Producer
         typeof(AbpMassTransitRabbitMqModule),
         typeof(AbpMassTransitKafkaModule),
         typeof(AbpMassTransitActiveMqModule),
+        typeof(AbpMassTransitPostgreSqlModule),
         typeof(AbpAutofacModule)
         )]
     public class MassTransitSampleProducerModule : AbpModule
@@ -93,6 +96,20 @@ namespace MassTransitSample.Producer
                             EndpointConvention.Map<MassTransitSampleMessage>(u);
                         }),
 
+                    });
+
+                });
+            }
+            else if (abpMassTransitOptions.Provider.Equals(MassTransitPostgreSqlConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            {
+                PreConfigure<AbpMassTransitPostgreSqlOptions>(options =>
+                {
+                    options.Producers.Add(new PostgreSqlProducerConfiguration()
+                    {
+                        MessageTypes = [typeof(MassTransitSampleMessage)],
+                        Configure = new Action<ISqlMessagePublishTopologyConfigurator, Type>((cfg, t) =>
+                        {
+                        })
                     });
 
                 });

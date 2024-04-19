@@ -1,7 +1,9 @@
-﻿using System;
+﻿using MassTransit;
+using System;
 
 namespace MassTransitSample.Common
 {
+    [ExcludeFromTopology]
     public class MassTransitSampleMessage
     {
         /// <summary>
