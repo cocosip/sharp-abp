@@ -5,16 +5,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
 
-namespace SharpAbp.Abp.MassTransit.PostgreSql
+namespace SharpAbp.Abp.MassTransit.SqlServer
 {
-    public class PostgreSqlProduceService: IPostgreSqlProduceService, ITransientDependency
+    public class SqlServerProduceService : ISqlServerProduceService, ITransientDependency
     {
         protected IServiceScopeFactory ServiceScopeFactory { get; }
-
-        public PostgreSqlProduceService(IServiceScopeFactory serviceScopeFactory)
+        public SqlServerProduceService(IServiceScopeFactory serviceScopeFactory)
         {
             ServiceScopeFactory = serviceScopeFactory;
         }
+
 
         public virtual async Task PublishAsync<T>(T message, CancellationToken cancellationToken = default) where T : class
         {

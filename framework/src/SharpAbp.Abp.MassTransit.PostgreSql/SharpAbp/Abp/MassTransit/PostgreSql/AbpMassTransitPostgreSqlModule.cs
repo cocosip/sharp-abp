@@ -114,13 +114,11 @@ namespace SharpAbp.Abp.MassTransit.PostgreSql
                             }
 
                             cfg.UseDbMessageScheduler();
-                            //cfg.AutoDeleteOnIdle = postgreSqlOptions.AutoDeleteOnIdle;
+                            cfg.AutoDeleteOnIdle = postgreSqlOptions.AutoDeleteOnIdle;
                             cfg.AutoStart = postgreSqlOptions.AutoStart;
-                            // cfg.PrefetchCount = postgreSqlOptions.PrefetchCount;
-                            // cfg.ConcurrentMessageLimit = postgreSqlOptions.ConcurrentMessageLimit;
+                            cfg.PrefetchCount = postgreSqlOptions.PrefetchCount;
+                            cfg.ConcurrentMessageLimit = postgreSqlOptions.ConcurrentMessageLimit;
                             cfg.ConfigureEndpoints(ctx);
-
-
 
                             //PostgreSql configure
                             foreach (var configure in postgreSqlOptions.PostgreSqlConfigures)
@@ -129,11 +127,11 @@ namespace SharpAbp.Abp.MassTransit.PostgreSql
                             }
 
                             //Producer
-                            // foreach (var producer in postgreSqlOptions.Producers)
-                            // {
-                            //     var configure = producer.Configure ?? postgreSqlOptions.DefaultPublishTopologyConfigurator;
-                            //     cfg.AddPublishMessageTypes(producer.MessageTypes, producer.Configure);
-                            // }
+                            foreach (var producer in postgreSqlOptions.Producers)
+                            {
+                                var configure = producer.Configure ?? postgreSqlOptions.DefaultPublishTopologyConfigurator;
+                                cfg.AddPublishMessageTypes(producer.MessageTypes, producer.Configure);
+                            }
 
                             //PostgreSql postConfigure
                             foreach (var postConfigure in postgreSqlOptions.PostgreSqlPostConfigures)

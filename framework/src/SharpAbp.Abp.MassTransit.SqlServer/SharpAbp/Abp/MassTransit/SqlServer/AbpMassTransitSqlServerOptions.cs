@@ -3,9 +3,9 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 
-namespace SharpAbp.Abp.MassTransit.PostgreSql
+namespace SharpAbp.Abp.MassTransit.SqlServer
 {
-    public class AbpMassTransitPostgreSqlOptions
+    public class AbpMassTransitSqlServerOptions
     {
         public string ConnectionString { get; set; }
         public bool Create { get; set; } = true;
@@ -22,26 +22,26 @@ namespace SharpAbp.Abp.MassTransit.PostgreSql
         public SqlTransportOptions SqlTransportOptions { get; set; }
 
         public Action<SqlTransportOptions> SqlTransportConfigure { get; set; }
-        public List<Action<IBusRegistrationContext, ISqlBusFactoryConfigurator>> PostgreSqlPreConfigures { get; set; }
-        public List<Action<IBusRegistrationContext, ISqlBusFactoryConfigurator>> PostgreSqlConfigures { get; set; }
-        public List<Action<IBusRegistrationContext, ISqlBusFactoryConfigurator>> PostgreSqlPostConfigures { get; set; }
+        public List<Action<IBusRegistrationContext, ISqlBusFactoryConfigurator>> SqlServerPreConfigures { get; set; }
+        public List<Action<IBusRegistrationContext, ISqlBusFactoryConfigurator>> SqlServerConfigures { get; set; }
+        public List<Action<IBusRegistrationContext, ISqlBusFactoryConfigurator>> SqlServerPostConfigures { get; set; }
 
 
-        public List<PostgreSqlProducerConfiguration> Producers { get; set; }
-        public List<PostgreSqlConsumerConfiguration> Consumers { get; set; }
-        public AbpMassTransitPostgreSqlOptions PreConfigure(IConfiguration configuration)
+        public List<SqlServerProducerConfiguration> Producers { get; set; }
+        public List<SqlServerConsumerConfiguration> Consumers { get; set; }
+        public AbpMassTransitSqlServerOptions PreConfigure(IConfiguration configuration)
         {
-            PostgreSqlPreConfigures = [];
-            PostgreSqlConfigures = [];
-            PostgreSqlPostConfigures = [];
+            SqlServerPreConfigures = [];
+            SqlServerConfigures = [];
+            SqlServerPostConfigures = [];
             SqlTransportOptions = new SqlTransportOptions();
 
             Producers = [];
             Consumers = [];
 
             var massTransitPostgreSqlOptions = configuration
-                .GetSection("MassTransitOptions:PostgreSqlOptions")
-                .Get<AbpMassTransitPostgreSqlOptions>();
+                .GetSection("MassTransitOptions:SqlServerOptions")
+                .Get<AbpMassTransitSqlServerOptions>();
 
             if (massTransitPostgreSqlOptions != null)
             {
@@ -72,5 +72,5 @@ namespace SharpAbp.Abp.MassTransit.PostgreSql
 
             return this;
         }
-    }
+}
 }

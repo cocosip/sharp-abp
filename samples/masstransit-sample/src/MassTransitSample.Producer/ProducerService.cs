@@ -31,15 +31,15 @@ namespace MassTransitSample.Producer
 
         public virtual void Run()
         {
-            for (var i = 0; i < 9; i++)
+            for (var i = 0; i < 3; i++)
             {
                 Task.Factory.StartNew(async () =>
                 {
+                    await Task.Delay(5000, CancellationTokenProvider.Token);
                     while (!CancellationTokenProvider.Token.IsCancellationRequested)
                     {
                         try
                         {
-                            await Task.Delay(5000, CancellationTokenProvider.Token);
                             await PublishAsync();
                         }
                         catch (Exception ex)
