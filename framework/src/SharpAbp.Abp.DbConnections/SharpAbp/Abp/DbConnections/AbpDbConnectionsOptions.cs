@@ -13,7 +13,7 @@ namespace SharpAbp.Abp.DbConnections
         public AbpDbConnectionsOptions()
         {
             DbConnections = new DbConnectionConfigurations();
-            DatabaseProviders = new HashSet<DatabaseProvider>();
+            DatabaseProviders = [];
             Creators = new TypeList<IDbConnectionCreator>();
         }
 
