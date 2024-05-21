@@ -102,7 +102,7 @@ namespace SharpAbp.Abp.TransformSecurity
             if (credential.IsRSA())
             {
                 var rsaParam = RSAEncryptionService.ImportPublicKey(credential.PublicKey);
-                return RSAEncryptionService.Encrypt(rsaParam, plainText, Encoding.UTF8, credential.GetRSAPadding());
+                return RSAEncryptionService.Encrypt(rsaParam, plainText, Encoding.UTF8, RSAOptions.Padding);
 
             }
             else if (credential.IsSM2())
@@ -125,8 +125,7 @@ namespace SharpAbp.Abp.TransformSecurity
             if (credential.IsRSA())
             {
                 var rsaParam = RSAEncryptionService.ImportPrivateKey(credential.PrivateKey);
-                return RSAEncryptionService.Decrypt(rsaParam, cipherText, Encoding.UTF8, credential.GetRSAPadding());
-
+                return RSAEncryptionService.Decrypt(rsaParam, cipherText, Encoding.UTF8, RSAOptions.Padding);
             }
             else if (credential.IsSM2())
             {

@@ -88,11 +88,11 @@ namespace SharpAbp.Abp.Crypto.RSA
 
             var plainText = "Hello World";
 
-            var encrypted = _rsaEncryptionService.EncryptFromPem(pub, plainText, Encoding.UTF8);
-            var decrypted = _rsaEncryptionService.DecryptFromPem(priv, encrypted, Encoding.UTF8);
+            var encrypted = _rsaEncryptionService.EncryptFromPem(pub, plainText, Encoding.UTF8,RSAPaddingNames.PKCS1Padding);
+            var decrypted = _rsaEncryptionService.DecryptFromPem(priv, encrypted, Encoding.UTF8, RSAPaddingNames.PKCS1Padding);
             Assert.Equal(plainText, decrypted);
 
-            var decrypted2 = _rsaEncryptionService.DecryptFromPkcs8Pem(priv_pkcs8, encrypted, Encoding.UTF8);
+            var decrypted2 = _rsaEncryptionService.DecryptFromPkcs8Pem(priv_pkcs8, encrypted, Encoding.UTF8, RSAPaddingNames.PKCS1Padding);
             Assert.Equal(plainText, decrypted2);
 
             var encrypted11 = _rsaEncryptionService.Encrypt(pub1, plainText, Encoding.UTF8);
