@@ -107,7 +107,7 @@ namespace SharpAbp.Abp.TransformSecurity
             }
             else if (credential.IsSM2())
             {
-                return Sm2EncryptionService.Encrypt(credential.PublicKey, plainText, "utf-8", credential.GetSM2Curve(), credential.GetSM2Mode());
+                return Sm2EncryptionService.Encrypt(credential.PublicKey, plainText, "utf-8", SM2Options.Curve, SM2Options.Mode);
             }
             else
             {
@@ -129,7 +129,7 @@ namespace SharpAbp.Abp.TransformSecurity
             }
             else if (credential.IsSM2())
             {
-                return Sm2EncryptionService.Decrypt(credential.PrivateKey, cipherText, "utf-8", credential.GetSM2Curve(), credential.GetSM2Mode());
+                return Sm2EncryptionService.Decrypt(credential.PrivateKey, cipherText, "utf-8", SM2Options.Curve, SM2Options.Mode);
             }
             else
             {
