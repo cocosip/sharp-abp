@@ -108,8 +108,8 @@
         <RuntimeHostConfigurationOption Include="System.Runtime.Loader.UseRidGraph" Value="true" />
         <PackageVersion Include="aliyun-net-sdk-sts" Version="3.1.2" />
         <PackageVersion Include="Aliyun.OSS.SDK.NetCore" Version="2.13.0" />
-        <PackageVersion Include="AWSSDK.S3" Version="3.7.308.3" />
-        <PackageVersion Include="AWSSDK.SecurityToken" Version="3.7.300.95" />
+        <PackageVersion Include="AWSSDK.S3" Version="3.7.308.4" />
+        <PackageVersion Include="AWSSDK.SecurityToken" Version="3.7.300.96" />
         <PackageVersion Include="Azure.Messaging.ServiceBus" Version="7.17.0" />
         <PackageVersion Include="Azure.Storage.Blobs" Version="12.20.0" />
         <PackageVersion Include="AutoS3" Version="2.1.0" />
@@ -230,9 +230,9 @@
         <PackageVersion Include="System.Text.Encodings.Web" Version="8.0.0" />
         <PackageVersion Include="System.Text.Json" Version="8.0.0" />
         <PackageVersion Include="Moq" Version="4.20.70" />
-        <PackageVersion Include="xunit" Version="2.8.0" />
+        <PackageVersion Include="xunit" Version="2.8.1" />
         <PackageVersion Include="xunit.extensibility.execution" Version="2.6.2" />
-        <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.0" />
+        <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.1" />
         <PackageVersion Include="coverlet.collector" Version="6.0.2" />
         <PackageVersion Include="ConfigureAwait.Fody" Version="3.3.2" />
         <PackageVersion Include="Fody" Version="6.8.0" />
