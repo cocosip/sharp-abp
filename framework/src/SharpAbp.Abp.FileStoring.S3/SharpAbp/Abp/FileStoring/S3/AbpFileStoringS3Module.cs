@@ -73,7 +73,7 @@ namespace SharpAbp.Abp.FileStoring.S3
                 .AddItem(S3FileProviderConfigurationNames.SecretAccessKey, typeof(string), "")
                 .AddItem(S3FileProviderConfigurationNames.ForcePathStyle, typeof(bool), "false")
                 .AddItem(S3FileProviderConfigurationNames.UseChunkEncoding, typeof(bool), "false")
-                .AddItem(S3FileProviderConfigurationNames.Protocol, typeof(int), "1-http,2-https")
+                .AddItem(S3FileProviderConfigurationNames.Protocol, typeof(int), "0-https,1-http")
                 .AddItem(S3FileProviderConfigurationNames.SignatureVersion, typeof(string), "v2.0")
                 .AddItem(S3FileProviderConfigurationNames.CreateBucketIfNotExists, typeof(bool), "false");
             return configuration;
