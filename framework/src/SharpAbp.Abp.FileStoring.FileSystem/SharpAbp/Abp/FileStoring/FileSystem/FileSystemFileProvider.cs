@@ -103,6 +103,7 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
                     using var fileStream = File.OpenRead(filePath);
                     var memoryStream = new MemoryStream();
                     await fileStream.CopyToAsync(memoryStream, args.CancellationToken);
+                    memoryStream.Seek(0, SeekOrigin.Begin);
                     return memoryStream;
                 });
         }
