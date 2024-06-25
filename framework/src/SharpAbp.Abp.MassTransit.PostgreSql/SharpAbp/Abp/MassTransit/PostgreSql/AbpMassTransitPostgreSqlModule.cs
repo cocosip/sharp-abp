@@ -113,7 +113,7 @@ namespace SharpAbp.Abp.MassTransit.PostgreSql
                                 preConfigure(ctx, cfg);
                             }
 
-                            cfg.UseDbMessageScheduler();
+                            cfg.UseSqlMessageScheduler();
                             cfg.AutoDeleteOnIdle = postgreSqlOptions.AutoDeleteOnIdle;
                             cfg.AutoStart = postgreSqlOptions.AutoStart;
                             cfg.PrefetchCount = postgreSqlOptions.PrefetchCount;

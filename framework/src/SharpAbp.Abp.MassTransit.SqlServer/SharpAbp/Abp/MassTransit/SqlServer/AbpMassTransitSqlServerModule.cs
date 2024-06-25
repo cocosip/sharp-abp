@@ -112,7 +112,7 @@ namespace SharpAbp.Abp.MassTransit.SqlServer
                                 preConfigure(ctx, cfg);
                             }
 
-                            cfg.UseDbMessageScheduler();
+                            cfg.UseSqlMessageScheduler();
                             cfg.AutoDeleteOnIdle = sqlServerOptions.AutoDeleteOnIdle;
                             cfg.AutoStart = sqlServerOptions.AutoStart;
                             cfg.PrefetchCount = sqlServerOptions.PrefetchCount;
