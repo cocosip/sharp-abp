@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Serialization;
 using Volo.Abp;
 
 namespace SharpAbp.Abp.FileStoring
@@ -19,12 +18,6 @@ namespace SharpAbp.Abp.FileStoring
 
         public FileAlreadyExistsException(string message, Exception innerException)
             : base(message, innerException)
-        {
-
-        }
-
-        public FileAlreadyExistsException(SerializationInfo serializationInfo, StreamingContext context)
-            : base(serializationInfo, context)
         {
 
         }

@@ -165,9 +165,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.TransformSecur
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.AspNetCore.Tests", "test\SharpAbp.Abp.AspNetCore.Tests\SharpAbp.Abp.AspNetCore.Tests.csproj", "{7777C957-5A82-47D0-9DA9-9CB18FEADE0A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.MassTransit.PostgreSql", "src\SharpAbp.Abp.MassTransit.PostgreSql\SharpAbp.Abp.MassTransit.PostgreSql.csproj", "{FE5DB165-FA83-424D-9C65-197355B81620}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.MassTransit.PostgreSql", "src\SharpAbp.Abp.MassTransit.PostgreSql\SharpAbp.Abp.MassTransit.PostgreSql.csproj", "{FE5DB165-FA83-424D-9C65-197355B81620}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.MassTransit.SqlServer", "src\SharpAbp.Abp.MassTransit.SqlServer\SharpAbp.Abp.MassTransit.SqlServer.csproj", "{17D8E8A3-1BF4-4340-A6B9-ADB564EFC719}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.MassTransit.SqlServer", "src\SharpAbp.Abp.MassTransit.SqlServer\SharpAbp.Abp.MassTransit.SqlServer.csproj", "{17D8E8A3-1BF4-4340-A6B9-ADB564EFC719}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
