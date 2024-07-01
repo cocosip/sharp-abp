@@ -4,7 +4,7 @@
 	<Import Project="..\..\..\..\configureawait.props" />
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.1;$(NetCoreFx)</TargetFrameworks>
+		<TargetFrameworks>$(NetCoreFx)</TargetFrameworks>
 		<AssemblyName>SharpAbp.Abp.AuditLogging.Application</AssemblyName>
 		<PackageId>SharpAbp.Abp.AuditLogging.Application</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>

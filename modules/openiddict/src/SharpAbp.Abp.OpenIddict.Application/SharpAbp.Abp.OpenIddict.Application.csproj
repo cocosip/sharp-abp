@@ -4,7 +4,7 @@
 	<Import Project="..\..\..\..\configureawait.props" />
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.1;$(NetCoreFx)</TargetFrameworks>
+		<TargetFrameworks>$(NetCoreFx)</TargetFrameworks>
 		<AssemblyName>SharpAbp.Abp.OpenIddict.Application</AssemblyName>
 		<PackageId>SharpAbp.Abp.OpenIddict.Application</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
