@@ -1,4 +1,5 @@
-﻿using Polly;
+﻿using Microsoft.Extensions.Logging;
+using Polly;
 using System;
 using System.IO;
 using System.Text;
@@ -11,12 +12,15 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
 {
     public class FileSystemFileProvider : FileProviderBase, ITransientDependency
     {
+        protected ILogger Logger { get; }
         protected ICurrentTenant CurrentTenant { get; }
         protected IFilePathCalculator FilePathCalculator { get; }
         public FileSystemFileProvider(
+            ILogger<FileSystemFileProvider> logger,
             ICurrentTenant currentTenant,
             IFilePathCalculator filePathCalculator)
         {
+            Logger = logger;
             CurrentTenant = currentTenant;
             FilePathCalculator = filePathCalculator;
         }
@@ -26,6 +30,8 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
             var filePath = FilePathCalculator.Calculate(args);
+
+            Logger.LogTrace("FileSystem SaveAsync filePath: {filePath}", filePath);
 
             if (!args.OverrideExisting && await ExistsAsync(filePath))
             {
@@ -57,18 +63,21 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
         public override Task<bool> DeleteAsync(FileProviderDeleteArgs args)
         {
             var filePath = FilePathCalculator.Calculate(args);
+            Logger.LogTrace("FileSystem DeleteAsync filePath: {filePath}", filePath);
             return Task.FromResult(FileHelper.DeleteIfExists(filePath));
         }
 
         public override Task<bool> ExistsAsync(FileProviderExistsArgs args)
         {
             var filePath = FilePathCalculator.Calculate(args);
+            Logger.LogTrace("FileSystem ExistsAsync filePath: {filePath}", filePath);
             return ExistsAsync(filePath);
         }
 
         public override async Task<bool> DownloadAsync(FileProviderDownloadArgs args)
         {
             var filePath = FilePathCalculator.Calculate(args);
+            Logger.LogTrace("FileSystem DownloadAsync filePath: {filePath}", filePath);
 
             if (!File.Exists(filePath))
             {
@@ -90,7 +99,7 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
         public override async Task<Stream> GetOrNullAsync(FileProviderGetArgs args)
         {
             var filePath = FilePathCalculator.Calculate(args);
-
+            Logger.LogTrace("FileSystem GetOrNullAsync filePath: {filePath}", filePath);
             if (!File.Exists(filePath))
             {
                 return null;
@@ -151,7 +160,7 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
             }
             else
             {
-                relativePathBuilder.Append($"/tenants/{CurrentTenant.Id.Value.ToString("D")}");
+                relativePathBuilder.Append($"/tenants/{CurrentTenant.Id.Value:D}");
             }
 
             if (fileSystemConfiguration.AppendContainerNameToBasePath)
