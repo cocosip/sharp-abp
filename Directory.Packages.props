@@ -14,7 +14,7 @@
         <PackageVersion Include="Volo.Abp.Timing" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Validation" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Guids" Version="$(VoloAbpPackageVersion)" />
-		<PackageVersion Include="Volo.Abp.EventBus" Version="$(VoloAbpPackageVersion)" />
+	<PackageVersion Include="Volo.Abp.EventBus" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.IdentityModel" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.AspNetCore" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.AspNetCore.MultiTenancy" Version="$(VoloAbpPackageVersion)" />
@@ -174,7 +174,7 @@
         <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
         <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
         <PackageVersion Include="Microsoft.Extensions.FileProviders.Composite" Version="8.0.0" />
-        <PackageVersion Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.2" />
+        <PackageVersion Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.6" />
         <PackageVersion Include="Microsoft.Extensions.FileProviders.Physical" Version="8.0.0" />
         <PackageVersion Include="Microsoft.Extensions.FileSystemGlobbing" Version="8.0.0" />
         <PackageVersion Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
