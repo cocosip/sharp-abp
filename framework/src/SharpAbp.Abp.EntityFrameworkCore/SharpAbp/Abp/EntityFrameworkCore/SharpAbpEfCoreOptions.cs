@@ -9,7 +9,7 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         public Dictionary<string, string> Properties { get; set; }
         public SharpAbpEfCoreOptions()
         {
-            Properties = new Dictionary<string, string>();
+            Properties = [];
         }
     }
 }
