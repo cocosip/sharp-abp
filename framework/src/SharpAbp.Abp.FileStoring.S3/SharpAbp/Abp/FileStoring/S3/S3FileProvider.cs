@@ -116,13 +116,7 @@ namespace SharpAbp.Abp.FileStoring.S3
             }
 
             var getObjectResponse = await client.GetObjectAsync(containerName, objectKey);
-            if (getObjectResponse.ResponseStream != null)
-            {
-                var memoryStream = new MemoryStream();
-                await getObjectResponse.ResponseStream.CopyToAsync(memoryStream);
-                return memoryStream;
-            }
-            return null;
+            return await TryCopyToMemoryStreamAsync(getObjectResponse.ResponseStream, args.CancellationToken);
         }
 
         public override async Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)

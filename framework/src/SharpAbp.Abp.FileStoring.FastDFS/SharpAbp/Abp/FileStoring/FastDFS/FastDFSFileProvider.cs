@@ -105,7 +105,9 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
             try
             {
                 var content = await Client.DownloadFileAsync(storageNode, fileId, configuration.ClusterName);
-                return new MemoryStream(content);
+                var ms = new MemoryStream(content);
+                ms.Seek(0, SeekOrigin.Begin);
+                return ms;
             }
             catch (Exception ex)
             {

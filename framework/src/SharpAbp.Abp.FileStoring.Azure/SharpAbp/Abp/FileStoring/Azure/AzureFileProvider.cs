@@ -69,9 +69,7 @@ namespace SharpAbp.Abp.FileStoring.Azure
 
             var blobClient = GetBlobClient(args, fileName);
             var download = await blobClient.DownloadAsync(args.CancellationToken);
-            var memoryStream = new MemoryStream();
-            await download.Value.Content.CopyToAsync(memoryStream);
-            return memoryStream;
+            return await TryCopyToMemoryStreamAsync(download.Value.Content, args.CancellationToken);
         }
 
 
@@ -84,7 +82,11 @@ namespace SharpAbp.Abp.FileStoring.Azure
             }
             var blobClient = GetBlobClient(args, fileName);
             var download = await blobClient.DownloadToAsync(args.Path, args.CancellationToken);
-            return download.Status == (int)HttpStatusCode.OK;
+            if (!download.IsError)
+            {
+                await TryWriteToFileAsync(download.Content.ToStream(), args.Path, args.CancellationToken);
+            }
+            return false;
         }
 
         public override Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)

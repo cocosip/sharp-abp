@@ -246,10 +246,10 @@ namespace SharpAbp.Abp.FileStoring.KS3
                 Logger.LogDebug("UploadId {uploadId} finish {Count}/{partCount}.", uploadId, partETags.Count, partCount);
             }
 
-            XElement root = new XElement("CompleteMultipartUpload");
+            var root = new XElement("CompleteMultipartUpload");
             foreach (var partETag in partETags)
             {
-                XElement partE = new XElement("Part");
+                var partE = new XElement("Part");
                 partE.Add(new XElement("PartNumber", partETag.PartNumber));
                 partE.Add(new XElement("ETag", partETag.ETag));
                 root.Add(partE);

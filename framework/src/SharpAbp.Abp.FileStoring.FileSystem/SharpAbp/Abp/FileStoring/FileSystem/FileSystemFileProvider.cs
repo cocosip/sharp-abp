@@ -89,8 +89,7 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
                 .ExecuteAsync(async () =>
                 {
                     using var fileStream = File.OpenRead(filePath);
-                    using var ts = new FileStream(args.Path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                    await fileStream.CopyToAsync(ts, args.CancellationToken);
+                    await TryWriteToFileAsync(fileStream, args.Path, args.CancellationToken);
                     return true;
                 });
         }
@@ -110,10 +109,7 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
                 .ExecuteAsync(async () =>
                 {
                     using var fileStream = File.OpenRead(filePath);
-                    var memoryStream = new MemoryStream();
-                    await fileStream.CopyToAsync(memoryStream, args.CancellationToken);
-                    memoryStream.Seek(0, SeekOrigin.Begin);
-                    return memoryStream;
+                    return await TryCopyToMemoryStreamAsync(fileStream, args.CancellationToken);
                 });
         }
 
