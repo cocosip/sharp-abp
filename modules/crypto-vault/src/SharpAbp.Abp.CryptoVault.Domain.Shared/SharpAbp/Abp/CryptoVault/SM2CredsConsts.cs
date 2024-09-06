@@ -28,13 +28,13 @@
         public static int MaxSaltLength { get; set; } = 512;
 
         /// <summary>
-        /// Default value: 4096
+        /// Default value: 8192
         /// </summary>
-        public static int MaxPublicKeyLength { get; set; } = 4096;
+        public static int MaxPublicKeyLength { get; set; } = 8192;
 
         /// <summary>
-        /// Default value: 4096
+        /// Default value: 8192
         /// </summary>
-        public static int MaxPrivateKeyLength { get; set; } = 4096;
+        public static int MaxPrivateKeyLength { get; set; } = 8192;
     }
 }
