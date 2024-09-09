@@ -16,13 +16,17 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Volo.Abp.Swashbuckle"/>
+		<PackageReference Include="Volo.Abp.Swashbuckle" />
+		<PackageReference Include="Volo.Abp.AspNetCore.Mvc" />
+		<PackageReference Include="Volo.Abp.VirtualFileSystem" />
 		<PackageReference Include="Swashbuckle.AspNetCore" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Remove="wwwroot\swagger\ui\swagger_theme.css" />
-		<EmbeddedResource Include="wwwroot\swagger\ui\swagger_theme.css" />
+		<None Remove="wwwroot\swagger\ui\abp.swagger.js" />
+		<EmbeddedResource Include="wwwroot\swagger\ui\abp.swagger.js" />
+		<None Remove="wwwroot\swagger\ui\abp.js" />
+		<EmbeddedResource Include="wwwroot\swagger\ui\abp.js" />
 	</ItemGroup>
 
 </Project>

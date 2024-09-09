@@ -1,7 +1,5 @@
 ﻿using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
-using Asp.Versioning.Builder;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -10,11 +8,14 @@ using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.Modularity;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.Threading;
+using Volo.Abp.VirtualFileSystem;
 
 namespace SharpAbp.Abp.Swashbuckle.Versioning
 {
     [DependsOn(
-        typeof(AbpSwashbuckleModule)
+        typeof(AbpSwashbuckleModule),
+        typeof(AbpVirtualFileSystemModule),
+        typeof(AbpAspNetCoreMvcModule)
         )]
     public class AbpSwashbuckleVersioningModule : AbpModule
     {

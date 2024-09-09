@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
 using Volo.Abp.Swashbuckle;
 
-namespace Microsoft.AspNetCore
+namespace Microsoft.AspNetCore.Builder
 {
     public static class AbpSwaggerUIBuilderExtensions
     {
