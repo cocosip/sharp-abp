@@ -1,21 +1,20 @@
 ﻿using Microsoft.Extensions.Configuration;
+using SharpAbp.Abp.Data;
 using System;
 using System.Collections.Generic;
-using Volo.Abp.EntityFrameworkCore;
 
 namespace SharpAbp.Abp.EntityFrameworkCore
 {
     public static class ConfigurationExtensions
     {
-        public static EfCoreDatabaseProvider GetDatabaseProvider(
+        public static DatabaseProvider GetDatabaseProvider(
             this IConfiguration configuration,
-            EfCoreDatabaseProvider defaultValue = EfCoreDatabaseProvider.PostgreSql)
+            DatabaseProvider defaultValue = DatabaseProvider.PostgreSql)
         {
-            if (Enum.TryParse(configuration["EfCoreOptions:DatabaseProvider"], out EfCoreDatabaseProvider databaseProvider))
+            if (Enum.TryParse(configuration["EfCoreOptions:DatabaseProvider"], out DatabaseProvider databaseProvider))
             {
                 return databaseProvider;
             }
-
             return defaultValue;
         }
 

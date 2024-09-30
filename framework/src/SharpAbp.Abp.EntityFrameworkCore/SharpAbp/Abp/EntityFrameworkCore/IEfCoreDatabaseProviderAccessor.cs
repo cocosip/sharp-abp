@@ -1,4 +1,4 @@
-﻿using Volo.Abp.EntityFrameworkCore;
+﻿using SharpAbp.Abp.Data;
 
 namespace SharpAbp.Abp.EntityFrameworkCore
 {
@@ -9,6 +9,6 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         /// </summary>
         /// <param name="providerName"></param>
         /// <returns></returns>
-        EfCoreDatabaseProvider? GetDatabaseProviderOrNull(string providerName);
+        DatabaseProvider? GetDatabaseProviderOrNull(string providerName);
     }
 }

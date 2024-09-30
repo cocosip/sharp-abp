@@ -9,6 +9,7 @@
         Sqlite,
         InMemory,
         Cosmos,
-        Firebird
+        Firebird,
+        Dm
     }
 }
