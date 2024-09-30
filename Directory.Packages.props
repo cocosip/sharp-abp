@@ -128,6 +128,7 @@
         <PackageVersion Include="FreeSql.Provider.PostgreSQL" Version="3.2.833" />
         <PackageVersion Include="FreeSql.Provider.Sqlite" Version="3.2.833" />
         <PackageVersion Include="FreeSql.Provider.SqlServer" Version="3.2.833" />
+		<PackageVersion Include="FreeSql.Provider.Dameng" Version="3.2.833" />
         <PackageVersion Include="HuaweiCloud.OBS.SDK" Version="3.20.7" />
         <PackageVersion Include="MassTransit" Version="8.2.5" />
         <PackageVersion Include="MassTransit.ActiveMQ" Version="8.2.5" />
