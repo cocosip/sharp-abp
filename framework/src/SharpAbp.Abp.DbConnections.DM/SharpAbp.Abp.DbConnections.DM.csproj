@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\..\..\common.props" />
+	<Import Project="..\..\..\configureawait.props" />
+
+	<PropertyGroup>
+		<TargetFramework>$(NetCoreFx)</TargetFramework>
+		<AssemblyName>SharpAbp.Abp.DbConnections.DM</AssemblyName>
+		<PackageId>SharpAbp.Abp.DbConnections.DM</PackageId>
+		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<Description>SharpAbp DbConnection Module</Description>
+		<RootNamespace />
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SharpAbp.Abp.DbConnections\SharpAbp.Abp.DbConnections.csproj" />
+		<ProjectReference Include="..\SharpAbp.Abp.EntityFrameworkCore.DM\SharpAbp.Abp.EntityFrameworkCore.DM.csproj" />
+	</ItemGroup>
+
+</Project>

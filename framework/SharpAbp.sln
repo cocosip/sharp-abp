@@ -169,7 +169,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.MassTransit.Po
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.MassTransit.SqlServer", "src\SharpAbp.Abp.MassTransit.SqlServer\SharpAbp.Abp.MassTransit.SqlServer.csproj", "{17D8E8A3-1BF4-4340-A6B9-ADB564EFC719}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.FreeSql.DM", "src\SharpAbp.Abp.FreeSql.DM\SharpAbp.Abp.FreeSql.DM.csproj", "{C86ABDFA-2CEB-42E0-ACFA-5E2A04A9E1F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FreeSql.DM", "src\SharpAbp.Abp.FreeSql.DM\SharpAbp.Abp.FreeSql.DM.csproj", "{C86ABDFA-2CEB-42E0-ACFA-5E2A04A9E1F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.EntityFrameworkCore.DM", "src\SharpAbp.Abp.EntityFrameworkCore.DM\SharpAbp.Abp.EntityFrameworkCore.DM.csproj", "{21659817-2A7B-4080-8418-B88DDA70C852}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.DbConnections.DM", "src\SharpAbp.Abp.DbConnections.DM\SharpAbp.Abp.DbConnections.DM.csproj", "{AB51AA9B-7127-4598-A04D-4F5144AD43FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1165,6 +1169,30 @@ Global
 		{C86ABDFA-2CEB-42E0-ACFA-5E2A04A9E1F4}.Release|x64.Build.0 = Release|Any CPU
 		{C86ABDFA-2CEB-42E0-ACFA-5E2A04A9E1F4}.Release|x86.ActiveCfg = Release|Any CPU
 		{C86ABDFA-2CEB-42E0-ACFA-5E2A04A9E1F4}.Release|x86.Build.0 = Release|Any CPU
+		{21659817-2A7B-4080-8418-B88DDA70C852}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21659817-2A7B-4080-8418-B88DDA70C852}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21659817-2A7B-4080-8418-B88DDA70C852}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{21659817-2A7B-4080-8418-B88DDA70C852}.Debug|x64.Build.0 = Debug|Any CPU
+		{21659817-2A7B-4080-8418-B88DDA70C852}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{21659817-2A7B-4080-8418-B88DDA70C852}.Debug|x86.Build.0 = Debug|Any CPU
+		{21659817-2A7B-4080-8418-B88DDA70C852}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21659817-2A7B-4080-8418-B88DDA70C852}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21659817-2A7B-4080-8418-B88DDA70C852}.Release|x64.ActiveCfg = Release|Any CPU
+		{21659817-2A7B-4080-8418-B88DDA70C852}.Release|x64.Build.0 = Release|Any CPU
+		{21659817-2A7B-4080-8418-B88DDA70C852}.Release|x86.ActiveCfg = Release|Any CPU
+		{21659817-2A7B-4080-8418-B88DDA70C852}.Release|x86.Build.0 = Release|Any CPU
+		{AB51AA9B-7127-4598-A04D-4F5144AD43FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB51AA9B-7127-4598-A04D-4F5144AD43FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB51AA9B-7127-4598-A04D-4F5144AD43FE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AB51AA9B-7127-4598-A04D-4F5144AD43FE}.Debug|x64.Build.0 = Debug|Any CPU
+		{AB51AA9B-7127-4598-A04D-4F5144AD43FE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AB51AA9B-7127-4598-A04D-4F5144AD43FE}.Debug|x86.Build.0 = Debug|Any CPU
+		{AB51AA9B-7127-4598-A04D-4F5144AD43FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB51AA9B-7127-4598-A04D-4F5144AD43FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB51AA9B-7127-4598-A04D-4F5144AD43FE}.Release|x64.ActiveCfg = Release|Any CPU
+		{AB51AA9B-7127-4598-A04D-4F5144AD43FE}.Release|x64.Build.0 = Release|Any CPU
+		{AB51AA9B-7127-4598-A04D-4F5144AD43FE}.Release|x86.ActiveCfg = Release|Any CPU
+		{AB51AA9B-7127-4598-A04D-4F5144AD43FE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1252,6 +1280,8 @@ Global
 		{FE5DB165-FA83-424D-9C65-197355B81620} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 		{17D8E8A3-1BF4-4340-A6B9-ADB564EFC719} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 		{C86ABDFA-2CEB-42E0-ACFA-5E2A04A9E1F4} = {16E4EB45-D029-4743-99CD-D125C72AE383}
+		{21659817-2A7B-4080-8418-B88DDA70C852} = {16E4EB45-D029-4743-99CD-D125C72AE383}
+		{AB51AA9B-7127-4598-A04D-4F5144AD43FE} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {30432CEA-45F2-4F5A-B44B-790A62AB73F1}
