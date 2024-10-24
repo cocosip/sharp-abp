@@ -16,7 +16,7 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             {
                 return context.DbContextOptions.UseDm(context.ExistingConnection, optionsBuilder =>
                 {
-                    optionsBuilder.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                    //optionsBuilder.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                     dmOptionsAction?.Invoke(optionsBuilder);
                 });
             }
@@ -24,7 +24,7 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             {
                 return context.DbContextOptions.UseDm(context.ConnectionString, optionsBuilder =>
                 {
-                    optionsBuilder.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                    //optionsBuilder.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                     dmOptionsAction?.Invoke(optionsBuilder);
                 });
             }
