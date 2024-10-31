@@ -109,8 +109,8 @@
         <RuntimeHostConfigurationOption Include="System.Runtime.Loader.UseRidGraph" Value="true" />
         <PackageVersion Include="aliyun-net-sdk-sts" Version="3.1.2" />
         <PackageVersion Include="Aliyun.OSS.SDK.NetCore" Version="2.14.1" />
-        <PackageVersion Include="AWSSDK.S3" Version="3.7.405.2" />
-        <PackageVersion Include="AWSSDK.SecurityToken" Version="3.7.400.38" />
+        <PackageVersion Include="AWSSDK.S3" Version="[3.7.405.7,)" />
+        <PackageVersion Include="AWSSDK.SecurityToken" Version="[3.7.400.43,)" />
         <PackageVersion Include="Azure.Messaging.ServiceBus" Version="7.17.0" />
         <PackageVersion Include="Azure.Storage.Blobs" Version="12.22.2" />
         <PackageVersion Include="AutoS3" Version="2.1.0" />
@@ -130,14 +130,14 @@
         <PackageVersion Include="FreeSql.Provider.SqlServer" Version="3.2.833" />
 		<PackageVersion Include="FreeSql.Provider.Dameng" Version="3.2.833" />
         <PackageVersion Include="HuaweiCloud.OBS.SDK" Version="3.20.7" />
-        <PackageVersion Include="MassTransit" Version="8.3.0" />
-        <PackageVersion Include="MassTransit.ActiveMQ" Version="8.3.0" />
-        <PackageVersion Include="MassTransit.Kafka" Version="8.3.0" />
-        <PackageVersion Include="MassTransit.RabbitMQ" Version="8.3.0" />
-		<PackageVersion Include="MassTransit.SqlTransport.PostgreSQL" Version="8.3.0" />
-		<PackageVersion Include="MassTransit.SqlTransport.SqlServer" Version="8.3.0" />
-		<PackageVersion Include="DM.Microsoft.EntityFrameworkCore" Version="8.0.0.28188" />
-		<PackageVersion Include="DM.DmProvider" Version="8.3.1.28188" />
+        <PackageVersion Include="MassTransit" Version="[8.3.0,)" />
+        <PackageVersion Include="MassTransit.ActiveMQ" Version="[8.3.0,)" />
+        <PackageVersion Include="MassTransit.Kafka" Version="[8.3.0,)" />
+        <PackageVersion Include="MassTransit.RabbitMQ" Version="[8.3.0,)" />
+		<PackageVersion Include="MassTransit.SqlTransport.PostgreSQL" Version="[8.3.0,)" />
+		<PackageVersion Include="MassTransit.SqlTransport.SqlServer" Version="[8.3.0,)" />
+		<PackageVersion Include="DM.Microsoft.EntityFrameworkCore" Version="[8.0.0.28188,)" />
+		<PackageVersion Include="DM.DmProvider" Version="[8.3.1.28188,)" />
 		<PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
         <PackageVersion Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0" />
         <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
