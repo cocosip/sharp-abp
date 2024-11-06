@@ -1,4 +1,5 @@
 ﻿using Dm;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using Volo.Abp.Data;
@@ -9,6 +10,13 @@ namespace SharpAbp.Abp.EntityFrameworkCore.ConnectionStrings
     [Dependency(ReplaceServices = true)]
     public class DmConnectionStringChecker : IConnectionStringChecker, ITransientDependency
     {
+        protected ILogger Logger { get; }
+        public DmConnectionStringChecker(ILogger<DmConnectionStringChecker> logger)
+        {
+            Logger = logger;
+        }
+
+
         public virtual async Task<AbpConnectionStringCheckResult> CheckAsync(string connectionString)
         {
             var result = new AbpConnectionStringCheckResult();
@@ -28,8 +36,9 @@ namespace SharpAbp.Abp.EntityFrameworkCore.ConnectionStrings
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
+                Logger.LogError(ex, "check dm database error -> {Message}", ex.Message);
                 return result;
             }
         }
