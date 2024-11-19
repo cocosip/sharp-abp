@@ -171,9 +171,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.MassTransit.Sq
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.FreeSql.DM", "src\SharpAbp.Abp.FreeSql.DM\SharpAbp.Abp.FreeSql.DM.csproj", "{C86ABDFA-2CEB-42E0-ACFA-5E2A04A9E1F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.EntityFrameworkCore.DM", "src\SharpAbp.Abp.EntityFrameworkCore.DM\SharpAbp.Abp.EntityFrameworkCore.DM.csproj", "{21659817-2A7B-4080-8418-B88DDA70C852}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.EntityFrameworkCore.DM", "src\SharpAbp.Abp.EntityFrameworkCore.DM\SharpAbp.Abp.EntityFrameworkCore.DM.csproj", "{21659817-2A7B-4080-8418-B88DDA70C852}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.DbConnections.DM", "src\SharpAbp.Abp.DbConnections.DM\SharpAbp.Abp.DbConnections.DM.csproj", "{AB51AA9B-7127-4598-A04D-4F5144AD43FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.DbConnections.DM", "src\SharpAbp.Abp.DbConnections.DM\SharpAbp.Abp.DbConnections.DM.csproj", "{AB51AA9B-7127-4598-A04D-4F5144AD43FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
