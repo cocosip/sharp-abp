@@ -6,6 +6,7 @@ using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoring.Minio
 {
+    [ExposeKeyedService<IFileProviderValuesValidator>(MinioFileProviderConfigurationNames.ProviderName)]
     public class MinioFileProviderValuesValidator : BaseFileProviderValuesValidator, ITransientDependency
     {
         public override string Provider => MinioFileProviderConfigurationNames.ProviderName;

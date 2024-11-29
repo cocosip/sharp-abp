@@ -4,6 +4,7 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.MassTransit.RabbitMQ
 {
+    [ExposeKeyedService<IPublishProvider>(MassTransitRabbitMqConsts.ProviderName)]
     public class RabbitMqPublishProvider : IPublishProvider, ITransientDependency
     {
         public string Provider => MassTransitRabbitMqConsts.ProviderName;

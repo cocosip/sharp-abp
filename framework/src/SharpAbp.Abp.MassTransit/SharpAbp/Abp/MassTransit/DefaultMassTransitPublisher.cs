@@ -1,37 +1,30 @@
-﻿using Microsoft.Extensions.Options;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Volo.Abp;
 using Volo.Abp.DependencyInjection;
-using System;
 
 namespace SharpAbp.Abp.MassTransit
 {
     public class DefaultMassTransitPublisher : IMassTransitPublisher, ITransientDependency
     {
         protected AbpMassTransitOptions Options { get; }
-        protected IEnumerable<IPublishProvider> Providers { get; }
+        protected IServiceProvider ServiceProvider { get; }
         public DefaultMassTransitPublisher(
             IOptions<AbpMassTransitOptions> options,
-            IEnumerable<IPublishProvider> providers)
+            IServiceProvider serviceProvider)
         {
             Options = options.Value;
-            Providers = providers;
+            ServiceProvider = serviceProvider;
         }
 
         public virtual async Task PublishAsync<T>(
             T message,
             CancellationToken cancellationToken = default) where T : class
         {
-            var provider = Providers.FirstOrDefault(x => x.Provider.Equals(Options.Provider, StringComparison.OrdinalIgnoreCase));
-            if (provider != null)
-            {
-                await provider.PublishAsync(message, cancellationToken);
-                return;
-            }
-            throw new AbpException($"Could not find the MassTransit eventBus provider with the type ({Options.Provider}) configured for the eventBus.");
+            var provider = ServiceProvider.GetRequiredKeyedService<IPublishProvider>(Options.Provider);
+            await provider.PublishAsync(message, cancellationToken);
         }
 
     }

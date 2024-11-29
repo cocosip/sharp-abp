@@ -1,7 +1,6 @@
 ﻿using JetBrains.Annotations;
+using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 
@@ -9,15 +8,15 @@ namespace SharpAbp.Abp.FileStoring
 {
     public class DefaultFileProviderSelector : IFileProviderSelector, ITransientDependency
     {
-        protected IEnumerable<IFileProvider> FileProviders { get; }
+        protected IServiceProvider ServiceProvider { get; }
         protected IFileContainerConfigurationProvider ConfigurationProvider { get; }
 
         public DefaultFileProviderSelector(
             IFileContainerConfigurationProvider configurationProvider,
-            IEnumerable<IFileProvider> fileProviders)
+            IServiceProvider serviceProvider)
         {
             ConfigurationProvider = configurationProvider;
-            FileProviders = fileProviders;
+            ServiceProvider = serviceProvider;
         }
 
         [NotNull]
@@ -30,26 +29,7 @@ namespace SharpAbp.Abp.FileStoring
                 throw new AbpException($"Could not find container configuration by name '{containerName}'.");
             }
 
-            if (!FileProviders.Any())
-            {
-                throw new AbpException("No FILE Storage provider was registered! At least one provider must be registered to be able to use the File Storing System.");
-            }
-
-            foreach (var provider in FileProviders)
-            {
-                if (provider.Provider.Equals(configuration.Provider, StringComparison.OrdinalIgnoreCase))
-                {
-                    return provider;
-                }
-                //if (ProxyHelper.GetUnProxiedType(provider).IsAssignableTo(configuration.Provider))
-                //{
-                //    return provider;
-                //}
-            }
-
-            throw new AbpException(
-                $"Could not find the FILE Storage provider with the type ({configuration.Provider}) configured for the container {containerName} and no default provider was set."
-            );
+            return ServiceProvider.GetRequiredKeyedService<IFileProvider>(configuration.Provider);
         }
     }
 }

@@ -4,6 +4,7 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.MassTransit.PostgreSql
 {
+    [ExposeKeyedService<IPublishProvider>(MassTransitPostgreSqlConsts.ProviderName)]
     public class PostgreSqlPublishProvider : IPublishProvider, ITransientDependency
     {
         public string Provider => MassTransitPostgreSqlConsts.ProviderName;

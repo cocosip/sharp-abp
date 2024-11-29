@@ -11,6 +11,7 @@ using Volo.Abp.Timing;
 
 namespace SharpAbp.Abp.FileStoring.Aws
 {
+    [ExposeKeyedService<IFileProvider>(AwsFileProviderConfigurationNames.ProviderName)]
     public class AwsFileProvider : FileProviderBase, ITransientDependency
     {
         public override string Provider => AwsFileProviderConfigurationNames.ProviderName;

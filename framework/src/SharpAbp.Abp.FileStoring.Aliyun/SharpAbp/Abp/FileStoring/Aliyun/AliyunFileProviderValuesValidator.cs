@@ -6,6 +6,7 @@ using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoring.Aliyun
 {
+    [ExposeKeyedService<IFileProviderValuesValidator>(AliyunFileProviderConfigurationNames.ProviderName)]
     public class AliyunFileProviderValuesValidator : BaseFileProviderValuesValidator, ITransientDependency
     {
         public override string Provider => AliyunFileProviderConfigurationNames.ProviderName;

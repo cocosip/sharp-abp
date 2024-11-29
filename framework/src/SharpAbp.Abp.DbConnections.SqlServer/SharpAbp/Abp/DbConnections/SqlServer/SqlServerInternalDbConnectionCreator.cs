@@ -5,6 +5,7 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.DbConnections.SqlServer
 {
+    [ExposeKeyedService<IInternalDbConnectionCreator>(DatabaseProvider.SqlServer)]
     public class SqlServerInternalDbConnectionCreator : IInternalDbConnectionCreator, ITransientDependency
     {
         public DatabaseProvider DatabaseProvider => DatabaseProvider.SqlServer;

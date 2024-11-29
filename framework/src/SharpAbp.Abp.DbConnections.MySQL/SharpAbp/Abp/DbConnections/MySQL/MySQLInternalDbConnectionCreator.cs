@@ -5,6 +5,7 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.DbConnections.MySQL
 {
+    [ExposeKeyedService<IInternalDbConnectionCreator>(DatabaseProvider.MySql)]
     public class MySQLInternalDbConnectionCreator : IInternalDbConnectionCreator, ITransientDependency
     {
         public DatabaseProvider DatabaseProvider => DatabaseProvider.MySql;

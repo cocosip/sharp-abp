@@ -4,6 +4,7 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.MassTransit.SqlServer
 {
+    [ExposeKeyedService<IPublishProvider>(MassTransitSqlServerConsts.ProviderName)]
     public class SqlServerPublishProvider : IPublishProvider, ITransientDependency
     {
         public string Provider => MassTransitSqlServerConsts.ProviderName;

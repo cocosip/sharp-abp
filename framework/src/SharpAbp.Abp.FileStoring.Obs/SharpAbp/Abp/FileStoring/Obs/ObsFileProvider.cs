@@ -10,6 +10,7 @@ using Volo.Abp.Timing;
 
 namespace SharpAbp.Abp.FileStoring.Obs
 {
+    [ExposeKeyedService<IFileProvider>(ObsFileProviderConfigurationNames.ProviderName)]
     public class ObsFileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }

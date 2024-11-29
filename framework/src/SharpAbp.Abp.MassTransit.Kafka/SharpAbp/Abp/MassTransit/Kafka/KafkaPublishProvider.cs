@@ -4,6 +4,7 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.MassTransit.Kafka
 {
+    [ExposeKeyedService<IPublishProvider>(MassTransitKafkaConsts.ProviderName)]
     public class KafkaPublishProvider : IPublishProvider, ITransientDependency
     {
         public string Provider => MassTransitKafkaConsts.ProviderName;

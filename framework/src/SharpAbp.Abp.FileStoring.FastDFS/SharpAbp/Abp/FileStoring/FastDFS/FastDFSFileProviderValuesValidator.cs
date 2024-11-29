@@ -6,6 +6,7 @@ using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoring.FastDFS
 {
+    [ExposeKeyedService<IFileProviderValuesValidator>(FastDFSFileProviderConfigurationNames.ProviderName)]
     public class FastDFSFileProviderValuesValidator : BaseFileProviderValuesValidator, ITransientDependency
     {
         public override string Provider => FastDFSFileProviderConfigurationNames.ProviderName;

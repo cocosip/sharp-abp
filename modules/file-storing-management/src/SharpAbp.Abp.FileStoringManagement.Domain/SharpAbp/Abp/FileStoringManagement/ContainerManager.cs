@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using SharpAbp.Abp.FileStoring;
 using SharpAbp.Abp.FileStoringManagement.Localization;
@@ -15,15 +16,12 @@ namespace SharpAbp.Abp.FileStoringManagement
     public class ContainerManager : DomainService
     {
         protected IStringLocalizer<FileStoringManagementResource> Localizer { get; }
-        protected IEnumerable<IFileProviderValuesValidator> ProviderValuesValidators { get; }
         protected IFileStoringContainerRepository ContainerRepository { get; }
         public ContainerManager(
             IStringLocalizer<FileStoringManagementResource> localizer,
-            IEnumerable<IFileProviderValuesValidator> providerValuesValidators,
             IFileStoringContainerRepository containerRepository)
         {
             Localizer = localizer;
-            ProviderValuesValidators = providerValuesValidators;
             ContainerRepository = containerRepository;
         }
 
@@ -34,11 +32,11 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="keyValuePairs"></param>
         public virtual void ValidateProviderValues(string provider, Dictionary<string, string> keyValuePairs)
         {
-            var valuesValidator = GetFileProviderValuesValidator(provider);
+            var valuesValidator = LazyServiceProvider.GetKeyedService<IFileProviderValuesValidator>(provider);
             if (valuesValidator != null)
             {
                 var result = valuesValidator.Validate(keyValuePairs);
-                if (result.Errors.Any())
+                if (result.Errors.Count != 0)
                 {
                     throw new AbpValidationException(Localizer["FileStoringManagement.ValidateContainerFailed", provider], result.Errors);
                 }
@@ -65,20 +63,6 @@ namespace SharpAbp.Abp.FileStoringManagement
                     throw new UserFriendlyException(Localizer["FileStoringManagement.DuplicateContainerName", name]);
                 }
             }
-        }
-
-        protected virtual IFileProviderValuesValidator GetFileProviderValuesValidator([NotNull] string provider)
-        {
-            Check.NotNullOrWhiteSpace(provider, nameof(provider));
-
-            foreach (var providerValuesValidator in ProviderValuesValidators)
-            {
-                if (providerValuesValidator.Provider == provider)
-                {
-                    return providerValuesValidator;
-                }
-            }
-            return null;
         }
 
     }

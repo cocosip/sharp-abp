@@ -23,9 +23,6 @@ namespace SharpAbp.Abp.FileStoring
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            context.Services.AddTransient<IFileProvider, FakeFileProvider1>();
-            context.Services.AddTransient<IFileProvider, FakeFileProvider2>();
-
             Configure<AbpFileStoringOptions>(options =>
             {
                 options.Containers

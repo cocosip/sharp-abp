@@ -6,6 +6,7 @@ using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoring.Azure
 {
+    [ExposeKeyedService<IFileProviderValuesValidator>(AzureFileProviderConfigurationNames.ProviderName)]
     public class AzureFileProviderValuesValidator : BaseFileProviderValuesValidator, ITransientDependency
     {
         public override string Provider => AzureFileProviderConfigurationNames.ProviderName;

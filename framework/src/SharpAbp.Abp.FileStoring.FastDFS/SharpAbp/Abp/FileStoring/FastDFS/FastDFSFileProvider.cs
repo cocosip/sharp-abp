@@ -8,6 +8,7 @@ using Volo.Abp.Timing;
 
 namespace SharpAbp.Abp.FileStoring.FastDFS
 {
+    [ExposeKeyedService<IFileProvider>(FastDFSFileProviderConfigurationNames.ProviderName)]
     public class FastDFSFileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }

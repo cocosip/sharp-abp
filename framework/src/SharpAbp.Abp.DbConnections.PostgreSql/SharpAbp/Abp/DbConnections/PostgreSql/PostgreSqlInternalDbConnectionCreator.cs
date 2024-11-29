@@ -5,6 +5,7 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.DbConnections.PostgreSql
 {
+    [ExposeKeyedService<IInternalDbConnectionCreator>(DatabaseProvider.PostgreSql)]
     public class PostgreSqlInternalDbConnectionCreator : IInternalDbConnectionCreator, ITransientDependency
     {
         public DatabaseProvider DatabaseProvider => DatabaseProvider.PostgreSql;

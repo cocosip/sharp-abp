@@ -5,6 +5,7 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.DbConnections.Oracle.Drvart
 {
+    [ExposeKeyedService<IInternalDbConnectionCreator>(DatabaseProvider.Oracle)]
     public class OracleDevartInternalDbConnectionCreator : IInternalDbConnectionCreator, ITransientDependency
     {
         public DatabaseProvider DatabaseProvider => DatabaseProvider.Oracle;

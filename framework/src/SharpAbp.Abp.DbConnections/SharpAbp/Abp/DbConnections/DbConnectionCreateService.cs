@@ -14,6 +14,7 @@ namespace SharpAbp.Abp.DbConnections
         protected AbpDbConnectionsOptions Options { get; }
         protected IServiceProvider ServiceProvider { get; }
         protected IDbConnectionInfoResolver DbConnectionInfoResolver { get; }
+
         public DbConnectionCreateService(
             IOptions<AbpDbConnectionsOptions> options,
             IServiceProvider serviceProvider,
@@ -57,16 +58,8 @@ namespace SharpAbp.Abp.DbConnections
             }
 
             //InternalDbConnectionCreator
-            var internalCreators = scope.ServiceProvider.GetServices<IInternalDbConnectionCreator>();
-            foreach (var internalCreator in internalCreators)
-            {
-                if (internalCreator.DatabaseProvider == dbConnectionInfo.DatabaseProvider)
-                {
-                    return internalCreator.Create(dbConnectionInfo);
-                }
-            }
-
-            throw new AbpException("Could not find any creator to create DbConnection.");
+            var internalCreator = ServiceProvider.GetRequiredKeyedService<IInternalDbConnectionCreator>(dbConnectionInfo.DatabaseProvider);
+            return internalCreator.Create(dbConnectionInfo);
         }
     }
 }

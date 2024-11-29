@@ -6,6 +6,7 @@ using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoring.S3
 {
+    [ExposeKeyedService<IFileProviderValuesValidator>(S3FileProviderConfigurationNames.ProviderName)]
     public class S3FileProviderValuesValidator : BaseFileProviderValuesValidator, ITransientDependency
     {
         public override string Provider => S3FileProviderConfigurationNames.ProviderName;

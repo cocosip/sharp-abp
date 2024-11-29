@@ -6,6 +6,7 @@ using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoring.FileSystem
 {
+    [ExposeKeyedService<IFileProviderValuesValidator>(FileSystemFileProviderConfigurationNames.ProviderName)]
     public class FileSystemFileProviderValuesValidator : BaseFileProviderValuesValidator, ITransientDependency
     {
         public override string Provider => FileSystemFileProviderConfigurationNames.ProviderName;

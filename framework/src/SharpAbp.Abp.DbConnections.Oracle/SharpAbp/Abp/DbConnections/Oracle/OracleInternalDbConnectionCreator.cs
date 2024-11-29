@@ -5,6 +5,7 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.DbConnections.Oracle
 {
+    [ExposeKeyedService<IInternalDbConnectionCreator>(DatabaseProvider.Oracle)]
     public class OracleInternalDbConnectionCreator : IInternalDbConnectionCreator, ITransientDependency
     {
         public DatabaseProvider DatabaseProvider => DatabaseProvider.Oracle;

@@ -1,4 +1,5 @@
-﻿using SharpAbp.Abp.Data;
+﻿using Microsoft.Extensions.DependencyInjection;
+using SharpAbp.Abp.Data;
 using System.Threading.Tasks;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
@@ -17,6 +18,7 @@ namespace SharpAbp.Abp.DbConnections.DM
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
+
             Configure<AbpDbConnectionsOptions>(options =>
             {
                 options.DatabaseProviders.Add(DatabaseProvider.Dm);

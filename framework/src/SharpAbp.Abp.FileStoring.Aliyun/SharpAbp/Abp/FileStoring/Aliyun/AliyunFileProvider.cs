@@ -9,6 +9,7 @@ using Volo.Abp.Timing;
 
 namespace SharpAbp.Abp.FileStoring.Aliyun
 {
+    [ExposeKeyedService<IFileProvider>(AliyunFileProviderConfigurationNames.ProviderName)]
     public class AliyunFileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }

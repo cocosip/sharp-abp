@@ -12,6 +12,7 @@ using Volo.Abp.Timing;
 
 namespace SharpAbp.Abp.FileStoring.S3
 {
+    [ExposeKeyedService<IFileProvider>(S3FileProviderConfigurationNames.ProviderName)]
     public class S3FileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }

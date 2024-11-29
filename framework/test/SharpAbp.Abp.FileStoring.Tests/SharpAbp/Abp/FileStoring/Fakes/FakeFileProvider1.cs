@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.FileStoring.Fakes
 {
-    public class FakeFileProvider1 : IFileProvider
+    [ExposeKeyedService<IFileProvider>(nameof(FakeFileProvider1))]
+    public class FakeFileProvider1 : IFileProvider, ITransientDependency
     {
         public string Provider => nameof(FakeFileProvider1);
 

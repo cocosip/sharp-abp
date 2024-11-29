@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Timing;
-using KS3SDK = KS3;
 
 namespace SharpAbp.Abp.FileStoring.KS3
 {
+    [ExposeKeyedService<IFileProvider>(KS3FileProviderConfigurationNames.ProviderName)]
     public class KS3FileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }

@@ -1,12 +1,12 @@
 ﻿using Azure.Storage.Blobs;
 using System;
 using System.IO;
-using System.Net;
 using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.FileStoring.Azure
 {
+    [ExposeKeyedService<IFileProvider>(AzureFileProviderConfigurationNames.ProviderName)]
     public class AzureFileProvider : FileProviderBase, ITransientDependency
     {
         protected IAzureFileNameCalculator AzureFileNameCalculator { get; }

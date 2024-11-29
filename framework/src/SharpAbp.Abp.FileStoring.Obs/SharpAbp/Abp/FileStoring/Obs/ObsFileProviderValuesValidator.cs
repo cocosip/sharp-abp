@@ -6,6 +6,7 @@ using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoring.Obs
 {
+    [ExposeKeyedService<IFileProviderValuesValidator>(ObsFileProviderConfigurationNames.ProviderName)]
     public class ObsFileProviderValuesValidator : BaseFileProviderValuesValidator, ITransientDependency
     {
         public override string Provider => ObsFileProviderConfigurationNames.ProviderName;

@@ -10,6 +10,7 @@ using Volo.Abp.MultiTenancy;
 
 namespace SharpAbp.Abp.FileStoring.FileSystem
 {
+    [ExposeKeyedService<IFileProvider>(FileSystemFileProviderConfigurationNames.ProviderName)]
     public class FileSystemFileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }

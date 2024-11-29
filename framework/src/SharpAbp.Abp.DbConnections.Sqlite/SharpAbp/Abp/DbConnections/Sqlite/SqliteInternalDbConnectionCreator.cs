@@ -5,6 +5,7 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.DbConnections.Sqlite
 {
+    [ExposeKeyedService<IInternalDbConnectionCreator>(DatabaseProvider.Sqlite)]
     public class SqliteInternalDbConnectionCreator : IInternalDbConnectionCreator, ITransientDependency
     {
         public DatabaseProvider DatabaseProvider => DatabaseProvider.Sqlite;

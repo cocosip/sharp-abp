@@ -12,6 +12,7 @@ using Volo.Abp.Timing;
 
 namespace SharpAbp.Abp.FileStoring.Minio
 {
+    [ExposeKeyedService<IFileProvider>(MinioFileProviderConfigurationNames.ProviderName)]
     public class MinioFileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }
