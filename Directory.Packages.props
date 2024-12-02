@@ -115,20 +115,20 @@
         <PackageVersion Include="Azure.Storage.Blobs" Version="12.23.0" />
         <PackageVersion Include="AutoS3" Version="2.1.0" />
         <PackageVersion Include="AutoS3.KS3" Version="2.1.0" />
-        <PackageVersion Include="BouncyCastle.Cryptography" Version="2.4.0" />
+        <PackageVersion Include="BouncyCastle.Cryptography" Version="2.5.0" />
         <PackageVersion Include="Cocosip.KS3SDK" Version="1.0.0" />
         <PackageVersion Include="DotCommon" Version="6.0.3" />
         <PackageVersion Include="FastDFSCore" Version="1.7.0" />
         <PackageVersion Include="FastDFSCore.Transport.SuperSocket" Version="1.7.0" />
         <PackageVersion Include="FastDFSCore.Transport.DotNetty" Version="1.7.0" />
         <PackageVersion Include="FreeRedis" Version="1.3.4" />
-        <PackageVersion Include="FreeSql" Version="3.2.833" />
-        <PackageVersion Include="FreeSql.Provider.MySql" Version="3.2.833" />
-        <PackageVersion Include="FreeSql.Provider.Oracle" Version="3.2.833" />
-        <PackageVersion Include="FreeSql.Provider.PostgreSQL" Version="3.2.833" />
-        <PackageVersion Include="FreeSql.Provider.Sqlite" Version="3.2.833" />
-        <PackageVersion Include="FreeSql.Provider.SqlServer" Version="3.2.833" />
-		<PackageVersion Include="FreeSql.Provider.Dameng" Version="3.2.833" />
+        <PackageVersion Include="FreeSql" Version="3.5.101" />
+        <PackageVersion Include="FreeSql.Provider.MySql" Version="3.5.101" />
+        <PackageVersion Include="FreeSql.Provider.Oracle" Version="3.5.101" />
+        <PackageVersion Include="FreeSql.Provider.PostgreSQL" Version="3.5.101" />
+        <PackageVersion Include="FreeSql.Provider.Sqlite" Version="3.5.101" />
+        <PackageVersion Include="FreeSql.Provider.SqlServer" Version="3.5.101" />
+		<PackageVersion Include="FreeSql.Provider.Dameng" Version="3.5.101" />
         <PackageVersion Include="HuaweiCloud.OBS.SDK" Version="3.20.7" />
         <PackageVersion Include="MassTransit" Version="[8.3.2,)" />
         <PackageVersion Include="MassTransit.ActiveMQ" Version="[8.3.2,)" />
