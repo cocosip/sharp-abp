@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Data;
+using Volo.Abp.Domain.Repositories;
 using Volo.Abp.EventBus.Distributed;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.ObjectExtending;
@@ -189,11 +190,12 @@ namespace SharpAbp.Abp.MapTenancyManagement
             {
                 //TODO: Handle database creation?
                 // TODO: Seeder might be triggered via event handler.
-                await DataSeeder.SeedAsync(
-                                new DataSeedContext(tenant.Id)
-                                    .WithProperty("AdminEmail", input.AdminEmailAddress)
-                                    .WithProperty("AdminPassword", input.AdminPassword)
-                                );
+
+                var ctx = new DataSeedContext(tenant.Id)
+                    .WithProperty("AdminEmail", input.AdminEmailAddress)
+                    .WithProperty("AdminPassword", input.AdminPassword);
+
+                await DataSeeder.SeedAsync(ctx);
             }
 
             var hybridMapTenant = ObjectMapper.Map<MapTenant, HybridMapTenantDto>(mapTenant);
@@ -237,7 +239,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         {
             var mapTenant = await MapTenantRepository.GetAsync(id);
             var tenant = await TenantRepository.GetAsync(mapTenant.TenantId);
-            await TenantRepository.DeleteAsync(tenant);
+            await TenantRepository.HardDeleteAsync(tenant);
             await MapTenantRepository.DeleteAsync(mapTenant);
         }
 
