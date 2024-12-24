@@ -239,6 +239,6 @@
         <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.0" />
         <PackageVersion Include="coverlet.collector" Version="6.0.2" />
         <PackageVersion Include="ConfigureAwait.Fody" Version="3.3.2" />
-        <PackageVersion Include="Fody" Version="6.8.0" />
+        <PackageVersion Include="Fody" Version="6.9.1" />
     </ItemGroup>
 </Project>
