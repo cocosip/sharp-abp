@@ -5,10 +5,10 @@
 		<ProjectFrameworks>netstandard2.0;netstandard2.1;$(NetCoreFx)</ProjectFrameworks>
 
 		<!--Net Core Framework-->
-		<NetCoreFx>net8.0</NetCoreFx>
+		<NetCoreFx>net9.0</NetCoreFx>
 
 		<!--Volo ABP packages-->
-		<VoloAbpPackageVersion>[8.3.4,9.0.0)</VoloAbpPackageVersion>
+		<VoloAbpPackageVersion>[9.0.2,10.0.0)</VoloAbpPackageVersion>
  
 	</PropertyGroup>
 </Project>
