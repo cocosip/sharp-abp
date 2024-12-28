@@ -53,7 +53,6 @@ namespace SharpAbp.Abp.MapTenancyManagement
                         var mapTenant = await MapTenantRepository.FindByCodeAsync(code, true, cancellationToken);
                         return mapTenant?.AsCacheItem();
                     },
-                    hideErrors: false,
                     token: cancellationToken);
 
                 return cacheItem;
@@ -80,7 +79,6 @@ namespace SharpAbp.Abp.MapTenancyManagement
                         var mapTenant = await MapTenantRepository.FindByMapCodeAsync(mapCode, true, cancellationToken);
                         return mapTenant?.AsMapCodeCacheItem();
                     },
-                    hideErrors: false,
                     token: cancellationToken);
 
                 return mapCodeCacheItem;
@@ -111,7 +109,6 @@ namespace SharpAbp.Abp.MapTenancyManagement
                         var mapTenant = await MapTenantRepository.FindByTenantIdAsync(tenantId.Value, true, cancellationToken);
                         return mapTenant?.AsCodeCacheItem();
                     },
-                    hideErrors: false,
                     token: cancellationToken);
                 return codeCacheItem;
             }
@@ -191,7 +188,6 @@ namespace SharpAbp.Abp.MapTenancyManagement
                     {
                         return await GetAllMapTenantCacheItemAsync(cancellationToken);
                     },
-                    hideErrors: false,
                     token: cancellationToken);
 
                 return allMapTenantCacheItem;

@@ -39,7 +39,6 @@ namespace SharpAbp.Abp.DbConnectionsManagement
                     var databaseConnectionInfo = await ConnectionInfoRepository.FindByNameAsync(name, true, cancellationToken);
                     return databaseConnectionInfo?.AsCacheItem();
                 },
-                hideErrors: false,
                 token: cancellationToken);
 
             return cacheItem;

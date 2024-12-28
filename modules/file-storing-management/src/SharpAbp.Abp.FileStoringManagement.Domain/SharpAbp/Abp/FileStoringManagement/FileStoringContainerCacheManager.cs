@@ -41,7 +41,6 @@ namespace SharpAbp.Abp.FileStoringManagement
                     var container = await ContainerRepository.FindByNameAsync(name, true, cancellationToken);
                     return container?.AsCacheItem();
                 },
-                hideErrors: false,
                 token: cancellationToken);
             return cacheItem;
         }
