@@ -60,7 +60,7 @@ namespace SharpAbp.Abp.FileStoringManagement
             if (container != null)
             {
                 var cacheItem = container.AsCacheItem();
-                await ContainerCache.SetAsync(container.Name, cacheItem, hideErrors: false, token: cancellationToken);
+                await ContainerCache.SetAsync(container.Name, cacheItem, token: cancellationToken);
             }
         }
 
@@ -75,7 +75,7 @@ namespace SharpAbp.Abp.FileStoringManagement
             CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            await ContainerCache.RemoveAsync(name, hideErrors: false, token: cancellationToken);
+            await ContainerCache.RemoveAsync(name, token: cancellationToken);
         }
     }
 }

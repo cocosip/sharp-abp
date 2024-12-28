@@ -60,8 +60,8 @@ namespace SharpAbp.Abp.TenantGroupManagement
         }
 
         public virtual async Task RemoveTenantGroupCacheAsync(
-            Guid id, 
-            string name, 
+            Guid id,
+            string name,
             List<Guid> tenantIds,
             CancellationToken cancellationToken = default)
         {
@@ -69,9 +69,9 @@ namespace SharpAbp.Abp.TenantGroupManagement
             using (CurrentTenant.Change(null))
             {
                 var cacheKey = CalculateCacheKey(id, name);
-                await Cache.RemoveAsync(cacheKey, hideErrors: false, token: cancellationToken);
+                await Cache.RemoveAsync(cacheKey, token: cancellationToken);
                 var keys = tenantIds.Select(CalculateTenantCacheKey).ToList();
-                await TenantCache.RemoveManyAsync(keys, hideErrors: false, token: cancellationToken);
+                await TenantCache.RemoveManyAsync(keys, token: cancellationToken);
             }
         }
 

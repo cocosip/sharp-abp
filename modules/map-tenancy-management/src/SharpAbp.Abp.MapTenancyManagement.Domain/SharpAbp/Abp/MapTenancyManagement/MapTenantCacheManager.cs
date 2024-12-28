@@ -134,19 +134,17 @@ namespace SharpAbp.Abp.MapTenancyManagement
                     await MapTenantCache.SetAsync(
                         mapTenant.Code,
                         cacheItem,
-                        hideErrors: false,
                         token: cancellationToken);
 
                     var mapCodeCacheItem = mapTenant.AsMapCodeCacheItem();
                     await MapTenantMapCodeCache.SetAsync(
                         mapTenant.MapCode,
                         mapCodeCacheItem,
-                        hideErrors: false,
                         token: cancellationToken);
 
                     var codeCacheItem = mapTenant.AsCodeCacheItem();
                     var key = mapTenant.TenantId.ToString("D");
-                    await CodeCache.SetAsync(key, codeCacheItem, hideErrors: false, token: cancellationToken);
+                    await CodeCache.SetAsync(key, codeCacheItem, token: cancellationToken);
                 }
             }
         }
@@ -167,8 +165,8 @@ namespace SharpAbp.Abp.MapTenancyManagement
             Check.NotNullOrWhiteSpace(mapCode, nameof(mapCode));
             using (CurrentTenant.Change(null))
             {
-                await MapTenantCache.RemoveAsync(code, hideErrors: false, token: cancellationToken);
-                await MapTenantMapCodeCache.RemoveAsync(mapCode, hideErrors: false, token: cancellationToken);
+                await MapTenantCache.RemoveAsync(code, token: cancellationToken);
+                await MapTenantMapCodeCache.RemoveAsync(mapCode, token: cancellationToken);
             }
         }
 
@@ -208,7 +206,6 @@ namespace SharpAbp.Abp.MapTenancyManagement
                 await AllMapTenantCache.SetAsync(
                     cacheKey,
                     allMapTenantCacheItem,
-                    hideErrors: false,
                     token: cancellationToken);
             }
         }
