@@ -39,7 +39,6 @@ namespace SharpAbp.Abp.DbConnectionsManagement
                     var databaseConnectionInfo = await ConnectionInfoRepository.FindByNameAsync(name, true, cancellationToken);
                     return databaseConnectionInfo?.AsCacheItem();
                 },
-                hideErrors: false,
                 token: cancellationToken);
 
             return cacheItem;
@@ -60,7 +59,6 @@ namespace SharpAbp.Abp.DbConnectionsManagement
                 await ConnectionInfoCache.SetAsync(
                     databaseConnectionInfo.Name,
                     databaseConnectionInfo.AsCacheItem(),
-                    hideErrors: false,
                     token: cancellationToken);
             }
         }
@@ -76,7 +74,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
             CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            await ConnectionInfoCache.RemoveAsync(name, hideErrors: false, token: cancellationToken);
+            await ConnectionInfoCache.RemoveAsync(name, token: cancellationToken);
         }
 
     }
