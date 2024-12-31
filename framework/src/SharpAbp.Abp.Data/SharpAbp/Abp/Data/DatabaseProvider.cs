@@ -10,6 +10,7 @@
         InMemory,
         Cosmos,
         Firebird,
-        Dm
+        Dm,
+        OpenGauss
     }
 }
