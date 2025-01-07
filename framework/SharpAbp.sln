@@ -175,6 +175,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.EntityFramewor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.DbConnections.DM", "src\SharpAbp.Abp.DbConnections.DM\SharpAbp.Abp.DbConnections.DM.csproj", "{AB51AA9B-7127-4598-A04D-4F5144AD43FE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Faster", "src\SharpAbp.Abp.Faster\SharpAbp.Abp.Faster.csproj", "{0940E3D4-B0A9-4727-8F72-959090F65670}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1193,6 +1195,18 @@ Global
 		{AB51AA9B-7127-4598-A04D-4F5144AD43FE}.Release|x64.Build.0 = Release|Any CPU
 		{AB51AA9B-7127-4598-A04D-4F5144AD43FE}.Release|x86.ActiveCfg = Release|Any CPU
 		{AB51AA9B-7127-4598-A04D-4F5144AD43FE}.Release|x86.Build.0 = Release|Any CPU
+		{0940E3D4-B0A9-4727-8F72-959090F65670}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0940E3D4-B0A9-4727-8F72-959090F65670}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0940E3D4-B0A9-4727-8F72-959090F65670}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0940E3D4-B0A9-4727-8F72-959090F65670}.Debug|x64.Build.0 = Debug|Any CPU
+		{0940E3D4-B0A9-4727-8F72-959090F65670}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0940E3D4-B0A9-4727-8F72-959090F65670}.Debug|x86.Build.0 = Debug|Any CPU
+		{0940E3D4-B0A9-4727-8F72-959090F65670}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0940E3D4-B0A9-4727-8F72-959090F65670}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0940E3D4-B0A9-4727-8F72-959090F65670}.Release|x64.ActiveCfg = Release|Any CPU
+		{0940E3D4-B0A9-4727-8F72-959090F65670}.Release|x64.Build.0 = Release|Any CPU
+		{0940E3D4-B0A9-4727-8F72-959090F65670}.Release|x86.ActiveCfg = Release|Any CPU
+		{0940E3D4-B0A9-4727-8F72-959090F65670}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1282,6 +1296,7 @@ Global
 		{C86ABDFA-2CEB-42E0-ACFA-5E2A04A9E1F4} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 		{21659817-2A7B-4080-8418-B88DDA70C852} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 		{AB51AA9B-7127-4598-A04D-4F5144AD43FE} = {16E4EB45-D029-4743-99CD-D125C72AE383}
+		{0940E3D4-B0A9-4727-8F72-959090F65670} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {30432CEA-45F2-4F5A-B44B-790A62AB73F1}

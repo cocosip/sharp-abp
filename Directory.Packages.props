@@ -8,6 +8,7 @@
         <PackageVersion Include="Volo.Abp.AutoMapper" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Authorization" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.MultiTenancy" Version="$(VoloAbpPackageVersion)" />
+		<PackageVersion Include="Volo.Abp.Serialization" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.Caching" Version="$(VoloAbpPackageVersion)" />
         <PackageVersion Include="Volo.Abp.ObjectExtending" Version="$(VoloAbpPackageVersion)" />
 		<PackageVersion Include="Volo.Abp.VirtualFileSystem" Version="$(VoloAbpPackageVersion)" />
@@ -121,6 +122,7 @@
         <PackageVersion Include="FastDFSCore" Version="1.7.0" />
         <PackageVersion Include="FastDFSCore.Transport.SuperSocket" Version="1.7.0" />
         <PackageVersion Include="FastDFSCore.Transport.DotNetty" Version="1.7.0" />
+		<PackageVersion Include="Microsoft.FASTER.Core" Version="2.6.5" />
         <PackageVersion Include="FreeRedis" Version="1.3.6" />
         <PackageVersion Include="FreeSql" Version="3.5.102" />
         <PackageVersion Include="FreeSql.Provider.MySql" Version="3.5.102" />
@@ -233,6 +235,7 @@
         <PackageVersion Include="System.Text.Encoding.CodePages" Version="9.0.0" />
         <PackageVersion Include="System.Text.Encodings.Web" Version="9.0.0" />
         <PackageVersion Include="System.Text.Json" Version="9.0.0" />
+		<PackageVersion Include="System.Threading.Channels" Version="9.0.0" />
         <PackageVersion Include="Moq" Version="4.20.72" />
         <PackageVersion Include="xunit" Version="2.9.2" />
         <PackageVersion Include="xunit.extensibility.execution" Version="2.6.2" />
