@@ -19,7 +19,7 @@ namespace SharpAbp.Abp.Faster
 
         public bool IsNext(long currentAddress)
         {
-            return currentAddress + Length <= Address;
+            return currentAddress + Length <= Address || currentAddress == Address;
         }
 
         public int CompareTo(Position other)

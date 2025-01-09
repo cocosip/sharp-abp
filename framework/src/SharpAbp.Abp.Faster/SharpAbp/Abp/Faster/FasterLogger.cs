@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -87,7 +88,7 @@ namespace SharpAbp.Abp.Faster
 
             Iter = Log.Scan(Log.BeginAddress, long.MaxValue, Configuration.IteratorName, true, ScanBufferingMode.DoublePageBuffering, Configuration.ScanUncommitted, Logger);
 
-            _completedUntilAddress = Iter.CompletedUntilAddress;
+            _completedUntilAddress = Math.Max(Iter.CompletedUntilAddress, Iter.BeginAddress);
 
             //commit
             StartScheduleCommit();
@@ -135,7 +136,6 @@ namespace SharpAbp.Abp.Faster
             {
                 while (!CancellationTokenProvider.Token.IsCancellationRequested)
                 {
-                    await Task.Delay(Configuration.ScanIntervalMillis, CancellationTokenProvider.Token);
                     try
                     {
                         byte[] buffer;
@@ -163,6 +163,8 @@ namespace SharpAbp.Abp.Faster
                     {
                         Logger.LogError(ex, "ScheduleScan exception {Message}", ex.Message);
                     }
+
+                    await Task.Delay(Configuration.ScanIntervalMillis, CancellationTokenProvider.Token);
                 }
             }, TaskCreationOptions.LongRunning);
         }
@@ -179,6 +181,8 @@ namespace SharpAbp.Abp.Faster
                     {
                         long commitAddress = _completedUntilAddress;
                         var commitList = _committing.Select(x => x.Value).OrderBy(x => x.Min).ToList();
+                        var removeIds = new List<long>();
+
                         foreach (var commit in commitList)
                         {
                             if (!commit.Min.IsNext(commitAddress))
@@ -188,6 +192,8 @@ namespace SharpAbp.Abp.Faster
                             else
                             {
                                 commitAddress = commit.Max.Address;
+                                //添加到删除列表
+                                removeIds.Add(commit.Min.Address);
                             }
                         }
 
@@ -196,6 +202,18 @@ namespace SharpAbp.Abp.Faster
                             Logger.LogDebug("CompleteUntilRecordAtAsync {commitAddress} .", commitAddress);
                             await Iter.CompleteUntilRecordAtAsync(commitAddress);
                             _completedUntilAddress = Iter.CompletedUntilAddress;
+
+                            //移除这个之前的数据
+                            if (removeIds.Count > 0)
+                            {
+                                foreach (var id in removeIds)
+                                {
+                                    if (!_committing.TryRemove(id, out _))
+                                    {
+                                        Logger.LogDebug("Remove commit {id} failed.", id);
+                                    }
+                                }
+                            }
                         }
                     }
                     catch (Exception ex)

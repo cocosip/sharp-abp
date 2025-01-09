@@ -55,7 +55,7 @@ namespace SharpAbp.Abp.Faster
         {
             var options = context.ServiceProvider.GetService<IOptions<AbpFasterOptions>>().Value;
             DirectoryHelper.CreateIfNotExists(options.RootPath);
-            return base.OnApplicationInitializationAsync(context);
+            return Task.CompletedTask;
         }
     }
 }

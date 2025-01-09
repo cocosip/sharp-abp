@@ -28,7 +28,7 @@
 		<ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.MassTransit.RabbitMQ\SharpAbp.Abp.MassTransit.RabbitMQ.csproj" />
 		<ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.MassTransit.Kafka\SharpAbp.Abp.MassTransit.Kafka.csproj" />
 		<ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.MassTransit.ActiveMQ\SharpAbp.Abp.MassTransit.ActiveMQ.csproj" />
-				<ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.MassTransit.ActiveMQ\SharpAbp.Abp.MassTransit.ActiveMQ.csproj" />		PostgreSqlPostgreSql
+		<ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.MassTransit.ActiveMQ\SharpAbp.Abp.MassTransit.ActiveMQ.csproj" />		 
 	</ItemGroup>
 
 
