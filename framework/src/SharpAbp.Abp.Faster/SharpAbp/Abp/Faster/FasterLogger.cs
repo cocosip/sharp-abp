@@ -81,6 +81,7 @@ namespace SharpAbp.Abp.Faster
             var settings = new FasterLogSettings()
             {
                 LogDevice = device,
+                AutoRefreshSafeTailAddress = Configuration.AutoRefreshSafeTailAddress,
             };
 
             Configuration.Configure?.Invoke(settings);
@@ -163,8 +164,6 @@ namespace SharpAbp.Abp.Faster
                     {
                         Logger.LogError(ex, "ScheduleScan exception {Message}", ex.Message);
                     }
-
-                    await Task.Delay(Configuration.ScanIntervalMillis, CancellationTokenProvider.Token);
                 }
             }, TaskCreationOptions.LongRunning);
         }
@@ -275,11 +274,13 @@ namespace SharpAbp.Abp.Faster
                     });
                 }
             }
-
-            var position = entries.GetPosition();
-            if (!_pending.TryAdd(position.Min.Address, position))
+            if (entries.Count > 0)
             {
-                Logger.LogDebug("Add position to pending failed. {Address}", position.Min.Address);
+                var position = entries.GetPosition();
+                if (!_pending.TryAdd(position.Min.Address, position))
+                {
+                    Logger.LogDebug("Add position to pending failed. {Address}", position.Min.Address);
+                }
             }
             return entries;
         }
@@ -292,7 +293,7 @@ namespace SharpAbp.Abp.Faster
         /// <returns></returns>
         public virtual Task CommitAsync(LogEntryPosition entryPosition, CancellationToken cancellationToken = default)
         {
-            if (_committing.TryAdd(entryPosition.Min.Address, entryPosition))
+            if (!_committing.TryAdd(entryPosition.Min.Address, entryPosition))
             {
                 Logger.LogDebug("Add position to committing failed. {Address}", entryPosition.Min.Address);
             }

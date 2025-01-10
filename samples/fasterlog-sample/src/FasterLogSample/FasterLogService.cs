@@ -2,6 +2,7 @@
 using SharpAbp.Abp.Faster;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Threading;
@@ -29,7 +30,7 @@ public class FasterLogService : ISingletonDependency
         FasterLogger = LoggerFactory.GetOrCreate<TenantData>("default");
         CancellationTokenProvider = cancellationTokenProvider;
     }
-
+    public static long Id = 1;
 
     public void Start()
     {
@@ -57,11 +58,10 @@ public class FasterLogService : ISingletonDependency
                 try
                 {
                     data.CreationTime = Clock.Now;
+                    data.Id = Id;
+                    Interlocked.Increment(ref Id);
                     await FasterLogger.WriteAsync(data, CancellationTokenProvider.Token);
-
-                    var d = data.CreationTime.ToString("yyyy-MM-dd HH:mm:ss fff");
-
-                    Logger.LogInformation("Write data: {d}", d);
+                    Logger.LogInformation("Write data: {Id}", data.Id);
                 }
                 catch (Exception ex)
                 {
@@ -80,30 +80,30 @@ public class FasterLogService : ISingletonDependency
         {
             Task.Factory.StartNew(async () =>
             {
-                await Task.Delay(3000);
+               // await Task.Delay(3000);
 
                 while (!CancellationTokenProvider.Token.IsCancellationRequested)
                 {
                     try
                     {
-                        var list = await FasterLogger.ReadAsync(5, CancellationTokenProvider.Token);
+                        var list = await FasterLogger.ReadAsync(50, CancellationTokenProvider.Token);
 
-                        var min = list.Min(x => x.Data.CreationTime);
-                        var max = list.Max(x => x.Data.CreationTime);
-                        Logger.LogDebug("Read data min: {min}, max:{max}", min.ToString("yyyy-MM-dd HH:mm:ss fff"), max.ToString("yyyy-MM-dd HH:mm:ss fff"));
+                        var min = list.Min(x => x.Data.Id);
+                        var max = list.Max(x => x.Data.Id);
+                        Logger.LogDebug("Read data min: {min}, max:{max}", min, max);
 
                         var p = list.GetPosition();
                         //提交
                         await FasterLogger.CommitAsync(p, CancellationTokenProvider.Token);
 
-                        await Task.Delay(5000);
+                        //await Task.Delay(5000);
                     }
                     catch (Exception ex)
                     {
                         Logger.LogError(ex, "Read data error -> {Message}", ex.Message);
                     }
 
-                    await Task.Delay(20);
+                    await Task.Delay(2);
                 }
 
 
@@ -118,6 +118,7 @@ public class FasterLogService : ISingletonDependency
 
     public class TenantData
     {
+        public long Id { get; set; }
         public string TenantId { get; set; }
 
         public string StudyInstanceUID { get; set; }

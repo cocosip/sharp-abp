@@ -36,24 +36,19 @@ namespace SharpAbp.Abp.Faster
         public bool DisableFileBuffering { get; set; } = true;
 
         /// <summary>
-        /// 扫描写入的
+        /// 扫描未写入完成到页面的
         /// </summary>
-        public bool ScanUncommitted { get; set; } = false;
+        public bool ScanUncommitted { get; set; } = true;
+
+        /// <summary>
+        /// AutoRefreshSafeTailAddress
+        /// </summary>
+        public bool AutoRefreshSafeTailAddress { get; set; } = true;
 
         /// <summary>
         /// 提交数据的时间间隔(ms)
         /// </summary>
         public int CommitIntervalMillis { get; set; } = 1000;
-
-        /// <summary>
-        /// 扫描的时间间隔(ms)
-        /// </summary>
-        public int ScanIntervalMillis { get; set; } = 1000;
-
-        /// <summary>
-        /// 扫描不到数据等待时间
-        /// </summary>
-        public int ScanWaitMillis { get; set; } = 1000;
 
         /// <summary>
         /// 完成数据的时间间隔(ms)
