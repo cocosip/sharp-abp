@@ -241,7 +241,7 @@ namespace SharpAbp.Abp.Faster
             {
                 while (!CancellationTokenProvider.Token.IsCancellationRequested)
                 {
-                    
+
                     try
                     {
                         if (_truncateUntilAddress < _completedUntilAddress)
@@ -277,6 +277,26 @@ namespace SharpAbp.Abp.Faster
             var buffer = Serializer.Serialize(entity);
             return await Log.EnqueueAsync(buffer, cancellationToken);
         }
+
+        /// <summary>
+        /// 批量写入数据
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<List<long>> BatchWriteAsync(List<T> values, CancellationToken cancellationToken = default)
+        {
+            var positions = new List<long>();
+            foreach (var entity in values)
+            {
+                var buffer = Serializer.Serialize(entity);
+                var p = await Log.EnqueueAsync(buffer, cancellationToken);
+                positions.Add(p);
+            }
+
+            return positions;
+        }
+
 
         /// <summary>
         /// 读取数据

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,6 +30,14 @@ namespace SharpAbp.Abp.Faster
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<long> WriteAsync(T entity, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// 批量写入数据
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<List<long>> BatchWriteAsync(List<T> values, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// 读取数据
