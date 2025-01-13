@@ -19,6 +19,7 @@ namespace SharpAbp.Abp.Faster
     {
 
         private long _completedUntilAddress = -1L;
+        private long _truncateUntilAddress = -1L;
         private bool _initialized = false;
         private readonly ConcurrentDictionary<long, LogEntryPosition> _pending;
         private readonly ConcurrentDictionary<long, LogEntryPosition> _committing;
@@ -100,6 +101,9 @@ namespace SharpAbp.Abp.Faster
             //complete
             StartScheduleComplete();
 
+            //truncate
+            StartScheduleTruncate();
+
             _initialized = true;
 
             Logger.LogDebug("Faster log {Name} is initialize. ", TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
@@ -168,7 +172,9 @@ namespace SharpAbp.Abp.Faster
             }, TaskCreationOptions.LongRunning);
         }
 
-
+        /// <summary>
+        /// 扫描自定完成的,并且进行数据的提交
+        /// </summary>
         protected virtual void StartScheduleComplete()
         {
             Task.Factory.StartNew(async () =>
@@ -226,6 +232,39 @@ namespace SharpAbp.Abp.Faster
             }, TaskCreationOptions.LongRunning);
         }
 
+        /// <summary>
+        /// 定时截断已经完成的
+        /// </summary>
+        protected virtual void StartScheduleTruncate()
+        {
+            Task.Factory.StartNew(async () =>
+            {
+                while (!CancellationTokenProvider.Token.IsCancellationRequested)
+                {
+                    
+                    try
+                    {
+                        if (_truncateUntilAddress < _completedUntilAddress)
+                        {
+                            Log.TruncateUntilPageStart(_completedUntilAddress);
+                            Logger.LogDebug("TruncateUntilPageStart {_completedUntilAddress}", _completedUntilAddress);
+                            _truncateUntilAddress = _completedUntilAddress;
+                        }
+                        else
+                        {
+                            Logger.LogDebug("TruncateUntilPageStart  truncateUntilAddress:({_truncateUntilAddress}) >completedUntilAddress:({_completedUntilAddress})", _completedUntilAddress);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(ex, "Truncate exception : {Message}", ex.Message);
+                    }
+
+                    await Task.Delay(Configuration.TruncateIntervalMillis, CancellationTokenProvider.Token);
+                }
+
+            }, TaskCreationOptions.LongRunning);
+        }
 
         /// <summary>
         /// 写入数据

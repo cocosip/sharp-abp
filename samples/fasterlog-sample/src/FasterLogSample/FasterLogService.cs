@@ -76,11 +76,11 @@ public class FasterLogService : ISingletonDependency
 
     public void Read()
     {
-        for (var i = 0; i < 3; i++)
+        for (var i = 0; i < 1; i++)
         {
             Task.Factory.StartNew(async () =>
             {
-               // await Task.Delay(3000);
+                await Task.Delay(1000);
 
                 while (!CancellationTokenProvider.Token.IsCancellationRequested)
                 {
@@ -103,7 +103,7 @@ public class FasterLogService : ISingletonDependency
                         Logger.LogError(ex, "Read data error -> {Message}", ex.Message);
                     }
 
-                    await Task.Delay(2);
+                    await Task.Delay(500);
                 }
 
 

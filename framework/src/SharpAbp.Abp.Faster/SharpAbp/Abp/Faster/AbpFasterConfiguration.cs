@@ -38,12 +38,12 @@ namespace SharpAbp.Abp.Faster
         /// <summary>
         /// 扫描未写入完成到页面的
         /// </summary>
-        public bool ScanUncommitted { get; set; } = true;
+        public bool ScanUncommitted { get; set; } = false;
 
         /// <summary>
         /// AutoRefreshSafeTailAddress
         /// </summary>
-        public bool AutoRefreshSafeTailAddress { get; set; } = true;
+        public bool AutoRefreshSafeTailAddress { get; set; } = false;
 
         /// <summary>
         /// 提交数据的时间间隔(ms)
@@ -58,7 +58,7 @@ namespace SharpAbp.Abp.Faster
         /// <summary>
         /// 日志截断的时间间隔(s)
         /// </summary>
-        public int TruncateIntervalSecond { get; set; } = 60;
+        public int TruncateIntervalMillis { get; set; } = 60 * 5 * 1000;
 
         /// <summary>
         /// 预先从Faster读取的数据的容量(ms)
