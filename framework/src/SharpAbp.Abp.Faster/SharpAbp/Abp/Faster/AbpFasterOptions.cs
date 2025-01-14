@@ -42,7 +42,6 @@ namespace SharpAbp.Abp.Faster
                         c.CompleteIntervalMillis = val.CompleteIntervalMillis;
                         c.TruncateIntervalMillis = val.TruncateIntervalMillis;
                         c.PreReadCapacity = val.PreReadCapacity;
-                        c.AutoRetiredMillis = val.AutoRetiredMillis;
                         c.IteratorName = val.IteratorName;
                     });
                 }

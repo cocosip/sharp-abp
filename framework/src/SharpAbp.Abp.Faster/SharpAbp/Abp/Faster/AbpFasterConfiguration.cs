@@ -66,11 +66,6 @@ namespace SharpAbp.Abp.Faster
         public int PreReadCapacity { get; set; } = 5000;
 
         /// <summary>
-        /// 自动过期数据的时间(ms)
-        /// </summary>
-        public int AutoRetiredMillis { get; set; } = 10000;
-
-        /// <summary>
         /// 迭代器的名称
         /// </summary>
         public string IteratorName { get; set; } = "default";
