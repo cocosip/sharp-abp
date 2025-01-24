@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.Faster
@@ -10,7 +10,7 @@ namespace SharpAbp.Abp.Faster
     public class DefaultFasterLoggerFactory : IFasterLoggerFactory, ISingletonDependency
     {
         private readonly object _lock = new();
-        protected ConcurrentDictionary<string, IFasterLogger> _loggers;
+        protected Dictionary<string, IFasterLogger> _loggers;
         protected AbpFasterOptions Options { get; }
         protected ILogger Logger { get; }
         protected IServiceProvider ServiceProvider { get; }
@@ -23,12 +23,13 @@ namespace SharpAbp.Abp.Faster
             Options = options.Value;
             Logger = logger;
             ServiceProvider = serviceProvider;
-            _loggers = new ConcurrentDictionary<string, IFasterLogger>();
+            _loggers = [];
         }
 
 
         public virtual IFasterLogger<T> GetOrCreate<T>(string name) where T : class
         {
+
             lock (_lock)
             {
                 var configuration = Options.Configurations.GetConfiguration(name);
