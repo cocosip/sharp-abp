@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Volo.Abp.DependencyInjection;
-using System.Collections.Concurrent;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Concurrent;
+using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.Faster
 {
     public class DefaultFasterLoggerFactory : IFasterLoggerFactory, ISingletonDependency
     {
+        private readonly object _lock = new();
         protected ConcurrentDictionary<string, IFasterLogger> _loggers;
         protected AbpFasterOptions Options { get; }
         protected ILogger Logger { get; }
@@ -30,24 +29,26 @@ namespace SharpAbp.Abp.Faster
 
         public virtual IFasterLogger<T> GetOrCreate<T>(string name) where T : class
         {
-            var configuration = Options.Configurations.GetConfiguration(name);
-            if (_loggers.TryGetValue(name, out IFasterLogger logger))
+            lock (_lock)
             {
-                return logger as IFasterLogger<T>;
-            }
+                var configuration = Options.Configurations.GetConfiguration(name);
+                if (_loggers.TryGetValue(name, out IFasterLogger logger))
+                {
+                    return logger as IFasterLogger<T>;
+                }
 
-            var fasterLogger = ActivatorUtilities.CreateInstance<FasterLogger<T>>(
-                  ServiceProvider,
-                  name,
-                  configuration);
-            fasterLogger.Initialize();
-            if (!_loggers.TryAdd(name, fasterLogger))
-            {
-                Logger.LogDebug("GetOrCreate faster logger add failed. {name}", name);
+                var fasterLogger = ActivatorUtilities.CreateInstance<FasterLogger<T>>(
+                      ServiceProvider,
+                      name,
+                      configuration);
+                fasterLogger.Initialize();
+                if (!_loggers.TryAdd(name, fasterLogger))
+                {
+                    Logger.LogDebug("GetOrCreate faster logger add failed. {name}", name);
+                }
+                return fasterLogger;
             }
-            return fasterLogger;
         }
-
 
     }
 }

@@ -205,7 +205,7 @@ namespace SharpAbp.Abp.Faster
                         if (commitAddress > _completedUntilAddress)
                         {
                             Logger.LogDebug("CompleteUntilRecordAtAsync {commitAddress} .", commitAddress);
-                            await Iter.CompleteUntilRecordAtAsync(commitAddress);
+                            await Iter.CompleteUntilRecordAtAsync(commitAddress, CancellationTokenProvider.Token);
                             _completedUntilAddress = Iter.CompletedUntilAddress;
 
                             //移除这个之前的数据
