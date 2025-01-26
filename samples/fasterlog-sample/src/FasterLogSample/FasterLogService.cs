@@ -76,7 +76,7 @@ public class FasterLogService : ISingletonDependency
 
     public void Read()
     {
-        for (var i = 0; i < 1; i++)
+        for (var i = 0; i < 3; i++)
         {
             Task.Factory.StartNew(async () =>
             {
@@ -103,7 +103,7 @@ public class FasterLogService : ISingletonDependency
                         Logger.LogError(ex, "Read data error -> {Message}", ex.Message);
                     }
 
-                    await Task.Delay(500);
+                    await Task.Delay(100);
                 }
 
 

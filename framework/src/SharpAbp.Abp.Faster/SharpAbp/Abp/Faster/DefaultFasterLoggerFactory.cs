@@ -36,6 +36,7 @@ namespace SharpAbp.Abp.Faster
                    ServiceProvider,
                    name,
                    configuration);
+                fasterLogger.Initialize();
                 return fasterLogger;
             }).As<IFasterLogger<T>>();
 
