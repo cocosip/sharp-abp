@@ -3,14 +3,14 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.Faster
 {
     public class DefaultFasterLoggerFactory : IFasterLoggerFactory, ISingletonDependency
     {
-        protected ConcurrentDictionary<string, IFasterLogger> _loggers;
+
+        protected ConcurrentDictionary<string, Lazy<IFasterLogger>> Loggers { get; }
         protected AbpFasterOptions Options { get; }
         protected ILogger Logger { get; }
         protected IServiceProvider ServiceProvider { get; }
@@ -23,24 +23,26 @@ namespace SharpAbp.Abp.Faster
             Options = options.Value;
             Logger = logger;
             ServiceProvider = serviceProvider;
-            _loggers = [];
+            Loggers = [];
         }
 
 
         public virtual IFasterLogger<T> GetOrCreate<T>(string name) where T : class
         {
-            var configuration = Options.Configurations.GetConfiguration(name);
-            var logger = _loggers.GetOrAdd(name, () =>
-            {
-                var fasterLogger = ActivatorUtilities.CreateInstance<FasterLogger<T>>(
-                   ServiceProvider,
-                   name,
-                   configuration);
-                fasterLogger.Initialize();
-                return fasterLogger;
-            }).As<IFasterLogger<T>>();
+            // 使用 Lazy<T> 确保线程安全的延迟初始化
+            var lazyLogger = Loggers.GetOrAdd(name, key => new Lazy<IFasterLogger>(() => CreateLogger<T>(key)));
+            return lazyLogger.Value as IFasterLogger<T>;
+        }
 
-            return logger;
+        protected virtual IFasterLogger<T> CreateLogger<T>(string name) where T : class
+        {
+            var configuration = Options.Configurations.GetConfiguration(name);
+            var fasterLogger = ActivatorUtilities.CreateInstance<FasterLogger<T>>(
+                ServiceProvider,
+                name,
+                configuration);
+            fasterLogger.Initialize();
+            return fasterLogger;
         }
 
     }
