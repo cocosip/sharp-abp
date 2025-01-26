@@ -16,7 +16,7 @@ public class Program
     {
         Log.Logger = new LoggerConfiguration()
 #if DEBUG
-            .MinimumLevel.Debug()
+            .MinimumLevel.Information()
 #else
             .MinimumLevel.Information()
 #endif

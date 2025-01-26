@@ -32,7 +32,9 @@ public class FasterLogSampleModule : AbpModule
             options.Configurations.Configure("default", c =>
             {
                 c.FileName = "tenant-data";
-           
+                c.CompleteIntervalMillis = 1000;
+                c.TruncateIntervalMillis = 5000;
+
             });
         });
 

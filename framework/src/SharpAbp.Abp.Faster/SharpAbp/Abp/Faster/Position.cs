@@ -6,20 +6,21 @@ namespace SharpAbp.Abp.Faster
     {
         public long Address { get; set; }
         public long Length { get; set; }
-
+        public long NextAddress { get; set; }
         public Position()
         {
 
         }
-        public Position(long address, long length)
+        public Position(long address, long length, long nextAddress)
         {
             Address = address;
             Length = length;
+            NextAddress = nextAddress;
         }
 
-        public bool IsNext(long currentAddress)
+        public bool IsMatch(long nextAddress)
         {
-            return currentAddress + Length <= Address || currentAddress == Address;
+            return nextAddress == Address;
         }
 
         public int CompareTo(Position other)
@@ -35,7 +36,7 @@ namespace SharpAbp.Abp.Faster
             }
             return Length.CompareTo(other.Length);
         }
+
+
     }
-
-
 }

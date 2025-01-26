@@ -53,7 +53,7 @@ namespace SharpAbp.Abp.Faster
         /// <summary>
         /// 完成数据的时间间隔(ms)
         /// </summary>
-        public int CompleteIntervalMillis { get; set; } = 5000;
+        public int CompleteIntervalMillis { get; set; } = 3000;
 
         /// <summary>
         /// 日志截断的时间间隔(s)

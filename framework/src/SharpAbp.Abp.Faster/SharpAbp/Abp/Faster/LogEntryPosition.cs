@@ -1,20 +1,17 @@
-﻿namespace SharpAbp.Abp.Faster
+﻿using System.Collections.Generic;
+
+namespace SharpAbp.Abp.Faster
 {
-    public class LogEntryPosition
+    public class LogEntryPosition : List<Position>, IComparer<Position>
     {
-
-        public Position Min { get; set; }
-        public Position Max { get; set; }
-
         public LogEntryPosition()
         {
 
         }
 
-        public LogEntryPosition(Position min, Position max)
+        public int Compare(Position x, Position y)
         {
-            Min = min;
-            Max = max;
+            return x.Address.CompareTo(y.Address);
         }
     }
 }

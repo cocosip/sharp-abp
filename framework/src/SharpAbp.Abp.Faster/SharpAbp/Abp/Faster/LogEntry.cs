@@ -16,6 +16,11 @@
         /// Current addreess
         /// </summary>
         public long CurrentAddress { get; set; }
+
+        /// <summary>
+        /// Next address
+        /// </summary>
+        public long NextAddress { get; set; }
     }
 
     public class BufferedLogEntry : LogEntry<byte[]>

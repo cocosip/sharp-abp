@@ -49,6 +49,7 @@ public class FasterLogService : ISingletonDependency
                 StudyInstanceUID = "1.3.1890.20241101.1104754694.140.86578",
                 SeriesInstanceUID = "1.2.156.112605.66988328761091.241102005416.3.8720.104750",
                 SOPInstanceUIDP = "1.2.156.112605.66988328761091.241102005607.4.1836.117740",
+                CreationTime = DateTime.Now,
                 FileSize = 526936,
                 FileId = "Hidos/Default/1.3.1890.20241101.1104754694.140.86578/1.2.156.112605.66988328761091.241102005416.3.8720.104750-CT/1.2.156.112605.66988328761091.241102005607.4.1836.117740-301-12.dcm",
             };
@@ -61,7 +62,7 @@ public class FasterLogService : ISingletonDependency
                     data.Id = Id;
                     Interlocked.Increment(ref Id);
                     await FasterLogger.WriteAsync(data, CancellationTokenProvider.Token);
-                    Logger.LogInformation("Write data: {Id}", data.Id);
+                    Logger.LogDebug("Write data: {Id}", data.Id);
                 }
                 catch (Exception ex)
                 {

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace SharpAbp.Abp.Faster
 {
@@ -13,14 +12,11 @@ namespace SharpAbp.Abp.Faster
                 return position;
             }
 
-            var min = this.Min(x => x.CurrentAddress);
-            var max = this.Max(x => x.CurrentAddress);
+            foreach (var entry in this)
+            {
+                position.Add(new Position(entry.CurrentAddress, entry.EntryLength, entry.NextAddress));
+            }
 
-            var minEntry = this.Where(x => x.CurrentAddress == min).FirstOrDefault();
-            var maxEntry = this.Where(x => x.CurrentAddress == max).FirstOrDefault();
-
-            position.Min = new Position(minEntry.CurrentAddress, minEntry.EntryLength);
-            position.Max = new Position(maxEntry.CurrentAddress, maxEntry.EntryLength);
             return position;
         }
 

@@ -21,8 +21,7 @@ namespace SharpAbp.Abp.Faster
         private long _completedUntilAddress = -1L;
         private long _truncateUntilAddress = -1L;
         private bool _initialized = false;
-        private readonly ConcurrentDictionary<long, LogEntryPosition> _pending;
-        private readonly ConcurrentDictionary<long, LogEntryPosition> _committing;
+        private readonly ConcurrentDictionary<long, Position> _committing;
         protected Channel<BufferedLogEntry> _pendingChannel;
 
 
@@ -53,8 +52,7 @@ namespace SharpAbp.Abp.Faster
             CancellationTokenProvider = cancellationTokenProvider;
 
             _pendingChannel = Channel.CreateBounded<BufferedLogEntry>(Configuration.PreReadCapacity);
-            _pending = new ConcurrentDictionary<long, LogEntryPosition>();
-            _committing = new ConcurrentDictionary<long, LogEntryPosition>();
+            _committing = new ConcurrentDictionary<long, Position>();
         }
 
         /// <summary>
@@ -146,13 +144,14 @@ namespace SharpAbp.Abp.Faster
                         byte[] buffer;
                         int entryLength;
                         long currentAddress;
-
-                        while (!Iter.GetNext(out buffer, out entryLength, out currentAddress))
+                        long nextAddress;
+                        while (!Iter.GetNext(out buffer, out entryLength, out currentAddress, out nextAddress))
                         {
                             await Iter.WaitAsync(CancellationTokenProvider.Token);
                         }
 
-                        if (buffer != null)
+
+                        if (buffer != null && entryLength > 0)
                         {
                             //写入到临时
                             var entry = new BufferedLogEntry
@@ -160,6 +159,7 @@ namespace SharpAbp.Abp.Faster
                                 Data = buffer,
                                 EntryLength = entryLength,
                                 CurrentAddress = currentAddress,
+                                NextAddress = nextAddress
                             };
                             await _pendingChannel.Writer.WriteAsync(entry, CancellationTokenProvider.Token);
                         }
@@ -185,27 +185,33 @@ namespace SharpAbp.Abp.Faster
                     try
                     {
                         long commitAddress = _completedUntilAddress;
-                        var commitList = _committing.Select(x => x.Value).OrderBy(x => x.Min).ToList();
+                        var commitList = _committing.Select(x => x.Value).OrderBy(x => x.Address).ToList();
                         var removeIds = new List<long>();
+
 
                         foreach (var commit in commitList)
                         {
-                            if (!commit.Min.IsNext(commitAddress))
+                            if (!commit.IsMatch(commitAddress))
                             {
                                 break;
                             }
                             else
                             {
-                                commitAddress = commit.Max.Address;
-                                //添加到删除列表
-                                removeIds.Add(commit.Min.Address);
+                                if (commitAddress <= Iter.EndAddress)
+                                {
+                                    commitAddress = commit.NextAddress;
+                                    //添加到删除列表
+                                    removeIds.Add(commit.Address);
+                                }
                             }
                         }
 
-                        if (commitAddress > _completedUntilAddress)
+                        if (commitAddress > _completedUntilAddress && commitAddress <= Iter.EndAddress)
                         {
                             Logger.LogDebug("CompleteUntilRecordAtAsync {commitAddress} .", commitAddress);
+                            await Log.CommitAsync(CancellationTokenProvider.Token);
                             await Iter.CompleteUntilRecordAtAsync(commitAddress, CancellationTokenProvider.Token);
+                         
 
                             //不能直接使用 Iter.CompletedUntilAddress,因为这时候还没刷新
                             //_completedUntilAddress = Iter.CompletedUntilAddress;
@@ -217,7 +223,7 @@ namespace SharpAbp.Abp.Faster
                                 {
                                     if (!_committing.TryRemove(id, out _))
                                     {
-                                        Logger.LogDebug("Remove commit {id} failed.", id);
+                                        Logger.LogWarning("Remove commit {id} failed.", id);
                                     }
                                 }
                             }
@@ -310,38 +316,35 @@ namespace SharpAbp.Abp.Faster
         {
             var entries = new LogEntryList<T>();
 
-            if (count > 0)
+            for (var i = 0; i < count; i++)
             {
-                while (entries.Count < count && !cancellationToken.IsCancellationRequested)
+                BufferedLogEntry entry;
+                if (i == 0)
                 {
-                    BufferedLogEntry entry;
-                    if (entries.Count == 0)
+                    entry = await _pendingChannel.Reader.ReadAsync(cancellationToken);
+                    //entries.Add(new LogEntry<T>
+                    //{
+                    //    Data = Serializer.Deserialize<T>(entry.Data),
+                    //    CurrentAddress = entry.CurrentAddress,
+                    //    EntryLength = entry.EntryLength,
+                    //    NextAddress = entry.NextAddress,
+                    //});
+                }
+                else
+                {
+                    if (!_pendingChannel.Reader.TryRead(out entry))
                     {
-                        entry = await _pendingChannel.Reader.ReadAsync(cancellationToken);
-                    }
-                    else
-                    {
-                        if (!_pendingChannel.Reader.TryRead(out entry))
-                        {
-                            break;
-                        }
+                        break;
                     }
 
-                    entries.Add(new LogEntry<T>
-                    {
-                        Data = Serializer.Deserialize<T>(entry.Data),
-                        CurrentAddress = entry.CurrentAddress,
-                        EntryLength = entry.EntryLength,
-                    });
                 }
-            }
-            if (entries.Count > 0)
-            {
-                var position = entries.GetPosition();
-                if (!_pending.TryAdd(position.Min.Address, position))
+                entries.Add(new LogEntry<T>
                 {
-                    Logger.LogDebug("Add position to pending failed. {Address}", position.Min.Address);
-                }
+                    Data = Serializer.Deserialize<T>(entry.Data),
+                    CurrentAddress = entry.CurrentAddress,
+                    EntryLength = entry.EntryLength,
+                    NextAddress = entry.NextAddress,
+                });
             }
             return entries;
         }
@@ -354,9 +357,12 @@ namespace SharpAbp.Abp.Faster
         /// <returns></returns>
         public virtual Task CommitAsync(LogEntryPosition entryPosition, CancellationToken cancellationToken = default)
         {
-            if (!_committing.TryAdd(entryPosition.Min.Address, entryPosition))
+            foreach (var position in entryPosition)
             {
-                Logger.LogDebug("Add position to committing failed. {Address}", entryPosition.Min.Address);
+                if (!_committing.TryAdd(position.Address, position))
+                {
+                    Logger.LogDebug("Add position to committing failed. {Address}", position.Address);
+                }
             }
             return Task.CompletedTask;
         }
