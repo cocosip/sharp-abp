@@ -237,7 +237,7 @@ namespace SharpAbp.Abp.Faster
                         Logger.LogError(ex, "Commit exception: {Message}", ex.Message);
                     }
 
-                    await Task.Delay(Configuration.CompleteIntervalMillis, CancellationTokenProvider.Token).ConfigureAwait(false);
+                    await Task.Delay(Configuration.CompleteIntervalMillis, CancellationTokenProvider.Token);
                 }
             }, TaskCreationOptions.LongRunning);
         }
@@ -246,8 +246,8 @@ namespace SharpAbp.Abp.Faster
         private async Task CompleteUntilRecordAtAsync(long commitAddress)
         {
             Logger.LogDebug("CompleteUntilRecordAtAsync {commitAddress}.", commitAddress);
-            await Log.CommitAsync(CancellationTokenProvider.Token).ConfigureAwait(false);
-            await Iter.CompleteUntilRecordAtAsync(commitAddress, CancellationTokenProvider.Token).ConfigureAwait(false);
+            await Log.CommitAsync(CancellationTokenProvider.Token);
+            await Iter.CompleteUntilRecordAtAsync(commitAddress, CancellationTokenProvider.Token);
         }
 
         private void RemoveProcessedCommits(List<long> removeIds)

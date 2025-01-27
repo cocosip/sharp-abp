@@ -95,8 +95,8 @@ public class FasterLogService : ISingletonDependency
 
                         var p = list.GetPosition();
                         //提交
-                        await FasterLogger.CommitAsync(p, CancellationTokenProvider.Token);
 
+                        await FasterLogger.CommitAsync(p, CancellationTokenProvider.Token);
                         //await Task.Delay(5000);
                     }
                     catch (Exception ex)
