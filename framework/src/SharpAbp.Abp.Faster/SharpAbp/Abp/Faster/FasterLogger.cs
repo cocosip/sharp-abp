@@ -17,7 +17,7 @@ namespace SharpAbp.Abp.Faster
 {
     public class FasterLogger<T> : IFasterLogger<T> where T : class
     {
-
+        private readonly SemaphoreSlim _commitSemaphore = new SemaphoreSlim(1, 1); // 异步锁
         private long _completedUntilAddress = -1L;
         private long _truncateUntilAddress = -1L;
         private bool _initialized = false;
@@ -119,11 +119,16 @@ namespace SharpAbp.Abp.Faster
                     await Task.Delay(Configuration.CommitIntervalMillis, CancellationTokenProvider.Token);
                     try
                     {
+                        await _commitSemaphore.WaitAsync(CancellationTokenProvider.Token);
                         await Log.CommitAsync(CancellationTokenProvider.Token);
                     }
                     catch (Exception ex)
                     {
                         Logger.LogError(ex, "Commit exception : {Message}", ex.Message);
+                    }
+                    finally
+                    {
+                        _commitSemaphore.Release();
                     }
                 }
 
@@ -246,8 +251,16 @@ namespace SharpAbp.Abp.Faster
         private async Task CompleteUntilRecordAtAsync(long commitAddress)
         {
             Logger.LogDebug("CompleteUntilRecordAtAsync {commitAddress}.", commitAddress);
-            await Log.CommitAsync(CancellationTokenProvider.Token);
-            await Iter.CompleteUntilRecordAtAsync(commitAddress, CancellationTokenProvider.Token);
+            await _commitSemaphore.WaitAsync(CancellationTokenProvider.Token);
+            try
+            {
+                await Log.CommitAsync(CancellationTokenProvider.Token);
+                await Iter.CompleteUntilRecordAtAsync(commitAddress, CancellationTokenProvider.Token);
+            }
+            finally
+            {
+                _commitSemaphore.Release();
+            }
         }
 
         private void RemoveProcessedCommits(List<long> removeIds)
