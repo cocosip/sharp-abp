@@ -69,7 +69,7 @@ public class FasterLogService : ISingletonDependency
                     Logger.LogError(ex, "Write data error -> {Message}", ex.Message);
                 }
 
-                await Task.Delay(1);
+                await Task.Delay(100);
             }
 
         }, TaskCreationOptions.LongRunning);

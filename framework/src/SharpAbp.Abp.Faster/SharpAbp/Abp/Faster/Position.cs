@@ -36,6 +36,30 @@ namespace SharpAbp.Abp.Faster
             }
             return Length.CompareTo(other.Length);
         }
+    }
+
+    public class RetryPosition
+    {
+        public Position Position { get; set; }
+        public int RetryCount { get; set; }
+
+        public RetryPosition()
+        {
+
+        }
+
+        public RetryPosition(Position position, int retryCount)
+        {
+            Position = position;
+            RetryCount = retryCount;
+        }
+
+
+        public bool IsMax(int max)
+        {
+            return RetryCount >= max && max > 0;
+        }
+
 
 
     }

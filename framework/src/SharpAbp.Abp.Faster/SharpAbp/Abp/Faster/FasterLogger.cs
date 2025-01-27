@@ -21,7 +21,7 @@ namespace SharpAbp.Abp.Faster
         private long _completedUntilAddress = -1L;
         private long _truncateUntilAddress = -1L;
         private bool _initialized = false;
-        private readonly ConcurrentDictionary<long, Position> _committing;
+        private readonly ConcurrentDictionary<long, RetryPosition> _committing;
         protected Channel<BufferedLogEntry> _pendingChannel;
 
 
@@ -52,7 +52,7 @@ namespace SharpAbp.Abp.Faster
             CancellationTokenProvider = cancellationTokenProvider;
 
             _pendingChannel = Channel.CreateBounded<BufferedLogEntry>(Configuration.PreReadCapacity);
-            _committing = new ConcurrentDictionary<long, Position>();
+            _committing = new ConcurrentDictionary<long, RetryPosition>();
         }
 
         /// <summary>
@@ -181,64 +181,86 @@ namespace SharpAbp.Abp.Faster
             {
                 while (!CancellationTokenProvider.Token.IsCancellationRequested)
                 {
-
                     try
                     {
                         long commitAddress = _completedUntilAddress;
-                        var commitList = _committing.Select(x => x.Value).OrderBy(x => x.Address).ToList();
                         var removeIds = new List<long>();
 
+                        // 提前对_committing进行排序，避免在循环中重复排序
+                        var sortedCommits = _committing.Values.OrderBy(x => x.Position.Address).ToList();
 
-                        foreach (var commit in commitList)
+                        foreach (var commit in sortedCommits)
                         {
-                            if (!commit.IsMatch(commitAddress))
+                            if (!commit.Position.IsMatch(commitAddress))
                             {
-                                break;
+                                if (commit.IsMax(Configuration.MaxCommitSkip))
+                                {
+                                    // 如果达到最大重试次数，检查是否需要更新commitAddress并记录日志
+                                    if (commitAddress <= Iter.EndAddress)
+                                    {
+                                        commitAddress = commit.Position.NextAddress;
+                                        removeIds.Add(commit.Position.Address);
+                                        Logger.LogDebug("{commitAddress} is max commit skip.", commitAddress);
+                                    }
+                                }
+                                else
+                                {
+                                    // 更新重试次数并尝试更新字典中的值
+                                    var gainPosition = new RetryPosition(commit.Position, commit.RetryCount + 1);
+                                    if (!_committing.TryUpdate(commit.Position.Address, gainPosition, commit))
+                                    {
+                                        Logger.LogWarning("Update retry position failed. {Address}", gainPosition.Position.Address);
+                                    }
+                                    break; // 更新后跳出循环等待下次调度
+                                }
                             }
                             else
                             {
                                 if (commitAddress <= Iter.EndAddress)
                                 {
-                                    commitAddress = commit.NextAddress;
-                                    //添加到删除列表
-                                    removeIds.Add(commit.Address);
+                                    commitAddress = commit.Position.NextAddress;
+                                    removeIds.Add(commit.Position.Address);
                                 }
                             }
                         }
 
+                        // 检查是否有新的commitAddress需要提交完成
                         if (commitAddress > _completedUntilAddress && commitAddress <= Iter.EndAddress)
                         {
-                            Logger.LogDebug("CompleteUntilRecordAtAsync {commitAddress} .", commitAddress);
-                            await Log.CommitAsync(CancellationTokenProvider.Token);
-                            await Iter.CompleteUntilRecordAtAsync(commitAddress, CancellationTokenProvider.Token);
-                         
-
-                            //不能直接使用 Iter.CompletedUntilAddress,因为这时候还没刷新
-                            //_completedUntilAddress = Iter.CompletedUntilAddress;
+                            await CompleteUntilRecordAtAsync(commitAddress);
                             _completedUntilAddress = commitAddress;
-                            //移除这个之前的数据
-                            if (removeIds.Count > 0)
-                            {
-                                foreach (var id in removeIds)
-                                {
-                                    if (!_committing.TryRemove(id, out _))
-                                    {
-                                        Logger.LogWarning("Remove commit {id} failed.", id);
-                                    }
-                                }
-                            }
+                            RemoveProcessedCommits(removeIds);
                         }
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError(ex, "Commit exception : {Message}", ex.Message);
+                        Logger.LogError(ex, "Commit exception: {Message}", ex.Message);
                     }
 
-                    await Task.Delay(Configuration.CompleteIntervalMillis, CancellationTokenProvider.Token);
+                    await Task.Delay(Configuration.CompleteIntervalMillis, CancellationTokenProvider.Token).ConfigureAwait(false);
                 }
-
             }, TaskCreationOptions.LongRunning);
         }
+
+
+        private async Task CompleteUntilRecordAtAsync(long commitAddress)
+        {
+            Logger.LogDebug("CompleteUntilRecordAtAsync {commitAddress}.", commitAddress);
+            await Log.CommitAsync(CancellationTokenProvider.Token).ConfigureAwait(false);
+            await Iter.CompleteUntilRecordAtAsync(commitAddress, CancellationTokenProvider.Token).ConfigureAwait(false);
+        }
+
+        private void RemoveProcessedCommits(List<long> removeIds)
+        {
+            foreach (var id in removeIds)
+            {
+                if (!_committing.TryRemove(id, out _))
+                {
+                    Logger.LogWarning("Remove commit {id} failed.", id);
+                }
+            }
+        }
+
 
         /// <summary>
         /// 定时截断已经完成的
@@ -359,7 +381,7 @@ namespace SharpAbp.Abp.Faster
         {
             foreach (var position in entryPosition)
             {
-                if (!_committing.TryAdd(position.Address, position))
+                if (!_committing.TryAdd(position.Address, new RetryPosition(position, 0)))
                 {
                     Logger.LogDebug("Add position to committing failed. {Address}", position.Address);
                 }

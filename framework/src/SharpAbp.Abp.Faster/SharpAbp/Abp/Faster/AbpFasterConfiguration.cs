@@ -66,6 +66,11 @@ namespace SharpAbp.Abp.Faster
         public int PreReadCapacity { get; set; } = 5000;
 
         /// <summary>
+        /// 最大提交跳过
+        /// </summary>
+        public int MaxCommitSkip { get; set; } = 100;
+
+        /// <summary>
         /// 迭代器的名称
         /// </summary>
         public string IteratorName { get; set; } = "default";
