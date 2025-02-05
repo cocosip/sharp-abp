@@ -20,7 +20,7 @@ namespace SharpAbp.Abp.Faster
 
         public bool IsMatch(long nextAddress)
         {
-            return nextAddress == Address;
+            return nextAddress == Address || Math.Abs(nextAddress - Address) < 10;
         }
 
         public int CompareTo(Position other)

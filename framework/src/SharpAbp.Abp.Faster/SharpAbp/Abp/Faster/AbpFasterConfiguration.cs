@@ -68,7 +68,7 @@ namespace SharpAbp.Abp.Faster
         /// <summary>
         /// 最大提交跳过
         /// </summary>
-        public int MaxCommitSkip { get; set; } = 100;
+        public int MaxCommitSkip { get; set; } = 50;
 
         /// <summary>
         /// 迭代器的名称

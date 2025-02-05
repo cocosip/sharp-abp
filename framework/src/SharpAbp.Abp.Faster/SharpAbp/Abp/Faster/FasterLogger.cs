@@ -214,7 +214,7 @@ namespace SharpAbp.Abp.Faster
                                     var gainPosition = new RetryPosition(commit.Position, commit.RetryCount + 1);
                                     if (!_committing.TryUpdate(commit.Position.Address, gainPosition, commit))
                                     {
-                                        Logger.LogWarning("Update retry position failed. {Address}", gainPosition.Position.Address);
+                                        Logger.LogWarning("Update retry position failed. {Address}", commit.Position.Address);
                                     }
                                     break; // 更新后跳出循环等待下次调度
                                 }
