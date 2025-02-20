@@ -177,6 +177,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.DbConnections.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.Faster", "src\SharpAbp.Abp.Faster\SharpAbp.Abp.Faster.csproj", "{0940E3D4-B0A9-4727-8F72-959090F65670}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solutions", "solutions", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		..\common.props = ..\common.props
+		..\Directory.Build.props = ..\Directory.Build.props
+		..\Directory.Packages.props = ..\Directory.Packages.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

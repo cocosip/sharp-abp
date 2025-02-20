@@ -198,6 +198,7 @@ namespace SharpAbp.Abp.Faster
                         {
                             if (!commit.Position.IsMatch(commitAddress))
                             {
+                                Logger.LogDebug("Commit position is not match {commitAddress}. Address: {Address}, NextAddress: {NextAddress}", commitAddress, commit.Position.Address, commit.Position.NextAddress);
                                 if (commit.IsMax(Configuration.MaxCommitSkip))
                                 {
                                     // 如果达到最大重试次数，检查是否需要更新commitAddress并记录日志
