@@ -24,7 +24,6 @@ namespace SharpAbp.Abp.Faster
         private readonly ConcurrentDictionary<long, RetryPosition> _committing;
         protected Channel<BufferedLogEntry> _pendingChannel;
 
-
         protected ILogger Logger { get; }
         protected AbpFasterOptions Options { get; }
         protected AbpFasterConfiguration Configuration { get; }
@@ -104,7 +103,7 @@ namespace SharpAbp.Abp.Faster
 
             _initialized = true;
 
-            Logger.LogDebug("Faster log {Name} is initialize. ", TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+            Logger.LogDebug("Faster log {Name} is initialize. Begin: [{BeginAddress}], Completed: [{_completedUntilAddress}],", TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)), Iter.BeginAddress, _completedUntilAddress);
         }
 
         /// <summary>
@@ -155,6 +154,7 @@ namespace SharpAbp.Abp.Faster
                             await Iter.WaitAsync(CancellationTokenProvider.Token);
                         }
 
+                        Logger.LogTrace("Get iter message, current: [{currentAddress}], next: [{nextAddress}] .");
 
                         if (buffer != null && entryLength > 0)
                         {
