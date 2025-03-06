@@ -226,7 +226,7 @@ namespace SharpAbp.Abp.OpenIddict
 
             if (!firstRedirectUri.IsNullOrWhiteSpace() || !firstPostLogoutRedirectUri.IsNullOrWhiteSpace())
             {
-                permissions.Add(OpenIddictConstants.Permissions.Endpoints.Logout);
+                permissions.Add(OpenIddictConstants.Permissions.Endpoints.EndSession);
             }
 
             foreach (var grantType in input.GrantTypes)
@@ -276,7 +276,7 @@ namespace SharpAbp.Abp.OpenIddict
                 if (grantType == OpenIddictConstants.GrantTypes.DeviceCode)
                 {
                     permissions.Add(OpenIddictConstants.Permissions.GrantTypes.DeviceCode);
-                    permissions.Add(OpenIddictConstants.Permissions.Endpoints.Device);
+                    permissions.Add(OpenIddictConstants.Permissions.Endpoints.DeviceAuthorization);
                 }
 
                 if (grantType == OpenIddictConstants.GrantTypes.Implicit)
