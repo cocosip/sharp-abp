@@ -11,6 +11,10 @@
     "Permission:AbpCryptoVault.SM2Creds.Generate": "SM2密鑰生成",
     "Permission:AbpCryptoVault.SM2Creds.DecryptKey": "解密SM2密鑰",
     "Permission:AbpCryptoVault.SM2Creds.Create": "創建SM2密鑰",
-    "Permission:AbpCryptoVault.SM2Creds.Delete": "刪除SM2密鑰"
+    "Permission:AbpCryptoVault.SM2Creds.Delete": "刪除SM2密鑰",
+    "Permission:AbpTransformSecurityManagement.SecurityCredentialInfos": "傳輸秘鑰管理",
+    "Permission:AbpTransformSecurityManagement.SecurityCredentialInfos.Create": "創建傳輸秘鑰",
+    "Permission:AbpTransformSecurityManagement.SecurityCredentialInfos.Update": "修改傳輸秘鑰",
+    "Permission:AbpTransformSecurityManagement.SecurityCredentialInfos.Delete": "刪除傳輸秘鑰"
   }
 }

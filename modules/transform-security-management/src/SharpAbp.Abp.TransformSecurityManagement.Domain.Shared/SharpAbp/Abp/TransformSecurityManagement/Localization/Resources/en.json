@@ -11,6 +11,10 @@
     "Permission:AbpCryptoVault.SM2Creds.Generate": "SM2 credentials generate",
     "Permission:AbpCryptoVault.SM2Creds.DecryptKey": "Decrypt SM2 credentials",
     "Permission:AbpCryptoVault.SM2Creds.Create": "Create SM2 credentials",
-    "Permission:AbpCryptoVault.SM2Creds.Delete": "Delete SM2 credentials"
+    "Permission:AbpCryptoVault.SM2Creds.Delete": "Delete SM2 credentials",
+    "Permission:AbpTransformSecurityManagement.SecurityCredentialInfos": "Security credential management",
+    "Permission:AbpTransformSecurityManagement.SecurityCredentialInfos.Create": "Create security credential",
+    "Permission:AbpTransformSecurityManagement.SecurityCredentialInfos.Update": "Update Security credential",
+    "Permission:AbpTransformSecurityManagement.SecurityCredentialInfos.Delete": "Delete Security credential"
   }
 }

@@ -20,6 +20,9 @@
 		<PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" />
 	</ItemGroup>
 
- 
+	<ItemGroup>
+		<EmbeddedResource Include="SharpAbp\Abp\TransformSecurityManagement\Localization\Resources\*.json" />
+		<Content Remove="SharpAbp\Abp\TransformSecurityManagement\Localization\Resources\*.json" />
+	</ItemGroup>
 
 </Project>
