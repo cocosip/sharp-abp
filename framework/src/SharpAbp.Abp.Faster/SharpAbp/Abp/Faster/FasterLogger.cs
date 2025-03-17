@@ -15,7 +15,7 @@ using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.Faster
 {
-    public class FasterLogger<T> : IFasterLogger<T> where T : class
+    public class FasterLogger<T> : IDisposable, IFasterLogger<T> where T : class
     {
         private readonly SemaphoreSlim _commitSemaphore = new SemaphoreSlim(1, 1); // 异步锁
         private long _completedUntilAddress = -1L;
@@ -193,6 +193,7 @@ namespace SharpAbp.Abp.Faster
 
                         // 提前对_committing进行排序，避免在循环中重复排序
                         var sortedCommits = _committing.Values.OrderBy(x => x.Position.Address).ToList();
+                        Logger.LogDebug("Current Committing count: {Count}", _committing.Count);
 
                         foreach (var commit in sortedCommits)
                         {
@@ -400,6 +401,7 @@ namespace SharpAbp.Abp.Faster
                     Logger.LogDebug("Add position to committing failed. {Address}", position.Address);
                 }
             }
+
             return Task.CompletedTask;
         }
 
