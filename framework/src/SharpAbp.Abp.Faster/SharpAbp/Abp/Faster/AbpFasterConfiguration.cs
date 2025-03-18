@@ -16,7 +16,7 @@ namespace SharpAbp.Abp.Faster
         public bool PreallocateFile { get; set; }
 
         /// <summary>
-        /// 存储空间
+        /// 存储空间 (4GB)
         /// </summary>
         public long Capacity { get; set; } = 1L << 32;
 
@@ -44,6 +44,21 @@ namespace SharpAbp.Abp.Faster
         /// AutoRefreshSafeTailAddress
         /// </summary>
         public bool AutoRefreshSafeTailAddress { get; set; } = false;
+
+        /// <summary>
+        /// Page Size, 20(1MB),原生默认 22(4MB)
+        /// </summary>
+        public int PageSizeBits { get; set; } = 22;
+
+        /// <summary>
+        /// Memory Size, 21(2MB), 原生默认 23(8MB)
+        /// </summary>
+        public int MemorySizeBits { get; set; } = 23;
+
+        /// <summary>
+        /// SegmentSize, 28(256MB), 原生默认 30(1GB)
+        /// </summary>
+        public int SegmentSizeBits { get; set; } = 30;
 
         /// <summary>
         /// 提交数据的时间间隔(ms)

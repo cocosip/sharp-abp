@@ -79,6 +79,9 @@ namespace SharpAbp.Abp.Faster
             var settings = new FasterLogSettings()
             {
                 LogDevice = device,
+                PageSizeBits = Configuration.PageSizeBits,
+                MemorySizeBits = Configuration.MemorySizeBits,
+                SegmentSizeBits = Configuration.SegmentSizeBits,
                 AutoRefreshSafeTailAddress = Configuration.AutoRefreshSafeTailAddress,
             };
 
