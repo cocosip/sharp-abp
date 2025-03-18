@@ -83,6 +83,7 @@ namespace SharpAbp.Abp.Faster
                 MemorySizeBits = Configuration.MemorySizeBits,
                 SegmentSizeBits = Configuration.SegmentSizeBits,
                 AutoRefreshSafeTailAddress = Configuration.AutoRefreshSafeTailAddress,
+                AutoCommit = false
             };
 
             Configuration.Configure?.Invoke(settings);

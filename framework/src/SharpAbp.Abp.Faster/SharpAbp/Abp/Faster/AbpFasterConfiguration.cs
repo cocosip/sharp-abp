@@ -63,7 +63,7 @@ namespace SharpAbp.Abp.Faster
         /// <summary>
         /// 提交数据的时间间隔(ms)
         /// </summary>
-        public int CommitIntervalMillis { get; set; } = 1000;
+        public int CommitIntervalMillis { get; set; } = 2000;
 
         /// <summary>
         /// 完成数据的时间间隔(ms)
