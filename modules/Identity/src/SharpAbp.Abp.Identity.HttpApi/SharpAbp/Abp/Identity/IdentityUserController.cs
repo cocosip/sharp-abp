@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Identity;
@@ -14,16 +14,10 @@ namespace SharpAbp.Abp.Identity
     public class IdentityUserController : IdentityController, IIdentityUserAppService
     {
         private readonly IIdentityUserAppService _identityUserAppService;
-        private readonly Volo.Abp.Identity.IIdentityUserAppService _userAppService;
-        public IdentityUserController(
-            IIdentityUserAppService identityUserAppService,
-            Volo.Abp.Identity.IIdentityUserAppService userAppService)
+        public IdentityUserController(IIdentityUserAppService identityUserAppService)
         {
             _identityUserAppService = identityUserAppService;
-            _userAppService = userAppService;
         }
-
-
 
         /// <summary>
         /// Get by id
