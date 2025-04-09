@@ -24,7 +24,7 @@ namespace SharpAbp.Abp.MassTransit.PostgreSql
             var configuration = context.Services.GetConfiguration();
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
 
-            if (abpMassTransitOptions.Provider.Equals(MassTransitPostgreSqlConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            if (abpMassTransitOptions.Provider!.Equals(MassTransitPostgreSqlConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
                 PreConfigure<AbpMassTransitPostgreSqlOptions>(options => options.PreConfigure(configuration));
 
@@ -54,7 +54,7 @@ namespace SharpAbp.Abp.MassTransit.PostgreSql
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
             if (abpMassTransitOptions != null)
             {
-                if (abpMassTransitOptions.Provider.Equals(MassTransitPostgreSqlConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+                if (abpMassTransitOptions.Provider!.Equals(MassTransitPostgreSqlConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
                 {
                     Configure<AbpMassTransitPostgreSqlOptions>(options =>
                     {
@@ -95,7 +95,7 @@ namespace SharpAbp.Abp.MassTransit.PostgreSql
                         x.SetKebabCaseEndpointNameFormatter();
 
                         //consumer
-                        foreach (var consumer in postgreSqlOptions.Consumers)
+                        foreach (var consumer in postgreSqlOptions.Consumers ?? [])
                         {
                             consumer.Configure?.Invoke(x);
 
@@ -108,7 +108,7 @@ namespace SharpAbp.Abp.MassTransit.PostgreSql
                         x.UsingPostgres((ctx, cfg) =>
                         {
                             //PostgreSql preConfigure
-                            foreach (var preConfigure in postgreSqlOptions.PostgreSqlPreConfigures)
+                            foreach (var preConfigure in postgreSqlOptions.PostgreSqlPreConfigures ?? [])
                             {
                                 preConfigure(ctx, cfg);
                             }
@@ -121,20 +121,20 @@ namespace SharpAbp.Abp.MassTransit.PostgreSql
                             cfg.ConfigureEndpoints(ctx);
 
                             //PostgreSql configure
-                            foreach (var configure in postgreSqlOptions.PostgreSqlConfigures)
+                            foreach (var configure in postgreSqlOptions.PostgreSqlConfigures ?? [])
                             {
                                 configure(ctx, cfg);
                             }
 
                             //Producer
-                            foreach (var producer in postgreSqlOptions.Producers)
+                            foreach (var producer in postgreSqlOptions.Producers ?? [])
                             {
                                 var configure = producer.Configure ?? postgreSqlOptions.DefaultPublishTopologyConfigurator;
                                 cfg.AddPublishMessageTypes(producer.MessageTypes, producer.Configure);
                             }
 
                             //PostgreSql postConfigure
-                            foreach (var postConfigure in postgreSqlOptions.PostgreSqlPostConfigures)
+                            foreach (var postConfigure in postgreSqlOptions.PostgreSqlPostConfigures ?? [])
                             {
                                 postConfigure(ctx, cfg);
                             }

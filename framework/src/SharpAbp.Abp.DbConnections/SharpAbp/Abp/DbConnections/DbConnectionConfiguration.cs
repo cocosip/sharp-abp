@@ -6,7 +6,7 @@ namespace SharpAbp.Abp.DbConnections
     {
         public DatabaseProvider DatabaseProvider { get; set; }
 
-        public string ConnectionString { get; set; }
+        public string? ConnectionString { get; set; }
 
         public DbConnectionConfiguration()
         {

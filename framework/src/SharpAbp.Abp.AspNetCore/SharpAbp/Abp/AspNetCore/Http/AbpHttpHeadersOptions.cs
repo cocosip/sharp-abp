@@ -5,6 +5,6 @@
         /// <summary>
         /// RouteTranslationPrefix
         /// </summary>
-        public string RouteTranslationPrefix { get; set; }
+        public string? RouteTranslationPrefix { get; set; }
     }
 }

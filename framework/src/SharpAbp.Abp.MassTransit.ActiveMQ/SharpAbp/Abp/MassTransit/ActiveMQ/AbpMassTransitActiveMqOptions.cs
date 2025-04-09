@@ -1,16 +1,16 @@
-﻿using MassTransit;
-using Microsoft.Extensions.Configuration;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using MassTransit;
+using Microsoft.Extensions.Configuration;
 
 namespace SharpAbp.Abp.MassTransit.ActiveMQ
 {
     public class AbpMassTransitActiveMqOptions
     {
-        public string Host { get; set; }
+        public string? Host { get; set; }
         public ushort Port { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
+        public string? Username { get; set; }
+        public string? Password { get; set; }
         public bool UseSSL { get; set; }
 
         public int DefaultConcurrentMessageLimit { get; set; } = 1;
@@ -20,11 +20,10 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
         public bool DefaultExclude { get; set; } = false;
         public bool DefaultEnableArtemisCompatibility { get; set; } = true;
 
+        public Func<string?, string, string>? DefaultQueueNameFormatFunc { get; set; }
 
-        public Func<string, string, string> DefaultQueueNameFormatFunc { get; set; }
-
-        public Action<IActiveMqMessagePublishTopologyConfigurator> DefaultPublishTopologyConfigure { get; set; }
-        public Action<string, IActiveMqReceiveEndpointConfigurator> DefaultReceiveEndpointConfigure { get; set; }
+        public Action<IActiveMqMessagePublishTopologyConfigurator>? DefaultPublishTopologyConfigure { get; set; }
+        public Action<string, IActiveMqReceiveEndpointConfigurator>? DefaultReceiveEndpointConfigure { get; set; }
 
         public List<Action<IBusRegistrationContext, IActiveMqBusFactoryConfigurator>> ActiveMqPreConfigures { get; set; }
         public List<Action<IBusRegistrationContext, IActiveMqBusFactoryConfigurator>> ActiveMqConfigures { get; set; }

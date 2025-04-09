@@ -15,7 +15,7 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
             {
                 if (!messageConfigures.Any(x => x.Item1 == consumer.QueueName))
                 {
-                    messageConfigures.Add((consumer.QueueName, consumer.MessageConfigure));
+                    messageConfigures.Add((consumer.QueueName!, consumer.MessageConfigure!));
                 }
             }
 
@@ -23,7 +23,7 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
             {
                 if (!messageConfigures.Any(x => x.Item1 == producer.QueueName))
                 {
-                    messageConfigures.Add((producer.QueueName, producer.MessageConfigure));
+                    messageConfigures.Add((producer.QueueName!, producer.MessageConfigure!));
                 }
             }
 

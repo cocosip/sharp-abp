@@ -23,7 +23,7 @@ namespace SharpAbp.Abp.MassTransit.Kafka
             var configuration = context.Services.GetConfiguration();
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
 
-            if (abpMassTransitOptions.Provider.Equals(MassTransitKafkaConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            if (abpMassTransitOptions.Provider!.Equals(MassTransitKafkaConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
                 PreConfigure<AbpMassTransitOptions>(options =>
                 {
@@ -83,7 +83,7 @@ namespace SharpAbp.Abp.MassTransit.Kafka
 
             return Task.CompletedTask;
         }
- 
+
 
         public override void PostConfigureServices(ServiceConfigurationContext context)
         {
@@ -93,7 +93,7 @@ namespace SharpAbp.Abp.MassTransit.Kafka
         public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
         {
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
-            if (abpMassTransitOptions.Provider.Equals(MassTransitKafkaConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            if (abpMassTransitOptions.Provider!.Equals(MassTransitKafkaConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
                 Configure<AbpMassTransitKafkaOptions>(options =>
                 {
@@ -124,8 +124,8 @@ namespace SharpAbp.Abp.MassTransit.Kafka
                         //Producer
                         foreach (var producer in kafkaOptions.Producers)
                         {
-                            var topic = kafkaOptions.DefaultTopicFormatFunc(abpMassTransitOptions.Prefix, producer.Topic);
-                            producer.Configure?.Invoke(topic, rider);
+                            var topic = kafkaOptions.DefaultTopicFormatFunc?.Invoke(abpMassTransitOptions.Prefix, producer.Topic!);
+                            producer.Configure?.Invoke(topic!, rider);
                         }
 
                         //Consumer
@@ -164,13 +164,13 @@ namespace SharpAbp.Abp.MassTransit.Kafka
 
                             foreach (var consumer in kafkaOptions.Consumers)
                             {
-                                var topic = kafkaOptions.DefaultTopicFormatFunc(abpMassTransitOptions.Prefix, consumer.Topic);
+                                var topic = kafkaOptions.DefaultTopicFormatFunc?.Invoke(abpMassTransitOptions.Prefix, consumer.Topic!);
 
                                 var groupId = consumer.GroupId.IsNullOrWhiteSpace() ?
                                 kafkaOptions.DefaultGroupId : consumer.GroupId;
 
                                 var receiveEndpointConfigure = consumer.ReceiveEndpointConfigure ?? kafkaOptions.DefaultReceiveEndpointConfigure;
-                                consumer.TopicEndpointConfigure?.Invoke(topic, groupId, receiveEndpointConfigure, ctx, k);
+                                consumer.TopicEndpointConfigure?.Invoke(topic!, groupId!, receiveEndpointConfigure!, ctx, k);
                             }
 
                             //Kafka postConfigure

@@ -5,6 +5,8 @@
 
 	<PropertyGroup>
 		<TargetFramework>$(NetCoreFx)</TargetFramework>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>Nullable</WarningsAsErrors>
 		<AssemblyName>SharpAbp.Abp.FreeSql</AssemblyName>
 		<PackageId>SharpAbp.Abp.FreeSql</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>

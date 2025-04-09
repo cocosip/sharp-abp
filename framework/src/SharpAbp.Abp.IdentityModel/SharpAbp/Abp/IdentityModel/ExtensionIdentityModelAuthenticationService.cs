@@ -31,10 +31,10 @@ namespace SharpAbp.Abp.IdentityModel
         /// <param name="userPassword"></param>
         /// <param name="identityClientName"></param>
         /// <returns></returns>
-        public virtual async Task<string> GetUserAccessTokenAsync(
+        public virtual async Task<string?> GetUserAccessTokenAsync(
             string userName,
             string userPassword,
-            string identityClientName = null)
+            string? identityClientName = null)
         {
             var configuration = GetClientConfiguration(userName, userPassword, identityClientName);
             if (configuration == null)
@@ -53,10 +53,10 @@ namespace SharpAbp.Abp.IdentityModel
         /// <param name="providerKey"></param>
         /// <param name="identityClientName"></param>
         /// <returns></returns>
-        public virtual async Task<string> GetExternalCredentialsAccessTokenAsync(
-            string loginProvider, 
-            string providerKey, 
-            string identityClientName = null)
+        public virtual async Task<string?> GetExternalCredentialsAccessTokenAsync(
+            string loginProvider,
+            string providerKey,
+            string? identityClientName = null)
         {
             var configuration = GetClientConfiguration(loginProvider, providerKey, identityClientName);
             if (configuration == null)
@@ -71,9 +71,9 @@ namespace SharpAbp.Abp.IdentityModel
         protected virtual IdentityClientConfiguration GetClientConfiguration(
             string userName,
             string userPassword,
-            string identityClientName = null)
+            string? identityClientName = null)
         {
-            IdentityClientConfiguration identityClientConfiguration;
+            IdentityClientConfiguration? identityClientConfiguration;
             if (identityClientName.IsNullOrWhiteSpace())
             {
                 identityClientConfiguration = ClientOptions.IdentityClients.Default;
@@ -85,15 +85,15 @@ namespace SharpAbp.Abp.IdentityModel
             }
 
             var configuration = new IdentityClientConfiguration(
-                identityClientConfiguration.Authority,
-                identityClientConfiguration.Scope,
-                identityClientConfiguration.ClientId,
-                identityClientConfiguration.ClientSecret,
-                identityClientConfiguration.GrantType,
+                identityClientConfiguration?.Authority!,
+                identityClientConfiguration?.Scope!,
+                identityClientConfiguration?.ClientId!,
+                identityClientConfiguration?.ClientSecret!,
+                identityClientConfiguration?.GrantType!,
                 userName,
                 userPassword,
-                identityClientConfiguration.RequireHttps,
-                identityClientConfiguration.CacheAbsoluteExpiration);
+                identityClientConfiguration?.RequireHttps ?? false,
+                identityClientConfiguration?.CacheAbsoluteExpiration ?? 1800);
 
             return configuration;
         }

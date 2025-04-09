@@ -11,7 +11,7 @@ namespace SharpAbp.Abp.TenancyGrouping
     {
         public Guid Id { get; set; }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public bool IsActive { get; set; }
 
@@ -22,8 +22,8 @@ namespace SharpAbp.Abp.TenancyGrouping
         public TenantGroupConfiguration()
         {
             IsActive = true;
-            Tenants = new List<Guid>();
-            ConnectionStrings = new ConnectionStrings();
+            Tenants = [];
+            ConnectionStrings = [];
         }
 
         public TenantGroupConfiguration(Guid id, [NotNull] string name)

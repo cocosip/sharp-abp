@@ -2,6 +2,6 @@
 {
     public class AbpSm2EncryptionOptions
     {
-        public string DefaultCurve { get; set; }
+        public string? DefaultCurve { get; set; }
     }
 }

@@ -8,7 +8,7 @@ namespace SharpAbp.Abp.Faster
         /// <summary>
         /// 文件存储的根目录
         /// </summary>
-        public string RootPath { get; set; }
+        public string? RootPath { get; set; }
         public AbpFasterConfigurations Configurations { get; }
         public AbpFasterOptions()
         {

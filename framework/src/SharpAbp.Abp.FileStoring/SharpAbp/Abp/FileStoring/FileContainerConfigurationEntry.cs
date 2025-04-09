@@ -4,7 +4,7 @@ namespace SharpAbp.Abp.FileStoring
 {
     public class FileContainerConfigurationEntry
     {
-        public string Provider { get; set; }
+        public string? Provider { get; set; }
         public bool IsMultiTenant { get; set; }
 
         /// <summary>

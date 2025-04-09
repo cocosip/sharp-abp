@@ -12,7 +12,7 @@ namespace SharpAbp.Abp.DbConnections
         /// <param name="dbConnectionName"></param>
         /// <returns></returns>
         [NotNull]
-        Task<IDbConnection> CreateAsync([NotNull] string dbConnectionName);
+        Task<IDbConnection?> CreateAsync([NotNull] string dbConnectionName);
 
         /// <summary>
         /// Create DbConnection by DbConnectionInfo
@@ -20,6 +20,6 @@ namespace SharpAbp.Abp.DbConnections
         /// <param name="dbConnectionInfo"></param>
         /// <returns></returns>
         [NotNull]
-        Task<IDbConnection> CreateAsync([NotNull] DbConnectionInfo dbConnectionInfo);
+        Task<IDbConnection?> CreateAsync([NotNull] DbConnectionInfo dbConnectionInfo);
     }
 }

@@ -5,6 +5,8 @@
 
 	<PropertyGroup>
 		<TargetFramework>$(NetCoreFx)</TargetFramework>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>Nullable</WarningsAsErrors>
 		<AssemblyName>SharpAbp.Abp.Swashbuckle</AssemblyName>
 		<PackageId>SharpAbp.Abp.Swashbuckle</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>

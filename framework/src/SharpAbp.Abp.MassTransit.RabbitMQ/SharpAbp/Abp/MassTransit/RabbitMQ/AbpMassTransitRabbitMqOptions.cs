@@ -8,16 +8,16 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
 {
     public class AbpMassTransitRabbitMqOptions
     {
-        public string Host { get; set; }
+        public string? Host { get; set; }
         public ushort Port { get; set; }
-        public string VirtualHost { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
+        public string? VirtualHost { get; set; }
+        public string? Username { get; set; }
+        public string? Password { get; set; }
 
         /// <summary>
         /// ConnectionName
         /// </summary>
-        public string ConnectionName { get; set; }
+        public string? ConnectionName { get; set; }
         public bool UseSSL { get; set; }
         public bool UseCluster { get; set; }
         public List<string> ClusterNodes { get; set; }
@@ -25,19 +25,19 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
         /// <summary>
         /// Queue prefix
         /// </summary>
-        public string DefaultQueuePrefix { get; set; }
+        public string? DefaultQueuePrefix { get; set; }
         public int DefaultConcurrentMessageLimit { get; set; } = 1;
         public int DefaultPrefetchCount { get; set; } = 4;
         public bool DefaultDurable { get; set; } = true;
         public bool DefaultAutoDelete { get; set; } = false;
         public string DefaultExchangeType { get; set; } = ExchangeType.Fanout;
 
-        public Action<IRabbitMqSslConfigurator> ConfigureSsl { get; set; }
-        public Func<string, string, string> DefaultExchangeNameFormatFunc { get; set; }
-        public Func<string, string, string, string> DefaultQueueNameFormatFunc { get; set; }
+        public Action<IRabbitMqSslConfigurator>? ConfigureSsl { get; set; }
+        public Func<string?, string, string>? DefaultExchangeNameFormatFunc { get; set; }
+        public Func<string?, string?, string, string>? DefaultQueueNameFormatFunc { get; set; }
 
-        public Action<IRabbitMqMessagePublishTopologyConfigurator> DefaultPublishTopologyConfigure { get; set; }
-        public Action<string, string, IRabbitMqReceiveEndpointConfigurator> DefaultReceiveEndpointConfigure { get; set; }
+        public Action<IRabbitMqMessagePublishTopologyConfigurator>? DefaultPublishTopologyConfigure { get; set; }
+        public Action<string, string, IRabbitMqReceiveEndpointConfigurator>? DefaultReceiveEndpointConfigure { get; set; }
 
         public List<Action<IBusRegistrationContext, IRabbitMqBusFactoryConfigurator>> RabbitMqPreConfigures { get; set; }
         public List<Action<IBusRegistrationContext, IRabbitMqBusFactoryConfigurator>> RabbitMqConfigures { get; set; }

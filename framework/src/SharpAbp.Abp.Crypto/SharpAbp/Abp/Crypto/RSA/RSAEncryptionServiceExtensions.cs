@@ -83,7 +83,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="encoding"></param>
         /// <param name="padding"></param>
         /// <returns></returns>
-        public static string Encrypt(this IRSAEncryptionService rsaEncryptionService, AsymmetricKeyParameter publicKeyParam, string plainText, Encoding encoding = null, string padding = RSAPaddingNames.None)
+        public static string Encrypt(this IRSAEncryptionService rsaEncryptionService, AsymmetricKeyParameter publicKeyParam, string plainText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
         {
             encoding ??= Encoding.UTF8;
             var cipherText = rsaEncryptionService.Encrypt(publicKeyParam, encoding.GetBytes(plainText), padding);
@@ -99,7 +99,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="encoding"></param>
         /// <param name="padding"></param>
         /// <returns></returns>
-        public static string Encrypt(this IRSAEncryptionService rsaEncryptionService, string publicKey, string plainText, Encoding encoding = null, string padding = RSAPaddingNames.None)
+        public static string Encrypt(this IRSAEncryptionService rsaEncryptionService, string publicKey, string plainText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
         {
             var publicKeyParam = rsaEncryptionService.ImportPublicKey(publicKey);
             return rsaEncryptionService.Encrypt(publicKeyParam, plainText, encoding, padding);
@@ -115,7 +115,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="encoding"></param>
         /// <param name="padding"></param>
         /// <returns></returns>
-        public static string EncryptFromPem(this IRSAEncryptionService rsaEncryptionService, string publicKeyPem, string plainText, Encoding encoding = null, string padding = RSAPaddingNames.None)
+        public static string EncryptFromPem(this IRSAEncryptionService rsaEncryptionService, string publicKeyPem, string plainText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
         {
             var publicKeyParam = rsaEncryptionService.ImportPublicKeyPem(publicKeyPem);
             return rsaEncryptionService.Encrypt(publicKeyParam, plainText, encoding, padding);
@@ -130,7 +130,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="encoding"></param>
         /// <param name="padding"></param>
         /// <returns></returns>
-        public static string Decrypt(this IRSAEncryptionService rsaEncryptionService, AsymmetricKeyParameter privateKeyParam, string cipherText, Encoding encoding = null, string padding = RSAPaddingNames.None)
+        public static string Decrypt(this IRSAEncryptionService rsaEncryptionService, AsymmetricKeyParameter privateKeyParam, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
         {
             encoding ??= Encoding.UTF8;
             var cipherBytes = Base64.Decode(cipherText);
@@ -147,7 +147,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="encoding"></param>
         /// <param name="padding"></param>
         /// <returns></returns>
-        public static string Decrypt(this IRSAEncryptionService rsaEncryptionService, string privateKey, string cipherText, Encoding encoding = null, string padding = RSAPaddingNames.None)
+        public static string Decrypt(this IRSAEncryptionService rsaEncryptionService, string privateKey, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
         {
             var privateKeyParam = rsaEncryptionService.ImportPrivateKey(privateKey);
             return rsaEncryptionService.Decrypt(privateKeyParam, cipherText, encoding, padding);
@@ -162,7 +162,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="encoding"></param>
         /// <param name="padding"></param>
         /// <returns></returns>
-        public static string DecryptFromPkcs8(this IRSAEncryptionService rsaEncryptionService, string privateKey, string cipherText, Encoding encoding = null, string padding = RSAPaddingNames.None)
+        public static string DecryptFromPkcs8(this IRSAEncryptionService rsaEncryptionService, string privateKey, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
         {
             var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPkcs8(privateKey);
             return rsaEncryptionService.Decrypt(privateKeyParam, cipherText, encoding, padding);
@@ -177,7 +177,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="encoding"></param>
         /// <param name="padding"></param>
         /// <returns></returns>
-        public static string DecryptFromPem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string cipherText, Encoding encoding = null, string padding = RSAPaddingNames.None)
+        public static string DecryptFromPem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
         {
             var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPem(privateKeyPem);
             return rsaEncryptionService.Decrypt(privateKeyParam, cipherText, encoding, padding);
@@ -192,7 +192,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="encoding"></param>
         /// <param name="padding"></param>
         /// <returns></returns>
-        public static string DecryptFromPkcs8Pem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string cipherText, Encoding encoding = null, string padding = RSAPaddingNames.None)
+        public static string DecryptFromPkcs8Pem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
         {
             var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPkcs8Pem(privateKeyPem);
             return rsaEncryptionService.Decrypt(privateKeyParam, cipherText, encoding, padding);
@@ -207,7 +207,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="algorithm">SHA1WITHRSA,SHA256WITHRSA,SHA384WITHRSA,SHA512WITHRSA</param>
         /// <param name="encoding"></param>
         /// <returns></returns>
-        public static string Sign(this IRSAEncryptionService rsaEncryptionService, AsymmetricKeyParameter privateKeyParam, string data, string algorithm = "SHA256WITHRSA", Encoding encoding = null)
+        public static string Sign(this IRSAEncryptionService rsaEncryptionService, AsymmetricKeyParameter privateKeyParam, string data, string algorithm = "SHA256WITHRSA", Encoding? encoding = null)
         {
             encoding ??= Encoding.UTF8;
             var d = encoding.GetBytes(data);
@@ -224,7 +224,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="algorithm"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>
-        public static string Sign(this IRSAEncryptionService rsaEncryptionService, string privateKey, string data, string algorithm = "SHA256WITHRSA", Encoding encoding = null)
+        public static string Sign(this IRSAEncryptionService rsaEncryptionService, string privateKey, string data, string algorithm = "SHA256WITHRSA", Encoding? encoding = null)
         {
             var privateKeyParam = rsaEncryptionService.ImportPrivateKey(privateKey);
             return rsaEncryptionService.Sign(privateKeyParam, data, algorithm, encoding);
@@ -239,7 +239,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="algorithm"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>
-        public static string SignFromPem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string data, string algorithm = "SHA256WITHRSA", Encoding encoding = null)
+        public static string SignFromPem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string data, string algorithm = "SHA256WITHRSA", Encoding? encoding = null)
         {
             var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPem(privateKeyPem);
             return rsaEncryptionService.Sign(privateKeyParam, data, algorithm, encoding);
@@ -254,7 +254,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="algorithm"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>
-        public static string SignFromPkcs8(this IRSAEncryptionService rsaEncryptionService, string privateKey, string data, string algorithm = "SHA256WITHRSA", Encoding encoding = null)
+        public static string SignFromPkcs8(this IRSAEncryptionService rsaEncryptionService, string privateKey, string data, string algorithm = "SHA256WITHRSA", Encoding? encoding = null)
         {
             var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPkcs8(privateKey);
             return rsaEncryptionService.Sign(privateKeyParam, data, algorithm, encoding);
@@ -269,7 +269,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="algorithm"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>
-        public static string SignFromPkcs8Pem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string data, string algorithm = "SHA256WITHRSA", Encoding encoding = null)
+        public static string SignFromPkcs8Pem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string data, string algorithm = "SHA256WITHRSA", Encoding? encoding = null)
         {
             var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPkcs8Pem(privateKeyPem);
             return rsaEncryptionService.Sign(privateKeyParam, data, algorithm, encoding);
@@ -285,7 +285,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="algorithm"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>
-        public static bool VerifySign(this IRSAEncryptionService rsaEncryptionService, AsymmetricKeyParameter publicKeyParam, string data, string signature, string algorithm = "SHA256WITHRSA", Encoding encoding = null)
+        public static bool VerifySign(this IRSAEncryptionService rsaEncryptionService, AsymmetricKeyParameter publicKeyParam, string data, string signature, string algorithm = "SHA256WITHRSA", Encoding? encoding = null)
         {
             encoding ??= Encoding.UTF8;
             var signatureBuffer = Base64.Decode(signature);
@@ -303,7 +303,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="algorithm"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>
-        public static bool VerifySign(this IRSAEncryptionService rsaEncryptionService, string publicKey, string data, string signature, string algorithm = "SHA256WITHRSA", Encoding encoding = null)
+        public static bool VerifySign(this IRSAEncryptionService rsaEncryptionService, string publicKey, string data, string signature, string algorithm = "SHA256WITHRSA", Encoding? encoding = null)
         {
             var publicKeyParam = rsaEncryptionService.ImportPublicKey(publicKey);
             return rsaEncryptionService.VerifySign(publicKeyParam, data, signature, algorithm, encoding);
@@ -319,7 +319,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="algorithm"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>
-        public static bool VerifySignFromPem(this IRSAEncryptionService rsaEncryptionService, string publicKeyPem, string data, string signature, string algorithm = "SHA256WITHRSA", Encoding encoding = null)
+        public static bool VerifySignFromPem(this IRSAEncryptionService rsaEncryptionService, string publicKeyPem, string data, string signature, string algorithm = "SHA256WITHRSA", Encoding? encoding = null)
         {
             var publicKeyParam = rsaEncryptionService.ImportPublicKeyPem(publicKeyPem);
             return rsaEncryptionService.VerifySign(publicKeyParam, data, signature, algorithm, encoding);

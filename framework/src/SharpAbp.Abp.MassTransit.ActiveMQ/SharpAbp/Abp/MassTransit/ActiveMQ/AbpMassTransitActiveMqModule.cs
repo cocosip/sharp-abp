@@ -21,7 +21,7 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
         {
             var configuration = context.Services.GetConfiguration();
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
-            if (abpMassTransitOptions.Provider.Equals(MassTransitActiveMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            if (abpMassTransitOptions.Provider!.Equals(MassTransitActiveMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
                 PreConfigure<AbpMassTransitActiveMqOptions>(options => options.PreConfigure(configuration));
 
@@ -65,7 +65,7 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
         {
             var configuration = context.Services.GetConfiguration();
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
-            if (abpMassTransitOptions.Provider.Equals(MassTransitActiveMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            if (abpMassTransitOptions.Provider!.Equals(MassTransitActiveMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
                 var massTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
                 var activeMqOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitActiveMqOptions>();
@@ -116,28 +116,28 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
                         //Message configure
                         foreach (var messageConfigue in messageConfigues)
                         {
-                            var queueName = activeMqOptions.DefaultQueueNameFormatFunc(massTransitOptions.Prefix, messageConfigue.Item1);
-                            messageConfigue.Item2?.Invoke(queueName, cfg);
+                            var queueName = activeMqOptions.DefaultQueueNameFormatFunc?.Invoke(massTransitOptions.Prefix, messageConfigue.Item1);
+                            messageConfigue.Item2?.Invoke(queueName!, cfg);
                         }
 
                         //Producer
                         foreach (var producer in activeMqOptions.Producers)
                         {
-                            var queueName = activeMqOptions.DefaultQueueNameFormatFunc(massTransitOptions.Prefix, producer.QueueName);
+                            var queueName = activeMqOptions.DefaultQueueNameFormatFunc?.Invoke(massTransitOptions.Prefix, producer.QueueName!);
                             producer.MapConfigure?.Invoke(new Uri($"activemq://{activeMqOptions.Host}/{queueName}"));
 
                             var publishTopologyConfigure = producer.PublishTopologyConfigure ?? activeMqOptions.DefaultPublishTopologyConfigure;
-                            producer.PublishConfigure?.Invoke(publishTopologyConfigure, ctx, cfg);
+                            producer.PublishConfigure?.Invoke(publishTopologyConfigure!, ctx, cfg);
                         }
 
                         //Consumer
                         foreach (var consumer in activeMqOptions.Consumers)
                         {
-                            var queueName = activeMqOptions.DefaultQueueNameFormatFunc(massTransitOptions.Prefix, consumer.QueueName);
+                            var queueName = activeMqOptions.DefaultQueueNameFormatFunc?.Invoke(massTransitOptions.Prefix, consumer.QueueName!);
                             consumer.MapConfigure?.Invoke(new Uri($"activemq://{activeMqOptions.Host}/{queueName}"));
 
                             var receiveEndpointConfigure = consumer.ReceiveEndpointConfigure ?? activeMqOptions.DefaultReceiveEndpointConfigure;
-                            consumer.ReceiveEndpoint?.Invoke(queueName, receiveEndpointConfigure, ctx, cfg);
+                            consumer.ReceiveEndpoint?.Invoke(queueName!, receiveEndpointConfigure!, ctx, cfg);
                         }
 
                         if (activeMqOptions.DefaultEnableArtemisCompatibility)
@@ -167,7 +167,7 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
         public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
         {
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
-            if (abpMassTransitOptions.Provider.Equals(MassTransitActiveMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            if (abpMassTransitOptions.Provider!.Equals(MassTransitActiveMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
                 Configure<AbpMassTransitActiveMqOptions>(options =>
                 {
@@ -226,28 +226,28 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
                         //Message configure
                         foreach (var messageConfigue in messageConfigues)
                         {
-                            var queueName = activeMqOptions.DefaultQueueNameFormatFunc(abpMassTransitOptions.Prefix, messageConfigue.Item1);
-                            messageConfigue.Item2?.Invoke(queueName, cfg);
+                            var queueName = activeMqOptions.DefaultQueueNameFormatFunc?.Invoke(abpMassTransitOptions.Prefix, messageConfigue.Item1);
+                            messageConfigue.Item2?.Invoke(queueName!, cfg);
                         }
 
                         //Producer
                         foreach (var producer in activeMqOptions.Producers)
                         {
-                            var queueName = activeMqOptions.DefaultQueueNameFormatFunc(abpMassTransitOptions.Prefix, producer.QueueName);
+                            var queueName = activeMqOptions.DefaultQueueNameFormatFunc?.Invoke(abpMassTransitOptions.Prefix, producer.QueueName!);
                             producer.MapConfigure?.Invoke(new Uri($"activemq://{activeMqOptions.Host}/{queueName}"));
 
                             var publishTopologyConfigure = producer.PublishTopologyConfigure ?? activeMqOptions.DefaultPublishTopologyConfigure;
-                            producer.PublishConfigure?.Invoke(publishTopologyConfigure, ctx, cfg);
+                            producer.PublishConfigure?.Invoke(publishTopologyConfigure!, ctx, cfg);
                         }
 
                         //Consumer
                         foreach (var consumer in activeMqOptions.Consumers)
                         {
-                            var queueName = activeMqOptions.DefaultQueueNameFormatFunc(abpMassTransitOptions.Prefix, consumer.QueueName);
+                            var queueName = activeMqOptions.DefaultQueueNameFormatFunc?.Invoke(abpMassTransitOptions.Prefix, consumer.QueueName!);
                             consumer.MapConfigure?.Invoke(new Uri($"activemq://{activeMqOptions.Host}/{queueName}"));
 
                             var receiveEndpointConfigure = consumer.ReceiveEndpointConfigure ?? activeMqOptions.DefaultReceiveEndpointConfigure;
-                            consumer.ReceiveEndpoint?.Invoke(queueName, receiveEndpointConfigure, ctx, cfg);
+                            consumer.ReceiveEndpoint?.Invoke(queueName!, receiveEndpointConfigure!, ctx, cfg);
                         }
 
                         if (activeMqOptions.DefaultEnableArtemisCompatibility)

@@ -7,7 +7,7 @@ namespace SharpAbp.Abp.MassTransit.PostgreSql
 {
     public class AbpMassTransitPostgreSqlOptions
     {
-        public string ConnectionString { get; set; }
+        public string? ConnectionString { get; set; }
         public bool Create { get; set; } = true;
         public bool Delete { get; set; } = false;
         public TimeSpan? AutoDeleteOnIdle { get; set; } = TimeSpan.FromSeconds(600);
@@ -16,19 +16,19 @@ namespace SharpAbp.Abp.MassTransit.PostgreSql
         public int ConcurrentMessageLimit { get; set; } = 1;
         public int PrefetchCount { get; set; } = 4;
 
-        public Action<ISqlMessagePublishTopologyConfigurator, Type> DefaultPublishTopologyConfigurator { get; set; }
-        public Func<Type, bool> DefaultFilter { get; set; }
+        public Action<ISqlMessagePublishTopologyConfigurator, Type>? DefaultPublishTopologyConfigurator { get; set; }
+        public Func<Type, bool>? DefaultFilter { get; set; }
 
-        public SqlTransportOptions SqlTransportOptions { get; set; }
+        public SqlTransportOptions? SqlTransportOptions { get; set; }
 
-        public Action<SqlTransportOptions> SqlTransportConfigure { get; set; }
-        public List<Action<IBusRegistrationContext, ISqlBusFactoryConfigurator>> PostgreSqlPreConfigures { get; set; }
-        public List<Action<IBusRegistrationContext, ISqlBusFactoryConfigurator>> PostgreSqlConfigures { get; set; }
-        public List<Action<IBusRegistrationContext, ISqlBusFactoryConfigurator>> PostgreSqlPostConfigures { get; set; }
+        public Action<SqlTransportOptions>? SqlTransportConfigure { get; set; }
+        public List<Action<IBusRegistrationContext, ISqlBusFactoryConfigurator>>? PostgreSqlPreConfigures { get; set; }
+        public List<Action<IBusRegistrationContext, ISqlBusFactoryConfigurator>>? PostgreSqlConfigures { get; set; }
+        public List<Action<IBusRegistrationContext, ISqlBusFactoryConfigurator>>? PostgreSqlPostConfigures { get; set; }
 
 
-        public List<PostgreSqlProducerConfiguration> Producers { get; set; }
-        public List<PostgreSqlConsumerConfiguration> Consumers { get; set; }
+        public List<PostgreSqlProducerConfiguration>? Producers { get; set; }
+        public List<PostgreSqlConsumerConfiguration>? Consumers { get; set; }
         public AbpMassTransitPostgreSqlOptions PreConfigure(IConfiguration configuration)
         {
             PostgreSqlPreConfigures = [];

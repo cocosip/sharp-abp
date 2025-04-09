@@ -51,7 +51,7 @@ namespace SharpAbp.Abp.FileStoring
             return await stream.GetAllBytesAsync(cancellationToken);
         }
 
-        public static async Task<byte[]> GetAllBytesOrNullAsync(
+        public static async Task<byte[]?> GetAllBytesOrNullAsync(
             this IFileContainer container,
             string fileId,
             CancellationToken cancellationToken = default)

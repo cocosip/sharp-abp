@@ -13,14 +13,14 @@ namespace SharpAbp.Abp.TransformSecurity
             Cache = cache;
         }
 
-        public virtual async Task<SecurityCredential> GetAsync(string identifier, CancellationToken cancellationToken = default)
+        public virtual async Task<SecurityCredential?> GetAsync(string identifier, CancellationToken cancellationToken = default)
         {
             return await Cache.GetAsync(identifier, token: cancellationToken);
         }
 
         public virtual async Task SetAsync(SecurityCredential credential, CancellationToken cancellationToken = default)
         {
-            await Cache.SetAsync(credential.Identifier, credential, token: cancellationToken);
+            await Cache.SetAsync(credential.Identifier!, credential, token: cancellationToken);
         }
     }
 }

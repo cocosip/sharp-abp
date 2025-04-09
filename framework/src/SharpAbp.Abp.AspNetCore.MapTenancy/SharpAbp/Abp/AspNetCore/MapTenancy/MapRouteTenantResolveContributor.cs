@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.MapTenancy;
-using System;
-using System.Threading.Tasks;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.MultiTenancy;
 
@@ -15,7 +15,7 @@ namespace SharpAbp.Abp.AspNetCore.MapTenancy
 
         public override string Name => ContributorName;
 
-        protected override async Task<string> GetTenantIdOrNameFromHttpContextOrNullAsync(ITenantResolveContext context, HttpContext httpContext)
+        protected override async Task<string?> GetTenantIdOrNameFromHttpContextOrNullAsync(ITenantResolveContext context, HttpContext httpContext)
         {
             var code = httpContext.GetRouteValue(context.GetAbpAspNetCoreMapTenancyOptions().MapTenantKey)?.ToString();
 

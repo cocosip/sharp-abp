@@ -100,7 +100,7 @@ namespace SharpAbp.Abp.FileStoring
         /// <returns>
         /// A <see cref="Stream"/> to read the file data.
         /// </returns>
-        Task<Stream> GetOrNullAsync(
+        Task<Stream?> GetOrNullAsync(
             string fileId,
             CancellationToken cancellationToken = default
         );

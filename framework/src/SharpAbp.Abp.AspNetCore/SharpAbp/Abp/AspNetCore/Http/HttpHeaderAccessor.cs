@@ -31,10 +31,10 @@ namespace SharpAbp.Abp.AspNetCore.Http
         public virtual RouteTranslationHeader GetRouteTranslationHeader()
         {
             var routeTranslationHeader = new RouteTranslationHeader();
-            var headers = GetPrefixHeaders(Options.RouteTranslationPrefix);
-            var schemeName = FormatHeaderName(Options.RouteTranslationPrefix, "Scheme");
-            var hostName = FormatHeaderName(Options.RouteTranslationPrefix, "Host");
-            var routerName = FormatHeaderName(Options.RouteTranslationPrefix, "Router");
+            var headers = GetPrefixHeaders(Options.RouteTranslationPrefix!);
+            var schemeName = FormatHeaderName(Options.RouteTranslationPrefix!, "Scheme");
+            var hostName = FormatHeaderName(Options.RouteTranslationPrefix!, "Host");
+            var routerName = FormatHeaderName(Options.RouteTranslationPrefix!, "Router");
 
             foreach (var headerKv in headers)
             {
@@ -42,15 +42,15 @@ namespace SharpAbp.Abp.AspNetCore.Http
                 {
                     if (headerKv.Key == schemeName)
                     {
-                        routeTranslationHeader.Scheme = headerKv.Value;
+                        routeTranslationHeader.Scheme = headerKv.Value!;
                     }
                     if (headerKv.Key == hostName)
                     {
-                        routeTranslationHeader.Host = headerKv.Value;
+                        routeTranslationHeader.Host = headerKv.Value!;
                     }
                     if (headerKv.Key == routerName)
                     {
-                        routeTranslationHeader.Router = headerKv.Value;
+                        routeTranslationHeader.Router = headerKv.Value!;
                     }
                 }
                 else

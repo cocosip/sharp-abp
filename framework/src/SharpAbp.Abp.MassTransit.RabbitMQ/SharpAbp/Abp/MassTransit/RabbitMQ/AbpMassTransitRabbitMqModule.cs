@@ -23,7 +23,7 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
             var configuration = context.Services.GetConfiguration();
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
 
-            if (abpMassTransitOptions.Provider.Equals(MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            if (abpMassTransitOptions.Provider!.Equals(MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
                 PreConfigure<AbpMassTransitRabbitMqOptions>(options => options.PreConfigure(configuration));
 
@@ -54,7 +54,7 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
 
             return Task.CompletedTask;
         }
- 
+
         public override void PostConfigureServices(ServiceConfigurationContext context)
         {
             AsyncHelper.RunSync(() => PostConfigureServicesAsync(context));
@@ -65,7 +65,7 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
             if (abpMassTransitOptions != null)
             {
-                if (abpMassTransitOptions.Provider.Equals(MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+                if (abpMassTransitOptions.Provider!.Equals(MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
                 {
                     Configure<AbpMassTransitRabbitMqOptions>(options =>
                     {
@@ -104,8 +104,8 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
 
                             cfg.Host(rabbitMqOptions.Host, rabbitMqOptions.Port, rabbitMqOptions.VirtualHost, rabbitMqOptions.ConnectionName, h =>
                             {
-                                h.Username(rabbitMqOptions.Username);
-                                h.Password(rabbitMqOptions.Password);
+                                h.Username(rabbitMqOptions.Username!);
+                                h.Password(rabbitMqOptions.Password!);
                                 //SSL
                                 if (rabbitMqOptions.UseSSL && rabbitMqOptions.ConfigureSsl != null)
                                 {
@@ -134,27 +134,27 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
                             //Message configure
                             foreach (var messageConfigue in messageConfigues)
                             {
-                                var entityName = rabbitMqOptions.DefaultExchangeNameFormatFunc(abpMassTransitOptions.Prefix, messageConfigue.Item1);
-                                messageConfigue.Item2?.Invoke(entityName, cfg);
+                                var entityName = rabbitMqOptions.DefaultExchangeNameFormatFunc?.Invoke(abpMassTransitOptions.Prefix, messageConfigue.Item1);
+                                messageConfigue.Item2?.Invoke(entityName!, cfg);
                             }
 
                             //Producer
                             foreach (var producer in rabbitMqOptions.Producers)
                             {
                                 var publishTopologyConfigure = producer.PublishTopologyConfigure ?? rabbitMqOptions.DefaultPublishTopologyConfigure;
-                                producer.PublishConfigure?.Invoke(publishTopologyConfigure, ctx, cfg);
+                                producer.PublishConfigure?.Invoke(publishTopologyConfigure!, ctx, cfg);
                             }
 
                             //Consumer
                             foreach (var consumer in rabbitMqOptions.Consumers)
                             {
-                                var exchangeName = rabbitMqOptions.DefaultExchangeNameFormatFunc(abpMassTransitOptions.Prefix, consumer.ExchangeName);
+                                var exchangeName = rabbitMqOptions.DefaultExchangeNameFormatFunc?.Invoke(abpMassTransitOptions.Prefix, consumer.ExchangeName!);
 
-                                var queueName = rabbitMqOptions.DefaultQueueNameFormatFunc(abpMassTransitOptions.Prefix, rabbitMqOptions.DefaultQueuePrefix, consumer.QueueName);
+                                var queueName = rabbitMqOptions.DefaultQueueNameFormatFunc?.Invoke(abpMassTransitOptions.Prefix , rabbitMqOptions.DefaultQueuePrefix, consumer.QueueName!);
 
                                 var receiveEndpointConfigure = consumer.ReceiveEndpointConfigure ?? rabbitMqOptions.DefaultReceiveEndpointConfigure;
 
-                                consumer.ReceiveEndpoint?.Invoke(exchangeName, queueName, receiveEndpointConfigure, ctx, cfg);
+                                consumer.ReceiveEndpoint?.Invoke(exchangeName!, queueName!, receiveEndpointConfigure!, ctx, cfg);
                             }
 
                             //RabbitMq postConfigure

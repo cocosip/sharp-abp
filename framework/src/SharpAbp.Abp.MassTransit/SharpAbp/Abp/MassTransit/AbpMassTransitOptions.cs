@@ -10,12 +10,12 @@ namespace SharpAbp.Abp.MassTransit
         /// <summary>
         /// Topic or queue prefix
         /// </summary>
-        public string Prefix { get; set; }
+        public string? Prefix { get; set; }
 
         /// <summary>
         /// Provider
         /// </summary>
-        public string Provider { get; set; }
+        public string? Provider { get; set; }
 
         /// <summary>
         /// Wait until started

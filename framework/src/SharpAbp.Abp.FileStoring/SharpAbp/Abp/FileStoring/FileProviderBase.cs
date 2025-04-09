@@ -18,11 +18,11 @@ namespace SharpAbp.Abp.FileStoring
 
         public abstract Task<bool> DownloadAsync(FileProviderDownloadArgs args);
 
-        public abstract Task<Stream> GetOrNullAsync(FileProviderGetArgs args);
+        public abstract Task<Stream?> GetOrNullAsync(FileProviderGetArgs args);
 
         public abstract Task<string> GetAccessUrlAsync(FileProviderAccessArgs args);
 
-        protected virtual async Task<Stream> TryCopyToMemoryStreamAsync(
+        protected virtual async Task<Stream?> TryCopyToMemoryStreamAsync(
             Stream stream, 
             CancellationToken cancellationToken = default)
         {

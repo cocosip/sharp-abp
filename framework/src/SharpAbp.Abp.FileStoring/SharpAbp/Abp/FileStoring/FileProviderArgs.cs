@@ -20,7 +20,7 @@ namespace SharpAbp.Abp.FileStoring
         protected FileProviderArgs(
             [NotNull] string containerName,
             [NotNull] FileContainerConfiguration configuration,
-            [CanBeNull] string fileId,
+            [CanBeNull] string? fileId,
             CancellationToken cancellationToken = default)
         {
             ContainerName = Check.NotNullOrWhiteSpace(containerName, nameof(containerName));

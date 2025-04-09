@@ -30,12 +30,12 @@ namespace SharpAbp.Abp.Crypto.SM2
         /// <returns></returns>
         public virtual AsymmetricCipherKeyPair GenerateSm2KeyPair(
             string curve = Sm2EncryptionNames.CurveSm2p256v1,
-            SecureRandom rd = null)
+            SecureRandom? rd = null)
         {
             rd ??= new SecureRandom();
             if (curve.IsNullOrWhiteSpace())
             {
-                curve = Options.DefaultCurve;
+                curve = Options.DefaultCurve!;
             }
 
             var generator = new ECKeyPairGenerator();
@@ -59,7 +59,7 @@ namespace SharpAbp.Abp.Crypto.SM2
         {
             if (curve.IsNullOrWhiteSpace())
             {
-                curve = Options.DefaultCurve;
+                curve = Options.DefaultCurve!;
             }
 
             var engine = new SM2Engine(mode);
@@ -86,7 +86,7 @@ namespace SharpAbp.Abp.Crypto.SM2
         {
             if (curve.IsNullOrWhiteSpace())
             {
-                curve = Options.DefaultCurve;
+                curve = Options.DefaultCurve!;
             }
 
             var engine = new SM2Engine(mode);
@@ -110,11 +110,11 @@ namespace SharpAbp.Abp.Crypto.SM2
             byte[] privateKey,
             byte[] plainText,
             string curve = Sm2EncryptionNames.CurveSm2p256v1,
-            byte[] id = null)
+            byte[]? id = null)
         {
             if (curve.IsNullOrWhiteSpace())
             {
-                curve = Options.DefaultCurve;
+                curve = Options.DefaultCurve!;
             }
 
             var x9Ec = GMNamedCurves.GetByName(curve);
@@ -144,11 +144,11 @@ namespace SharpAbp.Abp.Crypto.SM2
             byte[] plainText,
             byte[] signature,
             string curve = Sm2EncryptionNames.CurveSm2p256v1,
-            byte[] id = null)
+            byte[]? id = null)
         {
             if (curve.IsNullOrWhiteSpace())
             {
-                curve = Options.DefaultCurve;
+                curve = Options.DefaultCurve!;
             }
 
             var x9Ec = GMNamedCurves.GetByName(curve);
@@ -175,7 +175,7 @@ namespace SharpAbp.Abp.Crypto.SM2
         {
             if (curve.IsNullOrWhiteSpace())
             {
-                curve = Options.DefaultCurve;
+                curve = Options.DefaultCurve!;
             }
 
             var x9Ec = GMNamedCurves.GetByName(curve);
@@ -198,7 +198,7 @@ namespace SharpAbp.Abp.Crypto.SM2
         {
             if (curve.IsNullOrWhiteSpace())
             {
-                curve = Options.DefaultCurve;
+                curve = Options.DefaultCurve!;
             }
 
             var x9Ec = GMNamedCurves.GetByName(curve);
@@ -211,4 +211,4 @@ namespace SharpAbp.Abp.Crypto.SM2
             return result;
         }
     }
-    }
+}

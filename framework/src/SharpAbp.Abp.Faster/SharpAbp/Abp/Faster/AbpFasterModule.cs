@@ -53,8 +53,8 @@ namespace SharpAbp.Abp.Faster
 
         public override Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
         {
-            var options = context.ServiceProvider.GetService<IOptions<AbpFasterOptions>>().Value;
-            DirectoryHelper.CreateIfNotExists(options.RootPath);
+            var options = context.ServiceProvider.GetRequiredService<IOptions<AbpFasterOptions>>().Value;
+            DirectoryHelper.CreateIfNotExists(options.RootPath!);
             return Task.CompletedTask;
         }
     }

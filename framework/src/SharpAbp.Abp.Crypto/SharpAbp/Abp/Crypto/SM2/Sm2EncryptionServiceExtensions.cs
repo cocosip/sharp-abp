@@ -70,7 +70,7 @@ namespace SharpAbp.Abp.Crypto.SM2
             string plainText,
             string codeName = "utf-8",
             string curve = Sm2EncryptionNames.CurveSm2p256v1,
-            byte[] id = null)
+            byte[]? id = null)
         {
             var aPrivy = Hex.Decode(Encoding.Default.GetBytes(privateKey));
             var buffer = Encoding.GetEncoding(codeName).GetBytes(plainText);
@@ -96,7 +96,7 @@ namespace SharpAbp.Abp.Crypto.SM2
             string signature,
             string codeName = "utf-8",
             string curve = Sm2EncryptionNames.CurveSm2p256v1,
-            byte[] id = null)
+            byte[]? id = null)
         {
             var aPub = Hex.DecodeStrict(publicKey);
             var s = Hex.DecodeStrict(signature);

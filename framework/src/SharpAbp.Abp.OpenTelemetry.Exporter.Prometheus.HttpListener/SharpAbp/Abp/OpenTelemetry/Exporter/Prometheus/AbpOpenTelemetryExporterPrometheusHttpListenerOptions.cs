@@ -5,9 +5,9 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus
 {
     public class AbpOpenTelemetryExporterPrometheusHttpListenerOptions
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
-        public string ScrapeEndpointPath { get; set; } = "/metrics";
+        public string? ScrapeEndpointPath { get; set; } = "/metrics";
 
         public List<string> UriPrefixes { get; set; }
 

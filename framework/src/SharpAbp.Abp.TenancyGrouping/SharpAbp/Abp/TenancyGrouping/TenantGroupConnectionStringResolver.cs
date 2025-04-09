@@ -21,7 +21,7 @@ namespace SharpAbp.Abp.TenancyGrouping
         }
 
 
-        protected override async Task<TenantConfiguration> FindTenantConfigurationAsync(Guid tenantId)
+        protected override async Task<TenantConfiguration?> FindTenantConfigurationAsync(Guid tenantId)
         {
             using var serviceScope = ServiceProvider.CreateScope();
 
@@ -37,12 +37,15 @@ namespace SharpAbp.Abp.TenancyGrouping
             {
                 if (tenantGroup.ConnectionStrings != null)
                 {
-                    var defaultConnectionString = tenant.ConnectionStrings.Default;
+                    var defaultConnectionString = tenant?.ConnectionStrings?.Default;
 
-                    tenant.ConnectionStrings = tenantGroup.ConnectionStrings;
-                    if (tenant.ConnectionStrings.Default.IsNullOrWhiteSpace())
+                    if (tenant != null)
                     {
-                        tenant.ConnectionStrings.Default = defaultConnectionString;
+                        tenant.ConnectionStrings = tenantGroup.ConnectionStrings;
+                        if (tenant.ConnectionStrings.Default.IsNullOrWhiteSpace())
+                        {
+                            tenant.ConnectionStrings.Default = defaultConnectionString;
+                        }
                     }
                 }
             }
@@ -51,7 +54,7 @@ namespace SharpAbp.Abp.TenancyGrouping
         }
 
         [Obsolete("Use FindTenantConfigurationAsync method.")]
-        protected override TenantConfiguration FindTenantConfiguration(Guid tenantId)
+        protected override TenantConfiguration? FindTenantConfiguration(Guid tenantId)
         {
             using var serviceScope = ServiceProvider.CreateScope();
             var tenantStore = serviceScope
@@ -64,7 +67,10 @@ namespace SharpAbp.Abp.TenancyGrouping
             var tenantGroup = tenantGroupStore.FindByTenantId(tenantId);
             if (tenantGroup != null && tenantGroup.IsActive)
             {
-                tenant.ConnectionStrings = tenantGroup.ConnectionStrings;
+                if (tenant != null)
+                {
+                    tenant.ConnectionStrings = tenantGroup.ConnectionStrings;
+                }
             }
 
             return tenant;

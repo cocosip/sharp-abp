@@ -5,6 +5,8 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.1;$(NetCoreFx)</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>Nullable</WarningsAsErrors>
 		<AssemblyName>SharpAbp.Abp.FastDFS.SuperSocket</AssemblyName>
 		<PackageId>SharpAbp.Abp.FastDFS.SuperSocket</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>

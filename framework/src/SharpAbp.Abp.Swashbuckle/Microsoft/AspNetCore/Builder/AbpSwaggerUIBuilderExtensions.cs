@@ -9,7 +9,7 @@ namespace Microsoft.AspNetCore.Builder
     {
         public static IApplicationBuilder UseSharpAbpSwaggerUI(
             this IApplicationBuilder app,
-            Action<SwaggerUIOptions> setupAction = null)
+            Action<SwaggerUIOptions>? setupAction = null)
         {
             var resolver = app.ApplicationServices.GetService<ISwaggerHtmlResolver>();
 
@@ -18,7 +18,7 @@ namespace Microsoft.AspNetCore.Builder
                 options.InjectJavascript("ui/abp.js");
                 options.InjectJavascript("ui/abp.swagger.js");
                 options.InjectStylesheet("ui/swagger_theme.css");
-                options.IndexStream = () => resolver.Resolver();
+                options.IndexStream = () => resolver?.Resolver();
 
                 setupAction?.Invoke(options);
             });

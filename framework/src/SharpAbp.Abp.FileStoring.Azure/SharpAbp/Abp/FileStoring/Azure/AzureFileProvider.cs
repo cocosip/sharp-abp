@@ -59,7 +59,7 @@ namespace SharpAbp.Abp.FileStoring.Azure
             return await FileExistsAsync(args, fileName);
         }
 
-        public override async Task<Stream> GetOrNullAsync(FileProviderGetArgs args)
+        public override async Task<Stream?> GetOrNullAsync(FileProviderGetArgs args)
         {
             var fileName = AzureFileNameCalculator.Calculate(args);
             if (!await FileExistsAsync(args, fileName))

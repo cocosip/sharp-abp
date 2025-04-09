@@ -1,7 +1,7 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using System;
 using Volo.Abp.EntityFrameworkCore.DependencyInjection;
 
 namespace SharpAbp.Abp.EntityFrameworkCore
@@ -10,7 +10,7 @@ namespace SharpAbp.Abp.EntityFrameworkCore
     {
         public static DbContextOptionsBuilder UseDm(
             [NotNull] this AbpDbContextConfigurationContext context,
-            Action<DmDbContextOptionsBuilder> dmOptionsAction = null)
+            Action<DmDbContextOptionsBuilder>? dmOptionsAction = null)
         {
             if (context.ExistingConnection != null)
             {

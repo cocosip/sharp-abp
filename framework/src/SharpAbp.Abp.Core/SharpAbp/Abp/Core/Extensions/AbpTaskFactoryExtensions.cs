@@ -38,7 +38,7 @@ namespace SharpAbp.Abp.Core.Extensions
             }
 
             // Create the timed task
-            var tcs = new TaskCompletionSource<object>(factory.CreationOptions);
+            var tcs = new TaskCompletionSource<object?>(factory.CreationOptions);
             var ctr = default(CancellationTokenRegistration);
 
             // Create the timer but don't start it yet.  If we start it now,

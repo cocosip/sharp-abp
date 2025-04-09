@@ -15,7 +15,7 @@ namespace SharpAbp.Abp.Core.Extensions
             {
                 return task.Result;
             }
-            return default;
+            return default!;
         }
 
         /// <summary>

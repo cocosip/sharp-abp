@@ -32,7 +32,7 @@
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        PerformanceInfo GetKeyPerformanceInfo(string key);
+        PerformanceInfo? GetKeyPerformanceInfo(string key);
     
     }
 }

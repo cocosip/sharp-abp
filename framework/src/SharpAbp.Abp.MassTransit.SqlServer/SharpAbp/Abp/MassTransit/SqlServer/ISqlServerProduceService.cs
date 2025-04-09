@@ -22,7 +22,7 @@ namespace SharpAbp.Abp.MassTransit.SqlServer
         /// <param name="messageType"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task PublishAsync(object message, Type messageType = null, CancellationToken cancellationToken = default);
+        Task PublishAsync(object message, Type? messageType = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Send message

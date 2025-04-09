@@ -1,6 +1,6 @@
-﻿using JetBrains.Annotations;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Volo.Abp;
 using Volo.Abp.Collections;
 
@@ -8,9 +8,9 @@ namespace SharpAbp.Abp.FileStoring
 {
     public class FileProviderConfiguration
     {
-        public string Provider { get; }
+        public string? Provider { get; }
 
-        public Type LocalizationResource { get; }
+        public Type? LocalizationResource { get; }
 
         public ITypeList<IFileNamingNormalizer> DefaultNamingNormalizers { get; }
 
@@ -20,7 +20,7 @@ namespace SharpAbp.Abp.FileStoring
         public FileProviderConfiguration()
         {
             DefaultNamingNormalizers = new TypeList<IFileNamingNormalizer>();
-            _items = new Dictionary<string, FileProviderConfigurationItem>();
+            _items = [];
         }
 
         public FileProviderConfiguration([NotNull] string provider, Type localizationResource) : this()
@@ -37,7 +37,7 @@ namespace SharpAbp.Abp.FileStoring
         }
 
         public FileProviderConfiguration AddItem(
-            [NotNull] string name, 
+            [NotNull] string name,
             [NotNull] FileProviderConfigurationItem item)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
@@ -47,9 +47,9 @@ namespace SharpAbp.Abp.FileStoring
         }
 
         public FileProviderConfiguration AddItem(
-            [NotNull] string name, 
-            [NotNull] Type valueType, 
-            string eg = "", 
+            [NotNull] string name,
+            [NotNull] Type valueType,
+            string eg = "",
             string noteLocalizationName = "")
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));

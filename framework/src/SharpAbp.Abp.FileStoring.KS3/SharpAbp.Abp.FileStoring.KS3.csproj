@@ -5,6 +5,8 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>$(ProjectFrameworks)</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>Nullable</WarningsAsErrors>
 		<AssemblyName>SharpAbp.Abp.FileStoring.KS3</AssemblyName>
 		<PackageId>SharpAbp.Abp.FileStoring.KS3</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>

@@ -2,10 +2,10 @@
 {
     public class FileNormalizeNaming
     {
-        public string ContainerName { get; }
-        public string FileName { get; }
+        public string? ContainerName { get; }
+        public string? FileName { get; }
 
-        public FileNormalizeNaming(string containerName, string fileName)
+        public FileNormalizeNaming(string? containerName, string? fileName)
         {
             ContainerName = containerName;
             FileName = fileName;

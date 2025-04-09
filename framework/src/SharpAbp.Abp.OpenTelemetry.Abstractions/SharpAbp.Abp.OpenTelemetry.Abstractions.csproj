@@ -5,6 +5,8 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>$(ProjectFrameworks)</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>Nullable</WarningsAsErrors>
 		<AssemblyName>SharpAbp.Abp.OpenTelemetry.Abstractions</AssemblyName>
 		<PackageId>SharpAbp.Abp.OpenTelemetry.Abstractions</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>

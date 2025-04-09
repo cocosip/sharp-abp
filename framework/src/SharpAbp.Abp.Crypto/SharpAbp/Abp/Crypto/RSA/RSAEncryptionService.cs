@@ -24,7 +24,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="keySize"></param>
         /// <param name="rd"></param>
         /// <returns></returns>
-        public virtual AsymmetricCipherKeyPair GenerateRSAKeyPair(int keySize = 2048, SecureRandom rd = null)
+        public virtual AsymmetricCipherKeyPair GenerateRSAKeyPair(int keySize = 2048, SecureRandom? rd = null)
         {
             rd ??= new SecureRandom();
             var generator = new RsaKeyPairGenerator();

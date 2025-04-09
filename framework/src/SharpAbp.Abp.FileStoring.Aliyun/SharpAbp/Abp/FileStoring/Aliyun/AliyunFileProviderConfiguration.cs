@@ -96,7 +96,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
         }
 
         private readonly string _temporaryCredentialsCacheKey;
-        public string TemporaryCredentialsCacheKey
+        public string? TemporaryCredentialsCacheKey
         {
             get => _containerConfiguration.GetConfigurationOrDefault(AliyunFileProviderConfigurationNames.TemporaryCredentialsCacheKey, _temporaryCredentialsCacheKey);
             set => _containerConfiguration.SetConfiguration(AliyunFileProviderConfigurationNames.TemporaryCredentialsCacheKey, value);

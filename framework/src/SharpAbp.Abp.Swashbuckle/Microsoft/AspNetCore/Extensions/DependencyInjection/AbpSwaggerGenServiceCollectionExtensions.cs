@@ -15,7 +15,7 @@ namespace Microsoft.AspNetCore.Extensions.DependencyInjection
     {
         public static IServiceCollection AddAbpSwaggerGen(
             this IServiceCollection services,
-            Action<SwaggerGenOptions> setupAction = null)
+            Action<SwaggerGenOptions>? setupAction = null)
         {
             return services.AddSwaggerGen(
                 options =>
@@ -37,7 +37,7 @@ namespace Microsoft.AspNetCore.Extensions.DependencyInjection
             this IServiceCollection services,
             [NotNull] string authority,
             [NotNull] Dictionary<string, string> scopes,
-            Action<SwaggerGenOptions> setupAction = null,
+            Action<SwaggerGenOptions>? setupAction = null,
             string authorizationEndpoint = "/connect/authorize",
             string tokenEndpoint = "/connect/token")
         {
@@ -85,10 +85,10 @@ namespace Microsoft.AspNetCore.Extensions.DependencyInjection
         public static IServiceCollection AddAbpSwaggerGenWithOidc(
             this IServiceCollection services,
             [NotNull] string authority,
-            string[] scopes = null,
-            string[] flows = null,
-            string discoveryEndpoint = null,
-            Action<SwaggerGenOptions> setupAction = null)
+            string[]? scopes = null,
+            string[]? flows = null,
+            string? discoveryEndpoint = null,
+            Action<SwaggerGenOptions>? setupAction = null)
         {
             var discoveryUrl = discoveryEndpoint != null ?
                 $"{discoveryEndpoint.TrimEnd('/')}/.well-known/openid-configuration" :

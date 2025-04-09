@@ -40,7 +40,7 @@ namespace SharpAbp.Abp.TenancyGrouping
             return tenantGroup;
         }
 
-        protected virtual async Task<TenantGroupConfiguration> FindTenantAsync(string tenantGroupIdOrName)
+        protected virtual async Task<TenantGroupConfiguration?> FindTenantAsync(string tenantGroupIdOrName)
         {
             if (Guid.TryParse(tenantGroupIdOrName, out var parsedTenantId))
             {

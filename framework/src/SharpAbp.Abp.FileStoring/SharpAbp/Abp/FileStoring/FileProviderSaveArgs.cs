@@ -7,16 +7,16 @@ namespace SharpAbp.Abp.FileStoring
 {
     public class FileProviderSaveArgs : FileProviderArgs
     {
-        public Stream FileStream { get; }
+        public Stream? FileStream { get; }
 
-        public string FileExt { get; set; }
+        public string? FileExt { get; set; }
 
         public bool OverrideExisting { get; }
 
         public FileProviderSaveArgs(
             [NotNull] string containerName,
             [NotNull] FileContainerConfiguration configuration,
-            [CanBeNull] string fileId,
+            [CanBeNull] string? fileId,
             bool overrideExisting = false,
             CancellationToken cancellationToken = default)
             : base(
@@ -32,7 +32,7 @@ namespace SharpAbp.Abp.FileStoring
         public FileProviderSaveArgs(
            [NotNull] string containerName,
            [NotNull] FileContainerConfiguration configuration,
-           [CanBeNull] string fileId,
+           [CanBeNull] string? fileId,
            [NotNull] Stream fileStream,
            [NotNull] string fileExt,
            bool overrideExisting = false,

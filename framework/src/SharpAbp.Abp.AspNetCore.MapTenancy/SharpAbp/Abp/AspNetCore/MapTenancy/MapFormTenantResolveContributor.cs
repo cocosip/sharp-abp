@@ -14,7 +14,7 @@ namespace SharpAbp.Abp.AspNetCore.MapTenancy
 
         public override string Name => ContributorName;
 
-        protected override async Task<string> GetTenantIdOrNameFromHttpContextOrNullAsync(ITenantResolveContext context, HttpContext httpContext)
+        protected override async Task<string?> GetTenantIdOrNameFromHttpContextOrNullAsync(ITenantResolveContext context, HttpContext httpContext)
         {
             if (!httpContext.Request.HasFormContentType)
             {
@@ -27,7 +27,7 @@ namespace SharpAbp.Abp.AspNetCore.MapTenancy
             {
                 var configurationProvider = context.ServiceProvider.GetRequiredService<IMapTenancyConfigurationProvider>();
 
-                var mapTenancyConfiguration = await configurationProvider.GetAsync(code);
+                var mapTenancyConfiguration = await configurationProvider.GetAsync(code.ToString());
                 return mapTenancyConfiguration?.TenantId?.ToString();
             }
 

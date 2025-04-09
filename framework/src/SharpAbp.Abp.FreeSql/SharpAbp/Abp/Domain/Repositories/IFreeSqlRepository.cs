@@ -7,6 +7,6 @@ namespace SharpAbp.Abp.Domain.Repositories
     {
         Task<IDbConnection> GetDbConnectionAsync();
  
-        Task<IDbTransaction> GetDbTransactionAsync();
+        Task<IDbTransaction?> GetDbTransactionAsync();
     }
 }

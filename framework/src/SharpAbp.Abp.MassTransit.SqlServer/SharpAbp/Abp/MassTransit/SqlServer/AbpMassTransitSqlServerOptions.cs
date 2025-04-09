@@ -7,7 +7,7 @@ namespace SharpAbp.Abp.MassTransit.SqlServer
 {
     public class AbpMassTransitSqlServerOptions
     {
-        public string ConnectionString { get; set; }
+        public string? ConnectionString { get; set; }
         public bool Create { get; set; } = true;
         public bool Delete { get; set; } = false;
         public TimeSpan? AutoDeleteOnIdle { get; set; } = TimeSpan.FromSeconds(600);
@@ -16,19 +16,19 @@ namespace SharpAbp.Abp.MassTransit.SqlServer
         public int ConcurrentMessageLimit { get; set; } = 1;
         public int PrefetchCount { get; set; } = 4;
 
-        public Action<ISqlMessagePublishTopologyConfigurator, Type> DefaultPublishTopologyConfigurator { get; set; }
-        public Func<Type, bool> DefaultFilter { get; set; }
+        public Action<ISqlMessagePublishTopologyConfigurator, Type>? DefaultPublishTopologyConfigurator { get; set; }
+        public Func<Type, bool>? DefaultFilter { get; set; }
 
-        public SqlTransportOptions SqlTransportOptions { get; set; }
+        public SqlTransportOptions? SqlTransportOptions { get; set; }
 
-        public Action<SqlTransportOptions> SqlTransportConfigure { get; set; }
-        public List<Action<IBusRegistrationContext, ISqlBusFactoryConfigurator>> SqlServerPreConfigures { get; set; }
-        public List<Action<IBusRegistrationContext, ISqlBusFactoryConfigurator>> SqlServerConfigures { get; set; }
-        public List<Action<IBusRegistrationContext, ISqlBusFactoryConfigurator>> SqlServerPostConfigures { get; set; }
+        public Action<SqlTransportOptions>? SqlTransportConfigure { get; set; }
+        public List<Action<IBusRegistrationContext, ISqlBusFactoryConfigurator>>? SqlServerPreConfigures { get; set; }
+        public List<Action<IBusRegistrationContext, ISqlBusFactoryConfigurator>>? SqlServerConfigures { get; set; }
+        public List<Action<IBusRegistrationContext, ISqlBusFactoryConfigurator>>? SqlServerPostConfigures { get; set; }
 
 
-        public List<SqlServerProducerConfiguration> Producers { get; set; }
-        public List<SqlServerConsumerConfiguration> Consumers { get; set; }
+        public List<SqlServerProducerConfiguration>? Producers { get; set; }
+        public List<SqlServerConsumerConfiguration>? Consumers { get; set; }
         public AbpMassTransitSqlServerOptions PreConfigure(IConfiguration configuration)
         {
             SqlServerPreConfigures = [];
@@ -72,5 +72,5 @@ namespace SharpAbp.Abp.MassTransit.SqlServer
 
             return this;
         }
-}
+    }
 }

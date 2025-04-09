@@ -93,7 +93,7 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
             }
         }
 
-        public override async Task<Stream> GetOrNullAsync(FileProviderGetArgs args)
+        public override async Task<Stream?> GetOrNullAsync(FileProviderGetArgs args)
         {
             var configuration = args.Configuration.GetFastDFSConfiguration();
 

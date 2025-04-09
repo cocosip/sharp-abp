@@ -63,7 +63,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
                 }
             }
 
-            if (args.Configuration.EnableAutoMultiPartUpload && args.FileStream.Length > args.Configuration.MultiPartUploadMinFileSize)
+            if (args.Configuration.EnableAutoMultiPartUpload && args.FileStream?.Length > args.Configuration.MultiPartUploadMinFileSize)
             {
                 return await MultiPartUploadAsync(ossClient, containerName, objectKey, args);
             }
@@ -94,7 +94,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             return Task.FromResult(FileExistsAsync(ossClient, containerName, objectKey));
         }
 
-        public override async Task<Stream> GetOrNullAsync(FileProviderGetArgs args)
+        public override async Task<Stream?> GetOrNullAsync(FileProviderGetArgs args)
         {
             var containerName = GetContainerName(args);
             var objectKey = AliyunFileNameCalculator.Calculate(args);
@@ -185,7 +185,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             // 计算分片总数。
             var partSize = args.Configuration.MultiPartUploadShardingSize;
             //var fi = new FileInfo(spoolFile.FilePath);//?
-            var fileSize = args.FileStream.Length;
+            var fileSize = args.FileStream!.Length;
             var partCount = fileSize / partSize;
             if (fileSize % partSize != 0)
             {

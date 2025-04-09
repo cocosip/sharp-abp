@@ -40,7 +40,7 @@ namespace SharpAbp.Abp.Crypto.SM4
             //CBC模式下,iv不为空
             if (mode.Equals(Sm4EncryptionNames.ModeCBC, StringComparison.OrdinalIgnoreCase))
             {
-                iv ??= Options.DefaultIv;
+                iv ??= Options.DefaultIv!;
 
                 if (iv.Length != 16)
                 {
@@ -91,7 +91,7 @@ namespace SharpAbp.Abp.Crypto.SM4
             //CBC模式下,iv不为空
             if (mode.Equals(Sm4EncryptionNames.ModeCBC, StringComparison.OrdinalIgnoreCase))
             {
-                iv ??= Options.DefaultIv;
+                iv ??= Options.DefaultIv!;
 
                 if (iv.Length != 16)
                 {

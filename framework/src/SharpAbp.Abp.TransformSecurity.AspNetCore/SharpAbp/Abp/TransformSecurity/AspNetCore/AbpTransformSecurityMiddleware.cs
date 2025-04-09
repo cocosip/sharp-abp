@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
@@ -32,10 +33,10 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
             {
                 try
                 {
-                    var identifier = context.Request.Headers[AspNetCoreOptions.TransformSecurityIdentifierName];
+                    var identifier = context.Request.Headers[AspNetCoreOptions.TransformSecurityIdentifierName].ToString();
                     foreach (var type in AspNetCoreOptions.MiddlewareHandlers)
                     {
-                        var handler = ServiceProvider.GetService(type).As<IAbpTransformSecurityMiddlewareHandler>();
+                        var handler = ServiceProvider.GetRequiredService(type).As<IAbpTransformSecurityMiddlewareHandler>();
                         await handler.HandleAsync(context, identifier, default);
                     }
                 }

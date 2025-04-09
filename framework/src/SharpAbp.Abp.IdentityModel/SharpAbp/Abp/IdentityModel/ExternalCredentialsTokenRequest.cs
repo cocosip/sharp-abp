@@ -9,17 +9,17 @@ namespace SharpAbp.Abp.IdentityModel
         /// <summary>
         /// Login provider
         /// </summary>
-        public string LoginProvider { get; set; }
+        public string? LoginProvider { get; set; }
 
         /// <summary>
         /// Provider key
         /// </summary>
-        public string ProviderKey { get; set; }
+        public string? ProviderKey { get; set; }
 
         /// <summary>
         /// Scope
         /// </summary>
-        public string Scope { get; set; }
+        public string? Scope { get; set; }
 
         /// <summary>
         /// List of requested resources

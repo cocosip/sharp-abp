@@ -53,7 +53,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
                 await CreateContainerIfNotExists(amazonS3Client, containerName);
             }
 
-            if (args.Configuration.EnableAutoMultiPartUpload && args.FileStream.Length > args.Configuration.MultiPartUploadMinFileSize)
+            if (args.Configuration.EnableAutoMultiPartUpload && args.FileStream!.Length > args.Configuration.MultiPartUploadMinFileSize)
             {
                 return await MultiPartUploadAsync(amazonS3Client, containerName, objectKey, args);
             }
@@ -91,7 +91,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             using var amazonS3Client = await GetAmazonS3Client(args);
             return await FileExistsAsync(amazonS3Client, containerName, objectKey);
         }
-        public override async Task<Stream> GetOrNullAsync(FileProviderGetArgs args)
+        public override async Task<Stream?> GetOrNullAsync(FileProviderGetArgs args)
         {
             var objectKey = AwsFileNameCalculator.Calculate(args);
             var containerName = GetContainerName(args);
@@ -246,7 +246,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             // 计算分片总数。
             var partSize = args.Configuration.MultiPartUploadShardingSize;
 
-            var fileSize = args.FileStream.Length;
+            var fileSize = args.FileStream!.Length;
             var partCount = fileSize / partSize;
             if (fileSize % partSize != 0)
             {

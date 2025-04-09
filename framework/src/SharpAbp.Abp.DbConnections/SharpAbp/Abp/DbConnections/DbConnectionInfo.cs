@@ -6,14 +6,14 @@ namespace SharpAbp.Abp.DbConnections
     public class DbConnectionInfo : IEquatable<DbConnectionInfo>
     {
         public DatabaseProvider DatabaseProvider { get; }
-        public string ConnectionString { get; set; }
+        public string? ConnectionString { get; set; }
 
         public DbConnectionInfo()
         {
 
         }
 
-        public DbConnectionInfo(DatabaseProvider databaseProvider, string connectionString)
+        public DbConnectionInfo(DatabaseProvider databaseProvider, string? connectionString)
         {
             DatabaseProvider = databaseProvider;
             ConnectionString = connectionString;

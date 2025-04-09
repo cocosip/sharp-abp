@@ -92,7 +92,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
             return await FileExistsAsync(client, containerName, objectKey, args.CancellationToken);
         }
 
-        public override async Task<Stream> GetOrNullAsync(FileProviderGetArgs args)
+        public override async Task<Stream?> GetOrNullAsync(FileProviderGetArgs args)
         {
             var objectKey = MinioFileNameCalculator.Calculate(args);
             var client = GetMinioClient(args);

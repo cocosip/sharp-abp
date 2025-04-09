@@ -16,7 +16,7 @@ namespace SharpAbp.Abp.Swashbuckle
             var stream = typeof(SwaggerUIOptions).GetTypeInfo().Assembly
                 .GetManifestResourceStream("Swashbuckle.AspNetCore.SwaggerUI.index.html");
 
-            var html = new StreamReader(stream)
+            var html = new StreamReader(stream!)
                 .ReadToEnd()
                 .Replace("SwaggerUIBundle(configObject)", "abp.SwaggerUIBundle(configObject)");
 

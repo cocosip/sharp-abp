@@ -59,7 +59,7 @@ namespace SharpAbp.Abp.Swashbuckle.Versioning
                 if (parameter.Schema.Default == null && description.DefaultValue != null)
                 {
                     // REF: https://github.com/Microsoft/aspnet-api-versioning/issues/429#issuecomment-605402330
-                    var json = JsonSerializer.Serialize(description.DefaultValue, description.ModelMetadata.ModelType);
+                    var json = JsonSerializer.Serialize(description.DefaultValue, description.ModelMetadata!.ModelType);
                     parameter.Schema.Default = OpenApiAnyFactory.CreateFromJson(json);
                 }
 

@@ -9,7 +9,7 @@ namespace SharpAbp.Abp.EntityFrameworkCore
     {
         public static void UseDm(
             [NotNull] this AbpDbContextOptions options,
-            Action<DmDbContextOptionsBuilder> dmOptionsAction = null)
+            Action<DmDbContextOptionsBuilder>? dmOptionsAction = null)
         {
             options.Configure(context =>
             {
@@ -19,7 +19,7 @@ namespace SharpAbp.Abp.EntityFrameworkCore
 
         public static void UseDm<TDbContext>(
             [NotNull] this AbpDbContextOptions options,
-            Action<DmDbContextOptionsBuilder> dmOptionsAction = null)
+            Action<DmDbContextOptionsBuilder>? dmOptionsAction = null)
             where TDbContext : AbpDbContext<TDbContext>
         {
             options.Configure<TDbContext>(context =>

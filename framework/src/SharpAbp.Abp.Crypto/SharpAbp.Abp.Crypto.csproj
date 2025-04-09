@@ -5,6 +5,8 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>$(ProjectFrameworks)</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>Nullable</WarningsAsErrors>
 		<AssemblyName>SharpAbp.Abp.Crypto</AssemblyName>
 		<PackageId>SharpAbp.Abp.Crypto</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>

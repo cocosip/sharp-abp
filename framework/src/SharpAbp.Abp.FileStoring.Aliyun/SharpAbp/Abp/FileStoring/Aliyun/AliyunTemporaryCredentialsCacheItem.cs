@@ -11,11 +11,6 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
 
         public string SecurityToken { get; set; }
 
-        public AliyunTemporaryCredentialsCacheItem()
-        {
-
-        }
-
         public AliyunTemporaryCredentialsCacheItem(string accessKeyId, string accessKeySecret, string securityToken)
         {
             AccessKeyId = accessKeyId;

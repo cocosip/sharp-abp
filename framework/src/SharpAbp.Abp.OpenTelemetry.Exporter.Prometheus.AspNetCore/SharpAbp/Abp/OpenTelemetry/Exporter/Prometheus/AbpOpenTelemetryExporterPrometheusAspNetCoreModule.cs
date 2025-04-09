@@ -89,7 +89,7 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus
 
             var applicationBuilder = context.GetApplicationBuilder();
 
-            if (options.UseMetricsExporter.Equals(OpenTelemetryExporterNames.PrometheusAspNetCore, StringComparison.OrdinalIgnoreCase))
+            if (options.UseMetricsExporter!.Equals(OpenTelemetryExporterNames.PrometheusAspNetCore, StringComparison.OrdinalIgnoreCase))
             {
                 openTelemetryExporterPrometheusAspNetCoreOptions.PrometheusScrapingEndpointConfigure?.Invoke(applicationBuilder);
                 if (openTelemetryExporterPrometheusAspNetCoreOptions.PrometheusScrapingEndpointConfigure != null)

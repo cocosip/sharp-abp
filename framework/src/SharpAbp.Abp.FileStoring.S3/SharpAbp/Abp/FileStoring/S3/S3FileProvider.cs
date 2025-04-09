@@ -56,7 +56,7 @@ namespace SharpAbp.Abp.FileStoring.S3
             }
 
             string fileId;
-            if (args.Configuration.EnableAutoMultiPartUpload && (args.FileStream.Length > args.Configuration.MultiPartUploadMinFileSize))
+            if (args.Configuration.EnableAutoMultiPartUpload && (args.FileStream!.Length > args.Configuration.MultiPartUploadMinFileSize))
             {
                 fileId = await MultipartUploadAsync(client, containerName, objectKey, configuration, args);
             }
@@ -105,7 +105,7 @@ namespace SharpAbp.Abp.FileStoring.S3
             return true;
         }
 
-        public override async Task<Stream> GetOrNullAsync(FileProviderGetArgs args)
+        public override async Task<Stream?> GetOrNullAsync(FileProviderGetArgs args)
         {
             var containerName = GetContainerName(args);
             var objectKey = FileNameCalculator.Calculate(args);
@@ -186,7 +186,7 @@ namespace SharpAbp.Abp.FileStoring.S3
             //Calculate slice part count
             var partSize = args.Configuration.MultiPartUploadShardingSize;
             //var fi = new FileInfo(spoolFile.FilePath);//?
-            var fileSize = args.FileStream.Length;
+            var fileSize = args.FileStream!.Length;
             var partCount = fileSize / partSize;
             if (fileSize % partSize != 0)
             {

@@ -25,7 +25,7 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
                 {
                     builder.UseEndpoints(endpoints =>
                     {
-                        endpoints.MapGet(page.Route, ctx => MapPage(page, ctx));
+                        endpoints.MapGet(page.Route!, ctx => MapPage(page, ctx));
                     });
                 }
 
@@ -34,7 +34,7 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
                 {
                     builder.UseStaticFiles(new StaticFileOptions()
                     {
-                        FileProvider = new PhysicalFileProvider(staticDir.Path),
+                        FileProvider = new PhysicalFileProvider(staticDir.Path!),
                         RequestPath = staticDir.RequestPath,
                         ContentTypeProvider = new FileExtensionContentTypeProvider()
                     });
@@ -46,7 +46,7 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
 
         private static Task MapPage(FrontApplicationPage page, HttpContext context)
         {
-            var buffer = File.ReadAllBytes(page.Path);
+            var buffer = File.ReadAllBytes(page.Path!);
             context.Response.ContentType = page.ContentType;
             return context.Response.Body.WriteAsync(buffer, 0, buffer.Length);
         }

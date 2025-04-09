@@ -14,7 +14,7 @@ namespace SharpAbp.Abp.AspNetCore.MapTenancy
 
         public override string Name => ContributorName;
 
-        protected override async Task<string> GetTenantIdOrNameFromHttpContextOrNullAsync(ITenantResolveContext context, HttpContext httpContext)
+        protected override async Task<string?> GetTenantIdOrNameFromHttpContextOrNullAsync(ITenantResolveContext context, HttpContext httpContext)
         {
             if (httpContext.Request.QueryString.HasValue)
             {

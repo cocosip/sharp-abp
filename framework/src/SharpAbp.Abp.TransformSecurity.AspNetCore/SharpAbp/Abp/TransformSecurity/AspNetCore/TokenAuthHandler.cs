@@ -50,7 +50,7 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
                         }
                         else
                         {
-                            form.Add(item.Key, item.Value);
+                            form.Add(item.Key, item.Value.ToString());
                         }
                     }
 

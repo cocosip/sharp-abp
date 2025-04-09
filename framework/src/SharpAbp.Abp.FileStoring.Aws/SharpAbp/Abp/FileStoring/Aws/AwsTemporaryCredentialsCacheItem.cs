@@ -11,11 +11,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
 
         public string SessionToken { get; set; }
 
-        public AwsTemporaryCredentialsCacheItem()
-        {
-
-        }
-
+ 
         public AwsTemporaryCredentialsCacheItem(string accessKeyId, string secretAccessKey, string sessionToken)
         {
             AccessKeyId = accessKeyId;

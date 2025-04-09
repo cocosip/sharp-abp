@@ -11,7 +11,7 @@ namespace SharpAbp.Abp.IdentityModel
         /// <param name="userPassword"></param>
         /// <param name="identityClientName"></param>
         /// <returns></returns>
-        Task<string> GetUserAccessTokenAsync(string userName, string userPassword, string identityClientName = null);
+        Task<string?> GetUserAccessTokenAsync(string userName, string userPassword, string? identityClientName = null);
 
         /// <summary>
         /// ExternalCredentials
@@ -20,6 +20,6 @@ namespace SharpAbp.Abp.IdentityModel
         /// <param name="providerKey"></param>
         /// <param name="identityClientName"></param>
         /// <returns></returns>
-        Task<string> GetExternalCredentialsAccessTokenAsync(string loginProvider, string providerKey, string identityClientName = null);
+        Task<string?> GetExternalCredentialsAccessTokenAsync(string loginProvider, string providerKey, string? identityClientName = null);
     }
 }

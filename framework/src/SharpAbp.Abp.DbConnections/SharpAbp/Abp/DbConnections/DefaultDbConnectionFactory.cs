@@ -24,10 +24,10 @@ namespace SharpAbp.Abp.DbConnections
         /// <param name="dbConnectionName"></param>
         /// <returns></returns>
         [NotNull]
-        public virtual async Task<DbConnectionInfo> GetDbConnectionInfoAsync([NotNull] string dbConnectionName)
+        public virtual async Task<DbConnectionInfo?> GetDbConnectionInfoAsync([NotNull] string dbConnectionName)
         {
             Check.NotNullOrWhiteSpace(dbConnectionName, nameof(dbConnectionName));
-            return await DbConnectionInfoResolver.ResolveAsync(dbConnectionName);
+            return Check.NotNull(await DbConnectionInfoResolver.ResolveAsync(dbConnectionName), nameof(DbConnectionInfo));
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace SharpAbp.Abp.DbConnections
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public virtual async Task<DbConnectionInfo> GetDbConnectionInfoAsync<T>()
+        public virtual async Task<DbConnectionInfo?> GetDbConnectionInfoAsync<T>()
         {
             var dbConnectionName = DbConnectionNameAttribute.GetDbConnectionName<T>();
             return await GetDbConnectionInfoAsync(dbConnectionName);
@@ -47,10 +47,10 @@ namespace SharpAbp.Abp.DbConnections
         /// <param name="dbConnectionName"></param>
         /// <returns></returns>
         [NotNull]
-        public virtual async Task<IDbConnection> GetDbConnectionAsync([NotNull] string dbConnectionName)
+        public virtual async Task<IDbConnection?> GetDbConnectionAsync([NotNull] string dbConnectionName)
         {
             Check.NotNullOrWhiteSpace(dbConnectionName, nameof(dbConnectionName));
-            return await DbConnectionCreateService.CreateAsync(dbConnectionName);
+            return Check.NotNull(await DbConnectionCreateService.CreateAsync(dbConnectionName), nameof(IDbConnection));
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace SharpAbp.Abp.DbConnections
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public virtual async Task<IDbConnection> GetDbConnectionAsync<T>()
+        public virtual async Task<IDbConnection?> GetDbConnectionAsync<T>()
         {
             var dbConnectionName = DbConnectionNameAttribute.GetDbConnectionName<T>();
             return await GetDbConnectionAsync(dbConnectionName);

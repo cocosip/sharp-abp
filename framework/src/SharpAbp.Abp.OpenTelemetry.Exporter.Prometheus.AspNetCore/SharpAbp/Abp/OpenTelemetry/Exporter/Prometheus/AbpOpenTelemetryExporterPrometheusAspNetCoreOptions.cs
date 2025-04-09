@@ -6,13 +6,13 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus
 {
     public class AbpOpenTelemetryExporterPrometheusAspNetCoreOptions
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public string ScrapeEndpointPath { get; set; } = "/metrics";
 
         public int ScrapeResponseCacheDurationMilliseconds { get; set; }
 
-        public Action<IApplicationBuilder> PrometheusScrapingEndpointConfigure { get; set; }
+        public Action<IApplicationBuilder>? PrometheusScrapingEndpointConfigure { get; set; }
 
         public AbpOpenTelemetryExporterPrometheusAspNetCoreOptions PreConfigure(IConfiguration configuration)
         {

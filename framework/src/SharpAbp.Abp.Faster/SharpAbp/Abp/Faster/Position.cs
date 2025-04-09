@@ -40,7 +40,7 @@ namespace SharpAbp.Abp.Faster
 
     public class RetryPosition
     {
-        public Position Position { get; set; }
+        public Position? Position { get; set; }
         public int RetryCount { get; set; }
 
         public RetryPosition()

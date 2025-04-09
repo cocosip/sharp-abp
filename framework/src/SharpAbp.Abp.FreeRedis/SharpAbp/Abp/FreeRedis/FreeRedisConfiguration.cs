@@ -12,7 +12,7 @@ namespace SharpAbp.Abp.FreeRedis
 
         /// <summary>Connection string
         /// </summary>
-        public string ConnectionString { get; set; }
+        public string? ConnectionString { get; set; }
 
         /// <summary>Sentinel address
         /// </summary>
@@ -26,8 +26,8 @@ namespace SharpAbp.Abp.FreeRedis
 
         public FreeRedisConfiguration()
         {
-            Sentinels = new List<string>();
-            CliConfigures = new List<Action<RedisClient>>();
+            Sentinels = [];
+            CliConfigures = [];
         }
     }
 }

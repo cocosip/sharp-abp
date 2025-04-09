@@ -1,9 +1,9 @@
-﻿using MassTransit;
+﻿using System;
+using System.Threading.Tasks;
+using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.MassTransit;
 using SharpAbp.Abp.MassTransit.ActiveMQ;
-using System;
-using System.Threading.Tasks;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
 
@@ -24,7 +24,7 @@ namespace SharpAbp.Abp.EventBus.MassTransit.ActiveMQ
         {
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
 
-            if (abpMassTransitOptions.Provider.Equals(MassTransitActiveMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            if (abpMassTransitOptions.Provider!.Equals(MassTransitActiveMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
                 var abpMassTransitEventBusOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitEventBusOptions>();
 

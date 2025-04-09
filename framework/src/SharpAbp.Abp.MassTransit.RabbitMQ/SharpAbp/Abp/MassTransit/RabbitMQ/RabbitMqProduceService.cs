@@ -27,7 +27,7 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
             CancellationToken cancellationToken = default) where T : class
         {
             using var scope = ServiceScopeFactory.CreateScope();
-            var publishEndpoint = scope.ServiceProvider.GetService<IPublishEndpoint>();
+            var publishEndpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
             await publishEndpoint.Publish<T>(message, cancellationToken);
         }
 
@@ -40,11 +40,11 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
         /// <returns></returns>
         public virtual async Task PublishAsync(
             object message,
-            Type messageType = null,
+            Type? messageType = null,
             CancellationToken cancellationToken = default)
         {
             using var scope = ServiceScopeFactory.CreateScope();
-            var publishEndpoint = scope.ServiceProvider.GetService<IPublishEndpoint>();
+            var publishEndpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
             if (messageType == null)
             {
                 await publishEndpoint.Publish(message, cancellationToken);
@@ -69,7 +69,7 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
             CancellationToken cancellationToken = default) where T : class
         {
             using var scope = ServiceScopeFactory.CreateScope();
-            var sendEndpointProvider = scope.ServiceProvider.GetService<ISendEndpointProvider>();
+            var sendEndpointProvider = scope.ServiceProvider.GetRequiredService<ISendEndpointProvider>();
             var endpoint = await sendEndpointProvider.GetSendEndpoint(new Uri(uriString));
             await endpoint.Send<T>(message, cancellationToken);
         }
@@ -87,7 +87,7 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
             CancellationToken cancellationToken = default)
         {
             using var scope = ServiceScopeFactory.CreateScope();
-            var sendEndpointProvider = scope.ServiceProvider.GetService<ISendEndpointProvider>();
+            var sendEndpointProvider = scope.ServiceProvider.GetRequiredService<ISendEndpointProvider>();
             var endpoint = await sendEndpointProvider.GetSendEndpoint(new Uri(uriString));
             await endpoint.Send(message, cancellationToken);
         }

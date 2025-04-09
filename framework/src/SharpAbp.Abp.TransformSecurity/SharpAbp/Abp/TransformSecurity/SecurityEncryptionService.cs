@@ -101,13 +101,13 @@ namespace SharpAbp.Abp.TransformSecurity
             }
             if (credential.IsRSA())
             {
-                var rsaParam = RSAEncryptionService.ImportPublicKey(credential.PublicKey);
+                var rsaParam = RSAEncryptionService.ImportPublicKey(credential.PublicKey!);
                 return RSAEncryptionService.Encrypt(rsaParam, plainText, Encoding.UTF8, RSAOptions.Padding);
 
             }
             else if (credential.IsSM2())
             {
-                return Sm2EncryptionService.Encrypt(credential.PublicKey, plainText, "utf-8", SM2Options.Curve, SM2Options.Mode);
+                return Sm2EncryptionService.Encrypt(credential.PublicKey!, plainText, "utf-8", SM2Options.Curve, SM2Options.Mode);
             }
             else
             {
@@ -124,12 +124,12 @@ namespace SharpAbp.Abp.TransformSecurity
             }
             if (credential.IsRSA())
             {
-                var rsaParam = RSAEncryptionService.ImportPrivateKey(credential.PrivateKey);
+                var rsaParam = RSAEncryptionService.ImportPrivateKey(credential.PrivateKey!);
                 return RSAEncryptionService.Decrypt(rsaParam, cipherText, Encoding.UTF8, RSAOptions.Padding);
             }
             else if (credential.IsSM2())
             {
-                return Sm2EncryptionService.Decrypt(credential.PrivateKey, cipherText, "utf-8", SM2Options.Curve, SM2Options.Mode);
+                return Sm2EncryptionService.Decrypt(credential.PrivateKey!, cipherText, "utf-8", SM2Options.Curve, SM2Options.Mode);
             }
             else
             {

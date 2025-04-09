@@ -5,7 +5,7 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Console
 {
     public class AbpOpenTelemetryExporterConsoleOptions
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public ConsoleExporterOutputTargets Targets { get; set; }
 
         public AbpOpenTelemetryExporterConsoleOptions PreConfigure(IConfiguration configuration)

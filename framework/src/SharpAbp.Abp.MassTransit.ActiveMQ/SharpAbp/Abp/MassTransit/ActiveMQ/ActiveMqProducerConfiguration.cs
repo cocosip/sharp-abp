@@ -8,23 +8,23 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
         /// <summary>
         /// QueueName
         /// </summary>
-        public string QueueName { get; set; }
+        public string? QueueName { get; set; }
 
         /// <summary>
         /// Message configure
         /// </summary>
-        public Action<string, IActiveMqBusFactoryConfigurator> MessageConfigure { get; set; }
+        public Action<string, IActiveMqBusFactoryConfigurator>? MessageConfigure { get; set; }
 
         /// <summary>
         /// Publish configure
         /// </summary>
-        public Action<IActiveMqMessagePublishTopologyConfigurator> PublishTopologyConfigure { get; set; }
+        public Action<IActiveMqMessagePublishTopologyConfigurator>? PublishTopologyConfigure { get; set; }
 
         /// <summary>
         /// Publish configure
         /// </summary>
-        public Action<Action<IActiveMqMessagePublishTopologyConfigurator>, IBusRegistrationContext, IActiveMqBusFactoryConfigurator> PublishConfigure { get; set; }
+        public Action<Action<IActiveMqMessagePublishTopologyConfigurator>, IBusRegistrationContext, IActiveMqBusFactoryConfigurator>? PublishConfigure { get; set; }
 
-        public Action<Uri> MapConfigure { get; set; }
+        public Action<Uri>? MapConfigure { get; set; }
     }
 }

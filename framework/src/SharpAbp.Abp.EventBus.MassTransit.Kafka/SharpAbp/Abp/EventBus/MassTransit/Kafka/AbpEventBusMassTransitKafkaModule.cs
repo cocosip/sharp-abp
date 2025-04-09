@@ -24,7 +24,7 @@ namespace SharpAbp.Abp.EventBus.MassTransit.Kafka
         {
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
 
-            if (abpMassTransitOptions.Provider.Equals(MassTransitKafkaConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            if (abpMassTransitOptions.Provider!.Equals(MassTransitKafkaConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
                 var abpMassTransitEventBusOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitEventBusOptions>();
 

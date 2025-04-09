@@ -1,14 +1,15 @@
 <Project>
 	<PropertyGroup>
-
 		<!--Project Frameworks-->
 		<ProjectFrameworks>netstandard2.0;netstandard2.1;$(NetCoreFx)</ProjectFrameworks>
-
 		<!--Net Core Framework-->
 		<NetCoreFx>net9.0</NetCoreFx>
-
 		<!--Volo ABP packages-->
 		<VoloAbpPackageVersion>[9.1.1,10.0.0)</VoloAbpPackageVersion>
- 
 	</PropertyGroup>
+
+	<PropertyGroup>
+		<IsTestProject Condition="$(MSBuildProjectFullPath.Contains('test')) and ($(MSBuildProjectName.EndsWith('.Tests')) or $(MSBuildProjectName.EndsWith('.TestBase')))">true</IsTestProject>
+	</PropertyGroup>
+	
 </Project>

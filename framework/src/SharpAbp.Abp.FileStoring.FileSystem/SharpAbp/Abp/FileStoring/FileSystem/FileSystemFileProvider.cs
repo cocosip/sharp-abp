@@ -50,7 +50,7 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
                 .ExecuteAsync(async () =>
                 {
                     using var fileStream = File.Open(filePath, fileMode, FileAccess.Write);
-                    await args.FileStream.CopyToAsync(
+                    await args.FileStream!.CopyToAsync(
                         fileStream,
                         args.CancellationToken
                     );
@@ -96,7 +96,7 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
         }
 
 
-        public override async Task<Stream> GetOrNullAsync(FileProviderGetArgs args)
+        public override async Task<Stream?> GetOrNullAsync(FileProviderGetArgs args)
         {
             var filePath = FilePathCalculator.Calculate(args);
             Logger.LogTrace("FileSystem GetOrNullAsync filePath: {filePath}", filePath);

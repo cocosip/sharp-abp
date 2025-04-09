@@ -12,27 +12,27 @@ namespace SharpAbp.Abp.TransformSecurity
         /// <summary>
         /// 唯一编号
         /// </summary>
-        public string Identifier { get; set; }
+        public string? Identifier { get; set; }
 
         /// <summary>
         /// 密钥类型, RSA, SM2
         /// </summary>
-        public string KeyType { get; set; }
+        public string? KeyType { get; set; }
 
         /// <summary>
         /// 业务类型
         /// </summary>
-        public string BizType { get; set; }
+        public string? BizType { get; set; }
 
         /// <summary>
         /// 公钥
         /// </summary>
-        public string PublicKey { get; set; }
+        public string? PublicKey { get; set; }
 
         /// <summary>
         /// 私钥
         /// </summary>
-        public string PrivateKey { get; set; }
+        public string? PrivateKey { get; set; }
 
         /// <summary>
         /// 密钥的过期时间

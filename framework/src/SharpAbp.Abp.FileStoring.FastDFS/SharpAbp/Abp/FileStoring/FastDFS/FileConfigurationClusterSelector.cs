@@ -13,7 +13,7 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
             _configurationFactory = configurationFactory;
         }
 
-        public ClusterConfiguration Get(string name)
+        public ClusterConfiguration? Get(string name)
         {
             var fastDFSFileProviderConfiguration = _configurationFactory.GetConfiguration(name);
             if (fastDFSFileProviderConfiguration != null)

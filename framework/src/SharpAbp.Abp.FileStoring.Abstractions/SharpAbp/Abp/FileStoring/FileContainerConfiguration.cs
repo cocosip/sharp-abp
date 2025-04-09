@@ -10,7 +10,7 @@ namespace SharpAbp.Abp.FileStoring
         /// <summary>
         /// The provider to be used to store FILEs of this container.
         /// </summary>
-        public string Provider { get; set; }
+        public string? Provider { get; set; }
 
         /// <summary>
         /// Indicates whether this container is multi-tenant or not.
@@ -54,23 +54,23 @@ namespace SharpAbp.Abp.FileStoring
         private readonly Dictionary<string, object> _properties;
 
         [CanBeNull]
-        private readonly FileContainerConfiguration _fallbackConfiguration;
+        private readonly FileContainerConfiguration? _fallbackConfiguration;
 
-        public FileContainerConfiguration(FileContainerConfiguration fallbackConfiguration = null)
+        public FileContainerConfiguration(FileContainerConfiguration? fallbackConfiguration = null)
         {
             NamingNormalizers = new TypeList<IFileNamingNormalizer>();
             _fallbackConfiguration = fallbackConfiguration;
-            _properties = new Dictionary<string, object>();
+            _properties = [];
         }
 
         [CanBeNull]
-        public T GetConfigurationOrDefault<T>(string name, T defaultValue = default)
+        public T? GetConfigurationOrDefault<T>(string name, T? defaultValue = default)
         {
-            return (T)GetConfigurationOrNull(name, defaultValue);
+            return (T?)GetConfigurationOrNull(name, defaultValue);
         }
 
         [CanBeNull]
-        public object GetConfigurationOrNull(string name, object defaultValue = null)
+        public object? GetConfigurationOrNull(string name, object? defaultValue = null)
         {
             return _properties.GetOrDefault(name) ??
                    _fallbackConfiguration?.GetConfigurationOrNull(name, defaultValue) ??
@@ -78,10 +78,13 @@ namespace SharpAbp.Abp.FileStoring
         }
 
         [NotNull]
-        public FileContainerConfiguration SetConfiguration([NotNull] string name, [CanBeNull] object value)
+        public FileContainerConfiguration SetConfiguration([NotNull] string name, [CanBeNull] object? value)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            _properties[name] = value;
+            if (value == null)
+            {
+                _properties[name] = value!;
+            }
             return this;
         }
 

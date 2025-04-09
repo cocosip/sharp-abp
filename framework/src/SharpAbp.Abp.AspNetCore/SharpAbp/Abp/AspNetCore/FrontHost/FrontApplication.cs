@@ -7,12 +7,12 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
         /// <summary>
         /// 应用名称
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Web应用的根目录
         /// </summary>
-        public string RootPath { get; set; }
+        public string? RootPath { get; set; }
 
         /// <summary>
         /// 页面
@@ -37,9 +37,9 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
     /// </summary>
     public class FrontApplicationPage
     {
-        public string Route { get; set; }
-        public string ContentType { get; set; }
-        public string Path { get; set; }
+        public string? Route { get; set; }
+        public string? ContentType { get; set; }
+        public string? Path { get; set; }
     }
 
     /// <summary>
@@ -47,7 +47,7 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
     /// </summary>
     public class FrontApplicationStaticDirectory
     {
-        public string RequestPath { get; set; }
-        public string Path { get; set; }
+        public string? RequestPath { get; set; }
+        public string? Path { get; set; }
     }
 }

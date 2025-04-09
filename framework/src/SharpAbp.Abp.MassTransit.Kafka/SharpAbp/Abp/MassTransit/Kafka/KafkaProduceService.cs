@@ -29,7 +29,7 @@ namespace SharpAbp.Abp.MassTransit.Kafka
             CancellationToken cancellationToken = default) where TValue : class
         {
             using var scope = ServiceScopeFactory.CreateScope();
-            var topicProducer = scope.ServiceProvider.GetService<ITopicProducer<TKey, TValue>>();
+            var topicProducer = scope.ServiceProvider.GetRequiredService<ITopicProducer<TKey, TValue>>();
             await topicProducer.Produce(key, value, cancellationToken);
         }
 
@@ -45,7 +45,7 @@ namespace SharpAbp.Abp.MassTransit.Kafka
             CancellationToken cancellationToken = default) where TValue : class
         {
             using var scope = ServiceScopeFactory.CreateScope();
-            var topicProducer = scope.ServiceProvider.GetService<ITopicProducer<string, TValue>>();
+            var topicProducer = scope.ServiceProvider.GetRequiredService<ITopicProducer<string, TValue>>();
             var key = NewId.Next().ToString("D").ToUpperInvariant();
             await topicProducer.Produce(key, value, cancellationToken);
         }

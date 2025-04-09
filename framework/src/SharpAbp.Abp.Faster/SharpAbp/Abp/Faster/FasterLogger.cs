@@ -29,10 +29,10 @@ namespace SharpAbp.Abp.Faster
         protected AbpFasterConfiguration Configuration { get; }
         protected IObjectSerializer Serializer { get; }
         protected ICancellationTokenProvider CancellationTokenProvider { get; }
-        protected FasterLog Log { get; set; }
-        protected FasterLogScanIterator Iter { get; set; }
+        protected FasterLog? Log { get; set; }
+        protected FasterLogScanIterator? Iter { get; set; }
         public bool Initialized { get { return _initialized; } }
-        public string Name { get; }
+        public string? Name { get; }
 
 
         public FasterLogger(
@@ -123,7 +123,7 @@ namespace SharpAbp.Abp.Faster
                     try
                     {
                         await _commitSemaphore.WaitAsync(CancellationTokenProvider.Token);
-                        await Log.CommitAsync(CancellationTokenProvider.Token);
+                        await Log!.CommitAsync(CancellationTokenProvider.Token);
                     }
                     catch (Exception ex)
                     {
@@ -153,7 +153,7 @@ namespace SharpAbp.Abp.Faster
                         int entryLength;
                         long currentAddress;
                         long nextAddress;
-                        while (!Iter.GetNext(out buffer, out entryLength, out currentAddress, out nextAddress))
+                        while (!Iter!.GetNext(out buffer, out entryLength, out currentAddress, out nextAddress))
                         {
                             await Iter.WaitAsync(CancellationTokenProvider.Token);
                         }
@@ -196,18 +196,18 @@ namespace SharpAbp.Abp.Faster
                         var removeIds = new List<long>();
 
                         // 提前对_committing进行排序，避免在循环中重复排序
-                        var sortedCommits = _committing.Values.OrderBy(x => x.Position.Address).ToList();
+                        var sortedCommits = _committing.Values.OrderBy(x => x.Position!.Address).ToList();
                         Logger.LogDebug("Current Committing count: {Count}", _committing.Count);
 
                         foreach (var commit in sortedCommits)
                         {
-                            if (!commit.Position.IsMatch(commitAddress))
+                            if (!commit.Position!.IsMatch(commitAddress))
                             {
                                 Logger.LogDebug("Commit position is not match {commitAddress}. Address: {Address}, NextAddress: {NextAddress}", commitAddress, commit.Position.Address, commit.Position.NextAddress);
                                 if (commit.IsMax(Configuration.MaxCommitSkip))
                                 {
                                     // 如果达到最大重试次数，检查是否需要更新commitAddress并记录日志
-                                    if (commitAddress <= Iter.EndAddress)
+                                    if (commitAddress <= Iter!.EndAddress)
                                     {
                                         commitAddress = commit.Position.NextAddress;
                                         removeIds.Add(commit.Position.Address);
@@ -227,7 +227,7 @@ namespace SharpAbp.Abp.Faster
                             }
                             else
                             {
-                                if (commitAddress <= Iter.EndAddress)
+                                if (commitAddress <= Iter!.EndAddress)
                                 {
                                     commitAddress = commit.Position.NextAddress;
                                     removeIds.Add(commit.Position.Address);
@@ -236,7 +236,7 @@ namespace SharpAbp.Abp.Faster
                         }
 
                         // 检查是否有新的commitAddress需要提交完成
-                        if (commitAddress > _completedUntilAddress && commitAddress <= Iter.EndAddress)
+                        if (commitAddress > _completedUntilAddress && commitAddress <= Iter!.EndAddress)
                         {
                             await CompleteUntilRecordAtAsync(commitAddress);
                             _completedUntilAddress = commitAddress;
@@ -260,8 +260,8 @@ namespace SharpAbp.Abp.Faster
             await _commitSemaphore.WaitAsync(CancellationTokenProvider.Token);
             try
             {
-                await Log.CommitAsync(CancellationTokenProvider.Token);
-                await Iter.CompleteUntilRecordAtAsync(commitAddress, CancellationTokenProvider.Token);
+                await Log!.CommitAsync(CancellationTokenProvider.Token);
+                await Iter!.CompleteUntilRecordAtAsync(commitAddress, CancellationTokenProvider.Token);
             }
             finally
             {
@@ -295,7 +295,7 @@ namespace SharpAbp.Abp.Faster
                     {
                         if (_truncateUntilAddress < _completedUntilAddress)
                         {
-                            Log.TruncateUntilPageStart(_completedUntilAddress);
+                            Log!.TruncateUntilPageStart(_completedUntilAddress);
                             Logger.LogDebug("TruncateUntilPageStart {_completedUntilAddress}", _completedUntilAddress);
                             _truncateUntilAddress = _completedUntilAddress;
                         }
@@ -324,7 +324,7 @@ namespace SharpAbp.Abp.Faster
         public virtual async Task<long> WriteAsync(T entity, CancellationToken cancellationToken = default)
         {
             var buffer = Serializer.Serialize(entity);
-            return await Log.EnqueueAsync(buffer, cancellationToken);
+            return await Log!.EnqueueAsync(buffer, cancellationToken);
         }
 
         /// <summary>
@@ -339,7 +339,7 @@ namespace SharpAbp.Abp.Faster
             foreach (var entity in values)
             {
                 var buffer = Serializer.Serialize(entity);
-                var p = await Log.EnqueueAsync(buffer, cancellationToken);
+                var p = await Log!.EnqueueAsync(buffer, cancellationToken);
                 positions.Add(p);
             }
 
@@ -373,7 +373,7 @@ namespace SharpAbp.Abp.Faster
                 }
                 else
                 {
-                    if (!_pendingChannel.Reader.TryRead(out entry))
+                    if (!_pendingChannel.Reader.TryRead(out entry!))
                     {
                         break;
                     }
@@ -381,7 +381,7 @@ namespace SharpAbp.Abp.Faster
                 }
                 entries.Add(new LogEntry<T>
                 {
-                    Data = Serializer.Deserialize<T>(entry.Data),
+                    Data = Serializer.Deserialize<T>(entry.Data!),
                     CurrentAddress = entry.CurrentAddress,
                     EntryLength = entry.EntryLength,
                     NextAddress = entry.NextAddress,

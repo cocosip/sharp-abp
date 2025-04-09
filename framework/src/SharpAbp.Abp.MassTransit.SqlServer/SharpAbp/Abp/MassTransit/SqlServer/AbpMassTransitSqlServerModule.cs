@@ -1,8 +1,8 @@
-﻿using MassTransit;
+﻿using System;
+using System.Threading.Tasks;
+using MassTransit;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Threading.Tasks;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
 
@@ -23,7 +23,7 @@ namespace SharpAbp.Abp.MassTransit.SqlServer
             var configuration = context.Services.GetConfiguration();
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
 
-            if (abpMassTransitOptions.Provider.Equals(MassTransitSqlServerConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            if (abpMassTransitOptions.Provider!.Equals(MassTransitSqlServerConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
                 PreConfigure<AbpMassTransitSqlServerOptions>(options => options.PreConfigure(configuration));
 
@@ -53,7 +53,7 @@ namespace SharpAbp.Abp.MassTransit.SqlServer
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
             if (abpMassTransitOptions != null)
             {
-                if (abpMassTransitOptions.Provider.Equals(MassTransitSqlServerConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+                if (abpMassTransitOptions.Provider!.Equals(MassTransitSqlServerConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
                 {
                     Configure<AbpMassTransitSqlServerOptions>(options =>
                     {
@@ -64,7 +64,7 @@ namespace SharpAbp.Abp.MassTransit.SqlServer
                         }
                     });
 
-                    var sqlServerOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitSqlServerOptions>();
+                    var sqlServerOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitSqlServerOptions>()!;
                     var builder = new SqlConnectionStringBuilder(sqlServerOptions.ConnectionString);
                     context.Services.AddOptions<SqlTransportOptions>().Configure(options =>
                     {
@@ -94,7 +94,7 @@ namespace SharpAbp.Abp.MassTransit.SqlServer
                         x.SetKebabCaseEndpointNameFormatter();
 
                         //consumer
-                        foreach (var consumer in sqlServerOptions.Consumers)
+                        foreach (var consumer in sqlServerOptions.Consumers ?? [])
                         {
                             consumer.Configure?.Invoke(x);
 
@@ -107,7 +107,7 @@ namespace SharpAbp.Abp.MassTransit.SqlServer
                         x.UsingSqlServer((ctx, cfg) =>
                         {
                             //PostgreSql preConfigure
-                            foreach (var preConfigure in sqlServerOptions.SqlServerPreConfigures)
+                            foreach (var preConfigure in sqlServerOptions.SqlServerPreConfigures ?? [])
                             {
                                 preConfigure(ctx, cfg);
                             }
@@ -120,20 +120,20 @@ namespace SharpAbp.Abp.MassTransit.SqlServer
                             cfg.ConfigureEndpoints(ctx);
 
                             //PostgreSql configure
-                            foreach (var configure in sqlServerOptions.SqlServerConfigures)
+                            foreach (var configure in sqlServerOptions.SqlServerConfigures ?? [])
                             {
                                 configure(ctx, cfg);
                             }
 
                             //Producer
-                            foreach (var producer in sqlServerOptions.Producers)
+                            foreach (var producer in sqlServerOptions.Producers ?? [])
                             {
                                 var configure = producer.Configure ?? sqlServerOptions.DefaultPublishTopologyConfigurator;
                                 cfg.AddPublishMessageTypes(producer.MessageTypes, producer.Configure);
                             }
 
                             //PostgreSql postConfigure
-                            foreach (var postConfigure in sqlServerOptions.SqlServerPostConfigures)
+                            foreach (var postConfigure in sqlServerOptions.SqlServerPostConfigures ?? [])
                             {
                                 postConfigure(ctx, cfg);
                             }

@@ -4,8 +4,8 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Zipkin
 {
     public class AbpOpenTelemetryExporterZipkinOptions
     {
-        public string Name { get; set; }
-        public string Endpoint { get; set; }
+        public string? Name { get; set; }
+        public string? Endpoint { get; set; }
         public bool UseShortTraceIds { get; set; }
         public int? MaxPayloadSizeInBytes { get; set; }
 

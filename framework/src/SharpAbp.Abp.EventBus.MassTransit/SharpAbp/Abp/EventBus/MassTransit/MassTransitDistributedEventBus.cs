@@ -267,12 +267,12 @@ namespace SharpAbp.Abp.EventBus.MassTransit
         }
 
 
-        protected virtual async Task PublishToMassTransitAsync(Type eventType, object eventData, string correlationId, Guid? messageId = null, CancellationToken cancellationToken = default)
+        protected virtual async Task PublishToMassTransitAsync(Type eventType, object eventData, string? correlationId, Guid? messageId = null, CancellationToken cancellationToken = default)
         {
             await PublishToMassTransitAsync(EventNameAttribute.GetNameOrDefault(eventType), eventData, correlationId, messageId, cancellationToken);
         }
 
-        protected virtual async Task PublishToMassTransitAsync(string eventName, object eventData, string correlationId, Guid? messageId = null, CancellationToken cancellationToken = default)
+        protected virtual async Task PublishToMassTransitAsync(string eventName, object eventData, string? correlationId, Guid? messageId = null, CancellationToken cancellationToken = default)
         {
             var data = new AbpMassTransitEventData(
                 eventName,

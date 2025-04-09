@@ -47,7 +47,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
         /// <summary>
         /// http Or https
         /// </summary>
-        public string Protocol
+        public string? Protocol
         {
             get => _containerConfiguration.GetConfigurationOrDefault<string>(KS3FileProviderConfigurationNames.Protocol, KS3SDK.Http.Protocol.HTTP);
             set => _containerConfiguration.SetConfiguration(KS3FileProviderConfigurationNames.Protocol, Check.NotNullOrWhiteSpace(value, nameof(value)));
@@ -56,7 +56,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
         /// <summary>
         /// User agent
         /// </summary>
-        public string UserAgent
+        public string? UserAgent
         {
             get => _containerConfiguration.GetConfigurationOrDefault(KS3FileProviderConfigurationNames.UserAgent, KS3SDK.ClientConfiguration.DEFAULT_USER_AGENT);
             set => _containerConfiguration.SetConfiguration(KS3FileProviderConfigurationNames.UserAgent, Check.NotNullOrWhiteSpace(value, nameof(value)));

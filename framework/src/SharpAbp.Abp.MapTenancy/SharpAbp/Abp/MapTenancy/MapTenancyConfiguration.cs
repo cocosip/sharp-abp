@@ -9,12 +9,12 @@ namespace SharpAbp.Abp.MapTenancy
         /// <summary>
         /// LocalSystem code
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
         /// Third part system code
         /// </summary>
-        public string MapCode { get; set; }
+        public string? MapCode { get; set; }
 
         public MapTenancyConfiguration()
         {

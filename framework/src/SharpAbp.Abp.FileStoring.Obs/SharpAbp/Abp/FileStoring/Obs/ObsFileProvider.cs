@@ -64,7 +64,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
                 }
             }
 
-            if (args.Configuration.EnableAutoMultiPartUpload && args.FileStream.Length > args.Configuration.MultiPartUploadMinFileSize)
+            if (args.Configuration.EnableAutoMultiPartUpload && args.FileStream!.Length > args.Configuration.MultiPartUploadMinFileSize)
             {
                 return await MultiPartUploadAsync(obsClient, containerName, objectKey, args);
             }
@@ -99,7 +99,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
             return Task.FromResult(FileExistsAsync(obsClient, containerName, objectKey));
         }
 
-        public override async Task<Stream> GetOrNullAsync(FileProviderGetArgs args)
+        public override async Task<Stream?> GetOrNullAsync(FileProviderGetArgs args)
         {
             var containerName = GetContainerName(args);
             var objectKey = ObsFileNameCalculator.Calculate(args);
@@ -221,7 +221,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
             // 计算分片总数。
             var partSize = args.Configuration.MultiPartUploadShardingSize;
 
-            var fileSize = args.FileStream.Length;
+            var fileSize = args.FileStream!.Length;
             var partCount = fileSize / partSize;
             if (fileSize % partSize != 0)
             {

@@ -8,7 +8,7 @@ namespace SharpAbp.Abp.Faster
         /// <summary>
         /// 记录数据的文件名
         /// </summary>
-        public string FileName { get; set; }
+        public string? FileName { get; set; }
 
         /// <summary>
         /// Whether we try to preallocate the file on creation
@@ -93,6 +93,6 @@ namespace SharpAbp.Abp.Faster
         /// <summary>
         /// 配置
         /// </summary>
-        public Action<FasterLogSettings> Configure { get; set; }
+        public Action<FasterLogSettings>? Configure { get; set; }
     }
 }

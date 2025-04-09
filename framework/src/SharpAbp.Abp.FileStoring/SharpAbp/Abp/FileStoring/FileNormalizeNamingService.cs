@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.FileStoring
@@ -15,8 +15,8 @@ namespace SharpAbp.Abp.FileStoring
 
         public virtual FileNormalizeNaming NormalizeNaming(
             FileContainerConfiguration configuration,
-            string containerName,
-            string fileName)
+            string? containerName,
+            string? fileName)
         {
 
             if (!configuration.NamingNormalizers.Any())
@@ -45,7 +45,7 @@ namespace SharpAbp.Abp.FileStoring
                 return containerName;
             }
 
-            return NormalizeNaming(configuration, containerName, null).ContainerName;
+            return NormalizeNaming(configuration, containerName, null).ContainerName!;
         }
 
         public string NormalizeFileName(FileContainerConfiguration configuration, string fileName)
@@ -55,7 +55,7 @@ namespace SharpAbp.Abp.FileStoring
                 return fileName;
             }
 
-            return NormalizeNaming(configuration, null, fileName).FileName;
+            return NormalizeNaming(configuration, null, fileName).FileName!;
         }
     }
 }

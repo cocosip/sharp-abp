@@ -1,7 +1,7 @@
-﻿using MassTransit;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MassTransit;
 
 namespace SharpAbp.Abp.MassTransit.RabbitMQ
 {
@@ -15,7 +15,7 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
             {
                 if (!messageConfigures.Any(x => x.Item1 == consumer.ExchangeName))
                 {
-                    messageConfigures.Add((consumer.ExchangeName, consumer.MessageConfigure));
+                    messageConfigures.Add((consumer.ExchangeName!, consumer.MessageConfigure!));
                 }
             }
 
@@ -23,7 +23,7 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
             {
                 if (!messageConfigures.Any(x => x.Item1 == producer.ExchangeName))
                 {
-                    messageConfigures.Add((producer.ExchangeName, producer.MessageConfigure));
+                    messageConfigures.Add((producer.ExchangeName!, producer.MessageConfigure!));
                 }
             }
 

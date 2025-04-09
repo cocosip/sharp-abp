@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using System.Data;
+﻿using System.Data;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.Uow;
 
@@ -20,6 +20,6 @@ namespace SharpAbp.Abp.Domain.Repositories
 
         public virtual async Task<IDbConnection> GetDbConnectionAsync() => (await DbContextProvider.GetDbContextAsync()).Database.GetDbConnection();
 
-        public virtual async Task<IDbTransaction> GetDbTransactionAsync() => (await DbContextProvider.GetDbContextAsync()).Database.CurrentTransaction?.GetDbTransaction();
+        public virtual async Task<IDbTransaction?> GetDbTransactionAsync() => (await DbContextProvider.GetDbContextAsync()).Database.CurrentTransaction?.GetDbTransaction();
     }
 }

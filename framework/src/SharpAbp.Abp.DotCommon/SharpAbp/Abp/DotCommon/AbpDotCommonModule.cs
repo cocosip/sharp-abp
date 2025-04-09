@@ -38,7 +38,7 @@ namespace SharpAbp.Abp.DotCommon
 
         public override Task OnApplicationShutdownAsync(ApplicationShutdownContext context)
         {
-            var performanceServiceFactory = context.ServiceProvider.GetService<IPerformanceServiceFactory>();
+            var performanceServiceFactory = context.ServiceProvider.GetRequiredService<IPerformanceServiceFactory>();
             performanceServiceFactory.StopAll();
             return Task.CompletedTask;
         }

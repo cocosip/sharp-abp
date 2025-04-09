@@ -31,7 +31,7 @@ namespace SharpAbp.Abp.DbConnections
         /// <param name="dbConnectionName"></param>
         /// <returns></returns>
         [NotNull]
-        public virtual async Task<IDbConnection> CreateAsync([NotNull] string dbConnectionName)
+        public virtual async Task<IDbConnection?> CreateAsync([NotNull] string dbConnectionName)
         {
             Check.NotNullOrWhiteSpace(dbConnectionName, nameof(dbConnectionName));
             var dbConnectionInfo = await DbConnectionInfoResolver.ResolveAsync(dbConnectionName)
@@ -61,7 +61,7 @@ namespace SharpAbp.Abp.DbConnections
         }
 
         [NotNull]
-        public virtual Task<IDbConnection> CreateAsync([NotNull] DbConnectionInfo dbConnectionInfo)
+        public virtual Task<IDbConnection?> CreateAsync([NotNull] DbConnectionInfo dbConnectionInfo)
         {
             Check.NotNull(dbConnectionInfo, nameof(DbConnectionInfo));
             if (!Options.DatabaseProviders.Contains(dbConnectionInfo.DatabaseProvider))

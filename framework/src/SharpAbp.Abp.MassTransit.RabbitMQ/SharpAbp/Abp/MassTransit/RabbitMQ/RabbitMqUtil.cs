@@ -4,7 +4,7 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
 {
     public static class RabbitMqUtil
     {
-        public static string ExchangeNameFormat(string prefix, string exchangeName)
+        public static string ExchangeNameFormat(string? prefix, string exchangeName)
         {
             if (prefix.IsNullOrWhiteSpace())
             {
@@ -14,7 +14,7 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
             return $"{prefix}.{exchangeName}";
         }
 
-        public static string QueueNameFormat(string prefix, string queuePrefix, string queueName)
+        public static string QueueNameFormat(string? prefix, string? queuePrefix, string queueName)
         {
             //Prefix-QueuePrefix-QueueName
             var name = queueName;

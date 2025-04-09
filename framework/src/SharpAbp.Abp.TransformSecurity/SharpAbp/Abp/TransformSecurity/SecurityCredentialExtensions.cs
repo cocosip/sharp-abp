@@ -18,7 +18,7 @@ namespace SharpAbp.Abp.TransformSecurity
             return key.KeyType == "SM2";
         }
 
-        public static string GetReferenceId(this SecurityCredential key)
+        public static string? GetReferenceId(this SecurityCredential key)
         {
             return key.GetProperty("ReferenceId", "");
         }
@@ -38,7 +38,7 @@ namespace SharpAbp.Abp.TransformSecurity
             return key.SetProperty("RSA_KeySize", keySize, false);
         }
 
-        public static string GetRSAPadding(this SecurityCredential key)
+        public static string? GetRSAPadding(this SecurityCredential key)
         {
             return key.GetProperty("RSA_Padding", RSAPaddingNames.None);
         }
@@ -48,7 +48,7 @@ namespace SharpAbp.Abp.TransformSecurity
             return key.SetProperty("RSA_Padding", padding);
         }
 
-        public static string GetSM2Curve(this SecurityCredential key)
+        public static string? GetSM2Curve(this SecurityCredential key)
         {
             return key.GetProperty("SM2_Curve", Sm2EncryptionNames.CurveSm2p256v1);
         }

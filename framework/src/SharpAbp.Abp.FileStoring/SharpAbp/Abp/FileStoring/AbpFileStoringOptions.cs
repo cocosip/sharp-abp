@@ -28,7 +28,7 @@ namespace SharpAbp.Abp.FileStoring
             {
                 foreach (var entryKv in entries)
                 {
-                    var fileProviderConfiguration = abstractionsOptions.Providers.GetConfiguration(entryKv.Value.Provider);
+                    var fileProviderConfiguration = abstractionsOptions.Providers.GetConfiguration(entryKv.Value.Provider!);
                     if (fileProviderConfiguration == null)
                     {
                         throw new AbpException($"Could not find any provider configuration for '{entryKv.Key}' container, provider:'{entryKv.Value.Provider}'");
@@ -50,14 +50,14 @@ namespace SharpAbp.Abp.FileStoring
 
                         var itemDict = fileProviderConfiguration.GetItems();
 
-                        foreach (var itemKeyValuePair in itemDict)
+                        foreach (var itemKv in itemDict)
                         {
-                            entryKv.Value.Properties.TryGetValue(itemKeyValuePair.Key, out string value);
+                            string value = string.Empty;
+                            entryKv.Value?.Properties.TryGetValue(itemKv.Key, out value);
 
-                            var item = itemKeyValuePair.Value;
-
-                            var realValue = TypeHelper.ConvertFromString(item.ValueType, value);
-                            c.SetConfiguration(itemKeyValuePair.Key, realValue);
+                            var item = itemKv.Value;
+                            var realValue = TypeHelper.ConvertFromString(item.ValueType!, value);
+                            c.SetConfiguration(itemKv.Key, realValue!);
                         }
 
                     });

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
+using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.Faster
@@ -31,7 +32,8 @@ namespace SharpAbp.Abp.Faster
         {
             // 使用 Lazy<T> 确保线程安全的延迟初始化
             var lazyLogger = Loggers.GetOrAdd(name, key => new Lazy<IFasterLogger>(() => CreateLogger<T>(key)));
-            return lazyLogger.Value as IFasterLogger<T>;
+            Check.NotNull(lazyLogger.Value, nameof(IFasterLogger<T>));
+            return (lazyLogger.Value as IFasterLogger<T>)!;
         }
 
         protected virtual IFasterLogger<T> CreateLogger<T>(string name) where T : class

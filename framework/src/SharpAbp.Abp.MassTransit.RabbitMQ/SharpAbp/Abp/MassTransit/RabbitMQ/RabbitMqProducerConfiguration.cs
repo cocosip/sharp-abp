@@ -1,5 +1,5 @@
-﻿using MassTransit;
-using System;
+﻿using System;
+using MassTransit;
 
 namespace SharpAbp.Abp.MassTransit.RabbitMQ
 {
@@ -8,22 +8,22 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
         /// <summary>
         /// EntityName
         /// </summary>
-        public string ExchangeName { get; set; }
+        public string? ExchangeName { get; set; }
 
         /// <summary>
         /// Message configure
         /// </summary>
-        public Action<string, IRabbitMqBusFactoryConfigurator> MessageConfigure { get; set; }
+        public Action<string, IRabbitMqBusFactoryConfigurator>? MessageConfigure { get; set; }
 
         /// <summary>
         /// Publish configure
         /// </summary>
-        public Action<IRabbitMqMessagePublishTopologyConfigurator> PublishTopologyConfigure { get; set; }
+        public Action<IRabbitMqMessagePublishTopologyConfigurator>? PublishTopologyConfigure { get; set; }
 
         /// <summary>
         /// Publish configure
         /// </summary>
-        public Action<Action<IRabbitMqMessagePublishTopologyConfigurator>, IBusRegistrationContext, IRabbitMqBusFactoryConfigurator> PublishConfigure { get; set; }
+        public Action<Action<IRabbitMqMessagePublishTopologyConfigurator>, IBusRegistrationContext, IRabbitMqBusFactoryConfigurator>? PublishConfigure { get; set; }
 
     }
 }

@@ -59,7 +59,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             return new AmazonS3Client(configuration.AccessKeyId, configuration.SecretAccessKey, region);
         }
 
-        protected virtual AWSCredentials GetAwsCredentials(
+        protected virtual AWSCredentials? GetAwsCredentials(
             AwsFileProviderConfiguration configuration)
         {
             if (configuration.ProfileName.IsNullOrWhiteSpace())
@@ -80,7 +80,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
         protected virtual async Task<SessionAWSCredentials> GetTemporaryCredentialsAsync(
             AwsFileProviderConfiguration configuration)
         {
-            var temporaryCredentialsCache = await Cache.GetAsync(configuration.TemporaryCredentialsCacheKey);
+            var temporaryCredentialsCache = await Cache.GetAsync(configuration.TemporaryCredentialsCacheKey!);
 
             if (temporaryCredentialsCache == null)
             {
@@ -129,7 +129,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             Check.NotNullOrWhiteSpace(configuration.Name, nameof(configuration.Name));
             Check.NotNullOrWhiteSpace(configuration.Policy, nameof(configuration.Policy));
 
-            var temporaryCredentialsCache = await Cache.GetAsync(configuration.TemporaryCredentialsCacheKey);
+            var temporaryCredentialsCache = await Cache.GetAsync(configuration.TemporaryCredentialsCacheKey!);
 
             if (temporaryCredentialsCache == null)
             {
@@ -179,11 +179,11 @@ namespace SharpAbp.Abp.FileStoring.Aws
             Credentials credentials)
         {
             var temporaryCredentialsCache = new AwsTemporaryCredentialsCacheItem(
-                StringEncryptionService.Encrypt(credentials.AccessKeyId),
-                StringEncryptionService.Encrypt(credentials.SecretAccessKey),
-                StringEncryptionService.Encrypt(credentials.SessionToken));
+                StringEncryptionService.Encrypt(credentials.AccessKeyId)!,
+                StringEncryptionService.Encrypt(credentials.SecretAccessKey)!,
+                StringEncryptionService.Encrypt(credentials.SessionToken)!);
 
-            await Cache.SetAsync(configuration.TemporaryCredentialsCacheKey, temporaryCredentialsCache,
+            await Cache.SetAsync(configuration.TemporaryCredentialsCacheKey!, temporaryCredentialsCache,
                 new DistributedCacheEntryOptions
                 {
                     AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(configuration.DurationSeconds - 10)

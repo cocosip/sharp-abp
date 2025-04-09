@@ -9,8 +9,8 @@ namespace SharpAbp.Abp.MassTransit.SqlServer
         /// <summary>
         /// Configure
         /// </summary>
-        public Action<IBusRegistrationConfigurator> Configure { get; set; }
-        public Func<Type, bool> Filter { get; set; }
+        public Action<IBusRegistrationConfigurator>? Configure { get; set; }
+        public Func<Type, bool>? Filter { get; set; }
         public List<Type> Types { get; set; }
         public SqlServerConsumerConfiguration()
         {

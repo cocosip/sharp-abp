@@ -7,17 +7,17 @@ namespace SharpAbp.Abp.FileStoring
         /// <summary>
         /// The type of value
         /// </summary>
-        public Type ValueType { get; set; }
+        public Type? ValueType { get; set; }
 
         /// <summary>
         /// Example
         /// </summary>
-        public string Eg { get; set; }
+        public string? Eg { get; set; }
 
         /// <summary>
         /// Note Localization name
         /// </summary>
-        public string NoteLocalizationName { get; set; }
+        public string? NoteLocalizationName { get; set; }
 
         public FileProviderConfigurationItem()
         {

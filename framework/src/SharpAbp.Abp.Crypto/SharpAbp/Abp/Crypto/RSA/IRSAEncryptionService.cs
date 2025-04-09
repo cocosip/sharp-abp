@@ -13,7 +13,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="keySize"></param>
         /// <param name="rd"></param>
         /// <returns></returns>
-        AsymmetricCipherKeyPair GenerateRSAKeyPair(int keySize = 2048, SecureRandom rd = null);
+        AsymmetricCipherKeyPair GenerateRSAKeyPair(int keySize = 2048, SecureRandom? rd = null);
 
         /// <summary>
         /// 导入RSA公钥 (原始RSA公钥为Asn1,DER格式)
