@@ -17,12 +17,7 @@ namespace SharpAbp.Abp.FileStoring
             [NotNull] string name)
         {
             var value = containerConfiguration.GetConfigurationOrNull(name);
-            if (value == null)
-            {
-                throw new AbpException($"Could not find the configuration value for '{name}'!");
-            }
-
-            return value;
+            return value == null ? throw new AbpException($"Could not find the configuration value for '{name}'!") : value;
         }
     }
 }
