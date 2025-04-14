@@ -214,7 +214,7 @@ namespace SharpAbp.Abp.FileStoring.S3
                     InputStream = new MemoryStream(buffer),
                     PartSize = size,
                     PartNumber = i + 1,
-                    //UseChunkEncoding = useChunkEncoding
+                    UseChunkEncoding = configuration.UseChunkEncoding,
                 });
                 partETags.Add(new PartETag(uploadPartResponse.PartNumber, uploadPartResponse.ETag));
                 Logger.LogDebug("Upload part file ,key:{0},UploadId:{1},Complete {2}/{3}", objectKey, uploadId, partETags.Count, partCount);

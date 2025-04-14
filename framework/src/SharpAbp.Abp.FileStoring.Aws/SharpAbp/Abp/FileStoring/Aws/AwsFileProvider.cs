@@ -235,6 +235,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             string objectKey,
             FileProviderSaveArgs args)
         {
+            var configuration = args.Configuration.GetAwsConfiguration();
             var initiateMultipartUploadResponse = await amazonS3Client.InitiateMultipartUploadAsync(new InitiateMultipartUploadRequest()
             {
                 BucketName = containerName,
@@ -273,7 +274,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
                     UploadId = uploadId,
                     InputStream = new MemoryStream(buffer),
                     PartSize = size,
-                    PartNumber = i + 1
+                    PartNumber = i + 1,
                 };
 
                 // 调用UploadPart接口执行上传功能，返回结果中包含了这个数据片的ETag值。
