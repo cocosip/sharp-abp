@@ -6,7 +6,8 @@ using Volo.Abp.Threading;
 namespace SharpAbp.Abp.TenancyGrouping
 {
     [DependsOn(
-        typeof(AbpMultiTenancyModule)
+        //typeof(AbpMultiTenancyModule),
+        typeof(AbpTenancyGroupingAbstractionsModule)
         )]
     public class AbpTenancyGroupingModule : AbpModule
     {

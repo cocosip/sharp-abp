@@ -1,6 +1,6 @@
-﻿using JetBrains.Annotations;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Volo.Abp;
 using Volo.Abp.Data;
 
@@ -11,11 +11,13 @@ namespace SharpAbp.Abp.TenancyGrouping
     {
         public Guid Id { get; set; }
 
-        public string? Name { get; set; }
+        public string Name { get; set; } = default!;
+
+        public string NormalizedName { get; set; } = default!;
+
+        public ConnectionStrings? ConnectionStrings { get; set; }
 
         public bool IsActive { get; set; }
-
-        public ConnectionStrings ConnectionStrings { get; set; }
 
         public List<Guid> Tenants { get; set; }
 
@@ -23,7 +25,6 @@ namespace SharpAbp.Abp.TenancyGrouping
         {
             IsActive = true;
             Tenants = [];
-            ConnectionStrings = [];
         }
 
         public TenantGroupConfiguration(Guid id, [NotNull] string name)
@@ -35,5 +36,11 @@ namespace SharpAbp.Abp.TenancyGrouping
             Name = name;
         }
 
+        public TenantGroupConfiguration(Guid id, [NotNull] string name, [NotNull] string normalizedName)
+            : this(id, name)
+        {
+            Check.NotNull(normalizedName, nameof(normalizedName));
+            NormalizedName = normalizedName;
+        }
     }
 }

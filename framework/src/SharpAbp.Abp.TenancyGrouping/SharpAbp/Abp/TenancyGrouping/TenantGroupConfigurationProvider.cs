@@ -1,6 +1,7 @@
-﻿using JetBrains.Annotations;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Localization;
+using SharpAbp.Abp.TenancyGrouping.Localization;
 using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 
@@ -8,49 +9,72 @@ namespace SharpAbp.Abp.TenancyGrouping
 {
     public class TenantGroupConfigurationProvider : ITenantGroupConfigurationProvider, ITransientDependency
     {
+        protected virtual ITenantGroupResolver TenantGroupResolver { get; }
         protected virtual ITenantGroupStore TenantGroupStore { get; }
-        public TenantGroupConfigurationProvider(ITenantGroupStore tenantGroupStore)
+        protected virtual ITenantGroupNormalizer TenantGroupNormalizer { get; }
+        protected virtual ITenantGroupResolveResultAccessor TenantResolveResultAccessor { get; }
+        protected virtual IStringLocalizer<AbpTenancyGroupingResource> StringLocalizer { get; }
+
+        public TenantGroupConfigurationProvider(
+            ITenantGroupResolver tenantGroupResolver,
+            ITenantGroupStore tenantGroupStore,
+            ITenantGroupResolveResultAccessor tenantGroupResolveResultAccessor,
+            IStringLocalizer<AbpTenancyGroupingResource> stringLocalizer,
+            ITenantGroupNormalizer tenantGroupNormalizer)
         {
+            TenantGroupResolver = tenantGroupResolver;
             TenantGroupStore = tenantGroupStore;
+            TenantGroupNormalizer = tenantGroupNormalizer;
+            TenantResolveResultAccessor = tenantGroupResolveResultAccessor;
+            StringLocalizer = stringLocalizer;
         }
 
-        public virtual async Task<TenantGroupConfiguration> GetAsync([NotNull] string tenantGroupIdOrName)
+        public virtual async Task<TenantGroupConfiguration?> GetAsync(bool saveResolveResult = false)
         {
-            Check.NotNullOrWhiteSpace(tenantGroupIdOrName, nameof(tenantGroupIdOrName));
+            var resolveResult = await TenantGroupResolver.ResolveGroupIdOrNameAsync();
 
-            var tenantGroup = await FindTenantAsync(tenantGroupIdOrName);
-            if (tenantGroup == null)
+            if (saveResolveResult)
             {
-                throw new BusinessException(
-                    code: "Volo.AbpIo.TenancyGrouping:010001",
-                    message: "Tenant group not found!",
-                    details: "There is no tenant group with the tenant group id or name: " + tenantGroupIdOrName
-                );
+                TenantResolveResultAccessor.Result = resolveResult;
             }
 
-            if (!tenantGroup.IsActive)
+            TenantGroupConfiguration? tenant = null;
+            if (resolveResult.GroupIdOrName != null)
             {
-                throw new BusinessException(
-                    code: "Volo.AbpIo.TenancyGrouping:010002",
-                    message: "Tenant group not active!",
-                    details: "The tenant group is no active with the tenant group id or name: " + tenantGroupIdOrName
-                );
+                tenant = await FindTenantGroupAsync(resolveResult.GroupIdOrName);
+
+                if (tenant == null)
+                {
+                    throw new BusinessException(
+                        code: "Volo.AbpIo.TenancyGrouping:010001",
+                        message: StringLocalizer["TenantGroupNotFoundMessage"],
+                        details: StringLocalizer["TenantGroupNotFoundDetails", resolveResult.GroupIdOrName]
+                    );
+                }
+
+                if (!tenant.IsActive)
+                {
+                    throw new BusinessException(
+                        code: "Volo.AbpIo.TenancyGrouping:010002",
+                        message: StringLocalizer["TenantGroupNotActiveMessage"],
+                        details: StringLocalizer["TenantGroupNotActiveDetails", resolveResult.GroupIdOrName]
+                    );
+                }
             }
 
-            return tenantGroup;
+            return tenant;
         }
 
-        protected virtual async Task<TenantGroupConfiguration?> FindTenantAsync(string tenantGroupIdOrName)
+        protected virtual async Task<TenantGroupConfiguration?> FindTenantGroupAsync(string groupIdOrName)
         {
-            if (Guid.TryParse(tenantGroupIdOrName, out var parsedTenantId))
+            if (Guid.TryParse(groupIdOrName, out var parsedTenantId))
             {
                 return await TenantGroupStore.FindAsync(parsedTenantId);
             }
             else
             {
-                return await TenantGroupStore.FindAsync(tenantGroupIdOrName);
+                return await TenantGroupStore.FindAsync(TenantGroupNormalizer.NormalizeName(groupIdOrName)!);
             }
         }
-
     }
 }

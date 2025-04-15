@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-
 	<Import Project="..\..\..\common.props" />
 	<Import Project="..\..\..\configureawait.props" />
 
@@ -8,8 +7,8 @@
 		<TargetFrameworks>$(ProjectFrameworks)</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>Nullable</WarningsAsErrors>
-		<AssemblyName>SharpAbp.Abp.TenancyGrouping</AssemblyName>
-		<PackageId>SharpAbp.Abp.TenancyGrouping</PackageId>
+		<AssemblyName>SharpAbp.Abp.TenancyGrouping.Abstractions</AssemblyName>
+		<PackageId>SharpAbp.Abp.TenancyGrouping.Abstractions</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
 		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -19,11 +18,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Volo.Abp.MultiTenancy" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <ProjectReference Include="..\SharpAbp.Abp.TenancyGrouping.Abstractions\SharpAbp.Abp.TenancyGrouping.Abstractions.csproj" />
+		<PackageReference Include="Volo.Abp.MultiTenancy.Abstractions" />
 	</ItemGroup>
 
 </Project>
