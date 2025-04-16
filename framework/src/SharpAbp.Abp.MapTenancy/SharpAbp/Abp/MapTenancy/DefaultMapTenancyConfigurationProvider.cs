@@ -1,6 +1,6 @@
-﻿using JetBrains.Annotations;
+﻿using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
-using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.MapTenancy

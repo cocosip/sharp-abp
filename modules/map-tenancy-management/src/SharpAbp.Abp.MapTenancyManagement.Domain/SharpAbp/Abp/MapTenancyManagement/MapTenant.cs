@@ -7,9 +7,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
     {
         public virtual Guid TenantId { get; set; }
         public virtual string TenantName { get; set; }
-
         public virtual string Code { get; set; }
-
         public virtual string MapCode { get; set; }
 
         public MapTenant()

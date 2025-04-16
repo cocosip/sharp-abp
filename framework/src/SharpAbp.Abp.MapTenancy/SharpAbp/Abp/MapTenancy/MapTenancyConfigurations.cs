@@ -8,7 +8,7 @@ namespace SharpAbp.Abp.MapTenancy
 {
     public class MapTenancyConfigurations
     {
-        private MapTenancyConfiguration Default => new(null, "", "");
+        private MapTenancyConfiguration Default => new();
         private readonly Dictionary<string, MapTenancyConfiguration> _mappers;
 
         public MapTenancyConfigurations()

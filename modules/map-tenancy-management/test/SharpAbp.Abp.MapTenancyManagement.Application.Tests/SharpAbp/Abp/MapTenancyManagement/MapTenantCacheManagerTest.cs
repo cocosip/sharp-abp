@@ -7,11 +7,11 @@ namespace SharpAbp.Abp.MapTenancyManagement
     public class MapTenantCacheManagerTest : MapTenancyManagementApplicationTestBase
     {
         private readonly IHybridMapTenantAppService _hybridMapTenantAppService;
-        private readonly IMapTenantCacheManager _mapTenantCacheManager;
+        private readonly IMapTenantStore _mapTenantStore;
         public MapTenantCacheManagerTest()
         {
             _hybridMapTenantAppService = GetRequiredService<IHybridMapTenantAppService>();
-            _mapTenantCacheManager = GetRequiredService<IMapTenantCacheManager>();
+            _mapTenantStore = GetRequiredService<IMapTenantStore>();
         }
 
         [Fact]
@@ -36,24 +36,24 @@ namespace SharpAbp.Abp.MapTenancyManagement
             });
 
 
-            var c1 = await _mapTenantCacheManager.GetAsync("901");
+            var c1 = await _mapTenantStore.GetByCodeAsync("901");
             Assert.Equal("901", c1.Code);
             Assert.Equal("1901", c1.MapCode);
 
-            var c2 = await _mapTenantCacheManager.GetAsync("902");
+            var c2 = await _mapTenantStore.GetByCodeAsync("902");
             Assert.Equal("902", c2.Code);
             Assert.Equal("1902", c2.MapCode);
 
-            var all = await _mapTenantCacheManager.GetAllCacheAsync();
+            var all = await _mapTenantStore.GetAllAsync();
 
-            var all_c1 = all.MapTenants.FirstOrDefault(x => x.Code == "901");
+            var all_c1 = all.FirstOrDefault(x => x.Code == "901");
             Assert.NotNull(all_c1);
 
-            var all_c2 = all.MapTenants.FirstOrDefault(x => x.Code == "902");
+            var all_c2 = all.FirstOrDefault(x => x.Code == "902");
             Assert.NotNull(all_c2);
 
 
-            var codeCacheItem = await _mapTenantCacheManager.GetCodeCacheAsync(t1.TenantId);
+            var codeCacheItem = await _mapTenantStore.GetByTenantIdAsync(t1.TenantId);
             Assert.Equal("901", codeCacheItem.Code);
             Assert.Equal("1901", codeCacheItem.MapCode);
 
