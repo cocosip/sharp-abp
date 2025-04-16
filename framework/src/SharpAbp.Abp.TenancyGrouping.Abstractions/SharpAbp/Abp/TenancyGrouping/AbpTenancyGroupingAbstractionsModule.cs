@@ -30,7 +30,7 @@ namespace SharpAbp.Abp.TenancyGrouping
             Configure<AbpLocalizationOptions>(options =>
             {
                 options.Resources
-                    .Add<AbpMultiTenancyResource>("en")
+                    .Add<AbpTenancyGroupingResource>("en")
                     .AddVirtualJson("/SharpAbp/Abp/TenancyGrouping/Localization/Resources");
             });
 
