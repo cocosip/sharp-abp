@@ -1,9 +1,8 @@
-﻿using AutoMapper;
-using SharpAbp.Abp.TenancyGrouping;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using AutoMapper;
+using SharpAbp.Abp.TenancyGrouping;
 using Volo.Abp.Data;
-using Volo.Abp.TenantManagement;
 
 namespace SharpAbp.Abp.TenantGroupManagement
 {

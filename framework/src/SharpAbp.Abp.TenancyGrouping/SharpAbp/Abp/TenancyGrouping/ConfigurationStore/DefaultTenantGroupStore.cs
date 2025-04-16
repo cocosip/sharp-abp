@@ -50,7 +50,5 @@ namespace SharpAbp.Abp.TenancyGrouping.ConfigurationStore
         {
             return _options.Groups.FirstOrDefault(t => t.Tenants.Contains(tenantId));
         }
-
- 
     }
 }

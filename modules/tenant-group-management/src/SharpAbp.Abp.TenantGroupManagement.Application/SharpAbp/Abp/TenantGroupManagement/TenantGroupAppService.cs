@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using SharpAbp.Abp.TenancyGrouping;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Data;
+using Volo.Abp.EventBus.Distributed;
+using Volo.Abp.EventBus.Local;
 using Volo.Abp.TenantManagement;
 
 namespace SharpAbp.Abp.TenantGroupManagement
@@ -11,14 +15,23 @@ namespace SharpAbp.Abp.TenantGroupManagement
     [Authorize(TenantGroupManagementPermissions.TenantGroups.Default)]
     public class TenantGroupAppService : TenantGroupManagementAppServiceBase, ITenantGroupAppService
     {
-        protected TenantGroupManager TenantGroupManager { get; }
+        protected IDistributedEventBus DistributedEventBus { get; }
+        protected ILocalEventBus LocalEventBus { get; }
+        protected ITenantGroupNormalizer TenantGroupNormalizer { get; }
+        protected ITenantGroupManager TenantGroupManager { get; }
         protected ITenantGroupRepository TenantGroupRepository { get; }
         protected ITenantRepository TenantRepository { get; }
         public TenantGroupAppService(
-            TenantGroupManager tenantGroupManager,
+            IDistributedEventBus distributedEventBus,
+            ILocalEventBus localEventBus,
+            ITenantGroupNormalizer tenantGroupNormalizer,
+            ITenantGroupManager tenantGroupManager,
             ITenantGroupRepository tenantGroupRepository,
             ITenantRepository tenantRepository)
         {
+            DistributedEventBus = distributedEventBus;
+            LocalEventBus = localEventBus;
+            TenantGroupNormalizer = tenantGroupNormalizer;
             TenantGroupManager = tenantGroupManager;
             TenantGroupRepository = tenantGroupRepository;
             TenantRepository = tenantRepository;
@@ -32,7 +45,8 @@ namespace SharpAbp.Abp.TenantGroupManagement
 
         public virtual async Task<TenantGroupDto> FindByNameAsync(string name)
         {
-            var tenantGroup = await TenantGroupRepository.FindByNameAsync(name);
+            var normalizedName = TenantGroupNormalizer.NormalizeName(name);
+            var tenantGroup = await TenantGroupRepository.FindByNameAsync(normalizedName);
             return ObjectMapper.Map<TenantGroup, TenantGroupDto>(tenantGroup);
         }
 
@@ -74,20 +88,32 @@ namespace SharpAbp.Abp.TenantGroupManagement
             return ObjectMapper.Map<List<Tenant>, List<TenantDto>>(availableTenants);
         }
 
-
         [Authorize(TenantGroupManagementPermissions.TenantGroups.Create)]
         public virtual async Task<TenantGroupDto> CreateAsync(CreateTenantGroupDto input)
         {
-            var tenantGroup = new TenantGroup(GuidGenerator.Create(), input.Name, input.IsActive);
-            var created = await TenantGroupManager.CreateAsync(tenantGroup);
-            return ObjectMapper.Map<TenantGroup, TenantGroupDto>(created);
+            var tenantGroup = await TenantGroupManager.CreateAsync(input.Name, input.IsActive);
+            await TenantGroupRepository.InsertAsync(tenantGroup);
+            await CurrentUnitOfWork.SaveChangesAsync();
+
+            await DistributedEventBus.PublishAsync(
+                new TenantGroupCreatedEto
+                {
+                    Id = tenantGroup.Id,
+                    Name = tenantGroup.Name,
+                });
+
+            return ObjectMapper.Map<TenantGroup, TenantGroupDto>(tenantGroup);
         }
 
         [Authorize(TenantGroupManagementPermissions.TenantGroups.Update)]
         public virtual async Task<TenantGroupDto> UpdateAsync(Guid id, UpdateTenantGroupDto input)
         {
-            var updated = await TenantGroupManager.UpdateAsync(id, input.Name, input.IsActive);
-            return ObjectMapper.Map<TenantGroup, TenantGroupDto>(updated);
+            var tenantGroup = await TenantGroupRepository.GetAsync(id);
+            await TenantGroupManager.ChangeNameAsync(tenantGroup, input.Name, input.IsActive);
+            tenantGroup.SetConcurrencyStampIfNotNull(input.ConcurrencyStamp);
+            
+            await TenantGroupRepository.UpdateAsync(tenantGroup);
+            return ObjectMapper.Map<TenantGroup, TenantGroupDto>(tenantGroup);
         }
 
         [Authorize(TenantGroupManagementPermissions.TenantGroups.Delete)]
@@ -100,6 +126,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
         public virtual async Task<TenantGroupDto> AddTenantAsync(Guid id, AddTenantDto input)
         {
             var tenantGroup = await TenantGroupManager.AddTenantAsync(id, input.TenantId);
+            await TenantGroupRepository.UpdateAsync(tenantGroup);
             return ObjectMapper.Map<TenantGroup, TenantGroupDto>(tenantGroup);
         }
 
@@ -107,6 +134,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
         public virtual async Task<TenantGroupDto> RemoveTenantAsync(Guid id, Guid tenantGroupTenantId)
         {
             var tenantGroup = await TenantGroupManager.RemoveTenantAsync(id, tenantGroupTenantId);
+            await TenantGroupRepository.UpdateAsync(tenantGroup);
             return ObjectMapper.Map<TenantGroup, TenantGroupDto>(tenantGroup);
         }
 
@@ -121,6 +149,10 @@ namespace SharpAbp.Abp.TenantGroupManagement
         public virtual async Task UpdateDefaultConnectionStringAsync(Guid id, string defaultConnectionString)
         {
             var tenantGroup = await TenantGroupRepository.GetAsync(id);
+            if (tenantGroup.FindDefaultConnectionString() != defaultConnectionString)
+            {
+                await LocalEventBus.PublishAsync(new TenantGroupChangedEvent(tenantGroup.Id, tenantGroup.NormalizedName));
+            }
             tenantGroup.SetDefaultConnectionString(defaultConnectionString);
             await TenantGroupRepository.UpdateAsync(tenantGroup);
         }
@@ -130,6 +162,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
         {
             var tenantGroup = await TenantGroupRepository.GetAsync(id);
             tenantGroup.RemoveDefaultConnectionString();
+            await LocalEventBus.PublishAsync(new TenantGroupChangedEvent(tenantGroup.Id, tenantGroup.NormalizedName));
             await TenantGroupRepository.UpdateAsync(tenantGroup);
         }
 

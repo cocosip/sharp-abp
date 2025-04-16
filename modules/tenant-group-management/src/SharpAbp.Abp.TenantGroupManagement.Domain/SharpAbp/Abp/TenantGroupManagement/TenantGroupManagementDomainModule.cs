@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.TenancyGrouping;
-using System;
-using System.Threading.Tasks;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain.Entities.Events.Distributed;
@@ -39,7 +39,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
             {
                 options.CacheConfigurators.Add(cacheName =>
                 {
-                    if (cacheName == CacheNameAttribute.GetCacheName(typeof(TenantGroupCacheItem)))
+                    if (cacheName == CacheNameAttribute.GetCacheName<TenantGroupConfigurationCacheItem>())
                     {
                         return new DistributedCacheEntryOptions()
                         {
@@ -51,7 +51,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
 
                 options.CacheConfigurators.Add(cacheName =>
                 {
-                    if (cacheName == CacheNameAttribute.GetCacheName(typeof(TenantGroupTenantCacheItem)))
+                    if (cacheName == CacheNameAttribute.GetCacheName<TenantGroupTenantCacheItem>())
                     {
                         return new DistributedCacheEntryOptions()
                         {

@@ -1,10 +1,10 @@
-﻿using JetBrains.Annotations;
-using SharpAbp.Abp.TenancyGrouping;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
+using SharpAbp.Abp.TenancyGrouping;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.MultiTenancy;
@@ -17,13 +17,13 @@ namespace SharpAbp.Abp.TenantGroupManagement
         protected ICurrentTenant CurrentTenant { get; }
         protected IObjectMapper ObjectMapper { get; }
         protected ITenantGroupRepository TenantGroupRepository { get; }
-        protected IDistributedCache<TenantGroupCacheItem> Cache { get; }
+        protected IDistributedCache<TenantGroupConfigurationCacheItem> Cache { get; }
         protected IDistributedCache<TenantGroupTenantCacheItem> TenantCache { get; }
         public TenantGroupCacheManager(
             ICurrentTenant currentTenant,
             IObjectMapper objectMapper,
             ITenantGroupRepository tenantGroupRepository,
-            IDistributedCache<TenantGroupCacheItem> cache,
+            IDistributedCache<TenantGroupConfigurationCacheItem> cache,
             IDistributedCache<TenantGroupTenantCacheItem> tenantCache)
         {
             CurrentTenant = currentTenant;
@@ -51,7 +51,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
                         var key = CalculateTenantCacheKey(item.TenantId);
                         tenantGroupTenants.Add(new KeyValuePair<string, TenantGroupTenantCacheItem>(key, tenantGroupTenant));
                     }
-                    if (tenantGroupTenants.Any())
+                    if (tenantGroupTenants.Count != 0)
                     {
                         await TenantCache.SetManyAsync(tenantGroupTenants);
                     }
@@ -83,23 +83,23 @@ namespace SharpAbp.Abp.TenantGroupManagement
             await TenantCache.SetAsync(cacheKey, cacheItem, considerUow: true);
         }
 
-        protected virtual async Task<TenantGroupCacheItem> SetCacheItemAsync(string cacheKey, [CanBeNull] TenantGroup tenantGroup)
+        protected virtual async Task<TenantGroupConfigurationCacheItem> SetCacheItemAsync(string cacheKey, [CanBeNull] TenantGroup tenantGroup)
         {
-            var tenantConfiguration = tenantGroup != null ? ObjectMapper.Map<TenantGroup, TenantGroupConfiguration>(tenantGroup) : null;
-            var cacheItem = new TenantGroupCacheItem(tenantConfiguration);
+            var tenantGroupConfiguration = tenantGroup != null ? ObjectMapper.Map<TenantGroup, TenantGroupConfiguration>(tenantGroup) : null;
+            var cacheItem = new TenantGroupConfigurationCacheItem(tenantGroupConfiguration);
             await Cache.SetAsync(cacheKey, cacheItem, considerUow: true);
             return cacheItem;
         }
 
         protected virtual string CalculateTenantCacheKey(Guid tenantId)
         {
-            return TenantGroupTenantCacheItem.CalculateCacheKey(tenantId, null);
+            return TenantGroupTenantCacheItem.CalculateCacheKey(tenantId);
         }
 
 
         protected virtual string CalculateCacheKey(Guid? id, string name)
         {
-            return TenantGroupCacheItem.CalculateCacheKey(id, name);
+            return TenantGroupConfigurationCacheItem.CalculateCacheKey(id, name);
         }
     }
 }

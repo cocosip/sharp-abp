@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\..\..\common.props" />
+	<Import Project="..\..\..\configureawait.props" />
+
+	<PropertyGroup>
+		<TargetFramework>$(NetCoreFx)</TargetFramework>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>Nullable</WarningsAsErrors>
+		<AssemblyName>SharpAbp.Abp.AspNetCore.TenancyGrouping</AssemblyName>
+		<PackageId>SharpAbp.Abp.AspNetCore.TenancyGrouping</PackageId>
+		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<Description>SharpAbp AspNetCore TenancyGrouping Module</Description>
+		<IsPackable>true</IsPackable>
+		<OutputType>Library</OutputType>
+		<RootNamespace />
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.AspNetCore" />
+		<ProjectReference Include="..\SharpAbp.Abp.TenancyGrouping\SharpAbp.Abp.TenancyGrouping.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -8,6 +8,8 @@ namespace SharpAbp.Abp.TenantGroupManagement
     public class TenantGroupDto : ExtensibleEntityDto<Guid>, IHasConcurrencyStamp
     {
         public string Name { get; set; }
+
+        public string NormalizedName { get; set; }
         public bool IsActive { get; set; }
         public string ConcurrencyStamp { get; set; }
         public List<TenantGroupTenantDto> Tenants { get; set; }
@@ -15,8 +17,8 @@ namespace SharpAbp.Abp.TenantGroupManagement
 
         public TenantGroupDto()
         {
-            Tenants = new List<TenantGroupTenantDto>();
-            ConnectionStrings = new List<TenantGroupConnectionStringDto>();
+            Tenants = [];
+            ConnectionStrings = [];
         }
     }
 }

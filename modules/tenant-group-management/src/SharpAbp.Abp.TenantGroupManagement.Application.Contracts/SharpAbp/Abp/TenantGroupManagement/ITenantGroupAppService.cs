@@ -10,7 +10,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
     public interface ITenantGroupAppService : IApplicationService
     {
         Task<TenantGroupDto> GetAsync(Guid id);
-        Task<TenantGroupDto> FindByNameAsync(string name);
+        Task<TenantGroupDto> FindByNameAsync(string normalizedName);
         Task<PagedResultDto<TenantGroupDto>> GetPagedListAsync(TenantGroupPagedRequestDto input);
         Task<List<TenantGroupDto>> GetListAsync(string sorting = null, string name = "");
         Task<List<TenantDto>> GetAvialableTenantsAsync();

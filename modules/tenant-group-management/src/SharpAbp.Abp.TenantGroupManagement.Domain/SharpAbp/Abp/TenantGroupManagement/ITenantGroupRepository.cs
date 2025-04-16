@@ -11,22 +11,22 @@ namespace SharpAbp.Abp.TenantGroupManagement
         /// <summary>
         /// Find by name
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="normalizedName"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<TenantGroup> FindByNameAsync(string name, bool includeDetails = true, CancellationToken cancellationToken = default);
+        Task<TenantGroup> FindByNameAsync(string normalizedName, bool includeDetails = true, CancellationToken cancellationToken = default);
 
 
         /// <summary>
         /// Find expected by name
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="normalizedName"></param>
         /// <param name="expectedId"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<TenantGroup> FindExpectedByNameAsync(string name, Guid? expectedId = null, bool includeDetails = true, CancellationToken cancellationToken = default);
+        Task<TenantGroup> FindExpectedByNameAsync(string normalizedName, Guid? expectedId = null, bool includeDetails = true, CancellationToken cancellationToken = default);
 
 
         /// <summary>

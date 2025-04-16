@@ -10,8 +10,9 @@ namespace SharpAbp.Abp.TenantGroupManagement
         [Display(Name = "TenantGroupName")]
         public string Name { get; set; }
 
-
         [Required]
         public bool IsActive { get; set; }
+
+        public string ConcurrencyStamp { get; set; }
     }
 }

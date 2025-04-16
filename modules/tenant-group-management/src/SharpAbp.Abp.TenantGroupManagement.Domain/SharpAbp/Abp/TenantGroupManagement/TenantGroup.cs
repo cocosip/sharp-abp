@@ -1,17 +1,20 @@
-﻿using JetBrains.Annotations;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Volo.Abp;
 using Volo.Abp.Auditing;
 using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.TenantManagement;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SharpAbp.Abp.TenantGroupManagement
 {
     public class TenantGroup : AuditedAggregateRoot<Guid>, IHasEntityVersion
     {
         public virtual string Name { get; set; }
+
+        public virtual string NormalizedName { get; protected set; }
 
         public virtual bool IsActive { get; set; }
 
@@ -23,14 +26,15 @@ namespace SharpAbp.Abp.TenantGroupManagement
 
         public TenantGroup()
         {
-            ConnectionStrings = new List<TenantGroupConnectionString>();
-            Tenants = new List<TenantGroupTenant>();
+            ConnectionStrings = [];
+            Tenants = [];
         }
 
-        public TenantGroup(Guid id, [NotNull] string name, bool isActive) : this()
+        public TenantGroup(Guid id, [NotNull] string name, [CanBeNull] string normalizedName, bool isActive) : this()
         {
             Id = id;
-            Name = name;
+            SetName(name);
+            SetNormalizedName(normalizedName);
             IsActive = isActive;
         }
 
@@ -40,7 +44,6 @@ namespace SharpAbp.Abp.TenantGroupManagement
             {
                 throw new AbpException($"Dumplicate tenantId: {tenant.Id}");
             }
-
             Tenants.Add(tenant);
         }
 
@@ -87,11 +90,23 @@ namespace SharpAbp.Abp.TenantGroupManagement
             }
         }
 
+        [CanBeNull]
+        public virtual string FindDefaultConnectionString()
+        {
+            return FindConnectionString(Volo.Abp.Data.ConnectionStrings.DefaultConnectionStringName);
+        }
+
+        [CanBeNull]
+        public virtual string FindConnectionString(string name)
+        {
+            return ConnectionStrings.FirstOrDefault(c => c.Name == name)?.Value;
+        }
+
+
         public virtual void SetDefaultConnectionString(string connectionString)
         {
             SetConnectionString(Volo.Abp.Data.ConnectionStrings.DefaultConnectionStringName, connectionString);
         }
-
 
         public virtual void RemoveDefaultConnectionString()
         {
@@ -113,6 +128,13 @@ namespace SharpAbp.Abp.TenantGroupManagement
             Name = Check.NotNullOrWhiteSpace(name, nameof(name), TenantConsts.MaxNameLength);
         }
 
-
+        protected internal virtual void SetNormalizedName([CanBeNull] string normalizedName)
+        {
+            NormalizedName = normalizedName;
+        }
+        protected internal virtual void SetIsActive(bool isActive)
+        {
+            IsActive = isActive;
+        }
     }
 }

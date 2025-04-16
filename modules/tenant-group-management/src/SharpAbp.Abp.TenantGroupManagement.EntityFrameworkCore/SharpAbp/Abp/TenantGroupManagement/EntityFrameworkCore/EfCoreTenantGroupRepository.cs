@@ -19,40 +19,40 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
         /// <summary>
         /// Find by name
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="normalizedName"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<TenantGroup> FindByNameAsync(
-            string name,
+            string normalizedName,
             bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
                 .OrderBy(t => t.Id)
-                .FirstOrDefaultAsync(t => t.Name == name, GetCancellationToken(cancellationToken));
+                .FirstOrDefaultAsync(t => t.NormalizedName == normalizedName, GetCancellationToken(cancellationToken));
         }
 
         /// <summary>
         /// Find expected by name
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="normalizedName"></param>
         /// <param name="expectedId"></param>
         /// <param name="includeDetails"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<TenantGroup> FindExpectedByNameAsync(
-            string name,
+            string normalizedName,
             Guid? expectedId = null,
             bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
             return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
-                .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+                .WhereIf(!normalizedName.IsNullOrWhiteSpace(), item => item.NormalizedName == normalizedName)
                 .WhereIf(expectedId.HasValue, item => item.Id != expectedId.Value)
-                .FirstOrDefaultAsync(t => t.Name == name, GetCancellationToken(cancellationToken));
+                .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
         /// <summary>

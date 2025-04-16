@@ -1,4 +1,5 @@
 ﻿using SharpAbp.Abp.TenancyGrouping;
+using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp.Data;
 using Volo.Abp.MultiTenancy;
@@ -10,6 +11,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
     public class TenantGroupStoreTest : TenantGroupManagementTestBase
     {
         private readonly ICurrentTenant _currentTenant;
+        private readonly ICurrentTenantGroup _currentTenantGroup;
         private readonly ITenantGroupStore _tenantGroupStore;
         private readonly IConnectionStringResolver _connectionStringResolver;
         private readonly ITenantManager _tenantManager;
@@ -18,6 +20,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
         public TenantGroupStoreTest()
         {
             _currentTenant = GetRequiredService<ICurrentTenant>();
+            _currentTenantGroup = GetRequiredService<ICurrentTenantGroup>();
             _tenantGroupStore = GetRequiredService<ITenantGroupStore>();
             _connectionStringResolver = GetRequiredService<IConnectionStringResolver>();
             _tenantManager = GetRequiredService<ITenantManager>();
@@ -47,26 +50,31 @@ namespace SharpAbp.Abp.TenantGroupManagement
                 IsActive = true
             });
 
-            await _tenantGroupAppService.AddTenantAsync(g1.Id, new AddTenantDto()
+            g1 = await _tenantGroupAppService.AddTenantAsync(g1.Id, new AddTenantDto()
             {
                 TenantId = tenant.Id
             });
 
             await _tenantGroupAppService.UpdateDefaultConnectionStringAsync(g1.Id, "123456");
 
-
-
             using (_currentTenant.Change(tenant.Id))
             {
-                var c2 = await _tenantGroupStore.FindByTenantIdAsync(tenant.Id);
-                var c3 = await _tenantGroupStore.FindAsync(g1.Id);
-                Assert.Equal("test", c2.Name);
-                Assert.Equal(c2.Name, c3.Name);
+                using (_currentTenantGroup.Change(g1.Id, g1.Name, [.. g1.Tenants.Select(x => x.TenantId)]))
+                {
 
-                Assert.Equal("123456", c2.ConnectionStrings.Default);
+                    var a1 = _currentTenant.Id;
+                    var a2 = _currentTenantGroup.Id;
 
-                var connection2 = await _connectionStringResolver.ResolveAsync();
-                Assert.Equal("123456", connection2);
+                    var c2 = await _tenantGroupStore.FindByTenantIdAsync(tenant.Id);
+                    var c3 = await _tenantGroupStore.FindAsync(g1.Id);
+                    Assert.Equal("test", c2.Name);
+                    Assert.Equal(c2.Name, c3.Name);
+
+                    Assert.Equal("123456", c2.ConnectionStrings.Default);
+
+                    var connection2 = await _connectionStringResolver.ResolveAsync();
+                    Assert.Equal("123456", connection2);
+                }
             }
 
 
