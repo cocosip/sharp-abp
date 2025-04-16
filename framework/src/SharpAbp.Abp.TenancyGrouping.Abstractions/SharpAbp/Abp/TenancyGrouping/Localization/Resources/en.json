@@ -1,0 +1,9 @@
+{
+    "culture": "en",
+    "texts": {
+        "TenantGroupNotFoundMessage": "Tenant group not found!",
+        "TenantGroupNotFoundDetails": "There is no tenant group with the tenant group id or name: {0}",
+        "TenantGroupNotActiveMessage": "Tenant group is not active!",
+        "TenantGroupNotActiveDetails": "The tenant group is not active with the tenant group id or name: {0}"
+    }
+}

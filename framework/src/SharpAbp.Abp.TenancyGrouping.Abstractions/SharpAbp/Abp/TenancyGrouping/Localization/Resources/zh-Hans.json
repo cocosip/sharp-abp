@@ -1,0 +1,9 @@
+{
+    "culture": "zh-Hans",
+    "texts": {
+        "TenantGroupNotFoundMessage": "未找到租户分组！",
+        "TenantGroupNotFoundDetails": "没有租户分组的 ID 或名称为：{0}的租户分组。",
+        "TenantGroupNotActiveMessage": "租户分组未启用！",
+        "TenantGroupNotActiveDetails": "租户分组未启用，租户分组 ID 或名称为：{0}。"
+    }
+}
