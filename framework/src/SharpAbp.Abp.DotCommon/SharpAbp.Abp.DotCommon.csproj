@@ -22,4 +22,10 @@
 		<PackageReference Include="Volo.Abp" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<Reference Include="DotCommon">
+			<Aliases>Common</Aliases>
+		</Reference>
+	</ItemGroup>
+
 </Project>

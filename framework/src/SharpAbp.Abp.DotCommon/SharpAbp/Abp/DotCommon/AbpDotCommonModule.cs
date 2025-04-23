@@ -1,10 +1,12 @@
-﻿using DotCommon.DependencyInjection;
+﻿extern alias Common;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.DotCommon.Performance;
-using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
+
+using CommonDependencyInjection = Common::Microsoft.Extensions.DependencyInjection;
 
 namespace SharpAbp.Abp.DotCommon
 {
@@ -17,8 +19,7 @@ namespace SharpAbp.Abp.DotCommon
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            context.Services.AddDotCommon();
-
+            CommonDependencyInjection.ServiceCollectionExtensions.AddDotCommon(context.Services);
             Configure<AbpPerformanceOptions>(options =>
             {
                 options.Configurations.Configure("default", c =>

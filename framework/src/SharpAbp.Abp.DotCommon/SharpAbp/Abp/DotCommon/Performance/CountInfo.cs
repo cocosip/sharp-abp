@@ -92,7 +92,7 @@ namespace SharpAbp.Abp.DotCommon.Performance
             if (_configuration.AutoLogging)
             {
                 var contextText = GetLogContextText();
-                if (!contextText.IsNullOrWhiteSpace())
+                if (! contextText.IsNullOrWhiteSpace())
                 {
                     contextText += ", ";
                 }

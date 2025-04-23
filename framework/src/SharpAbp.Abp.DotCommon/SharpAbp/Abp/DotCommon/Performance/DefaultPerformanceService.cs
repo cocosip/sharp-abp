@@ -1,7 +1,8 @@
-﻿using DotCommon.Scheduling;
-using Microsoft.Extensions.Logging;
+﻿extern alias Common;
 using System;
 using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
+using CommonScheduling = Common::DotCommon.Scheduling;
 
 namespace SharpAbp.Abp.DotCommon.Performance
 {
@@ -13,13 +14,13 @@ namespace SharpAbp.Abp.DotCommon.Performance
         public PerformanceConfiguration Configuration { get; }
         protected ILogger Logger { get; }
         protected ICountInfoFactory CountInfoFactory { get; }
-        protected IScheduleService ScheduleService { get; }
+        protected CommonScheduling.IScheduleService ScheduleService { get; }
 
         private readonly ConcurrentDictionary<string, CountInfo> _countInfoDict;
         public DefaultPerformanceService(
             ILogger<DefaultPerformanceService> logger,
             ICountInfoFactory countInfoFactory,
-            IScheduleService scheduleService,
+            CommonScheduling.IScheduleService scheduleService,
             string name,
             PerformanceConfiguration configuration)
         {
