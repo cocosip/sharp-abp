@@ -5,7 +5,6 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Volo.Abp;
 using Volo.Abp.Caching;
-using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.DistributedLocking;
 using Volo.Abp.Guids;
@@ -81,11 +80,16 @@ namespace SharpAbp.Abp.MapTenancyManagement
             }
         }
 
-        public virtual async Task ResetAsync()
+        public virtual async Task ResetAsync(bool resetLastCheckTime = false)
         {
             using (await StoreCache.SyncSemaphore.LockAsync())
             {
                 var cacheKey = GetCommonStampCacheKey();
+                if (resetLastCheckTime)
+                {
+                    StoreCache.LastCheckTime = null;
+                }
+
                 await DistributedCache.RemoveAsync(cacheKey);
             }
         }

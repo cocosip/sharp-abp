@@ -10,6 +10,6 @@ namespace SharpAbp.Abp.MapTenancyManagement
         Task<MapTenancyTenant> GetByCodeAsync(string code);
         Task<MapTenancyTenant> GetByMapCodeAsync(string mapCode);
         Task<IReadOnlyList<MapTenancyTenant>> GetAllAsync();
-        Task ResetAsync();
+        Task ResetAsync(bool resetLastCheckTime = false);
     }
 }
