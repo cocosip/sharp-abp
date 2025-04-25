@@ -11,11 +11,9 @@ namespace SharpAbp.Abp.MapTenancyManagement
 {
     public class MapTenancyStoreInMemoryCache : IMapTenancyStoreInMemoryCache, ISingletonDependency
     {
-
-        public string CacheStamp { get; set; }
         protected List<MapTenancyTenant> Tenants { get; }
+        public string CacheStamp { get; set; }
         public SemaphoreSlim SyncSemaphore { get; } = new(1, 1);
-
         public DateTime? LastCheckTime { get; set; }
 
         public MapTenancyStoreInMemoryCache()
@@ -49,7 +47,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
             return Tenants.FirstOrDefault(x => x.MapCode == mapCode);
         }
 
-        public virtual List<MapTenancyTenant> GetAll()
+        public virtual IReadOnlyList<MapTenancyTenant> GetAll()
         {
             return Tenants;
         }

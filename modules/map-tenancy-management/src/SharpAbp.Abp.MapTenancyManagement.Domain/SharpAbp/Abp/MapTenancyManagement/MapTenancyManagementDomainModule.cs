@@ -42,6 +42,8 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
             context.Services.AddAutoMapperObjectMapper<MapTenancyManagementDomainModule>();
 
+            Configure<MapTenancyStoreOptions>(options => { });
+
             Configure<AbpDistributedEntityEventOptions>(options =>
             {
                 options.AutoEventSelectors.Add<MapTenant>();

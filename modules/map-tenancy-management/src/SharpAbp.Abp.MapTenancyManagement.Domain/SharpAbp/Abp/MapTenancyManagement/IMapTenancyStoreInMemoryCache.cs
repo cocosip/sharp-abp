@@ -15,6 +15,6 @@ namespace SharpAbp.Abp.MapTenancyManagement
         MapTenancyTenant GetByTenantIdOrNull(Guid tenantId);
         MapTenancyTenant GetByCodeOrNull([NotNull] string code);
         MapTenancyTenant GetByMapCodeOrNull([NotNull] string mapCode);
-        List<MapTenancyTenant> GetAll();
+        IReadOnlyList<MapTenancyTenant> GetAll();
     }
 }
