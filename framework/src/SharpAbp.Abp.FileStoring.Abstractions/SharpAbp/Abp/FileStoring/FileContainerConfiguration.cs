@@ -40,7 +40,7 @@ namespace SharpAbp.Abp.FileStoring
         /// Multi-part upload sharding size
         /// </summary>
         /// <value></value>
-        public int MultiPartUploadShardingSize { get; set; } = 1024 * 1024 * 3;
+        public int MultiPartUploadShardingSize { get; set; } = 1024 * 1024 * 5;
 
         /// <summary>
         /// Whether the container support use http url to access object
