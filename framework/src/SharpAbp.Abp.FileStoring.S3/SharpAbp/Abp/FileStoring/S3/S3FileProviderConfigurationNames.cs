@@ -19,6 +19,6 @@
         public const string SignatureVersion = "S3.SignatureVersion";
         public const string CreateBucketIfNotExists = "S3.CreateBucketIfNotExists";
 
-        public const string DefaultRegion = "Region";
+        public const string DefaultRegion = "us-east-1";
     }
 }
