@@ -4,6 +4,18 @@ namespace SharpAbp.Abp.FileStoring.S3
 {
     public class S3FileProviderConfiguration
     {
+        /// <summary>
+        /// Region
+        /// </summary>
+        public string? Region
+        {
+            get => _containerConfiguration.GetConfigurationOrDefault<string>(S3FileProviderConfigurationNames.Region);
+            set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.Region, value);
+        }
+
+        /// <summary>
+        /// Bucket name
+        /// </summary>
         public string BucketName
         {
             get => _containerConfiguration.GetConfiguration<string>(S3FileProviderConfigurationNames.BucketName);

@@ -67,6 +67,7 @@ namespace SharpAbp.Abp.FileStoring.S3
 
             configuration.DefaultNamingNormalizers.TryAdd<S3FileNamingNormalizer>();
             configuration
+                .AddItem(S3FileProviderConfigurationNames.Region, typeof(string), S3FileProviderConfigurationNames.DefaultRegion)
                 .AddItem(S3FileProviderConfigurationNames.BucketName, typeof(string), "bucket1")
                 .AddItem(S3FileProviderConfigurationNames.ServerUrl, typeof(string), "http://192.168.0.100:9005")
                 .AddItem(S3FileProviderConfigurationNames.AccessKeyId, typeof(string), "")
