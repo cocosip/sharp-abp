@@ -8,7 +8,7 @@ namespace SharpAbp.Abp.DbConnections.DM
     [ExposeKeyedService<IInternalDbConnectionCreator>(DatabaseProvider.MySql)]
     public class DmInternalDbConnectionCreator : IInternalDbConnectionCreator, ITransientDependency
     {
-        public DatabaseProvider DatabaseProvider => DatabaseProvider.MySql;
+        public DatabaseProvider DatabaseProvider => DatabaseProvider.Dm;
 
         public virtual IDbConnection Create(DbConnectionInfo dbConnectionInfo)
         {
