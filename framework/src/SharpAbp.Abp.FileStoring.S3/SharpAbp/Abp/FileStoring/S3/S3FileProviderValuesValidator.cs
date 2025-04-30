@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.Options;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Options;
+using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Validation;
 
@@ -15,41 +16,41 @@ namespace SharpAbp.Abp.FileStoring.S3
 
         }
 
-        public override IAbpValidationResult Validate(Dictionary<string, string> keyValuePairs)
+        public override IAbpValidationResult Validate(List<NameValue> values)
         {
             var result = new AbpValidationResult();
-            ValidateBasic(result, keyValuePairs);
+            ValidateBasic(result, values);
             if (result.Errors.Any())
             {
                 return result;
             }
 
             //BucketName
-            ValidateHelper.NotNullOrWhiteSpace(result, Provider, S3FileProviderConfigurationNames.BucketName, keyValuePairs[S3FileProviderConfigurationNames.BucketName]);
+            ValidateHelper.NotNullOrWhiteSpace(result, Provider, S3FileProviderConfigurationNames.BucketName, values.FindValue(S3FileProviderConfigurationNames.BucketName));
 
             //ServerUrl
-            ValidateHelper.NotNullOrWhiteSpace(result, Provider, S3FileProviderConfigurationNames.ServerUrl, keyValuePairs[S3FileProviderConfigurationNames.ServerUrl]);
+            ValidateHelper.NotNullOrWhiteSpace(result, Provider, S3FileProviderConfigurationNames.ServerUrl, values.FindValue(S3FileProviderConfigurationNames.ServerUrl));
 
             //AccessKeyId
-            ValidateHelper.NotNullOrWhiteSpace(result, Provider, S3FileProviderConfigurationNames.AccessKeyId, keyValuePairs[S3FileProviderConfigurationNames.AccessKeyId]);
+            ValidateHelper.NotNullOrWhiteSpace(result, Provider, S3FileProviderConfigurationNames.AccessKeyId, values.FindValue(S3FileProviderConfigurationNames.AccessKeyId));
 
             //SecretAccessKey
-            ValidateHelper.NotNullOrWhiteSpace(result, Provider, S3FileProviderConfigurationNames.SecretAccessKey, keyValuePairs[S3FileProviderConfigurationNames.SecretAccessKey]);
+            ValidateHelper.NotNullOrWhiteSpace(result, Provider, S3FileProviderConfigurationNames.SecretAccessKey, values.FindValue(S3FileProviderConfigurationNames.SecretAccessKey));
 
             //ForcePathStyle
-            ValidateHelper.ShouldBool(result, Provider, S3FileProviderConfigurationNames.ForcePathStyle, keyValuePairs[S3FileProviderConfigurationNames.ForcePathStyle]);
+            ValidateHelper.ShouldBool(result, Provider, S3FileProviderConfigurationNames.ForcePathStyle, values.FindValue(S3FileProviderConfigurationNames.ForcePathStyle));
 
             //UseChunkEncoding
-            ValidateHelper.ShouldBool(result, Provider, S3FileProviderConfigurationNames.UseChunkEncoding, keyValuePairs[S3FileProviderConfigurationNames.UseChunkEncoding]);
+            ValidateHelper.ShouldBool(result, Provider, S3FileProviderConfigurationNames.UseChunkEncoding, values.FindValue(S3FileProviderConfigurationNames.UseChunkEncoding));
 
             //Protocol
-            ValidateHelper.ShouldInt(result, Provider, S3FileProviderConfigurationNames.Protocol, keyValuePairs[S3FileProviderConfigurationNames.Protocol]);
+            ValidateHelper.ShouldInt(result, Provider, S3FileProviderConfigurationNames.Protocol, values.FindValue(S3FileProviderConfigurationNames.Protocol));
 
             //SignatureVersion
-            ValidateHelper.NotNullOrWhiteSpace(result, Provider, S3FileProviderConfigurationNames.SignatureVersion, keyValuePairs[S3FileProviderConfigurationNames.SignatureVersion]);
+            ValidateHelper.NotNullOrWhiteSpace(result, Provider, S3FileProviderConfigurationNames.SignatureVersion, values.FindValue(S3FileProviderConfigurationNames.SignatureVersion));
 
             //CreateBucketIfNotExists
-            ValidateHelper.ShouldBool(result, Provider, S3FileProviderConfigurationNames.CreateBucketIfNotExists, keyValuePairs[S3FileProviderConfigurationNames.CreateBucketIfNotExists]);
+            ValidateHelper.ShouldBool(result, Provider, S3FileProviderConfigurationNames.CreateBucketIfNotExists, values.FindValue(S3FileProviderConfigurationNames.CreateBucketIfNotExists));
 
             return result;
         }

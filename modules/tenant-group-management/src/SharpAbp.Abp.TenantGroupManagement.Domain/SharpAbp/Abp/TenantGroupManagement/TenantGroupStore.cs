@@ -57,11 +57,9 @@ namespace SharpAbp.Abp.TenantGroupManagement
                 await TenantGroupRepository.GetListAsync(includeDetails));
         }
 
-
         protected virtual async Task<TenantGroupConfigurationCacheItem> GetCacheItemAsync(Guid? id, string normalizedName)
         {
             var cacheKey = CalculateCacheKey(id, normalizedName);
-
             var cacheItem = await Cache.GetAsync(cacheKey, considerUow: true);
             if (cacheItem?.Value != null)
             {
@@ -97,7 +95,6 @@ namespace SharpAbp.Abp.TenantGroupManagement
             await Cache.SetAsync(cacheKey, cacheItem, considerUow: true);
             return cacheItem;
         }
-
 
         protected virtual async Task<TenantGroupTenantCacheItem> GetGroupCacheItemAsync(Guid tenantId)
         {

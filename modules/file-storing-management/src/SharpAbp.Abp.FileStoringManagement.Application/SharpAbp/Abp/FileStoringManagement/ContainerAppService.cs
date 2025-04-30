@@ -1,24 +1,28 @@
-﻿using JetBrains.Annotations;
-using Microsoft.AspNetCore.Authorization;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
+using Microsoft.AspNetCore.Authorization;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.EventBus.Distributed;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
     [Authorize(FileStoringManagementPermissions.Containers.Default)]
     public class ContainerAppService : FileStoringManagementAppServiceBase, IContainerAppService
     {
-        protected ContainerManager ContainerManager { get; }
+        protected IDistributedEventBus DistributedEventBus { get; }
+        protected IContainerManager ContainerManager { get; }
         protected IFileStoringContainerRepository ContainerRepository { get; }
 
         public ContainerAppService(
-            ContainerManager containerManager,
+            IDistributedEventBus distributedEventBus,
+            IContainerManager containerManager,
             IFileStoringContainerRepository fileStoringContainerRepository)
         {
+            DistributedEventBus = distributedEventBus;
             ContainerManager = containerManager;
             ContainerRepository = fileStoringContainerRepository;
         }
@@ -91,15 +95,9 @@ namespace SharpAbp.Abp.FileStoringManagement
         [Authorize(FileStoringManagementPermissions.Containers.Create)]
         public virtual async Task<ContainerDto> CreateAsync(CreateContainerDto input)
         {
-            //Validate provider values
-            var keyValuePairs = input.Items.ToDictionary(x => x.Name, y => y.Value);
-            ContainerManager.ValidateProviderValues(input.Provider, keyValuePairs);
+            var values = input.Items.Select(x => new NameValue(x.Name, x.Value)).ToList();
 
-            //Validate name
-            await ContainerManager.ValidateNameAsync(CurrentTenant.Id, input.Name, null);
-
-            var container = new FileStoringContainer(
-                GuidGenerator.Create(),
+            var container = await ContainerManager.CreateAsync(
                 CurrentTenant.Id,
                 input.IsMultiTenant,
                 input.Provider,
@@ -108,15 +106,8 @@ namespace SharpAbp.Abp.FileStoringManagement
                 input.EnableAutoMultiPartUpload,
                 input.MultiPartUploadMinFileSize,
                 input.MultiPartUploadShardingSize,
-                input.HttpAccess);
-
-            foreach (var item in input.Items)
-            {
-                container.AddItem(
-                    GuidGenerator.Create(),
-                    item.Name,
-                    item.Value);
-            }
+                input.HttpAccess,
+                values);
 
             await ContainerRepository.InsertAsync(container);
 
@@ -132,31 +123,20 @@ namespace SharpAbp.Abp.FileStoringManagement
         [Authorize(FileStoringManagementPermissions.Containers.Update)]
         public virtual async Task<ContainerDto> UpdateAsync(Guid id, UpdateContainerDto input)
         {
-            var keyValuePairs = input.Items.ToDictionary(x => x.Name, y => y.Value);
-            ContainerManager.ValidateProviderValues(input.Provider, keyValuePairs);
+            var container = await ContainerRepository.GetAsync(id);
+            var values = input.Items.Select(x => new NameValue(x.Name, x.Value)).ToList();
 
-            var container = await ContainerRepository.GetAsync(id, true);
-
-            container.Update(
+            await ContainerManager.UpdateAsync(
+                container,
                 input.IsMultiTenant,
                 input.Provider,
+                input.Name,
                 input.Title,
                 input.EnableAutoMultiPartUpload,
                 input.MultiPartUploadMinFileSize,
                 input.MultiPartUploadShardingSize,
-                input.HttpAccess);
-
-            //Remove all items
-            container.CleanItem();
-
-            //Create
-            foreach (var item in input.Items)
-            {
-                container.AddItem(
-                    GuidGenerator.Create(),
-                    item.Name,
-                    item.Value);
-            }
+                input.HttpAccess,
+                values);
 
             await ContainerRepository.UpdateAsync(container);
 
@@ -171,6 +151,18 @@ namespace SharpAbp.Abp.FileStoringManagement
         [Authorize(FileStoringManagementPermissions.Containers.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {
+            var container = await ContainerRepository.GetAsync(id);
+            if (container == null)
+            {
+                return;
+            }
+            await DistributedEventBus.PublishAsync(new FileStoringContainerDeletedEto()
+            {
+                Id = container.Id,
+                TenantId = container.TenantId,
+                Name = container.Name,
+            });
+
             await ContainerRepository.DeleteAsync(id);
         }
     }

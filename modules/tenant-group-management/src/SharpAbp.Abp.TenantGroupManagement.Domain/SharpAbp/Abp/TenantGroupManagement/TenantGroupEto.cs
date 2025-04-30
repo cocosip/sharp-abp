@@ -8,7 +8,6 @@ namespace SharpAbp.Abp.TenantGroupManagement
     {
         public string Name { get; set; }
         public bool IsActive { get; set; }
-
         public List<Guid> Tenants { get; set; }
 
         public TenantGroupEto()

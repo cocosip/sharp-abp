@@ -1,7 +1,7 @@
-﻿using JetBrains.Annotations;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.MultiTenancy;
 
@@ -35,7 +35,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 
         public FileStoringContainer()
         {
-            Items = new List<FileStoringContainerItem>();
+            Items = [];
         }
 
         public FileStoringContainer(
@@ -65,19 +65,31 @@ namespace SharpAbp.Abp.FileStoringManagement
         public void Update(
             bool isMultiTenant,
             string provider,
+            string name,
             string title,
             bool enableAutoMultiPartUpload,
             int multiPartUploadMinFileSize,
             int multiPartUploadShardingSize,
             bool httpAccess)
         {
+            var oldName = Name;
+
             IsMultiTenant = isMultiTenant;
             Provider = provider;
+            Name = name;
             Title = title;
             EnableAutoMultiPartUpload = enableAutoMultiPartUpload;
             MultiPartUploadMinFileSize = multiPartUploadMinFileSize;
             MultiPartUploadShardingSize = multiPartUploadShardingSize;
             HttpAccess = httpAccess;
+
+            AddDistributedEvent(new FileStoringContainerUpdatedEto
+            {
+                Id = Id,
+                TenantId = TenantId,
+                OldName = oldName,
+                Name = Name,
+            });
         }
 
 
@@ -86,7 +98,7 @@ namespace SharpAbp.Abp.FileStoringManagement
             Items.Add(new FileStoringContainerItem(id, name, value, Id));
         }
 
-        public void CleanItem()
+        public void ItemClear()
         {
             Items.Clear();
         }

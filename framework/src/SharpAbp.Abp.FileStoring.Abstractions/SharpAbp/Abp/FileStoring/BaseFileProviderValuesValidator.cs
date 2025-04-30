@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.Options;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using Microsoft.Extensions.Options;
 using Volo.Abp;
 using Volo.Abp.Validation;
 
@@ -16,15 +17,16 @@ namespace SharpAbp.Abp.FileStoring
         }
 
         public abstract string Provider { get; }
-        public abstract IAbpValidationResult Validate(Dictionary<string, string> keyValuePairs);
+        public abstract IAbpValidationResult Validate(List<NameValue> values);
 
-        protected virtual void ValidateBasic(IAbpValidationResult result, Dictionary<string, string> keyValuePairs)
+        protected virtual void ValidateBasic(IAbpValidationResult result, List<NameValue> values)
         {
             var providerConfiguration = Options.Providers.GetConfiguration(Provider) ?? throw new AbpException($"Could not find any provider configuration for provider '{Provider}'.");
 
             foreach (var itemKeyValuePair in providerConfiguration.GetItems())
             {
-                if (!keyValuePairs.ContainsKey(itemKeyValuePair.Key))
+                var value = values.FirstOrDefault(x => x.Name == itemKeyValuePair.Key);
+                if (value == null)
                 {
                     result.Errors.Add(new ValidationResult($"[{Provider}-{itemKeyValuePair.Key}] is missing."));
                 }

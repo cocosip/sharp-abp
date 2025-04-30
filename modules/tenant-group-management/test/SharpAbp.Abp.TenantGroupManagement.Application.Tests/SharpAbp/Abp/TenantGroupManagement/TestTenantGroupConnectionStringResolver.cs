@@ -19,7 +19,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
         }
 
 
-        public override async Task<string> ResolveAsync(string? connectionStringName = null)
+        public override async Task<string> ResolveAsync(string connectionStringName = null)
         {
 
             if (CurrentTenantGroup != null && CurrentTenantGroup.IsAvailable && CurrentTenant.Id.HasValue)
@@ -76,7 +76,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
             return await base.ResolveAsync(connectionStringName);
         }
 
-        protected override async Task<TenantGroupConfiguration?> FindTenantGroupConfigurationAsync(Guid groupId)
+        protected override async Task<TenantGroupConfiguration> FindTenantGroupConfigurationAsync(Guid groupId)
         {
             using var serviceScope = ServiceProvider.CreateScope();
             var tenantGroupStore = serviceScope

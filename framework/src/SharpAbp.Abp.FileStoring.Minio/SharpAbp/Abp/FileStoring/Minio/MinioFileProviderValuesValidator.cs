@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.Options;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Options;
+using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Validation;
 
@@ -15,32 +16,32 @@ namespace SharpAbp.Abp.FileStoring.Minio
 
         }
 
-        public override IAbpValidationResult Validate(Dictionary<string, string> keyValuePairs)
+        public override IAbpValidationResult Validate(List<NameValue> values)
         {
             var result = new AbpValidationResult();
-            ValidateBasic(result, keyValuePairs);
+            ValidateBasic(result, values);
             if (result.Errors.Any())
             {
                 return result;
             }
 
             //BucketName
-            ValidateHelper.NotNullOrWhiteSpace(result, Provider, MinioFileProviderConfigurationNames.BucketName, keyValuePairs[MinioFileProviderConfigurationNames.BucketName]);
+            ValidateHelper.NotNullOrWhiteSpace(result, Provider, MinioFileProviderConfigurationNames.BucketName, values.FindValue(MinioFileProviderConfigurationNames.BucketName));
 
             //EndPoint
-            ValidateHelper.NotNullOrWhiteSpace(result, Provider, MinioFileProviderConfigurationNames.EndPoint, keyValuePairs[MinioFileProviderConfigurationNames.EndPoint]);
+            ValidateHelper.NotNullOrWhiteSpace(result, Provider, MinioFileProviderConfigurationNames.EndPoint, values.FindValue(MinioFileProviderConfigurationNames.EndPoint));
 
             //AccessKey
-            ValidateHelper.NotNullOrWhiteSpace(result, Provider, MinioFileProviderConfigurationNames.AccessKey, keyValuePairs[MinioFileProviderConfigurationNames.AccessKey]);
+            ValidateHelper.NotNullOrWhiteSpace(result, Provider, MinioFileProviderConfigurationNames.AccessKey, values.FindValue(MinioFileProviderConfigurationNames.AccessKey));
 
             //SecretKey
-            ValidateHelper.NotNullOrWhiteSpace(result, Provider, MinioFileProviderConfigurationNames.SecretKey, keyValuePairs[MinioFileProviderConfigurationNames.SecretKey]);
+            ValidateHelper.NotNullOrWhiteSpace(result, Provider, MinioFileProviderConfigurationNames.SecretKey, values.FindValue(MinioFileProviderConfigurationNames.SecretKey));
 
             //WithSSL
-            ValidateHelper.ShouldBool(result, Provider, MinioFileProviderConfigurationNames.WithSSL, keyValuePairs[MinioFileProviderConfigurationNames.WithSSL]);
+            ValidateHelper.ShouldBool(result, Provider, MinioFileProviderConfigurationNames.WithSSL, values.FindValue(MinioFileProviderConfigurationNames.WithSSL));
 
             //CreateBucketIfNotExists
-            ValidateHelper.ShouldBool(result, Provider, MinioFileProviderConfigurationNames.CreateBucketIfNotExists, keyValuePairs[MinioFileProviderConfigurationNames.CreateBucketIfNotExists]);
+            ValidateHelper.ShouldBool(result, Provider, MinioFileProviderConfigurationNames.CreateBucketIfNotExists, values.FindValue(MinioFileProviderConfigurationNames.CreateBucketIfNotExists));
 
             return result;
         }

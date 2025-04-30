@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Linq;
+using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Validation;
 
@@ -16,10 +17,10 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
         }
 
 
-        public override IAbpValidationResult Validate(Dictionary<string, string> keyValuePairs)
+        public override IAbpValidationResult Validate(List<NameValue> values)
         {
             var result = new AbpValidationResult();
-            ValidateBasic(result, keyValuePairs);
+            ValidateBasic(result, values);
 
             if (result.Errors.Any())
             {
@@ -27,46 +28,46 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
             }
 
             //ClusterName
-            ValidateHelper.NotNullOrWhiteSpace(result, Provider, FastDFSFileProviderConfigurationNames.ClusterName, keyValuePairs[FastDFSFileProviderConfigurationNames.ClusterName]);
+            ValidateHelper.NotNullOrWhiteSpace(result, Provider, FastDFSFileProviderConfigurationNames.ClusterName, values.FindValue(FastDFSFileProviderConfigurationNames.ClusterName));
 
             //HttpServer
-            ValidateHelper.NotNullOrWhiteSpace(result, Provider, FastDFSFileProviderConfigurationNames.HttpServer, keyValuePairs[FastDFSFileProviderConfigurationNames.HttpServer]);
+            ValidateHelper.NotNullOrWhiteSpace(result, Provider, FastDFSFileProviderConfigurationNames.HttpServer, values.FindValue(FastDFSFileProviderConfigurationNames.HttpServer));
 
             //GroupName
-            ValidateHelper.NotNullOrWhiteSpace(result, Provider, FastDFSFileProviderConfigurationNames.GroupName, keyValuePairs[FastDFSFileProviderConfigurationNames.GroupName]);
+            ValidateHelper.NotNullOrWhiteSpace(result, Provider, FastDFSFileProviderConfigurationNames.GroupName, values.FindValue(FastDFSFileProviderConfigurationNames.GroupName));
 
             //AppendGroupNameToUrl
-            ValidateHelper.ShouldBool(result, Provider, FastDFSFileProviderConfigurationNames.AppendGroupNameToUrl, keyValuePairs[FastDFSFileProviderConfigurationNames.AppendGroupNameToUrl]);
+            ValidateHelper.ShouldBool(result, Provider, FastDFSFileProviderConfigurationNames.AppendGroupNameToUrl, values.FindValue(FastDFSFileProviderConfigurationNames.AppendGroupNameToUrl));
 
             //Trackers
-            ValidateHelper.NotNullOrWhiteSpace(result, Provider, FastDFSFileProviderConfigurationNames.Trackers, keyValuePairs[FastDFSFileProviderConfigurationNames.Trackers]);
+            ValidateHelper.NotNullOrWhiteSpace(result, Provider, FastDFSFileProviderConfigurationNames.Trackers, values.FindValue(FastDFSFileProviderConfigurationNames.Trackers));
 
             //AntiStealCheckToken
-            ValidateHelper.ShouldBool(result, Provider, FastDFSFileProviderConfigurationNames.AntiStealCheckToken, keyValuePairs[FastDFSFileProviderConfigurationNames.AntiStealCheckToken]);
+            ValidateHelper.ShouldBool(result, Provider, FastDFSFileProviderConfigurationNames.AntiStealCheckToken, values.FindValue(FastDFSFileProviderConfigurationNames.AntiStealCheckToken));
 
             ////SecretKey
-            //ValidateHelper.NotNullOrWhiteSpace(result, Provider, FastDFSFileProviderConfigurationNames.SecretKey, keyValuePairs[FastDFSFileProviderConfigurationNames.SecretKey]);
+            //ValidateHelper.NotNullOrWhiteSpace(result, Provider, FastDFSFileProviderConfigurationNames.SecretKey, values.FindValue[FastDFSFileProviderConfigurationNames.SecretKey]);
 
             //Charset
-            ValidateHelper.NotNullOrWhiteSpace(result, Provider, FastDFSFileProviderConfigurationNames.Charset, keyValuePairs[FastDFSFileProviderConfigurationNames.Charset]);
+            ValidateHelper.NotNullOrWhiteSpace(result, Provider, FastDFSFileProviderConfigurationNames.Charset, values.FindValue(FastDFSFileProviderConfigurationNames.Charset));
 
             //ConnectionTimeout
-            ValidateHelper.ShouldInt(result, Provider, FastDFSFileProviderConfigurationNames.ConnectionTimeout, keyValuePairs[FastDFSFileProviderConfigurationNames.ConnectionTimeout]);
+            ValidateHelper.ShouldInt(result, Provider, FastDFSFileProviderConfigurationNames.ConnectionTimeout, values.FindValue(FastDFSFileProviderConfigurationNames.ConnectionTimeout));
 
             //ConnectionLifeTime
-            ValidateHelper.ShouldInt(result, Provider, FastDFSFileProviderConfigurationNames.ConnectionLifeTime, keyValuePairs[FastDFSFileProviderConfigurationNames.ConnectionLifeTime]);
+            ValidateHelper.ShouldInt(result, Provider, FastDFSFileProviderConfigurationNames.ConnectionLifeTime, values.FindValue(FastDFSFileProviderConfigurationNames.ConnectionLifeTime));
 
             //ConnectionConcurrentThread
-            ValidateHelper.ShouldInt(result, Provider, FastDFSFileProviderConfigurationNames.ConnectionConcurrentThread, keyValuePairs[FastDFSFileProviderConfigurationNames.ConnectionConcurrentThread]);
+            ValidateHelper.ShouldInt(result, Provider, FastDFSFileProviderConfigurationNames.ConnectionConcurrentThread, values.FindValue(FastDFSFileProviderConfigurationNames.ConnectionConcurrentThread));
 
             //ScanTimeoutConnectionInterval
-            ValidateHelper.ShouldInt(result, Provider, FastDFSFileProviderConfigurationNames.ScanTimeoutConnectionInterval, keyValuePairs[FastDFSFileProviderConfigurationNames.ScanTimeoutConnectionInterval]);
+            ValidateHelper.ShouldInt(result, Provider, FastDFSFileProviderConfigurationNames.ScanTimeoutConnectionInterval, values.FindValue(FastDFSFileProviderConfigurationNames.ScanTimeoutConnectionInterval));
 
             //TrackerMaxConnection
-            ValidateHelper.ShouldInt(result, Provider, FastDFSFileProviderConfigurationNames.TrackerMaxConnection, keyValuePairs[FastDFSFileProviderConfigurationNames.TrackerMaxConnection]);
+            ValidateHelper.ShouldInt(result, Provider, FastDFSFileProviderConfigurationNames.TrackerMaxConnection, values.FindValue(FastDFSFileProviderConfigurationNames.TrackerMaxConnection));
 
             //StorageMaxConnection
-            ValidateHelper.ShouldInt(result, Provider, FastDFSFileProviderConfigurationNames.StorageMaxConnection, keyValuePairs[FastDFSFileProviderConfigurationNames.StorageMaxConnection]);
+            ValidateHelper.ShouldInt(result, Provider, FastDFSFileProviderConfigurationNames.StorageMaxConnection, values.FindValue(FastDFSFileProviderConfigurationNames.StorageMaxConnection));
 
             return result;
         }

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using SharpAbp.Abp.TenancyGrouping;
+using Volo.Abp;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.MultiTenancy;
@@ -18,88 +18,74 @@ namespace SharpAbp.Abp.TenantGroupManagement
         protected IObjectMapper ObjectMapper { get; }
         protected ITenantGroupRepository TenantGroupRepository { get; }
         protected IDistributedCache<TenantGroupConfigurationCacheItem> Cache { get; }
-        protected IDistributedCache<TenantGroupTenantCacheItem> TenantCache { get; }
+        protected IDistributedCache<TenantGroupTenantCacheItem> GroupCache { get; }
         public TenantGroupCacheManager(
             ICurrentTenant currentTenant,
             IObjectMapper objectMapper,
             ITenantGroupRepository tenantGroupRepository,
             IDistributedCache<TenantGroupConfigurationCacheItem> cache,
-            IDistributedCache<TenantGroupTenantCacheItem> tenantCache)
+            IDistributedCache<TenantGroupTenantCacheItem> groupCache)
         {
             CurrentTenant = currentTenant;
             ObjectMapper = objectMapper;
             TenantGroupRepository = tenantGroupRepository;
             Cache = cache;
-            TenantCache = tenantCache;
+            GroupCache = groupCache;
         }
 
-        public virtual async Task UpdateTenantGroupCacheAsync(Guid id, CancellationToken cancellationToken = default)
+
+        public virtual async Task RemoveAsync(Guid? id, string normalizedName, CancellationToken cancellationToken = default)
         {
+            if (id == null && normalizedName.IsNullOrWhiteSpace())
+            {
+                throw new AbpException("Both id and normalizedName can't be invalid.");
+            }
+
             using (CurrentTenant.Change(null))
             {
-                var tenantGroup = await TenantGroupRepository.FindAsync(id, true, cancellationToken);
-                if (tenantGroup != null)
+                var tenants = new List<Guid>();
+                var cacheKeys = new List<string>();
+                if (id.HasValue)
                 {
-                    var cacheKey = CalculateCacheKey(tenantGroup.Id, tenantGroup.Name);
-                    await SetCacheItemAsync(cacheKey, tenantGroup);
+                    cacheKeys.Add(CalculateCacheKey(id, null));
+                }
 
-                    var tenantGroupTenants = new List<KeyValuePair<string, TenantGroupTenantCacheItem>>();
+                if (!normalizedName.IsNullOrWhiteSpace())
+                {
+                    cacheKeys.Add(CalculateCacheKey(null, normalizedName));
+                }
 
-                    foreach (var item in tenantGroup.Tenants)
+                if (id.HasValue && !normalizedName.IsNullOrWhiteSpace())
+                {
+                    cacheKeys.Add(CalculateCacheKey(id, normalizedName));
+                }
+
+                foreach (var cacheKey in cacheKeys)
+                {
+                    var cacheItem = await Cache.GetAsync(cacheKey);
+                    if (cacheItem?.Value != null)
                     {
-                        var tenantGroupTenant = new TenantGroupTenantCacheItem(item.TenantId, item.TenantGroupId);
-                        var key = CalculateTenantCacheKey(item.TenantId);
-                        tenantGroupTenants.Add(new KeyValuePair<string, TenantGroupTenantCacheItem>(key, tenantGroupTenant));
-                    }
-                    if (tenantGroupTenants.Count != 0)
-                    {
-                        await TenantCache.SetManyAsync(tenantGroupTenants);
+                        foreach (var tenantId in cacheItem.Value.Tenants)
+                        {
+                            tenants.AddIfNotContains(tenantId);
+                        }
                     }
                 }
+
+                var groupCacheKeys = tenants.Distinct().Select(CalculateGroupCacheKey).ToList();
+                await Cache.RefreshManyAsync(cacheKeys, token: cancellationToken);
+                await GroupCache.RemoveManyAsync(groupCacheKeys, token: cancellationToken);
             }
-        }
+        } 
 
-        public virtual async Task RemoveTenantGroupCacheAsync(
-            Guid id,
-            string name,
-            List<Guid> tenantIds,
-            CancellationToken cancellationToken = default)
+        protected virtual string CalculateCacheKey(Guid? id, string normalizedName)
         {
-
-            using (CurrentTenant.Change(null))
-            {
-                var cacheKey = CalculateCacheKey(id, name);
-                await Cache.RemoveAsync(cacheKey, token: cancellationToken);
-                var keys = tenantIds.Select(CalculateTenantCacheKey).ToList();
-                await TenantCache.RemoveManyAsync(keys, token: cancellationToken);
-            }
+            return TenantConfigurationCacheItem.CalculateCacheKey(id, normalizedName);
         }
 
-
-        protected virtual async Task SetTenantCacheItemAsync(
-            string cacheKey,
-            [CanBeNull] TenantGroupTenantCacheItem cacheItem)
-        {
-            await TenantCache.SetAsync(cacheKey, cacheItem, considerUow: true);
-        }
-
-        protected virtual async Task<TenantGroupConfigurationCacheItem> SetCacheItemAsync(string cacheKey, [CanBeNull] TenantGroup tenantGroup)
-        {
-            var tenantGroupConfiguration = tenantGroup != null ? ObjectMapper.Map<TenantGroup, TenantGroupConfiguration>(tenantGroup) : null;
-            var cacheItem = new TenantGroupConfigurationCacheItem(tenantGroupConfiguration);
-            await Cache.SetAsync(cacheKey, cacheItem, considerUow: true);
-            return cacheItem;
-        }
-
-        protected virtual string CalculateTenantCacheKey(Guid tenantId)
+        protected virtual string CalculateGroupCacheKey(Guid tenantId)
         {
             return TenantGroupTenantCacheItem.CalculateCacheKey(tenantId);
-        }
-
-
-        protected virtual string CalculateCacheKey(Guid? id, string name)
-        {
-            return TenantGroupConfigurationCacheItem.CalculateCacheKey(id, name);
         }
     }
 }

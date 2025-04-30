@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Volo.Abp;
 using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoring
@@ -7,6 +8,6 @@ namespace SharpAbp.Abp.FileStoring
     {
         string Provider { get; }
 
-        IAbpValidationResult Validate(Dictionary<string, string> keyValuePairs);
+        IAbpValidationResult Validate(List<NameValue> values);
     }
 }

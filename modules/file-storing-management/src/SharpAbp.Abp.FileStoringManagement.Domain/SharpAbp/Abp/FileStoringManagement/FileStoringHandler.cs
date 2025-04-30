@@ -1,42 +1,39 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
-using Volo.Abp.Domain.Entities.Events.Distributed;
 using Volo.Abp.EventBus.Distributed;
 using Volo.Abp.MultiTenancy;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
     public class FileStoringHandler :
-        IDistributedEventHandler<EntityUpdatedEto<FileStoringContainerEto>>,
-        IDistributedEventHandler<EntityDeletedEto<FileStoringContainerEto>>,
+        IDistributedEventHandler<FileStoringContainerUpdatedEto>,
+        IDistributedEventHandler<FileStoringContainerDeletedEto>,
         ITransientDependency
     {
-        private readonly ICurrentTenant _currentTenant;
-        private readonly IFileStoringContainerCacheManager _containerCacheManager;
+        protected ICurrentTenant CurrentTenant { get; }
+        protected IFileStoringContainerCacheManager FileStoringContainerCacheManager { get; }
         public FileStoringHandler(
             ICurrentTenant currentTenant,
-            IFileStoringContainerCacheManager containerCacheManager)
+            IFileStoringContainerCacheManager fileStoringContainerCacheManager)
         {
-            _currentTenant = currentTenant;
-            _containerCacheManager = containerCacheManager;
+            CurrentTenant = currentTenant;
+            FileStoringContainerCacheManager = fileStoringContainerCacheManager;
         }
 
-        public async Task HandleEventAsync(EntityUpdatedEto<FileStoringContainerEto> eventData)
+
+        public async Task HandleEventAsync(FileStoringContainerUpdatedEto eventData)
         {
-            eventData.IsMultiTenant(out Guid? tenantId);
-            using (_currentTenant.Change(tenantId))
+            using (CurrentTenant.Change(eventData.TenantId))
             {
-                await _containerCacheManager.UpdateAsync(eventData.Entity.Id);
+                await FileStoringContainerCacheManager.RemoveAsync(eventData.OldName);
             }
         }
 
-        public async Task HandleEventAsync(EntityDeletedEto<FileStoringContainerEto> eventData)
+        public async Task HandleEventAsync(FileStoringContainerDeletedEto eventData)
         {
-            eventData.IsMultiTenant(out Guid? tenantId);
-            using (_currentTenant.Change(tenantId))
+            using (CurrentTenant.Change(eventData.TenantId))
             {
-                await _containerCacheManager.RemoveAsync(eventData.Entity.Name);
+                await FileStoringContainerCacheManager.RemoveAsync(eventData.Name);
             }
         }
     }

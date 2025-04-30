@@ -11,7 +11,7 @@ namespace SharpAbp.Abp.TenancyGrouping
         public Guid Id { get; set; }
 
         public string Name { get; set; } = default!;
-
+        public string? NormalizedName { get; set; }
         public string ConnectionStringName { get; set; } = default!;
 
         public string? OldValue { get; set; }

@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Volo.Abp.Application.Dtos;
 using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
     public class UpdateContainerDto : IValidatableObject
     {
+        [Required]
+        [DynamicStringLength(typeof(FileStoringContainerConsts), nameof(FileStoringContainerConsts.MaxNameLength))]
+        public string Name { get; set; }
 
         [Required]
         public bool IsMultiTenant { get; set; }

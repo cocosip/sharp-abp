@@ -37,7 +37,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 
         public CreateContainerDto()
         {
-            Items = new List<CreateContainerItemDto>();
+            Items = [];
         }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

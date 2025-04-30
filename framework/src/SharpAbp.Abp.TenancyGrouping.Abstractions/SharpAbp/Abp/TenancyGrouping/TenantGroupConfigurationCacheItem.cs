@@ -5,7 +5,7 @@ namespace SharpAbp.Abp.TenancyGrouping
 {
     public class TenantGroupConfigurationCacheItem
     {
-        private const string CacheKeyFormat = "gi:{0},gn:{1}";
+        private const string CacheKeyFormat = "i:{0},n:{1}";
         public TenantGroupConfiguration? Value { get; set; }
 
         public TenantGroupConfigurationCacheItem()

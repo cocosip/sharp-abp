@@ -28,6 +28,10 @@ namespace SharpAbp.Abp.TenancyGrouping
         private IDisposable SetCurrent(Guid? groupId, string? name = null, List<Guid>? tenants = null)
         {
             var parentScope = _currentTenantGroupAccessor.Current;
+
+            var basicTenantGroupInfo = new BasicTenantGroupInfo(groupId, name);
+
+
             _currentTenantGroupAccessor.Current = new BasicTenantGroupInfo(groupId, name, tenants);
 
             return new DisposeAction<ValueTuple<ICurrentTenantGroupAccessor, BasicTenantGroupInfo?>>(static (state) =>

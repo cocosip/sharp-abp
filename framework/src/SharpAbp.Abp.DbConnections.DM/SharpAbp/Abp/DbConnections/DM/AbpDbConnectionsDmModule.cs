@@ -1,6 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Threading.Tasks;
 using SharpAbp.Abp.Data;
-using System.Threading.Tasks;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
 
