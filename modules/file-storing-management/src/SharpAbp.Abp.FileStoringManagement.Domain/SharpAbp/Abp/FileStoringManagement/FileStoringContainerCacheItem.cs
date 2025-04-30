@@ -5,6 +5,8 @@ namespace SharpAbp.Abp.FileStoringManagement
 {
     public class FileStoringContainerCacheItem
     {
+        private const string CacheKeyFormat = "t:{0},n:{1}";
+
         public Guid Id { get; set; }
 
         public Guid? TenantId { get; set; }
@@ -55,6 +57,11 @@ namespace SharpAbp.Abp.FileStoringManagement
             MultiPartUploadMinFileSize = multiPartUploadMinFileSize;
             MultiPartUploadShardingSize = multiPartUploadShardingSize;
             HttpAccess = httpAccess;
+        }
+
+        public static string CalculateCacheKey(Guid? tenantId, string name)
+        {
+            return string.Format(CacheKeyFormat, tenantId, name);
         }
     }
 

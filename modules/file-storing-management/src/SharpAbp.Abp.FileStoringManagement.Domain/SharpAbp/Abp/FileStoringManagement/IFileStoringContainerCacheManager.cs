@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,19 +15,19 @@ namespace SharpAbp.Abp.FileStoringManagement
         Task<FileStoringContainerCacheItem> GetAsync(string name, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Update container cache
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        Task UpdateAsync(Guid id, CancellationToken cancellationToken = default);
-
-        /// <summary>
         /// Remove container cache by name
         /// </summary>
         /// <param name="name"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task RemoveAsync(string name, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Remove many container cache
+        /// </summary>
+        /// <param name="names"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task RemoveManyAsync(List<string> names, CancellationToken cancellationToken = default);
     }
 }
