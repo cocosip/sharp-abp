@@ -1,22 +1,27 @@
-﻿using JetBrains.Annotations;
-using Microsoft.AspNetCore.Authorization;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
+using Microsoft.AspNetCore.Authorization;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.EventBus.Distributed;
+using Volo.Abp.MultiTenancy;
 
 namespace SharpAbp.Abp.DbConnectionsManagement
 {
     [Authorize(DbConnectionsManagementPermissions.DatabaseConnectionInfos.Default)]
     public class DatabaseConnectionInfoAppService : DbConnectionsManagementAppServiceBase, IDatabaseConnectionInfoAppService
     {
-        protected DatabaseConnectionInfoManager ConnectionInfoManager { get; }
+        protected IDistributedEventBus DistributedEventBus { get; }
+        protected IDatabaseConnectionInfoManager ConnectionInfoManager { get; }
         protected IDatabaseConnectionInfoRepository ConnectionInfoRepository { get; }
         public DatabaseConnectionInfoAppService(
-            DatabaseConnectionInfoManager connectionInfoManager,
+            IDistributedEventBus distributedEventBus,
+            IDatabaseConnectionInfoManager connectionInfoManager,
             IDatabaseConnectionInfoRepository connectionInfoRepository)
         {
+            DistributedEventBus = distributedEventBus;
             ConnectionInfoManager = connectionInfoManager;
             ConnectionInfoRepository = connectionInfoRepository;
         }
@@ -98,14 +103,17 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         [Authorize(DbConnectionsManagementPermissions.DatabaseConnectionInfos.Create)]
         public virtual async Task<DatabaseConnectionInfoDto> CreateAsync(CreateDatabaseConnectionInfoDto input)
         {
-            var databaseConnectionInfo = new DatabaseConnectionInfo(
-                GuidGenerator.Create(),
-                input.Name,
-                input.DatabaseProvider,
-                input.ConnectionString);
+            var databaseConnectionInfo = await ConnectionInfoManager.CreateAsync(input.Name, input.DatabaseProvider, input.ConnectionString);
+            await DistributedEventBus.PublishAsync(new DatabaseConnectionCreatedEto()
+            {
+                Id = databaseConnectionInfo.Id,
+                Name = input.Name,
+                DatabaseProvider = databaseConnectionInfo.DatabaseProvider,
+                ConnectionString = input.ConnectionString,
+            });
 
-            await ConnectionInfoManager.CreateAsync(databaseConnectionInfo);
-            return ObjectMapper.Map<DatabaseConnectionInfo, DatabaseConnectionInfoDto>(databaseConnectionInfo);
+            var created = await ConnectionInfoRepository.InsertAsync(databaseConnectionInfo);
+            return ObjectMapper.Map<DatabaseConnectionInfo, DatabaseConnectionInfoDto>(created);
         }
 
         /// <summary>
@@ -117,11 +125,12 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         [Authorize(DbConnectionsManagementPermissions.DatabaseConnectionInfos.Update)]
         public virtual async Task<DatabaseConnectionInfoDto> UpdateAsync(Guid id, UpdateDatabaseConnectionInfoDto input)
         {
-            var databaseConnectionInfo = await ConnectionInfoManager.UpdateAsync(
-                id,
+            var databaseConnectionInfo = await ConnectionInfoRepository.GetAsync(id);
+            var updated = await ConnectionInfoManager.UpdateAsync(
+                databaseConnectionInfo,
                 input.DatabaseProvider,
                 input.ConnectionString);
-            return ObjectMapper.Map<DatabaseConnectionInfo, DatabaseConnectionInfoDto>(databaseConnectionInfo);
+            return ObjectMapper.Map<DatabaseConnectionInfo, DatabaseConnectionInfoDto>(updated);
         }
 
         /// <summary>
@@ -132,7 +141,21 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         [Authorize(DbConnectionsManagementPermissions.DatabaseConnectionInfos.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {
-            await ConnectionInfoRepository.DeleteAsync(id);
+            var databaseConnectionInfo = await ConnectionInfoRepository.GetAsync(id);
+            if (databaseConnectionInfo == null)
+            {
+                return;
+            }
+
+            await DistributedEventBus.PublishAsync(new DatabaseConnectionDeletedEto()
+            {
+                Id = databaseConnectionInfo.Id,
+                Name = databaseConnectionInfo.Name,
+                DatabaseProvider = databaseConnectionInfo.DatabaseProvider,
+                ConnectionString = databaseConnectionInfo.ConnectionString,
+            });
+
+            await ConnectionInfoRepository.DeleteAsync(databaseConnectionInfo);
         }
     }
 }

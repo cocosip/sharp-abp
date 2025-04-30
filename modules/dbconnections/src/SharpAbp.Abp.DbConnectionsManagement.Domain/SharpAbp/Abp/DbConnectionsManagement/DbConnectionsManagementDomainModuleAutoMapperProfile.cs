@@ -6,7 +6,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
     {
         public DbConnectionsManagementDomainModuleAutoMapperProfile()
         {
-            CreateMap<DatabaseConnectionInfo, DatabaseConnectionInfoEto>();
+            
         }
     }
 }

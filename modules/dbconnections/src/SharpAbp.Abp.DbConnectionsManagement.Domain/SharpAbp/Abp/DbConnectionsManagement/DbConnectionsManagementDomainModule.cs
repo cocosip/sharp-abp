@@ -1,12 +1,11 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.DbConnections;
-using System;
-using System.Threading.Tasks;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain;
-using Volo.Abp.Domain.Entities.Events.Distributed;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
 
@@ -40,7 +39,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
             {
                 options.CacheConfigurators.Add(cacheName =>
                 {
-                    if (cacheName == CacheNameAttribute.GetCacheName(typeof(DatabaseConnectionInfoCacheItem)))
+                    if (cacheName == CacheNameAttribute.GetCacheName(typeof(DatabaseConnectionCacheItem)))
                     {
                         return new DistributedCacheEntryOptions()
                         {
@@ -50,15 +49,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
                     return null;
                 });
             });
-
-            Configure<AbpDistributedEntityEventOptions>(options =>
-            {
-                options.AutoEventSelectors.Add<DatabaseConnectionInfo>();
-                options.EtoMappings.Add<DatabaseConnectionInfo, DatabaseConnectionInfoEto>();
-            });
             return Task.CompletedTask;
         }
-
-
     }
 }

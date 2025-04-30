@@ -1,4 +1,5 @@
 ﻿using System;
+using Volo.Abp;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace SharpAbp.Abp.DbConnectionsManagement
@@ -33,13 +34,35 @@ namespace SharpAbp.Abp.DbConnectionsManagement
             ConnectionString = connectionString;
         }
 
-
-        public void Update(
-            string databaseProvider, 
-            string connectionString)
+        public virtual void Update(string databaseProvider, string connectionString)
         {
+            Check.NotNullOrWhiteSpace(databaseProvider, nameof(databaseProvider));
+            Check.NotNullOrWhiteSpace(connectionString, nameof(connectionString));
+
             DatabaseProvider = databaseProvider;
             ConnectionString = connectionString;
+
+            AddDistributedEvent(new DatabaseConnectionUpdatedEto
+            {
+                Id = Id,
+                Name = Name,
+                DatabaseProvider = DatabaseProvider,
+                ConnectionString = ConnectionString
+            });
+        }
+
+        public virtual void ChangeName(string name)
+        {
+            Check.NotNullOrWhiteSpace(name, nameof(name));
+            var oldName = Name;
+            Name = name;
+
+            AddDistributedEvent(new DatabaseConnectionNameChangedEto
+            {
+                Id = Id,
+                Name = Name,
+                OldName = oldName,
+            });
         }
     }
 }

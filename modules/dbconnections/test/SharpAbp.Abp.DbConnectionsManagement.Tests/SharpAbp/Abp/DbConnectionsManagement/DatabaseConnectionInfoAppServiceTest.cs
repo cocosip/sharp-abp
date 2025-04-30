@@ -7,11 +7,11 @@ namespace SharpAbp.Abp.DbConnectionsManagement
     public class DatabaseConnectionInfoAppServiceTest : DbConnectionsManagementTestBase
     {
         private readonly IDatabaseConnectionInfoAppService _databaseConnectionInfoAppService;
-        private readonly IDatabaseConnectionInfoCacheManager _databaseConnectionInfoCacheManager;
+        private readonly IDatabaseConnectionCacheManager _databaseConnectionInfoCacheManager;
         public DatabaseConnectionInfoAppServiceTest()
         {
             _databaseConnectionInfoAppService = GetRequiredService<IDatabaseConnectionInfoAppService>();
-            _databaseConnectionInfoCacheManager = GetRequiredService<IDatabaseConnectionInfoCacheManager>();
+            _databaseConnectionInfoCacheManager = GetRequiredService<IDatabaseConnectionCacheManager>();
         }
 
         [Fact]

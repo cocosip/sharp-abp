@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.Data;
 using SharpAbp.Abp.DbConnections;
-using System;
-using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 
@@ -12,11 +12,11 @@ namespace SharpAbp.Abp.DbConnectionsManagement
     [ExposeServices(typeof(IDbConnectionInfoResolver))]
     public class DatabaseDbConnectionInfoResolver : IDbConnectionInfoResolver, ITransientDependency
     {
-        protected IDatabaseConnectionInfoCacheManager ConnectionInfoCacheManager { get; }
+        protected IDatabaseConnectionCacheManager ConnectionInfoCacheManager { get; }
         protected IDatabaseConnectionInfoRepository ConnectionInfoRepository { get; }
 
         public DatabaseDbConnectionInfoResolver(
-            IDatabaseConnectionInfoCacheManager connectionInfoCacheManager,
+            IDatabaseConnectionCacheManager connectionInfoCacheManager,
             IDatabaseConnectionInfoRepository connectionInfoRepository)
         {
             ConnectionInfoCacheManager = connectionInfoCacheManager;
@@ -34,7 +34,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
             throw new AbpException($"Could not find dbConnectionInfo by dbConnectionName '{dbConnectionName}'.");
         }
 
-        private DbConnectionInfo ConvertToDbConnection(DatabaseConnectionInfoCacheItem cacheItem)
+        private DbConnectionInfo ConvertToDbConnection(DatabaseConnectionCacheItem cacheItem)
         {
             var databaseProvider = (DatabaseProvider)Enum.Parse(typeof(DatabaseProvider), cacheItem.DatabaseProvider);
             return new DbConnectionInfo(databaseProvider, cacheItem.ConnectionString);

@@ -1,7 +1,9 @@
 ﻿namespace SharpAbp.Abp.DbConnectionsManagement
 {
-    public class DatabaseConnectionInfoCacheItem
+    public class DatabaseConnectionCacheItem
     {
+        private const string CacheKeyFormat = "n:{0}";
+
         /// <summary>
         /// DbConnection name
         /// </summary>
@@ -17,10 +19,10 @@
         /// </summary>
         public string ConnectionString { get; set; }
 
-        public DatabaseConnectionInfoCacheItem()
-        {
 
+        public static string CalculateCacheKey(string name)
+        {
+            return string.Format(CacheKeyFormat, name);
         }
-   
     }
 }
