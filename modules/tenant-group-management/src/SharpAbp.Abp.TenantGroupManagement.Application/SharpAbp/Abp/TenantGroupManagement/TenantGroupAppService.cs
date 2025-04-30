@@ -111,7 +111,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
             var tenantGroup = await TenantGroupRepository.GetAsync(id);
             await TenantGroupManager.ChangeNameAsync(tenantGroup, input.Name, input.IsActive);
             tenantGroup.SetConcurrencyStampIfNotNull(input.ConcurrencyStamp);
-            
+
             await TenantGroupRepository.UpdateAsync(tenantGroup);
             return ObjectMapper.Map<TenantGroup, TenantGroupDto>(tenantGroup);
         }
@@ -151,7 +151,14 @@ namespace SharpAbp.Abp.TenantGroupManagement
             var tenantGroup = await TenantGroupRepository.GetAsync(id);
             if (tenantGroup.FindDefaultConnectionString() != defaultConnectionString)
             {
-                await LocalEventBus.PublishAsync(new TenantGroupChangedEvent(tenantGroup.Id, tenantGroup.NormalizedName));
+                await LocalEventBus.PublishAsync(new TenantGroupChangedEvent()
+                {
+                    Id = tenantGroup.Id,
+                    Name = tenantGroup.Name,
+                    NormalizedName = tenantGroup.NormalizedName,
+                    IsActive = tenantGroup.IsActive,
+                    Tenants = [.. tenantGroup.Tenants.Select(x => x.TenantId)]
+                });
             }
             tenantGroup.SetDefaultConnectionString(defaultConnectionString);
             await TenantGroupRepository.UpdateAsync(tenantGroup);
@@ -162,7 +169,14 @@ namespace SharpAbp.Abp.TenantGroupManagement
         {
             var tenantGroup = await TenantGroupRepository.GetAsync(id);
             tenantGroup.RemoveDefaultConnectionString();
-            await LocalEventBus.PublishAsync(new TenantGroupChangedEvent(tenantGroup.Id, tenantGroup.NormalizedName));
+            await LocalEventBus.PublishAsync(new TenantGroupChangedEvent()
+            {
+                Id = tenantGroup.Id,
+                Name = tenantGroup.Name,
+                NormalizedName = tenantGroup.NormalizedName,
+                IsActive = tenantGroup.IsActive,
+                Tenants = [.. tenantGroup.Tenants.Select(x => x.TenantId)]
+            });
             await TenantGroupRepository.UpdateAsync(tenantGroup);
         }
 

@@ -48,7 +48,14 @@ namespace SharpAbp.Abp.TenantGroupManagement
             var normalizedName = TenantGroupNormalizer.NormalizeName(name);
 
             await ValidateNameAsync(normalizedName, tenantGroup.Id);
-            await LocalEventBus.PublishAsync(new TenantGroupChangedEvent(tenantGroup.Id, tenantGroup.NormalizedName));
+            await LocalEventBus.PublishAsync(new TenantGroupChangedEvent()
+            {
+                Id = tenantGroup.Id,
+                NormalizedName = normalizedName,
+                Name = name,
+                IsActive = isActive,
+                Tenants = [.. tenantGroup.Tenants.Select(static x => x.TenantId)]
+            });
             tenantGroup.SetName(name);
             tenantGroup.SetNormalizedName(normalizedName);
             tenantGroup.SetIsActive(isActive);
@@ -59,7 +66,14 @@ namespace SharpAbp.Abp.TenantGroupManagement
             var tenantGroup = await TenantGroupRepository.GetAsync(id, true);
             ValidateTenant(tenantGroup, tenantId);
             tenantGroup.AddTenant(new TenantGroupTenant(GuidGenerator.Create(), tenantGroup.Id, tenantId));
-            await LocalEventBus.PublishAsync(new TenantGroupChangedEvent(tenantGroup.Id, tenantGroup.NormalizedName, [.. tenantGroup.Tenants.Select(x => x.TenantId)]));
+            await LocalEventBus.PublishAsync(new TenantGroupChangedEvent()
+            {
+                Id = tenantGroup.Id,
+                Name = tenantGroup.Name,
+                NormalizedName = tenantGroup.NormalizedName,
+                IsActive = tenantGroup.IsActive,
+                Tenants = [.. tenantGroup.Tenants.Select(x => x.TenantId)]
+            });
             return tenantGroup;
         }
 
@@ -67,7 +81,14 @@ namespace SharpAbp.Abp.TenantGroupManagement
         {
             var tenantGroup = await TenantGroupRepository.GetAsync(id, true);
             tenantGroup.RemoveTenant(tenantGroupTenantId);
-            await LocalEventBus.PublishAsync(new TenantGroupChangedEvent(tenantGroup.Id, tenantGroup.NormalizedName, [.. tenantGroup.Tenants.Select(x => x.TenantId)]));
+            await LocalEventBus.PublishAsync(new TenantGroupChangedEvent()
+            {
+                Id = tenantGroup.Id,
+                Name = tenantGroup.Name,
+                NormalizedName = tenantGroup.NormalizedName,
+                IsActive = tenantGroup.IsActive,
+                Tenants = [.. tenantGroup.Tenants.Select(x => x.TenantId)]
+            });
             return tenantGroup;
         }
 
