@@ -11,25 +11,25 @@ namespace SharpAbp.Abp.MapTenancyManagement
         IDistributedEventHandler<EntityDeletedEto<MapTenantEto>>,
         ITransientDependency
     {
-        private readonly IMapTenantStore _mapTenantStore;
+        protected IMapTenantStore MapTenantStore { get; }
         public MapTenancyHandler(IMapTenantStore mapTenantStore)
         {
-            _mapTenantStore = mapTenantStore;
+            MapTenantStore = mapTenantStore;
         }
 
         public async Task HandleEventAsync(EntityCreatedEto<MapTenantEto> eventData)
         {
-            await _mapTenantStore.ResetAsync();
+            await MapTenantStore.ResetAsync(true);
         }
 
         public async Task HandleEventAsync(EntityUpdatedEto<MapTenantEto> eventData)
         {
-            await _mapTenantStore.ResetAsync();
+            await MapTenantStore.ResetAsync(true);
         }
 
         public async Task HandleEventAsync(EntityDeletedEto<MapTenantEto> eventData)
         {
-            await _mapTenantStore.ResetAsync();
+            await MapTenantStore.ResetAsync(true);
         }
     }
 }

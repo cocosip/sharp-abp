@@ -238,7 +238,15 @@ namespace SharpAbp.Abp.MapTenancyManagement
         public virtual async Task DeleteAsync(Guid id)
         {
             var mapTenant = await MapTenantRepository.GetAsync(id);
+            if (mapTenant == null)
+            {
+                return;
+            }
             var tenant = await TenantRepository.GetAsync(mapTenant.TenantId);
+            if (tenant == null)
+            {
+                return;
+            }
             await TenantRepository.HardDeleteAsync(tenant);
             await MapTenantRepository.DeleteAsync(mapTenant);
         }
