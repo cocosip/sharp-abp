@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using Volo.Abp.EntityFrameworkCore;
+using SharpAbp.Abp.Data;
 
 namespace SharpAbp.Abp.EntityFrameworkCore
 {
     public class SharpAbpEfCoreOptions
     {
-        public EfCoreDatabaseProvider DatabaseProvider { get; set; }
+        public DatabaseProvider DatabaseProvider { get; set; }
         public Dictionary<string, string> Properties { get; set; }
         public SharpAbpEfCoreOptions()
         {

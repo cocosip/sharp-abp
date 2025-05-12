@@ -125,7 +125,7 @@
 		<PackageVersion Include="FastDFSCore.Transport.SuperSocket" Version="1.7.0" />
 		<PackageVersion Include="FastDFSCore.Transport.DotNetty" Version="1.7.0" />
 		<PackageVersion Include="Microsoft.FASTER.Core" Version="2.6.5" />
-		<PackageVersion Include="FreeRedis" Version="1.3.6" />
+		<PackageVersion Include="FreeRedis" Version="1.3.7" />
 		<PackageVersion Include="FreeSql" Version="[3.5.205,)" />
 		<PackageVersion Include="FreeSql.Provider.MySql" Version="[3.5.205,)" />
 		<PackageVersion Include="FreeSql.Provider.Oracle" Version="[3.5.205,)" />
