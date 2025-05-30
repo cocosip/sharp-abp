@@ -11,5 +11,6 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         {
             Properties = [];
         }
+ 
     }
 }
