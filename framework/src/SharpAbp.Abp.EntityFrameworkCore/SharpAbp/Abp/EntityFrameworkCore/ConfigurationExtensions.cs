@@ -98,5 +98,19 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             }
             return "MySql";
         }
+
+        public static string GetDefaultSchema(this IConfiguration configuration)
+        {
+            var properties = configuration.GetProperties();
+            if (properties != null)
+            {
+                if (properties.TryGetValue("DefaultSchema", out string? value))
+                {
+                    return value;
+                }
+            }
+            return "";
+        }
+
     }
 }
