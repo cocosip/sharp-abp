@@ -1,12 +1,12 @@
-﻿using JetBrains.Annotations;
-using MongoDB.Driver;
-using MongoDB.Driver.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
+using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using Volo.Abp;
 using Volo.Abp.Domain.Repositories.MongoDB;
 using Volo.Abp.MongoDB;
@@ -50,10 +50,9 @@ namespace SharpAbp.Abp.DbConnectionsManagement.MongoDB
             bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
+            return await (await GetQueryableAsync())
                 .WhereIf(!name.IsNullOrWhiteSpace(), x => x.Name == name)
                 .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
-                .As<IMongoQueryable<DatabaseConnectionInfo>>()
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -73,11 +72,10 @@ namespace SharpAbp.Abp.DbConnectionsManagement.MongoDB
             bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
-                .WhereIf<DatabaseConnectionInfo, IMongoQueryable<DatabaseConnectionInfo>>(!name.IsNullOrWhiteSpace(), item => item.Name == name)
-                .WhereIf<DatabaseConnectionInfo, IMongoQueryable<DatabaseConnectionInfo>>(!databaseProvider.IsNullOrWhiteSpace(), item => item.DatabaseProvider == databaseProvider)
+            return await (await GetQueryableAsync())
+                .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+                .WhereIf(!databaseProvider.IsNullOrWhiteSpace(), item => item.DatabaseProvider == databaseProvider)
                 .OrderBy(sorting ?? nameof(DatabaseConnectionInfo.Name))
-                .As<IMongoQueryable<DatabaseConnectionInfo>>()
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -101,12 +99,11 @@ namespace SharpAbp.Abp.DbConnectionsManagement.MongoDB
             bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
-                .WhereIf<DatabaseConnectionInfo, IMongoQueryable<DatabaseConnectionInfo>>(!name.IsNullOrWhiteSpace(), item => item.Name == name)
-                .WhereIf<DatabaseConnectionInfo, IMongoQueryable<DatabaseConnectionInfo>>(!databaseProvider.IsNullOrWhiteSpace(), item => item.DatabaseProvider == databaseProvider)
+            return await (await GetQueryableAsync())
+                .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+                .WhereIf(!databaseProvider.IsNullOrWhiteSpace(), item => item.DatabaseProvider == databaseProvider)
                 .OrderBy(sorting ?? nameof(DatabaseConnectionInfo.Name))
-                .As<IMongoQueryable<DatabaseConnectionInfo>>()
-                .PageBy<DatabaseConnectionInfo, IMongoQueryable<DatabaseConnectionInfo>>(skipCount, maxResultCount)
+                .PageBy(skipCount, maxResultCount)
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -122,10 +119,9 @@ namespace SharpAbp.Abp.DbConnectionsManagement.MongoDB
             string databaseProvider = "",
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
-                .WhereIf<DatabaseConnectionInfo, IMongoQueryable<DatabaseConnectionInfo>>(!name.IsNullOrWhiteSpace(), item => item.Name == name)
-                .WhereIf<DatabaseConnectionInfo, IMongoQueryable<DatabaseConnectionInfo>>(!databaseProvider.IsNullOrWhiteSpace(), item => item.DatabaseProvider == databaseProvider)
-                .As<IMongoQueryable<DatabaseConnectionInfo>>()
+            return await (await GetQueryableAsync())
+                .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+                .WhereIf(!databaseProvider.IsNullOrWhiteSpace(), item => item.DatabaseProvider == databaseProvider)
                 .CountAsync(GetCancellationToken(cancellationToken));
         }
     }
