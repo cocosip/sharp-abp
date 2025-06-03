@@ -1,12 +1,12 @@
-﻿using JetBrains.Annotations;
-using MongoDB.Driver;
-using MongoDB.Driver.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
+using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using Volo.Abp;
 using Volo.Abp.Domain.Repositories.MongoDB;
 using Volo.Abp.MongoDB;
@@ -36,10 +36,9 @@ namespace SharpAbp.Abp.TransformSecurityManagement.MongoDB
             bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
+            return await (await GetQueryableAsync())
                 .WhereIf(!identifier.IsNullOrWhiteSpace(), x => x.Identifier == identifier)
                 .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
-                .As<IMongoQueryable<SecurityCredentialInfo>>()
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -52,14 +51,13 @@ namespace SharpAbp.Abp.TransformSecurityManagement.MongoDB
             DateTime? expiresMax = null,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
-                .WhereIf<SecurityCredentialInfo, IMongoQueryable<SecurityCredentialInfo>>(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
-                .WhereIf<SecurityCredentialInfo, IMongoQueryable<SecurityCredentialInfo>>(!keyType.IsNullOrWhiteSpace(), item => item.KeyType == keyType)
-                .WhereIf<SecurityCredentialInfo, IMongoQueryable<SecurityCredentialInfo>>(!bizType.IsNullOrWhiteSpace(), item => item.BizType == bizType)
-                .WhereIf<SecurityCredentialInfo, IMongoQueryable<SecurityCredentialInfo>>(expiresMin.HasValue, item => item.Expires >= expiresMin.Value)
-                .WhereIf<SecurityCredentialInfo, IMongoQueryable<SecurityCredentialInfo>>(expiresMax.HasValue, item => item.Expires < expiresMax.Value)
+            return await (await GetQueryableAsync())
+                .WhereIf(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
+                .WhereIf(!keyType.IsNullOrWhiteSpace(), item => item.KeyType == keyType)
+                .WhereIf(!bizType.IsNullOrWhiteSpace(), item => item.BizType == bizType)
+                .WhereIf(expiresMin.HasValue, item => item.Expires >= expiresMin.Value)
+                .WhereIf(expiresMax.HasValue, item => item.Expires < expiresMax.Value)
                 .OrderBy(sorting ?? nameof(SecurityCredentialInfo.Id))
-                .As<IMongoQueryable<SecurityCredentialInfo>>()
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -74,38 +72,33 @@ namespace SharpAbp.Abp.TransformSecurityManagement.MongoDB
             DateTime? expiresMax = null,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
-                .WhereIf<SecurityCredentialInfo, IMongoQueryable<SecurityCredentialInfo>>(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
-                .WhereIf<SecurityCredentialInfo, IMongoQueryable<SecurityCredentialInfo>>(!keyType.IsNullOrWhiteSpace(), item => item.KeyType == keyType)
-                .WhereIf<SecurityCredentialInfo, IMongoQueryable<SecurityCredentialInfo>>(!bizType.IsNullOrWhiteSpace(), item => item.BizType == bizType)
-                .WhereIf<SecurityCredentialInfo, IMongoQueryable<SecurityCredentialInfo>>(expiresMin.HasValue, item => item.Expires >= expiresMin.Value)
-                .WhereIf<SecurityCredentialInfo, IMongoQueryable<SecurityCredentialInfo>>(expiresMax.HasValue, item => item.Expires < expiresMax.Value)
+            return await (await GetQueryableAsync())
+                .WhereIf(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
+                .WhereIf(!keyType.IsNullOrWhiteSpace(), item => item.KeyType == keyType)
+                .WhereIf(!bizType.IsNullOrWhiteSpace(), item => item.BizType == bizType)
+                .WhereIf(expiresMin.HasValue, item => item.Expires >= expiresMin.Value)
+                .WhereIf(expiresMax.HasValue, item => item.Expires < expiresMax.Value)
                 .OrderBy(sorting ?? nameof(SecurityCredentialInfo.Id))
-                .As<IMongoQueryable<SecurityCredentialInfo>>()
-                .PageBy<SecurityCredentialInfo, IMongoQueryable<SecurityCredentialInfo>>(skipCount, maxResultCount)
+                .PageBy(skipCount, maxResultCount)
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
 
         public virtual async Task<int> GetCountAsync(
-            string identifier = "", 
+            string identifier = "",
             string keyType = "",
-            string bizType = "", 
+            string bizType = "",
             DateTime? expiresMin = null,
-            DateTime? expiresMax = null, 
+            DateTime? expiresMax = null,
             CancellationToken cancellationToken = default)
         {
-            return await(await GetMongoQueryableAsync())
-                .WhereIf<SecurityCredentialInfo, IMongoQueryable<SecurityCredentialInfo>>(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
-                .WhereIf<SecurityCredentialInfo, IMongoQueryable<SecurityCredentialInfo>>(!keyType.IsNullOrWhiteSpace(), item => item.KeyType == keyType)
-                .WhereIf<SecurityCredentialInfo, IMongoQueryable<SecurityCredentialInfo>>(!bizType.IsNullOrWhiteSpace(), item => item.BizType == bizType)
-                .WhereIf<SecurityCredentialInfo, IMongoQueryable<SecurityCredentialInfo>>(expiresMin.HasValue, item => item.Expires >= expiresMin.Value)
-                .WhereIf<SecurityCredentialInfo, IMongoQueryable<SecurityCredentialInfo>>(expiresMax.HasValue, item => item.Expires < expiresMax.Value)
-                .As<IMongoQueryable<SecurityCredentialInfo>>()
+            return await (await GetQueryableAsync())
+                .WhereIf(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
+                .WhereIf(!keyType.IsNullOrWhiteSpace(), item => item.KeyType == keyType)
+                .WhereIf(!bizType.IsNullOrWhiteSpace(), item => item.BizType == bizType)
+                .WhereIf(expiresMin.HasValue, item => item.Expires >= expiresMin.Value)
+                .WhereIf(expiresMax.HasValue, item => item.Expires < expiresMax.Value)
                 .CountAsync(GetCancellationToken(cancellationToken));
         }
-
-
-
     }
 }

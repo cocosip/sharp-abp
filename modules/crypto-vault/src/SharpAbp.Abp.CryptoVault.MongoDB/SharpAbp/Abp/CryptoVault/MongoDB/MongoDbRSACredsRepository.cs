@@ -36,10 +36,9 @@ namespace SharpAbp.Abp.CryptoVault.MongoDB
             bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
+            return await (await GetQueryableAsync())
                 .WhereIf(!identifier.IsNullOrWhiteSpace(), x => x.Identifier == identifier)
                 .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
-                .As<IMongoQueryable<RSACreds>>()
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -49,11 +48,10 @@ namespace SharpAbp.Abp.CryptoVault.MongoDB
             bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
+            return await (await GetQueryableAsync())
                 .WhereIf(sourceType.HasValue, item => item.SourceType == sourceType.Value)
                 .WhereIf(size.HasValue, item => item.Size == size.Value)
                 .OrderBy(x => Guid.NewGuid())
-                .As<IMongoQueryable<RSACreds>>()
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -65,12 +63,11 @@ namespace SharpAbp.Abp.CryptoVault.MongoDB
             bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
-                .WhereIf<RSACreds, IMongoQueryable<RSACreds>>(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
-                .WhereIf<RSACreds, IMongoQueryable<RSACreds>>(sourceType.HasValue, item => item.SourceType == sourceType.Value)
-                .WhereIf<RSACreds, IMongoQueryable<RSACreds>>(size.HasValue, item => item.Size == size.Value)
+            return await (await GetQueryableAsync())
+                .WhereIf(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
+                .WhereIf(sourceType.HasValue, item => item.SourceType == sourceType.Value)
+                .WhereIf(size.HasValue, item => item.Size == size.Value)
                 .OrderBy(sorting ?? nameof(RSACreds.Id))
-                .As<IMongoQueryable<RSACreds>>()
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -84,13 +81,12 @@ namespace SharpAbp.Abp.CryptoVault.MongoDB
             bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
-                .WhereIf<RSACreds, IMongoQueryable<RSACreds>>(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
-                .WhereIf<RSACreds, IMongoQueryable<RSACreds>>(sourceType.HasValue, item => item.SourceType == sourceType.Value)
-                .WhereIf<RSACreds, IMongoQueryable<RSACreds>>(size.HasValue, item => item.Size == size.Value)
+            return await (await GetQueryableAsync())
+                .WhereIf(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
+                .WhereIf(sourceType.HasValue, item => item.SourceType == sourceType.Value)
+                .WhereIf(size.HasValue, item => item.Size == size.Value)
                 .OrderBy(sorting ?? nameof(RSACreds.Id))
-                .As<IMongoQueryable<RSACreds>>()
-                .PageBy<RSACreds, IMongoQueryable<RSACreds>>(skipCount, maxResultCount)
+                .PageBy(skipCount, maxResultCount)
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -100,11 +96,10 @@ namespace SharpAbp.Abp.CryptoVault.MongoDB
             int? size = null,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
-                .WhereIf<RSACreds, IMongoQueryable<RSACreds>>(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
-                .WhereIf<RSACreds, IMongoQueryable<RSACreds>>(sourceType.HasValue, item => item.SourceType == sourceType.Value)
-                .WhereIf<RSACreds, IMongoQueryable<RSACreds>>(size.HasValue, item => item.Size == size.Value)
-                .As<IMongoQueryable<RSACreds>>()
+            return await (await GetQueryableAsync())
+                .WhereIf(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
+                .WhereIf(sourceType.HasValue, item => item.SourceType == sourceType.Value)
+                .WhereIf(size.HasValue, item => item.Size == size.Value)
                 .CountAsync(GetCancellationToken(cancellationToken));
         }
 

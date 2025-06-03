@@ -35,10 +35,9 @@ namespace SharpAbp.Abp.CryptoVault.MongoDB
             bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
+            return await (await GetQueryableAsync())
                 .WhereIf(!identifier.IsNullOrWhiteSpace(), x => x.Identifier == identifier)
                 .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
-                .As<IMongoQueryable<SM2Creds>>()
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -48,11 +47,10 @@ namespace SharpAbp.Abp.CryptoVault.MongoDB
             bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
+            return await (await GetQueryableAsync())
                 .WhereIf(sourceType.HasValue, item => item.SourceType == sourceType.Value)
                 .WhereIf(!curve.IsNullOrWhiteSpace(), item => item.Curve == curve)
                 .OrderBy(x => Guid.NewGuid())
-                .As<IMongoQueryable<SM2Creds>>()
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -64,12 +62,11 @@ namespace SharpAbp.Abp.CryptoVault.MongoDB
             bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
-                .WhereIf<SM2Creds, IMongoQueryable<SM2Creds>>(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
-                .WhereIf<SM2Creds, IMongoQueryable<SM2Creds>>(sourceType.HasValue, item => item.SourceType == sourceType.Value)
-                .WhereIf<SM2Creds, IMongoQueryable<SM2Creds>>(!curve.IsNullOrWhiteSpace(), item => item.Curve == curve)
+            return await (await GetQueryableAsync())
+                .WhereIf(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
+                .WhereIf(sourceType.HasValue, item => item.SourceType == sourceType.Value)
+                .WhereIf(!curve.IsNullOrWhiteSpace(), item => item.Curve == curve)
                 .OrderBy(sorting ?? nameof(SM2Creds.Id))
-                .As<IMongoQueryable<SM2Creds>>()
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -83,13 +80,12 @@ namespace SharpAbp.Abp.CryptoVault.MongoDB
             bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
-                .WhereIf<SM2Creds, IMongoQueryable<SM2Creds>>(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
-                .WhereIf<SM2Creds, IMongoQueryable<SM2Creds>>(sourceType.HasValue, item => item.SourceType == sourceType.Value)
-                .WhereIf<SM2Creds, IMongoQueryable<SM2Creds>>(!curve.IsNullOrWhiteSpace(), item => item.Curve == curve)
+            return await (await GetQueryableAsync())
+                .WhereIf(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
+                .WhereIf(sourceType.HasValue, item => item.SourceType == sourceType.Value)
+                .WhereIf(!curve.IsNullOrWhiteSpace(), item => item.Curve == curve)
                 .OrderBy(sorting ?? nameof(SM2Creds.Id))
-                .As<IMongoQueryable<SM2Creds>>()
-                .PageBy<SM2Creds, IMongoQueryable<SM2Creds>>(skipCount, maxResultCount)
+                .PageBy(skipCount, maxResultCount)
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -99,11 +95,10 @@ namespace SharpAbp.Abp.CryptoVault.MongoDB
             string curve = "",
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
-                .WhereIf<SM2Creds, IMongoQueryable<SM2Creds>>(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
-                .WhereIf<SM2Creds, IMongoQueryable<SM2Creds>>(sourceType.HasValue, item => item.SourceType == sourceType.Value)
-                .WhereIf<SM2Creds, IMongoQueryable<SM2Creds>>(!curve.IsNullOrWhiteSpace(), item => item.Curve == curve)
-                .As<IMongoQueryable<SM2Creds>>()
+            return await (await GetQueryableAsync())
+                .WhereIf(!identifier.IsNullOrWhiteSpace(), item => item.Identifier == identifier)
+                .WhereIf(sourceType.HasValue, item => item.SourceType == sourceType.Value)
+                .WhereIf(!curve.IsNullOrWhiteSpace(), item => item.Curve == curve)
                 .CountAsync(GetCancellationToken(cancellationToken));
         }
 

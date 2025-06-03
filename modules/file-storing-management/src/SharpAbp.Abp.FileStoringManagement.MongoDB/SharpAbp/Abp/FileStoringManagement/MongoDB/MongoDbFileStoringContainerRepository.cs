@@ -1,12 +1,12 @@
-﻿using JetBrains.Annotations;
-using MongoDB.Driver;
-using MongoDB.Driver.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
+using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using Volo.Abp;
 using Volo.Abp.Domain.Repositories.MongoDB;
 using Volo.Abp.MongoDB;
@@ -52,10 +52,9 @@ namespace SharpAbp.Abp.FileStoringManagement.MongoDB
             bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
+            return await (await GetQueryableAsync())
                 .WhereIf(!name.IsNullOrWhiteSpace(), x => x.Name == name)
                 .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
-                .As<IMongoQueryable<FileStoringContainer>>()
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -75,11 +74,10 @@ namespace SharpAbp.Abp.FileStoringManagement.MongoDB
             bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
-               .WhereIf<FileStoringContainer, IMongoQueryable<FileStoringContainer>>(!name.IsNullOrWhiteSpace(), item => item.Name == name)
-               .WhereIf<FileStoringContainer, IMongoQueryable<FileStoringContainer>>(!provider.IsNullOrWhiteSpace(), item => item.Provider == provider)
+            return await (await GetQueryableAsync())
+               .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+               .WhereIf(!provider.IsNullOrWhiteSpace(), item => item.Provider == provider)
                .OrderBy(sorting ?? nameof(FileStoringContainer.Name))
-               .As<IMongoQueryable<FileStoringContainer>>()
                .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -103,12 +101,11 @@ namespace SharpAbp.Abp.FileStoringManagement.MongoDB
             bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
-                .WhereIf<FileStoringContainer, IMongoQueryable<FileStoringContainer>>(!name.IsNullOrWhiteSpace(), item => item.Name == name)
-                .WhereIf<FileStoringContainer, IMongoQueryable<FileStoringContainer>>(!provider.IsNullOrWhiteSpace(), item => item.Provider == provider)
+            return await (await GetQueryableAsync())
+                .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+                .WhereIf(!provider.IsNullOrWhiteSpace(), item => item.Provider == provider)
                 .OrderBy(sorting ?? nameof(FileStoringContainer.Name))
-                .As<IMongoQueryable<FileStoringContainer>>()
-                .PageBy<FileStoringContainer, IMongoQueryable<FileStoringContainer>>(skipCount, maxResultCount)
+                .PageBy(skipCount, maxResultCount)
                 .ToListAsync(GetCancellationToken(cancellationToken));
 
         }
@@ -125,10 +122,9 @@ namespace SharpAbp.Abp.FileStoringManagement.MongoDB
             string provider = "",
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
-                .WhereIf<FileStoringContainer, IMongoQueryable<FileStoringContainer>>(!name.IsNullOrWhiteSpace(), item => item.Name == name)
-                .WhereIf<FileStoringContainer, IMongoQueryable<FileStoringContainer>>(!provider.IsNullOrWhiteSpace(), item => item.Provider == provider)
-                .As<IMongoQueryable<FileStoringContainer>>()
+            return await (await GetQueryableAsync())
+                .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+                .WhereIf(!provider.IsNullOrWhiteSpace(), item => item.Provider == provider)
                 .CountAsync(GetCancellationToken(cancellationToken));
         }
 

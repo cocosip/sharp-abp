@@ -82,10 +82,9 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
             bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
+            return await (await GetQueryableAsync())
                 .WhereIf(!code.IsNullOrWhiteSpace(), x => x.Code == code)
                 .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
-                .As<IMongoQueryable<MapTenant>>()
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -103,10 +102,9 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
            bool includeDetails = true,
            CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
+            return await (await GetQueryableAsync())
                 .WhereIf(!mapCode.IsNullOrWhiteSpace(), x => x.MapCode == mapCode)
                 .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
-                .As<IMongoQueryable<MapTenant>>()
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -124,10 +122,9 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
             bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
+            return await (await GetQueryableAsync())
                 .Where(x => x.TenantId == tenantId)
                 .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
-                .As<IMongoQueryable<MapTenant>>()
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -143,9 +140,8 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
             bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
+            return await (await GetQueryableAsync())
                 .Where(x => tenantIds.Contains(x.TenantId))
-                .As<IMongoQueryable<MapTenant>>()
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -161,9 +157,8 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
             bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
+            return await (await GetQueryableAsync())
                 .Where(x => codes.Contains(x.Code))
-                .As<IMongoQueryable<MapTenant>>()
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -179,9 +174,8 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
             bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
+            return await (await GetQueryableAsync())
                 .Where(x => mapCodes.Contains(x.MapCode))
-                .As<IMongoQueryable<MapTenant>>()
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -211,15 +205,14 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
             bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
-                .WhereIf<MapTenant, IMongoQueryable<MapTenant>>(!filter.IsNullOrWhiteSpace(), item => item.TenantName.Contains(tenantName) || item.Code.Contains(filter))
-                .WhereIf<MapTenant, IMongoQueryable<MapTenant>>(tenantId.HasValue, item => item.TenantId == tenantId.Value)
-                .WhereIf<MapTenant, IMongoQueryable<MapTenant>>(!tenantName.IsNullOrWhiteSpace(), item => item.TenantName.Contains(tenantName))
-                .WhereIf<MapTenant, IMongoQueryable<MapTenant>>(!code.IsNullOrWhiteSpace(), item => item.Code.Contains(code))
+            return await (await GetQueryableAsync())
+                .WhereIf(!filter.IsNullOrWhiteSpace(), item => item.TenantName.Contains(tenantName) || item.Code.Contains(filter))
+                .WhereIf(tenantId.HasValue, item => item.TenantId == tenantId.Value)
+                .WhereIf(!tenantName.IsNullOrWhiteSpace(), item => item.TenantName.Contains(tenantName))
+                .WhereIf(!code.IsNullOrWhiteSpace(), item => item.Code.Contains(code))
                 .WhereIf(!mapCode.IsNullOrWhiteSpace(), item => item.MapCode.Contains(code))
                 .OrderBy(sorting ?? nameof(MapTenant.Code))
-                .As<IMongoQueryable<MapTenant>>()
-                .PageBy<MapTenant, IMongoQueryable<MapTenant>>(skipCount, maxResultCount)
+                .PageBy(skipCount, maxResultCount)
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -241,13 +234,12 @@ namespace SharpAbp.Abp.MapTenancyManagement.MongoDB
             string mapCode = "",
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
-                .WhereIf<MapTenant, IMongoQueryable<MapTenant>>(!filter.IsNullOrWhiteSpace(), item => item.TenantName.Contains(tenantName) || item.Code.Contains(filter))
-                .WhereIf<MapTenant, IMongoQueryable<MapTenant>>(tenantId.HasValue, item => item.TenantId == tenantId.Value)
-                .WhereIf<MapTenant, IMongoQueryable<MapTenant>>(!tenantName.IsNullOrWhiteSpace(), item => item.TenantName.Contains(tenantName))
-                .WhereIf<MapTenant, IMongoQueryable<MapTenant>>(!code.IsNullOrWhiteSpace(), item => item.Code.Contains(code))
+            return await (await GetQueryableAsync())
+                .WhereIf(!filter.IsNullOrWhiteSpace(), item => item.TenantName.Contains(tenantName) || item.Code.Contains(filter))
+                .WhereIf(tenantId.HasValue, item => item.TenantId == tenantId.Value)
+                .WhereIf(!tenantName.IsNullOrWhiteSpace(), item => item.TenantName.Contains(tenantName))
+                .WhereIf(!code.IsNullOrWhiteSpace(), item => item.Code.Contains(code))
                 .WhereIf(!mapCode.IsNullOrWhiteSpace(), item => item.MapCode.Contains(mapCode))
-                .As<IMongoQueryable<MapTenant>>()
                 .CountAsync(GetCancellationToken(cancellationToken));
         }
 

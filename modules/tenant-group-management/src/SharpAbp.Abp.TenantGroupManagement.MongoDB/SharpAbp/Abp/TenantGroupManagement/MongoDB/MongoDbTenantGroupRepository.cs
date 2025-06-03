@@ -1,11 +1,11 @@
-﻿using MongoDB.Driver;
-using MongoDB.Driver.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using Volo.Abp.Domain.Repositories.MongoDB;
 using Volo.Abp.MongoDB;
 
@@ -32,28 +32,25 @@ namespace SharpAbp.Abp.TenantGroupManagement.MongoDB
             bool includeDetails = true,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
+            return await (await GetQueryableAsync())
                 .WhereIf(!name.IsNullOrWhiteSpace(), x => x.Name == name)
                 .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
-                .As<IMongoQueryable<TenantGroup>>()
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
 
         public async Task<TenantGroup> FindByTenantIdAsync(Guid? tenantId, bool includeDetails = true, CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
+            return await (await GetQueryableAsync())
                 .WhereIf(tenantId.HasValue, x => x.Tenants.Any(x => x.TenantId == tenantId))
-                .As<IMongoQueryable<TenantGroup>>()
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
         public virtual async Task<TenantGroup> FindExpectedByTenantIdAsync(Guid? tenantId, Guid? expectedId = null, bool includeDetails = true, CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
+            return await (await GetQueryableAsync())
                 .WhereIf(tenantId.HasValue, x => x.Tenants.Any(x => x.TenantId == tenantId))
                 .WhereIf(expectedId.HasValue, x => x.Id != expectedId.Value)
-                .As<IMongoQueryable<TenantGroup>>()
                 .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -63,11 +60,10 @@ namespace SharpAbp.Abp.TenantGroupManagement.MongoDB
             bool? isActive = null,
             bool includeDetails = false, CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
-               .WhereIf<TenantGroup, IMongoQueryable<TenantGroup>>(!name.IsNullOrWhiteSpace(), item => item.Name == name)
-               .WhereIf<TenantGroup, IMongoQueryable<TenantGroup>>(isActive.HasValue, item => item.IsActive == isActive.Value)
+            return await (await GetQueryableAsync())
+               .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+               .WhereIf(isActive.HasValue, item => item.IsActive == isActive.Value)
                .OrderBy(sorting ?? nameof(TenantGroup.Id))
-               .As<IMongoQueryable<TenantGroup>>()
                .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
@@ -80,27 +76,23 @@ namespace SharpAbp.Abp.TenantGroupManagement.MongoDB
             bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
-               .WhereIf<TenantGroup, IMongoQueryable<TenantGroup>>(!name.IsNullOrWhiteSpace(), item => item.Name == name)
-               .WhereIf<TenantGroup, IMongoQueryable<TenantGroup>>(isActive.HasValue, item => item.IsActive == isActive.Value)
+            return await (await GetQueryableAsync())
+               .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+               .WhereIf(isActive.HasValue, item => item.IsActive == isActive.Value)
                .OrderBy(sorting ?? nameof(TenantGroup.Id))
-               .As<IMongoQueryable<TenantGroup>>()
-               .PageBy<TenantGroup, IMongoQueryable<TenantGroup>>(skipCount, maxResultCount)
+               .PageBy(skipCount, maxResultCount)
                .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
         public virtual async Task<int> GetCountAsync(
-            string name = "", 
-            bool? isActive = null, 
+            string name = "",
+            bool? isActive = null,
             CancellationToken cancellationToken = default)
         {
-            return await (await GetMongoQueryableAsync())
-               .WhereIf<TenantGroup, IMongoQueryable<TenantGroup>>(!name.IsNullOrWhiteSpace(), item => item.Name == name)
-               .WhereIf<TenantGroup, IMongoQueryable<TenantGroup>>(isActive.HasValue, item => item.IsActive == isActive.Value)
-               .As<IMongoQueryable<TenantGroup>>()
+            return await (await GetQueryableAsync())
+               .WhereIf(!name.IsNullOrWhiteSpace(), item => item.Name == name)
+               .WhereIf(isActive.HasValue, item => item.IsActive == isActive.Value)
                .CountAsync(GetCancellationToken(cancellationToken));
         }
-
-
     }
 }
