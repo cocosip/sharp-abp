@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Identity;
@@ -66,7 +66,6 @@ namespace SharpAbp.Abp.Identity
             );
         }
 
-
         /// <summary>
         /// Find by email
         /// </summary>
@@ -79,6 +78,21 @@ namespace SharpAbp.Abp.Identity
                 await UserManager.FindByEmailAsync(email)
             );
         }
+
+
+        /// <summary>
+        /// Get list by ids
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [Authorize(Volo.Abp.Identity.IdentityPermissions.Users.Default)]
+        public virtual async Task<List<IdentityUserDto>> GetListByIdsAsync(List<Guid> ids)
+        {
+            return ObjectMapper.Map<List<IdentityUser>, List<IdentityUserDto>>(
+                await UserRepository.GetListByIdsAsync(ids)
+            );
+        }
+
 
         /// <summary>
         /// Get paged list

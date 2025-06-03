@@ -44,6 +44,18 @@ namespace SharpAbp.Abp.Identity
         }
 
         /// <summary>
+        /// 根据id列表获取用户
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("get-list-by-ids")]
+        public async Task<List<IdentityUserDto>> GetListByIdsAsync(List<Guid> ids)
+        {
+            return await _identityUserAppService.GetListByIdsAsync(ids);
+        }
+
+        /// <summary>
         /// Get paged list
         /// </summary>
         /// <param name="input"></param>
@@ -261,7 +273,6 @@ namespace SharpAbp.Abp.Identity
         {
             await _identityUserAppService.SetTwoFactorAsync(id, enabled);
         }
-
 
     }
 }

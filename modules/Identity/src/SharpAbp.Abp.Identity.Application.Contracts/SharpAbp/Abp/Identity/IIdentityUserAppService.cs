@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Identity;
@@ -30,6 +31,13 @@ namespace SharpAbp.Abp.Identity
         /// <param name="email"></param>
         /// <returns></returns>
         Task<IdentityUserDto> FindByEmailAsync(string email);
+
+        /// <summary>
+        /// Get list by ids
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<List<IdentityUserDto>> GetListByIdsAsync(List<Guid> ids);
 
         /// <summary>
         /// Get paged list
