@@ -158,7 +158,7 @@ namespace SharpAbp.Abp.Faster
                             await Iter.WaitAsync(CancellationTokenProvider.Token);
                         }
 
-                        Logger.LogTrace("Get iter message, current: [{currentAddress}], next: [{nextAddress}] .");
+                        Logger.LogTrace("Get iter message, current: [{currentAddress}], next: [{nextAddress}] .",currentAddress,nextAddress);
 
                         if (buffer != null && entryLength > 0)
                         {
