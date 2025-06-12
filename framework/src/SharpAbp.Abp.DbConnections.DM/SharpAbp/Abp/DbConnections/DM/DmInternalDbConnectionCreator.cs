@@ -1,11 +1,11 @@
-﻿using Dm;
+﻿using System.Data;
+using Dm;
 using SharpAbp.Abp.Data;
-using System.Data;
 using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.DbConnections.DM
 {
-    [ExposeKeyedService<IInternalDbConnectionCreator>(DatabaseProvider.MySql)]
+    [ExposeKeyedService<IInternalDbConnectionCreator>(DatabaseProvider.Dm)]
     public class DmInternalDbConnectionCreator : IInternalDbConnectionCreator, ITransientDependency
     {
         public DatabaseProvider DatabaseProvider => DatabaseProvider.Dm;
