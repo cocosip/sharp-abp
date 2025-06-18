@@ -7,7 +7,7 @@
 		<!--Volo ABP packages-->
 		<VoloAbpPackageVersion>[9.2.0,10.0.0)</VoloAbpPackageVersion>
 		<!--FreeSql package-->
-		<FreeSqlPackageVersion>[3.5.207,)</FreeSqlPackageVersion>
+		<FreeSqlPackageVersion>[3.5.208,)</FreeSqlPackageVersion>
 		<!--FreeSql package-->
 		<MassTransitPackageVersion>[8.4.1,)</MassTransitPackageVersion>
 	</PropertyGroup>
