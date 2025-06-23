@@ -9,7 +9,7 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Otlp
         public string? Endpoint { get; set; }
         public string? Headers { get; set; }
         public int TimeoutMilliseconds { get; set; } = 10000;
-        public OtlpExportProtocol Protocol { get; set; } = OtlpExportProtocol.Grpc;
+        public OtlpExportProtocol Protocol { get; set; } = OtlpExportProtocol.HttpProtobuf;
 
 
         public AbpOpenTelemetryExporterOtlpOptions PreConfigure(IConfiguration configuration)
