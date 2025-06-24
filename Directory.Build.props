@@ -5,7 +5,7 @@
 		<!--Net Core Framework-->
 		<NetCoreFx>net9.0</NetCoreFx>
 		<!--Volo ABP packages-->
-		<VoloAbpPackageVersion>[9.2.0,10.0.0)</VoloAbpPackageVersion>
+		<VoloAbpPackageVersion>[9.2.1,10.0.0)</VoloAbpPackageVersion>
 		<!--FreeSql package-->
 		<FreeSqlPackageVersion>[3.5.209,)</FreeSqlPackageVersion>
 		<!--FreeSql package-->
