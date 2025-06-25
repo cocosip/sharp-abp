@@ -20,16 +20,6 @@ namespace SharpAbp.Abp.FileStoring.S3
                 SignatureVersion = configuration.SignatureVersion,
                 ForcePathStyle = configuration.ForcePathStyle,
             };
-
-            if (!configuration.Region.IsNullOrWhiteSpace())
-            {
-                var region = RegionEndpoint.GetBySystemName(S3FileProviderConfigurationNames.DefaultRegion);
-                if (region != null)
-                {
-
-                    clientConfig.RegionEndpoint = region;
-                }
-            }
             return new AmazonS3Client(configuration.AccessKeyId, configuration.SecretAccessKey, clientConfig);
         }
     }

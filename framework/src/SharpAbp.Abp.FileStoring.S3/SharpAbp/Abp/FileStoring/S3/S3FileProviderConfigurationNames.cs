@@ -4,7 +4,6 @@
     {
         public const string ProviderName = "S3";
 
-        public const string Region = "S3.Region";
         public const string BucketName = "S3.BucketName";
         public const string ServerUrl = "S3.ServerUrl";
         public const string AccessKeyId = "S3.AccessKeyId";

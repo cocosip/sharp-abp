@@ -198,7 +198,7 @@
 		<PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
 		<PackageVersion Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.6" />
 		<PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
-		<PackageVersion Include="Minio" Version="6.0.4" />
+		<PackageVersion Include="Minio" Version="6.0.5" />
 		<PackageVersion Include="NSubstitute" Version="5.1.0" />
 		<PackageVersion Include="NuGet.Versioning" Version="6.7.0" />
 		<PackageVersion Include="NUglify" Version="1.21.0" />
