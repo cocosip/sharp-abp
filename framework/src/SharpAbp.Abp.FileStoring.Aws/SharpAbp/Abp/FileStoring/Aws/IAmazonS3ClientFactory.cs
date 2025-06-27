@@ -5,6 +5,6 @@ namespace SharpAbp.Abp.FileStoring.Aws
 {
     public interface IAmazonS3ClientFactory
     {
-        Task<AmazonS3Client> GetAmazonS3Client(AwsFileProviderConfiguration configuration);
+        Task<IAmazonS3> GetAmazonS3Client(AwsFileProviderConfiguration configuration);
     }
 }

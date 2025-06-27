@@ -1,13 +1,19 @@
-﻿using KS3;
-using KS3.Model;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using KS3;
+using KS3.Model;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ObjectPool;
+using Microsoft.Extensions.Options;
+using SharpAbp.Abp.ObjectPool;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Timing;
 
@@ -17,63 +23,88 @@ namespace SharpAbp.Abp.FileStoring.KS3
     public class KS3FileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }
+        protected IServiceProvider ServiceProvider { get; }
+        protected AbpFileStoringAbstractionsOptions Options { get; }
         protected IClock Clock { get; }
-        protected IKS3ClientFactory KS3ClientFactory { get; }
+        protected IPoolOrchestrator PoolOrchestrator { get; }
         protected IKS3FileNameCalculator KS3FileNameCalculator { get; }
         protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
 
         public KS3FileProvider(
             ILogger<KS3FileProvider> logger,
+            IServiceProvider serviceProvider,
+            IOptions<AbpFileStoringAbstractionsOptions> options,
             IClock clock,
-            IKS3ClientFactory ks3ClientFactory,
+            IPoolOrchestrator poolOrchestrator,
             IKS3FileNameCalculator ks3FileNameCalculator,
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
             Logger = logger;
+            ServiceProvider = serviceProvider;
+            Options = options.Value;
             Clock = clock;
-            KS3ClientFactory = ks3ClientFactory;
+            PoolOrchestrator = poolOrchestrator;
+
             KS3FileNameCalculator = ks3FileNameCalculator;
             FileNormalizeNamingService = fileNormalizeNamingService;
         }
 
         public override string Provider => KS3FileProviderConfigurationNames.ProviderName;
 
-        protected virtual IKS3 GetKS3Client(FileContainerConfiguration fileContainerConfiguration)
+        protected virtual ObjectPool<IKS3> GetKS3ClientPool(KS3FileProviderConfiguration ks3Configuration)
         {
-            var ks3Configuration = fileContainerConfiguration.GetKS3Configuration();
-            return KS3ClientFactory.Create(ks3Configuration);
+            var poolName = NormalizePoolName(ks3Configuration);
+            var ks3ClientPolicy = ActivatorUtilities.CreateInstance<KS3ClientPolicy>(ServiceProvider, ks3Configuration);
+            var pool = PoolOrchestrator.GetPool(poolName, ks3ClientPolicy, Options.DefaultClientMaximumRetained);
+            return pool;
         }
 
-        protected virtual IKS3 GetKS3Client(KS3FileProviderConfiguration ks3Configuration)
+        protected virtual string NormalizePoolName(KS3FileProviderConfiguration ks3Configuration)
         {
-            return KS3ClientFactory.Create(ks3Configuration);
+            var v = $"{ks3Configuration.Endpoint}-{ks3Configuration.AccessKey}-{ks3Configuration.SecretKey}";
+            using var sha1 = SHA1.Create();
+            var hashBuffer = sha1.ComputeHash(Encoding.UTF8.GetBytes(v));
+            var hash = hashBuffer.Aggregate("", (current, b) => current + b.ToString("X2"));
+            return $"FileStoring-{KS3FileProviderConfigurationNames.ProviderName}-{hash}";
         }
+
 
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
             var containerName = GetContainerName(args);
             var objectKey = KS3FileNameCalculator.Calculate(args);
-            var ks3Config = args.Configuration.GetKS3Configuration();
-            var ks3Client = GetKS3Client(ks3Config);
-            if (!args.OverrideExisting && FileExists(ks3Client, containerName, objectKey))
+
+            var ks3Configuration = args.Configuration.GetKS3Configuration();
+            var pool = GetKS3ClientPool(ks3Configuration);
+            var ks3Client = pool.Get();
+
+            try
             {
-                throw new FileAlreadyExistsException($"Saving FILE '{args.FileId}' does already exists in the container '{containerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
-            }
-            if (ks3Config.CreateContainerIfNotExists)
-            {
-                if (!BucketExist(ks3Client, containerName))
+
+                if (!args.OverrideExisting && FileExists(ks3Client, containerName, objectKey))
                 {
-                    ks3Client.CreateBucket(containerName);
+                    throw new FileAlreadyExistsException($"Saving FILE '{args.FileId}' does already exists in the container '{containerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
+                }
+                if (ks3Configuration.CreateContainerIfNotExists)
+                {
+                    if (!BucketExist(ks3Client, containerName))
+                    {
+                        ks3Client.CreateBucket(containerName);
+                    }
+                }
+
+                if (args.Configuration.EnableAutoMultiPartUpload && args.FileStream!.Length > args.Configuration.MultiPartUploadMinFileSize)
+                {
+                    return await MultiPartUploadAsync(ks3Client, containerName, objectKey, args);
+                }
+                else
+                {
+                    return await PutObjectAsync(ks3Client, containerName, objectKey, args);
                 }
             }
-
-            if (args.Configuration.EnableAutoMultiPartUpload && args.FileStream!.Length > args.Configuration.MultiPartUploadMinFileSize)
+            finally
             {
-                return await MultiPartUploadAsync(ks3Client, containerName, objectKey, args);
-            }
-            else
-            {
-                return await PutObjectAsync(ks3Client, containerName, objectKey, args);
+                pool.Return(ks3Client);
             }
         }
 
@@ -81,50 +112,98 @@ namespace SharpAbp.Abp.FileStoring.KS3
         {
             var containerName = GetContainerName(args);
             var objectKey = KS3FileNameCalculator.Calculate(args);
-            var ks3Client = GetKS3Client(args.Configuration);
-            if (!FileExists(ks3Client, containerName, objectKey))
+
+            var ks3Configuration = args.Configuration.GetKS3Configuration();
+            var pool = GetKS3ClientPool(ks3Configuration);
+            var ks3Client = pool.Get();
+
+            try
             {
-                return Task.FromResult(false);
+
+                if (!FileExists(ks3Client, containerName, objectKey))
+                {
+                    return Task.FromResult(false);
+                }
+                ks3Client.DeleteObject(containerName, objectKey);
+                return Task.FromResult(true);
             }
-            ks3Client.DeleteObject(containerName, objectKey);
-            return Task.FromResult(true);
+            finally
+            {
+                pool.Return(ks3Client);
+            }
         }
 
         public override Task<bool> ExistsAsync(FileProviderExistsArgs args)
         {
             var containerName = GetContainerName(args);
             var objectKey = KS3FileNameCalculator.Calculate(args);
-            var ks3Client = GetKS3Client(args.Configuration);
-            return Task.FromResult(FileExists(ks3Client, containerName, objectKey));
+
+            var ks3Configuration = args.Configuration.GetKS3Configuration();
+            var pool = GetKS3ClientPool(ks3Configuration);
+            var ks3Client = pool.Get();
+
+            try
+            {
+
+                return Task.FromResult(FileExists(ks3Client, containerName, objectKey));
+            }
+            finally
+            {
+                pool.Return(ks3Client);
+            }
         }
 
         public override async Task<Stream?> GetOrNullAsync(FileProviderGetArgs args)
         {
             var containerName = GetContainerName(args);
             var objectKey = KS3FileNameCalculator.Calculate(args);
-            var ks3Client = GetKS3Client(args.Configuration);
-            if (!FileExists(ks3Client, containerName, objectKey))
-            {
-                return null;
-            }
-            var result = ks3Client.GetObject(containerName, objectKey);
 
-            return await TryCopyToMemoryStreamAsync(result.ObjectContent, args.CancellationToken);
+            var ks3Configuration = args.Configuration.GetKS3Configuration();
+            var pool = GetKS3ClientPool(ks3Configuration);
+            var ks3Client = pool.Get();
+
+            try
+            {
+
+                if (!FileExists(ks3Client, containerName, objectKey))
+                {
+                    return null;
+                }
+                var result = ks3Client.GetObject(containerName, objectKey);
+
+                return await TryCopyToMemoryStreamAsync(result.ObjectContent, args.CancellationToken);
+            }
+            finally
+            {
+                pool.Return(ks3Client);
+            }
         }
 
         public override async Task<bool> DownloadAsync(FileProviderDownloadArgs args)
         {
             var containerName = GetContainerName(args);
             var objectKey = KS3FileNameCalculator.Calculate(args);
-            var ks3Client = GetKS3Client(args.Configuration);
-            if (!FileExists(ks3Client, containerName, objectKey))
-            {
-                return false;
-            }
 
-            var result = ks3Client.GetObject(containerName, objectKey);
-            await TryWriteToFileAsync(result.ObjectContent, args.Path, args.CancellationToken);
-            return true;
+            var ks3Configuration = args.Configuration.GetKS3Configuration();
+            var pool = GetKS3ClientPool(ks3Configuration);
+            var ks3Client = pool.Get();
+
+            try
+            {
+
+                if (!FileExists(ks3Client, containerName, objectKey))
+                {
+                    return false;
+                }
+
+                var result = ks3Client.GetObject(containerName, objectKey);
+                await TryWriteToFileAsync(result.ObjectContent, args.Path, args.CancellationToken);
+                return true;
+            }
+            finally
+            {
+                pool.Return(ks3Client);
+            }
         }
 
         public override Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)
@@ -136,17 +215,28 @@ namespace SharpAbp.Abp.FileStoring.KS3
 
             var containerName = GetContainerName(args);
             var objectKey = KS3FileNameCalculator.Calculate(args);
-            var ks3Client = GetKS3Client(args.Configuration);
 
-            if (args.CheckFileExist && !FileExists(ks3Client, containerName, objectKey))
+            var ks3Configuration = args.Configuration.GetKS3Configuration();
+            var pool = GetKS3ClientPool(ks3Configuration);
+            var ks3Client = pool.Get();
+
+            try
             {
-                return Task.FromResult(string.Empty);
+
+                if (args.CheckFileExist && !FileExists(ks3Client, containerName, objectKey))
+                {
+                    return Task.FromResult(string.Empty);
+                }
+
+                var datetime = args.Expires ?? Clock.Now.AddSeconds(600);
+                var uri = ks3Client.GeneratePresignedUrl(containerName, objectKey, datetime);
+
+                return Task.FromResult(uri.ToString());
             }
-
-            var datetime = args.Expires ?? Clock.Now.AddSeconds(600);
-            var uri = ks3Client.GeneratePresignedUrl(containerName, objectKey, datetime);
-
-            return Task.FromResult(uri.ToString());
+            finally
+            {
+                pool.Return(ks3Client);
+            }
         }
 
         protected virtual string GetContainerName(FileProviderArgs args)
@@ -269,6 +359,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
             Logger.LogDebug("CompleteMultipartUpload {Key} ({ETag}).", completeMultipartUploadResult.Key, completeMultipartUploadResult.ETag);
             return args.FileId;
         }
+ 
 
     }
 }

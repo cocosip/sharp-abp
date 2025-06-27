@@ -29,7 +29,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             StringEncryptionService = stringEncryptionService;
         }
 
-        public virtual async Task<AmazonS3Client> GetAmazonS3Client(
+        public virtual async Task<IAmazonS3> GetAmazonS3Client(
             AwsFileProviderConfiguration configuration)
         {
             var region = RegionEndpoint.GetBySystemName(configuration.Region);

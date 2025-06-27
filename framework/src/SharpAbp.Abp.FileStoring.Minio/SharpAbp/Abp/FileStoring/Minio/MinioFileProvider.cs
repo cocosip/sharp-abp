@@ -1,11 +1,18 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ObjectPool;
+using Microsoft.Extensions.Options;
 using Minio;
 using Minio.DataModel.Args;
 using Minio.Exceptions;
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
+using SharpAbp.Abp.ObjectPool;
 using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Timing;
@@ -16,132 +23,211 @@ namespace SharpAbp.Abp.FileStoring.Minio
     public class MinioFileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }
+        protected IServiceProvider ServiceProvider { get; }
+        protected AbpFileStoringAbstractionsOptions Options { get; }
         protected IClock Clock { get; }
+        protected IPoolOrchestrator PoolOrchestrator { get; }
         protected IMinioFileNameCalculator MinioFileNameCalculator { get; }
         protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
         public MinioFileProvider(
             ILogger<MinioFileProvider> logger,
+            IServiceProvider serviceProvider,
+            IOptions<AbpFileStoringAbstractionsOptions> options,
             IClock clock,
+            IPoolOrchestrator poolOrchestrator,
             IMinioFileNameCalculator minioFileNameCalculator,
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
             Logger = logger;
+            ServiceProvider = serviceProvider;
+            Options = options.Value;
             Clock = clock;
+            PoolOrchestrator = poolOrchestrator;
             MinioFileNameCalculator = minioFileNameCalculator;
             FileNormalizeNamingService = fileNormalizeNamingService;
         }
 
         public override string Provider => MinioFileProviderConfigurationNames.ProviderName;
 
+        protected virtual ObjectPool<IMinioClient> GetMinioClientPool(MinioFileProviderConfiguration minioConfiguration)
+        {
+            var poolName = NormalizePoolName(minioConfiguration);
+            var minioClientPolicy = ActivatorUtilities.CreateInstance<MinioClientPolicy>(ServiceProvider, minioConfiguration);
+            var pool = PoolOrchestrator.GetPool(poolName, minioClientPolicy, Options.DefaultClientMaximumRetained);
+            return pool;
+        }
+
+        protected virtual string NormalizePoolName(MinioFileProviderConfiguration minioConfiguration)
+        {
+            var v = $"{minioConfiguration.EndPoint}-{minioConfiguration.AccessKey}-{minioConfiguration.SecretKey}";
+            using var sha1 = SHA1.Create();
+            var hashBuffer = sha1.ComputeHash(Encoding.UTF8.GetBytes(v));
+            var hash = hashBuffer.Aggregate("", (current, b) => current + b.ToString("X2"));
+            return $"FileStoring-{MinioFileProviderConfigurationNames.ProviderName}-{hash}";
+        }
+
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
             var objectKey = MinioFileNameCalculator.Calculate(args);
-            var configuration = args.Configuration.GetMinioConfiguration();
-            var client = GetMinioClient(args);
             var containerName = GetContainerName(args);
 
-            if (!args.OverrideExisting && await FileExistsAsync(client, containerName, objectKey, args.CancellationToken))
+            var minioConfiguration = args.Configuration.GetMinioConfiguration();
+            var pool = GetMinioClientPool(minioConfiguration);
+            var minioClient = pool.Get();
+
+            try
             {
-                throw new FileAlreadyExistsException($"Saving File '{args.FileId}' does already exists in the container '{containerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
-            }
 
-            if (configuration.CreateBucketIfNotExists)
+                if (!args.OverrideExisting && await FileExistsAsync(minioClient, containerName, objectKey, args.CancellationToken))
+                {
+                    throw new FileAlreadyExistsException($"Saving File '{args.FileId}' does already exists in the container '{containerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
+                }
+
+                if (minioConfiguration.CreateBucketIfNotExists)
+                {
+                    await CreateBucketIfNotExists(minioClient, containerName, args.CancellationToken);
+                }
+
+                Check.NotNull(args.FileStream, "args stream");
+
+                var putObjectArgs = new PutObjectArgs()
+                    .WithBucket(containerName)
+                    .WithObject(objectKey)
+                    .WithStreamData(args.FileStream)
+                    .WithObjectSize(args.FileStream.Length);
+
+                await minioClient.PutObjectAsync(putObjectArgs, args.CancellationToken);
+
+                //await client.PutObjectAsync(containerName, fileName, args.FileStream, args.FileStream.Length);
+                return args.FileId;
+            }
+            finally
             {
-                await CreateBucketIfNotExists(client, containerName, args.CancellationToken);
+                pool.Return(minioClient);
             }
-
-            Check.NotNull(args.FileStream, "args stream");
-
-            var putObjectArgs = new PutObjectArgs()
-                .WithBucket(containerName)
-                .WithObject(objectKey)
-                .WithStreamData(args.FileStream)
-                .WithObjectSize(args.FileStream.Length);
-
-            await client.PutObjectAsync(putObjectArgs, args.CancellationToken);
-
-            //await client.PutObjectAsync(containerName, fileName, args.FileStream, args.FileStream.Length);
-            return args.FileId;
         }
 
         public override async Task<bool> DeleteAsync(FileProviderDeleteArgs args)
         {
             var objectKey = MinioFileNameCalculator.Calculate(args);
-            var client = GetMinioClient(args);
             var containerName = GetContainerName(args);
 
-            if (await FileExistsAsync(client, containerName, objectKey, args.CancellationToken))
+            var minioConfiguration = args.Configuration.GetMinioConfiguration();
+            var pool = GetMinioClientPool(minioConfiguration);
+            var minioClient = pool.Get();
+
+            try
             {
-                var removeObjectArgs = new RemoveObjectArgs()
-                    .WithBucket(containerName)
-                    .WithObject(objectKey);
 
-                await client.RemoveObjectAsync(removeObjectArgs, args.CancellationToken);
-                return true;
+                if (await FileExistsAsync(minioClient, containerName, objectKey, args.CancellationToken))
+                {
+                    var removeObjectArgs = new RemoveObjectArgs()
+                        .WithBucket(containerName)
+                        .WithObject(objectKey);
+
+                    await minioClient.RemoveObjectAsync(removeObjectArgs, args.CancellationToken);
+                    return true;
+                }
+
+                return false;
             }
-
-            return false;
+            finally
+            {
+                pool.Return(minioClient);
+            }
         }
 
         public override async Task<bool> ExistsAsync(FileProviderExistsArgs args)
         {
             var objectKey = MinioFileNameCalculator.Calculate(args);
-            var client = GetMinioClient(args);
             var containerName = GetContainerName(args);
 
-            return await FileExistsAsync(client, containerName, objectKey, args.CancellationToken);
+            var minioConfiguration = args.Configuration.GetMinioConfiguration();
+            var pool = GetMinioClientPool(minioConfiguration);
+            var minioClient = pool.Get();
+
+            try
+            {
+                return await FileExistsAsync(minioClient, containerName, objectKey, args.CancellationToken);
+            }
+            finally
+            {
+                pool.Return(minioClient);
+            }
         }
 
         public override async Task<Stream?> GetOrNullAsync(FileProviderGetArgs args)
         {
             var objectKey = MinioFileNameCalculator.Calculate(args);
-            var client = GetMinioClient(args);
             var containerName = GetContainerName(args);
 
-            if (!await FileExistsAsync(client, containerName, objectKey))
+            var minioConfiguration = args.Configuration.GetMinioConfiguration();
+            var pool = GetMinioClientPool(minioConfiguration);
+            var minioClient = pool.Get();
+
+            try
             {
-                return null;
-            }
 
-            var memoryStream = new MemoryStream();
-            var getObjectArgs = new GetObjectArgs()
-                .WithBucket(containerName)
-                .WithObject(objectKey)
-                .WithCallbackStream(stream =>
+                if (!await FileExistsAsync(minioClient, containerName, objectKey))
                 {
-                    if (stream != null)
-                    {
-                        stream.CopyTo(memoryStream);
-                        memoryStream.Seek(0, SeekOrigin.Begin);
-                    }
-                    else
-                    {
-                        memoryStream = null;
-                    }
-                });
+                    return null;
+                }
 
-            await client.GetObjectAsync(getObjectArgs, args.CancellationToken);
-            return memoryStream;
+                var memoryStream = new MemoryStream();
+                var getObjectArgs = new GetObjectArgs()
+                    .WithBucket(containerName)
+                    .WithObject(objectKey)
+                    .WithCallbackStream(stream =>
+                    {
+                        if (stream != null)
+                        {
+                            stream.CopyTo(memoryStream);
+                            memoryStream.Seek(0, SeekOrigin.Begin);
+                        }
+                        else
+                        {
+                            memoryStream = null;
+                        }
+                    });
+
+                await minioClient.GetObjectAsync(getObjectArgs, args.CancellationToken);
+                return memoryStream;
+            }
+            finally
+            {
+                pool.Return(minioClient);
+            }
         }
 
         public override async Task<bool> DownloadAsync(FileProviderDownloadArgs args)
         {
             var objectKey = MinioFileNameCalculator.Calculate(args);
-            var client = GetMinioClient(args);
             var containerName = GetContainerName(args);
 
-            if (!await FileExistsAsync(client, containerName, objectKey, args.CancellationToken))
+            var minioConfiguration = args.Configuration.GetMinioConfiguration();
+            var pool = GetMinioClientPool(minioConfiguration);
+            var minioClient = pool.Get();
+
+            try
             {
-                return false;
+
+                if (!await FileExistsAsync(minioClient, containerName, objectKey, args.CancellationToken))
+                {
+                    return false;
+                }
+
+                var getObjectArgs = new GetObjectArgs()
+                    .WithBucket(containerName)
+                    .WithObject(objectKey)
+                    .WithFile(args.Path);
+
+                await minioClient.GetObjectAsync(getObjectArgs, args.CancellationToken);
+                return true;
             }
-
-            var getObjectArgs = new GetObjectArgs()
-                .WithBucket(containerName)
-                .WithObject(objectKey)
-                .WithFile(args.Path);
-
-            await client.GetObjectAsync(getObjectArgs, args.CancellationToken);
-            return true;
+            finally
+            {
+                pool.Return(minioClient);
+            }
         }
 
         public override async Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)
@@ -152,40 +238,36 @@ namespace SharpAbp.Abp.FileStoring.Minio
             }
 
             var objectKey = MinioFileNameCalculator.Calculate(args);
-            var client = GetMinioClient(args);
             var containerName = GetContainerName(args);
 
-            if (args.CheckFileExist && !await FileExistsAsync(client, containerName, objectKey, args.CancellationToken))
-            {
-                return string.Empty;
-            }
-
-            var expiresInt = 600;
-            if (args.Expires.HasValue && args.Expires > Clock.Now)
-            {
-                expiresInt = Convert.ToInt32((args.Expires.Value - Clock.Now).TotalSeconds);
-            }
-            var presignedGetObjectArgs = new PresignedGetObjectArgs()
-                .WithBucket(containerName)
-                .WithObject(objectKey)
-                .WithExpiry(expiresInt);
-
-            return await client.PresignedGetObjectAsync(presignedGetObjectArgs);
-        }
-
-
-        protected virtual IMinioClient GetMinioClient(FileProviderArgs args)
-        {
             var minioConfiguration = args.Configuration.GetMinioConfiguration();
-            var client = new MinioClient()
-                .WithEndpoint(minioConfiguration.EndPoint)
-                .WithCredentials(minioConfiguration.AccessKey, minioConfiguration.SecretKey);
-            if (minioConfiguration.WithSSL)
+            var pool = GetMinioClientPool(minioConfiguration);
+            var minioClient = pool.Get();
+
+            try
             {
-                client.WithSSL();
+
+                if (args.CheckFileExist && !await FileExistsAsync(minioClient, containerName, objectKey, args.CancellationToken))
+                {
+                    return string.Empty;
+                }
+
+                var expiresInt = 600;
+                if (args.Expires.HasValue && args.Expires > Clock.Now)
+                {
+                    expiresInt = Convert.ToInt32((args.Expires.Value - Clock.Now).TotalSeconds);
+                }
+                var presignedGetObjectArgs = new PresignedGetObjectArgs()
+                    .WithBucket(containerName)
+                    .WithObject(objectKey)
+                    .WithExpiry(expiresInt);
+
+                return await minioClient.PresignedGetObjectAsync(presignedGetObjectArgs);
             }
-            client.Build();
-            return client;
+            finally
+            {
+                pool.Return(minioClient);
+            }
         }
 
         protected virtual async Task CreateBucketIfNotExists(
@@ -205,7 +287,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
         }
 
         private async Task<bool> FileExistsAsync(
-            IMinioClient client,
+            IMinioClient minioClient,
             string containerName,
             string fileName,
             CancellationToken cancellationToken = default)
@@ -214,14 +296,14 @@ namespace SharpAbp.Abp.FileStoring.Minio
 
             var bucketExistsArgs = new BucketExistsArgs().WithBucket(containerName);
 
-            if (await client.BucketExistsAsync(bucketExistsArgs, cancellationToken))
+            if (await minioClient.BucketExistsAsync(bucketExistsArgs, cancellationToken))
             {
                 try
                 {
                     var statObjectArgs = new StatObjectArgs()
                         .WithBucket(containerName)
                         .WithObject(fileName);
-                    await client.StatObjectAsync(statObjectArgs, cancellationToken);
+                    await minioClient.StatObjectAsync(statObjectArgs, cancellationToken);
                 }
                 catch (Exception e)
                 {

@@ -19,11 +19,12 @@
 
 	<ItemGroup>
 		<PackageReference Include="HuaweiCloud.OBS.SDK" />
-		<PackageReference Include="Volo.Abp.Timing"  />
+		<PackageReference Include="Volo.Abp.Timing" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\SharpAbp.Abp.FileStoring\SharpAbp.Abp.FileStoring.csproj" />
+		<ProjectReference Include="..\SharpAbp.Abp.ObjectPool\SharpAbp.Abp.ObjectPool.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

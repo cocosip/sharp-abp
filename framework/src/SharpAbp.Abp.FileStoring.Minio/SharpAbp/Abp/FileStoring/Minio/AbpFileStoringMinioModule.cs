@@ -1,5 +1,6 @@
-﻿using SharpAbp.Abp.FileStoring.Minio.Localization;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using SharpAbp.Abp.FileStoring.Minio.Localization;
+using SharpAbp.Abp.ObjectPool;
 using Volo.Abp.Localization;
 using Volo.Abp.Localization.ExceptionHandling;
 using Volo.Abp.Modularity;
@@ -10,7 +11,8 @@ using Volo.Abp.VirtualFileSystem;
 namespace SharpAbp.Abp.FileStoring.Minio
 {
     [DependsOn(
-        typeof(AbpFileStoringModule)
+        typeof(AbpFileStoringModule),
+        typeof(AbpObjectPoolModule)
         )]
     public class AbpFileStoringMinioModule : AbpModule
     {

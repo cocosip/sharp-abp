@@ -4,6 +4,10 @@
 		<ProjectFrameworks>netstandard2.0;netstandard2.1;$(NetCoreFx)</ProjectFrameworks>
 		<!--Net Core Framework-->
 		<NetCoreFx>net9.0</NetCoreFx>
+		<!--Microsoft-->
+		<MicrosoftPackageVersion>[9.0.6,)</MicrosoftPackageVersion>
+		<!--EfCore-->
+		<EfCorePackageVersion>[9.0.4,)</EfCorePackageVersion>
 		<!--Volo ABP packages-->
 		<VoloAbpPackageVersion>[9.2.1,10.0.0)</VoloAbpPackageVersion>
 		<!--FreeSql package-->
@@ -15,5 +19,5 @@
 	<PropertyGroup>
 		<IsTestProject Condition="$(MSBuildProjectFullPath.Contains('test')) and ($(MSBuildProjectName.EndsWith('.Tests')) or $(MSBuildProjectName.EndsWith('.TestBase')))">true</IsTestProject>
 	</PropertyGroup>
-	
+
 </Project>

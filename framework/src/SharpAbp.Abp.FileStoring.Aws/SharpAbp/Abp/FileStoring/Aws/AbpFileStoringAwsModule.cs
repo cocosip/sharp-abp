@@ -1,5 +1,6 @@
-﻿using SharpAbp.Abp.FileStoring.Aws.Localization;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using SharpAbp.Abp.FileStoring.Aws.Localization;
+using SharpAbp.Abp.ObjectPool;
 using Volo.Abp.Caching;
 using Volo.Abp.Localization;
 using Volo.Abp.Localization.ExceptionHandling;
@@ -12,7 +13,8 @@ namespace SharpAbp.Abp.FileStoring.Aws
 {
     [DependsOn(
         typeof(AbpFileStoringModule),
-        typeof(AbpCachingModule)
+        typeof(AbpCachingModule),
+        typeof(AbpObjectPoolModule)
         )]
     public class AbpFileStoringAwsModule : AbpModule
     {

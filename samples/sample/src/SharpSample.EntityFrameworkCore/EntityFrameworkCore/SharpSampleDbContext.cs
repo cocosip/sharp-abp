@@ -54,6 +54,10 @@ public class SharpSampleDbContext :
     public DbSet<Tenant> Tenants { get; set; }
     public DbSet<TenantConnectionString> TenantConnectionStrings { get; set; }
 
+    public DbSet<IdentityUserDelegation> UserDelegations { get; set; }
+
+    public DbSet<IdentitySession> Sessions { get; set; }
+
     #endregion
 
     public SharpSampleDbContext(DbContextOptions<SharpSampleDbContext> options)

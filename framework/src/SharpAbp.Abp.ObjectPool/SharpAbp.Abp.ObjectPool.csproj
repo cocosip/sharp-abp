@@ -7,29 +7,19 @@
 		<TargetFrameworks>$(ProjectFrameworks)</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>Nullable</WarningsAsErrors>
-		<AssemblyName>SharpAbp.Abp.FileStoring.S3</AssemblyName>
-		<PackageId>SharpAbp.Abp.FileStoring.S3</PackageId>
+		<AssemblyName>SharpAbp.Abp.ObjectPool</AssemblyName>
+		<PackageId>SharpAbp.Abp.ObjectPool</PackageId>
 		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
 		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-		<Description>SharpAbp FileStoring Module</Description>
+		<Description>SharpAbp ObjectPool Module</Description>
 		<RootNamespace />
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\SharpAbp.Abp.FileStoring\SharpAbp.Abp.FileStoring.csproj" />
-		<ProjectReference Include="..\SharpAbp.Abp.ObjectPool\SharpAbp.Abp.ObjectPool.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="AWSSDK.S3" />
-		<PackageReference Include="Volo.Abp.Timing" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Include="SharpAbp\Abp\FileStoring\S3\Localization\Resources\*.json" />
-		<Content Remove="SharpAbp\Abp\FileStoring\S3\Localization\Resources\*.json" />
+		<PackageReference Include="Volo.Abp" />
+		<PackageReference Include="Microsoft.Extensions.ObjectPool" />
 	</ItemGroup>
 
 </Project>
