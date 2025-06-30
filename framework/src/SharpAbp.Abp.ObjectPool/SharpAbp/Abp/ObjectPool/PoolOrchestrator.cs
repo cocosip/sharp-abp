@@ -25,7 +25,6 @@ namespace SharpAbp.Abp.ObjectPool
             var key = NormalizeKey(typeof(T), poolName);
             return (ObjectPool<T>)Pools.GetOrAdd(key, _ =>
             {
-                // 动态创建带大小控制的Provider
                 var configurableObjectPoolProvider = new ConfigurableObjectPoolProvider
                 {
                     MaxSize = maxSize ?? Provider.GetDefaultSize()

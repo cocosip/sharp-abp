@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.FileStoring.Aliyun;
 using SharpAbp.Abp.FileStoring.Aws;
 using SharpAbp.Abp.FileStoring.Azure;
@@ -8,7 +9,6 @@ using SharpAbp.Abp.FileStoring.KS3;
 using SharpAbp.Abp.FileStoring.Minio;
 using SharpAbp.Abp.FileStoring.Obs;
 using SharpAbp.Abp.FileStoring.S3;
-using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Autofac;
 using Volo.Abp.Modularity;

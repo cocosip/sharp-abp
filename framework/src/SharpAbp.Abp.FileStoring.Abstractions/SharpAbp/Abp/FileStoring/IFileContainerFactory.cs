@@ -9,8 +9,6 @@
         /// <returns>
         /// The container object.
         /// </returns>
-        IFileContainer Create(
-            string name
-        );
+        IFileContainer Create(string name);
     }
 }

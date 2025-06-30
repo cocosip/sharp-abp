@@ -7,7 +7,7 @@
 		<!--Microsoft-->
 		<MicrosoftPackageVersion>[9.0.6,)</MicrosoftPackageVersion>
 		<!--EfCore-->
-		<EfCorePackageVersion>[9.0.4,)</EfCorePackageVersion>
+		<EfCorePackageVersion>[9.0.6,)</EfCorePackageVersion>
 		<!--Volo ABP packages-->
 		<VoloAbpPackageVersion>[9.2.1,10.0.0)</VoloAbpPackageVersion>
 		<!--FreeSql package-->

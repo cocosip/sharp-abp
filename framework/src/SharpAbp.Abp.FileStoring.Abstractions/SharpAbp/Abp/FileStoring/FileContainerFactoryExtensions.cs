@@ -13,7 +13,7 @@
         {
             return fileContainerFactory.Create(
                 FileContainerNameAttribute.GetContainerName<TContainer>()
-            );
+                );
         }
     }
 }

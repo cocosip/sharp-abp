@@ -33,6 +33,7 @@ namespace SharpAbp.Abp.FileStoring
         [Fact]
         public void Aliyun_Default_Configuration_Test()
         {
+
             var configuration = _configurationProvider.Get<DefaultContainer>();
             Assert.Equal("Aliyun", configuration.Provider);
             Assert.False(configuration.IsMultiTenant);

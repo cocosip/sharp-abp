@@ -16,7 +16,7 @@ namespace SharpAbp.Abp.ObjectPool
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
             context.Services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
-            return base.ConfigureServicesAsync(context);
+            return Task.CompletedTask;
         }
     }
 }
