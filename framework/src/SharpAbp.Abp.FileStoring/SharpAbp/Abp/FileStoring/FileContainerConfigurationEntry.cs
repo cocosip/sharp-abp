@@ -29,7 +29,7 @@ namespace SharpAbp.Abp.FileStoring
 
         public FileContainerConfigurationEntry()
         {
-            Properties = new Dictionary<string, string>();
+            Properties = [];
         }
     }
 }

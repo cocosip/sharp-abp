@@ -42,7 +42,7 @@ namespace SharpAbp.Abp.FileStoring
 
         public List<FileProviderConfiguration> GetFileProviders()
         {
-            return _providers.Values.ToList();
+            return [.. _providers.Values];
         }
 
     }
