@@ -169,7 +169,7 @@ namespace SharpAbp.Abp.FileStoring.S3
 
             try
             {
-                var getObjectResponse = await s3Client.GetObjectAsync(containerName, objectKey);
+                var getObjectResponse = await s3Client.GetObjectAsync(containerName, objectKey, args.CancellationToken);
                 await getObjectResponse.WriteResponseStreamToFileAsync(args.Path, true, args.CancellationToken);
                 return true;
 
@@ -197,7 +197,7 @@ namespace SharpAbp.Abp.FileStoring.S3
                     return null;
                 }
 
-                var getObjectResponse = await s3Client.GetObjectAsync(containerName, objectKey);
+                var getObjectResponse = await s3Client.GetObjectAsync(containerName, objectKey, args.CancellationToken);
                 return await TryCopyToMemoryStreamAsync(getObjectResponse.ResponseStream, args.CancellationToken);
             }
             finally
@@ -310,7 +310,7 @@ namespace SharpAbp.Abp.FileStoring.S3
                     PartSize = size,
                     PartNumber = i + 1,
                     UseChunkEncoding = configuration.UseChunkEncoding,
-                });
+                }, args.CancellationToken);
                 partETags.Add(new PartETag(uploadPartResponse.PartNumber, uploadPartResponse.ETag));
                 Logger.LogDebug("Upload part file ,key:{0},UploadId:{1},Complete {2}/{3}", objectKey, uploadId, partETags.Count, partCount);
             }

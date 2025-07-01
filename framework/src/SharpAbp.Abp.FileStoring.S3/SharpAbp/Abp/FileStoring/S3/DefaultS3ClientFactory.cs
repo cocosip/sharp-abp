@@ -1,6 +1,4 @@
-﻿using Amazon;
-using Amazon.S3;
-using System;
+﻿using Amazon.S3;
 using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 
