@@ -7,6 +7,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
     public class DatabaseConnectionUpdatedEto : EtoBase
     {
         public Guid Id { get; set; }
+        public string OldName { get; set; }
         public string Name { get; set; }
         public string DatabaseProvider { get; set; }
         public string ConnectionString { get; set; }

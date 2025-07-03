@@ -34,20 +34,24 @@ namespace SharpAbp.Abp.DbConnectionsManagement
             ConnectionString = connectionString;
         }
 
-        public virtual void Update(string databaseProvider, string connectionString)
+        public virtual void Update(string name, string databaseProvider, string connectionString)
         {
+            Check.NotNullOrWhiteSpace(name, nameof(name));
             Check.NotNullOrWhiteSpace(databaseProvider, nameof(databaseProvider));
             Check.NotNullOrWhiteSpace(connectionString, nameof(connectionString));
 
+            var oldName = Name;
+            Name = name;
             DatabaseProvider = databaseProvider;
             ConnectionString = connectionString;
 
             AddDistributedEvent(new DatabaseConnectionUpdatedEto
             {
                 Id = Id,
-                Name = Name,
-                DatabaseProvider = DatabaseProvider,
-                ConnectionString = ConnectionString
+                OldName = oldName,
+                Name = name,
+                DatabaseProvider = databaseProvider,
+                ConnectionString = connectionString
             });
         }
 

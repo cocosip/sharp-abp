@@ -22,11 +22,12 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         /// Update
         /// </summary>
         /// <param name="databaseConnectionInfo"></param>
+        /// <param name="name"></param>
         /// <param name="databaseProvider"></param>
         /// <param name="connectionString"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<DatabaseConnectionInfo> UpdateAsync(DatabaseConnectionInfo databaseConnectionInfo, string databaseProvider, string connectionString, CancellationToken cancellationToken = default);
+        Task<DatabaseConnectionInfo> UpdateAsync(DatabaseConnectionInfo databaseConnectionInfo, string name, string databaseProvider, string connectionString, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Change name

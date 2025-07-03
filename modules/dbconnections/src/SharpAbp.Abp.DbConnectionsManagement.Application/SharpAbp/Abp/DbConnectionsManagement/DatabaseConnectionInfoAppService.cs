@@ -128,6 +128,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
             var databaseConnectionInfo = await ConnectionInfoRepository.GetAsync(id);
             var updated = await ConnectionInfoManager.UpdateAsync(
                 databaseConnectionInfo,
+                input.Name,
                 input.DatabaseProvider,
                 input.ConnectionString);
             return ObjectMapper.Map<DatabaseConnectionInfo, DatabaseConnectionInfoDto>(updated);

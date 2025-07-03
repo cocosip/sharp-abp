@@ -6,12 +6,12 @@ namespace SharpAbp.Abp.DbConnectionsManagement
 {
     public class UpdateDatabaseConnectionInfoDto : ExtensibleEntityDto
     {
-        ///// <summary>
-        ///// DbConnection name
-        ///// </summary>
-        //[Required]
-        //[DynamicStringLength(typeof(DatabaseConnectionInfoConsts), nameof(DatabaseConnectionInfoConsts.MaxNameLength))]
-        //public string Name { get; set; }
+        /// <summary>
+        /// DbConnection name
+        /// </summary>
+        [Required]
+        [DynamicStringLength(typeof(DatabaseConnectionInfoConsts), nameof(DatabaseConnectionInfoConsts.MaxNameLength))]
+        public string Name { get; set; }
 
         /// <summary>
         /// Database Provider

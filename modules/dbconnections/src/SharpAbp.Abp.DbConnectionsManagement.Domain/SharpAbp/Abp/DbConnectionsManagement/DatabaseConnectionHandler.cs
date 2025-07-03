@@ -19,15 +19,12 @@ namespace SharpAbp.Abp.DbConnectionsManagement
 
         public async Task HandleEventAsync(DatabaseConnectionUpdatedEto eventData)
         {
-            await CacheManager.RemoveAsync(eventData.Name);
+            await CacheManager.RemoveManyAsync([eventData.OldName, eventData.Name]);
         }
 
         public async Task HandleEventAsync(DatabaseConnectionNameChangedEto eventData)
         {
-            if (eventData.OldName != eventData.Name)
-            {
-                await CacheManager.RemoveAsync(eventData.OldName);
-            }
+            await CacheManager.RemoveAsync(eventData.OldName);
         }
 
         public async Task HandleEventAsync(DatabaseConnectionDeletedEto eventData)

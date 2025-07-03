@@ -4,7 +4,6 @@ using Microsoft.Extensions.Localization;
 using SharpAbp.Abp.DbConnectionsManagement.Localization;
 using Volo.Abp;
 using Volo.Abp.Domain.Services;
-using Volo.Abp.Guids;
 
 namespace SharpAbp.Abp.DbConnectionsManagement
 {
@@ -45,13 +44,19 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         /// Update
         /// </summary>
         /// <param name="databaseConnectionInfo"></param>
+        /// <param name="name"></param>
         /// <param name="databaseProvider"></param>
         /// <param name="connectionString"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<DatabaseConnectionInfo> UpdateAsync(DatabaseConnectionInfo databaseConnectionInfo, string databaseProvider, string connectionString, CancellationToken cancellationToken = default)
+        public virtual async Task<DatabaseConnectionInfo> UpdateAsync(
+            DatabaseConnectionInfo databaseConnectionInfo,
+            string name,
+            string databaseProvider,
+            string connectionString,
+            CancellationToken cancellationToken = default)
         {
-            databaseConnectionInfo.Update(databaseProvider, connectionString);
+            databaseConnectionInfo.Update(name, databaseProvider, connectionString);
             return await ConnectionInfoRepository.UpdateAsync(databaseConnectionInfo, cancellationToken: cancellationToken);
         }
 
@@ -63,7 +68,10 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         /// <exception cref="UserFriendlyException"></exception>
-        public virtual async Task<DatabaseConnectionInfo> ChangeNameAsync(DatabaseConnectionInfo databaseConnectionInfo, string name, CancellationToken cancellationToken = default)
+        public virtual async Task<DatabaseConnectionInfo> ChangeNameAsync(
+            DatabaseConnectionInfo databaseConnectionInfo,
+            string name,
+            CancellationToken cancellationToken = default)
         {
             var queryDatabaseConnectionInfo = await ConnectionInfoRepository.FindExpectedByNameAsync(databaseConnectionInfo.Name, databaseConnectionInfo.Id, cancellationToken: cancellationToken);
             if (queryDatabaseConnectionInfo != null)
