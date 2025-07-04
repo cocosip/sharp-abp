@@ -54,12 +54,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         {
             Check.NotNullOrWhiteSpace(provider, nameof(provider));
 
-            var fileProviderConfiguration = Options.Providers.GetConfiguration(provider);
-            if (fileProviderConfiguration == null)
-            {
-                throw new UserFriendlyException($"Could not get provider configuration by name '{provider}'.");
-            }
-
+            var fileProviderConfiguration = Options.Providers.GetConfiguration(provider) ?? throw new UserFriendlyException($"Could not get provider configuration by name '{provider}'.");
             var providerItems = fileProviderConfiguration.GetItems();
             var providerOptions = new ProviderOptionsDto(provider);
 

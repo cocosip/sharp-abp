@@ -12,7 +12,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         public ProviderOptionsDto(string provider)
         {
             Provider = provider;
-            Values = new List<ProviderValueDto>();
+            Values = [];
         }
 
     }
