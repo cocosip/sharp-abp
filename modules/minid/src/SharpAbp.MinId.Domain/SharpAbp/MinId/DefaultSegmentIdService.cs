@@ -3,7 +3,6 @@ using Microsoft.Extensions.Options;
 using System.Data;
 using System.Threading.Tasks;
 using Volo.Abp;
-using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Uow;
 
@@ -41,7 +40,7 @@ namespace SharpAbp.MinId
             {
                 SegmentId segmentId = null;
 
-                using var uow = UnitOfWorkManager.Begin(true, true, IsolationLevel.ReadCommitted, timeout);
+                using var unitOfWork = UnitOfWorkManager.Begin(true, true, IsolationLevel.ReadCommitted, timeout);
 
                 try
                 {
@@ -51,20 +50,27 @@ namespace SharpAbp.MinId
                     //New id
                     var newMaxId = minIdInfo.MaxId + minIdInfo.Step;
 
-                    Logger.LogDebug("Old maxId:{0}, New maxId {1},Step:{2}", minIdInfo.MaxId, newMaxId, minIdInfo.Step);
+                    Logger.LogDebug("Old maxId: '{MaxId}', New maxId: '{newMaxId}', Step: {Step}", minIdInfo.MaxId, newMaxId, minIdInfo.Step);
 
                     minIdInfo.UpdateMaxId(newMaxId);
                     await MinIdInfoRepository.UpdateAsync(minIdInfo);
-                    //await uow.SaveChangesAsync();
-                    await uow.CompleteAsync();
                     segmentId = ConvertToSegmentId(minIdInfo);
                 }
-                catch (AbpDbConcurrencyException ex)
+                catch
                 {
-                    await uow?.RollbackAsync();
-                    Logger.LogError(ex, "Get next segmentId conflict. {0}", ex.Message);
-                    segmentId = null;
+                    try
+                    {
+                        await unitOfWork.RollbackAsync();
+                    }
+                    catch
+                    {
+                        /* ignored */
+                    }
+
+                    throw;
                 }
+
+                await unitOfWork.CompleteAsync();
 
                 if (segmentId != null)
                 {
