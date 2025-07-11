@@ -3,7 +3,6 @@ using Microsoft.Extensions.Options;
 using System.Data;
 using System.Threading.Tasks;
 using Volo.Abp;
-using Volo.Abp.Data;
 using Volo.Abp.Uow;
 
 namespace SharpAbp.MinId
@@ -41,7 +40,6 @@ namespace SharpAbp.MinId
 
                 minIdInfo.UpdateMaxId(newMaxId);
                 await MinIdInfoRepository.UpdateAsync(minIdInfo);
-                await unitOfWork.SaveChangesAsync();
                 segmentId = ConvertToSegmentId(minIdInfo);
             }
             catch
@@ -58,6 +56,7 @@ namespace SharpAbp.MinId
 
                 throw;
             }
+            await unitOfWork.CompleteAsync();
             return segmentId;
         }
 
