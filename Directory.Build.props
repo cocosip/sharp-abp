@@ -12,8 +12,8 @@
 		<VoloAbpPackageVersion>[9.2.2,10.0.0)</VoloAbpPackageVersion>
 		<!--FreeSql package-->
 		<FreeSqlPackageVersion>[3.5.210,)</FreeSqlPackageVersion>
-		<!--FreeSql package-->
-		<MassTransitPackageVersion>[8.5.0,)</MassTransitPackageVersion>
+		<!--Masstransit package-->
+		<MassTransitPackageVersion>[8.5.1,)</MassTransitPackageVersion>
 	</PropertyGroup>
 
 	<PropertyGroup>
