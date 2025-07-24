@@ -9,7 +9,7 @@
 		<!--EfCore-->
 		<EfCorePackageVersion>[9.0.7,)</EfCorePackageVersion>
 		<!--Volo ABP packages-->
-		<VoloAbpPackageVersion>[9.2.2,10.0.0)</VoloAbpPackageVersion>
+		<VoloAbpPackageVersion>[9.2.3,10.0.0)</VoloAbpPackageVersion>
 		<!--FreeSql package-->
 		<FreeSqlPackageVersion>[3.5.210,)</FreeSqlPackageVersion>
 		<!--Masstransit package-->
