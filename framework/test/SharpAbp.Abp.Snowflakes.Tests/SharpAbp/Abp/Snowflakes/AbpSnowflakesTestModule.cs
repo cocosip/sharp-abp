@@ -28,8 +28,21 @@ namespace SharpAbp.Abp.Snowflakes
 
                 options.Snowflakes.Configure<DefaultSnowflake>(c =>
                 {
-                    c.DatacenterId = 3;
-                    c.WorkerId = 3;
+                    c.DatacenterId = 1L;
+                    c.WorkerId = 1L;
+                });
+
+                options.Snowflakes.Configure("test_instance", c =>
+                {
+                    c.DatacenterId = 2L;
+                    c.WorkerId = 2L;
+                    c.Twepoch = 1500000000000L; // Example custom epoch
+                });
+
+                options.Snowflakes.Configure("shared_instance", c =>
+                {
+                    c.DatacenterId = 3L;
+                    c.WorkerId = 3L;
                 });
             });
             return Task.CompletedTask;

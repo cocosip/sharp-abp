@@ -1,179 +1,190 @@
-﻿using System;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SharpAbp.Abp.Snowflakes
 {
     /// <summary>
-    /// 雪花算法分布式id生成
-    /// Twitter_Snowflake
-    /// SnowFlake的结构如下(每部分用-分开):
+    /// Implements the Snowflake algorithm for generating unique, distributed IDs.
+    /// The ID structure is as follows:
     /// 0 - 0000000000 0000000000 0000000000 0000000000 0 - 00000 - 00000 - 000000000000
-    /// 1位标识，由于long基本类型在Java中是带符号的，最高位是符号位，正数是0，负数是1，所以id一般是正数，最高位是0
-    /// 41位时间截(毫秒级)，注意，41位时间截不是存储当前时间的时间截，而是存储时间截的差值（当前时间截 - 开始时间截)
-    /// 得到的值），这里的的开始时间截，一般是我们的id生成器开始使用的时间，由我们程序来指定的（如下下面程序IdWorker类的startTime属性）。41位的时间截，可以使用69年，年T = (1L 《 41) / (1000L * 60 * 60 * 24 * 365) = 69
-    /// 10位的数据机器位，可以部署在1024个节点，包括5位datacenterId和5位workerId
-    /// 12位序列，毫秒内的计数，12位的计数顺序号支持每个节点每毫秒(同一机器，同一时间截)产生4096个ID序号
-    /// 加起来刚好64位，为一个Long型
-    /// SnowFlake的优点是，整体上按照时间自增排序，并且整个分布式系统内不会产生ID碰撞(由数据中心ID和机器ID作区分)，并且效率较高，经测试,SnowFlake每秒能够产生26万ID左右。
+    /// 1 bit: Sign bit (always 0 for positive IDs).
+    /// 41 bits: Timestamp (milliseconds since a custom epoch). This allows for ~69 years of IDs.
+    /// 10 bits: Machine ID (5 bits for datacenter ID, 5 bits for worker ID), supporting 1024 nodes.
+    /// 12 bits: Sequence number (milliseconds within the same timestamp), supporting 4096 IDs per millisecond per node.
+    /// Total: 64 bits (long type).
     /// </summary>
     public class Snowflake
     {
+        // Custom epoch (January 1, 2015, 00:00:00 UTC)
+        private readonly long _epoch;
 
-        //开始时间截(2015-01-01)
-        private readonly long _twepoch = 1420041600000L;
+        // Number of bits allocated for worker ID
+        private readonly int _workerIdBits;
 
-        //机器id所占的位数
-        private readonly int _workerIdBits = 5;
+        // Number of bits allocated for datacenter ID
+        private readonly int _datacenterIdBits;
 
-        //数据标识id所占的位数
-        private readonly int _datacenterIdBits = 5;
+        // Number of bits allocated for sequence number
+        private readonly int _sequenceBits;
 
-        //序列在id中占的位数(1ms内的并发数)
-        private readonly int _sequenceBits = 12;
+        // Shift left for worker ID
+        private readonly int _workerIdShift;
 
-        //机器ID向左移12位
-        private readonly int _workerIdShift = 12;
+        // Shift left for datacenter ID
+        private readonly int _datacenterIdShift;
 
-        //数据标识id向左移17位(12+5)
-        private readonly int _datacenterIdShift = 17;
+        // Shift left for timestamp
+        private readonly int _timestampLeftShift;
 
-        //时间截向左移22位(5+5+12)
-        private readonly int _timestampLeftShift = 22;
+        // Mask for sequence number
+        private readonly long _sequenceMask;
 
-        // 生成序列的掩码，这里为4095 (0b111111111111=0xfff=4095)
-        private readonly long _sequenceMask = 4095;
-
-        // 工作机器ID(0~31)
+        // Worker ID (0-31)
         private readonly long _workerId;
 
-        //数据中心ID(0~31)
+        // Datacenter ID (0-31)
         private readonly long _datacenterId;
 
-        //毫秒内序列(0~4095)
-        private long sequence = 0L;
+        // Sequence number within the millisecond (0-4095)
+        private long _sequence = 0L;
 
-        //上次生成ID的时间截
-        private long lastTimestamp = -1L;
+        // Last timestamp when an ID was generated
+        private long _lastTimestamp = -1L;
 
-        private readonly object _sync = new();
+        // Object for thread synchronization
+        private readonly object _syncObject = new object();
 
-        private static readonly Lazy<Snowflake> _instance = new Lazy<Snowflake>(() =>
-        {
-            return new Snowflake(0L, 0L);
-        });
+        // Default static instance of Snowflake for convenience
+        private static readonly Lazy<Snowflake> _defaultInstance = new Lazy<Snowflake>(() => new Snowflake());
 
-        public static Snowflake GetInstance { get { return _instance.Value; } }
+        /// <summary>
+        /// Gets the default static instance of the <see cref="Snowflake"/> ID generator.
+        /// This instance uses default parameters (workerId = 0, datacenterId = 0).
+        /// </summary>
+        public static Snowflake Default => _defaultInstance.Value;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Snowflake"/> class with default parameters.
+        /// Uses a default epoch (January 1, 2015, 00:00:00 UTC), 5 bits for worker ID, 5 bits for datacenter ID, and 12 bits for sequence.
+        /// </summary>
+        /// <param name="workerId">The worker ID (0-31). Defaults to 0.</param>
+        /// <param name="datacenterId">The datacenter ID (0-31). Defaults to 0.</param>
         public Snowflake(long workerId = 0L, long datacenterId = 0L)
             : this(1420041600000L, 5, 5, 12, workerId, datacenterId)
         {
-
         }
 
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Snowflake"/> class with custom parameters.
+        /// </summary>
+        /// <param name="epoch">The custom epoch timestamp in milliseconds.</param>
+        /// <param name="workerIdBits">The number of bits to use for the worker ID (e.g., 5).</param>
+        /// <param name="datacenterIdBits">The number of bits to use for the datacenter ID (e.g., 5).</param>
+        /// <param name="sequenceBits">The number of bits to use for the sequence number (e.g., 12).</param>
+        /// <param name="workerId">The worker ID.</param>
+        /// <param name="datacenterId">The datacenter ID.</param>
+        /// <exception cref="ArgumentException">Thrown if workerId or datacenterId are out of their valid ranges based on the bit allocations.</exception>
         public Snowflake(
-            long twepoch = 1420041600000L,
-            int workerIdBits = 5,
-            int datacenterIdBits = 5,
-            int sequenceBits = 12,
-            long workerId = 0L,
-            long datacenterId = 0L)
+            long epoch,
+            int workerIdBits,
+            int datacenterIdBits,
+            int sequenceBits,
+            long workerId,
+            long datacenterId)
         {
-            _twepoch = twepoch;
+            _epoch = epoch;
             _workerIdBits = workerIdBits;
             _datacenterIdBits = datacenterIdBits;
             _sequenceBits = sequenceBits;
-            _workerIdShift = _sequenceBits;
 
+            _workerIdShift = _sequenceBits;
             _datacenterIdShift = _sequenceBits + _workerIdBits;
             _timestampLeftShift = _sequenceBits + _workerIdBits + _datacenterIdBits;
             _sequenceMask = -1L ^ (-1L << _sequenceBits);
 
-            _workerId = workerId;
-            _datacenterId = datacenterId;
-
-            var maxWorkerId = -1L ^ (-1L << _workerIdBits);
-            var maxDatacenterId = -1L ^ (-1L << _datacenterIdBits);
+            long maxWorkerId = -1L ^ (-1L << _workerIdBits);
+            long maxDatacenterId = -1L ^ (-1L << _datacenterIdBits);
 
             if (workerId > maxWorkerId || workerId < 0)
             {
-                throw new ArgumentException(string.Format("worker Id can't be greater than %d or less than 0", maxWorkerId));
+                throw new ArgumentException($"Worker ID can't be greater than {maxWorkerId} or less than 0.", nameof(workerId));
             }
             if (datacenterId > maxDatacenterId || datacenterId < 0)
             {
-                throw new ArgumentException(string.Format("datacenter Id can't be greater than %d or less than 0", maxDatacenterId));
+                throw new ArgumentException($"Datacenter ID can't be greater than {maxDatacenterId} or less than 0.", nameof(datacenterId));
             }
+
+            _workerId = workerId;
+            _datacenterId = datacenterId;
         }
 
-
-
         /// <summary>
-        /// 获得下一个ID (该方法是线程安全的)
+        /// Generates the next unique ID. This method is thread-safe.
         /// </summary>
+        /// <returns>The next unique 64-bit ID.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if the system clock moves backwards, indicating a potential issue with time synchronization.</exception>
         public long NextId()
         {
-            lock (_sync)
+            lock (_syncObject)
             {
-                long timestamp = TimeGen();
+                long timestamp = GetCurrentTimestampMillis();
 
-                //如果当前时间小于上一次ID生成的时间戳，说明系统时钟回退过这个时候应当抛出异常
-                if (timestamp < lastTimestamp)
+                // If current time is less than last generated timestamp, clock has moved backwards.
+                if (timestamp < _lastTimestamp)
                 {
-                    throw new InvalidTimeZoneException(
-                            string.Format("Clock moved backwards.  Refusing to generate id for %d milliseconds", lastTimestamp - timestamp));
+                    throw new InvalidOperationException(
+                            $"Clock moved backwards. Refusing to generate ID for {_lastTimestamp - timestamp} milliseconds.");
                 }
 
-                //如果是同一时间生成的，则进行毫秒内序列
-                if (lastTimestamp == timestamp)
+                // If generated in the same millisecond, increment sequence.
+                if (_lastTimestamp == timestamp)
                 {
-                    sequence = (sequence + 1) & _sequenceMask;
-                    //毫秒内序列溢出
-                    if (sequence == 0)
+                    _sequence = (_sequence + 1) & _sequenceMask;
+                    // If sequence overflows (reaches 0), block until next millisecond.
+                    if (_sequence == 0)
                     {
-                        //阻塞到下一个毫秒,获得新的时间戳
-                        timestamp = TilNextMillis(lastTimestamp);
+                        timestamp = WaitUntilNextMillis(_lastTimestamp);
                     }
                 }
-                //时间戳改变，毫秒内序列重置
+                // If timestamp has changed, reset sequence.
                 else
                 {
-                    sequence = 0L;
+                    _sequence = 0L;
                 }
 
-                //上次生成ID的时间截
-                lastTimestamp = timestamp;
+                _lastTimestamp = timestamp;
 
-                //移位并通过或运算拼到一起组成64位的ID
-                return ((timestamp - _twepoch) << _timestampLeftShift) //
-                        | (_datacenterId << _datacenterIdShift) //
-                        | (_workerId << _workerIdShift) //
-                        | sequence;
+                // Combine parts to form the 64-bit ID.
+                return ((timestamp - _epoch) << _timestampLeftShift) |
+                       (_datacenterId << _datacenterIdShift) |
+                       (_workerId << _workerIdShift) |
+                       _sequence;
             }
         }
 
-
-
-
         /// <summary>
-        /// 阻塞到下一个毫秒，直到获得新的时间戳
+        /// Blocks until the next millisecond to ensure unique timestamps.
         /// </summary>
-        private long TilNextMillis(long lastTimestamp)
+        /// <param name="lastTimestamp">The last timestamp when an ID was generated.</param>
+        /// <returns>The new timestamp in milliseconds.</returns>
+        private long WaitUntilNextMillis(long lastTimestamp)
         {
-            long timestamp = TimeGen();
+            long timestamp = GetCurrentTimestampMillis();
             while (timestamp <= lastTimestamp)
             {
-                timestamp = TimeGen();
+                timestamp = GetCurrentTimestampMillis();
             }
             return timestamp;
         }
 
         /// <summary>
-        /// 返回以毫秒为单位的当前时间
+        /// Gets the current timestamp in milliseconds since the Unix epoch (January 1, 1970, 00:00:00 UTC).
         /// </summary>
-        protected long TimeGen()
+        /// <returns>The current timestamp in milliseconds.</returns>
+        protected virtual long GetCurrentTimestampMillis()
         {
             return (long)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
         }
-
-
     }
 }

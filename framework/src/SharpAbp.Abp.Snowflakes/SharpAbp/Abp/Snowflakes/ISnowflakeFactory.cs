@@ -2,19 +2,23 @@
 
 namespace SharpAbp.Abp.Snowflakes
 {
+    /// <summary>
+    /// Defines the interface for a factory that provides <see cref="Snowflake"/> instances.
+    /// </summary>
     public interface ISnowflakeFactory
     {
         /// <summary>
-        /// Get or create a snowflake by name
+        /// Gets or creates a <see cref="Snowflake"/> instance by its unique name.
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
+        /// <param name="name">The unique name of the Snowflake instance.</param>
+        /// <returns>A <see cref="Snowflake"/> instance.</returns>
+        [NotNull]
         Snowflake Get([NotNull] string name);
 
         /// <summary>
-        /// Get default snowflake
+        /// Gets the default <see cref="Snowflake"/> instance.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The default <see cref="Snowflake"/> instance.</returns>
         Snowflake GetDefault();
     }
 }
