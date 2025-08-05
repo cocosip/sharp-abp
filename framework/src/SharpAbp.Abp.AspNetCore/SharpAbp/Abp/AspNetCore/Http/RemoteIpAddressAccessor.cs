@@ -7,10 +7,21 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.AspNetCore.Http
 {
+    /// <summary>
+    /// Provides methods to access the remote IP address of the current HTTP request.
+    /// This implementation considers various HTTP headers commonly used by reverse proxies
+    /// and load balancers to determine the original client IP address.
+    /// </summary>
     public class RemoteIpAddressAccessor : IRemoteIpAddressAccessor, ITransientDependency
     {
         protected ILogger Logger { get; }
         protected IServiceProvider ServiceProvider { get; }
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RemoteIpAddressAccessor"/> class.
+        /// </summary>
+        /// <param name="logger">The logger instance.</param>
+        /// <param name="serviceProvider">The service provider.</param>
         public RemoteIpAddressAccessor(
             ILogger<RemoteIpAddressAccessor> logger,
             IServiceProvider serviceProvider)
@@ -20,9 +31,15 @@ namespace SharpAbp.Abp.AspNetCore.Http
         }
 
         /// <summary>
-        /// Get remote ip address
+        /// Gets the remote IP address of the current HTTP request.
+        /// This method checks for common HTTP headers used by reverse proxies and load balancers
+        /// in the following order:
+        /// 1. X-Forwarded-For
+        /// 2. X-Real-IP
+        /// 3. HttpContext.Connection.RemoteIpAddress
+        /// If none of these sources provide a valid IP address, an empty string is returned.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The remote IP address as a string, or an empty string if not found.</returns>
         public virtual string GetRemoteIpAddress()
         {
             try
@@ -67,9 +84,11 @@ namespace SharpAbp.Abp.AspNetCore.Http
         }
 
         /// <summary>
-        /// Get remote ip address from X-Forwarded-For
+        /// Gets the remote IP address from the X-Forwarded-For HTTP header.
+        /// The X-Forwarded-For header may contain a comma-separated list of IP addresses,
+        /// where the first one is typically the original client IP address.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The remote IP address from X-Forwarded-For header as a string, or an empty string if not found.</returns>
         public virtual string GetXForwardedForRemoteIpAddress()
         {
             try
@@ -100,9 +119,10 @@ namespace SharpAbp.Abp.AspNetCore.Http
         }
 
         /// <summary>
-        /// Get remote ip address from X-Real-IP
+        /// Gets the remote IP address from the X-Real-IP HTTP header.
+        /// This header is commonly used by Nginx and other reverse proxies to pass the original client IP.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The remote IP address from X-Real-IP header as a string, or an empty string if not found.</returns>
         public virtual string GetXRealIPRemoteIpAddress()
         {
             try

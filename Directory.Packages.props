@@ -120,7 +120,7 @@
 		<PackageVersion Include="AutoS3.KS3" Version="2.2.0" />
 		<PackageVersion Include="BouncyCastle.Cryptography" Version="2.6.2" />
 		<PackageVersion Include="Cocosip.KS3SDK" Version="1.0.0" />
-		<PackageVersion Include="DotCommon" Version="7.1.1" />
+		<PackageVersion Include="DotCommon" Version="7.1.2" />
 		<PackageVersion Include="FastDFSCore" Version="1.7.0" />
 		<PackageVersion Include="FastDFSCore.Transport.SuperSocket" Version="1.7.0" />
 		<PackageVersion Include="FastDFSCore.Transport.DotNetty" Version="1.7.0" />

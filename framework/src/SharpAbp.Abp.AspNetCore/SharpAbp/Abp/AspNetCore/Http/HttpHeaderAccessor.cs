@@ -9,11 +9,32 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.AspNetCore.Http
 {
+    /// <summary>
+    /// Provides access to HTTP headers in the ABP framework.
+    /// </summary>
     public class HttpHeaderAccessor : IHttpHeaderAccessor, ITransientDependency
     {
+        /// <summary>
+        /// Gets the logger instance.
+        /// </summary>
         protected ILogger Logger { get; }
+
+        /// <summary>
+        /// Gets the ABP HTTP headers options.
+        /// </summary>
         protected AbpHttpHeadersOptions Options { get; }
+
+        /// <summary>
+        /// Gets the service provider.
+        /// </summary>
         protected IServiceProvider ServiceProvider { get; }
+
+        /// <summary>
+        /// Initializes a new instance of the HttpHeaderAccessor class.
+        /// </summary>
+        /// <param name="logger">The logger instance.</param>
+        /// <param name="options">The ABP HTTP headers options.</param>
+        /// <param name="serviceProvider">The service provider.</param>
         public HttpHeaderAccessor(
             ILogger<HttpHeaderAccessor> logger,
             IOptions<AbpHttpHeadersOptions> options,
@@ -25,15 +46,15 @@ namespace SharpAbp.Abp.AspNetCore.Http
         }
 
         /// <summary>
-        /// GetRouteTranslationHeader
+        /// Gets the route translation header from the HTTP context.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A RouteTranslationHeader object containing the route translation information.</returns>
         public virtual RouteTranslationHeader GetRouteTranslationHeader()
         {
             var routeTranslationHeader = new RouteTranslationHeader();
             var headers = GetPrefixHeaders(Options.RouteTranslationPrefix!);
             var schemeName = FormatHeaderName(Options.RouteTranslationPrefix!, "Scheme");
-            var hostName = FormatHeaderName(Options.RouteTranslationPrefix!, "Host");
+            var hostName = FormatHeaderName(Options.RouteTranslationPrefix!,"Host");
             var routerName = FormatHeaderName(Options.RouteTranslationPrefix!, "Router");
 
             foreach (var headerKv in headers)

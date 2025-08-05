@@ -3,25 +3,28 @@ using System.Collections.Generic;
 
 namespace SharpAbp.Abp.AspNetCore.Http
 {
+    /// <summary>
+    /// Defines an interface for accessing HTTP headers in the ABP framework.
+    /// </summary>
     public interface IHttpHeaderAccessor
     {
         /// <summary>
-        /// GetRouteTranslationHeader
+        /// Gets the route translation header from the HTTP context.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A RouteTranslationHeader object containing the route translation information.</returns>
         RouteTranslationHeader GetRouteTranslationHeader();
 
         /// <summary>
-        /// GetPrefixHeader
+        /// Gets headers with a specific prefix from the HTTP context.
         /// </summary>
-        /// <param name="prefix"></param>
-        /// <returns></returns>
+        /// <param name="prefix">The prefix to filter headers by. If "*", returns all headers.</param>
+        /// <returns>A dictionary of header names and values that match the prefix.</returns>
         IDictionary<string, StringValues> GetPrefixHeaders(string prefix = "*");
 
         /// <summary>
-        /// Get Request HostURL
+        /// Gets the request host URL from the HTTP context.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The request host URL as a string.</returns>
         string GetRequesHostURL();
     }
 }

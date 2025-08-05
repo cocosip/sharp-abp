@@ -5,14 +5,17 @@ using Volo.Abp.Modularity;
 
 namespace SharpAbp.Abp.AspNetCore.Http
 {
+    /// <summary>
+    /// Provides extension methods for configuring cookie policy options in the ABP framework.
+    /// </summary>
     public static class CookiePolicyOptionsExtensions
     {
         /// <summary>
-        /// 同域名Cookie策略
-        /// 在非https请求下,swagger登录出错,使用该代码解决。
+        /// Adds a SameSite cookie policy to the service configuration context.
+        /// This resolves issues with Swagger login failures under non-HTTPS requests.
         /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
+        /// <param name="context">The service configuration context.</param>
+        /// <returns>The service configuration context with the cookie policy configured.</returns>
         public static ServiceConfigurationContext AddSameSiteCookiePolicy(this ServiceConfigurationContext context)
         {
             context.Services.Configure<CookiePolicyOptions>(options =>
@@ -27,6 +30,11 @@ namespace SharpAbp.Abp.AspNetCore.Http
             return context;
         }
 
+        /// <summary>
+        /// Checks the SameSite policy for cookies and adjusts it based on the HTTP context and user agent.
+        /// </summary>
+        /// <param name="httpContext">The HTTP context.</param>
+        /// <param name="options">The cookie options.</param>
         private static void CheckSameSite(HttpContext httpContext, CookieOptions options)
         {
             if (options.SameSite == SameSiteMode.None)
@@ -40,7 +48,12 @@ namespace SharpAbp.Abp.AspNetCore.Http
             }
         }
 
-        private static bool DisallowsSameSiteNone(string userAgent)
+        /// <summary>
+        /// Determines if the user agent disallows SameSite=None cookies.
+        /// </summary>
+        /// <param name="userAgent">The user agent string.</param>
+        /// <returns>True if the user agent disallows SameSite=None cookies, otherwise false.</returns>
+        public static bool DisallowsSameSiteNone(string userAgent)
         {
             // Cover all iOS based browsers here. This includes:
             // - Safari on iOS 12 for iPhone, iPod Touch, iPad
@@ -75,5 +88,4 @@ namespace SharpAbp.Abp.AspNetCore.Http
             return false;
         }
     }
-
 }

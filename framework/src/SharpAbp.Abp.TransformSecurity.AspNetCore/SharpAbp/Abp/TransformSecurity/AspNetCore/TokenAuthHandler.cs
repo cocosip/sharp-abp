@@ -13,20 +13,37 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.TransformSecurity.AspNetCore
 {
+    /// <summary>
+    /// Token认证处理器，用于处理OAuth2 token请求中的加密密码解密
+    /// </summary>
     [Dependency(ServiceLifetime.Transient, ReplaceServices = false, TryRegister = true)]
     [ExposeServices(typeof(TokenAuthHandler), IncludeDefaults = true, IncludeSelf = true)]
     public class TokenAuthHandler : IAbpTransformSecurityMiddlewareHandler, ITransientDependency
     {
         private readonly ISecurityEncryptionService _securityEncryptionService;
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="securityEncryptionService">安全加密服务</param>
         public TokenAuthHandler(ISecurityEncryptionService securityEncryptionService)
         {
             _securityEncryptionService = securityEncryptionService;
         }
 
+        /// <summary>
+        /// 处理HTTP上下文中的加密密码
+        /// </summary>
+        /// <param name="context">HTTP上下文</param>
+        /// <param name="identifier">安全标识符</param>
+        /// <param name="cancellationToken">取消令牌</param>
+        /// <returns></returns>
         public async Task HandleAsync(HttpContext context, string identifier, CancellationToken cancellationToken = default)
         {
-            //判断是否为登录这个方法
-            if (context.Request.Method == HttpMethods.Post && context.Request.HasFormContentType && context.Request.Path.StartsWithSegments("/connect/token", StringComparison.OrdinalIgnoreCase))
+            // 判断是否为登录这个方法
+            if (context.Request.Method == HttpMethods.Post && 
+                context.Request.HasFormContentType && 
+                context.Request.Path.StartsWithSegments("/connect/token", StringComparison.OrdinalIgnoreCase))
             {
                 if (identifier.IsNullOrWhiteSpace())
                 {
@@ -44,7 +61,7 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
                         if (item.Key.Equals("password", StringComparison.OrdinalIgnoreCase))
                         {
                             var p = WebUtility.UrlDecode(item.Value.ToString());
-                            //明文密码
+                            // 明文密码
                             var plainPassword = await _securityEncryptionService.DecryptAsync(p, identifier, cancellationToken);
                             form.Add(item.Key, plainPassword);
                         }
@@ -59,6 +76,5 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
                 }
             }
         }
-
     }
 }
