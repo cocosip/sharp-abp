@@ -1,115 +1,114 @@
----
 trigger: always_on
 ---
 
-# Sharp-ABP C# Project Rules
+# Sharp-ABP C# 项目规范
 
-## Project Overview
+## 项目概述
 
-This project is a collection of extension modules based on the ABP vNext framework, providing various functional modules to enhance the capabilities of ABP applications.
+本项目是基于 ABP vNext 框架的扩展模块集合，提供各种功能模块以增强 ABP 应用的能力。
 
-## Naming Conventions
+## 命名规范
 
-### Project Naming
-- Project names start with `SharpAbp.Abp` followed by the module name
-- Example: `SharpAbp.Abp.FileStoring`, `SharpAbp.Abp.FreeRedis`
+### 项目命名
+- 项目名称以 `SharpAbp.Abp` 开头，后跟模块名称
+- 示例: `SharpAbp.Abp.FileStoring`, `SharpAbp.Abp.FreeRedis`
 
-### Namespace
-- Namespaces start with `SharpAbp.Abp`, corresponding to the project name
-- Example: `SharpAbp.Abp.FileStoring`, `SharpAbp.Abp.FreeRedis`
+### 命名空间
+- 命名空间以 `SharpAbp.Abp` 开头，与项目名称相对应
+- 示例: `SharpAbp.Abp.FileStoring`, `SharpAbp.Abp.FreeRedis`
 
-### Class Naming
-- Class names use PascalCase naming convention
-- Module class names end with `XxxModule`
-- DTO class names end with `XxxDto`
-- Application service class names end with `XxxAppService`
+### 类命名
+- 类名使用 PascalCase 命名法
+- 模块类名以 `XxxModule` 结尾
+- DTO 类名以 `XxxDto` 结尾
+- 应用服务类名以 `XxxAppService` 结尾
 
-### Interface Naming
-- Interface names use PascalCase naming convention and start with `I`
-- Example: `IFileContainerConfiguration`
+### 接口命名
+- 接口名称使用 PascalCase 命名法，并以 `I` 开头
+- 示例: `IFileContainerConfiguration`
 
-### Method Naming
-- Method names use PascalCase naming convention
-- Async methods end with `Async`
+### 方法命名
+- 方法名使用 PascalCase 命名法
+- 异步方法以 `Async` 结尾
 
-## Project Structure
+## 项目结构
 
-### Module Structure
-The project adopts the modular structure recommended by ABP. Each functional module typically contains the following submodules:
+### 模块结构
+项目采用 ABP 推荐的模块化结构。每个功能模块通常包含以下子模块：
 
-- `Xxx.Domain.Shared` - Domain shared layer, containing constants, enumerations, DTOs, etc.
-- `Xxx.Domain` - Domain layer, containing entities, repository interfaces, domain services, etc.
-- `Xxx.EntityFrameworkCore` - Entity Framework Core integration
-- `Xxx.MongoDB` - MongoDB integration
-- `Xxx.Application.Contracts` - Application service interfaces and DTOs
-- `Xxx.Application` - Application service implementation
-- `Xxx.HttpApi` - HTTP API controllers
-- `Xxx.HttpApi.Client` - HTTP API client
+- `Xxx.Domain.Shared` - 领域共享层，包含常量、枚举、DTO 等。
+- `Xxx.Domain` - 领域层，包含实体、仓储接口、领域服务等。
+- `Xxx.EntityFrameworkCore` - Entity Framework Core 集成
+- `Xxx.MongoDB` - MongoDB 集成
+- `Xxx.Application.Contracts` - 应用服务接口和 DTO
+- `Xxx.Application` - 应用服务实现
+- `Xxx.HttpApi` - HTTP API 控制器
+- `Xxx.HttpApi.Client` - HTTP API 客户端
 
-### Code Organization
-- Each module should have a clear layered structure
-- Follow ABP's dependency injection and modular design principles
-- Use ABP's exception handling and localization mechanisms
+### 代码组织
+- 每个模块都应有清晰的层次结构
+- 遵循 ABP 的依赖注入和模块化设计原则
+- 使用 ABP 的异常处理和本地化机制
 
-## Coding Standards
+## 编码标准
 
-### Dependency Injection
-- Use constructor injection
-- Service interfaces should inherit from the corresponding ABP base interfaces (such as `IApplicationService`)
-- Use `[Autowired]` attribute for property injection (if needed)
+### 依赖注入
+- 使用构造函数注入
+- 服务接口应继承自相应的 ABP 基础接口（如 `IApplicationService`）
+- 使用 `[Autowired]` 特性进行属性注入（如果需要）
 
-### Exception Handling
-- Use ABP's exception handling mechanism
-- Custom exceptions should inherit from ABP's exception base classes
+### 异常处理
+- 使用 ABP 的异常处理机制
+- 自定义异常应继承自 ABP 的异常基类
 
-### Logging
-- Use ABP's logging system
-- Log through the `ILogger<T>` interface
+### 日志记录
+- 使用 ABP 的日志系统
+- 通过 `ILogger<T>` 接口进行日志记录
 
-### Localization
-- Use ABP's localization system
-- Resource files should be placed in the module's `Localization` folder
+### 本地化
+- 使用 ABP 的本地化系统
+- 资源文件应放置在模块的 `Localization` 文件夹中
 
-## ABP Specific Standards
+## ABP 特定标准
 
-### Module Definition
-- Module classes should inherit from `AbpModule`
-- Register services in the `ConfigureServices` method
-- Configure application initialization logic in the `OnApplicationInitialization` method
+### 模块定义
+- 模块类应继承自 `AbpModule`
+- 在 `ConfigureServices` 方法中注册服务
+- 在 `OnApplicationInitialization` 方法中配置应用程序初始化逻辑
 
-### Application Services
-- Application services should inherit from the `ApplicationService` base class
-- Implement corresponding interfaces and mark with `[Service]` attribute
-- Use DTOs for data transfer
+### 应用服务
+- 应用服务应继承自 `ApplicationService` 基类
+- 实现相应的接口并使用 `[Service]` 特性标记
+- 使用 DTO 进行数据传输
 
-### Entity Design
-- Entities should inherit from ABP's `Entity` base class
-- Use ABP's audit properties (such as `CreationTime`, `CreatorId`, etc.)
-- Entity properties should have appropriate validation attributes
+### 实体设计
+- 实体应继承自 ABP 的 `Entity` 基类
+- 使用 ABP 的审计属性（如 `CreationTime`, `CreatorId` 等）
+- 实体属性应具有适当的验证特性
 
-### Repository Pattern
-- Repository interfaces should inherit from `IRepository<TEntity>`
-- Use ABP's provided generic repository methods
-- Custom repositories should be placed in the `Repositories` folder
+### 仓储模式
+- 仓储接口应继承自 `IRepository<TEntity>`
+- 使用 ABP 提供的泛型仓储方法
+- 自定义仓储应放置在 `Repositories` 文件夹中
 
-## Technology Stack
+## 技术栈
 
 - .NET 9.0
 - ABP vNext 9.2.3+
 - Entity Framework Core 9.0.7+
 - MassTransit 8.5.1+
 
-## Testing Standards
+## 测试标准
 
-- Unit test project names end with `.Tests`
-- Integration test project names end with `.TestBase`
-- Use xUnit as the testing framework
-- Use Shouldly for assertions
-- Use NSubstitute for mocking
+- 单元测试项目名称以 `.Tests` 结尾
+- 集成测试项目名称以 `.TestBase` 结尾
+- 使用 xUnit 作为测试框架
+- 使用 Shouldly 进行断言
+- 使用 NSubstitute 进行模拟
 
-## Documentation Standards
+## 文档标准
 
-- Every public class and public method should have XML comments
-- Comment content should be written in English
-- README.md should include module introduction, installation steps, and basic usage
-- Complex features should have dedicated documentation
+- 每个公共类和公共方法都应有 XML 注释
+- 注释内容应使用英文编写
+- README.md 应包含模块介绍、安装步骤和基本用法
+- 复杂功能应有专门的文档
