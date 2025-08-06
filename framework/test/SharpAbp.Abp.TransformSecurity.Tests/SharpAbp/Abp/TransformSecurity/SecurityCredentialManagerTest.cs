@@ -1,42 +1,156 @@
-﻿using SharpAbp.Abp.Crypto.RSA;
+using Microsoft.Extensions.Options;
+using SharpAbp.Abp.Crypto.RSA;
+using System;
 using System.Threading.Tasks;
+using Volo.Abp;
+using Volo.Abp.Timing;
 using Xunit;
 
 namespace SharpAbp.Abp.TransformSecurity
 {
+    /// <summary>
+    /// Unit tests for SecurityCredentialManager
+    /// </summary>
     public class SecurityCredentialManagerTest : AbpTransformSecurityTestBase
     {
         private readonly ISecurityCredentialManager _securityCredentialManager;
         private readonly IRSAEncryptionService _rsaEncryptionService;
         private readonly ISecurityEncryptionService _securityEncryptionService;
+        private readonly IClock _clock;
+
         public SecurityCredentialManagerTest()
         {
             _securityCredentialManager = GetRequiredService<ISecurityCredentialManager>();
             _rsaEncryptionService = GetRequiredService<IRSAEncryptionService>();
             _securityEncryptionService = GetRequiredService<ISecurityEncryptionService>();
+            _clock = GetRequiredService<IClock>();
         }
 
         [Fact]
-        public async Task GenerateAsync_Test()
+        public async Task GenerateAsync_Should_Create_Valid_RSA_Credential()
         {
-            var securityCredential = await _securityCredentialManager.GenerateAsync("Login");
-            var cipherText = _rsaEncryptionService.Encrypt(securityCredential.PublicKey, "HelloWorld");
-            var plainText = _rsaEncryptionService.Decrypt(securityCredential.PrivateKey, cipherText);
-            Assert.Equal("HelloWorld", plainText);
+            // Arrange
+            var bizType = "Login";
+
+            // Act
+            var credential = await _securityCredentialManager.GenerateAsync(bizType);
+
+            // Assert
+            Assert.NotNull(credential);
+            Assert.NotNull(credential.Identifier);
+            Assert.Equal(bizType, credential.BizType);
+            Assert.Equal(AbpTransformSecurityNames.RSA, credential.KeyType);
+            Assert.NotNull(credential.PublicKey);
+            Assert.NotNull(credential.PrivateKey);
+            Assert.True(credential.Expires > _clock.Now);
+            Assert.True(credential.CreationTime <= _clock.Now);
+            Assert.False(credential.IsExpires(_clock.Now));
         }
 
         [Fact]
-        public async Task Generate_Decrypt_Test_Async()
+        public async Task GenerateAsync_Should_Create_Functional_RSA_KeyPair()
         {
-            var securityCredential = await _securityCredentialManager.GenerateAsync("Login");
+            // Arrange
+            var bizType = "Login";
+            var testMessage = "HelloWorld";
 
-            var result = await _securityEncryptionService.ValidateAsync(securityCredential.Identifier);
-            Assert.Equal(SecurityCredentialResultType.Success, result.Result);
+            // Act
+            var credential = await _securityCredentialManager.GenerateAsync(bizType);
 
-            var cipherText = await _securityEncryptionService.EncryptAsync("1q2w3E*", securityCredential.Identifier);
-            var plainText = await _securityEncryptionService.DecryptAsync(cipherText, securityCredential.Identifier);
-            Assert.Equal("1q2w3E*", plainText);
+            // Assert - Test encryption/decryption functionality
+            var cipherText = _rsaEncryptionService.Encrypt(credential.PublicKey!, testMessage);
+            var plainText = _rsaEncryptionService.Decrypt(credential.PrivateKey!, cipherText);
+            Assert.Equal(testMessage, plainText);
         }
 
+        [Fact]
+        public async Task GenerateAsync_Should_Throw_Exception_For_Invalid_BizType()
+        {
+            // Arrange
+            var invalidBizType = "InvalidBizType";
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<AbpException>(
+                () => _securityCredentialManager.GenerateAsync(invalidBizType));
+            
+            Assert.Contains("Unsupported bizType", exception.Message);
+        }
+
+        [Theory]
+        [InlineData("Login")]
+        [InlineData("UpdatePassword")]
+        [InlineData("TestBizType")]
+        public async Task GenerateAsync_Should_Work_For_Valid_BizTypes(string bizType)
+        {
+            // Act
+            var credential = await _securityCredentialManager.GenerateAsync(bizType);
+
+            // Assert
+            Assert.NotNull(credential);
+            Assert.Equal(bizType, credential.BizType);
+        }
+
+        [Fact]
+        public async Task GenerateAsync_Should_Create_Unique_Identifiers()
+        {
+            // Arrange
+            var bizType = "Login";
+
+            // Act
+            var credential1 = await _securityCredentialManager.GenerateAsync(bizType);
+            var credential2 = await _securityCredentialManager.GenerateAsync(bizType);
+
+            // Assert
+            Assert.NotEqual(credential1.Identifier, credential2.Identifier);
+        }
+
+        [Fact]
+        public async Task GenerateAsync_Should_Set_Correct_RSA_Properties()
+        {
+            // Arrange
+            var bizType = "Login";
+
+            // Act
+            var credential = await _securityCredentialManager.GenerateAsync(bizType);
+
+            // Assert
+            Assert.True(credential.IsRSA());
+            Assert.False(credential.IsSM2());
+            Assert.Equal(2048, credential.GetRSAKeySize());
+            Assert.NotNull(credential.GetRSAPadding());
+        }
+
+        [Fact]
+        public async Task GenerateAsync_Should_Store_Credential_In_Store()
+        {
+            // Arrange
+            var bizType = "Login";
+
+            // Act
+            var credential = await _securityCredentialManager.GenerateAsync(bizType);
+
+            // Assert - Verify credential can be validated through encryption service
+            var validationResult = await _securityEncryptionService.ValidateAsync(credential.Identifier!);
+            Assert.Equal(SecurityCredentialResultType.Success, validationResult.Result);
+        }
+
+        [Fact]
+        public async Task GenerateAsync_Should_Work_With_EncryptionService()
+        {
+            // Arrange
+            var bizType = "Login";
+            var testMessage = "1q2w3E*";
+
+            // Act
+            var credential = await _securityCredentialManager.GenerateAsync(bizType);
+
+            // Assert
+            var validationResult = await _securityEncryptionService.ValidateAsync(credential.Identifier!);
+            Assert.Equal(SecurityCredentialResultType.Success, validationResult.Result);
+
+            var cipherText = await _securityEncryptionService.EncryptAsync(testMessage, credential.Identifier!);
+            var plainText = await _securityEncryptionService.DecryptAsync(cipherText, credential.Identifier!);
+            Assert.Equal(testMessage, plainText);
+        }
     }
 }
