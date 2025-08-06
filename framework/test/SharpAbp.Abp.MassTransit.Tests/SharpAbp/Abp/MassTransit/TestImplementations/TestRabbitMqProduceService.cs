@@ -61,14 +61,14 @@ namespace SharpAbp.Abp.MassTransit.TestImplementations
         /// <param name="messageType">The type of the message</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>A task representing the asynchronous operation</returns>
-        public virtual async Task PublishAsync(object message, Type? messageType = null, CancellationToken cancellationToken = default)
+        public virtual async Task PublishAsync(object message, Type messageType = null, CancellationToken cancellationToken = default)
         {
             _logger.LogInformation("Test RabbitMQ PublishAsync called with message: {Message}, messageType: {MessageType}", message, messageType?.Name);
             
             PublishedMessages.Add(new PublishedMessage
             {
                 Message = message,
-                MessageType = messageType?.Name ?? message?.GetType().Name ?? "Unknown"
+                MessageType = messageType?.Name ?? (message?.GetType().Name ?? "Unknown")
             });
 
             await Task.CompletedTask.ConfigureAwait(false);

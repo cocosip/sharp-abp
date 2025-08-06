@@ -8,12 +8,12 @@ namespace SharpAbp.Abp.MassTransit.TestImplementations
         /// <summary>
         /// Gets or sets the message key
         /// </summary>
-        public object? Key { get; set; }
+        public object Key { get; set; }
 
         /// <summary>
         /// Gets or sets the message value
         /// </summary>
-        public object? Value { get; set; }
+        public object Value { get; set; }
 
         /// <summary>
         /// Gets or sets the key type name

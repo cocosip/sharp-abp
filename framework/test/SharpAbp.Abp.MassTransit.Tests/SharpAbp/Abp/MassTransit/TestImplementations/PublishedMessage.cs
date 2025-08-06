@@ -8,7 +8,7 @@ namespace SharpAbp.Abp.MassTransit.TestImplementations
         /// <summary>
         /// Gets or sets the message object
         /// </summary>
-        public object? Message { get; set; }
+        public object Message { get; set; }
 
         /// <summary>
         /// Gets or sets the message type name

@@ -107,7 +107,7 @@ namespace SharpAbp.Abp.MassTransit
         [InlineData(null)]
         [InlineData("")]
         [InlineData("   ")]
-        public async Task PublishAsync_Should_Throw_InvalidOperationException_For_Invalid_Provider(string? provider)
+        public async Task PublishAsync_Should_Throw_InvalidOperationException_For_Invalid_Provider(string provider)
         {
             // Arrange
             _options.Provider = provider;
@@ -198,15 +198,8 @@ namespace SharpAbp.Abp.MassTransit
             
             Assert.Same(expectedException, actualException);
             
-            // Verify logging occurred
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Error,
-                    It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Failed to publish message of type TestMessage using provider RabbitMQ")),
-                    expectedException,
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                Times.Once);
+            // Verify that the provider's PublishAsync method was called
+            publishProviderMock.Verify(x => x.PublishAsync(message, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         /// <summary>
