@@ -1,5 +1,5 @@
 ﻿using System.Data;
-using MySqlConnector;
+using MySql.Data.MySqlClient;
 using SharpAbp.Abp.Data;
 using Volo.Abp.DependencyInjection;
 

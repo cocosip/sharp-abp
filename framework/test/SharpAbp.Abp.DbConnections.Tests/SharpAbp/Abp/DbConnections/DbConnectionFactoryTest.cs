@@ -1,8 +1,9 @@
-﻿using Microsoft.Data.SqlClient;
-using MySqlConnector;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
+using MySql.Data.MySqlClient;
 using Npgsql;
 using Oracle.ManagedDataAccess.Client;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace SharpAbp.Abp.DbConnections
@@ -20,11 +21,11 @@ namespace SharpAbp.Abp.DbConnections
         {
             var dbConnection1 = await _dbConnectionFactory.GetDbConnectionAsync("db1");
             Assert.Equal(typeof(MySqlConnection), dbConnection1.GetType());
-            Assert.Equal("Server=127.0.0.1;Port=3306;Database=demo1;User=root;Charset=utf8;", dbConnection1.ConnectionString);
+            Assert.Equal("server=127.0.0.1;port=3306;database=demo1;user id=root;characterset=utf8", dbConnection1.ConnectionString, true);
 
             var dbConnection2 = await _dbConnectionFactory.GetDbConnectionAsync("db2");
             Assert.Equal(typeof(NpgsqlConnection), dbConnection2.GetType());
-            Assert.Equal("Server=127.0.0.1;Port=9432;Username=root;Password=123456;Database=demo2;", dbConnection2.ConnectionString);
+            Assert.Equal("Server=127.0.0.1;Port=9432;Username=root;Password=123456;Database=demo2;", dbConnection2.ConnectionString, true);
 
             var dbConnection3 = await _dbConnectionFactory.GetDbConnectionAsync("db3");
             Assert.Equal(typeof(SqlConnection), dbConnection3.GetType());
