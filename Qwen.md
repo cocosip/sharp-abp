@@ -113,7 +113,6 @@
 - **异步操作**：查询数据库时，始终使用异步LINQ扩展方法，如`await _repository.ToListAsync()`。
 
 #### 4.8. 异步编程
-- **`ConfigureAwait(false)`**：在库代码（`/framework`和`/modules`）中，在等待的任务上始终使用`.ConfigureAwait(false)`以避免潜在的死锁。
 - **`CancellationToken`**：所有异步方法都应接受`CancellationToken`作为最后一个参数，并提供`default`的默认值。
   ```csharp
   Task<MyResult> DoSomethingAsync(string input, CancellationToken cancellationToken = default);
