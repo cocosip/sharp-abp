@@ -1,8 +1,10 @@
-﻿using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Asn1.Pkcs;
+using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Encodings;
 using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Generators;
+using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Security;
 using System;
@@ -83,6 +85,48 @@ namespace SharpAbp.Abp.Crypto.RSA
                 return keyParam;
             }
             throw new ArgumentException("Invalid PKCS#8 private key PEM format.");
+        }
+
+        /// <summary>
+        /// Imports an RSA public key from a Base64 encoded DER format string.
+        /// </summary>
+        /// <param name="publicKeyBase64">The Base64 encoded DER format public key string.</param>
+        /// <returns>An <see cref="AsymmetricKeyParameter"/> representing the public key.</returns>
+        public virtual AsymmetricKeyParameter ImportPublicKey(string publicKeyBase64)
+        {
+            var keyBytes = Convert.FromBase64String(publicKeyBase64);
+            return PublicKeyFactory.CreateKey(keyBytes);
+        }
+
+        /// <summary>
+        /// Imports an RSA private key from a Base64 encoded DER format string (PKCS#1 format).
+        /// </summary>
+        /// <param name="privateKeyBase64">The Base64 encoded DER format private key string.</param>
+        /// <returns>An <see cref="AsymmetricKeyParameter"/> representing the private key.</returns>
+        public virtual AsymmetricKeyParameter ImportPrivateKey(string privateKeyBase64)
+        {
+            var keyBytes = Convert.FromBase64String(privateKeyBase64);
+            var rsaPrivateKeyStructure = RsaPrivateKeyStructure.GetInstance(keyBytes);
+            return new RsaPrivateCrtKeyParameters(
+                rsaPrivateKeyStructure.Modulus,
+                rsaPrivateKeyStructure.PublicExponent,
+                rsaPrivateKeyStructure.PrivateExponent,
+                rsaPrivateKeyStructure.Prime1,
+                rsaPrivateKeyStructure.Prime2,
+                rsaPrivateKeyStructure.Exponent1,
+                rsaPrivateKeyStructure.Exponent2,
+                rsaPrivateKeyStructure.Coefficient);
+        }
+
+        /// <summary>
+        /// Imports an RSA private key from a Base64 encoded DER format string (PKCS#8 format).
+        /// </summary>
+        /// <param name="privateKeyBase64">The Base64 encoded DER format private key string.</param>
+        /// <returns>An <see cref="AsymmetricKeyParameter"/> representing the private key.</returns>
+        public virtual AsymmetricKeyParameter ImportPrivateKeyPkcs8(string privateKeyBase64)
+        {
+            var keyBytes = Convert.FromBase64String(privateKeyBase64);
+            return PrivateKeyFactory.CreateKey(keyBytes);
         }
 
         /// <summary>

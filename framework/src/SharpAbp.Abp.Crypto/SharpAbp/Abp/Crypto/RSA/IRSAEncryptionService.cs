@@ -1,4 +1,4 @@
-﻿using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Security;
 using System;
 
@@ -34,6 +34,27 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="privateKeyPem"></param>
         /// <returns></returns>
         AsymmetricKeyParameter ImportPrivateKeyPkcs8Pem(string privateKeyPem);
+
+        /// <summary>
+        /// Imports an RSA public key from a Base64 encoded DER format string.
+        /// </summary>
+        /// <param name="publicKeyBase64">The Base64 encoded DER format public key string.</param>
+        /// <returns>An <see cref="AsymmetricKeyParameter"/> representing the public key.</returns>
+        AsymmetricKeyParameter ImportPublicKey(string publicKeyBase64);
+
+        /// <summary>
+        /// Imports an RSA private key from a Base64 encoded DER format string (PKCS#1 format).
+        /// </summary>
+        /// <param name="privateKeyBase64">The Base64 encoded DER format private key string.</param>
+        /// <returns>An <see cref="AsymmetricKeyParameter"/> representing the private key.</returns>
+        AsymmetricKeyParameter ImportPrivateKey(string privateKeyBase64);
+
+        /// <summary>
+        /// Imports an RSA private key from a Base64 encoded DER format string (PKCS#8 format).
+        /// </summary>
+        /// <param name="privateKeyBase64">The Base64 encoded DER format private key string.</param>
+        /// <returns>An <see cref="AsymmetricKeyParameter"/> representing the private key.</returns>
+        AsymmetricKeyParameter ImportPrivateKeyPkcs8(string privateKeyBase64);
 
         /// <summary>
         ///  RSA encrypts data.

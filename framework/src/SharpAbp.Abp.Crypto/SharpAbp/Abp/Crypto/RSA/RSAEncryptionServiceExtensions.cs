@@ -1,4 +1,4 @@
-﻿using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Utilities.Encoders;
 using System.IO;
 using System.Text;
@@ -166,6 +166,97 @@ namespace SharpAbp.Abp.Crypto.RSA
         public static bool VerifySignFromPem(this IRSAEncryptionService rsaEncryptionService, string publicKeyPem, string data, string signature, string algorithm = "SHA256WITHRSA", Encoding? encoding = null)
         {
             var publicKeyParam = rsaEncryptionService.ImportPublicKeyPem(publicKeyPem);
+            return rsaEncryptionService.VerifySign(publicKeyParam, data, signature, algorithm, encoding);
+        }
+
+        /// <summary>
+        /// Encrypts a string using RSA with a Base64 encoded public key (DER format) and returns the result as a Base64 string.
+        /// </summary>
+        /// <param name="rsaEncryptionService">The RSA encryption service instance.</param>
+        /// <param name="publicKeyBase64">The Base64 encoded string containing the public key in DER format.</param>
+        /// <param name="plainText">The plain text string to encrypt.</param>
+        /// <param name="encoding">The encoding to use for the plain text. Defaults to UTF8.</param>
+        /// <param name="padding">The padding scheme to use (e.g., "PKCS1Padding", "OAEPPadding").</param>
+        /// <returns>The encrypted data as a Base64 string.</returns>
+        public static string EncryptFromBase64(this IRSAEncryptionService rsaEncryptionService, string publicKeyBase64, string plainText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
+        {
+            var publicKeyParam = rsaEncryptionService.ImportPublicKey(publicKeyBase64);
+            return rsaEncryptionService.Encrypt(publicKeyParam, plainText, encoding, padding);
+        }
+
+        /// <summary>
+        /// Decrypts a Base64 encoded string using RSA with a Base64 encoded private key (PKCS#1 DER format) and returns the result as a string.
+        /// </summary>
+        /// <param name="rsaEncryptionService">The RSA encryption service instance.</param>
+        /// <param name="privateKeyBase64">The Base64 encoded string containing the private key in PKCS#1 DER format.</param>
+        /// <param name="cipherText">The Base64 encoded encrypted data.</param>
+        /// <param name="encoding">The encoding to use for the decrypted text. Defaults to UTF8.</param>
+        /// <param name="padding">The padding scheme used during encryption (e.g., "PKCS1Padding", "OAEPPadding").</param>
+        /// <returns>The decrypted data as a string.</returns>
+        public static string DecryptFromBase64(this IRSAEncryptionService rsaEncryptionService, string privateKeyBase64, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
+        {
+            var privateKeyParam = rsaEncryptionService.ImportPrivateKey(privateKeyBase64);
+            return rsaEncryptionService.Decrypt(privateKeyParam, cipherText, encoding, padding);
+        }
+
+        /// <summary>
+        /// Decrypts a Base64 encoded string using RSA with a Base64 encoded private key (PKCS#8 DER format) and returns the result as a string.
+        /// </summary>
+        /// <param name="rsaEncryptionService">The RSA encryption service instance.</param>
+        /// <param name="privateKeyBase64">The Base64 encoded string containing the private key in PKCS#8 DER format.</param>
+        /// <param name="cipherText">The Base64 encoded encrypted data.</param>
+        /// <param name="encoding">The encoding to use for the decrypted text. Defaults to UTF8.</param>
+        /// <param name="padding">The padding scheme used during encryption (e.g., "PKCS1Padding", "OAEPPadding").</param>
+        /// <returns>The decrypted data as a string.</returns>
+        public static string DecryptFromPkcs8Base64(this IRSAEncryptionService rsaEncryptionService, string privateKeyBase64, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
+        {
+            var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPkcs8(privateKeyBase64);
+            return rsaEncryptionService.Decrypt(privateKeyParam, cipherText, encoding, padding);
+        }
+
+        /// <summary>
+        /// Signs a string using RSA with a Base64 encoded private key (PKCS#1 DER format) and returns the signature as a Base64 string.
+        /// </summary>
+        /// <param name="rsaEncryptionService">The RSA encryption service instance.</param>
+        /// <param name="privateKeyBase64">The Base64 encoded string containing the private key in PKCS#1 DER format.</param>
+        /// <param name="data">The data string to sign.</param>
+        /// <param name="algorithm">The signing algorithm (e.g., "SHA256WITHRSA", "SHA1WITHRSA"). Default is "SHA256WITHRSA".</param>
+        /// <param name="encoding">The encoding to use for the data. Defaults to UTF8.</param>
+        /// <returns>The signature as a Base64 string.</returns>
+        public static string SignFromBase64(this IRSAEncryptionService rsaEncryptionService, string privateKeyBase64, string data, string algorithm = "SHA256WITHRSA", Encoding? encoding = null)
+        {
+            var privateKeyParam = rsaEncryptionService.ImportPrivateKey(privateKeyBase64);
+            return rsaEncryptionService.Sign(privateKeyParam, data, algorithm, encoding);
+        }
+
+        /// <summary>
+        /// Signs a string using RSA with a Base64 encoded private key (PKCS#8 DER format) and returns the signature as a Base64 string.
+        /// </summary>
+        /// <param name="rsaEncryptionService">The RSA encryption service instance.</param>
+        /// <param name="privateKeyBase64">The Base64 encoded string containing the private key in PKCS#8 DER format.</param>
+        /// <param name="data">The data string to sign.</param>
+        /// <param name="algorithm">The signing algorithm (e.g., "SHA256WITHRSA", "SHA1WITHRSA"). Default is "SHA256WITHRSA".</param>
+        /// <param name="encoding">The encoding to use for the data. Defaults to UTF8.</param>
+        /// <returns>The signature as a Base64 string.</returns>
+        public static string SignFromPkcs8Base64(this IRSAEncryptionService rsaEncryptionService, string privateKeyBase64, string data, string algorithm = "SHA256WITHRSA", Encoding? encoding = null)
+        {
+            var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPkcs8(privateKeyBase64);
+            return rsaEncryptionService.Sign(privateKeyParam, data, algorithm, encoding);
+        }
+
+        /// <summary>
+        /// Verifies a Base64 encoded signature using RSA with a Base64 encoded public key (DER format).
+        /// </summary>
+        /// <param name="rsaEncryptionService">The RSA encryption service instance.</param>
+        /// <param name="publicKeyBase64">The Base64 encoded string containing the public key in DER format.</param>
+        /// <param name="data">The original data string that was signed.</param>
+        /// <param name="signature">The Base64 encoded signature to verify.</param>
+        /// <param name="algorithm">The signing algorithm used (e.g., "SHA256WITHRSA", "SHA1WITHRSA"). Default is "SHA256WITHRSA".</param>
+        /// <param name="encoding">The encoding to use for the data. Defaults to UTF8.</param>
+        /// <returns>True if the signature is valid, false otherwise.</returns>
+        public static bool VerifySignFromBase64(this IRSAEncryptionService rsaEncryptionService, string publicKeyBase64, string data, string signature, string algorithm = "SHA256WITHRSA", Encoding? encoding = null)
+        {
+            var publicKeyParam = rsaEncryptionService.ImportPublicKey(publicKeyBase64);
             return rsaEncryptionService.VerifySign(publicKeyParam, data, signature, algorithm, encoding);
         }
     }

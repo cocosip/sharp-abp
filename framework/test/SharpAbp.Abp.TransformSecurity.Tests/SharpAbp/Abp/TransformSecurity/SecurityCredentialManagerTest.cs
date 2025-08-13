@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.Crypto.RSA;
 using System;
+using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Timing;
@@ -58,8 +59,10 @@ namespace SharpAbp.Abp.TransformSecurity
             var credential = await _securityCredentialManager.GenerateAsync(bizType);
 
             // Assert - Test encryption/decryption functionality
-            var cipherText = _rsaEncryptionService.Encrypt(credential.PublicKey!, testMessage);
-            var plainText = _rsaEncryptionService.Decrypt(credential.PrivateKey!, cipherText);
+            var publicKeyParam = _rsaEncryptionService.ImportPublicKey(credential.PublicKey!);
+            var privateKeyParam = _rsaEncryptionService.ImportPrivateKey(credential.PrivateKey!);
+            var cipherText = _rsaEncryptionService.Encrypt(publicKeyParam, Encoding.UTF8.GetBytes(testMessage), "PKCS1Padding");
+            var plainText = Encoding.UTF8.GetString(_rsaEncryptionService.Decrypt(privateKeyParam, cipherText, "PKCS1Padding"));
             Assert.Equal(testMessage, plainText);
         }
 

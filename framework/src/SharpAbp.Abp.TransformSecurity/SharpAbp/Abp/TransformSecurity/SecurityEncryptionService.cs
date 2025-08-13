@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using SharpAbp.Abp.Crypto.RSA;
 using SharpAbp.Abp.Crypto.SM2;
 using System.Text;
@@ -8,6 +8,7 @@ using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Guids;
 using Volo.Abp.Timing;
+using static SharpAbp.Abp.Crypto.RSA.RSAPaddingNames;
 
 namespace SharpAbp.Abp.TransformSecurity
 {
@@ -41,39 +42,6 @@ namespace SharpAbp.Abp.TransformSecurity
             Sm2EncryptionService = sm2EncryptionService;
         }
 
-        //public virtual async Task<SecurityCredential> GenerateAsync(string bizType, CancellationToken cancellationToken = default)
-        //{
-        //    var credential = new SecurityCredential()
-        //    {
-        //        Identifier = GuidGenerator.Create().ToString("N"),
-        //        BizType = bizType,
-        //        Expires = Clock.Now.Add(Options.Expires),
-        //        CreationTime = Clock.Now,
-        //    };
-
-        //    if (Options.EncryptionAlgo == AbpTransformSecurityNames.RSA)
-        //    {
-        //        credential.KeyType = AbpTransformSecurityNames.RSA;
-        //        var keyPair = RSAEncryptionService.GenerateRSAKeyPair(RSAOptions.KeySize);
-        //        credential.PublicKey = RSAExtensions.ExportPublicKey(keyPair.Public);
-        //        credential.PrivateKey = RSAExtensions.ExportPrivateKey(keyPair.Private);
-        //        credential.SetRSAKeySize(RSAOptions.KeySize);
-        //        credential.SetRSAPadding(RSAOptions.Padding);
-        //    }
-        //    else if (Options.EncryptionAlgo == AbpTransformSecurityNames.SM2)
-        //    {
-        //        credential.KeyType = AbpTransformSecurityNames.SM2;
-        //        var keyPair = Sm2EncryptionService.GenerateSm2KeyPair(SM2Options.Curve);
-        //        credential.PublicKey = Sm2Extensions.ExportPublicKey(keyPair.Public);
-        //        credential.PrivateKey = Sm2Extensions.ExportPrivateKey(keyPair.Private);
-        //        credential.SetSM2Curve(SM2Options.Curve);
-        //        credential.SetSM2Mode(SM2Options.Mode);
-        //    }
-
-        //    await SecurityCredentialStore.SetAsync(credential);
-        //    return credential;
-        //}
-
         public virtual async Task<SecurityCredentialValidateResult> ValidateAsync(string identifier, CancellationToken cancellationToken = default)
         {
             var result = new SecurityCredentialValidateResult();
@@ -101,13 +69,11 @@ namespace SharpAbp.Abp.TransformSecurity
             }
             if (credential.IsRSA())
             {
-                var rsaParam = RSAEncryptionService.ImportPublicKey(credential.PublicKey!);
-                return RSAEncryptionService.Encrypt(rsaParam, plainText, Encoding.UTF8, RSAOptions.Padding);
-
+                return RSAEncryptionService.EncryptFromBase64(credential.PublicKey!, plainText, Encoding.UTF8, credential.GetRSAPadding() ?? None);
             }
             else if (credential.IsSM2())
             {
-                return Sm2EncryptionService.Encrypt(credential.PublicKey!, plainText, "utf-8", SM2Options.Curve, SM2Options.Mode);
+                return Sm2EncryptionService.Encrypt(credential.PublicKey!, plainText, Encoding.UTF8, SM2Options.Curve, SM2Options.Mode);
             }
             else
             {
@@ -124,12 +90,11 @@ namespace SharpAbp.Abp.TransformSecurity
             }
             if (credential.IsRSA())
             {
-                var rsaParam = RSAEncryptionService.ImportPrivateKey(credential.PrivateKey!);
-                return RSAEncryptionService.Decrypt(rsaParam, cipherText, Encoding.UTF8, RSAOptions.Padding);
+                return RSAEncryptionService.DecryptFromBase64(credential.PrivateKey!, cipherText, Encoding.UTF8, credential.GetRSAPadding() ?? None);
             }
             else if (credential.IsSM2())
             {
-                return Sm2EncryptionService.Decrypt(credential.PrivateKey!, cipherText, "utf-8", SM2Options.Curve, SM2Options.Mode);
+                return Sm2EncryptionService.Decrypt(credential.PrivateKey!, cipherText, Encoding.UTF8, SM2Options.Curve, SM2Options.Mode);
             }
             else
             {
