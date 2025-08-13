@@ -13,6 +13,9 @@ using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace SharpAbp.Abp.Crypto.SM2
 {
+    /// <summary>
+    /// Provides SM2 encryption, decryption, signing, and verification services.
+    /// </summary>
     public class Sm2EncryptionService : ISm2EncryptionService, ITransientDependency
     {
         protected AbpSm2EncryptionOptions Options { get; }
@@ -23,17 +26,17 @@ namespace SharpAbp.Abp.Crypto.SM2
         }
 
         /// <summary>
-        /// 生成SM2密钥对
+        /// Generates an SM2 key pair.
         /// </summary>
-        /// <param name="curve">曲率名称,默认使用:Sm2p256v1</param>
-        /// <param name="rd">随机数</param>
-        /// <returns></returns>
+        /// <param name="curve">The curve name to use, defaults to Sm2p256v1.</param>
+        /// <param name="rd">Optional: A secure random number generator. If null, a new one will be created.</param>
+        /// <returns>An <see cref="AsymmetricCipherKeyPair"/> containing the public and private keys.</returns>
         public virtual AsymmetricCipherKeyPair GenerateSm2KeyPair(
             string curve = Sm2EncryptionNames.CurveSm2p256v1,
             SecureRandom? rd = null)
         {
             rd ??= new SecureRandom();
-            if (curve.IsNullOrWhiteSpace())
+            if (string.IsNullOrWhiteSpace(curve))
             {
                 curve = Options.DefaultCurve!;
             }
@@ -44,20 +47,20 @@ namespace SharpAbp.Abp.Crypto.SM2
         }
 
         /// <summary>
-        /// 使用公钥进行加密
+        /// Encrypts data using the SM2 public key.
         /// </summary>
-        /// <param name="publicKey">公钥</param>
-        /// <param name="plainText">明文</param>
-        /// <param name="curve">曲率名称</param>
-        /// <param name="mode">加密模式,默认使用:C1C2C3</param>
-        /// <returns></returns>
+        /// <param name="publicKey">The public key as a byte array.</param>
+        /// <param name="plainText">The plain text data to encrypt.</param>
+        /// <param name="curve">The curve name used for encryption. Defaults to Sm2p256v1.</param>
+        /// <param name="mode">The encryption mode. Defaults to C1C2C3.</param>
+        /// <returns>The encrypted data as a byte array.</returns>
         public virtual byte[] Encrypt(
             byte[] publicKey,
             byte[] plainText,
             string curve = Sm2EncryptionNames.CurveSm2p256v1,
             Mode mode = Mode.C1C2C3)
         {
-            if (curve.IsNullOrWhiteSpace())
+            if (string.IsNullOrWhiteSpace(curve))
             {
                 curve = Options.DefaultCurve!;
             }
@@ -71,20 +74,20 @@ namespace SharpAbp.Abp.Crypto.SM2
         }
 
         /// <summary>
-        /// 使用私钥进行解密
+        /// Decrypts data using the SM2 private key.
         /// </summary>
-        /// <param name="privateKey">私钥</param>
-        /// <param name="cipherText">密文</param>
-        /// <param name="curve">曲率名称</param>
-        /// <param name="mode">加密模式</param>
-        /// <returns></returns>
+        /// <param name="privateKey">The private key as a byte array.</param>
+        /// <param name="cipherText">The encrypted data to decrypt.</param>
+        /// <param name="curve">The curve name used for decryption. Defaults to Sm2p256v1.</param>
+        /// <param name="mode">The encryption mode. Defaults to C1C2C3.</param>
+        /// <returns>The decrypted data as a byte array.</returns>
         public virtual byte[] Decrypt(
             byte[] privateKey,
             byte[] cipherText,
             string curve = Sm2EncryptionNames.CurveSm2p256v1,
             Mode mode = Mode.C1C2C3)
         {
-            if (curve.IsNullOrWhiteSpace())
+            if (string.IsNullOrWhiteSpace(curve))
             {
                 curve = Options.DefaultCurve!;
             }
@@ -99,20 +102,20 @@ namespace SharpAbp.Abp.Crypto.SM2
         }
 
         /// <summary>
-        /// 使用私钥进行加签
+        /// Signs data using the SM2 private key.
         /// </summary>
-        /// <param name="privateKey">私钥</param>
-        /// <param name="plainText">明文</param>
-        /// <param name="curve">曲率名称</param>
-        /// <param name="id">id</param>
-        /// <returns></returns>
+        /// <param name="privateKey">The private key as a byte array.</param>
+        /// <param name="plainText">The plain text data to sign.</param>
+        /// <param name="curve">The curve name used for signing. Defaults to Sm2p256v1.</param>
+        /// <param name="id">Optional: The ID to use for signing. If null, a default ID will be used.</param>
+        /// <returns>The signature as a byte array.</returns>
         public virtual byte[] Sign(
             byte[] privateKey,
             byte[] plainText,
             string curve = Sm2EncryptionNames.CurveSm2p256v1,
             byte[]? id = null)
         {
-            if (curve.IsNullOrWhiteSpace())
+            if (string.IsNullOrWhiteSpace(curve))
             {
                 curve = Options.DefaultCurve!;
             }
@@ -131,14 +134,14 @@ namespace SharpAbp.Abp.Crypto.SM2
         }
 
         /// <summary>
-        /// 使用公钥进行验签
+        /// Verifies a signature using the SM2 public key.
         /// </summary>
-        /// <param name="publicKey">公钥</param>
-        /// <param name="plainText">明文</param>
-        /// <param name="signature">签名数据</param>
-        /// <param name="curve">曲率名称</param>
-        /// <param name="id">id</param>
-        /// <returns></returns>
+        /// <param name="publicKey">The public key as a byte array.</param>
+        /// <param name="plainText">The original plain text data.</param>
+        /// <param name="signature">The signature to verify.</param>
+        /// <param name="curve">The curve name used for verification. Defaults to Sm2p256v1.</param>
+        /// <param name="id">Optional: The ID used during signing. If null, a default ID will be used.</param>
+        /// <returns>True if the signature is valid, false otherwise.</returns>
         public virtual bool VerifySign(
             byte[] publicKey,
             byte[] plainText,
@@ -146,7 +149,7 @@ namespace SharpAbp.Abp.Crypto.SM2
             string curve = Sm2EncryptionNames.CurveSm2p256v1,
             byte[]? id = null)
         {
-            if (curve.IsNullOrWhiteSpace())
+            if (string.IsNullOrWhiteSpace(curve))
             {
                 curve = Options.DefaultCurve!;
             }
@@ -156,7 +159,7 @@ namespace SharpAbp.Abp.Crypto.SM2
             var signer = new SM2Signer();
 
             ICipherParameters cp = id != null
-                ? new ParametersWithID(new ParametersWithRandom(p), id)
+                ? new ParametersWithID(p, id)
                 : p;
             signer.Init(false, cp);
             signer.BlockUpdate(plainText, 0, plainText.Length);
@@ -164,16 +167,16 @@ namespace SharpAbp.Abp.Crypto.SM2
         }
 
         /// <summary>
-        ///  将C1C22C3编码转换成C1C3C2编码
+        /// Converts C1C2C3 encoded ciphertext to C1C3C2 encoded ciphertext.
         /// </summary>
-        /// <param name="c1c2c3">C1C2C3</param>
-        /// <param name="curve">曲率名称</param>
-        /// <returns></returns>
+        /// <param name="c1c2c3">The C1C2C3 encoded ciphertext.</param>
+        /// <param name="curve">The curve name used for encryption. Defaults to Sm2p256v1.</param>
+        /// <returns>The C1C3C2 encoded ciphertext.</returns>
         public virtual byte[] C123ToC132(
             byte[] c1c2c3,
             string curve = Sm2EncryptionNames.CurveSm2p256v1)
         {
-            if (curve.IsNullOrWhiteSpace())
+            if (string.IsNullOrWhiteSpace(curve))
             {
                 curve = Options.DefaultCurve!;
             }
@@ -189,14 +192,14 @@ namespace SharpAbp.Abp.Crypto.SM2
         }
 
         /// <summary>
-        /// 将C1C3C2编码转换成C1C2C3
+        /// Converts C1C3C2 encoded ciphertext to C1C2C3 encoded ciphertext.
         /// </summary>
-        /// <param name="c1c3c2">C1C3C2</param>
-        /// <param name="curve">曲率名称</param>
-        /// <returns></returns>
+        /// <param name="c1c3c2">The C1C3C2 encoded ciphertext.</param>
+        /// <param name="curve">The curve name used for encryption. Defaults to Sm2p256v1.</param>
+        /// <returns>The C1C2C3 encoded ciphertext.</returns>
         public virtual byte[] C132ToC123(byte[] c1c3c2, string curve = Sm2EncryptionNames.CurveSm2p256v1)
         {
-            if (curve.IsNullOrWhiteSpace())
+            if (string.IsNullOrWhiteSpace(curve))
             {
                 curve = Options.DefaultCurve!;
             }

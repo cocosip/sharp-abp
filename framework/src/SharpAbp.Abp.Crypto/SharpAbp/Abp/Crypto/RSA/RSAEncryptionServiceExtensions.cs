@@ -5,84 +5,20 @@ using System.Text;
 
 namespace SharpAbp.Abp.Crypto.RSA
 {
+    /// <summary>
+    /// Provides extension methods for <see cref="IRSAEncryptionService"/>.
+    /// </summary>
     public static class RSAEncryptionServiceExtensions
     {
         /// <summary>
-        /// 从公钥二进制中导入RSA公钥 (原始RSA公钥为Asn1,DER格式)
+        /// Encrypts a string using RSA and returns the result as a Base64 string.
         /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="publicKeyBytes"></param>
-        /// <returns></returns>
-        public static AsymmetricKeyParameter ImportPublicKey(this IRSAEncryptionService rsaEncryptionService, byte[] publicKeyBytes)
-        {
-            return rsaEncryptionService.ImportPublicKey(new MemoryStream(publicKeyBytes));
-        }
-
-        /// <summary>
-        /// 从公钥字符串中导入RSA公钥 (原始RSA公钥为Asn1,DER格式)
-        /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="publicKey"></param>
-        /// <returns></returns>
-        public static AsymmetricKeyParameter ImportPublicKey(this IRSAEncryptionService rsaEncryptionService, string publicKey)
-        {
-            return rsaEncryptionService.ImportPublicKey(Base64.Decode(publicKey));
-        }
-
-        /// <summary>
-        /// 从私钥二进制中导入RSA私钥 (原始RSA私钥为Asn1,DER格式)
-        /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="privateKeyBytes"></param>
-        /// <returns></returns>
-        public static AsymmetricKeyParameter ImportPrivateKey(this IRSAEncryptionService rsaEncryptionService, byte[] privateKeyBytes)
-        {
-            return rsaEncryptionService.ImportPrivateKey(new MemoryStream(privateKeyBytes));
-        }
-
-        /// <summary>
-        /// 从私钥字符串中导入RSA私钥 (原始RSA私钥为Asn1,DER格式)
-        /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="privateKey"></param>
-        /// <returns></returns>
-        public static AsymmetricKeyParameter ImportPrivateKey(this IRSAEncryptionService rsaEncryptionService, string privateKey)
-        {
-            return rsaEncryptionService.ImportPrivateKey(Base64.Decode(privateKey));
-        }
-
-
-        /// <summary>
-        /// 从私钥二进制中导入PKCS8格式RSA私钥
-        /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="privateKeyBytes"></param>
-        /// <returns></returns>
-        public static AsymmetricKeyParameter ImportPrivateKeyPkcs8(this IRSAEncryptionService rsaEncryptionService, byte[] privateKeyBytes)
-        {
-            return rsaEncryptionService.ImportPrivateKeyPkcs8(new MemoryStream(privateKeyBytes));
-        }
-
-        /// <summary>
-        /// 从私钥字符串中导入PKCS8格式RSA私钥
-        /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="privateKey"></param>
-        /// <returns></returns>
-        public static AsymmetricKeyParameter ImportPrivateKeyPkcs8(this IRSAEncryptionService rsaEncryptionService, string privateKey)
-        {
-            return rsaEncryptionService.ImportPrivateKeyPkcs8(Base64.Decode(privateKey));
-        }
-
-        /// <summary>
-        /// RSA加密为Base64字符串
-        /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="publicKeyParam"></param>
-        /// <param name="plainText"></param>
-        /// <param name="encoding"></param>
-        /// <param name="padding"></param>
-        /// <returns></returns>
+        /// <param name="rsaEncryptionService">The RSA encryption service instance.</param>
+        /// <param name="publicKeyParam">The RSA public key parameter.</param>
+        /// <param name="plainText">The plain text string to encrypt.</param>
+        /// <param name="encoding">The encoding to use for the plain text. Defaults to UTF8.</param>
+        /// <param name="padding">The padding scheme to use (e.g., "PKCS1Padding", "OAEPPadding").</param>
+        /// <returns>The encrypted data as a Base64 string.</returns>
         public static string Encrypt(this IRSAEncryptionService rsaEncryptionService, AsymmetricKeyParameter publicKeyParam, string plainText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
         {
             encoding ??= Encoding.UTF8;
@@ -91,30 +27,14 @@ namespace SharpAbp.Abp.Crypto.RSA
         }
 
         /// <summary>
-        /// RSA加密为Base64字符串
+        /// Encrypts a string using RSA with a public key PEM string and returns the result as a Base64 string.
         /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="publicKey"></param>
-        /// <param name="plainText"></param>
-        /// <param name="encoding"></param>
-        /// <param name="padding"></param>
-        /// <returns></returns>
-        public static string Encrypt(this IRSAEncryptionService rsaEncryptionService, string publicKey, string plainText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
-        {
-            var publicKeyParam = rsaEncryptionService.ImportPublicKey(publicKey);
-            return rsaEncryptionService.Encrypt(publicKeyParam, plainText, encoding, padding);
-        }
-
-
-        /// <summary>
-        ///  Pem格式RSA公钥进行加密为Base64字符串
-        /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="publicKeyPem"></param>
-        /// <param name="plainText"></param>
-        /// <param name="encoding"></param>
-        /// <param name="padding"></param>
-        /// <returns></returns>
+        /// <param name="rsaEncryptionService">The RSA encryption service instance.</param>
+        /// <param name="publicKeyPem">The PEM formatted string containing the public key.</param>
+        /// <param name="plainText">The plain text string to encrypt.</param>
+        /// <param name="encoding">The encoding to use for the plain text. Defaults to UTF8.</param>
+        /// <param name="padding">The padding scheme to use (e.g., "PKCS1Padding", "OAEPPadding").</param>
+        /// <returns>The encrypted data as a Base64 string.</returns>
         public static string EncryptFromPem(this IRSAEncryptionService rsaEncryptionService, string publicKeyPem, string plainText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
         {
             var publicKeyParam = rsaEncryptionService.ImportPublicKeyPem(publicKeyPem);
@@ -122,14 +42,14 @@ namespace SharpAbp.Abp.Crypto.RSA
         }
 
         /// <summary>
-        /// RSA从Base64加密字符串中解密
+        /// Decrypts a Base64 encoded string using RSA and returns the result as a string.
         /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="privateKeyParam"></param>
-        /// <param name="cipherText"></param>
-        /// <param name="encoding"></param>
-        /// <param name="padding"></param>
-        /// <returns></returns>
+        /// <param name="rsaEncryptionService">The RSA encryption service instance.</param>
+        /// <param name="privateKeyParam">The RSA private key parameter.</param>
+        /// <param name="cipherText">The Base64 encoded encrypted data.</param>
+        /// <param name="encoding">The encoding to use for the decrypted text. Defaults to UTF8.</param>
+        /// <param name="padding">The padding scheme used during encryption (e.g., "PKCS1Padding", "OAEPPadding").</param>
+        /// <returns>The decrypted data as a string.</returns>
         public static string Decrypt(this IRSAEncryptionService rsaEncryptionService, AsymmetricKeyParameter privateKeyParam, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
         {
             encoding ??= Encoding.UTF8;
@@ -139,44 +59,14 @@ namespace SharpAbp.Abp.Crypto.RSA
         }
 
         /// <summary>
-        /// RSA从Base64加密字符串中解密
+        /// Decrypts a Base64 encoded string using RSA with a private key PEM string and returns the result as a string.
         /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="privateKey"></param>
-        /// <param name="cipherText"></param>
-        /// <param name="encoding"></param>
-        /// <param name="padding"></param>
-        /// <returns></returns>
-        public static string Decrypt(this IRSAEncryptionService rsaEncryptionService, string privateKey, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
-        {
-            var privateKeyParam = rsaEncryptionService.ImportPrivateKey(privateKey);
-            return rsaEncryptionService.Decrypt(privateKeyParam, cipherText, encoding, padding);
-        }
-
-        /// <summary>
-        /// RSA使用PKCS8私钥从Base64加密字符串中解密
-        /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="privateKey"></param>
-        /// <param name="cipherText"></param>
-        /// <param name="encoding"></param>
-        /// <param name="padding"></param>
-        /// <returns></returns>
-        public static string DecryptFromPkcs8(this IRSAEncryptionService rsaEncryptionService, string privateKey, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
-        {
-            var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPkcs8(privateKey);
-            return rsaEncryptionService.Decrypt(privateKeyParam, cipherText, encoding, padding);
-        }
-
-        /// <summary>
-        /// RSA使用Pem私钥从Base64加密字符串中解密
-        /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="privateKeyPem"></param>
-        /// <param name="cipherText"></param>
-        /// <param name="encoding"></param>
-        /// <param name="padding"></param>
-        /// <returns></returns>
+        /// <param name="rsaEncryptionService">The RSA encryption service instance.</param>
+        /// <param name="privateKeyPem">The PEM formatted string containing the private key.</param>
+        /// <param name="cipherText">The Base64 encoded encrypted data.</param>
+        /// <param name="encoding">The encoding to use for the decrypted text. Defaults to UTF8.</param>
+        /// <param name="padding">The padding scheme used during encryption (e.g., "PKCS1Padding", "OAEPPadding").</param>
+        /// <returns>The decrypted data as a string.</returns>
         public static string DecryptFromPem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
         {
             var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPem(privateKeyPem);
@@ -184,14 +74,14 @@ namespace SharpAbp.Abp.Crypto.RSA
         }
 
         /// <summary>
-        /// RSA使用PKCS8格式的Pem私钥从Base64加密字符串中解密
+        /// Decrypts a Base64 encoded string using RSA with a PKCS#8 private key PEM string and returns the result as a string.
         /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="privateKeyPem"></param>
-        /// <param name="cipherText"></param>
-        /// <param name="encoding"></param>
-        /// <param name="padding"></param>
-        /// <returns></returns>
+        /// <param name="rsaEncryptionService">The RSA encryption service instance.</param>
+        /// <param name="privateKeyPem">The PEM formatted string containing the PKCS#8 private key.</param>
+        /// <param name="cipherText">The Base64 encoded encrypted data.</param>
+        /// <param name="encoding">The encoding to use for the decrypted text. Defaults to UTF8.</param>
+        /// <param name="padding">The padding scheme used during encryption (e.g., "PKCS1Padding", "OAEPPadding").</param>
+        /// <returns>The decrypted data as a string.</returns>
         public static string DecryptFromPkcs8Pem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
         {
             var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPkcs8Pem(privateKeyPem);
@@ -199,14 +89,14 @@ namespace SharpAbp.Abp.Crypto.RSA
         }
 
         /// <summary>
-        /// RSA加签为Base64
+        /// Signs a string using RSA and returns the signature as a Base64 string.
         /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="privateKeyParam"></param>
-        /// <param name="data"></param>
-        /// <param name="algorithm">SHA1WITHRSA,SHA256WITHRSA,SHA384WITHRSA,SHA512WITHRSA</param>
-        /// <param name="encoding"></param>
-        /// <returns></returns>
+        /// <param name="rsaEncryptionService">The RSA encryption service instance.</param>
+        /// <param name="privateKeyParam">The RSA private key parameter.</param>
+        /// <param name="data">The data string to sign.</param>
+        /// <param name="algorithm">The signing algorithm (e.g., "SHA256WITHRSA", "SHA1WITHRSA"). Default is "SHA256WITHRSA".</param>
+        /// <param name="encoding">The encoding to use for the data. Defaults to UTF8.</param>
+        /// <returns>The signature as a Base64 string.</returns>
         public static string Sign(this IRSAEncryptionService rsaEncryptionService, AsymmetricKeyParameter privateKeyParam, string data, string algorithm = "SHA256WITHRSA", Encoding? encoding = null)
         {
             encoding ??= Encoding.UTF8;
@@ -216,29 +106,14 @@ namespace SharpAbp.Abp.Crypto.RSA
         }
 
         /// <summary>
-        /// RSA 使用字符串私钥加签为Base64
+        /// Signs a string using RSA with a private key PEM string and returns the signature as a Base64 string.
         /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="privateKey"></param>
-        /// <param name="data"></param>
-        /// <param name="algorithm"></param>
-        /// <param name="encoding"></param>
-        /// <returns></returns>
-        public static string Sign(this IRSAEncryptionService rsaEncryptionService, string privateKey, string data, string algorithm = "SHA256WITHRSA", Encoding? encoding = null)
-        {
-            var privateKeyParam = rsaEncryptionService.ImportPrivateKey(privateKey);
-            return rsaEncryptionService.Sign(privateKeyParam, data, algorithm, encoding);
-        }
-
-        /// <summary>
-        /// RSA使用Pem私钥加签为Base64
-        /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="privateKeyPem"></param>
-        /// <param name="data"></param>
-        /// <param name="algorithm"></param>
-        /// <param name="encoding"></param>
-        /// <returns></returns>
+        /// <param name="rsaEncryptionService">The RSA encryption service instance.</param>
+        /// <param name="privateKeyPem">The PEM formatted string containing the private key.</param>
+        /// <param name="data">The data string to sign.</param>
+        /// <param name="algorithm">The signing algorithm (e.g., "SHA256WITHRSA", "SHA1WITHRSA"). Default is "SHA256WITHRSA".</param>
+        /// <param name="encoding">The encoding to use for the data. Defaults to UTF8.</param>
+        /// <returns>The signature as a Base64 string.</returns>
         public static string SignFromPem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string data, string algorithm = "SHA256WITHRSA", Encoding? encoding = null)
         {
             var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPem(privateKeyPem);
@@ -246,29 +121,14 @@ namespace SharpAbp.Abp.Crypto.RSA
         }
 
         /// <summary>
-        /// RSA使用PKCS8格式私钥加签为Base64
+        /// Signs a string using RSA with a PKCS#8 private key PEM string and returns the signature as a Base64 string.
         /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="privateKey"></param>
-        /// <param name="data"></param>
-        /// <param name="algorithm"></param>
-        /// <param name="encoding"></param>
-        /// <returns></returns>
-        public static string SignFromPkcs8(this IRSAEncryptionService rsaEncryptionService, string privateKey, string data, string algorithm = "SHA256WITHRSA", Encoding? encoding = null)
-        {
-            var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPkcs8(privateKey);
-            return rsaEncryptionService.Sign(privateKeyParam, data, algorithm, encoding);
-        }
-
-        /// <summary>
-        /// RSA使用PKCS8格式Pem私钥加签为Base64
-        /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="privateKeyPem"></param>
-        /// <param name="data"></param>
-        /// <param name="algorithm"></param>
-        /// <param name="encoding"></param>
-        /// <returns></returns>
+        /// <param name="rsaEncryptionService">The RSA encryption service instance.</param>
+        /// <param name="privateKeyPem">The PEM formatted string containing the PKCS#8 private key.</param>
+        /// <param name="data">The data string to sign.</param>
+        /// <param name="algorithm">The signing algorithm (e.g., "SHA256WITHRSA", "SHA1WITHRSA"). Default is "SHA256WITHRSA".</param>
+        /// <param name="encoding">The encoding to use for the data. Defaults to UTF8.</param>
+        /// <returns>The signature as a Base64 string.</returns>
         public static string SignFromPkcs8Pem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string data, string algorithm = "SHA256WITHRSA", Encoding? encoding = null)
         {
             var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPkcs8Pem(privateKeyPem);
@@ -276,15 +136,15 @@ namespace SharpAbp.Abp.Crypto.RSA
         }
 
         /// <summary>
-        /// RSA从Base64签名中验签
+        /// Verifies a Base64 encoded signature using RSA.
         /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="publicKeyParam"></param>
-        /// <param name="data"></param>
-        /// <param name="signature"></param>
-        /// <param name="algorithm"></param>
-        /// <param name="encoding"></param>
-        /// <returns></returns>
+        /// <param name="rsaEncryptionService">The RSA encryption service instance.</param>
+        /// <param name="publicKeyParam">The RSA public key parameter.</param>
+        /// <param name="data">The original data string that was signed.</param>
+        /// <param name="signature">The Base64 encoded signature to verify.</param>
+        /// <param name="algorithm">The signing algorithm used (e.g., "SHA256WITHRSA", "SHA1WITHRSA"). Default is "SHA256WITHRSA".</param>
+        /// <param name="encoding">The encoding to use for the data. Defaults to UTF8.</param>
+        /// <returns>True if the signature is valid, false otherwise.</returns>
         public static bool VerifySign(this IRSAEncryptionService rsaEncryptionService, AsymmetricKeyParameter publicKeyParam, string data, string signature, string algorithm = "SHA256WITHRSA", Encoding? encoding = null)
         {
             encoding ??= Encoding.UTF8;
@@ -294,31 +154,15 @@ namespace SharpAbp.Abp.Crypto.RSA
         }
 
         /// <summary>
-        /// RSA从Base64签名中验签
+        /// Verifies a Base64 encoded signature using RSA with a public key PEM string.
         /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="publicKey"></param>
-        /// <param name="data"></param>
-        /// <param name="signature"></param>
-        /// <param name="algorithm"></param>
-        /// <param name="encoding"></param>
-        /// <returns></returns>
-        public static bool VerifySign(this IRSAEncryptionService rsaEncryptionService, string publicKey, string data, string signature, string algorithm = "SHA256WITHRSA", Encoding? encoding = null)
-        {
-            var publicKeyParam = rsaEncryptionService.ImportPublicKey(publicKey);
-            return rsaEncryptionService.VerifySign(publicKeyParam, data, signature, algorithm, encoding);
-        }
-
-        /// <summary>
-        /// RSA使用Pem公钥,从Base64签名中验签
-        /// </summary>
-        /// <param name="rsaEncryptionService"></param>
-        /// <param name="publicKeyPem"></param>
-        /// <param name="data"></param>
-        /// <param name="signature"></param>
-        /// <param name="algorithm"></param>
-        /// <param name="encoding"></param>
-        /// <returns></returns>
+        /// <param name="rsaEncryptionService">The RSA encryption service instance.</param>
+        /// <param name="publicKeyPem">The PEM formatted string containing the public key.</param>
+        /// <param name="data">The original data string that was signed.</param>
+        /// <param name="signature">The Base64 encoded signature to verify.</param>
+        /// <param name="algorithm">The signing algorithm used (e.g., "SHA256WITHRSA", "SHA1WITHRSA"). Default is "SHA256WITHRSA".</param>
+        /// <param name="encoding">The encoding to use for the data. Defaults to UTF8.</param>
+        /// <returns>True if the signature is valid, false otherwise.</returns>
         public static bool VerifySignFromPem(this IRSAEncryptionService rsaEncryptionService, string publicKeyPem, string data, string signature, string algorithm = "SHA256WITHRSA", Encoding? encoding = null)
         {
             var publicKeyParam = rsaEncryptionService.ImportPublicKeyPem(publicKeyPem);

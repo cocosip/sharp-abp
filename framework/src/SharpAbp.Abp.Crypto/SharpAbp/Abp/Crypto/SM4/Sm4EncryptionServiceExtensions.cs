@@ -3,66 +3,79 @@ using System.Text;
 
 namespace SharpAbp.Abp.Crypto.SM4
 {
+    /// <summary>
+    /// Provides extension methods for <see cref="ISm4EncryptionService"/>.
+    /// </summary>
     public static class Sm4EncryptionServiceExtensions
     {
         /// <summary>
-        /// 加密
+        /// Encrypts a string using SM4 and returns the result as a hexadecimal string.
         /// </summary>
-        /// <param name="sm4EncryptionService"></param>
-        /// <param name="plainText">明文</param>
-        /// <param name="key">密钥(十六进制)</param>
-        /// <param name="iv">IV向量(十六进制)</param>
-        /// <param name="mode">加密模式,ECB或CBC</param>
-        /// <param name="padding">填充模式,NoPadding,PKCS5Padding,PKCS7Padding</param>
-        /// <param name="codeName">编码方式,默认使用utf-8</param>
-        /// <returns></returns>
+        /// <param name="sm4EncryptionService">The SM4 encryption service instance.</param>
+        /// <param name="plainText">The plain text string to encrypt.</param>
+        /// <param name="keyHex">The encryption key as a hexadecimal string (16 bytes).</param>
+        /// <param name="ivHex">The Initialization Vector (IV) as a hexadecimal string (16 bytes for CBC mode).</param>
+        /// <param name="mode">The encryption mode (e.g., ECB, CBC). Defaults to the configured default mode.</param>
+        /// <param name="padding">The padding scheme (e.g., PKCS7Padding, NoPadding). Defaults to the configured default padding.</param>
+        /// <param name="encoding">The encoding to use for the plain text. Defaults to UTF8.</param>
+        /// <returns>The encrypted data as a hexadecimal string.</returns>
         public static string Encrypt(
             this ISm4EncryptionService sm4EncryptionService,
             string plainText,
-            string key,
-            string iv,
+            string keyHex,
+            string ivHex,
             string mode = "",
             string padding = "",
-            string codeName = "utf-8")
+            Encoding? encoding = null)
         {
-            var cipherText = sm4EncryptionService.Encrypt(
-                Encoding.GetEncoding(codeName).GetBytes(plainText),
-                Encoding.GetEncoding(codeName).GetBytes(key),
-                Encoding.GetEncoding(codeName).GetBytes(iv),
+            encoding ??= Encoding.UTF8;
+            var plainTextBytes = encoding.GetBytes(plainText);
+            var keyBytes = Hex.DecodeStrict(keyHex);
+            var ivBytes = Hex.DecodeStrict(ivHex);
+
+            var cipherTextBytes = sm4EncryptionService.Encrypt(
+                plainTextBytes,
+                keyBytes,
+                ivBytes,
                 mode,
                 padding);
 
-            return Hex.ToHexString(cipherText);
+            return Hex.ToHexString(cipherTextBytes);
         }
 
         /// <summary>
-        /// 解密
+        /// Decrypts a hexadecimal string using SM4 and returns the result as a string.
         /// </summary>
-        /// <param name="sm4EncryptionService"></param>
-        /// <param name="cipherText">密文</param>
-        /// <param name="key">密钥</param>
-        /// <param name="iv">IV向量</param>
-        /// <param name="mode">加密模式,ECB或CBC</param>
-        /// <param name="padding">填充模式,NoPadding,PKCS5Padding,PKCS7Padding</param>
-        /// <param name="codeName">编码方式,默认使用utf-8</param>
-        /// <returns></returns>
+        /// <param name="sm4EncryptionService">The SM4 encryption service instance.</param>
+        /// <param name="cipherTextHex">The encrypted data as a hexadecimal string.</param>
+        /// <param name="keyHex">The decryption key as a hexadecimal string (16 bytes).</param>
+        /// <param name="ivHex">The Initialization Vector (IV) as a hexadecimal string (16 bytes for CBC mode).</param>
+        /// <param name="mode">The decryption mode (e.g., ECB, CBC). Defaults to the configured default mode.</param>
+        /// <param name="padding">The padding scheme (e.g., PKCS7Padding, NoPadding). Defaults to the configured default padding.</param>
+        /// <param name="encoding">The encoding to use for the decrypted text. Defaults to UTF8.</param>
+        /// <returns>The decrypted data as a string.</returns>
         public static string Decrypt(
             this ISm4EncryptionService sm4EncryptionService,
-            string cipherText,
-            string key,
-            string iv,
+            string cipherTextHex,
+            string keyHex,
+            string ivHex,
             string mode = "",
             string padding = "",
-            string codeName = "utf-8")
+            Encoding? encoding = null)
         {
-            var buffer = sm4EncryptionService.Decrypt(
-                Hex.DecodeStrict(cipherText),
-                Encoding.GetEncoding(codeName).GetBytes(key),
-                Encoding.GetEncoding(codeName).GetBytes(iv),
+            encoding ??= Encoding.UTF8;
+            var cipherTextBytes = Hex.DecodeStrict(cipherTextHex);
+            var keyBytes = Hex.DecodeStrict(keyHex);
+            var ivBytes = Hex.DecodeStrict(ivHex);
+
+            var plainTextBytes = sm4EncryptionService.Decrypt(
+                cipherTextBytes,
+                keyBytes,
+                ivBytes,
                 mode,
                 padding);
 
-            return Encoding.GetEncoding(codeName).GetString(buffer);
+            return encoding.GetString(plainTextBytes);
         }
     }
 }

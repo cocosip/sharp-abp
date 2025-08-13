@@ -3,23 +3,27 @@ using System.Text;
 
 namespace SharpAbp.Abp.Crypto.SM3
 {
+    /// <summary>
+    /// Provides extension methods for <see cref="ISm3EncryptionService"/>.
+    /// </summary>
     public static class Sm3EncryptionServiceExtensions
     {
         /// <summary>
-        /// 使用SM3获取Hash
+        /// Computes the SM3 hash of a string and returns the result as a hexadecimal string.
         /// </summary>
-        /// <param name="sm3EncryptionService"></param>
-        /// <param name="plainText">明文</param>
-        /// <param name="codeName">编码,默认utf-8</param>
-        /// <returns></returns>
+        /// <param name="sm3EncryptionService">The SM3 encryption service instance.</param>
+        /// <param name="plainText">The plain text string to hash.</param>
+        /// <param name="encoding">The encoding to use for the plain text. Defaults to UTF8.</param>
+        /// <returns>The SM3 hash as a hexadecimal string.</returns>
         public static string GetHash(
             this ISm3EncryptionService sm3EncryptionService,
             string plainText,
-            string codeName = "utf-8")
+            Encoding? encoding = null)
         {
-            var buffer = Encoding.GetEncoding(codeName).GetBytes(plainText);
-            var v = sm3EncryptionService.GetHash(buffer);
-            return Hex.ToHexString(v);
+            encoding ??= Encoding.UTF8;
+            var buffer = encoding.GetBytes(plainText);
+            var hashBytes = sm3EncryptionService.GetHash(buffer);
+            return Hex.ToHexString(hashBytes);
         }
     }
 }
