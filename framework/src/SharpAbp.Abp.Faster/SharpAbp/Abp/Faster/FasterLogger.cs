@@ -15,9 +15,13 @@ using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.Faster
 {
+    /// <summary>
+    /// A high-performance logger implementation using FASTER for efficient logging operations.
+    /// </summary>
+    /// <typeparam name="T">The type of objects to be logged.</typeparam>
     public class FasterLogger<T> : IDisposable, IFasterLogger<T> where T : class
     {
-        private readonly SemaphoreSlim _commitSemaphore = new SemaphoreSlim(1, 1); // 异步锁
+        private readonly SemaphoreSlim _commitSemaphore = new SemaphoreSlim(1, 1);
         private long _completedUntilAddress = -1L;
         private long _truncateUntilAddress = -1L;
         private bool _initialized = false;
@@ -31,10 +35,26 @@ namespace SharpAbp.Abp.Faster
         protected ICancellationTokenProvider CancellationTokenProvider { get; }
         protected FasterLog? Log { get; set; }
         protected FasterLogScanIterator? Iter { get; set; }
-        public bool Initialized { get { return _initialized; } }
+        
+        /// <summary>
+        /// Gets whether the logger has been initialized.
+        /// </summary>
+        public bool Initialized => _initialized;
+        
+        /// <summary>
+        /// Gets the name of the logger.
+        /// </summary>
         public string? Name { get; }
 
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FasterLogger{T}"/> class.
+        /// </summary>
+        /// <param name="logger">The logger instance.</param>
+        /// <param name="options">The FASTER options.</param>
+        /// <param name="name">The logger name.</param>
+        /// <param name="configuration">The FASTER configuration.</param>
+        /// <param name="serializer">The object serializer.</param>
+        /// <param name="cancellationTokenProvider">The cancellation token provider.</param>
         public FasterLogger(
             ILogger<FasterLogger<T>> logger,
             IOptions<AbpFasterOptions> options,
@@ -55,17 +75,22 @@ namespace SharpAbp.Abp.Faster
         }
 
         /// <summary>
-        /// 初始化
+        /// Initializes the FASTER logger with the specified configuration.
         /// </summary>
         public virtual void Initialize()
         {
             if (_initialized)
             {
-                Logger.LogWarning("Faster log {Name} has initialized... ", TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+                Logger.LogWarning(
+                    "FASTER logger '{Name}' is already initialized.", 
+                    TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
                 return;
             }
 
-            var fileName = Path.Combine(Options.RootPath, TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)), Configuration.FileName);
+            var fileName = Path.Combine(
+                Options.RootPath, 
+                TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)), 
+                Configuration.FileName);
 
             var device = Devices.CreateLogDevice(
                 fileName,
@@ -89,29 +114,35 @@ namespace SharpAbp.Abp.Faster
             Configuration.Configure?.Invoke(settings);
             Log = new FasterLog(settings);
 
-            Iter = Log.Scan(Log.BeginAddress, long.MaxValue, Configuration.IteratorName, true, ScanBufferingMode.DoublePageBuffering, Configuration.ScanUncommitted, Logger);
+            Iter = Log.Scan(
+                Log.BeginAddress, 
+                long.MaxValue, 
+                Configuration.IteratorName, 
+                true, 
+                ScanBufferingMode.DoublePageBuffering, 
+                Configuration.ScanUncommitted, 
+                Logger);
 
             _completedUntilAddress = Math.Max(Iter.CompletedUntilAddress, Iter.BeginAddress);
 
-            //commit
+            // Start background tasks
             StartScheduleCommit();
-
-            //scan
             StartScheduleScan();
-
-            //complete
             StartScheduleComplete();
-
-            //truncate
             StartScheduleTruncate();
 
             _initialized = true;
 
-            Logger.LogDebug("Faster log {Name} is initialize. Begin: [{BeginAddress}], Completed: [{_completedUntilAddress}],", TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)), Iter.BeginAddress, _completedUntilAddress);
+            Logger.LogInformation(
+                "FASTER logger '{Name}' initialized successfully. Begin address: {BeginAddress}, Completed address: {CompletedAddress}.",
+                TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
+                Iter.BeginAddress,
+                _completedUntilAddress);
         }
 
         /// <summary>
-        /// 定时提交写入数据,避免因程序关闭等原因造成的数据丢失
+        /// Starts the scheduled commit task to periodically commit written data.
+        /// This prevents data loss due to unexpected shutdowns.
         /// </summary>
         protected virtual void StartScheduleCommit()
         {
@@ -123,23 +154,25 @@ namespace SharpAbp.Abp.Faster
                     try
                     {
                         await _commitSemaphore.WaitAsync(CancellationTokenProvider.Token);
-                        await Log!.CommitAsync(CancellationTokenProvider.Token);
+                        if (Log != null)
+                        {
+                            await Log.CommitAsync(CancellationTokenProvider.Token);
+                        }
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError(ex, "Commit exception : {Message}", ex.Message);
+                        Logger.LogError(ex, "Error committing FASTER log data: {Message}", ex.Message);
                     }
                     finally
                     {
                         _commitSemaphore.Release();
                     }
                 }
-
             }, TaskCreationOptions.LongRunning);
         }
 
         /// <summary>
-        /// 扫描读取的文件迭代器中的数据
+        /// Starts the scheduled scan task to read data from the log iterator.
         /// </summary>
         protected virtual void StartScheduleScan()
         {
@@ -149,20 +182,26 @@ namespace SharpAbp.Abp.Faster
                 {
                     try
                     {
-                        byte[] buffer;
-                        int entryLength;
-                        long currentAddress;
-                        long nextAddress;
-                        while (!Iter!.GetNext(out buffer, out entryLength, out currentAddress, out nextAddress))
+                        byte[]? buffer = null;
+                        int entryLength = 0;
+                        long currentAddress = 0;
+                        long nextAddress = 0;
+                        
+                        if (Iter != null)
                         {
-                            await Iter.WaitAsync(CancellationTokenProvider.Token);
+                            while (!Iter.GetNext(out buffer, out entryLength, out currentAddress, out nextAddress))
+                            {
+                                await Iter.WaitAsync(CancellationTokenProvider.Token);
+                            }
                         }
 
-                        Logger.LogTrace("Get iter message, current: [{currentAddress}], next: [{nextAddress}] .",currentAddress,nextAddress);
+                        Logger.LogTrace(
+                            "Retrieved iterator message. Current address: {CurrentAddress}, Next address: {NextAddress}.", 
+                            currentAddress, 
+                            nextAddress);
 
                         if (buffer != null && entryLength > 0)
                         {
-                            //写入到临时
                             var entry = new BufferedLogEntry
                             {
                                 Data = buffer,
@@ -170,19 +209,20 @@ namespace SharpAbp.Abp.Faster
                                 CurrentAddress = currentAddress,
                                 NextAddress = nextAddress
                             };
+                            
                             await _pendingChannel.Writer.WriteAsync(entry, CancellationTokenProvider.Token);
                         }
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError(ex, "ScheduleScan exception {Message}", ex.Message);
+                        Logger.LogError(ex, "Error during scheduled log scan: {Message}", ex.Message);
                     }
                 }
             }, TaskCreationOptions.LongRunning);
         }
 
         /// <summary>
-        /// 扫描自定完成的,并且进行数据的提交
+        /// Starts the scheduled completion task to process completed log entries.
         /// </summary>
         protected virtual void StartScheduleComplete()
         {
@@ -195,39 +235,48 @@ namespace SharpAbp.Abp.Faster
                         long commitAddress = _completedUntilAddress;
                         var removeIds = new List<long>();
 
-                        // 提前对_committing进行排序，避免在循环中重复排序
+                        // Pre-sort _committing to avoid repeated sorting in the loop
                         var sortedCommits = _committing.Values.OrderBy(x => x.Position!.Address).ToList();
-                        Logger.LogDebug("Current Committing count: {Count}", _committing.Count);
+                        Logger.LogDebug("Processing {Count} pending commit operations.", _committing.Count);
 
                         foreach (var commit in sortedCommits)
                         {
-                            if (!commit.Position!.IsMatch(commitAddress))
+                            if (commit.Position != null && !commit.Position.IsMatch(commitAddress))
                             {
-                                Logger.LogDebug("Commit position is not match {commitAddress}. Address: {Address}, NextAddress: {NextAddress}", commitAddress, commit.Position.Address, commit.Position.NextAddress);
+                                Logger.LogDebug(
+                                    "Commit position mismatch. Expected: {ExpectedAddress}, Actual - Address: {Address}, Next: {NextAddress}", 
+                                    commitAddress, 
+                                    commit.Position.Address, 
+                                    commit.Position.NextAddress);
+                                    
                                 if (commit.IsMax(Configuration.MaxCommitSkip))
                                 {
-                                    // 如果达到最大重试次数，检查是否需要更新commitAddress并记录日志
-                                    if (commitAddress <= Iter!.EndAddress)
+                                    // If max retry count reached, update commitAddress and log
+                                    if (Iter != null && commitAddress <= Iter.EndAddress)
                                     {
                                         commitAddress = commit.Position.NextAddress;
                                         removeIds.Add(commit.Position.Address);
-                                        Logger.LogDebug("{commitAddress} is max commit skip.", commitAddress);
+                                        Logger.LogDebug(
+                                            "Maximum commit skip count reached for address {Address}. Proceeding to next.", 
+                                            commit.Position.Address);
                                     }
                                 }
                                 else
                                 {
-                                    // 更新重试次数并尝试更新字典中的值
+                                    // Increment retry count and update dictionary
                                     var gainPosition = new RetryPosition(commit.Position, commit.RetryCount + 1);
                                     if (!_committing.TryUpdate(commit.Position.Address, gainPosition, commit))
                                     {
-                                        Logger.LogWarning("Update retry position failed. {Address}", commit.Position.Address);
+                                        Logger.LogWarning(
+                                            "Failed to update retry position for address {Address}.", 
+                                            commit.Position.Address);
                                     }
-                                    break; // 更新后跳出循环等待下次调度
+                                    break; // Exit loop to wait for next schedule
                                 }
                             }
                             else
                             {
-                                if (commitAddress <= Iter!.EndAddress)
+                                if (Iter != null && commitAddress <= Iter.EndAddress && commit.Position != null)
                                 {
                                     commitAddress = commit.Position.NextAddress;
                                     removeIds.Add(commit.Position.Address);
@@ -235,8 +284,10 @@ namespace SharpAbp.Abp.Faster
                             }
                         }
 
-                        // 检查是否有新的commitAddress需要提交完成
-                        if (commitAddress > _completedUntilAddress && commitAddress <= Iter!.EndAddress)
+                        // Check if we need to commit completed records
+                        if (commitAddress > _completedUntilAddress && 
+                            Iter != null && 
+                            commitAddress <= Iter.EndAddress)
                         {
                             await CompleteUntilRecordAtAsync(commitAddress);
                             _completedUntilAddress = commitAddress;
@@ -245,7 +296,7 @@ namespace SharpAbp.Abp.Faster
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError(ex, "Commit exception: {Message}", ex.Message);
+                        Logger.LogError(ex, "Error during commit completion: {Message}", ex.Message);
                     }
 
                     await Task.Delay(Configuration.CompleteIntervalMillis, CancellationTokenProvider.Token);
@@ -253,15 +304,25 @@ namespace SharpAbp.Abp.Faster
             }, TaskCreationOptions.LongRunning);
         }
 
-
+        /// <summary>
+        /// Completes records up to the specified address.
+        /// </summary>
+        /// <param name="commitAddress">The address up to which records should be completed.</param>
         private async Task CompleteUntilRecordAtAsync(long commitAddress)
         {
-            Logger.LogDebug("CompleteUntilRecordAtAsync {commitAddress}.", commitAddress);
+            Logger.LogDebug("Completing records up to address {CommitAddress}.", commitAddress);
             await _commitSemaphore.WaitAsync(CancellationTokenProvider.Token);
             try
             {
-                await Log!.CommitAsync(CancellationTokenProvider.Token);
-                await Iter!.CompleteUntilRecordAtAsync(commitAddress, CancellationTokenProvider.Token);
+                if (Log != null)
+                {
+                    await Log.CommitAsync(CancellationTokenProvider.Token);
+                }
+                
+                if (Iter != null)
+                {
+                    await Iter.CompleteUntilRecordAtAsync(commitAddress, CancellationTokenProvider.Token);
+                }
             }
             finally
             {
@@ -269,20 +330,23 @@ namespace SharpAbp.Abp.Faster
             }
         }
 
+        /// <summary>
+        /// Removes processed commit entries from the committing dictionary.
+        /// </summary>
+        /// <param name="removeIds">The list of IDs to remove.</param>
         private void RemoveProcessedCommits(List<long> removeIds)
         {
             foreach (var id in removeIds)
             {
                 if (!_committing.TryRemove(id, out _))
                 {
-                    Logger.LogWarning("Remove commit {id} failed.", id);
+                    Logger.LogWarning("Failed to remove commit entry with ID {Id}.", id);
                 }
             }
         }
 
-
         /// <summary>
-        /// 定时截断已经完成的
+        /// Starts the scheduled truncation task to remove completed log segments.
         /// </summary>
         protected virtual void StartScheduleTruncate()
         {
@@ -290,69 +354,91 @@ namespace SharpAbp.Abp.Faster
             {
                 while (!CancellationTokenProvider.Token.IsCancellationRequested)
                 {
-
                     try
                     {
-                        if (_truncateUntilAddress < _completedUntilAddress)
+                        if (_truncateUntilAddress < _completedUntilAddress && Log != null)
                         {
-                            Log!.TruncateUntilPageStart(_completedUntilAddress);
-                            Logger.LogDebug("TruncateUntilPageStart {_completedUntilAddress}", _completedUntilAddress);
+                            Log.TruncateUntilPageStart(_completedUntilAddress);
+                            Logger.LogDebug(
+                                "Truncated log until page start. Address: {TruncateAddress}.", 
+                                _completedUntilAddress);
                             _truncateUntilAddress = _completedUntilAddress;
                         }
                         else
                         {
-                            Logger.LogDebug("TruncateUntilPageStart  truncateUntilAddress:({_truncateUntilAddress}) >completedUntilAddress:({_completedUntilAddress})", _completedUntilAddress);
+                            Logger.LogDebug(
+                                "Skipping truncation. Truncate address ({TruncateAddress}) >= completed address ({CompletedAddress}).", 
+                                _truncateUntilAddress, 
+                                _completedUntilAddress);
                         }
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError(ex, "Truncate exception : {Message}", ex.Message);
+                        Logger.LogError(ex, "Error during log truncation: {Message}", ex.Message);
                     }
 
                     await Task.Delay(Configuration.TruncateIntervalMillis, CancellationTokenProvider.Token);
                 }
-
             }, TaskCreationOptions.LongRunning);
         }
 
         /// <summary>
-        /// 写入数据
+        /// Writes a single entity to the log.
         /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <param name="entity">The entity to write.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The position of the written entry.</returns>
         public virtual async Task<long> WriteAsync(T entity, CancellationToken cancellationToken = default)
         {
+            if (entity == null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
+            
             var buffer = Serializer.Serialize(entity);
-            return await Log!.EnqueueAsync(buffer, cancellationToken);
+            if (Log == null)
+            {
+                throw new InvalidOperationException("Logger has not been initialized.");
+            }
+            
+            return await Log.EnqueueAsync(buffer, cancellationToken);
         }
 
         /// <summary>
-        /// 批量写入数据
+        /// Writes a batch of entities to the log.
         /// </summary>
-        /// <param name="values"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <param name="values">The entities to write.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The positions of the written entries.</returns>
         public virtual async Task<List<long>> BatchWriteAsync(List<T> values, CancellationToken cancellationToken = default)
         {
+            if (values == null)
+            {
+                throw new ArgumentNullException(nameof(values));
+            }
+            
             var positions = new List<long>();
+            if (Log == null)
+            {
+                throw new InvalidOperationException("Logger has not been initialized.");
+            }
+            
             foreach (var entity in values)
             {
                 var buffer = Serializer.Serialize(entity);
-                var p = await Log!.EnqueueAsync(buffer, cancellationToken);
-                positions.Add(p);
+                var position = await Log.EnqueueAsync(buffer, cancellationToken);
+                positions.Add(position);
             }
 
             return positions;
         }
 
-
         /// <summary>
-        /// 读取数据
+        /// Reads log entries from the pending channel.
         /// </summary>
-        /// <param name="count"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <param name="count">The number of entries to read.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A list of log entries.</returns>
         public virtual async Task<LogEntryList<T>> ReadAsync(int count = 1, CancellationToken cancellationToken = default)
         {
             var entries = new LogEntryList<T>();
@@ -363,13 +449,6 @@ namespace SharpAbp.Abp.Faster
                 if (i == 0)
                 {
                     entry = await _pendingChannel.Reader.ReadAsync(cancellationToken);
-                    //entries.Add(new LogEntry<T>
-                    //{
-                    //    Data = Serializer.Deserialize<T>(entry.Data),
-                    //    CurrentAddress = entry.CurrentAddress,
-                    //    EntryLength = entry.EntryLength,
-                    //    NextAddress = entry.NextAddress,
-                    //});
                 }
                 else
                 {
@@ -377,43 +456,54 @@ namespace SharpAbp.Abp.Faster
                     {
                         break;
                     }
-
                 }
-                entries.Add(new LogEntry<T>
+                
+                if (entry.Data != null)
                 {
-                    Data = Serializer.Deserialize<T>(entry.Data!),
-                    CurrentAddress = entry.CurrentAddress,
-                    EntryLength = entry.EntryLength,
-                    NextAddress = entry.NextAddress,
-                });
+                    entries.Add(new LogEntry<T>
+                    {
+                        Data = Serializer.Deserialize<T>(entry.Data),
+                        CurrentAddress = entry.CurrentAddress,
+                        EntryLength = entry.EntryLength,
+                        NextAddress = entry.NextAddress,
+                    });
+                }
             }
+            
             return entries;
         }
 
         /// <summary>
-        /// 提交进度
+        /// Commits the specified log entry positions.
         /// </summary>
-        /// <param name="entryPosition"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <param name="entryPosition">The positions to commit.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         public virtual Task CommitAsync(LogEntryPosition entryPosition, CancellationToken cancellationToken = default)
         {
+            if (entryPosition == null)
+            {
+                throw new ArgumentNullException(nameof(entryPosition));
+            }
+            
             foreach (var position in entryPosition)
             {
                 if (!_committing.TryAdd(position.Address, new RetryPosition(position, 0)))
                 {
-                    Logger.LogDebug("Add position to committing failed. {Address}", position.Address);
+                    Logger.LogDebug("Failed to add position {Address} to committing dictionary.", position.Address);
                 }
             }
 
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Disposes of the logger resources.
+        /// </summary>
         public void Dispose()
         {
             Log?.Dispose();
             Iter?.Dispose();
+            _commitSemaphore?.Dispose();
         }
-
     }
 }
