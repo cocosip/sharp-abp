@@ -2,6 +2,8 @@
 using SharpAbp.Abp.Data;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Volo.Abp;
 
 namespace SharpAbp.Abp.EntityFrameworkCore
 {
@@ -10,6 +12,21 @@ namespace SharpAbp.Abp.EntityFrameworkCore
     /// </summary>
     public static class ConfigurationExtensions
     {
+        /// <summary>
+        /// Valid Oracle SQL compatibility versions.
+        /// </summary>
+        private static readonly HashSet<string> ValidOracleSqlCompatibilityVersions = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "DatabaseVersion19", "DatabaseVersion21", "DatabaseVersion23"
+        };
+
+        /// <summary>
+        /// Valid Oracle logon versions.
+        /// </summary>
+        private static readonly HashSet<string> ValidOracleLogonVersions = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "Version8", "Version9", "Version10", "Version11", "Version12", "Version12a"
+        };
         /// <summary>
         /// Gets the database provider from configuration.
         /// </summary>
@@ -48,7 +65,7 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             return configuration.GetProperties().GetPropertyValue(
                 "OracleSQLCompatibility",
                 "DatabaseVersion19",
-                ["DatabaseVersion19", "DatabaseVersion21", "DatabaseVersion23"]);
+                ValidOracleSqlCompatibilityVersions);
         }
 
         /// <summary>
@@ -60,8 +77,8 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         {
             return configuration.GetProperties().GetPropertyValue(
                 "OracleAllowedLogonVersionClient",
-                "DatabaseVersion19",
-                ["Version8", "Version9", "Version10", "Version11", "Version12", "Version12a"]);
+                "Version11",
+                ValidOracleLogonVersions);
         }
 
         /// <summary>
@@ -100,33 +117,45 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         /// <param name="properties">The properties dictionary.</param>
         /// <param name="propertyName">The name of the property to retrieve.</param>
         /// <param name="defaultValue">The default value if property is not found.</param>
-        /// <param name="validValues">Optional array of valid values for validation.</param>
+        /// <param name="validValues">Optional set of valid values for validation.</param>
         /// <returns>The property value if found and valid; otherwise, the default value.</returns>
         private static string GetPropertyValue(
             this Dictionary<string, string>? properties,
             string propertyName,
             string defaultValue,
-            string[]? validValues = null)
+            HashSet<string>? validValues = null)
         {
-            if (properties != null && properties.TryGetValue(propertyName, out string? value))
+            Check.NotNullOrWhiteSpace(propertyName, nameof(propertyName));
+            Check.NotNull(defaultValue, nameof(defaultValue));
+
+            if (properties?.TryGetValue(propertyName, out string? value) == true && !string.IsNullOrWhiteSpace(value))
             {
                 // If valid values are specified, check if the value is in the valid set
-                if (validValues != null && Array.IndexOf(validValues, value) >= 0)
-                {
-                    return value;
-                }
-
-                // If valid values are specified but the value is not in the set, return default
                 if (validValues != null)
                 {
-                    return defaultValue;
+                    return validValues.Contains(value) ? value : defaultValue;
                 }
 
-                // If no validation is needed, return the value or default if null
-                return value ?? defaultValue;
+                // If no validation is needed, return the value
+                return value;
             }
 
             return defaultValue;
+        }
+
+        /// <summary>
+        /// Gets a property value from a dictionary without validation.
+        /// </summary>
+        /// <param name="properties">The properties dictionary.</param>
+        /// <param name="propertyName">The name of the property to retrieve.</param>
+        /// <param name="defaultValue">The default value if property is not found.</param>
+        /// <returns>The property value if found; otherwise, the default value.</returns>
+        private static string GetPropertyValue(
+            this Dictionary<string, string>? properties,
+            string propertyName,
+            string defaultValue)
+        {
+            return GetPropertyValue(properties, propertyName, defaultValue, null);
         }
     }
 }

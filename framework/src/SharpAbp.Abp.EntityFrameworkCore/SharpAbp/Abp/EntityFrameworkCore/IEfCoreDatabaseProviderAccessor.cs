@@ -5,10 +5,10 @@ namespace SharpAbp.Abp.EntityFrameworkCore
     public interface IEfCoreDatabaseProviderAccessor
     {
         /// <summary>
-        /// Get databaseProvider or null
+        /// Gets the database provider enum value based on the provider name, or null if not found.
         /// </summary>
-        /// <param name="providerName"></param>
-        /// <returns></returns>
+        /// <param name="providerName">The name of the database provider.</param>
+        /// <returns>The corresponding DatabaseProvider enum value, or null if the provider name is not recognized.</returns>
         DatabaseProvider? GetDatabaseProviderOrNull(string providerName);
     }
 }

@@ -35,12 +35,12 @@ namespace SharpAbp.Abp.Faster
         protected ICancellationTokenProvider CancellationTokenProvider { get; }
         protected FasterLog? Log { get; set; }
         protected FasterLogScanIterator? Iter { get; set; }
-        
+
         /// <summary>
         /// Gets whether the logger has been initialized.
         /// </summary>
         public bool Initialized => _initialized;
-        
+
         /// <summary>
         /// Gets the name of the logger.
         /// </summary>
@@ -82,14 +82,14 @@ namespace SharpAbp.Abp.Faster
             if (_initialized)
             {
                 Logger.LogWarning(
-                    "FASTER logger '{Name}' is already initialized.", 
+                    "FASTER logger '{Name}' is already initialized.",
                     TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
                 return;
             }
 
             var fileName = Path.Combine(
-                Options.RootPath, 
-                TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)), 
+                Options.RootPath,
+                TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
                 Configuration.FileName);
 
             var device = Devices.CreateLogDevice(
@@ -115,12 +115,12 @@ namespace SharpAbp.Abp.Faster
             Log = new FasterLog(settings);
 
             Iter = Log.Scan(
-                Log.BeginAddress, 
-                long.MaxValue, 
-                Configuration.IteratorName, 
-                true, 
-                ScanBufferingMode.DoublePageBuffering, 
-                Configuration.ScanUncommitted, 
+                Log.BeginAddress,
+                long.MaxValue,
+                Configuration.IteratorName,
+                true,
+                ScanBufferingMode.DoublePageBuffering,
+                Configuration.ScanUncommitted,
                 Logger);
 
             _completedUntilAddress = Math.Max(Iter.CompletedUntilAddress, Iter.BeginAddress);
@@ -186,7 +186,7 @@ namespace SharpAbp.Abp.Faster
                         int entryLength = 0;
                         long currentAddress = 0;
                         long nextAddress = 0;
-                        
+
                         if (Iter != null)
                         {
                             while (!Iter.GetNext(out buffer, out entryLength, out currentAddress, out nextAddress))
@@ -196,8 +196,8 @@ namespace SharpAbp.Abp.Faster
                         }
 
                         Logger.LogTrace(
-                            "Retrieved iterator message. Current address: {CurrentAddress}, Next address: {NextAddress}.", 
-                            currentAddress, 
+                            "Retrieved iterator message. Current address: {CurrentAddress}, Next address: {NextAddress}.",
+                            currentAddress,
                             nextAddress);
 
                         if (buffer != null && entryLength > 0)
@@ -209,7 +209,7 @@ namespace SharpAbp.Abp.Faster
                                 CurrentAddress = currentAddress,
                                 NextAddress = nextAddress
                             };
-                            
+
                             await _pendingChannel.Writer.WriteAsync(entry, CancellationTokenProvider.Token);
                         }
                     }
@@ -244,11 +244,11 @@ namespace SharpAbp.Abp.Faster
                             if (commit.Position != null && !commit.Position.IsMatch(commitAddress))
                             {
                                 Logger.LogDebug(
-                                    "Commit position mismatch. Expected: {ExpectedAddress}, Actual - Address: {Address}, Next: {NextAddress}", 
-                                    commitAddress, 
-                                    commit.Position.Address, 
+                                    "Commit position mismatch. Expected: {ExpectedAddress}, Actual - Address: {Address}, Next: {NextAddress}",
+                                    commitAddress,
+                                    commit.Position.Address,
                                     commit.Position.NextAddress);
-                                    
+
                                 if (commit.IsMax(Configuration.MaxCommitSkip))
                                 {
                                     // If max retry count reached, update commitAddress and log
@@ -257,7 +257,7 @@ namespace SharpAbp.Abp.Faster
                                         commitAddress = commit.Position.NextAddress;
                                         removeIds.Add(commit.Position.Address);
                                         Logger.LogDebug(
-                                            "Maximum commit skip count reached for address {Address}. Proceeding to next.", 
+                                            "Maximum commit skip count reached for address {Address}. Proceeding to next.",
                                             commit.Position.Address);
                                     }
                                 }
@@ -268,7 +268,7 @@ namespace SharpAbp.Abp.Faster
                                     if (!_committing.TryUpdate(commit.Position.Address, gainPosition, commit))
                                     {
                                         Logger.LogWarning(
-                                            "Failed to update retry position for address {Address}.", 
+                                            "Failed to update retry position for address {Address}.",
                                             commit.Position.Address);
                                     }
                                     break; // Exit loop to wait for next schedule
@@ -285,8 +285,8 @@ namespace SharpAbp.Abp.Faster
                         }
 
                         // Check if we need to commit completed records
-                        if (commitAddress > _completedUntilAddress && 
-                            Iter != null && 
+                        if (commitAddress > _completedUntilAddress &&
+                            Iter != null &&
                             commitAddress <= Iter.EndAddress)
                         {
                             await CompleteUntilRecordAtAsync(commitAddress);
@@ -318,7 +318,7 @@ namespace SharpAbp.Abp.Faster
                 {
                     await Log.CommitAsync(CancellationTokenProvider.Token);
                 }
-                
+
                 if (Iter != null)
                 {
                     await Iter.CompleteUntilRecordAtAsync(commitAddress, CancellationTokenProvider.Token);
@@ -360,15 +360,15 @@ namespace SharpAbp.Abp.Faster
                         {
                             Log.TruncateUntilPageStart(_completedUntilAddress);
                             Logger.LogDebug(
-                                "Truncated log until page start. Address: {TruncateAddress}.", 
+                                "Truncated log until page start. Address: {TruncateAddress}.",
                                 _completedUntilAddress);
                             _truncateUntilAddress = _completedUntilAddress;
                         }
                         else
                         {
                             Logger.LogDebug(
-                                "Skipping truncation. Truncate address ({TruncateAddress}) >= completed address ({CompletedAddress}).", 
-                                _truncateUntilAddress, 
+                                "Skipping truncation. Truncate address ({TruncateAddress}) >= completed address ({CompletedAddress}).",
+                                _truncateUntilAddress,
                                 _completedUntilAddress);
                         }
                     }
@@ -394,13 +394,13 @@ namespace SharpAbp.Abp.Faster
             {
                 throw new ArgumentNullException(nameof(entity));
             }
-            
+
             var buffer = Serializer.Serialize(entity);
             if (Log == null)
             {
                 throw new InvalidOperationException("Logger has not been initialized.");
             }
-            
+
             return await Log.EnqueueAsync(buffer, cancellationToken);
         }
 
@@ -416,13 +416,13 @@ namespace SharpAbp.Abp.Faster
             {
                 throw new ArgumentNullException(nameof(values));
             }
-            
+
             var positions = new List<long>();
             if (Log == null)
             {
                 throw new InvalidOperationException("Logger has not been initialized.");
             }
-            
+
             foreach (var entity in values)
             {
                 var buffer = Serializer.Serialize(entity);
@@ -457,7 +457,7 @@ namespace SharpAbp.Abp.Faster
                         break;
                     }
                 }
-                
+
                 if (entry.Data != null)
                 {
                     entries.Add(new LogEntry<T>
@@ -469,7 +469,7 @@ namespace SharpAbp.Abp.Faster
                     });
                 }
             }
-            
+
             return entries;
         }
 
@@ -484,7 +484,9 @@ namespace SharpAbp.Abp.Faster
             {
                 throw new ArgumentNullException(nameof(entryPosition));
             }
-            
+
+            Logger.LogDebug("Committing {Count} positions.", entryPosition.Count);
+
             foreach (var position in entryPosition)
             {
                 if (!_committing.TryAdd(position.Address, new RetryPosition(position, 0)))
@@ -492,6 +494,8 @@ namespace SharpAbp.Abp.Faster
                     Logger.LogDebug("Failed to add position {Address} to committing dictionary.", position.Address);
                 }
             }
+
+            Logger.LogDebug("Finished committing positions.");
 
             return Task.CompletedTask;
         }

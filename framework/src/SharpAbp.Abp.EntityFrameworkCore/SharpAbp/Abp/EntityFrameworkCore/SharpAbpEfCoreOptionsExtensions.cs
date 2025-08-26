@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using Volo.Abp;
 
 namespace SharpAbp.Abp.EntityFrameworkCore
 {
@@ -7,6 +10,33 @@ namespace SharpAbp.Abp.EntityFrameworkCore
     /// </summary>
     public static class SharpAbpEfCoreOptionsExtensions
     {
+        #region Constants
+        
+        /// <summary>
+        /// Valid Oracle SQL compatibility versions.
+        /// </summary>
+        private static readonly HashSet<string> ValidOracleSqlCompatibilityVersions = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "DatabaseVersion19",
+            "DatabaseVersion21",
+            "DatabaseVersion23"
+        };
+        
+        /// <summary>
+        /// Valid Oracle allowed logon versions for clients.
+        /// </summary>
+        private static readonly HashSet<string> ValidOracleLogonVersions = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "Version8",
+            "Version9",
+            "Version10",
+            "Version11",
+            "Version12",
+            "Version12a"
+        };
+        
+        #endregion
+        
         /// <summary>
         /// Gets the Oracle SQL compatibility version.
         /// </summary>
@@ -14,19 +44,17 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         /// <returns>The Oracle SQL compatibility version, or "DatabaseVersion19" if not specified or invalid.</returns>
         public static string GetOracleSQLCompatibility(this SharpAbpEfCoreOptions options)
         {
-            string[] validValues = { "DatabaseVersion19", "DatabaseVersion21", "DatabaseVersion23" };
-            return GetPropertyValue(options, "OracleSQLCompatibility", "DatabaseVersion19", validValues);
+            return GetPropertyValue(options, "OracleSQLCompatibility", "DatabaseVersion19", ValidOracleSqlCompatibilityVersions);
         }
 
         /// <summary>
         /// Gets the Oracle allowed logon version for clients.
         /// </summary>
         /// <param name="options">The SharpAbpEfCoreOptions instance.</param>
-        /// <returns>The Oracle allowed logon version, or "DatabaseVersion19" if not specified or invalid.</returns>
+        /// <returns>The Oracle allowed logon version, or "Version11" if not specified or invalid.</returns>
         public static string GetOracleAllowedLogonVersionClient(this SharpAbpEfCoreOptions options)
         {
-            string[] validValues = ["Version8", "Version9", "Version10", "Version11", "Version12", "Version12a"];
-            return GetPropertyValue(options, "OracleAllowedLogonVersionClient", "DatabaseVersion19", validValues);
+            return GetPropertyValue(options, "OracleAllowedLogonVersionClient", "Version11", ValidOracleLogonVersions);
         }
 
         /// <summary>
@@ -65,35 +93,44 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         /// <param name="options">The SharpAbpEfCoreOptions instance.</param>
         /// <param name="propertyName">The name of the property to retrieve.</param>
         /// <param name="defaultValue">The default value to return if the property is not found.</param>
-        /// <param name="validValues">Optional array of valid values for validation.</param>
+        /// <param name="validValues">Optional set of valid values for validation.</param>
         /// <returns>The property value if found and valid; otherwise, the default value.</returns>
         private static string GetPropertyValue(
             SharpAbpEfCoreOptions options,
             string propertyName,
             string defaultValue = "",
-            string[]? validValues = null)
+            HashSet<string>? validValues = null)
         {
-            if (options.Properties.TryGetValue(propertyName, out string? value))
+            Check.NotNull(options, nameof(options));
+            Check.NotNullOrWhiteSpace(propertyName, nameof(propertyName));
+            
+            if (!options.Properties.TryGetValue(propertyName, out string? value) || string.IsNullOrWhiteSpace(value))
             {
-                // If valid values are specified, check if the value is in the valid set
-                if (validValues != null && validValues.Length > 0)
-                {
-                    foreach (string validValue in validValues)
-                    {
-                        if (string.Equals(value, validValue, StringComparison.OrdinalIgnoreCase))
-                        {
-                            return value;
-                        }
-                    }
-                    // If we get here, the value is not in the valid set, so return the default
-                    return defaultValue;
-                }
-
-                // If no validation is needed, just return the value or default
-                return value ?? defaultValue;
+                return defaultValue;
             }
 
-            return defaultValue;
+            // If valid values are specified, check if the value is in the valid set
+            if (validValues?.Count > 0)
+            {
+                return validValues.Contains(value) ? value : defaultValue;
+            }
+
+            return value;
+        }
+        
+        /// <summary>
+        /// Gets a property value from the options Properties dictionary without validation.
+        /// </summary>
+        /// <param name="options">The SharpAbpEfCoreOptions instance.</param>
+        /// <param name="propertyName">The name of the property to retrieve.</param>
+        /// <param name="defaultValue">The default value to return if the property is not found.</param>
+        /// <returns>The property value if found; otherwise, the default value.</returns>
+        private static string GetPropertyValue(
+            SharpAbpEfCoreOptions options,
+            string propertyName,
+            string defaultValue)
+        {
+            return GetPropertyValue(options, propertyName, defaultValue, null);
         }
     }
 }
