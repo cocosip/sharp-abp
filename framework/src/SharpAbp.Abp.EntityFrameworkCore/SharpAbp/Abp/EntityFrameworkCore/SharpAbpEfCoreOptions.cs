@@ -9,8 +9,9 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         public Dictionary<string, string> Properties { get; set; }
         public SharpAbpEfCoreOptions()
         {
+            DatabaseProvider = DatabaseProvider.PostgreSql;
             Properties = [];
         }
- 
+
     }
 }

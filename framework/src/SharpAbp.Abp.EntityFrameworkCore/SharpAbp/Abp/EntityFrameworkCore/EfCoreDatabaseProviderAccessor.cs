@@ -3,39 +3,37 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.EntityFrameworkCore
 {
+    /// <summary>
+    /// Provides access to database providers for Entity Framework Core.
+    /// Maps provider names to their corresponding DatabaseProvider enum values.
+    /// </summary>
     public class EfCoreDatabaseProviderAccessor : IEfCoreDatabaseProviderAccessor, ITransientDependency
     {
         /// <summary>
-        /// Get databaseProvider or null
+        /// Gets the database provider enum value based on the provider name, or null if not found.
         /// </summary>
-        /// <param name="providerName"></param>
-        /// <returns></returns>
+        /// <param name="providerName">The name of the database provider.</param>
+        /// <returns>The corresponding DatabaseProvider enum value, or null if the provider name is not recognized.</returns>
         public virtual DatabaseProvider? GetDatabaseProviderOrNull(string providerName)
         {
-            switch (providerName)
+            if (string.IsNullOrEmpty(providerName))
+                return null;
+
+            return providerName.ToUpperInvariant() switch
             {
-                case "Microsoft.EntityFrameworkCore.SqlServer":
-                    return DatabaseProvider.SqlServer;
-                case "Npgsql.EntityFrameworkCore.PostgreSQL":
-                    return DatabaseProvider.PostgreSql;
-                case "Pomelo.EntityFrameworkCore.MySql":
-                    return DatabaseProvider.MySql;
-                case "Oracle.EntityFrameworkCore":
-                case "Devart.Data.Oracle.Entity.EFCore":
-                    return DatabaseProvider.Oracle;
-                case "Microsoft.EntityFrameworkCore.Sqlite":
-                    return DatabaseProvider.Sqlite;
-                case "Microsoft.EntityFrameworkCore.InMemory":
-                    return DatabaseProvider.InMemory;
-                case "FirebirdSql.EntityFrameworkCore.Firebird":
-                    return DatabaseProvider.Firebird;
-                case "Microsoft.EntityFrameworkCore.Cosmos":
-                    return DatabaseProvider.Cosmos;
-                case "DM.Microsoft.EntityFrameworkCore":
-                    return DatabaseProvider.Dm;
-                default:
-                    return null;
-            }
+                "SQLSERVER" => (DatabaseProvider?)DatabaseProvider.SqlServer,
+                "POSTGRESQL" => (DatabaseProvider?)DatabaseProvider.PostgreSql,
+                "MYSQL" => (DatabaseProvider?)DatabaseProvider.MySql,
+                "ORACLE" or "DEVART.ORACLE" => (DatabaseProvider?)DatabaseProvider.Oracle,
+                "SQLITE" => (DatabaseProvider?)DatabaseProvider.Sqlite,
+                "INMEMORY" => (DatabaseProvider?)DatabaseProvider.InMemory,
+                "FIREBIRD" => (DatabaseProvider?)DatabaseProvider.Firebird,
+                "COSMOS" => (DatabaseProvider?)DatabaseProvider.Cosmos,
+                "DM" => (DatabaseProvider?)DatabaseProvider.Dm,
+                "OPENGAUSS" => (DatabaseProvider?)DatabaseProvider.OpenGauss,
+                "GAUSSDB" => (DatabaseProvider?)DatabaseProvider.GaussDB,
+                _ => null,
+            };
         }
     }
 }
