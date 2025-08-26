@@ -11,6 +11,7 @@
         Cosmos,
         Firebird,
         Dm,
-        OpenGauss
+        OpenGauss,
+        GaussDB
     }
 }
