@@ -1,3 +1,8 @@
+---
+trigger: always_on
+alwaysApply: true
+---
+
 # 项目：Sharp-ABP
 
 本指南提供了在`sharp-abp`项目中开发和代码生成的上下文和规则。
