@@ -34,34 +34,6 @@ namespace SharpAbp.Abp.CryptoVault
                 options.SM2Curve = Sm2EncryptionNames.CurveSm2p256v1;
             });
 
-            //Configure<AbpAutoMapperOptions>(options =>
-            //{
-            //    options.AddMaps<DbConnectionsManagementDomainModule>();
-            //});
-
-            //context.Services.AddAutoMapperObjectMapper<DbConnectionsManagementDomainModule>();
-
-
-            //Configure<AbpDistributedCacheOptions>(options =>
-            //{
-            //    options.CacheConfigurators.Add(cacheName =>
-            //    {
-            //        if (cacheName == CacheNameAttribute.GetCacheName(typeof(DatabaseConnectionInfoCacheItem)))
-            //        {
-            //            return new DistributedCacheEntryOptions()
-            //            {
-            //                SlidingExpiration = TimeSpan.FromSeconds(1800)
-            //            };
-            //        }
-            //        return null;
-            //    });
-            //});
-
-            //Configure<AbpDistributedEntityEventOptions>(options =>
-            //{
-            //    options.AutoEventSelectors.Add<DatabaseConnectionInfo>();
-            //    options.EtoMappings.Add<DatabaseConnectionInfo, DatabaseConnectionInfoEto>();
-            //});
             return Task.CompletedTask;
         }
 

@@ -26,9 +26,8 @@ namespace SharpAbp.Abp.DbConnectionsManagement
 
         }
 
-        public DatabaseConnectionInfo(Guid id, string name, string databaseProvider, string connectionString)
+        public DatabaseConnectionInfo(Guid id, string name, string databaseProvider, string connectionString) : base(id)
         {
-            Id = id;
             Name = name;
             DatabaseProvider = databaseProvider;
             ConnectionString = connectionString;

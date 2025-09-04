@@ -31,11 +31,11 @@ namespace SharpAbp.Abp.FileStoringManagement
 
         public virtual bool HttpAccess { get; set; }
 
-        public virtual ICollection<FileStoringContainerItem> Items { get; protected set; }
+        public virtual ICollection<FileStoringContainerItem> Items { get; protected set; } = [];
 
         public FileStoringContainer()
         {
-            Items = [];
+
         }
 
         public FileStoringContainer(
@@ -48,9 +48,8 @@ namespace SharpAbp.Abp.FileStoringManagement
             bool enableAutoMultiPartUpload,
             int multiPartUploadMinFileSize,
             int multiPartUploadShardingSize,
-            bool httpAccess) : this()
+            bool httpAccess) : base(id)
         {
-            Id = id;
             TenantId = tenantId;
             IsMultiTenant = isMultiTenant;
             Provider = provider;

@@ -1,4 +1,4 @@
-﻿using System;
+    using System;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace SharpAbp.Abp.CryptoVault
@@ -6,42 +6,42 @@ namespace SharpAbp.Abp.CryptoVault
     public class RSACreds : AuditedAggregateRoot<Guid>
     {
         /// <summary>
-        /// 唯一标志
+        /// Unique identifier
         /// </summary>
         public virtual string Identifier { get; set; }
 
         /// <summary>
-        /// SourceType
+        /// Source type
         /// </summary>
         public virtual int SourceType { get; set; }
 
         /// <summary>
-        /// RSA密钥长度 (1024,2048)
+        /// RSA key size (1024, 2048)
         /// </summary>
         public virtual int Size { get; set; }
 
         /// <summary>
-        /// RSA 公钥(加密后)
+        /// RSA public key (encrypted)
         /// </summary>
         public virtual string PublicKey { get; set; }
 
         /// <summary>
-        /// RSA 私钥(加密后)
+        /// RSA private key (encrypted)
         /// </summary>
         public virtual string PrivateKey { get; set; }
 
         /// <summary>
-        /// 对公钥,私钥加密的密钥
+        /// Passphrase used to encrypt the public and private keys
         /// </summary>
         public virtual string PassPhrase { get; set; }
 
         /// <summary>
-        /// 对公钥,私钥加密的盐
+        /// Salt used to encrypt the public and private keys
         /// </summary>
         public virtual string Salt { get; set; }
 
         /// <summary>
-        /// 描述信息
+        /// Description information
         /// </summary>
         public virtual string Description { get; set; }
 
@@ -51,9 +51,9 @@ namespace SharpAbp.Abp.CryptoVault
 
         }
 
-        public RSACreds(Guid id)
+        public RSACreds(Guid id) : base(id)
         {
-            Id = id;
+
         }
 
         public RSACreds(
@@ -65,9 +65,8 @@ namespace SharpAbp.Abp.CryptoVault
             string privateKey,
             string passPhrase,
             string salt,
-            string description)
+            string description) : base(id)
         {
-            Id = id;
             Identifier = identifier;
             SourceType = sourceType;
             Size = size;

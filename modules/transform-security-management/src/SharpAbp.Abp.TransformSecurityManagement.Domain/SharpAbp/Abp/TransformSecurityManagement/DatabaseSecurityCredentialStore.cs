@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.CryptoVault;
 using SharpAbp.Abp.TransformSecurity;
 using System;
@@ -39,7 +39,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
             var securityCredentialInfo = await SecurityCredentialInfoRepository.FindByIdentifierAsync(identifier, cancellationToken: cancellationToken);
             if (securityCredentialInfo == null)
             {
-                throw new ArgumentNullException(nameof(securityCredentialInfo));
+                throw new AbpException($"Security credential info with identifier '{identifier}' could not be found.");
             }
 
             var securityCredential = new SecurityCredential()
@@ -67,7 +67,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
             }
             else
             {
-                throw new AbpException($"Invalid KeyType {securityCredentialInfo.KeyType}");
+                throw new AbpException($"Unsupported key type '{securityCredentialInfo.KeyType}'. Only 'RSA' and 'SM2' key types are supported.");
             }
             return securityCredential;
         }
@@ -77,7 +77,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
             var referenceId = credential.GetReferenceId();
             if (referenceId.IsNullOrWhiteSpace())
             {
-                throw new AbpException("Reference Identifier is null or empty");
+                throw new AbpException("The reference identifier of the security credential is null or empty. Please ensure the credential has a valid reference identifier before setting it.");
             }
 
             var securityCredentialInfo = new SecurityCredentialInfo(

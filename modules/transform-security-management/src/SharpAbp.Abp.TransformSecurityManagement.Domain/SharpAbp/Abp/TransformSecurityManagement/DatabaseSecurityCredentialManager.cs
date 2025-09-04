@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.CryptoVault;
 using SharpAbp.Abp.TransformSecurity;
@@ -51,7 +51,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
         {
             if (!ValidateBizType(bizType))
             {
-                throw new AbpException($"Unsupported bizType {bizType}");
+                throw new AbpException($"Unsupported bizType '{bizType}'. Please check the configuration to ensure this bizType is supported.");
             }
 
             var credential = new SecurityCredential()
@@ -65,7 +65,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
             if (Options.EncryptionAlgo.Equals("RSA", StringComparison.OrdinalIgnoreCase))
             {
                 credential.KeyType = "RSA";
-                var rsaCreds = await RSACredsRepository.GetRandomAsync(size: credential.GetRSAKeySize(), cancellationToken: cancellationToken) ?? throw new AbpException("Get RSACreds failed");
+                var rsaCreds = await RSACredsRepository.GetRandomAsync(size: credential.GetRSAKeySize(), cancellationToken: cancellationToken) ?? throw new AbpException("Failed to retrieve RSA credentials. Please ensure RSA credentials are properly configured and available.");
 
                 credential.SetReferenceId(rsaCreds.Id.ToString("N"));
                 credential.SetSM2Curve(SM2Options.Curve);
@@ -77,7 +77,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
             else if (Options.EncryptionAlgo.Equals("SM2", StringComparison.OrdinalIgnoreCase))
             {
                 credential.KeyType = "SM2";
-                var sm2Creds = await SM2CredsRepository.GetRandomAsync(curve: credential.GetSM2Curve(), cancellationToken: cancellationToken) ?? throw new AbpException("Get SM2Creds failed");
+                var sm2Creds = await SM2CredsRepository.GetRandomAsync(curve: credential.GetSM2Curve(), cancellationToken: cancellationToken) ?? throw new AbpException("Failed to retrieve SM2 credentials. Please ensure SM2 credentials are properly configured and available.");
 
                 credential.SetReferenceId(sm2Creds.Id.ToString("N"));
                 credential.SetRSAKeySize(RSAOptions.KeySize);
@@ -87,7 +87,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
             }
             else
             {
-                throw new AbpException($"Unsupport EncryptionAlgo {Options.EncryptionAlgo}");
+                throw new AbpException($"Unsupported encryption algorithm '{Options.EncryptionAlgo}'. Only 'RSA' and 'SM2' encryption algorithms are supported.");
             }
             await SecurityCredentialStore.SetAsync(credential);
             return credential;

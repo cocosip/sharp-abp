@@ -20,9 +20,8 @@ namespace SharpAbp.Abp.FileStoringManagement
 
         }
 
-        public FileStoringContainerItem(Guid id, string name, string value, Guid containerId)
+        public FileStoringContainerItem(Guid id, string name, string value, Guid containerId) : base(id)
         {
-            Id = id;
             Name = name;
             Value = value;
             ContainerId = containerId;

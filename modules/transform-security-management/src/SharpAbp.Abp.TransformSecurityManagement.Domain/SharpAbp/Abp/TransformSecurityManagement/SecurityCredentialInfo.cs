@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace SharpAbp.Abp.TransformSecurityManagement
@@ -6,32 +6,32 @@ namespace SharpAbp.Abp.TransformSecurityManagement
     public class SecurityCredentialInfo : AuditedAggregateRoot<Guid>
     {
         /// <summary>
-        /// 唯一编号
+        /// Unique identifier
         /// </summary>
         public virtual string Identifier { get; set; }
 
         /// <summary>
-        /// 对应的RSA或者SM2密钥CryptoVault的Id
+        /// Id of the corresponding RSA or SM2 key CryptoVault
         /// </summary>
         public virtual Guid CredsId { get; set; }
 
         /// <summary>
-        /// 密钥类型, RSA, SM2
+        /// Key type, RSA or SM2
         /// </summary>
         public virtual string KeyType { get; set; }
 
         /// <summary>
-        /// 业务类型
+        /// Business type
         /// </summary>
         public virtual string BizType { get; set; }
 
         /// <summary>
-        /// 密钥的过期时间
+        /// Key expiration time
         /// </summary>
         public virtual DateTime? Expires { get; set; }
 
         /// <summary>
-        /// 描述信息
+        /// Description information
         /// </summary>
         public virtual string Description { get; set; }
 
@@ -41,21 +41,19 @@ namespace SharpAbp.Abp.TransformSecurityManagement
 
         }
 
-        public SecurityCredentialInfo(Guid id)
+        public SecurityCredentialInfo(Guid id) : base(id)
         {
-            Id = id;
         }
 
         public SecurityCredentialInfo(
-            Guid id, 
+            Guid id,
             string identifier,
-            Guid credsId, 
-            string keyType, 
+            Guid credsId,
+            string keyType,
             string bizType,
             DateTime? expires,
-            string description)
+            string description) : base(id)
         {
-            Id = id;
             Identifier = identifier;
             CredsId = credsId;
             KeyType = keyType;
