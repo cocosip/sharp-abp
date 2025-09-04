@@ -29,19 +29,7 @@ namespace SharpAbp.Abp.Dapper
             var databaseProvider = configuration.GetDatabaseProvider();
             if (databaseProvider == DatabaseProvider.Oracle)
             {
-                SqlMapper.ResetTypeHandlers();
-
-                SqlMapper.RemoveTypeMap(typeof(Guid));
-                SqlMapper.RemoveTypeMap(typeof(Guid?));
-
-                SqlMapper.RemoveTypeMap(typeof(bool));
-                SqlMapper.RemoveTypeMap(typeof(bool?));
-
-                SqlMapper.AddTypeHandler(typeof(Guid), new GuidTypeHandler());
-                SqlMapper.AddTypeHandler(typeof(Guid?), new NullableGuidTypeHandler());
-
-                SqlMapper.AddTypeHandler(typeof(bool), new BoolTypeHandler());
-                SqlMapper.AddTypeHandler(typeof(bool?), new NullableBoolTypeHandler());
+                DapperOracleExtensions.ConfigureOracleTypeHandlers();
             }
 
             return Task.CompletedTask;
