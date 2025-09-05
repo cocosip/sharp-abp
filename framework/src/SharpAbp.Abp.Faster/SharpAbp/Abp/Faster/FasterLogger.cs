@@ -1,4 +1,4 @@
-﻿using FASTER.core;
+using FASTER.core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
@@ -82,7 +82,7 @@ namespace SharpAbp.Abp.Faster
             if (_initialized)
             {
                 Logger.LogWarning(
-                    "FASTER logger '{Name}' is already initialized.",
+                    "FASTER logger '{LoggerName}' is already initialized.",
                     TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
                 return;
             }
@@ -134,10 +134,11 @@ namespace SharpAbp.Abp.Faster
             _initialized = true;
 
             Logger.LogInformation(
-                "FASTER logger '{Name}' initialized successfully. Begin address: {BeginAddress}, Completed address: {CompletedAddress}.",
+                "FASTER logger '{LoggerName}' initialized successfully. Begin address: {BeginAddress}, Completed address: {CompletedAddress}, File: {FileName}.",
                 TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
                 Iter.BeginAddress,
-                _completedUntilAddress);
+                _completedUntilAddress,
+                fileName);
         }
 
         /// <summary>
@@ -161,7 +162,8 @@ namespace SharpAbp.Abp.Faster
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError(ex, "Error committing FASTER log data: {Message}", ex.Message);
+                        Logger.LogError(ex, "Error committing FASTER log data for type '{TypeName}': {Message}", 
+                            TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)), ex.Message);
                     }
                     finally
                     {
@@ -196,7 +198,8 @@ namespace SharpAbp.Abp.Faster
                         }
 
                         Logger.LogTrace(
-                            "Retrieved iterator message. Current address: {CurrentAddress}, Next address: {NextAddress}.",
+                            "Retrieved iterator message for type '{TypeName}'. Current address: {CurrentAddress}, Next address: {NextAddress}.",
+                            TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
                             currentAddress,
                             nextAddress);
 
@@ -215,7 +218,8 @@ namespace SharpAbp.Abp.Faster
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError(ex, "Error during scheduled log scan: {Message}", ex.Message);
+                        Logger.LogError(ex, "Error during scheduled log scan for type '{TypeName}': {Message}", 
+                            TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)), ex.Message);
                     }
                 }
             }, TaskCreationOptions.LongRunning);
@@ -237,14 +241,16 @@ namespace SharpAbp.Abp.Faster
 
                         // Pre-sort _committing to avoid repeated sorting in the loop
                         var sortedCommits = _committing.Values.OrderBy(x => x.Position!.Address).ToList();
-                        Logger.LogDebug("Processing {Count} pending commit operations.", _committing.Count);
+                        Logger.LogDebug("Processing {Count} pending commit operations for type '{TypeName}'.", 
+                            _committing.Count, TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
 
                         foreach (var commit in sortedCommits)
                         {
                             if (commit.Position != null && !commit.Position.IsMatch(commitAddress))
                             {
                                 Logger.LogDebug(
-                                    "Commit position mismatch. Expected: {ExpectedAddress}, Actual - Address: {Address}, Next: {NextAddress}",
+                                    "Commit position mismatch for type '{TypeName}'. Expected: {ExpectedAddress}, Actual - Address: {Address}, Next: {NextAddress}",
+                                    TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
                                     commitAddress,
                                     commit.Position.Address,
                                     commit.Position.NextAddress);
@@ -257,8 +263,9 @@ namespace SharpAbp.Abp.Faster
                                         commitAddress = commit.Position.NextAddress;
                                         removeIds.Add(commit.Position.Address);
                                         Logger.LogDebug(
-                                            "Maximum commit skip count reached for address {Address}. Proceeding to next.",
-                                            commit.Position.Address);
+                                            "Maximum commit skip count reached for address {Address} in type '{TypeName}'. Proceeding to next.",
+                                            commit.Position.Address,
+                                            TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
                                     }
                                 }
                                 else
@@ -268,8 +275,9 @@ namespace SharpAbp.Abp.Faster
                                     if (!_committing.TryUpdate(commit.Position.Address, gainPosition, commit))
                                     {
                                         Logger.LogWarning(
-                                            "Failed to update retry position for address {Address}.",
-                                            commit.Position.Address);
+                                            "Failed to update retry position for address {Address} in type '{TypeName}'.",
+                                            commit.Position.Address,
+                                            TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
                                     }
                                     break; // Exit loop to wait for next schedule
                                 }
@@ -296,7 +304,8 @@ namespace SharpAbp.Abp.Faster
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError(ex, "Error during commit completion: {Message}", ex.Message);
+                        Logger.LogError(ex, "Error during commit completion for type '{TypeName}': {Message}", 
+                            TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)), ex.Message);
                     }
 
                     await Task.Delay(Configuration.CompleteIntervalMillis, CancellationTokenProvider.Token);
@@ -310,7 +319,8 @@ namespace SharpAbp.Abp.Faster
         /// <param name="commitAddress">The address up to which records should be completed.</param>
         private async Task CompleteUntilRecordAtAsync(long commitAddress)
         {
-            Logger.LogDebug("Completing records up to address {CommitAddress}.", commitAddress);
+            Logger.LogDebug("Completing records up to address {CommitAddress} for type '{TypeName}'.", 
+                commitAddress, TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
             await _commitSemaphore.WaitAsync(CancellationTokenProvider.Token);
             try
             {
@@ -340,7 +350,8 @@ namespace SharpAbp.Abp.Faster
             {
                 if (!_committing.TryRemove(id, out _))
                 {
-                    Logger.LogWarning("Failed to remove commit entry with ID {Id}.", id);
+                    Logger.LogWarning("Failed to remove commit entry with ID {Id} for type '{TypeName}'.", 
+                        id, TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
                 }
             }
         }
@@ -360,21 +371,24 @@ namespace SharpAbp.Abp.Faster
                         {
                             Log.TruncateUntilPageStart(_completedUntilAddress);
                             Logger.LogDebug(
-                                "Truncated log until page start. Address: {TruncateAddress}.",
-                                _completedUntilAddress);
+                                "Truncated log until page start. Address: {TruncateAddress} for type '{TypeName}'.",
+                                _completedUntilAddress,
+                                TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
                             _truncateUntilAddress = _completedUntilAddress;
                         }
                         else
                         {
                             Logger.LogDebug(
-                                "Skipping truncation. Truncate address ({TruncateAddress}) >= completed address ({CompletedAddress}).",
+                                "Skipping truncation for type '{TypeName}'. Truncate address ({TruncateAddress}) >= completed address ({CompletedAddress}).",
+                                TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
                                 _truncateUntilAddress,
                                 _completedUntilAddress);
                         }
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError(ex, "Error during log truncation: {Message}", ex.Message);
+                        Logger.LogError(ex, "Error during log truncation for type '{TypeName}': {Message}", 
+                            TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)), ex.Message);
                     }
 
                     await Task.Delay(Configuration.TruncateIntervalMillis, CancellationTokenProvider.Token);
@@ -485,17 +499,20 @@ namespace SharpAbp.Abp.Faster
                 throw new ArgumentNullException(nameof(entryPosition));
             }
 
-            Logger.LogDebug("Committing {Count} positions.", entryPosition.Count);
+            Logger.LogDebug("Committing {Count} positions for type '{TypeName}'.", 
+                entryPosition.Count, TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
 
             foreach (var position in entryPosition)
             {
                 if (!_committing.TryAdd(position.Address, new RetryPosition(position, 0)))
                 {
-                    Logger.LogDebug("Failed to add position {Address} to committing dictionary.", position.Address);
+                    Logger.LogDebug("Failed to add position {Address} to committing dictionary for type '{TypeName}'.", 
+                        position.Address, TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
                 }
             }
 
-            Logger.LogDebug("Finished committing positions.");
+            Logger.LogDebug("Finished committing positions for type '{TypeName}'.", 
+                TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
 
             return Task.CompletedTask;
         }

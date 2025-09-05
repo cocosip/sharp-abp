@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -266,10 +266,12 @@ namespace SharpAbp.Abp.FileStoring.KS3
                 try
                 {
                     var headObject = ks3.HeadObject(containerName, fileName);
+                    return true;
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(ex, "KS3 HeadObject failed,{0}", ex.Message);
+                    Logger.LogError(ex, "Failed to check existence of object '{FileName}' in KS3 bucket '{ContainerName}'. Error: {ErrorMessage}", 
+                        fileName, containerName, ex.Message);
                     return false;
                 }
             }
@@ -295,9 +297,9 @@ namespace SharpAbp.Abp.FileStoring.KS3
         {
             var initiateMultipartUploadResult = ks3.InitiateMultipartUpload(new InitiateMultipartUploadRequest(containerName, objectKey));
 
-            //上传Id
+            // Upload ID
             var uploadId = initiateMultipartUploadResult.UploadId;
-            // 计算分片总数。
+            // Calculate the total number of shards
             var partSize = args.Configuration.MultiPartUploadShardingSize;
             //var fi = new FileInfo(spoolFile.FilePath);//?
             var fileSize = args.FileStream!.Length;
@@ -307,15 +309,17 @@ namespace SharpAbp.Abp.FileStoring.KS3
                 partCount++;
             }
 
-            // 开始分片上传。partETags是保存partETag的列表，OSS收到用户提交的分片列表后，会逐一验证每个分片数据的有效性。 当所有的数据分片通过验证后，OSS会将这些分片组合成一个完整的文件。
+            // Start multipart upload. partETags is a list that stores partETag. After KS3 receives the shard list submitted by the user,
+            // it will verify the validity of each shard data one by one. After all data shards pass the verification,
+            // KS3 will combine these shards into a complete file.
             var partETags = new List<PartETag>();
             for (var i = 0; i < partCount; i++)
             {
                 var skipBytes = (long)partSize * i;
-                // 定位到本次上传的起始位置。
+                // Position to the starting point of this upload.
                 args.FileStream.Seek(skipBytes, 0);
 
-                // 计算本次上传的分片大小，最后一片为剩余的数据大小。
+                // Calculate the size of the shard to be uploaded this time. The last shard is the remaining data size.
                 var size = (partSize < fileSize - skipBytes) ? partSize : (fileSize - skipBytes);
                 var buffer = new byte[size];
                 await args.FileStream.ReadAsync(buffer, 0, buffer.Length);
@@ -329,11 +333,12 @@ namespace SharpAbp.Abp.FileStoring.KS3
                     PartNumber = i + 1
                 };
 
-                // 调用UploadPart接口执行上传功能，返回结果中包含了这个数据片的ETag值。
+                // Call the UploadPart interface to perform the upload function. The result contains the ETag value of this data shard.
                 var partETag = ks3.UploadPart(request);
                 partETags.Add(partETag);
 
-                Logger.LogDebug("UploadId {uploadId} finish {Count}/{partCount}.", uploadId, partETags.Count, partCount);
+                Logger.LogDebug("Multipart upload progress for file '{FileId}' with UploadId '{UploadId}': {CompletedParts}/{TotalParts} completed.", 
+                    args.FileId, uploadId, partETags.Count, partCount);
             }
 
             var root = new XElement("CompleteMultipartUpload");
@@ -356,7 +361,8 @@ namespace SharpAbp.Abp.FileStoring.KS3
             };
 
             var completeMultipartUploadResult = ks3.CompleteMultipartUpload(completeMultipartUploadRequest);
-            Logger.LogDebug("CompleteMultipartUpload {Key} ({ETag}).", completeMultipartUploadResult.Key, completeMultipartUploadResult.ETag);
+            Logger.LogInformation("Multipart upload completed for file '{FileId}' with key '{ObjectKey}'. ETag: {ETag}", 
+                args.FileId, completeMultipartUploadResult.Key, completeMultipartUploadResult.ETag);
             return args.FileId;
         }
  

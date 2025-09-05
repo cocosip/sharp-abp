@@ -1,4 +1,4 @@
-﻿using FastDFSCore;
+using FastDFSCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
@@ -88,7 +88,8 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
             }
             catch (Exception ex)
             {
-                Logger.LogException(ex, LogLevel.Error);
+                Logger.LogError(ex, "Failed to download file '{FileId}' from FastDFS. Container: {ContainerName}, Cluster: {ClusterName}", 
+                    fileId, containerName, configuration.ClusterName);
                 return false;
             }
         }
@@ -112,7 +113,8 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
             }
             catch (Exception ex)
             {
-                Logger.LogException(ex, LogLevel.Error);
+                Logger.LogError(ex, "Failed to get file '{FileId}' from FastDFS. Container: {ContainerName}, Cluster: {ClusterName}", 
+                    fileId, containerName, configuration.ClusterName);
                 return null;
             }
         }
@@ -159,10 +161,11 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
             }
         }
 
-        /// <summary>Convert time to int32 timestamp(from 1970-01-01 00:00:00)
+        /// <summary>
+        /// Convert time to int32 timestamp (from 1970-01-01 00:00:00)
         /// </summary>
-        /// <param name="datetime">time</param>
-        /// <returns></returns>
+        /// <param name="datetime">Time to convert</param>
+        /// <returns>Timestamp as int32</returns>
         protected virtual int ToInt32(DateTime datetime)
         {
             var timeSpan = datetime.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);

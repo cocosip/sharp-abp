@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -117,7 +117,7 @@ namespace SharpAbp.Abp.AspNetCore.Http
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Get http headers failed. {Message}", ex.Message);
+                Logger.LogError(ex, "Failed to get HTTP headers with prefix: '{Prefix}'.", prefix);
             }
             return headers;
         }
@@ -140,7 +140,7 @@ namespace SharpAbp.Abp.AspNetCore.Http
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Get http host url failed. {Message}", ex.Message);
+                Logger.LogError(ex, "Failed to get HTTP host URL from request context.");
             }
             return hostURL;
         }

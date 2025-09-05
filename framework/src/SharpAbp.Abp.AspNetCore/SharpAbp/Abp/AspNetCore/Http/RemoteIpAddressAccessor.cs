@@ -77,7 +77,7 @@ namespace SharpAbp.Abp.AspNetCore.Http
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Get real remote ip failed. {Message}", ex.Message);
+                Logger.LogError(ex, "Failed to get remote IP address from HTTP context.");
             }
 
             return string.Empty;
@@ -112,7 +112,7 @@ namespace SharpAbp.Abp.AspNetCore.Http
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Get real remote ip failed. {Message}", ex.Message);
+                Logger.LogError(ex, "Failed to get remote IP address from X-Forwarded-For header.");
             }
 
             return string.Empty;
@@ -146,7 +146,7 @@ namespace SharpAbp.Abp.AspNetCore.Http
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Get real remote ip failed. {Message}", ex.Message);
+                Logger.LogError(ex, "Failed to get remote IP address from X-Real-IP header.");
             }
 
             return string.Empty;

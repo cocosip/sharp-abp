@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -247,7 +247,8 @@ namespace SharpAbp.Abp.FileStoring.S3
         }
 
 
-        /// <summary>单文件上传
+        /// <summary>
+        /// Upload a single file
         /// </summary>
         protected virtual async Task<string> SingleUploadAsync(
             IAmazonS3 client,
@@ -265,6 +266,8 @@ namespace SharpAbp.Abp.FileStoring.S3
                 UseChunkEncoding = configuration.UseChunkEncoding,
             };
             await client.PutObjectAsync(putObjectRequest, args.CancellationToken);
+            Logger.LogInformation("Successfully uploaded single file '{FileId}' to S3. Bucket: {BucketName}, Key: {ObjectKey}", 
+                args.FileId, containerName, objectKey);
             return args.FileId;
         }
 
@@ -276,9 +279,9 @@ namespace SharpAbp.Abp.FileStoring.S3
             FileProviderSaveArgs args)
         {
             var initiateMultipartUploadResponse = await client.InitiateMultipartUploadAsync(containerName, objectKey, args.CancellationToken);
-            //UploadId
+            // Upload ID
             var uploadId = initiateMultipartUploadResponse.UploadId;
-            //Calculate slice part count
+            // Calculate slice part count
             var partSize = args.Configuration.MultiPartUploadShardingSize;
             //var fi = new FileInfo(spoolFile.FilePath);//?
             var fileSize = args.FileStream!.Length;
@@ -288,19 +291,21 @@ namespace SharpAbp.Abp.FileStoring.S3
                 partCount++;
             }
 
-            // 开始分片上传。partETags是保存partETag的列表，OSS收到用户提交的分片列表后，会逐一验证每个分片数据的有效性。 当所有的数据分片通过验证后，OSS会将这些分片组合成一个完整的文件。
+            // Start multipart upload. partETags is a list that stores partETag. After S3 receives the shard list submitted by the user,
+            // it will verify the validity of each shard data one by one. After all data shards pass the verification,
+            // S3 will combine these shards into a complete file.
             var partETags = new List<PartETag>();
 
             for (var i = 0; i < partCount; i++)
             {
                 var skipBytes = (long)partSize * i;
-                // 计算本次上传的片大小，最后一片为剩余的数据大小。
+                // Calculate the size of the shard to be uploaded this time. The last shard is the remaining data size.
                 var size = (int)((partSize < fileSize - skipBytes) ? partSize : (fileSize - skipBytes));
 
                 byte[] buffer = new byte[size];
                 args.FileStream.Read(buffer, 0, size);
 
-                //分片上传
+                // Upload part
                 var uploadPartResponse = await client.UploadPartAsync(new UploadPartRequest()
                 {
                     BucketName = containerName,
@@ -312,10 +317,11 @@ namespace SharpAbp.Abp.FileStoring.S3
                     UseChunkEncoding = configuration.UseChunkEncoding,
                 }, args.CancellationToken);
                 partETags.Add(new PartETag(uploadPartResponse.PartNumber, uploadPartResponse.ETag));
-                Logger.LogDebug("Upload part file ,key:{0},UploadId:{1},Complete {2}/{3}", objectKey, uploadId, partETags.Count, partCount);
+                Logger.LogDebug("Multipart upload progress for file '{FileId}' with UploadId '{UploadId}': {CompletedParts}/{TotalParts} completed. Bucket: {BucketName}, Key: {ObjectKey}", 
+                    args.FileId, uploadId, partETags.Count, partCount, containerName, objectKey);
             }
 
-            //完成上传分片
+            // Complete multipart upload
             var completeMultipartUploadRequest = new CompleteMultipartUploadRequest()
             {
                 BucketName = containerName,
@@ -325,7 +331,8 @@ namespace SharpAbp.Abp.FileStoring.S3
             };
 
             var completeMultipartUploadResponse = await client.CompleteMultipartUploadAsync(completeMultipartUploadRequest, args.CancellationToken);
-            Logger.LogDebug("CompleteMultipartUpload {Key} ({ETag}).", completeMultipartUploadResponse.Key, completeMultipartUploadResponse.ETag);
+            Logger.LogInformation("Multipart upload completed for file '{FileId}' with key '{ObjectKey}'. ETag: {ETag}, Bucket: {BucketName}", 
+                args.FileId, completeMultipartUploadResponse.Key, completeMultipartUploadResponse.ETag, containerName);
             return args.FileId;
         }
 

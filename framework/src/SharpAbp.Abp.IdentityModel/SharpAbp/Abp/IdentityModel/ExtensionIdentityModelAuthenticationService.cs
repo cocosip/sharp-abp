@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -39,11 +39,21 @@ namespace SharpAbp.Abp.IdentityModel
             var configuration = GetClientConfiguration(userName, userPassword, identityClientName);
             if (configuration == null)
             {
-                Logger.LogWarning($"Could not find {nameof(IdentityClientConfiguration)} for {identityClientName}. Either define a configuration for {identityClientName} or set a default configuration.");
+                Logger.LogWarning("Could not find {IdentityClientConfiguration} for client name '{IdentityClientName}'. Either define a configuration for this client or set a default configuration.",
+                    nameof(IdentityClientConfiguration), identityClientName ?? "null");
                 return null;
             }
 
-            return await IdentityModelAuthenticationService.GetAccessTokenAsync(configuration);
+            try
+            {
+                return await IdentityModelAuthenticationService.GetAccessTokenAsync(configuration);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Failed to get access token for user '{UserName}' with client '{IdentityClientName}'.",
+                    userName, identityClientName ?? "default");
+                throw;
+            }
         }
 
         /// <summary>
@@ -61,11 +71,21 @@ namespace SharpAbp.Abp.IdentityModel
             var configuration = GetClientConfiguration(loginProvider, providerKey, identityClientName);
             if (configuration == null)
             {
-                Logger.LogWarning($"Could not find {nameof(IdentityClientConfiguration)} for {identityClientName}. Either define a configuration for {identityClientName} or set a default configuration.");
+                Logger.LogWarning("Could not find {IdentityClientConfiguration} for client name '{IdentityClientName}'. Either define a configuration for this client or set a default configuration.",
+                    nameof(IdentityClientConfiguration), identityClientName ?? "null");
                 return null;
             }
 
-            return await IdentityModelAuthenticationService.GetAccessTokenAsync(configuration);
+            try
+            {
+                return await IdentityModelAuthenticationService.GetAccessTokenAsync(configuration);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Failed to get access token for external credentials. Login provider: '{LoginProvider}', Provider key: '{ProviderKey}', Client name: '{IdentityClientName}'.",
+                    loginProvider, providerKey, identityClientName ?? "default");
+                throw;
+            }
         }
 
         protected virtual IdentityClientConfiguration GetClientConfiguration(

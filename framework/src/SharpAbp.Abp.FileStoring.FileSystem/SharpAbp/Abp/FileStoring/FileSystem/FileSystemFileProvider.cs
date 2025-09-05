@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Polly;
 using System;
 using System.IO;
@@ -32,11 +32,12 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
         {
             var filePath = FilePathCalculator.Calculate(args);
 
-            Logger.LogTrace("FileSystem SaveAsync filePath: {filePath}", filePath);
+            Logger.LogDebug("Saving file to file system. File: {FilePath}", filePath);
 
             if (!args.OverrideExisting && await ExistsAsync(filePath))
             {
-                throw new FileAlreadyExistsException($"Saving File '{args.FileId}' does already exists in the container '{args.ContainerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
+                throw new FileAlreadyExistsException(
+                    $"Saving File '{args.FileId}' already exists in the container '{args.ContainerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
             }
 
             DirectoryHelper.CreateIfNotExists(Path.GetDirectoryName(filePath));
@@ -49,39 +50,57 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
                 .WaitAndRetryAsync(2, retryCount => TimeSpan.FromSeconds(retryCount))
                 .ExecuteAsync(async () =>
                 {
-                    using var fileStream = File.Open(filePath, fileMode, FileAccess.Write);
-                    await args.FileStream!.CopyToAsync(
-                        fileStream,
-                        args.CancellationToken
-                    );
+                    try
+                    {
+                        using var fileStream = File.Open(filePath, fileMode, FileAccess.Write);
+                        await args.FileStream!.CopyToAsync(
+                            fileStream,
+                            args.CancellationToken
+                        );
 
-                    await fileStream.FlushAsync();
+                        await fileStream.FlushAsync();
+                    }
+                    catch (IOException ex)
+                    {
+                        Logger.LogError(ex, "Failed to save file '{FileId}' to file system. Path: {FilePath}", args.FileId, filePath);
+                        throw;
+                    }
                 });
 
+            Logger.LogInformation("Successfully saved file '{FileId}' to file system. Path: {FilePath}", args.FileId, filePath);
             return args.FileId;
         }
 
         public override Task<bool> DeleteAsync(FileProviderDeleteArgs args)
         {
             var filePath = FilePathCalculator.Calculate(args);
-            Logger.LogTrace("FileSystem DeleteAsync filePath: {filePath}", filePath);
-            return Task.FromResult(FileHelper.DeleteIfExists(filePath));
+            Logger.LogDebug("Deleting file from file system. File: {FilePath}", filePath);
+            
+            var result = FileHelper.DeleteIfExists(filePath);
+            
+            if (result)
+            {
+                Logger.LogInformation("Successfully deleted file from file system. File: {FilePath}", filePath);
+            }
+            
+            return Task.FromResult(result);
         }
 
         public override Task<bool> ExistsAsync(FileProviderExistsArgs args)
         {
             var filePath = FilePathCalculator.Calculate(args);
-            Logger.LogTrace("FileSystem ExistsAsync filePath: {filePath}", filePath);
+            Logger.LogDebug("Checking file existence in file system. File: {FilePath}", filePath);
             return ExistsAsync(filePath);
         }
 
         public override async Task<bool> DownloadAsync(FileProviderDownloadArgs args)
         {
             var filePath = FilePathCalculator.Calculate(args);
-            Logger.LogTrace("FileSystem DownloadAsync filePath: {filePath}", filePath);
+            Logger.LogDebug("Downloading file from file system. File: {FilePath}", filePath);
 
             if (!File.Exists(filePath))
             {
+                Logger.LogWarning("File not found in file system. File: {FilePath}", filePath);
                 return false;
             }
 
@@ -89,19 +108,31 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
                 .WaitAndRetryAsync(2, retryCount => TimeSpan.FromSeconds(retryCount))
                 .ExecuteAsync(async () =>
                 {
-                    using var fileStream = File.OpenRead(filePath);
-                    await TryWriteToFileAsync(fileStream, args.Path, args.CancellationToken);
-                    return true;
+                    try
+                    {
+                        using var fileStream = File.OpenRead(filePath);
+                        await TryWriteToFileAsync(fileStream, args.Path, args.CancellationToken);
+                        Logger.LogInformation("Successfully downloaded file from file system. Source: {SourcePath}, Destination: {DestinationPath}", 
+                            filePath, args.Path);
+                        return true;
+                    }
+                    catch (IOException ex)
+                    {
+                        Logger.LogError(ex, "Failed to download file '{FileId}' from file system. Source: {SourcePath}, Destination: {DestinationPath}", 
+                            args.FileId, filePath, args.Path);
+                        throw;
+                    }
                 });
         }
-
 
         public override async Task<Stream?> GetOrNullAsync(FileProviderGetArgs args)
         {
             var filePath = FilePathCalculator.Calculate(args);
-            Logger.LogTrace("FileSystem GetOrNullAsync filePath: {filePath}", filePath);
+            Logger.LogDebug("Getting file from file system. File: {FilePath}", filePath);
+            
             if (!File.Exists(filePath))
             {
+                Logger.LogWarning("File not found in file system. File: {FilePath}", filePath);
                 return null;
             }
 
@@ -109,8 +140,18 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
                 .WaitAndRetryAsync(2, retryCount => TimeSpan.FromSeconds(retryCount))
                 .ExecuteAsync(async () =>
                 {
-                    using var fileStream = File.OpenRead(filePath);
-                    return await TryCopyToMemoryStreamAsync(fileStream, args.CancellationToken);
+                    try
+                    {
+                        using var fileStream = File.OpenRead(filePath);
+                        var result = await TryCopyToMemoryStreamAsync(fileStream, args.CancellationToken);
+                        Logger.LogDebug("Successfully retrieved file from file system. File: {FilePath}", filePath);
+                        return result;
+                    }
+                    catch (IOException ex)
+                    {
+                        Logger.LogError(ex, "Failed to get file '{FileId}' from file system. Path: {FilePath}", args.FileId, filePath);
+                        throw;
+                    }
                 });
         }
 
@@ -118,18 +159,22 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
         {
             if (!args.Configuration.HttpAccess)
             {
+                Logger.LogDebug("HTTP access is disabled for file system provider");
                 return string.Empty;
             }
 
             var configuration = args.Configuration.GetFileSystemConfiguration();
             var relativePath = CalculateRelativePath(args);
             var filePath = FilePathCalculator.Calculate(args);
+            
             if (args.CheckFileExist && !await ExistsAsync(filePath))
             {
+                Logger.LogWarning("File not found when generating access URL. File: {FilePath}", filePath);
                 return string.Empty;
             }
 
             var accessUrl = BuildAccessUrl(configuration, relativePath);
+            Logger.LogDebug("Generated access URL for file. File: {FilePath}, URL: {AccessUrl}", filePath, accessUrl);
             return accessUrl;
         }
 

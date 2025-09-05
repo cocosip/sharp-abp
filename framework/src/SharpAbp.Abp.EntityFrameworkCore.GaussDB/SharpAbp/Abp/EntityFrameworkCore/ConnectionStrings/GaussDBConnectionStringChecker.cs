@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using GaussDB;
 using Microsoft.Extensions.Logging;
@@ -41,7 +41,7 @@ namespace SharpAbp.Abp.EntityFrameworkCore.ConnectionStrings
 
             var result = new AbpConnectionStringCheckResult();
             
-            Logger.LogDebug("Starting GaussDB connection string validation for database connection");
+            Logger.LogDebug("Starting GaussDB connection validation for database connection");
 
             try
             {
@@ -55,11 +55,12 @@ namespace SharpAbp.Abp.EntityFrameworkCore.ConnectionStrings
                 }
                 catch (ArgumentException ex)
                 {
-                    Logger.LogError(ex, "Invalid GaussDB connection string format. Message: {Message}", ex.Message);
+                    Logger.LogError(ex, "Invalid GaussDB connection string format detected during validation. Connection String: {ConnectionString}", 
+                        connectionString);
                     return result;
                 }
 
-                Logger.LogDebug("Attempting to connect to GaussDB database. Host: {Host}, Database: {Database}, Port: {Port}", 
+                Logger.LogDebug("Attempting to establish connection to GaussDB database. Host: {Host}, Database: {Database}, Port: {Port}", 
                     connString.Host, connString.Database, connString.Port);
 
                 await using var conn = new GaussDBConnection(connString.ConnectionString);
@@ -68,7 +69,7 @@ namespace SharpAbp.Abp.EntityFrameworkCore.ConnectionStrings
                 result.Connected = true;
                 result.DatabaseExists = true;
 
-                Logger.LogInformation("Successfully connected to GaussDB database. Host: {Host}, Database: {Database}, Server Version: {ServerVersion}", 
+                Logger.LogInformation("Successfully established connection to GaussDB database. Host: {Host}, Database: {Database}, Server Version: {ServerVersion}", 
                     connString.Host, connString.Database, conn.ServerVersion);
 
                 await conn.CloseAsync();
@@ -78,13 +79,13 @@ namespace SharpAbp.Abp.EntityFrameworkCore.ConnectionStrings
 
             catch (GaussDBException ex)
             {
-                Logger.LogError(ex, "GaussDB specific error occurred during connection check. Error Code: {ErrorCode}, SqlState: {SqlState}, Message: {Message}", 
+                Logger.LogError(ex, "GaussDB database specific error occurred during connection validation. Error Code: {ErrorCode}, SqlState: {SqlState}, Message: {Message}", 
                     ex.ErrorCode, ex.SqlState, ex.Message);
                 return result;
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Unexpected error occurred during GaussDB connection check. Exception Type: {ExceptionType}, Message: {Message}", 
+                Logger.LogError(ex, "Unexpected error occurred during GaussDB connection validation. Exception Type: {ExceptionType}, Message: {Message}", 
                     ex.GetType().Name, ex.Message);
                 return result;
             }
