@@ -10,33 +10,17 @@ namespace SharpAbp.Abp.EntityFrameworkCore
     /// </summary>
     public static class SharpAbpEfCoreOptionsExtensions
     {
-        #region Constants
         
         /// <summary>
-        /// Valid Oracle SQL compatibility versions.
+        /// Gets the PostgreSQL version.
         /// </summary>
-        private static readonly HashSet<string> ValidOracleSqlCompatibilityVersions = new(StringComparer.OrdinalIgnoreCase)
+        /// <param name="options">The SharpAbpEfCoreOptions instance.</param>
+        /// <returns>The PostgreSQL version, or an empty string if not specified.</returns>
+        public static string GetPostgreSqlVersion(this SharpAbpEfCoreOptions options)
         {
-            "DatabaseVersion19",
-            "DatabaseVersion21",
-            "DatabaseVersion23"
-        };
-        
-        /// <summary>
-        /// Valid Oracle allowed logon versions for clients.
-        /// </summary>
-        private static readonly HashSet<string> ValidOracleLogonVersions = new(StringComparer.OrdinalIgnoreCase)
-        {
-            "Version8",
-            "Version9",
-            "Version10",
-            "Version11",
-            "Version12",
-            "Version12a"
-        };
-        
-        #endregion
-        
+            return options.GetPropertyValue(EfCoreConstants.PropertyNames.PostgreSqlVersion, "");
+        }
+
         /// <summary>
         /// Gets the Oracle SQL compatibility version.
         /// </summary>
@@ -44,7 +28,10 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         /// <returns>The Oracle SQL compatibility version, or "DatabaseVersion19" if not specified or invalid.</returns>
         public static string GetOracleSQLCompatibility(this SharpAbpEfCoreOptions options)
         {
-            return GetPropertyValue(options, "OracleSQLCompatibility", "DatabaseVersion19", ValidOracleSqlCompatibilityVersions);
+            return options.GetPropertyValue(
+                EfCoreConstants.PropertyNames.OracleSQLCompatibility,
+                EfCoreConstants.DefaultValues.OracleSQLCompatibility,
+                EfCoreConstants.ValidOracleSqlCompatibilityVersions);
         }
 
         /// <summary>
@@ -54,7 +41,10 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         /// <returns>The Oracle allowed logon version, or "Version11" if not specified or invalid.</returns>
         public static string GetOracleAllowedLogonVersionClient(this SharpAbpEfCoreOptions options)
         {
-            return GetPropertyValue(options, "OracleAllowedLogonVersionClient", "Version11", ValidOracleLogonVersions);
+            return options.GetPropertyValue(
+                EfCoreConstants.PropertyNames.OracleAllowedLogonVersionClient,
+                EfCoreConstants.DefaultValues.OracleAllowedLogonVersionClient,
+                EfCoreConstants.ValidOracleLogonVersions);
         }
 
         /// <summary>
@@ -64,7 +54,9 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         /// <returns>The MySQL version, or "5.6" if not specified.</returns>
         public static string GetMySqlVersion(this SharpAbpEfCoreOptions options)
         {
-            return GetPropertyValue(options, "MySqlVersion", "5.6");
+            return options.GetPropertyValue(
+                EfCoreConstants.PropertyNames.MySqlVersion, 
+                EfCoreConstants.DefaultValues.MySqlVersion);
         }
 
         /// <summary>
@@ -74,7 +66,9 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         /// <returns>The MySQL server type, or "MySql" if not specified.</returns>
         public static string GetMySqlServerType(this SharpAbpEfCoreOptions options)
         {
-            return GetPropertyValue(options, "MySqlServerType", "MySql");
+            return options.GetPropertyValue(
+                EfCoreConstants.PropertyNames.MySqlServerType, 
+                EfCoreConstants.DefaultValues.MySqlServerType);
         }
 
         /// <summary>
@@ -84,53 +78,9 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         /// <returns>The default schema, or an empty string if not specified.</returns>
         public static string GetDefaultSchema(this SharpAbpEfCoreOptions options)
         {
-            return GetPropertyValue(options, "DefaultSchema", "");
+            return options.GetPropertyValue(EfCoreConstants.PropertyNames.DefaultSchema, "");
         }
 
-        /// <summary>
-        /// Gets a property value from the options Properties dictionary with validation.
-        /// </summary>
-        /// <param name="options">The SharpAbpEfCoreOptions instance.</param>
-        /// <param name="propertyName">The name of the property to retrieve.</param>
-        /// <param name="defaultValue">The default value to return if the property is not found.</param>
-        /// <param name="validValues">Optional set of valid values for validation.</param>
-        /// <returns>The property value if found and valid; otherwise, the default value.</returns>
-        private static string GetPropertyValue(
-            SharpAbpEfCoreOptions options,
-            string propertyName,
-            string defaultValue = "",
-            HashSet<string>? validValues = null)
-        {
-            Check.NotNull(options, nameof(options));
-            Check.NotNullOrWhiteSpace(propertyName, nameof(propertyName));
-            
-            if (!options.Properties.TryGetValue(propertyName, out string? value) || string.IsNullOrWhiteSpace(value))
-            {
-                return defaultValue;
-            }
 
-            // If valid values are specified, check if the value is in the valid set
-            if (validValues?.Count > 0)
-            {
-                return validValues.Contains(value) ? value : defaultValue;
-            }
-
-            return value;
-        }
-        
-        /// <summary>
-        /// Gets a property value from the options Properties dictionary without validation.
-        /// </summary>
-        /// <param name="options">The SharpAbpEfCoreOptions instance.</param>
-        /// <param name="propertyName">The name of the property to retrieve.</param>
-        /// <param name="defaultValue">The default value to return if the property is not found.</param>
-        /// <returns>The property value if found; otherwise, the default value.</returns>
-        private static string GetPropertyValue(
-            SharpAbpEfCoreOptions options,
-            string propertyName,
-            string defaultValue)
-        {
-            return GetPropertyValue(options, propertyName, defaultValue, null);
-        }
     }
 }
