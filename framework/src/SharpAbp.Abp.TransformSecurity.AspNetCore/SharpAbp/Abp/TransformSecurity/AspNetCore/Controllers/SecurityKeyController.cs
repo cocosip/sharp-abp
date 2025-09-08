@@ -1,47 +1,85 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.AspNetCore.Mvc;
 
 namespace SharpAbp.Abp.TransformSecurity.AspNetCore.Controllers
 {
     /// <summary>
-    /// 安全凭证控制器，用于获取加密公钥等操作
+    /// Security credential controller for retrieving encryption public keys and related operations
     /// </summary>
     [Route("api/security-credentials")]
     [IgnoreAntiforgeryToken]
     public class SecurityKeyController : AbpController
     {
         private readonly ISecurityCredentialManager _securityCredentialManager;
+        private readonly ILogger<SecurityKeyController> _logger;
 
         /// <summary>
-        /// 构造函数
+        /// Initializes a new instance of the <see cref="SecurityKeyController"/> class
         /// </summary>
-        /// <param name="securityCredentialManager">安全凭证管理器</param>
-        public SecurityKeyController(ISecurityCredentialManager securityCredentialManager)
+        /// <param name="securityCredentialManager">The security credential manager</param>
+        /// <param name="logger">The logger instance</param>
+        public SecurityKeyController(
+            ISecurityCredentialManager securityCredentialManager,
+            ILogger<SecurityKeyController> logger)
         {
             _securityCredentialManager = securityCredentialManager;
+            _logger = logger;
         }
 
         /// <summary>
-        /// 根据业务类型获取安全凭证的公钥信息
+        /// Gets the public key information of security credential by business type
         /// </summary>
-        /// <param name="bizType">业务类型</param>
-        /// <returns>安全凭证公钥信息</returns>
+        /// <param name="bizType">The business type</param>
+        /// <returns>The security credential public key information</returns>
+        /// <exception cref="AbpException">Thrown when business type is invalid or credential generation fails</exception>
         [HttpGet]
         [Route("public")]
         [EnableRateLimiting(TransformSecurityRatelimitNames.SecurityKeyRateLimiting)]
         public async Task<SecurityCredentialPublicKeyDto> GetSecurityKeyAsync(string bizType)
         {
-            var credential = await _securityCredentialManager.GenerateAsync(bizType);
-            var pub = new SecurityCredentialPublicKeyDto()
+            try
             {
-                Identifier = credential.Identifier,
-                BizType = credential.BizType,
-                KeyType = credential.KeyType,
-                PublicKey = credential.PublicKey
-            };
-            return pub;
+                _logger.LogDebug("Requesting security credential public key for business type: {BizType}", bizType);
+
+                if (string.IsNullOrWhiteSpace(bizType))
+                {
+                    const string errorMessage = "Business type cannot be null or empty";
+                    _logger.LogWarning(errorMessage);
+                    throw new AbpException(errorMessage);
+                }
+
+                var credential = await _securityCredentialManager.GenerateAsync(bizType);
+                
+                if (credential == null)
+                {
+                    var errorMessage = $"Failed to generate security credential for business type: {bizType}";
+                    _logger.LogError(errorMessage);
+                    throw new AbpException(errorMessage);
+                }
+
+                var result = new SecurityCredentialPublicKeyDto
+                {
+                    Identifier = credential.Identifier,
+                    BizType = credential.BizType,
+                    KeyType = credential.KeyType,
+                    PublicKey = credential.PublicKey
+                };
+
+                _logger.LogDebug("Successfully generated security credential public key for business type: {BizType}, Identifier: {Identifier}, KeyType: {KeyType}", 
+                    bizType, credential.Identifier, credential.KeyType);
+
+                return result;
+            }
+            catch (Exception ex) when (!(ex is AbpException))
+            {
+                _logger.LogError(ex, "Unexpected error occurred while generating security credential for business type: {BizType}", bizType);
+                throw new AbpException($"An error occurred while generating security credential for business type: {bizType}", ex);
+            }
         }
     }
 }

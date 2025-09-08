@@ -9,12 +9,11 @@ namespace SharpAbp.Abp.AspNetCore.Mvc
     {
 
         /// <summary>
-        /// 其他的配置
+        /// Other AntiForgery Options
         /// options.TokenCookie.Expiration = TimeSpan.FromDays(365);
         /// options.AutoValidateIgnoredHttpMethods.Add("POST");
-        /// 
         /// options.TokenCookie.Expiration = TimeSpan.Zero;
-        /// options.AutoValidate = false; //表示不验证防伪令牌
+        /// options.AutoValidate = false; //Do not validate antiforgery token
         /// options.AutoValidateIgnoredHttpMethods.Remove("GET");
         /// options.AutoValidateFilter = type => !type.Namespace.StartsWith("MyProject.MyIgnoredNamespace");
         /// </summary>

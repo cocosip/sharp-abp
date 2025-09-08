@@ -3,29 +3,34 @@ using System.Collections.Generic;
 
 namespace SharpAbp.Abp.TransformSecurity
 {
+    /// <summary>
+    /// Configuration options for ABP Transform Security functionality
+    /// </summary>
     public class AbpTransformSecurityOptions
     {
         /// <summary>
-        /// Enable security or not。 default: false
+        /// Gets or sets whether security is enabled. Default: false
         /// </summary>
         public bool Enabled { get; set; } = false;
 
         /// <summary>
-        /// Encryption algorithm. default: RSA  (RSA/SM2)
+        /// Gets or sets the encryption algorithm. Default: RSA (supported algorithms: RSA/SM2)
         /// </summary>
         public string EncryptionAlgo { get; set; } = AbpTransformSecurityNames.RSA;
 
         /// <summary>
-        /// Expires timespan
+        /// Gets or sets the expiration timespan for security credentials
         /// </summary>
         public TimeSpan Expires { get; set; } = TimeSpan.FromSeconds(600);
 
         /// <summary>
-        /// 业务类型
+        /// Gets or sets the list of supported business types
         /// </summary>
         public List<string> BizTypes { get; set; }
 
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AbpTransformSecurityOptions"/> class
+        /// </summary>
         public AbpTransformSecurityOptions()
         {
             BizTypes = [];

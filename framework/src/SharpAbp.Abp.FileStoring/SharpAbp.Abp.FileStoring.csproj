@@ -23,6 +23,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\SharpAbp.Abp.Core\SharpAbp.Abp.Core.csproj" />
 		<ProjectReference Include="..\SharpAbp.Abp.FileStoring.Abstractions\SharpAbp.Abp.FileStoring.Abstractions.csproj" />
 	</ItemGroup>
 

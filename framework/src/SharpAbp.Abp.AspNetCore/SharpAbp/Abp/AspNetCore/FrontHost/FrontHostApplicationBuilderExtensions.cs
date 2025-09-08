@@ -20,7 +20,7 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
 
             foreach (var app in options.Apps)
             {
-                //页面文件注册
+                //Page File Registration
                 foreach (var page in app.Pages)
                 {
                     builder.UseEndpoints(endpoints =>
@@ -29,7 +29,7 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
                     });
                 }
 
-                //静态文件目录注册
+                //Static File Directory Registration
                 foreach (var staticDir in app.StaticDirs)
                 {
                     builder.UseStaticFiles(new StaticFileOptions()

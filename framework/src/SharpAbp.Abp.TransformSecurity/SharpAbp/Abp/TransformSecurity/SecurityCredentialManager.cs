@@ -11,16 +11,61 @@ using Volo.Abp.Timing;
 
 namespace SharpAbp.Abp.TransformSecurity
 {
+    /// <summary>
+    /// Default implementation of <see cref="ISecurityCredentialManager"/> for managing security credentials
+    /// </summary>
     public class SecurityCredentialManager : ISecurityCredentialManager, ITransientDependency
     {
+        /// <summary>
+        /// Gets the transform security options
+        /// </summary>
         protected AbpTransformSecurityOptions Options { get; }
+        
+        /// <summary>
+        /// Gets the RSA encryption options
+        /// </summary>
         protected AbpTransformSecurityRSAOptions RSAOptions { get; }
+        
+        /// <summary>
+        /// Gets the SM2 encryption options
+        /// </summary>
         protected AbpTransformSecuritySM2Options SM2Options { get; }
+        
+        /// <summary>
+        /// Gets the GUID generator service
+        /// </summary>
         protected IGuidGenerator GuidGenerator { get; }
+        
+        /// <summary>
+        /// Gets the clock service for time operations
+        /// </summary>
         protected IClock Clock { get; }
+        
+        /// <summary>
+        /// Gets the security credential store service
+        /// </summary>
         protected ISecurityCredentialStore SecurityCredentialStore { get; }
+        
+        /// <summary>
+        /// Gets the RSA encryption service
+        /// </summary>
         protected IRSAEncryptionService RSAEncryptionService { get; }
+        
+        /// <summary>
+        /// Gets the SM2 encryption service
+        /// </summary>
         protected ISm2EncryptionService Sm2EncryptionService { get; }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SecurityCredentialManager"/> class
+        /// </summary>
+        /// <param name="options">The transform security options</param>
+        /// <param name="rsaOptions">The RSA encryption options</param>
+        /// <param name="sm2Options">The SM2 encryption options</param>
+        /// <param name="guidGenerator">The GUID generator service</param>
+        /// <param name="clock">The clock service</param>
+        /// <param name="securityCredentialStore">The security credential store service</param>
+        /// <param name="rsaEncryptionService">The RSA encryption service</param>
+        /// <param name="sm2EncryptionService">The SM2 encryption service</param>
         public SecurityCredentialManager(
             IOptions<AbpTransformSecurityOptions> options,
             IOptions<AbpTransformSecurityRSAOptions> rsaOptions,
@@ -41,11 +86,18 @@ namespace SharpAbp.Abp.TransformSecurity
             Sm2EncryptionService = sm2EncryptionService;
         }
 
+        /// <summary>
+        /// Generates a new security credential for the specified business type
+        /// </summary>
+        /// <param name="bizType">The business type for which to generate the credential</param>
+        /// <param name="cancellationToken">A token to cancel the operation</param>
+        /// <returns>A task that represents the asynchronous operation and contains the generated security credential</returns>
+        /// <exception cref="AbpException">Thrown when the business type is not supported</exception>
         public virtual async Task<SecurityCredential> GenerateAsync(string bizType, CancellationToken cancellationToken = default)
         {
             if (!ValidateBizType(bizType))
             {
-                throw new AbpException($"Unsupported bizType {bizType}");
+                throw new AbpException($"The business type '{bizType}' is not supported. Please ensure the business type is configured in the supported business types list.");
             }
 
             var credential = new SecurityCredential()
@@ -79,6 +131,11 @@ namespace SharpAbp.Abp.TransformSecurity
             return credential;
         }
 
+        /// <summary>
+        /// Validates whether the specified business type is supported
+        /// </summary>
+        /// <param name="bizType">The business type to validate</param>
+        /// <returns>True if the business type is supported; otherwise, false</returns>
         protected virtual bool ValidateBizType(string bizType)
         {
             if (Options.BizTypes.Contains(bizType))
