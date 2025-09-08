@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using SharpAbp.Abp.Validation;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
-using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoring
 {
     [DependsOn(
-        typeof(AbpValidationModule)
+        typeof(SharpAbpValidationModule)
         )]
     public class AbpFileStoringAbstractionsModule : AbpModule
     {
