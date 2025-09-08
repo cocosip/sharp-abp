@@ -76,7 +76,8 @@ namespace SharpAbp.Abp.TransformSecurity
             var exception = await Assert.ThrowsAsync<AbpException>(
                 () => _securityCredentialManager.GenerateAsync(invalidBizType));
             
-            Assert.Contains("Unsupported bizType", exception.Message);
+            Assert.Contains("The business type", exception.Message);
+            Assert.Contains("is not", exception.Message);
         }
 
         [Theory]

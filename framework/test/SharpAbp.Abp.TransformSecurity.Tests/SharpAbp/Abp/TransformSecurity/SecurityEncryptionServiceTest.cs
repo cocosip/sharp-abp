@@ -135,7 +135,8 @@ namespace SharpAbp.Abp.TransformSecurity
             var exception = await Assert.ThrowsAsync<AbpException>(
                 () => _securityEncryptionService.EncryptAsync(plainText, invalidIdentifier));
             
-            Assert.Contains("Could not find security key by id", exception.Message);
+            Assert.Contains("Security credential with identifier", exception.Message);
+            Assert.Contains("was not found", exception.Message);
         }
 
         [Fact]
@@ -149,7 +150,8 @@ namespace SharpAbp.Abp.TransformSecurity
             var exception = await Assert.ThrowsAsync<AbpException>(
                 () => _securityEncryptionService.DecryptAsync(cipherText, invalidIdentifier));
             
-            Assert.Contains("Could not find security key by id", exception.Message);
+            Assert.Contains("Security credential with identifier", exception.Message);
+            Assert.Contains("was not found", exception.Message);
         }
 
         [Fact]
