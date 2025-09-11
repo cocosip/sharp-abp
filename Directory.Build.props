@@ -5,11 +5,11 @@
 		<!--Net Core Framework-->
 		<NetCoreFx>net9.0</NetCoreFx>
 		<!--Microsoft-->
-		<MicrosoftPackageVersion>[9.0.8,)</MicrosoftPackageVersion>
+		<MicrosoftPackageVersion>[9.0.9,)</MicrosoftPackageVersion>
 		<!--EfCore-->
-		<EfCorePackageVersion>[9.0.8,)</EfCorePackageVersion>
+		<EfCorePackageVersion>[9.0.9,)</EfCorePackageVersion>
 		<!--Volo ABP packages-->
-		<VoloAbpPackageVersion>[9.3.2,10.0.0)</VoloAbpPackageVersion>
+		<VoloAbpPackageVersion>[9.3.3,10.0.0)</VoloAbpPackageVersion>
 		<!--FreeSql package-->
 		<FreeSqlPackageVersion>[3.5.213,)</FreeSqlPackageVersion>
 		<!--Masstransit package-->
