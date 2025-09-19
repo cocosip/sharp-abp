@@ -1,4 +1,5 @@
-﻿using SharpAbp.Abp.Data;
+﻿using System;
+using SharpAbp.Abp.Data;
 using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.EntityFrameworkCore
@@ -16,7 +17,7 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         /// <returns>The corresponding DatabaseProvider enum value, or null if the provider name is not recognized.</returns>
         public virtual DatabaseProvider? GetDatabaseProviderOrNull(string providerName)
         {
-            if (string.IsNullOrEmpty(providerName))
+            if (providerName.IsNullOrWhiteSpace())
                 return null;
 
             return providerName.ToUpperInvariant() switch
