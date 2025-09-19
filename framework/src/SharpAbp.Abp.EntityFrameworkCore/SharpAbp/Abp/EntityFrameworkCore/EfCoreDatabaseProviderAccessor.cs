@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
 using SharpAbp.Abp.Data;
 using Volo.Abp.DependencyInjection;
 
@@ -10,6 +11,13 @@ namespace SharpAbp.Abp.EntityFrameworkCore
     /// </summary>
     public class EfCoreDatabaseProviderAccessor : IEfCoreDatabaseProviderAccessor, ITransientDependency
     {
+        protected ILogger Logger { get; }
+
+        public EfCoreDatabaseProviderAccessor(ILogger<EfCoreDatabaseProviderAccessor> logger)
+        {
+            Logger = logger;
+        }
+        
         /// <summary>
         /// Gets the database provider enum value based on the provider name, or null if not found.
         /// </summary>
@@ -18,9 +26,12 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         public virtual DatabaseProvider? GetDatabaseProviderOrNull(string providerName)
         {
             if (providerName.IsNullOrWhiteSpace())
+            {
+                Logger.LogDebug("Database provider name is null or whitespace, returning null");
                 return null;
+            }
 
-            return providerName.ToUpperInvariant() switch
+            var result = providerName.ToUpperInvariant() switch
             {
                 "SQLSERVER" => (DatabaseProvider?)DatabaseProvider.SqlServer,
                 "POSTGRESQL" => (DatabaseProvider?)DatabaseProvider.PostgreSql,
@@ -35,6 +46,10 @@ namespace SharpAbp.Abp.EntityFrameworkCore
                 "GAUSSDB" => (DatabaseProvider?)DatabaseProvider.GaussDB,
                 _ => null,
             };
+
+            Logger.LogDebug("Resolved database provider: {DatabaseProvider} for provider name: {ProviderName}", result, providerName);
+
+            return result;
         }
     }
 }

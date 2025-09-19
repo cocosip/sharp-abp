@@ -30,6 +30,9 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             Assert.Equal(DatabaseProvider.SqlServer, _databaseProviderAccessor.GetDatabaseProviderOrNull("SQLSERVER"));
             Assert.Equal(DatabaseProvider.SqlServer, _databaseProviderAccessor.GetDatabaseProviderOrNull("sqlserver"));
             Assert.Equal(DatabaseProvider.SqlServer, _databaseProviderAccessor.GetDatabaseProviderOrNull("SqlServer"));
+            // Additional case variations
+            Assert.Equal(DatabaseProvider.SqlServer, _databaseProviderAccessor.GetDatabaseProviderOrNull("SqlSeRvEr"));
+            Assert.Equal(DatabaseProvider.SqlServer, _databaseProviderAccessor.GetDatabaseProviderOrNull("sQLsERVER"));
         }
 
         /// <summary>
@@ -42,6 +45,10 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             Assert.Equal(DatabaseProvider.PostgreSql, _databaseProviderAccessor.GetDatabaseProviderOrNull("POSTGRESQL"));
             Assert.Equal(DatabaseProvider.PostgreSql, _databaseProviderAccessor.GetDatabaseProviderOrNull("postgresql"));
             Assert.Equal(DatabaseProvider.PostgreSql, _databaseProviderAccessor.GetDatabaseProviderOrNull("PostgreSql"));
+            Assert.Equal(DatabaseProvider.PostgreSql, _databaseProviderAccessor.GetDatabaseProviderOrNull("PostgreSQL"));
+            // Additional case variations
+            Assert.Equal(DatabaseProvider.PostgreSql, _databaseProviderAccessor.GetDatabaseProviderOrNull("PostgreSQl"));
+            Assert.Equal(DatabaseProvider.PostgreSql, _databaseProviderAccessor.GetDatabaseProviderOrNull("pOstGrESqL"));
         }
 
         /// <summary>
@@ -54,6 +61,9 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             Assert.Equal(DatabaseProvider.MySql, _databaseProviderAccessor.GetDatabaseProviderOrNull("MYSQL"));
             Assert.Equal(DatabaseProvider.MySql, _databaseProviderAccessor.GetDatabaseProviderOrNull("mysql"));
             Assert.Equal(DatabaseProvider.MySql, _databaseProviderAccessor.GetDatabaseProviderOrNull("MySql"));
+            // Additional case variations
+            Assert.Equal(DatabaseProvider.MySql, _databaseProviderAccessor.GetDatabaseProviderOrNull("MySQl"));
+            Assert.Equal(DatabaseProvider.MySql, _databaseProviderAccessor.GetDatabaseProviderOrNull("mYsQL"));
         }
 
         /// <summary>
@@ -66,6 +76,9 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             Assert.Equal(DatabaseProvider.Oracle, _databaseProviderAccessor.GetDatabaseProviderOrNull("ORACLE"));
             Assert.Equal(DatabaseProvider.Oracle, _databaseProviderAccessor.GetDatabaseProviderOrNull("oracle"));
             Assert.Equal(DatabaseProvider.Oracle, _databaseProviderAccessor.GetDatabaseProviderOrNull("Oracle"));
+            // Additional case variations
+            Assert.Equal(DatabaseProvider.Oracle, _databaseProviderAccessor.GetDatabaseProviderOrNull("oRACLe"));
+            Assert.Equal(DatabaseProvider.Oracle, _databaseProviderAccessor.GetDatabaseProviderOrNull("OracLE"));
         }
 
         /// <summary>
@@ -78,6 +91,9 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             Assert.Equal(DatabaseProvider.Oracle, _databaseProviderAccessor.GetDatabaseProviderOrNull("DEVART.ORACLE"));
             Assert.Equal(DatabaseProvider.Oracle, _databaseProviderAccessor.GetDatabaseProviderOrNull("devart.oracle"));
             Assert.Equal(DatabaseProvider.Oracle, _databaseProviderAccessor.GetDatabaseProviderOrNull("Devart.Oracle"));
+            // Additional case variations
+            Assert.Equal(DatabaseProvider.Oracle, _databaseProviderAccessor.GetDatabaseProviderOrNull("Devart.ORACLE"));
+            Assert.Equal(DatabaseProvider.Oracle, _databaseProviderAccessor.GetDatabaseProviderOrNull("devart.Oracle"));
         }
 
         /// <summary>
@@ -90,6 +106,9 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             Assert.Equal(DatabaseProvider.Sqlite, _databaseProviderAccessor.GetDatabaseProviderOrNull("SQLITE"));
             Assert.Equal(DatabaseProvider.Sqlite, _databaseProviderAccessor.GetDatabaseProviderOrNull("sqlite"));
             Assert.Equal(DatabaseProvider.Sqlite, _databaseProviderAccessor.GetDatabaseProviderOrNull("Sqlite"));
+            // Additional case variations
+            Assert.Equal(DatabaseProvider.Sqlite, _databaseProviderAccessor.GetDatabaseProviderOrNull("SQLite"));
+            Assert.Equal(DatabaseProvider.Sqlite, _databaseProviderAccessor.GetDatabaseProviderOrNull("sQLiTe"));
         }
 
         /// <summary>
@@ -102,6 +121,9 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             Assert.Equal(DatabaseProvider.InMemory, _databaseProviderAccessor.GetDatabaseProviderOrNull("INMEMORY"));
             Assert.Equal(DatabaseProvider.InMemory, _databaseProviderAccessor.GetDatabaseProviderOrNull("inmemory"));
             Assert.Equal(DatabaseProvider.InMemory, _databaseProviderAccessor.GetDatabaseProviderOrNull("InMemory"));
+            // Additional case variations
+            Assert.Equal(DatabaseProvider.InMemory, _databaseProviderAccessor.GetDatabaseProviderOrNull("InMEMORY"));
+            Assert.Equal(DatabaseProvider.InMemory, _databaseProviderAccessor.GetDatabaseProviderOrNull("iNmEmOrY"));
         }
 
         /// <summary>
@@ -114,6 +136,9 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             Assert.Equal(DatabaseProvider.Firebird, _databaseProviderAccessor.GetDatabaseProviderOrNull("FIREBIRD"));
             Assert.Equal(DatabaseProvider.Firebird, _databaseProviderAccessor.GetDatabaseProviderOrNull("firebird"));
             Assert.Equal(DatabaseProvider.Firebird, _databaseProviderAccessor.GetDatabaseProviderOrNull("Firebird"));
+            // Additional case variations
+            Assert.Equal(DatabaseProvider.Firebird, _databaseProviderAccessor.GetDatabaseProviderOrNull("FireBIRD"));
+            Assert.Equal(DatabaseProvider.Firebird, _databaseProviderAccessor.GetDatabaseProviderOrNull("fIrEbIrD"));
         }
 
         /// <summary>
@@ -126,6 +151,9 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             Assert.Equal(DatabaseProvider.Cosmos, _databaseProviderAccessor.GetDatabaseProviderOrNull("COSMOS"));
             Assert.Equal(DatabaseProvider.Cosmos, _databaseProviderAccessor.GetDatabaseProviderOrNull("cosmos"));
             Assert.Equal(DatabaseProvider.Cosmos, _databaseProviderAccessor.GetDatabaseProviderOrNull("Cosmos"));
+            // Additional case variations
+            Assert.Equal(DatabaseProvider.Cosmos, _databaseProviderAccessor.GetDatabaseProviderOrNull("CosMOS"));
+            Assert.Equal(DatabaseProvider.Cosmos, _databaseProviderAccessor.GetDatabaseProviderOrNull("cOsMoS"));
         }
 
         /// <summary>
@@ -138,6 +166,8 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             Assert.Equal(DatabaseProvider.Dm, _databaseProviderAccessor.GetDatabaseProviderOrNull("DM"));
             Assert.Equal(DatabaseProvider.Dm, _databaseProviderAccessor.GetDatabaseProviderOrNull("dm"));
             Assert.Equal(DatabaseProvider.Dm, _databaseProviderAccessor.GetDatabaseProviderOrNull("Dm"));
+            // Additional case variations
+            Assert.Equal(DatabaseProvider.Dm, _databaseProviderAccessor.GetDatabaseProviderOrNull("dM"));
         }
 
         /// <summary>
@@ -150,6 +180,9 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             Assert.Equal(DatabaseProvider.OpenGauss, _databaseProviderAccessor.GetDatabaseProviderOrNull("OPENGAUSS"));
             Assert.Equal(DatabaseProvider.OpenGauss, _databaseProviderAccessor.GetDatabaseProviderOrNull("opengauss"));
             Assert.Equal(DatabaseProvider.OpenGauss, _databaseProviderAccessor.GetDatabaseProviderOrNull("OpenGauss"));
+            // Additional case variations
+            Assert.Equal(DatabaseProvider.OpenGauss, _databaseProviderAccessor.GetDatabaseProviderOrNull("OpenGAUSS"));
+            Assert.Equal(DatabaseProvider.OpenGauss, _databaseProviderAccessor.GetDatabaseProviderOrNull("oPeNgAuSs"));
         }
 
         /// <summary>
@@ -162,6 +195,9 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             Assert.Equal(DatabaseProvider.GaussDB, _databaseProviderAccessor.GetDatabaseProviderOrNull("GAUSSDB"));
             Assert.Equal(DatabaseProvider.GaussDB, _databaseProviderAccessor.GetDatabaseProviderOrNull("gaussdb"));
             Assert.Equal(DatabaseProvider.GaussDB, _databaseProviderAccessor.GetDatabaseProviderOrNull("GaussDB"));
+            // Additional case variations
+            Assert.Equal(DatabaseProvider.GaussDB, _databaseProviderAccessor.GetDatabaseProviderOrNull("GaussDb"));
+            Assert.Equal(DatabaseProvider.GaussDB, _databaseProviderAccessor.GetDatabaseProviderOrNull("gAuSsDb"));
         }
 
         /// <summary>
@@ -171,6 +207,9 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         [InlineData(null)]
         [InlineData("")]
         [InlineData("   ")]
+        [InlineData("\t")]
+        [InlineData("\n")]
+        [InlineData("\r\n")]
         public void GetDatabaseProviderOrNull_NullOrEmptyProviderName_ShouldReturnNull(string providerName)
         {
             // Act & Assert
@@ -185,6 +224,11 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         [InlineData("INVALID")]
         [InlineData("NOTEXIST")]
         [InlineData("RANDOM")]
+        [InlineData("SQL-SERVER")] // Special characters
+        [InlineData("Postgre_SQL")] // Special characters
+        [InlineData("My SQL")] // Space in name
+        [InlineData("Oracle123")] // Numbers
+        [InlineData("Firebird!")] // Special characters
         public void GetDatabaseProviderOrNull_UnknownProviderName_ShouldReturnNull(string providerName)
         {
             // Act & Assert
