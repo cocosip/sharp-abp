@@ -27,7 +27,7 @@ namespace SharpAbp.Abp.TransformSecurity
             // Configure test-specific options
             Configure<AbpTransformSecurityOptions>(options =>
             {
-                options.Enabled = true;
+                options.IsEnabled = true;
                 options.EncryptionAlgo = "RSA";
                 options.Expires = TimeSpan.FromMinutes(10);
                 options.BizTypes.Add("Login");

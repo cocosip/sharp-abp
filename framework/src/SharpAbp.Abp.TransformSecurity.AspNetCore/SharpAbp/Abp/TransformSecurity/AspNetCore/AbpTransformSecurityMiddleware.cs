@@ -29,7 +29,7 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
 
         public override async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            if (Options.Enabled)
+            if (Options.IsEnabled)
             {
                 try
                 {

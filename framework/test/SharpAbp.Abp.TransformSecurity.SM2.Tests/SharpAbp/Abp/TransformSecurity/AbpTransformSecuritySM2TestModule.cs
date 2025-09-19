@@ -23,7 +23,7 @@ namespace SharpAbp.Abp.TransformSecurity
         {
             Configure<AbpTransformSecurityOptions>(options =>
             {
-                options.Enabled = true;
+                options.IsEnabled = true;
                 options.EncryptionAlgo = "SM2";
                 options.BizTypes.Add("UpdatePassword");
             });

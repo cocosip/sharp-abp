@@ -41,7 +41,7 @@ namespace SharpAbp.Abp.TransformSecurity
 
             Configure<AbpTransformSecurityOptions>(options =>
             {
-                options.Enabled = false;
+                options.IsEnabled = false;
                 options.EncryptionAlgo = "RSA";
                 options.Expires = TimeSpan.FromSeconds(600);
                 options.BizTypes.Add("Login");

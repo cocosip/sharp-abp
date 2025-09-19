@@ -11,7 +11,7 @@ namespace SharpAbp.Abp.TransformSecurity
         /// <summary>
         /// Gets or sets whether security is enabled. Default: false
         /// </summary>
-        public bool Enabled { get; set; } = false;
+        public bool IsEnabled { get; set; } = false;
 
         /// <summary>
         /// Gets or sets the encryption algorithm. Default: RSA (supported algorithms: RSA/SM2)

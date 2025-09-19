@@ -32,7 +32,7 @@ namespace SharpAbp.Abp.TransformSecurity
 
             // Assert
             Assert.NotNull(options);
-            Assert.True(options.Enabled); // Set in test module
+            Assert.True(options.IsEnabled); // Set in test module
             Assert.Equal("RSA", options.EncryptionAlgo);
             Assert.Equal(TimeSpan.FromMinutes(10), options.Expires);
             Assert.Contains("Login", options.BizTypes);

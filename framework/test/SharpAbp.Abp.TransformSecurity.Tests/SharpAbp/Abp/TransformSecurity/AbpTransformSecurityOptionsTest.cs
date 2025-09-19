@@ -25,7 +25,7 @@ namespace SharpAbp.Abp.TransformSecurity
             var options = new AbpTransformSecurityOptions();
 
             // Assert
-            Assert.False(options.Enabled);
+            Assert.False(options.IsEnabled);
             Assert.Equal(AbpTransformSecurityNames.RSA, options.EncryptionAlgo);
             Assert.Equal(TimeSpan.FromSeconds(600), options.Expires);
             Assert.NotNull(options.BizTypes);
@@ -41,7 +41,7 @@ namespace SharpAbp.Abp.TransformSecurity
             // Assert
             Assert.NotNull(options);
             Assert.NotNull(options.BizTypes);
-            Assert.True(options.Enabled); // Set in test module
+            Assert.True(options.IsEnabled); // Set in test module
             Assert.Equal(AbpTransformSecurityNames.RSA, options.EncryptionAlgo); // Set in test module
         }
 
@@ -52,10 +52,10 @@ namespace SharpAbp.Abp.TransformSecurity
             var options = new AbpTransformSecurityOptions();
 
             // Act
-            options.Enabled = true;
+            options.IsEnabled = true;
 
             // Assert
-            Assert.True(options.Enabled);
+            Assert.True(options.IsEnabled);
         }
 
         [Fact]
@@ -190,7 +190,7 @@ namespace SharpAbp.Abp.TransformSecurity
             // Arrange & Act
             var options = new AbpTransformSecurityOptions
             {
-                Enabled = true,
+                IsEnabled = true,
                 EncryptionAlgo = "SM2",
                 Expires = TimeSpan.FromMinutes(15)
             };
@@ -198,7 +198,7 @@ namespace SharpAbp.Abp.TransformSecurity
             options.BizTypes.Add("Register");
 
             // Assert
-            Assert.True(options.Enabled);
+            Assert.True(options.IsEnabled);
             Assert.Equal("SM2", options.EncryptionAlgo);
             Assert.Equal(TimeSpan.FromMinutes(15), options.Expires);
             Assert.Equal(2, options.BizTypes.Count);
@@ -250,7 +250,7 @@ namespace SharpAbp.Abp.TransformSecurity
 
             // Assert
             Assert.NotNull(options);
-            Assert.True(options.Enabled); // Set in test module
+            Assert.True(options.IsEnabled); // Set in test module
             Assert.Equal(AbpTransformSecurityNames.RSA, options.EncryptionAlgo); // Set in test module
             Assert.Equal(TimeSpan.FromMinutes(10), options.Expires); // Set in test module
             Assert.NotNull(options.BizTypes);
