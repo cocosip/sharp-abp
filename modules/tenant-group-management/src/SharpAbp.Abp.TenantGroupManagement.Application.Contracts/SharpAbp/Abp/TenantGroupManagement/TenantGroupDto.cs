@@ -12,13 +12,12 @@ namespace SharpAbp.Abp.TenantGroupManagement
         public string NormalizedName { get; set; }
         public bool IsActive { get; set; }
         public string ConcurrencyStamp { get; set; }
-        public List<TenantGroupTenantDto> Tenants { get; set; }
-        public List<TenantGroupConnectionStringDto> ConnectionStrings { get; set; }
+        public List<TenantGroupTenantDto> Tenants { get; set; } = [];
+        public List<TenantGroupConnectionStringDto> ConnectionStrings { get; set; } = [];
 
         public TenantGroupDto()
         {
-            Tenants = [];
-            ConnectionStrings = [];
+
         }
     }
 }

@@ -13,9 +13,8 @@ namespace SharpAbp.Abp.TenantGroupManagement
 
         }
 
-        public TenantGroupTenant(Guid id, Guid tenantGroupId, Guid tenantId)
+        public TenantGroupTenant(Guid id, Guid tenantGroupId, Guid tenantId) : base(id)
         {
-            Id = id;
             TenantGroupId = tenantGroupId;
             TenantId = tenantId;
         }
