@@ -24,7 +24,7 @@ namespace SharpAbp.Abp.AspNetCore.Mvc
             context.Services.Configure<AbpAntiForgeryOptions>(options =>
             {
                 options.TokenCookie.Expiration = TimeSpan.Zero;
-                //false代表不验证防伪令牌
+                //Disable antiforgery token validation
                 options.AutoValidate = false;
             });
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Data;
+using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Uow;
@@ -24,7 +25,7 @@ namespace SharpAbp.MinId
         }
 
 
-        public override async Task<SegmentId> GetNextSegmentIdAsync(string bizType)
+        public override async Task<SegmentId> GetNextSegmentIdAsync(string bizType, CancellationToken cancellationToken = default)
         {
             SegmentId segmentId = null;
 
@@ -39,7 +40,7 @@ namespace SharpAbp.MinId
                 Logger.LogDebug("Old maxId:{MaxId}, New maxId {newMaxId},Step:{Step}", minIdInfo.MaxId, newMaxId, minIdInfo.Step);
 
                 minIdInfo.UpdateMaxId(newMaxId);
-                await MinIdInfoRepository.UpdateAsync(minIdInfo);
+                await MinIdInfoRepository.UpdateAsync(minIdInfo, cancellationToken: cancellationToken);
                 segmentId = ConvertToSegmentId(minIdInfo);
             }
             catch

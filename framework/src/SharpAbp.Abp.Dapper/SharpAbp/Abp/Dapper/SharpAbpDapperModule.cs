@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Dapper;
+﻿using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.Dapper.Oracle;
 using SharpAbp.Abp.Data;

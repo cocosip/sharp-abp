@@ -16,11 +16,7 @@ namespace SharpAbp.Abp.Binary.Protobuf
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            Configure<AbpProtobufSerializerOptions>(options =>
-            {
-            });
-
-
+            Configure<AbpProtobufSerializerOptions>(options => { });
             return Task.CompletedTask;
         }
 

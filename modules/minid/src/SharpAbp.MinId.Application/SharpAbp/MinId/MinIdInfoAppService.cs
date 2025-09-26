@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+﻿﻿﻿﻿using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
@@ -8,14 +8,30 @@ using Volo.Abp.Application.Dtos;
 
 namespace SharpAbp.MinId
 {
+    /// <summary>
+    /// Application service implementation for managing MinId information.
+    /// This service provides methods for CRUD operations on MinIdInfo entities.
+    /// </summary>
     [Authorize(MinIdPermissions.MinIdInfos.Default)]
     public class MinIdInfoAppService : MinIdAppService, IMinIdInfoAppService
     {
-        protected MinIdInfoManager MinIdInfoManager { get; }
+        /// <summary>
+        /// The manager responsible for handling MinIdInfo business logic.
+        /// </summary>
+        protected IMinIdInfoManager MinIdInfoManager { get; }
+
+        /// <summary>
+        /// The repository for accessing MinIdInfo data.
+        /// </summary>
         protected IMinIdInfoRepository MinIdInfoRepository { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the MinIdInfoAppService class.
+        /// </summary>
+        /// <param name="minIdInfoManager">The manager for MinIdInfo business logic.</param>
+        /// <param name="minIdInfoRepository">The repository for MinIdInfo data access.</param>
         public MinIdInfoAppService(
-            MinIdInfoManager minIdInfoManager,
+            IMinIdInfoManager minIdInfoManager,
             IMinIdInfoRepository minIdInfoRepository)
         {
             MinIdInfoManager = minIdInfoManager;
@@ -23,10 +39,10 @@ namespace SharpAbp.MinId
         }
 
         /// <summary>
-        /// Get minIdInfo by id
+        /// Gets a MinIdInfo entity by its unique identifier.
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">The unique identifier of the MinIdInfo entity.</param>
+        /// <returns>The MinIdInfoDto representing the requested entity.</returns>
         [Authorize(MinIdPermissions.MinIdInfos.Default)]
         public virtual async Task<MinIdInfoDto> GetAsync(Guid id)
         {
@@ -35,10 +51,10 @@ namespace SharpAbp.MinId
         }
 
         /// <summary>
-        /// Find minIdInfo by bizType
+        /// Finds a MinIdInfo entity by its business type.
         /// </summary>
-        /// <param name="bizType"></param>
-        /// <returns></returns>
+        /// <param name="bizType">The business type of the MinIdInfo entity. Cannot be null or white space.</param>
+        /// <returns>The MinIdInfoDto representing the found entity.</returns>
         [Authorize(MinIdPermissions.MinIdInfos.Default)]
         public virtual async Task<MinIdInfoDto> FindByBizTypeAsync([NotNull] string bizType)
         {
@@ -48,10 +64,10 @@ namespace SharpAbp.MinId
         }
 
         /// <summary>
-        /// Get paged list
+        /// Gets a paged list of MinIdInfo entities based on the provided request parameters.
         /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
+        /// <param name="input">The paged request DTO containing filtering and paging parameters.</param>
+        /// <returns>A paged result containing the MinIdInfoDto entities.</returns>
         [Authorize(MinIdPermissions.MinIdInfos.Default)]
         public virtual async Task<PagedResultDto<MinIdInfoDto>> GetPagedListAsync(MinIdInfoPagedRequestDto input)
         {
@@ -69,11 +85,11 @@ namespace SharpAbp.MinId
         }
 
         /// <summary>
-        /// Get list
+        /// Gets a list of MinIdInfo entities with optional sorting and filtering by business type.
         /// </summary>
-        /// <param name="sorting"></param>
-        /// <param name="bizType"></param>
-        /// <returns></returns>
+        /// <param name="sorting">The sorting criteria for the results.</param>
+        /// <param name="bizType">The business type to filter by (optional).</param>
+        /// <returns>A list of MinIdInfoDto entities.</returns>
         [Authorize(MinIdPermissions.MinIdInfos.Default)]
         public virtual async Task<List<MinIdInfoDto>> GetListAsync(string sorting = null, string bizType = "")
         {
@@ -82,10 +98,10 @@ namespace SharpAbp.MinId
         }
 
         /// <summary>
-        /// Create minIdInfo
+        /// Creates a new MinIdInfo entity based on the provided input data.
         /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
+        /// <param name="input">The DTO containing the data for the new MinIdInfo entity.</param>
+        /// <returns>The created MinIdInfoDto representing the new entity.</returns>
         [Authorize(MinIdPermissions.MinIdInfos.Create)]
         public virtual async Task<MinIdInfoDto> CreateAsync(CreateMinIdInfoDto input)
         {
@@ -102,11 +118,11 @@ namespace SharpAbp.MinId
         }
 
         /// <summary>
-        /// Update minIdInfo
+        /// Updates an existing MinIdInfo entity with the specified ID using the provided input data.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="input"></param>
-        /// <returns></returns>
+        /// <param name="id">The unique identifier of the MinIdInfo entity to update.</param>
+        /// <param name="input">The DTO containing the updated data for the MinIdInfo entity.</param>
+        /// <returns>The updated MinIdInfoDto representing the modified entity.</returns>
         [Authorize(MinIdPermissions.MinIdInfos.Update)]
         public virtual async Task<MinIdInfoDto> UpdateAsync(Guid id, UpdateMinIdInfoDto input)
         {
@@ -122,16 +138,14 @@ namespace SharpAbp.MinId
         }
 
         /// <summary>
-        /// Delete minIdInfo
+        /// Deletes a MinIdInfo entity with the specified ID.
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">The unique identifier of the MinIdInfo entity to delete.</param>
+        /// <returns>A task that represents the asynchronous delete operation.</returns>
         [Authorize(MinIdPermissions.MinIdInfos.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {
             await MinIdInfoRepository.DeleteAsync(id);
         }
-
-
     }
 }

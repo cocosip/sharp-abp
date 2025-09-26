@@ -4,36 +4,39 @@ using System.Threading.Tasks;
 
 namespace SharpAbp.Abp.DbConnections
 {
+    /// <summary>
+    /// Defines an interface for creating and managing database connections
+    /// </summary>
     public interface IDbConnectionFactory
     {
         /// <summary>
-        /// Get DbConnectionInfo
+        /// Gets the database connection information for the specified connection name
         /// </summary>
-        /// <param name="dbConnectionName"></param>
-        /// <returns></returns>
+        /// <param name="dbConnectionName">The name of the database connection</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the database connection information.</returns>
         [NotNull]
         Task<DbConnectionInfo?> GetDbConnectionInfoAsync([NotNull] string dbConnectionName);
 
         /// <summary>
-        /// Get DbConnectionInfo
+        /// Gets the database connection information for the specified connection type
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
+        /// <typeparam name="T">The type of the database connection</typeparam>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the database connection information.</returns>
         Task<DbConnectionInfo?> GetDbConnectionInfoAsync<T>();
 
         /// <summary>
-        /// Get IDbConnection
+        /// Gets a database connection for the specified connection name
         /// </summary>
-        /// <param name="dbConnectionName"></param>
-        /// <returns></returns>
+        /// <param name="dbConnectionName">The name of the database connection</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the database connection.</returns>
         [NotNull]
         Task<IDbConnection?> GetDbConnectionAsync([NotNull] string dbConnectionName);
 
         /// <summary>
-        /// Get DbConnection
+        /// Gets a database connection for the specified connection type
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
+        /// <typeparam name="T">The type of the database connection</typeparam>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the database connection.</returns>
         Task<IDbConnection?> GetDbConnectionAsync<T>();
     }
 }
