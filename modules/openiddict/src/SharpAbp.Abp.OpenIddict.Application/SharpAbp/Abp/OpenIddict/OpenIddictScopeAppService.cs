@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using OpenIddict.Abstractions;
 using System;
 using System.Collections.Generic;
@@ -14,11 +14,25 @@ using Volo.Abp.OpenIddict.Scopes;
 
 namespace SharpAbp.Abp.OpenIddict
 {
+    /// <summary>
+    /// Application service for managing OpenIddict scopes
+    /// </summary>
     [Authorize(OpenIddictPermissions.Scopes.Default)]
     public class OpenIddictScopeAppService : OpenIddictAppServiceBase, IOpenIddictScopeAppService
     {
+        /// <summary>
+        /// Gets the OpenIddict scope store
+        /// </summary>
         protected IOpenIddictScopeStore<OpenIddictScopeModel> OpenIddictScopeStore { get; }
+        /// <summary>
+        /// Gets the OpenIddict scope repository
+        /// </summary>
         protected IOpenIddictScopeRepository OpenIddictScopeRepository { get; }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OpenIddictScopeAppService"/> class
+        /// </summary>
+        /// <param name="openIddictScopeStore">The OpenIddict scope store</param>
+        /// <param name="openIddictScopeRepository">The OpenIddict scope repository</param>
         public OpenIddictScopeAppService(
             IOpenIddictScopeStore<OpenIddictScopeModel> openIddictScopeStore,
             IOpenIddictScopeRepository openIddictScopeRepository)
@@ -27,6 +41,11 @@ namespace SharpAbp.Abp.OpenIddict
             OpenIddictScopeRepository = openIddictScopeRepository;
         }
 
+        /// <summary>
+        /// Gets an OpenIddict scope by its unique identifier
+        /// </summary>
+        /// <param name="id">The unique identifier of the scope</param>
+        /// <returns>The OpenIddict scope DTO</returns>
         [Authorize(OpenIddictPermissions.Scopes.Default)]
         public virtual async Task<OpenIddictScopeDto> GetAsync(Guid id)
         {
@@ -34,6 +53,11 @@ namespace SharpAbp.Abp.OpenIddict
             return await ToScopeDtoAsync(scope.ToModel());
         }
 
+        /// <summary>
+        /// Finds an OpenIddict scope by its name
+        /// </summary>
+        /// <param name="name">The name of the scope</param>
+        /// <returns>The OpenIddict scope DTO if found, null otherwise</returns>
         [Authorize(OpenIddictPermissions.Scopes.Default)]
         public virtual async Task<OpenIddictScopeDto> FindByNameAsync(string name)
         {
@@ -42,6 +66,11 @@ namespace SharpAbp.Abp.OpenIddict
             return await ToScopeDtoAsync(scope.ToModel());
         }
 
+        /// <summary>
+        /// Gets a paged list of OpenIddict scopes
+        /// </summary>
+        /// <param name="input">The paged request parameters</param>
+        /// <returns>A paged result of OpenIddict scope DTOs</returns>
         [Authorize(OpenIddictPermissions.Scopes.Default)]
         public virtual async Task<PagedResultDto<OpenIddictScopeDto>> GetPagedListAsync(OpenIddictScopePagedRequestDto input)
         {
@@ -56,6 +85,10 @@ namespace SharpAbp.Abp.OpenIddict
             return new PagedResultDto<OpenIddictScopeDto>(count, scopeDtos);
         }
 
+        /// <summary>
+        /// Gets all OpenIddict scopes
+        /// </summary>
+        /// <returns>A list of all OpenIddict scope DTOs</returns>
         [Authorize(OpenIddictPermissions.Scopes.Default)]
         public virtual async Task<List<OpenIddictScopeDto>> GetListAsync()
         {
@@ -68,6 +101,11 @@ namespace SharpAbp.Abp.OpenIddict
             return scopeDtos;
         }
 
+        /// <summary>
+        /// Creates a new OpenIddict scope
+        /// </summary>
+        /// <param name="input">The scope creation data</param>
+        /// <returns>The created OpenIddict scope DTO</returns>
         [Authorize(OpenIddictPermissions.Scopes.Create)]
         public virtual async Task<OpenIddictScopeDto> CreateAsync(CreateOpenIddictScopeDto input)
         {
@@ -98,6 +136,12 @@ namespace SharpAbp.Abp.OpenIddict
             return await ToScopeDtoAsync(model);
         }
 
+        /// <summary>
+        /// Updates an existing OpenIddict scope
+        /// </summary>
+        /// <param name="id">The unique identifier of the scope to update</param>
+        /// <param name="input">The scope update data</param>
+        /// <returns>The updated OpenIddict scope DTO</returns>
         [Authorize(OpenIddictPermissions.Scopes.Update)]
         public virtual async Task<OpenIddictScopeDto> UpdateAsync(Guid id, UpdateOpenIddictScopeDto input)
         {
@@ -125,12 +169,23 @@ namespace SharpAbp.Abp.OpenIddict
             return await ToScopeDtoAsync(model, CancellationToken.None);
         }
 
+        /// <summary>
+        /// Deletes an OpenIddict scope
+        /// </summary>
+        /// <param name="id">The unique identifier of the scope to delete</param>
+        /// <returns>A task representing the asynchronous operation</returns>
         [Authorize(OpenIddictPermissions.Scopes.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {
             await OpenIddictScopeRepository.DeleteAsync(id);
         }
 
+        /// <summary>
+        /// Converts an OpenIddict scope model to a DTO
+        /// </summary>
+        /// <param name="model">The OpenIddict scope model</param>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>The OpenIddict scope DTO</returns>
         protected virtual async Task<OpenIddictScopeDto> ToScopeDtoAsync(OpenIddictScopeModel model, CancellationToken cancellationToken = default)
         {
             var dto = new OpenIddictScopeDto()
