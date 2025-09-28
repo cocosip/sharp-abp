@@ -12,19 +12,72 @@ using Volo.Abp.Timing;
 
 namespace SharpAbp.Abp.TransformSecurityManagement
 {
+    /// <summary>
+    /// Database-backed implementation of the security credential manager.
+    /// This class manages the generation and retrieval of security credentials for RSA and SM2 encryption algorithms,
+    /// storing and retrieving cryptographic keys from a database repository.
+    /// </summary>
     [Dependency(ServiceLifetime.Transient, ReplaceServices = true)]
     [ExposeServices(typeof(ISecurityCredentialManager))]
     public class DatabaseSecurityCredentialManager : ISecurityCredentialManager, ITransientDependency
     {
+        /// <summary>
+        /// Gets the transform security options containing global configuration settings.
+        /// </summary>
         protected AbpTransformSecurityOptions Options { get; }
+        
+        /// <summary>
+        /// Gets the RSA-specific configuration options including key size and padding settings.
+        /// </summary>
         protected AbpTransformSecurityRSAOptions RSAOptions { get; }
+        
+        /// <summary>
+        /// Gets the SM2-specific configuration options including curve and mode settings.
+        /// </summary>
         protected AbpTransformSecuritySM2Options SM2Options { get; }
+        
+        /// <summary>
+        /// Gets the GUID generator for creating unique identifiers for security credentials.
+        /// </summary>
         protected IGuidGenerator GuidGenerator { get; }
+        
+        /// <summary>
+        /// Gets the clock service for managing time-related operations and credential expiration.
+        /// </summary>
         protected IClock Clock { get; }
+        
+        /// <summary>
+        /// Gets the key service for encrypting and decrypting cryptographic keys.
+        /// </summary>
         protected IKeyService KeyService { get; }
+        
+        /// <summary>
+        /// Gets the security credential store for persisting and retrieving credentials.
+        /// </summary>
         protected ISecurityCredentialStore SecurityCredentialStore { get; }
+        
+        /// <summary>
+        /// Gets the repository for managing RSA credentials in the database.
+        /// </summary>
         protected IRSACredsRepository RSACredsRepository { get; }
+        
+        /// <summary>
+        /// Gets the repository for managing SM2 credentials in the database.
+        /// </summary>
         protected ISM2CredsRepository SM2CredsRepository { get; }
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DatabaseSecurityCredentialManager"/> class.
+        /// </summary>
+        /// <param name="options">The transform security options.</param>
+        /// <param name="rsaOptions">The RSA-specific configuration options.</param>
+        /// <param name="sm2Options">The SM2-specific configuration options.</param>
+        /// <param name="guidGenerator">The GUID generator service.</param>
+        /// <param name="clock">The clock service for time operations.</param>
+        /// <param name="keyService">The key service for cryptographic operations.</param>
+        /// <param name="securityCredentialStore">The security credential store.</param>
+        /// <param name="rsaCredsRepository">The RSA credentials repository.</param>
+        /// <param name="sm2CredsRepository">The SM2 credentials repository.</param>
         public DatabaseSecurityCredentialManager(
             IOptions<AbpTransformSecurityOptions> options,
             IOptions<AbpTransformSecurityRSAOptions> rsaOptions,
@@ -47,6 +100,15 @@ namespace SharpAbp.Abp.TransformSecurityManagement
             SM2CredsRepository = sm2CredsRepository;
         }
 
+        /// <summary>
+        /// Generates a new security credential for the specified business type.
+        /// This method creates appropriate credentials based on the configured encryption algorithm (RSA or SM2),
+        /// retrieves the corresponding cryptographic keys from the database, and stores the credential.
+        /// </summary>
+        /// <param name="bizType">The business type identifier for which the credential is being generated.</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+        /// <returns>A newly generated security credential with cryptographic keys and metadata.</returns>
+        /// <exception cref="AbpException">Thrown when the business type is not supported, encryption algorithm is unsupported, or credential retrieval fails.</exception>
         public virtual async Task<SecurityCredential> GenerateAsync(string bizType, CancellationToken cancellationToken = default)
         {
             if (!ValidateBizType(bizType))
@@ -93,6 +155,11 @@ namespace SharpAbp.Abp.TransformSecurityManagement
             return credential;
         }
 
+        /// <summary>
+        /// Validates whether the specified business type is supported according to the current configuration.
+        /// </summary>
+        /// <param name="bizType">The business type to validate.</param>
+        /// <returns>True if the business type is supported; otherwise, false.</returns>
         protected virtual bool ValidateBizType(string bizType)
         {
             foreach (var item in Options.BizTypes)

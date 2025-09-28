@@ -10,19 +10,27 @@ using Volo.Abp.EntityFrameworkCore;
 
 namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
 {
+    /// <summary>
+    /// Entity Framework Core implementation of the tenant group repository.
+    /// Provides data access operations for tenant groups using Entity Framework Core.
+    /// </summary>
     public class EfCoreTenantGroupRepository : EfCoreRepository<ITenantGroupManagementDbContext, TenantGroup, Guid>, ITenantGroupRepository
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EfCoreTenantGroupRepository"/> class.
+        /// </summary>
+        /// <param name="dbContextProvider">The database context provider.</param>
         public EfCoreTenantGroupRepository(IDbContextProvider<ITenantGroupManagementDbContext> dbContextProvider) : base(dbContextProvider)
         {
         }
 
         /// <summary>
-        /// Find by name
+        /// Finds a tenant group by its normalized name.
         /// </summary>
-        /// <param name="normalizedName"></param>
-        /// <param name="includeDetails"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <param name="normalizedName">The normalized name of the tenant group to find.</param>
+        /// <param name="includeDetails">A value indicating whether to include related entities in the result.</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+        /// <returns>The tenant group with the specified normalized name, or null if not found.</returns>
         public virtual async Task<TenantGroup> FindByNameAsync(
             string normalizedName,
             bool includeDetails = true,
@@ -35,13 +43,14 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
         }
 
         /// <summary>
-        /// Find expected by name
+        /// Finds a tenant group by its normalized name, excluding the specified expected ID.
+        /// This method is typically used for uniqueness validation during updates.
         /// </summary>
-        /// <param name="normalizedName"></param>
-        /// <param name="expectedId"></param>
-        /// <param name="includeDetails"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <param name="normalizedName">The normalized name of the tenant group to find.</param>
+        /// <param name="expectedId">The ID to exclude from the search (typically the current entity's ID being updated).</param>
+        /// <param name="includeDetails">A value indicating whether to include related entities in the result.</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+        /// <returns>The tenant group with the specified normalized name excluding the expected ID, or null if not found.</returns>
         public virtual async Task<TenantGroup> FindExpectedByNameAsync(
             string normalizedName,
             Guid? expectedId = null,
@@ -56,12 +65,12 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
         }
 
         /// <summary>
-        /// Find by tenantId
+        /// Finds a tenant group that contains the specified tenant ID.
         /// </summary>
-        /// <param name="tenantId"></param>
-        /// <param name="includeDetails"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <param name="tenantId">The ID of the tenant to search for within tenant groups.</param>
+        /// <param name="includeDetails">A value indicating whether to include related entities in the result.</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+        /// <returns>The tenant group containing the specified tenant ID, or null if not found.</returns>
         public virtual async Task<TenantGroup> FindByTenantIdAsync(
             Guid? tenantId,
             bool includeDetails = true,
@@ -74,13 +83,14 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
         }
 
         /// <summary>
-        /// Find expected by tenantId
+        /// Finds a tenant group that contains the specified tenant ID, excluding the specified expected ID.
+        /// This method is typically used for uniqueness validation during updates.
         /// </summary>
-        /// <param name="tenantId"></param>
-        /// <param name="expectedId"></param>
-        /// <param name="includeDetails"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <param name="tenantId">The ID of the tenant to search for within tenant groups.</param>
+        /// <param name="expectedId">The ID to exclude from the search (typically the current entity's ID being updated).</param>
+        /// <param name="includeDetails">A value indicating whether to include related entities in the result.</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+        /// <returns>The tenant group containing the specified tenant ID excluding the expected ID, or null if not found.</returns>
         public virtual async Task<TenantGroup> FindExpectedByTenantIdAsync(
             Guid? tenantId,
             Guid? expectedId = null,
@@ -95,14 +105,14 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
         }
 
         /// <summary>
-        ///  Get list
+        /// Gets a list of tenant groups based on the specified filtering and sorting criteria.
         /// </summary>
-        /// <param name="sorting"></param>
-        /// <param name="name"></param>
-        /// <param name="isActive"></param>
-        /// <param name="includeDetails"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <param name="sorting">The sorting expression. If null, defaults to ordering by ID.</param>
+        /// <param name="name">The name filter to search for tenant groups containing this value.</param>
+        /// <param name="isActive">The active status filter. If null, includes both active and inactive tenant groups.</param>
+        /// <param name="includeDetails">A value indicating whether to include related entities in the result.</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+        /// <returns>A list of tenant groups matching the specified criteria.</returns>
         public virtual async Task<List<TenantGroup>> GetListAsync(
             string sorting = null,
             string name = "",
@@ -118,18 +128,17 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
-
         /// <summary>
-        /// Get paged list
+        /// Gets a paged list of tenant groups based on the specified filtering, sorting, and pagination criteria.
         /// </summary>
-        /// <param name="skipCount"></param>
-        /// <param name="maxResultCount"></param>
-        /// <param name="sorting"></param>
-        /// <param name="name"></param>
-        /// <param name="isActive"></param>
-        /// <param name="includeDetails"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <param name="skipCount">The number of records to skip for pagination.</param>
+        /// <param name="maxResultCount">The maximum number of records to return.</param>
+        /// <param name="sorting">The sorting expression. If null, defaults to ordering by ID.</param>
+        /// <param name="name">The name filter to search for tenant groups containing this value.</param>
+        /// <param name="isActive">The active status filter. If null, includes both active and inactive tenant groups.</param>
+        /// <param name="includeDetails">A value indicating whether to include related entities in the result.</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+        /// <returns>A paged list of tenant groups matching the specified criteria.</returns>
         public virtual async Task<List<TenantGroup>> GetPagedListAsync(
             int skipCount,
             int maxResultCount,
@@ -150,12 +159,12 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
         }
 
         /// <summary>
-        /// Get count
+        /// Gets the total count of tenant groups based on the specified filtering criteria.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="isActive"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <param name="name">The name filter to search for tenant groups containing this value.</param>
+        /// <param name="isActive">The active status filter. If null, includes both active and inactive tenant groups.</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+        /// <returns>The total count of tenant groups matching the specified criteria.</returns>
         public virtual async Task<int> GetCountAsync(
             string name = "",
             bool? isActive = null,
@@ -167,6 +176,10 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
                 .CountAsync(GetCancellationToken(cancellationToken));
         }
 
+        /// <summary>
+        /// Gets a queryable with all related entities included.
+        /// </summary>
+        /// <returns>A queryable with all related entities included.</returns>
         public override async Task<IQueryable<TenantGroup>> WithDetailsAsync()
         {
             return (await GetQueryableAsync()).IncludeDetails();
