@@ -12,22 +12,5 @@ namespace SharpAbp.Abp.FileStoringManagement
             LocalizationResource = typeof(FileStoringManagementResource);
         }
 
-
-        // protected virtual IStringLocalizer CreateFileProviderLocalizer()
-        // {
-        //     if (LocalizationResource != null)
-        //     {
-        //         return StringLocalizerFactory.Create(LocalizationResource);
-        //     }
-
-        //     var localizer = StringLocalizerFactory.CreateDefaultOrNull();
-        //     if (localizer == null)
-        //     {
-        //         throw new AbpException($"Set {nameof(LocalizationResource)} or define the default localization resource type (by configuring the {nameof(AbpLocalizationOptions)}.{nameof(AbpLocalizationOptions.DefaultResourceType)}) to be able to use the {nameof(L)} object!");
-        //     }
-
-        //     return localizer;
-        // }
-
     }
 }

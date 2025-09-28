@@ -8,20 +8,28 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.DbConnectionsManagement
 {
+    /// <summary>
+    /// Database connection information resolver that resolves connection information from the database management system
+    /// </summary>
     [Dependency(ServiceLifetime.Transient, ReplaceServices = true)]
     [ExposeServices(typeof(IDbConnectionInfoResolver))]
     public class DatabaseDbConnectionInfoResolver : IDbConnectionInfoResolver, ITransientDependency
     {
         /// <summary>
-        /// Database connection cache manager
+        /// Gets the database connection cache manager for caching connection information
         /// </summary>
         protected IDatabaseConnectionCacheManager ConnectionInfoCacheManager { get; }
         
         /// <summary>
-        /// Database connection information repository
+        /// Gets the database connection information repository for data access
         /// </summary>
         protected IDatabaseConnectionInfoRepository ConnectionInfoRepository { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DatabaseDbConnectionInfoResolver"/> class
+        /// </summary>
+        /// <param name="connectionInfoCacheManager">The cache manager for database connection information</param>
+        /// <param name="connectionInfoRepository">The repository for database connection information</param>
         public DatabaseDbConnectionInfoResolver(
             IDatabaseConnectionCacheManager connectionInfoCacheManager,
             IDatabaseConnectionInfoRepository connectionInfoRepository)
@@ -31,10 +39,11 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         }
 
         /// <summary>
-        /// Resolve database connection information by name
+        /// Resolves database connection information for the specified connection name
         /// </summary>
-        /// <param name="dbConnectionName">Database connection name</param>
-        /// <returns>Database connection information</returns>
+        /// <param name="dbConnectionName">The name of the database connection to resolve</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the database connection information.</returns>
+        /// <exception cref="AbpException">Thrown when no database connection configuration is found for the specified name</exception>
         public virtual async Task<DbConnectionInfo> ResolveAsync(string dbConnectionName)
         {
             var cacheItem = await ConnectionInfoCacheManager.GetAsync(dbConnectionName);
@@ -47,10 +56,10 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         }
 
         /// <summary>
-        /// Convert cache item to database connection information
+        /// Converts a database connection cache item to database connection information
         /// </summary>
-        /// <param name="cacheItem">Database connection cache item</param>
-        /// <returns>Database connection information</returns>
+        /// <param name="cacheItem">The database connection cache item to convert</param>
+        /// <returns>The converted database connection information</returns>
         private DbConnectionInfo ConvertToDbConnection(DatabaseConnectionCacheItem cacheItem)
         {
             var databaseProvider = (DatabaseProvider)Enum.Parse(typeof(DatabaseProvider), cacheItem.DatabaseProvider);

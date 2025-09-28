@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace SharpAbp.Abp.DbConnections
 {
     /// <summary>
-    /// Defines an interface for resolving database connection information by name
+    /// Defines a contract for resolving database connection information by connection name
     /// </summary>
     public interface IDbConnectionInfoResolver
     {
