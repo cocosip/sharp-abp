@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+﻿﻿using JetBrains.Annotations;
 using System;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
@@ -6,63 +6,77 @@ using Volo.Abp.Application.Services;
 
 namespace SharpAbp.Abp.MapTenancyManagement
 {
+    /// <summary>
+    /// Defines the contract for map tenant application service operations.
+    /// Provides comprehensive CRUD operations and query capabilities for managing map tenant entities.
+    /// </summary>
     public interface IMapTenantAppService : IApplicationService
     {
         /// <summary>
-        /// Get MapTenant
+        /// Retrieves a map tenant by its unique identifier
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">The unique identifier of the map tenant</param>
+        /// <returns>The map tenant DTO with the specified ID</returns>
+        /// <exception cref="Volo.Abp.EntityNotFoundException">Thrown when the map tenant with the specified ID is not found</exception>
         Task<MapTenantDto> GetAsync(Guid id);
 
         /// <summary>
-        /// Find MapTenant by code
+        /// Finds a map tenant by its unique code
         /// </summary>
-        /// <param name="code"></param>
-        /// <returns></returns>
+        /// <param name="code">The unique code to search for; cannot be null or whitespace</param>
+        /// <returns>The map tenant DTO with the specified code if found; otherwise null</returns>
+        /// <exception cref="System.ArgumentException">Thrown when code is null or whitespace</exception>
         Task<MapTenantDto> FindByCodeAsync(string code);
 
         /// <summary>
-        /// Find MapTenant by mapCode
+        /// Finds a map tenant by its unique map code
         /// </summary>
-        /// <param name="mapCode"></param>
-        /// <returns></returns>
+        /// <param name="mapCode">The unique map code to search for; cannot be null or whitespace</param>
+        /// <returns>The map tenant DTO with the specified map code if found; otherwise null</returns>
+        /// <exception cref="System.ArgumentException">Thrown when mapCode is null or whitespace</exception>
         Task<MapTenantDto> FindByMapCodeAsync(string mapCode);
 
         /// <summary>
-        /// Find MapTenant by tenantId
+        /// Finds a map tenant by its associated tenant identifier
         /// </summary>
-        /// <param name="tenantId"></param>
-        /// <returns></returns>
+        /// <param name="tenantId">The tenant identifier to search for</param>
+        /// <returns>The map tenant DTO associated with the specified tenant ID if found; otherwise null</returns>
         Task<MapTenantDto> FindByTenantIdAsync(Guid tenantId);
 
         /// <summary>
-        /// Get Paged List
+        /// Retrieves a paginated list of map tenants with filtering and sorting capabilities
         /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
+        /// <param name="input">The paged request containing pagination, sorting, and filtering parameters</param>
+        /// <returns>A paginated result containing map tenant DTOs matching the specified criteria</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown when input is null</exception>
         Task<PagedResultDto<MapTenantDto>> GetPagedListAsync(MapTenantPagedRequestDto input);
 
         /// <summary>
-        /// Create MapTenant
+        /// Creates a new map tenant with the specified information
         /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
+        /// <param name="input">The creation DTO containing the map tenant information</param>
+        /// <returns>The created map tenant DTO</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown when input is null</exception>
+        /// <exception cref="Volo.Abp.UserFriendlyException">Thrown when validation fails or business rules are violated</exception>
         Task<MapTenantDto> CreateAsync(CreateMapTenantDto input);
 
         /// <summary>
-        /// Update MapTenant
+        /// Updates an existing map tenant with the specified information
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="input"></param>
-        /// <returns></returns>
+        /// <param name="id">The unique identifier of the map tenant to update</param>
+        /// <param name="input">The update DTO containing the modified map tenant information</param>
+        /// <returns>The updated map tenant DTO</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown when input is null</exception>
+        /// <exception cref="Volo.Abp.EntityNotFoundException">Thrown when the map tenant with the specified ID is not found</exception>
+        /// <exception cref="Volo.Abp.UserFriendlyException">Thrown when validation fails or business rules are violated</exception>
         Task<MapTenantDto> UpdateAsync(Guid id, UpdateMapTenantDto input);
 
         /// <summary>
-        /// Delete MapTenant
+        /// Deletes a map tenant by its unique identifier
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">The unique identifier of the map tenant to delete</param>
+        /// <returns>A task representing the asynchronous delete operation</returns>
+        /// <exception cref="Volo.Abp.EntityNotFoundException">Thrown when the map tenant with the specified ID is not found</exception>
         Task DeleteAsync(Guid id);
     }
 }

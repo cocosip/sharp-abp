@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+﻿﻿using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -41,6 +41,9 @@ namespace SharpAbp.Abp.MapTenancyManagement
             });
 
             context.Services.AddAutoMapperObjectMapper<MapTenancyManagementDomainModule>();
+
+            // Register IMapTenantManager interface with MapTenantManager implementation
+            context.Services.AddTransient<IMapTenantManager, MapTenantManager>();
 
             Configure<MapTenancyStoreOptions>(options => { });
 
