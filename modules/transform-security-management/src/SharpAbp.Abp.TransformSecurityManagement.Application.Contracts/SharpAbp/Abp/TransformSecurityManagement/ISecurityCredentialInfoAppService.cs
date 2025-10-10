@@ -36,9 +36,6 @@ namespace SharpAbp.Abp.TransformSecurityManagement
         /// A task that represents the asynchronous operation.
         /// The task result contains the security credential information DTO if found.
         /// </returns>
-        /// <exception cref="Volo.Abp.Domain.Entities.EntityNotFoundException">
-        /// Thrown when no security credential with the specified ID is found.
-        /// </exception>
         /// <remarks>
         /// This operation requires the caller to have the appropriate read permissions
         /// for security credential information. The returned DTO includes all non-sensitive
@@ -155,9 +152,6 @@ namespace SharpAbp.Abp.TransformSecurityManagement
         /// <returns>
         /// A task that represents the asynchronous operation.
         /// </returns>
-        /// <exception cref="Volo.Abp.Domain.Entities.EntityNotFoundException">
-        /// Thrown when no security credential with the specified ID is found.
-        /// </exception>
         /// <exception cref="Volo.Abp.Authorization.AbpAuthorizationException">
         /// Thrown when the current user lacks the required permissions to delete security credentials.
         /// </exception>

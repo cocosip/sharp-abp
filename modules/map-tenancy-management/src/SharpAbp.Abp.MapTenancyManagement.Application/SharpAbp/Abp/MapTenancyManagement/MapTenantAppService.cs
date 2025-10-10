@@ -36,7 +36,6 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// </summary>
         /// <param name="id">The unique identifier of the map tenant</param>
         /// <returns>The map tenant DTO with the specified ID</returns>
-        /// <exception cref="Volo.Abp.EntityNotFoundException">Thrown when the map tenant with the specified ID is not found</exception>
         [Authorize(MapTenancyManagementPermissions.MapTenants.Default)]
         public virtual async Task<MapTenantDto> GetAsync(Guid id)
         {
@@ -144,7 +143,6 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <param name="input">The update DTO containing the modified map tenant information</param>
         /// <returns>The updated map tenant DTO</returns>
         /// <exception cref="System.ArgumentNullException">Thrown when input is null</exception>
-        /// <exception cref="Volo.Abp.EntityNotFoundException">Thrown when the map tenant with the specified ID is not found</exception>
         /// <exception cref="Volo.Abp.UserFriendlyException">Thrown when validation fails or business rules are violated</exception>
         [Authorize(MapTenancyManagementPermissions.MapTenants.Update)]
         public virtual async Task<MapTenantDto> UpdateAsync(Guid id, UpdateMapTenantDto input)
@@ -163,7 +161,6 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// </summary>
         /// <param name="id">The unique identifier of the map tenant to delete</param>
         /// <returns>A task representing the asynchronous delete operation</returns>
-        /// <exception cref="Volo.Abp.EntityNotFoundException">Thrown when the map tenant with the specified ID is not found</exception>
         [Authorize(MapTenancyManagementPermissions.MapTenants.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {

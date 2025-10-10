@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Volo.Abp;
 using Volo.Abp.Account;
 using Volo.Abp.Data;
+using Volo.Abp.Domain.Entities;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.Settings;
 using Volo.Abp.ObjectExtending;

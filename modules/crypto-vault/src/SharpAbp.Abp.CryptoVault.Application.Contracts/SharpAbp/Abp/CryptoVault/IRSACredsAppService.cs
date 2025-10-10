@@ -1,5 +1,6 @@
 ﻿﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
@@ -122,7 +123,6 @@ namespace SharpAbp.Abp.CryptoVault
         /// </summary>
         /// <param name="id">The unique identifier of the RSA credentials to delete.</param>
         /// <returns>A task that represents the asynchronous deletion operation.</returns>
-        /// <exception cref="EntityNotFoundException">Thrown when RSA credentials with the specified ID are not found.</exception>
         /// <remarks>
         /// This operation requires 'Delete' permission for RSA credentials.
         /// WARNING: This is a permanent operation that cannot be undone.
@@ -139,7 +139,6 @@ namespace SharpAbp.Abp.CryptoVault
         /// A task that represents the asynchronous operation.
         /// The task result contains the decrypted RSA public and private keys.
         /// </returns>
-        /// <exception cref="EntityNotFoundException">Thrown when RSA credentials with the specified ID are not found.</exception>
         /// <exception cref="UnauthorizedAccessException">Thrown when the caller lacks decrypt key permissions.</exception>
         /// <remarks>
         /// This operation requires 'DecryptKey' permission for RSA credentials.

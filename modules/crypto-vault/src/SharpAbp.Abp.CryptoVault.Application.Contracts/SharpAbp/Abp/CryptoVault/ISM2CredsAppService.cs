@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
@@ -33,7 +34,6 @@ namespace SharpAbp.Abp.CryptoVault
         /// A task that represents the asynchronous operation.
         /// The task result contains the SM2 credentials data transfer object.
         /// </returns>
-        /// <exception cref="EntityNotFoundException">Thrown when SM2 credentials with the specified ID are not found.</exception>
         /// <remarks>
         /// This operation requires the caller to have read permissions for SM2 credentials.
         /// The returned data contains encrypted key information and metadata but not the decrypted keys.
@@ -132,7 +132,6 @@ namespace SharpAbp.Abp.CryptoVault
         /// </summary>
         /// <param name="id">The unique identifier of the SM2 credentials to delete.</param>
         /// <returns>A task that represents the asynchronous deletion operation.</returns>
-        /// <exception cref="EntityNotFoundException">Thrown when SM2 credentials with the specified ID are not found.</exception>
         /// <remarks>
         /// This operation requires 'Delete' permission for SM2 credentials.
         /// WARNING: This is a permanent operation that cannot be undone.
@@ -149,7 +148,6 @@ namespace SharpAbp.Abp.CryptoVault
         /// A task that represents the asynchronous operation.
         /// The task result contains the decrypted SM2 public and private keys.
         /// </returns>
-        /// <exception cref="EntityNotFoundException">Thrown when SM2 credentials with the specified ID are not found.</exception>
         /// <exception cref="UnauthorizedAccessException">Thrown when the caller lacks decrypt key permissions.</exception>
         /// <remarks>
         /// This operation requires 'DecryptKey' permission for SM2 credentials.

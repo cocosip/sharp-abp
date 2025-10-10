@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Domain.Entities;
 
 namespace SharpAbp.Abp.CryptoVault
 {
