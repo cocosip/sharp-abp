@@ -6,6 +6,7 @@ namespace SharpAbp.Abp.AspNetCore.Response
 {
     public class AbpHttpResponseHeaderOptions
     {
+        public bool IsEnabled { get; set; }
         public Dictionary<string, StringValues> Headers { get; }
 
         public AbpHttpResponseHeaderOptions()

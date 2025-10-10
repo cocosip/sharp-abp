@@ -2,11 +2,12 @@
 using Microsoft.Extensions.Options;
 using System.Linq;
 using System.Threading.Tasks;
+using Volo.Abp.AspNetCore.Middleware;
 using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.AspNetCore.Response
 {
-    public class ResponseHeaderMiddleware : IMiddleware, ITransientDependency
+    public class ResponseHeaderMiddleware : AbpMiddlewareBase, ITransientDependency
     {
         protected AbpHttpResponseHeaderOptions Options { get; }
         public ResponseHeaderMiddleware(IOptions<AbpHttpResponseHeaderOptions> options)
@@ -14,7 +15,16 @@ namespace SharpAbp.Abp.AspNetCore.Response
             Options = options.Value;
         }
 
-        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+        protected override Task<bool> ShouldSkipAsync(HttpContext context, RequestDelegate next)
+        {
+            if (Options.IsEnabled)
+            {
+                return Task.FromResult(false);
+            }
+            return Task.FromResult(true);
+        }
+
+        public override async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             if (Options.Headers.Count > 0)
             {

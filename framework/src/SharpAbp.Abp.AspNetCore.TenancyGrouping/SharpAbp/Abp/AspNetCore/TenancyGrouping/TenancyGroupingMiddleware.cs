@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.RequestLocalization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using SharpAbp.Abp.TenancyGrouping;
 using Volo.Abp.AspNetCore.Middleware;
 using Volo.Abp.DependencyInjection;
@@ -17,19 +17,31 @@ namespace SharpAbp.Abp.AspNetCore.TenancyGrouping
 {
     public class TenancyGroupingMiddleware : AbpMiddlewareBase, ITransientDependency
     {
-        public ILogger<TenancyGroupingMiddleware> Logger { get; set; }
+        protected ILogger Logger { get; set; }
+        protected AbpTenancyGroupingOptions Options { get; }
 
         private readonly ITenantGroupConfigurationProvider _tenantGroupConfigurationProvider;
         private readonly ICurrentTenantGroup _currentTenantGroup;
 
         public TenancyGroupingMiddleware(
+            ILogger<TenancyGroupingMiddleware> logger,
+            IOptions<AbpTenancyGroupingOptions> options,
             ITenantGroupConfigurationProvider tenantGroupConfigurationProvider,
             ICurrentTenantGroup currentTenantGroup)
         {
-            Logger = NullLogger<TenancyGroupingMiddleware>.Instance;
-
+            Logger = logger;
+            Options = options.Value;
             _tenantGroupConfigurationProvider = tenantGroupConfigurationProvider;
             _currentTenantGroup = currentTenantGroup;
+        }
+
+        override protected Task<bool> ShouldSkipAsync(HttpContext context, RequestDelegate next)
+        {
+            if (Options.IsEnabled)
+            {
+                return Task.FromResult(false);
+            }
+            return Task.FromResult(true);
         }
 
         public async override Task InvokeAsync(HttpContext context, RequestDelegate next)
