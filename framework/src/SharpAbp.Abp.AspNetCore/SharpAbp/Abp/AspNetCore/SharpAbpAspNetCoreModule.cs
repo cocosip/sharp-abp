@@ -20,8 +20,16 @@ namespace SharpAbp.Abp.AspNetCore
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            Configure<AbpHttpResponseHeaderOptions>(options => { });
-            Configure<AbpFrontHostOptions>(options => { });
+            Configure<AbpHttpResponseHeaderOptions>(options =>
+            {
+                options.IsEnabled = false;
+            });
+
+            Configure<AbpFrontHostOptions>(options =>
+            {
+
+            });
+            
             Configure<AbpHttpHeadersOptions>(options =>
             {
                 options.RouteTranslationPrefix = "X-Abp";
