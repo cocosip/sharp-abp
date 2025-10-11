@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
@@ -21,7 +21,7 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
 
             Configure<AbpTransformSecurityAspNetCoreOptions>(options =>
             {
-                options.MiddlewareHandlers.Add<TokenAuthHandler>();
+                options.MiddlewareHandlers.Add<PasswordGrantTokenHandler>();
             });
 
             return Task.CompletedTask;
