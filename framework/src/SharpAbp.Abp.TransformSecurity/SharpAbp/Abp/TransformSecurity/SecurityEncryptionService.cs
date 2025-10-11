@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.Crypto.RSA;
 using SharpAbp.Abp.Crypto.SM2;
+using System;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,37 +22,37 @@ namespace SharpAbp.Abp.TransformSecurity
         /// Gets the transform security options
         /// </summary>
         protected AbpTransformSecurityOptions Options { get; }
-        
+
         /// <summary>
         /// Gets the RSA encryption options
         /// </summary>
         protected AbpTransformSecurityRSAOptions RSAOptions { get; }
-        
+
         /// <summary>
         /// Gets the SM2 encryption options
         /// </summary>
         protected AbpTransformSecuritySM2Options SM2Options { get; }
-        
+
         /// <summary>
         /// Gets the GUID generator service
         /// </summary>
         protected IGuidGenerator GuidGenerator { get; }
-        
+
         /// <summary>
         /// Gets the clock service for time operations
         /// </summary>
         protected IClock Clock { get; }
-        
+
         /// <summary>
         /// Gets the security credential store service
         /// </summary>
         protected ISecurityCredentialStore SecurityCredentialStore { get; }
-        
+
         /// <summary>
         /// Gets the RSA encryption service
         /// </summary>
         protected IRSAEncryptionService RSAEncryptionService { get; }
-        
+
         /// <summary>
         /// Gets the SM2 encryption service
         /// </summary>
@@ -121,14 +122,10 @@ namespace SharpAbp.Abp.TransformSecurity
         /// <exception cref="AbpException">Thrown when the security credential is not found or has an invalid key type</exception>
         public virtual async Task<string> EncryptAsync(string plainText, string identifier, CancellationToken cancellationToken = default)
         {
-            var credential = await SecurityCredentialStore.GetAsync(identifier, cancellationToken);
-            if (credential == null)
-            {
-                throw new AbpException($"Security credential with identifier '{identifier}' was not found. Please ensure the credential exists and is valid.");
-            }
+            var credential = await SecurityCredentialStore.GetAsync(identifier, cancellationToken) ?? throw new AbpException($"Security credential with identifier '{identifier}' was not found. Please ensure the credential exists and is valid.");
             if (credential.IsRSA())
             {
-                return RSAEncryptionService.EncryptFromBase64(credential.PublicKey!, plainText, Encoding.UTF8, credential.GetRSAPadding() ?? None);
+                return RSAEncryptionService.EncryptFromBase64(credential.PublicKey!, plainText, Encoding.UTF8, RSAOptions.Padding);
             }
             else if (credential.IsSM2())
             {
@@ -150,14 +147,11 @@ namespace SharpAbp.Abp.TransformSecurity
         /// <exception cref="AbpException">Thrown when the security credential is not found or has an invalid key type</exception>
         public virtual async Task<string> DecryptAsync(string cipherText, string identifier, CancellationToken cancellationToken = default)
         {
-            var credential = await SecurityCredentialStore.GetAsync(identifier, cancellationToken);
-            if (credential == null)
-            {
-                throw new AbpException($"Security credential with identifier '{identifier}' was not found. Please ensure the credential exists and is valid.");
-            }
+            var credential = await SecurityCredentialStore.GetAsync(identifier, cancellationToken) ?? throw new AbpException($"Security credential with identifier '{identifier}' was not found. Please ensure the credential exists and is valid.");
+
             if (credential.IsRSA())
             {
-                return RSAEncryptionService.DecryptFromBase64(credential.PrivateKey!, cipherText, Encoding.UTF8, credential.GetRSAPadding() ?? None);
+                return RSAEncryptionService.DecryptFromBase64(credential.PrivateKey!, cipherText, Encoding.UTF8, RSAOptions.Padding);
             }
             else if (credential.IsSM2())
             {
