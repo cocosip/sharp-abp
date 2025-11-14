@@ -1,4 +1,4 @@
-﻿﻿﻿﻿using JetBrains.Annotations;
+﻿﻿﻿﻿﻿﻿using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -203,6 +203,24 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
             return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
                 .Where(x => mapCodes.Contains(x.MapCode))
+                .ToListAsync(GetCancellationToken(cancellationToken));
+        }
+
+        /// <summary>
+        /// Retrieves a list of map tenants by multiple tenant name identifiers using EF Core
+        /// </summary>
+        /// <param name="tenantNames">The collection of tenant names to search for</param>
+        /// <param name="includeDetails">Whether to include related entity details in the results; defaults to false</param>
+        /// <param name="cancellationToken">A token to cancel the asynchronous operation; defaults to CancellationToken.None</param>
+        /// <returns>A list of map tenants with the specified tenant names</returns>
+        public virtual async Task<List<MapTenant>> GetListByTenantNamesAsync(
+            List<string> tenantNames,
+            bool includeDetails = false,
+            CancellationToken cancellationToken = default)
+        {
+            return await (await GetDbSetAsync())
+                .IncludeDetails(includeDetails)
+                .Where(x => tenantNames.Contains(x.TenantName))
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 

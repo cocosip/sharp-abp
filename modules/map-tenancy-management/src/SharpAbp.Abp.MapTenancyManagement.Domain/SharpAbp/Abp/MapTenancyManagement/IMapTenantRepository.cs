@@ -1,4 +1,4 @@
-﻿﻿using JetBrains.Annotations;
+﻿﻿﻿﻿using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -96,6 +96,15 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <param name="cancellationToken">A token to cancel the asynchronous operation; defaults to CancellationToken.None</param>
         /// <returns>A list of map tenants with the specified map codes</returns>
         Task<List<MapTenant>> GetListByMapCodesAsync(List<string> mapCodes, bool includeDetails = false, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Retrieves a list of map tenants by multiple tenant name identifiers
+        /// </summary>
+        /// <param name="tenantNames">The collection of tenant names to search for</param>
+        /// <param name="includeDetails">Whether to include related entity details in the results; defaults to false</param>
+        /// <param name="cancellationToken">A token to cancel the asynchronous operation; defaults to CancellationToken.None</param>
+        /// <returns>A list of map tenants with the specified tenant names</returns>
+        Task<List<MapTenant>> GetListByTenantNamesAsync(List<string> tenantNames, bool includeDetails = false, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Retrieves a paginated list of map tenants with filtering and sorting capabilities
