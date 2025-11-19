@@ -1,5 +1,5 @@
 ﻿
-using IdentityModel.Client;
+using Duende.IdentityModel.Client;
 using System.Collections.Generic;
 
 namespace SharpAbp.Abp.IdentityModel

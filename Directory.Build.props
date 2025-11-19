@@ -3,15 +3,15 @@
 		<!--Project Frameworks-->
 		<ProjectFrameworks>netstandard2.0;netstandard2.1;$(NetCoreFx)</ProjectFrameworks>
 		<!--Net Core Framework-->
-		<NetCoreFx>net9.0</NetCoreFx>
+		<NetCoreFx>net10.0</NetCoreFx>
 		<!--Microsoft-->
-		<MicrosoftPackageVersion>[9.0.10,)</MicrosoftPackageVersion>
+		<MicrosoftPackageVersion>[10.0.0,)</MicrosoftPackageVersion>
 		<!--EfCore-->
-		<EfCorePackageVersion>[9.0.10,)</EfCorePackageVersion>
+		<EfCorePackageVersion>[10.0.0,)</EfCorePackageVersion>
 		<!--Volo ABP packages-->
-		<VoloAbpPackageVersion>[9.3.6,10.0.0)</VoloAbpPackageVersion>
+		<VoloAbpPackageVersion>[10.0.0,)</VoloAbpPackageVersion>
 		<!--FreeSql package-->
-		<FreeSqlPackageVersion>[3.5.215,)</FreeSqlPackageVersion>
+		<FreeSqlPackageVersion>[3.5.303,)</FreeSqlPackageVersion>
 		<!--Masstransit package-->
 		<MassTransitPackageVersion>[8.5.5,)</MassTransitPackageVersion>
 	</PropertyGroup>
