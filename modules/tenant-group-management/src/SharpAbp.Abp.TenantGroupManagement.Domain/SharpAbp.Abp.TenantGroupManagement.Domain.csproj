@@ -18,6 +18,7 @@
 	<ItemGroup>
 		<PackageReference Include="Volo.Abp.TenantManagement.Domain" />
 		<PackageReference Include="Volo.Abp.Caching" />
+		<PackageReference Include="Volo.Abp.AutoMapper" />
 	</ItemGroup>
 
 	<ItemGroup>

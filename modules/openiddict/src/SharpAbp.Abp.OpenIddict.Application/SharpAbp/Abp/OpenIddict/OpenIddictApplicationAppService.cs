@@ -26,33 +26,33 @@ namespace SharpAbp.Abp.OpenIddict
         /// <summary>
         /// Gets the OpenIddict application store resolver
         /// </summary>
-        protected IOpenIddictApplicationStoreResolver Resolver { get; }
-        
+        protected IOpenIddictApplicationStore<OpenIddictApplicationModel> Resolver { get; }
+
         /// <summary>
         /// Gets the ABP OpenId application store
         /// </summary>
         protected IAbpOpenIdApplicationStore OpenIdApplicationStore { get; }
-        
+
         /// <summary>
         /// Gets the ABP application manager
         /// </summary>
         protected IAbpApplicationManager ApplicationManager { get; }
-        
+
         /// <summary>
         /// Gets the permission data seeder
         /// </summary>
         protected IPermissionDataSeeder PermissionDataSeeder { get; }
-        
+
         /// <summary>
         /// Gets the permission manager
         /// </summary>
         protected IPermissionManager PermissionManager { get; }
-        
+
         /// <summary>
         /// Gets the OpenIddict application repository
         /// </summary>
         protected IOpenIddictApplicationRepository OpenIdApplicationRepository { get; }
-        
+
         /// <summary>
         /// Gets the string localizer for OpenIddict responses
         /// </summary>
@@ -67,7 +67,7 @@ namespace SharpAbp.Abp.OpenIddict
         /// <param name="openIddictApplicationRepository">The OpenIddict application repository</param>
         /// <param name="ll">The string localizer for OpenIddict responses</param>
         public OpenIddictApplicationAppService(
-            IOpenIddictApplicationStoreResolver resolver,
+            IOpenIddictApplicationStore<OpenIddictApplicationModel> resolver,
             IAbpApplicationManager applicationManager,
             IPermissionDataSeeder permissionDataSeeder,
             IPermissionManager permissionManager,
@@ -75,7 +75,7 @@ namespace SharpAbp.Abp.OpenIddict
             IStringLocalizer<OpenIddictResponse> ll)
         {
             Resolver = resolver;
-            OpenIdApplicationStore = (resolver ?? throw new ArgumentNullException(nameof(resolver))).Get<OpenIddictApplicationModel>().As<IAbpOpenIdApplicationStore>();
+            OpenIdApplicationStore = (resolver ?? throw new ArgumentNullException(nameof(resolver))).As<IAbpOpenIdApplicationStore>();
             ApplicationManager = applicationManager;
             PermissionDataSeeder = permissionDataSeeder;
             PermissionManager = permissionManager;
