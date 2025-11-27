@@ -28,7 +28,6 @@
 	<ItemGroup>
 		<PackageReference Include="Volo.Abp.UI.Navigation" />
 		<PackageReference Include="Volo.Abp.Emailing" />
-		<PackageReference Include="System.Text.Encodings.Web" />
 		<PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" />
 	</ItemGroup>
 
