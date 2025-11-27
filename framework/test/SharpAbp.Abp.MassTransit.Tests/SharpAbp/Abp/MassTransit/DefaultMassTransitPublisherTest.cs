@@ -1,7 +1,9 @@
+using Autofac.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using SharpAbp.Abp.MassTransit.RabbitMQ;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,12 +27,12 @@ namespace SharpAbp.Abp.MassTransit
         {
             _optionsMock = new Mock<IOptionsSnapshot<AbpMassTransitOptions>>();
             _loggerMock = new Mock<ILogger<DefaultMassTransitPublisher>>();
-            
+
             _options = new AbpMassTransitOptions
             {
                 Provider = "RabbitMQ"
             };
-            
+
             _optionsMock.Setup(x => x.Value).Returns(_options);
         }
 
@@ -52,9 +54,9 @@ namespace SharpAbp.Abp.MassTransit
             // Arrange
             var services = CreateServiceCollection();
             var serviceProvider = services.BuildServiceProvider();
-            
+
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
+            Assert.Throws<ArgumentNullException>(() =>
                 new DefaultMassTransitPublisher(null!, serviceProvider, _loggerMock.Object));
         }
 
@@ -65,7 +67,7 @@ namespace SharpAbp.Abp.MassTransit
         public void Constructor_Should_Throw_ArgumentNullException_For_Null_ServiceProvider()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
+            Assert.Throws<ArgumentNullException>(() =>
                 new DefaultMassTransitPublisher(_optionsMock.Object, null!, _loggerMock.Object));
         }
 
@@ -78,9 +80,9 @@ namespace SharpAbp.Abp.MassTransit
             // Arrange
             var services = CreateServiceCollection();
             var serviceProvider = services.BuildServiceProvider();
-            
+
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
+            Assert.Throws<ArgumentNullException>(() =>
                 new DefaultMassTransitPublisher(_optionsMock.Object, serviceProvider, null!));
         }
 
@@ -96,7 +98,7 @@ namespace SharpAbp.Abp.MassTransit
             var publisher = new DefaultMassTransitPublisher(_optionsMock.Object, serviceProvider, _loggerMock.Object);
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => 
+            await Assert.ThrowsAsync<ArgumentNullException>(() =>
                 publisher.PublishAsync<object>(null!, CancellationToken.None));
         }
 
@@ -117,9 +119,9 @@ namespace SharpAbp.Abp.MassTransit
             var message = new TestMessage { Content = "Test" };
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => 
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 publisher.PublishAsync(message, CancellationToken.None));
-            
+
             Assert.Contains("Provider", exception.Message);
         }
 
@@ -132,14 +134,16 @@ namespace SharpAbp.Abp.MassTransit
             // Arrange
             // Don't register any keyed services, so GetRequiredKeyedService will throw
             var services = CreateServiceCollection();
+            services.AddTransient<IRabbitMqProduceService, RabbitMqProduceService>();
+            services.AddKeyedTransient<IPublishProvider, RabbitMqPublishProvider>(MassTransitRabbitMqConsts.ProviderName);
             var serviceProvider = services.BuildServiceProvider();
             var publisher = new DefaultMassTransitPublisher(_optionsMock.Object, serviceProvider, _loggerMock.Object);
             var message = new TestMessage { Content = "Test" };
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => 
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 publisher.PublishAsync(message, CancellationToken.None));
-            
+
             Assert.Contains("RabbitMQ", exception.Message);
             Assert.Contains("not registered", exception.Message);
         }
@@ -160,7 +164,7 @@ namespace SharpAbp.Abp.MassTransit
             var services = CreateServiceCollection();
             services.AddKeyedSingleton<IPublishProvider>("RabbitMQ", publishProviderMock.Object);
             var serviceProvider = services.BuildServiceProvider();
-            
+
             var publisher = new DefaultMassTransitPublisher(_optionsMock.Object, serviceProvider, _loggerMock.Object);
             var message = new TestMessage { Content = "Test" };
 
@@ -188,16 +192,16 @@ namespace SharpAbp.Abp.MassTransit
             var services = CreateServiceCollection();
             services.AddKeyedSingleton<IPublishProvider>("RabbitMQ", publishProviderMock.Object);
             var serviceProvider = services.BuildServiceProvider();
-            
+
             var publisher = new DefaultMassTransitPublisher(_optionsMock.Object, serviceProvider, _loggerMock.Object);
             var message = new TestMessage { Content = "Test" };
 
             // Act & Assert
-            var actualException = await Assert.ThrowsAsync<InvalidOperationException>(() => 
+            var actualException = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 publisher.PublishAsync(message, CancellationToken.None));
-            
+
             Assert.Same(expectedException, actualException);
-            
+
             // Verify that the provider's PublishAsync method was called
             publishProviderMock.Verify(x => x.PublishAsync(message, It.IsAny<CancellationToken>()), Times.Once);
         }
@@ -211,12 +215,12 @@ namespace SharpAbp.Abp.MassTransit
             // Arrange
             var publishProviderMock = new Mock<IPublishProvider>();
             publishProviderMock.Setup(x => x.Provider).Returns("RabbitMQ");
-            
+
             var cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenSource.Cancel();
-            
+
             publishProviderMock.Setup(x => x.PublishAsync(It.IsAny<TestMessage>(), It.IsAny<CancellationToken>()))
-                .Returns((TestMessage msg, CancellationToken ct) => 
+                .Returns((TestMessage msg, CancellationToken ct) =>
                 {
                     ct.ThrowIfCancellationRequested();
                     return Task.CompletedTask;
@@ -226,12 +230,12 @@ namespace SharpAbp.Abp.MassTransit
             var services = CreateServiceCollection();
             services.AddKeyedSingleton<IPublishProvider>("RabbitMQ", publishProviderMock.Object);
             var serviceProvider = services.BuildServiceProvider();
-            
+
             var publisher = new DefaultMassTransitPublisher(_optionsMock.Object, serviceProvider, _loggerMock.Object);
             var message = new TestMessage { Content = "Test" };
 
             // Act & Assert
-            await Assert.ThrowsAsync<OperationCanceledException>(() => 
+            await Assert.ThrowsAsync<OperationCanceledException>(() =>
                 publisher.PublishAsync(message, cancellationTokenSource.Token));
         }
 

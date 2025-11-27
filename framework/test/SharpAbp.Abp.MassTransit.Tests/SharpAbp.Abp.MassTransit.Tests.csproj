@@ -25,13 +25,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\src\SharpAbp.Abp.MassTransit\SharpAbp.Abp.MassTransit.csproj" />
-	  <ProjectReference Include="..\..\src\SharpAbp.Abp.MassTransit.ActiveMQ\SharpAbp.Abp.MassTransit.ActiveMQ.csproj" />
-	  <ProjectReference Include="..\..\src\SharpAbp.Abp.MassTransit.Kafka\SharpAbp.Abp.MassTransit.Kafka.csproj" />
-	  <ProjectReference Include="..\..\src\SharpAbp.Abp.MassTransit.RabbitMQ\SharpAbp.Abp.MassTransit.RabbitMQ.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.MassTransit\SharpAbp.Abp.MassTransit.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.MassTransit.ActiveMQ\SharpAbp.Abp.MassTransit.ActiveMQ.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.MassTransit.Kafka\SharpAbp.Abp.MassTransit.Kafka.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.MassTransit.RabbitMQ\SharpAbp.Abp.MassTransit.RabbitMQ.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.MassTransit.PostgreSql\SharpAbp.Abp.MassTransit.PostgreSql.csproj" />
 	</ItemGroup>
 
- 
+
 
 
 </Project>

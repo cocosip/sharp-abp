@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.MassTransit.ActiveMQ;
 using SharpAbp.Abp.MassTransit.Kafka;
+using SharpAbp.Abp.MassTransit.PostgreSql;
 using SharpAbp.Abp.MassTransit.RabbitMQ;
 using SharpAbp.Abp.MassTransit.TestImplementations;
 using Volo.Abp;
@@ -17,7 +18,7 @@ namespace SharpAbp.Abp.MassTransit
         typeof(AbpTestBaseModule),
         typeof(AbpAutofacModule)
       )]
-    public class AbpMassTransitTestModule: AbpModule
+    public class AbpMassTransitTestModule : AbpModule
     {
         /// <summary>
         /// Configure services for testing
@@ -31,6 +32,11 @@ namespace SharpAbp.Abp.MassTransit
             services.AddTransient<IKafkaProduceService, TestKafkaProduceService>();
             services.AddTransient<IRabbitMqProduceService, TestRabbitMqProduceService>();
             services.AddTransient<IActiveMqProduceService, TestActiveMqProduceService>();
+
+            // services.AddKeyedTransient<IPublishProvider, RabbitMqPublishProvider>(MassTransitRabbitMqConsts.ProviderName);
+            // services.AddKeyedTransient<IPublishProvider, KafkaPublishProvider>(MassTransitKafkaConsts.ProviderName);
+            // services.AddKeyedTransient<IPublishProvider, ActiveMqPublishProvider>(MassTransitActiveMqConsts.ProviderName);
+            // services.AddKeyedTransient<IPublishProvider, PostgreSqlPublishProvider>(MassTransitPostgreSqlConsts.ProviderName);
         }
     }
 }
