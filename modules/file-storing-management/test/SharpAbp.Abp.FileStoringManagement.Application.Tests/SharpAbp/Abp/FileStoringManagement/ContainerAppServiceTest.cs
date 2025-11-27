@@ -159,7 +159,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 });
             }
 
-            await Assert.ThrowsAsync<EntityNotFoundException>(() =>
+            await Assert.ThrowsAsync<EntityNotFoundException<FileStoringContainer>>(() =>
             {
                 return _containerAppService.GetAsync(c1.Id);
             });
@@ -175,7 +175,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 
                 await _containerAppService.DeleteAsync(c1.Id);
 
-                await Assert.ThrowsAsync<EntityNotFoundException>(() =>
+                await Assert.ThrowsAsync<EntityNotFoundException<FileStoringContainer>>(() =>
                 {
                     return _containerAppService.GetAsync(c1.Id);
                 });
