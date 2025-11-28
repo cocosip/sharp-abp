@@ -67,7 +67,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
 
             await _tenantGroupAppService.DeleteAsync(g1.Id);
 
-            await Assert.ThrowsAsync<EntityNotFoundException>(() =>
+            await Assert.ThrowsAsync<EntityNotFoundException<TenantGroup>>(() =>
             {
                 return _tenantGroupAppService.GetAsync(g1.Id);
             });
