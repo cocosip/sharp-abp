@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
+using Volo.Abp.IdentityServer.ApiResources;
 using Xunit;
 
 namespace SharpAbp.Abp.IdentityServer
@@ -110,7 +111,7 @@ namespace SharpAbp.Abp.IdentityServer
 
             await _identityServerApiResourceAppService.DeleteAsync(id2);
 
-            await Assert.ThrowsAsync<EntityNotFoundException>(() =>
+            await Assert.ThrowsAsync<EntityNotFoundException<ApiResource>>(() =>
             {
                 return _identityServerApiResourceAppService.GetAsync(id2);
             });

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
+using Volo.Abp.IdentityServer.ApiScopes;
 using Xunit;
 
 namespace SharpAbp.Abp.IdentityServer
@@ -111,7 +112,7 @@ namespace SharpAbp.Abp.IdentityServer
             Assert.Single(apiScope3.UserClaims);
 
             await _identityServerApiScopeAppService.DeleteAsync(id1);
-            await Assert.ThrowsAsync<EntityNotFoundException>(() =>
+            await Assert.ThrowsAsync<EntityNotFoundException<ApiScope>>(() =>
             {
                 return _identityServerApiScopeAppService.GetAsync(id1);
             });
