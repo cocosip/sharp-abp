@@ -11,6 +11,7 @@ using System;
 using Volo.Abp;
 using Volo.Abp.Autofac;
 using Volo.Abp.EntityFrameworkCore;
+using Volo.Abp.Mapperly;
 using Volo.Abp.Modularity;
 using Volo.Abp.Uow;
 
@@ -26,6 +27,7 @@ namespace SharpAbp.Abp.FileStoringManagement
        typeof(FileStoringManagementApplicationModule),
        typeof(FileStoringManagementEntityFrameworkCoreModule),
        typeof(AbpTestBaseModule),
+       typeof(AbpMapperlyModule),
        typeof(AbpAutofacModule)
        )]
     public class FileStoringManagementApplicationTestModule : AbpModule
@@ -50,8 +52,8 @@ namespace SharpAbp.Abp.FileStoringManagement
             {
                 options.TransactionBehavior = UnitOfWorkTransactionBehavior.Disabled; //EF in-memory database does not support transactions
             });
-
-
         }
+
+        
     }
 }

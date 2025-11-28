@@ -7,7 +7,7 @@ namespace SharpAbp.Abp.FileStoringManagement
     /// <summary>
     /// Data transfer object for creating a new file storing container.
     /// </summary>
-    public class CreateContainerDto : IValidatableObject
+    public class CreateOrUpdateContainerDto : IValidatableObject
     {
         /// <summary>
         /// Gets or sets a value indicating whether the container supports multi-tenancy.
@@ -68,12 +68,12 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <summary>
         /// Gets or sets the list of container items.
         /// </summary>
-        public List<CreateContainerItemDto> Items { get; set; }
+        public List<CreateOrUpdateContainerItemDto> Items { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CreateContainerDto"/> class.
+        /// Initializes a new instance of the <see cref="CreateOrUpdateContainerDto"/> class.
         /// </summary>
-        public CreateContainerDto()
+        public CreateOrUpdateContainerDto()
         {
             Items = [];
         }
@@ -91,13 +91,13 @@ namespace SharpAbp.Abp.FileStoringManagement
                 {
                     yield return new ValidationResult(
                         "Multi-part upload minimum file size must be at least 5MB (5,242,880 bytes).",
-                        new[] { nameof(MultiPartUploadMinFileSize) });
+                        [nameof(MultiPartUploadMinFileSize)]);
                 }
                 if (MultiPartUploadShardingSize < 1024 * 1024)
                 {
                     yield return new ValidationResult(
                         "Multi-part upload sharding size must be at least 1MB (1,048,576 bytes).",
-                        new[] { nameof(MultiPartUploadShardingSize) });
+                        [nameof(MultiPartUploadShardingSize)]);
                 }
             }
 

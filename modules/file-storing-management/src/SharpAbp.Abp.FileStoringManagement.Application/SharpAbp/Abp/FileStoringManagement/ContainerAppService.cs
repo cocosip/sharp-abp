@@ -114,7 +114,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="input">The container creation information including name, provider, and configuration items.</param>
         /// <returns>The created container information.</returns>
         [Authorize(FileStoringManagementPermissions.Containers.Create)]
-        public virtual async Task<ContainerDto> CreateAsync(CreateContainerDto input)
+        public virtual async Task<ContainerDto> CreateAsync(CreateOrUpdateContainerDto input)
         {
             var values = input.Items.Select(x => new NameValue(x.Name, x.Value)).ToList();
 
@@ -142,7 +142,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="input">The updated container information including configuration changes.</param>
         /// <returns>The updated container information.</returns>
         [Authorize(FileStoringManagementPermissions.Containers.Update)]
-        public virtual async Task<ContainerDto> UpdateAsync(Guid id, UpdateContainerDto input)
+        public virtual async Task<ContainerDto> UpdateAsync(Guid id, CreateOrUpdateContainerDto input)
         {
             var container = await ContainerRepository.GetAsync(id);
             var values = input.Items.Select(x => new NameValue(x.Name, x.Value)).ToList();

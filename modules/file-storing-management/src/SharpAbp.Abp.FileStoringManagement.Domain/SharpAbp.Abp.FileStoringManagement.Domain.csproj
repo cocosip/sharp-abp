@@ -16,9 +16,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Volo.Abp.Ddd.Domain"  />
-		<PackageReference Include="Volo.Abp.Caching"  />
-		<PackageReference Include="Volo.Abp.AutoMapper" />
+		<PackageReference Include="Volo.Abp.Ddd.Domain" />
+		<PackageReference Include="Volo.Abp.Caching" />
+		<PackageReference Include="Volo.Abp.Mapperly" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETStandard' And $([MSBuild]::VersionGreaterThanOrEquals($(TargetFrameworkVersion), '2.1')) ">

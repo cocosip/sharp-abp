@@ -3,10 +3,10 @@ using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.FileStoring;
 using System;
 using System.Threading.Tasks;
-using Volo.Abp.AutoMapper;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain;
 using Volo.Abp.Domain.Entities.Events.Distributed;
+using Volo.Abp.Mapperly;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
 
@@ -16,7 +16,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         typeof(AbpDddDomainModule),
         typeof(AbpCachingModule),
         typeof(AbpFileStoringAbstractionsModule),
-        typeof(AbpAutoMapperModule),
+        typeof(AbpMapperlyModule),
         typeof(FileStoringManagementDomainSharedModule)
         )]
     public class FileStoringManagementDomainModule : AbpModule
@@ -28,12 +28,8 @@ namespace SharpAbp.Abp.FileStoringManagement
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            Configure<AbpAutoMapperOptions>(options =>
-            {
-                options.AddMaps<FileStoringManagementDomainModule>();
-            });
 
-            context.Services.AddAutoMapperObjectMapper<FileStoringManagementDomainModule>();
+            context.Services.AddMapperlyObjectMapper<FileStoringManagementDomainModule>();
 
             Configure<AbpDistributedCacheOptions>(options =>
             {

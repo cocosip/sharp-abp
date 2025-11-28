@@ -44,7 +44,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// </summary>
         /// <param name="input">The container creation information including name, provider, and configuration items.</param>
         /// <returns>The created container information.</returns>
-        Task<ContainerDto> CreateAsync(CreateContainerDto input);
+        Task<ContainerDto> CreateAsync(CreateOrUpdateContainerDto input);
 
         /// <summary>
         /// Updates an existing file storing container with new configuration.
@@ -52,7 +52,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="id">The unique identifier of the container to update.</param>
         /// <param name="input">The updated container information including configuration changes.</param>
         /// <returns>The updated container information.</returns>
-        Task<ContainerDto> UpdateAsync(Guid id, UpdateContainerDto input);
+        Task<ContainerDto> UpdateAsync(Guid id, CreateOrUpdateContainerDto input);
 
         /// <summary>
         /// Deletes a file storing container from the system.

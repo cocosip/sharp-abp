@@ -7,7 +7,7 @@ namespace SharpAbp.Abp.FileStoringManagement
     /// <summary>
     /// Data transfer object for updating a file storing container item.
     /// </summary>
-    public class UpdateContainerItemDto
+    public class CreateOrUpdateContainerItemDto
     {
         /// <summary>
         /// Gets or sets the unique identifier of the container item.
@@ -31,20 +31,20 @@ namespace SharpAbp.Abp.FileStoringManagement
         public string Value { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UpdateContainerItemDto"/> class.
+        /// Initializes a new instance of the <see cref="CreateOrUpdateContainerItemDto"/> class.
         /// </summary>
-        public UpdateContainerItemDto()
+        public CreateOrUpdateContainerItemDto()
         {
 
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UpdateContainerItemDto"/> class with the specified parameters.
+        /// Initializes a new instance of the <see cref="CreateOrUpdateContainerItemDto"/> class with the specified parameters.
         /// </summary>
         /// <param name="id">The unique identifier of the container item.</param>
         /// <param name="name">The name of the container item.</param>
         /// <param name="value">The value of the container item.</param>
-        public UpdateContainerItemDto(Guid? id, string name, string value)
+        public CreateOrUpdateContainerItemDto(Guid? id, string name, string value)
         {
             Id = id;
             Name = name;
@@ -52,11 +52,11 @@ namespace SharpAbp.Abp.FileStoringManagement
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UpdateContainerItemDto"/> class for creating a new item.
+        /// Initializes a new instance of the <see cref="CreateOrUpdateContainerItemDto"/> class for creating a new item.
         /// </summary>
         /// <param name="name">The name of the container item.</param>
         /// <param name="value">The value of the container item.</param>
-        public UpdateContainerItemDto(string name, string value) : this(null, name, value)
+        public CreateOrUpdateContainerItemDto(string name, string value) : this(null, name, value)
         {
 
         }

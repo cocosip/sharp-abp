@@ -7,6 +7,7 @@
 		<PackageVersion Include="Volo.Abp.Security" Version="$(VoloAbpPackageVersion)" />
 		<PackageVersion Include="Volo.Abp.Json" Version="$(VoloAbpPackageVersion)" />
 		<PackageVersion Include="Volo.Abp.AutoMapper" Version="$(VoloAbpPackageVersion)" />
+		<PackageVersion Include="Volo.Abp.Mapperly" Version="$(VoloAbpPackageVersion)" />
 		<PackageVersion Include="Volo.Abp.Authorization" Version="$(VoloAbpPackageVersion)" />
 		<PackageVersion Include="Volo.Abp.MultiTenancy.Abstractions" Version="$(VoloAbpPackageVersion)" />
 		<PackageVersion Include="Volo.Abp.MultiTenancy" Version="$(VoloAbpPackageVersion)" />

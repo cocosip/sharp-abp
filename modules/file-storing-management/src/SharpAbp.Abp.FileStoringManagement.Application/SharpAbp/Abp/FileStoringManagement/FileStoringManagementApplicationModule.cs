@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using Volo.Abp.Application;
-using Volo.Abp.AutoMapper;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
 
@@ -10,8 +9,7 @@ namespace SharpAbp.Abp.FileStoringManagement
     [DependsOn(
         typeof(FileStoringManagementApplicationContractsModule),
         typeof(FileStoringManagementDomainModule),
-        typeof(AbpDddApplicationModule),
-        typeof(AbpAutoMapperModule)
+        typeof(AbpDddApplicationModule)
         )]
     public class FileStoringManagementApplicationModule : AbpModule
     {
@@ -22,13 +20,9 @@ namespace SharpAbp.Abp.FileStoringManagement
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            Configure<AbpAutoMapperOptions>(options =>
-            {
-                options.AddMaps<FileStoringManagementApplicationModule>();
-            });
-
-            context.Services.AddAutoMapperObjectMapper<FileStoringManagementApplicationModule>();
+            context.Services.AddMapperlyObjectMapper<FileStoringManagementApplicationModule>();
             return Task.CompletedTask;
         }
+
     }
 }
