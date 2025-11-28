@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Auditing;
-using Volo.Abp.Data;
 
 namespace SharpAbp.Abp.AuditLogging
 {
@@ -36,10 +35,10 @@ namespace SharpAbp.Abp.AuditLogging
         /// </summary>
         public string EntityId { get; set; }
         
-        /// <summary>
-        /// Gets or sets the name of the changed entity
-        /// </summary>
-        public string EntityName { get; set; }
+        // /// <summary>
+        // /// Gets or sets the name of the changed entity
+        // /// </summary>
+        // public string EntityName { get; set; }
         
         /// <summary>
         /// Gets or sets the full type name of the changed entity

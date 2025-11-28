@@ -1,7 +1,6 @@
 ﻿using SharpAbp.Abp.Crypto;
 using SharpAbp.Abp.Crypto.SM2;
 using System.Threading.Tasks;
-using Volo.Abp.AutoMapper;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain;
 using Volo.Abp.Modularity;
@@ -13,7 +12,6 @@ namespace SharpAbp.Abp.CryptoVault
     [DependsOn(
         typeof(AbpDddDomainModule),
         typeof(AbpCachingModule),
-        typeof(AbpAutoMapperModule),
         typeof(AbpCryptoVaultDomainSharedModule),
         typeof(AbpCryptoModule)
         )]

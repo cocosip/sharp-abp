@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using Volo.Abp.Application;
-using Volo.Abp.AutoMapper;
+using Volo.Abp.Mapperly;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
 
@@ -11,7 +11,7 @@ namespace SharpAbp.Abp.AuditLogging
         typeof(AuditLoggingApplicationContractsModule),
         typeof(AuditLoggingDomainModule),
         typeof(AbpDddApplicationModule),
-        typeof(AbpAutoMapperModule)
+        typeof(AbpMapperlyModule)
         )]
     public class AuditLoggingApplicationModule : AbpModule
     {
@@ -23,12 +23,7 @@ namespace SharpAbp.Abp.AuditLogging
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            Configure<AbpAutoMapperOptions>(options =>
-            {
-                options.AddMaps<AuditLoggingApplicationModule>();
-            });
-
-            context.Services.AddAutoMapperObjectMapper<AuditLoggingApplicationModule>();
+            context.Services.AddMapperlyObjectMapper<AuditLoggingApplicationModule>();
             return Task.CompletedTask;
         }
     }

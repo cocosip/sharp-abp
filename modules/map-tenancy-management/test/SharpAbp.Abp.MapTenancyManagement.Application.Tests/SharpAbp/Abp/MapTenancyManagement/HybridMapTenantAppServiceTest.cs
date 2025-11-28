@@ -43,7 +43,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
             await _hybridMapTenantAppService.DeleteAsync(hybridMapTenant2.Id);
 
-            await Assert.ThrowsAsync<EntityNotFoundException>(() =>
+            await Assert.ThrowsAsync<EntityNotFoundException<MapTenant>>(() =>
             {
                 return _hybridMapTenantAppService.GetAsync(hybridMapTenant2.Id);
             });

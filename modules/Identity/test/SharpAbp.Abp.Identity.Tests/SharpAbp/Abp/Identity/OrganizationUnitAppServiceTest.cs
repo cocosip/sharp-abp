@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
+using Volo.Abp.Identity;
 using Xunit;
 
 namespace SharpAbp.Abp.Identity
@@ -85,7 +86,7 @@ namespace SharpAbp.Abp.Identity
 
             await _organizationUnitAppService.DeleteAsync(ou2Id);
 
-            await Assert.ThrowsAsync<EntityNotFoundException>(() =>
+            await Assert.ThrowsAsync<EntityNotFoundException<OrganizationUnit>>(() =>
             {
                 return _organizationUnitAppService.GetAsync(ou2Id);
             });

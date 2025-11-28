@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.DbConnections;
-using Volo.Abp.AutoMapper;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain;
 using Volo.Abp.Modularity;
@@ -15,7 +13,6 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         typeof(AbpDddDomainModule),
         typeof(AbpCachingModule),
         typeof(AbpDbConnectionsModule),
-        typeof(AbpAutoMapperModule),
         typeof(DbConnectionsManagementDomainSharedModule)
         )]
     public class DbConnectionsManagementDomainModule : AbpModule
@@ -27,13 +24,6 @@ namespace SharpAbp.Abp.DbConnectionsManagement
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            Configure<AbpAutoMapperOptions>(options =>
-            {
-                options.AddMaps<DbConnectionsManagementDomainModule>();
-            });
-
-            context.Services.AddAutoMapperObjectMapper<DbConnectionsManagementDomainModule>();
-
 
             Configure<AbpDistributedCacheOptions>(options =>
             {

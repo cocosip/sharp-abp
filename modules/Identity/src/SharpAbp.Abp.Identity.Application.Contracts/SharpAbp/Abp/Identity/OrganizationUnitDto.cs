@@ -31,7 +31,7 @@ namespace SharpAbp.Abp.Identity
         
         public OrganizationUnitDto()
         {
-            Roles = new List<OrganizationUnitRoleDto>();
+            Roles = [];
         }
     }
 }

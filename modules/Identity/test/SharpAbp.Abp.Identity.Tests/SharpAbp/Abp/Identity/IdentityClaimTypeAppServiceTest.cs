@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
+using Volo.Abp.Identity;
 using Xunit;
 
 namespace SharpAbp.Abp.Identity
@@ -71,7 +72,7 @@ namespace SharpAbp.Abp.Identity
 
             await _identityClaimTypeAppService.DeleteAsync(claimTypeId1);
 
-            await Assert.ThrowsAsync<EntityNotFoundException>(() =>
+            await Assert.ThrowsAsync<EntityNotFoundException<IdentityClaimType>>(() =>
             {
                 return _identityClaimTypeAppService.GetAsync(claimTypeId1);
             });

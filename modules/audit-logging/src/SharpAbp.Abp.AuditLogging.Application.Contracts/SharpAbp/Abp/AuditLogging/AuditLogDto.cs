@@ -126,8 +126,8 @@ namespace SharpAbp.Abp.AuditLogging
         /// </summary>
         public AuditLogDto()
         {
-            EntityChanges = new List<EntityChangeDto>();
-            Actions = new List<AuditLogActionDto>();
+            EntityChanges = [];
+            Actions = [];
         }
     }
 }

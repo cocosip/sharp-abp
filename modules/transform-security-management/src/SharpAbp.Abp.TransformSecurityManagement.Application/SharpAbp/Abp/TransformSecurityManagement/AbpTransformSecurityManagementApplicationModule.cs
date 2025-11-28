@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Volo.Abp.Application;
 using Volo.Abp.AutoMapper;
+using Volo.Abp.Mapperly;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
 
@@ -11,7 +12,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
         typeof(AbpTransformSecurityManagementApplicationContractsModule),
         typeof(AbpTransformSecurityManagementDomainModule),
         typeof(AbpDddApplicationModule),
-        typeof(AbpAutoMapperModule)
+        typeof(AbpMapperlyModule)
         )]
     public class AbpTransformSecurityManagementApplicationModule : AbpModule
     {
@@ -22,12 +23,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            Configure<AbpAutoMapperOptions>(options =>
-            {
-                options.AddMaps<AbpTransformSecurityManagementApplicationModule>();
-            });
-
-            context.Services.AddAutoMapperObjectMapper<AbpTransformSecurityManagementApplicationModule>();
+            context.Services.AddMapperlyObjectMapper<AbpTransformSecurityManagementApplicationModule>();
             return Task.CompletedTask;
         }
     }

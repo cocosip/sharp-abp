@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Auditing;
-using Volo.Abp.Data;
 
 namespace SharpAbp.Abp.AuditLogging
 {

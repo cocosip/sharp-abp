@@ -2,7 +2,7 @@
 using SharpAbp.Abp.Identity;
 using System.Threading.Tasks;
 using Volo.Abp.Application;
-using Volo.Abp.AutoMapper;
+using Volo.Abp.Mapperly;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
 
@@ -10,7 +10,7 @@ namespace SharpAbp.Abp.IdentityServer
 {
     [DependsOn(
         typeof(AbpDddApplicationModule),
-        typeof(AbpAutoMapperModule),
+        typeof(AbpMapperlyModule),
         typeof(IdentityServerApplicationContractsModule),
         typeof(IdentityServerDomainModule),
         typeof(IdentityApplicationModule)
@@ -24,12 +24,7 @@ namespace SharpAbp.Abp.IdentityServer
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            Configure<AbpAutoMapperOptions>(options =>
-            {
-                options.AddMaps<IdentityServerApplicationModule>();
-            });
-
-            context.Services.AddAutoMapperObjectMapper<IdentityServerApplicationModule>();
+            context.Services.AddMapperlyObjectMapper<IdentityServerApplicationModule>();
             return Task.CompletedTask;
         }
     }

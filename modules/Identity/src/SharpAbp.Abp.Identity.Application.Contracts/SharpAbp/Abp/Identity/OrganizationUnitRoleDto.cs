@@ -3,8 +3,9 @@ using Volo.Abp.Application.Dtos;
 
 namespace SharpAbp.Abp.Identity
 {
-    public class OrganizationUnitRoleDto : CreationAuditedEntityDto<Guid>
+    public class OrganizationUnitRoleDto : CreationAuditedEntityDto
     {
+
         /// <summary>
         /// TenantId of this entity.
         /// </summary>

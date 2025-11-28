@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using Volo.Abp.Application;
-using Volo.Abp.AutoMapper;
+using Volo.Abp.Mapperly;
 using Volo.Abp.Modularity;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.Threading;
@@ -13,7 +13,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         typeof(MapTenancyManagementApplicationContractsModule),
         typeof(AbpTenantManagementApplicationModule),
         typeof(AbpDddApplicationModule),
-        typeof(AbpAutoMapperModule)
+        typeof(AbpMapperlyModule)
         )]
     public class MapTenancyManagementApplicationModule : AbpModule
     {
@@ -24,12 +24,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            Configure<AbpAutoMapperOptions>(options =>
-            {
-                options.AddMaps<MapTenancyManagementApplicationModule>();
-            });
-
-            context.Services.AddAutoMapperObjectMapper<MapTenancyManagementApplicationModule>();
+            context.Services.AddMapperlyObjectMapper<MapTenancyManagementApplicationModule>();
             return Task.CompletedTask;
         }
     }

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.EventBus.Distributed;
-using Volo.Abp.MultiTenancy;
 
 namespace SharpAbp.Abp.DbConnectionsManagement
 {

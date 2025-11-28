@@ -1,17 +1,9 @@
-﻿﻿using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+﻿﻿using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.MapTenancy;
-using System;
-using System.Threading;
 using System.Threading.Tasks;
-using Volo.Abp;
-using Volo.Abp.AutoMapper;
 using Volo.Abp.Caching;
-using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Entities.Events.Distributed;
+using Volo.Abp.Mapperly;
 using Volo.Abp.Modularity;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.Threading;
@@ -21,7 +13,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
     [DependsOn(
         typeof(AbpCachingModule),
         typeof(AbpMapTenancyModule),
-        typeof(AbpAutoMapperModule),
+        typeof(AbpMapperlyModule),
         typeof(AbpTenantManagementDomainModule),
         typeof(MapTenancyManagementDomainSharedModule)
         )]
@@ -35,15 +27,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            Configure<AbpAutoMapperOptions>(options =>
-            {
-                options.AddMaps<MapTenancyManagementDomainModule>();
-            });
-
-            context.Services.AddAutoMapperObjectMapper<MapTenancyManagementDomainModule>();
-
-            // Register IMapTenantManager interface with MapTenantManager implementation
-            context.Services.AddTransient<IMapTenantManager, MapTenantManager>();
+            context.Services.AddMapperlyObjectMapper<MapTenancyManagementDomainModule>();
 
             Configure<MapTenancyStoreOptions>(options => { });
 

@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 using Volo.Abp.Application;
-using Volo.Abp.AutoMapper;
 using Volo.Abp.Caching;
+using Volo.Abp.Mapperly;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
 
@@ -14,7 +14,7 @@ namespace SharpAbp.MinId
         typeof(MinIdDomainModule),
         typeof(MinIdApplicationContractsModule),
         typeof(AbpDddApplicationModule),
-        typeof(AbpAutoMapperModule)
+        typeof(AbpMapperlyModule)
         )]
     public class MinIdApplicationModule : AbpModule
     {
@@ -25,11 +25,7 @@ namespace SharpAbp.MinId
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            context.Services.AddAutoMapperObjectMapper<MinIdApplicationModule>();
-            Configure<AbpAutoMapperOptions>(options =>
-            {
-                options.AddMaps<MinIdApplicationModule>(validate: false);
-            });
+            context.Services.AddMapperlyObjectMapper<MinIdApplicationModule>();
 
             Configure<AbpDistributedCacheOptions>(options =>
             {

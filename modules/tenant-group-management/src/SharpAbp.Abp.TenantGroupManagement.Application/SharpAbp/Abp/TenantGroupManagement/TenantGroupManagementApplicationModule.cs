@@ -1,8 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.Application;
-using Volo.Abp.AutoMapper;
+using Volo.Abp.Mapperly;
 using Volo.Abp.Modularity;
 using Volo.Abp.TenantManagement;
+using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.TenantGroupManagement
 {
@@ -11,18 +13,20 @@ namespace SharpAbp.Abp.TenantGroupManagement
         typeof(TenantGroupManagementApplicationContractsModule),
         typeof(AbpTenantManagementApplicationModule),
         typeof(AbpDddApplicationModule),
-        typeof(AbpAutoMapperModule)
+        typeof(AbpMapperlyModule)
         )]
     public class TenantGroupManagementApplicationModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            Configure<AbpAutoMapperOptions>(options =>
-            {
-                options.AddMaps<TenantGroupManagementApplicationModule>();
-            });
-
-            context.Services.AddAutoMapperObjectMapper<TenantGroupManagementApplicationModule>();
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
         }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
+        {
+            context.Services.AddMapperlyObjectMapper<TenantGroupManagementApplicationModule>();
+            return Task.CompletedTask;
+        }
+
     }
 }

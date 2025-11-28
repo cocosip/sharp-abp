@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.Application;
-using Volo.Abp.AutoMapper;
+using Volo.Abp.Mapperly;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
 
@@ -11,7 +11,7 @@ namespace SharpAbp.Abp.CryptoVault
         typeof(AbpCryptoVaultApplicationContractsModule),
         typeof(AbpCryptoVaultDomainModule),
         typeof(AbpDddApplicationModule),
-        typeof(AbpAutoMapperModule)
+        typeof(AbpMapperlyModule)
         )]
     public class AbpCryptoVaultApplicationModule : AbpModule
     {
@@ -22,12 +22,7 @@ namespace SharpAbp.Abp.CryptoVault
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            Configure<AbpAutoMapperOptions>(options =>
-            {
-                options.AddMaps<AbpCryptoVaultApplicationModule>();
-            });
-
-            context.Services.AddAutoMapperObjectMapper<AbpCryptoVaultApplicationModule>();
+            context.Services.AddMapperlyObjectMapper<AbpCryptoVaultApplicationModule>();
             return Task.CompletedTask;
         }
     }

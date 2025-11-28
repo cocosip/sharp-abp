@@ -16,7 +16,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Volo.Abp.AutoMapper" />
 		<PackageReference Include="Volo.Abp.Ddd.Application" />
 		<PackageReference Include="Volo.Abp.Identity.Application" />
 		<PackageReference Include="Volo.Abp.PermissionManagement.Application" />

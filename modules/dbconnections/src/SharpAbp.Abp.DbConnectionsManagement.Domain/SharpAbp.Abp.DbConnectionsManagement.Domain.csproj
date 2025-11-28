@@ -18,7 +18,6 @@
 	<ItemGroup>
 		<PackageReference Include="Volo.Abp.Ddd.Domain" />
 		<PackageReference Include="Volo.Abp.Caching" />
-		<PackageReference Include="Volo.Abp.AutoMapper" />
 	</ItemGroup>
 
 	<ItemGroup>

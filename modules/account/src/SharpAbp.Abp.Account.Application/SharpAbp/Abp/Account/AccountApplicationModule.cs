@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.Identity;
 using System.Threading.Tasks;
-using Volo.Abp.AutoMapper;
 using Volo.Abp.Emailing;
-using Volo.Abp.Mapperly;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
 using Volo.Abp.UI.Navigation;
@@ -16,8 +14,7 @@ namespace SharpAbp.Abp.Account
         typeof(AccountApplicationContractsModule),
         typeof(IdentityApplicationModule),
         typeof(AbpUiNavigationModule),
-        typeof(AbpEmailingModule),
-        typeof(AbpAutoMapperModule)
+        typeof(AbpEmailingModule)
     )]
     public class AccountApplicationModule : AbpModule
     {
@@ -28,13 +25,7 @@ namespace SharpAbp.Abp.Account
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            //context.Services.AddMapperlyObjectMapper<AccountApplicationModule>();
-
-            Configure<AbpAutoMapperOptions>(options =>
-            {
-                options.AddMaps<AccountApplicationModule>();
-                options.AddProfile<AbpAccountApplicationModuleAutoMapperProfile>();
-            });
+            context.Services.AddMapperlyObjectMapper<AccountApplicationModule>();
 
             Configure<AbpVirtualFileSystemOptions>(options =>
             {
