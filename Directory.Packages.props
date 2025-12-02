@@ -126,7 +126,7 @@
 		<PackageVersion Include="FastDFSCore.Transport.SuperSocket" Version="1.7.0" />
 		<PackageVersion Include="FastDFSCore.Transport.DotNetty" Version="1.7.0" />
 		<PackageVersion Include="Microsoft.FASTER.Core" Version="2.6.5" />
-		<PackageVersion Include="FreeRedis" Version="1.5.2" />
+		<PackageVersion Include="FreeRedis" Version="1.5.3" />
 		<PackageVersion Include="FreeSql" Version="$(FreeSqlPackageVersion)" />
 		<PackageVersion Include="FreeSql.Provider.MySql" Version="$(FreeSqlPackageVersion)" />
 		<PackageVersion Include="FreeSql.Provider.Oracle" Version="$(FreeSqlPackageVersion)" />
@@ -139,6 +139,7 @@
 		<PackageVersion Include="MassTransit.ActiveMQ" Version="$(MassTransitPackageVersion)" />
 		<PackageVersion Include="MassTransit.Kafka" Version="$(MassTransitPackageVersion)" />
 		<PackageVersion Include="MassTransit.RabbitMQ" Version="$(MassTransitPackageVersion)" />
+		<PackageVersion Include="MassTransit.Azure.ServiceBus.Core" Version="$(MassTransitPackageVersion)" />
 		<PackageVersion Include="MassTransit.SqlTransport.PostgreSQL" Version="$(MassTransitPackageVersion)" />
 		<PackageVersion Include="MassTransit.SqlTransport.SqlServer" Version="$(MassTransitPackageVersion)" />
 		<PackageVersion Include="DM.Microsoft.EntityFrameworkCore" Version="[9.0.0.37033,)" />
