@@ -25,6 +25,41 @@ namespace SharpAbp.Abp.Faster
         bool Initialized { get; }
 
         /// <summary>
+        /// Gets the total number of committed ranges since initialization.
+        /// </summary>
+        long TotalCommittedRanges { get; }
+
+        /// <summary>
+        /// Gets the total number of writes since initialization.
+        /// </summary>
+        long TotalWriteCount { get; }
+
+        /// <summary>
+        /// Gets the total number of reads since initialization.
+        /// </summary>
+        long TotalReadCount { get; }
+
+        /// <summary>
+        /// Gets the current number of gaps in the completed ranges.
+        /// </summary>
+        long CurrentGapCount { get; }
+
+        /// <summary>
+        /// Gets the largest gap size in bytes detected.
+        /// </summary>
+        long LargestGapSize { get; }
+
+        /// <summary>
+        /// Gets the number of completed ranges currently tracked.
+        /// </summary>
+        int CompletedRangeCount { get; }
+
+        /// <summary>
+        /// Gets the current truncate address.
+        /// </summary>
+        long TruncateBeforeAddress { get; }
+
+        /// <summary>
         /// Initializes the FASTER logger with the specified configuration.
         /// </summary>
         void Initialize();
@@ -56,9 +91,9 @@ namespace SharpAbp.Abp.Faster
         /// <summary>
         /// Commits the specified log entry positions.
         /// </summary>
-        /// <param name="entryPosition">The positions to commit.</param>
+        /// <param name="positions">The positions to commit.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        Task CommitAsync(LogEntryPosition entryPosition, CancellationToken cancellationToken = default);
+        Task CommitAsync(IEnumerable<Position> positions, CancellationToken cancellationToken = default);
     }
 }

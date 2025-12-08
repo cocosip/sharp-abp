@@ -2,65 +2,118 @@
 
 namespace SharpAbp.Abp.Faster
 {
-    public class Position : IComparable<Position>
+    /// <summary>
+    /// Represents an address range with a start and end position.
+    /// </summary>
+    public interface IAddressRange
     {
+        /// <summary>
+        /// Gets the start address of the range.
+        /// </summary>
+        long Start { get; }
+
+        /// <summary>
+        /// Gets the end address of the range.
+        /// </summary>
+        long End { get; }
+    }
+
+    /// <summary>
+    /// Represents a position in the log with address range information.
+    /// </summary>
+    public class Position : IAddressRange, IComparable<Position>
+    {
+        /// <summary>
+        /// Gets or sets the starting address of this position.
+        /// </summary>
         public long Address { get; set; }
-        public long Length { get; set; }
+
+        /// <summary>
+        /// Gets or sets the next address after this position (end of range).
+        /// </summary>
         public long NextAddress { get; set; }
+
+        /// <summary>
+        /// Gets the start address (same as Address).
+        /// </summary>
+        long IAddressRange.Start => Address;
+
+        /// <summary>
+        /// Gets the end address (same as NextAddress).
+        /// </summary>
+        long IAddressRange.End => NextAddress;
+
+        /// <summary>
+        /// Gets the length of this position's range.
+        /// </summary>
+        public long Length => NextAddress - Address;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Position"/> class.
+        /// </summary>
         public Position()
         {
-
         }
-        public Position(long address, long length, long nextAddress)
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Position"/> class.
+        /// </summary>
+        /// <param name="address">The starting address.</param>
+        /// <param name="nextAddress">The next address (end of range).</param>
+        /// <exception cref="ArgumentException">Thrown when address is negative or nextAddress is not greater than address.</exception>
+        public Position(long address, long nextAddress)
         {
+            if (address < 0)
+            {
+                throw new ArgumentException($"Address must be non-negative. Got: {address}", nameof(address));
+            }
+
+            if (nextAddress <= address)
+            {
+                throw new ArgumentException(
+                    $"NextAddress must be greater than Address. Address: {address}, NextAddress: {nextAddress}",
+                    nameof(nextAddress));
+            }
+
             Address = address;
-            Length = length;
             NextAddress = nextAddress;
         }
 
-        public bool IsMatch(long nextAddress)
+        /// <summary>
+        /// Validates this position's address range.
+        /// </summary>
+        /// <returns>True if the position is valid, otherwise false.</returns>
+        public bool IsValid()
         {
-            return nextAddress == Address || Math.Abs(nextAddress - Address) < 10;
+            return Address >= 0 && NextAddress > Address;
         }
 
-        public int CompareTo(Position other)
+        /// <summary>
+        /// Compares this position to another based on address.
+        /// </summary>
+        public int CompareTo(Position? other)
         {
             if (other == null)
             {
                 return 1;
             }
+
             int addressComparison = Address.CompareTo(other.Address);
             if (addressComparison != 0)
             {
                 return addressComparison;
             }
-            return Length.CompareTo(other.Length);
+
+            return NextAddress.CompareTo(other.NextAddress);
+        }
+
+        /// <summary>
+        /// Returns a string representation of this position.
+        /// </summary>
+        public override string ToString()
+        {
+            return $"[{Address}, {NextAddress})";
         }
     }
 
-    public class RetryPosition
-    {
-        public Position? Position { get; set; }
-        public int RetryCount { get; set; }
-
-        public RetryPosition()
-        {
-
-        }
-
-        public RetryPosition(Position position, int retryCount)
-        {
-            Position = position;
-            RetryCount = retryCount;
-        }
-
-
-        public bool IsMax(int max)
-        {
-            return RetryCount >= max && max > 0;
-        }
-
-
-
-    }
 }

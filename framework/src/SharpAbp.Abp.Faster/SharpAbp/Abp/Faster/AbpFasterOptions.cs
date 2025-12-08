@@ -58,7 +58,9 @@ namespace SharpAbp.Abp.Faster
                         c.CompleteIntervalMillis = val.CompleteIntervalMillis;
                         c.TruncateIntervalMillis = val.TruncateIntervalMillis;
                         c.PreReadCapacity = val.PreReadCapacity;
-                        c.MaxCommitSkip = val.MaxCommitSkip;
+                        c.AddressMatchTolerance = val.AddressMatchTolerance;
+                        c.GapTimeoutMillis = val.GapTimeoutMillis;
+                        c.MaxCompletedRanges = val.MaxCompletedRanges;
                         c.IteratorName = val.IteratorName;
                     });
                 }

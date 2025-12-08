@@ -11,7 +11,7 @@ namespace SharpAbp.Abp.Faster
     /// <summary>
     /// Default implementation of <see cref="IFasterLoggerFactory"/> that creates and manages Faster logger instances
     /// </summary>
-    public class DefaultFasterLoggerFactory : IFasterLoggerFactory, ISingletonDependency
+    public class DefaultFasterLoggerFactory : IFasterLoggerFactory, ISingletonDependency, IDisposable
     {
         /// <summary>
         /// Gets the concurrent dictionary that stores created logger instances with lazy initialization
@@ -79,6 +79,33 @@ namespace SharpAbp.Abp.Faster
                 configuration);
             fasterLogger.Initialize();
             return fasterLogger;
+        }
+
+        /// <summary>
+        /// Disposes all created logger instances and releases resources
+        /// </summary>
+        public void Dispose()
+        {
+            Logger.LogInformation("Disposing FasterLoggerFactory and all cached loggers...");
+
+            foreach (var kvp in Loggers)
+            {
+                if (kvp.Value.IsValueCreated)
+                {
+                    try
+                    {
+                        kvp.Value.Value?.Dispose();
+                        Logger.LogDebug("Disposed logger: {LoggerName}", kvp.Key);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(ex, "Error disposing logger '{LoggerName}': {Message}", kvp.Key, ex.Message);
+                    }
+                }
+            }
+
+            Loggers.Clear();
+            Logger.LogInformation("FasterLoggerFactory disposed successfully.");
         }
     }
 }

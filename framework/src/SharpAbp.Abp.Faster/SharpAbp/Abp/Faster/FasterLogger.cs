@@ -22,11 +22,30 @@ namespace SharpAbp.Abp.Faster
     public class FasterLogger<T> : IDisposable, IFasterLogger<T> where T : class
     {
         private readonly SemaphoreSlim _commitSemaphore = new SemaphoreSlim(1, 1);
-        private long _completedUntilAddress = -1L;
-        private long _truncateUntilAddress = -1L;
+        private readonly SemaphoreSlim _initializeSemaphore = new SemaphoreSlim(1, 1);
+        private readonly CancellationTokenSource _disposeCts = new CancellationTokenSource();
+        private CancellationTokenSource? _linkedCts;
+        private long _truncateBeforeAddress = -1L;
         private bool _initialized = false;
-        private readonly ConcurrentDictionary<long, RetryPosition> _committing;
-        protected Channel<BufferedLogEntry> _pendingChannel;
+        private bool _disposed = false;
+
+        // Use interval tracking instead of retry-based commit tracking
+        private readonly SortedSet<CompletedRange> _completedRanges = new SortedSet<CompletedRange>();
+        private readonly object _completedRangesLock = new object();
+        private DateTime _lastGapWarningTime = DateTime.MinValue;
+        private long _lastGapStart = -1;
+
+        // Background task tracking for graceful shutdown
+        private readonly List<Task> _backgroundTasks = new List<Task>();
+
+        // Monitoring metrics for observability
+        private long _totalCommittedRanges = 0;
+        private long _totalWriteCount = 0;
+        private long _totalReadCount = 0;
+        private long _currentGapCount = 0;
+        private long _largestGapSize = 0;
+
+        protected readonly Channel<BufferedLogEntry> _pendingChannel;
 
         protected ILogger Logger { get; }
         protected AbpFasterOptions Options { get; }
@@ -37,6 +56,11 @@ namespace SharpAbp.Abp.Faster
         protected FasterLogScanIterator? Iter { get; set; }
 
         /// <summary>
+        /// Gets the combined cancellation token from both the dispose CTS and the application CTS.
+        /// </summary>
+        protected CancellationToken CombinedCancellationToken => _linkedCts?.Token ?? CancellationToken.None;
+
+        /// <summary>
         /// Gets whether the logger has been initialized.
         /// </summary>
         public bool Initialized => _initialized;
@@ -45,6 +69,50 @@ namespace SharpAbp.Abp.Faster
         /// Gets the name of the logger.
         /// </summary>
         public string? Name { get; }
+
+        /// <summary>
+        /// Gets the total number of committed ranges since initialization.
+        /// </summary>
+        public long TotalCommittedRanges => Interlocked.Read(ref _totalCommittedRanges);
+
+        /// <summary>
+        /// Gets the total number of writes since initialization.
+        /// </summary>
+        public long TotalWriteCount => Interlocked.Read(ref _totalWriteCount);
+
+        /// <summary>
+        /// Gets the total number of reads since initialization.
+        /// </summary>
+        public long TotalReadCount => Interlocked.Read(ref _totalReadCount);
+
+        /// <summary>
+        /// Gets the current number of gaps in the completed ranges.
+        /// </summary>
+        public long CurrentGapCount => Interlocked.Read(ref _currentGapCount);
+
+        /// <summary>
+        /// Gets the largest gap size in bytes detected.
+        /// </summary>
+        public long LargestGapSize => Interlocked.Read(ref _largestGapSize);
+
+        /// <summary>
+        /// Gets the number of completed ranges currently tracked.
+        /// </summary>
+        public int CompletedRangeCount
+        {
+            get
+            {
+                lock (_completedRangesLock)
+                {
+                    return _completedRanges.Count;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the current truncate address.
+        /// </summary>
+        public long TruncateBeforeAddress => Interlocked.Read(ref _truncateBeforeAddress);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FasterLogger{T}"/> class.
@@ -70,8 +138,19 @@ namespace SharpAbp.Abp.Faster
             Serializer = serializer;
             CancellationTokenProvider = cancellationTokenProvider;
 
-            _pendingChannel = Channel.CreateBounded<BufferedLogEntry>(Configuration.PreReadCapacity);
-            _committing = new ConcurrentDictionary<long, RetryPosition>();
+            _linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
+                _disposeCts.Token,
+                cancellationTokenProvider.Token);
+
+            // Create bounded channel with explicit full mode configuration
+            // Use Wait mode to ensure no data loss when channel is full
+            var channelOptions = new BoundedChannelOptions(Configuration.PreReadCapacity)
+            {
+                FullMode = BoundedChannelFullMode.Wait,
+                SingleReader = true,  // Only one ReadAsync consumer
+                SingleWriter = true   // Only one scan task writing
+            };
+            _pendingChannel = Channel.CreateBounded<BufferedLogEntry>(channelOptions);
         }
 
         /// <summary>
@@ -79,66 +158,94 @@ namespace SharpAbp.Abp.Faster
         /// </summary>
         public virtual void Initialize()
         {
+            // Use double-checked locking pattern for thread-safe initialization
             if (_initialized)
             {
-                Logger.LogWarning(
-                    "FASTER logger '{LoggerName}' is already initialized.",
-                    TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
                 return;
             }
 
-            var fileName = Path.Combine(
-                Options.RootPath,
-                TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
-                Configuration.FileName);
-
-            var device = Devices.CreateLogDevice(
-                fileName,
-                Configuration.PreallocateFile,
-                false,
-                Configuration.Capacity,
-                Configuration.RecoverDevice,
-                Configuration.UseIoCompletionPort,
-                Configuration.DisableFileBuffering);
-
-            var settings = new FasterLogSettings()
+            _initializeSemaphore.Wait();
+            try
             {
-                LogDevice = device,
-                PageSizeBits = Configuration.PageSizeBits,
-                MemorySizeBits = Configuration.MemorySizeBits,
-                SegmentSizeBits = Configuration.SegmentSizeBits,
-                AutoRefreshSafeTailAddress = Configuration.AutoRefreshSafeTailAddress,
-                AutoCommit = false
-            };
+                // Double-check after acquiring the lock
+                if (_initialized)
+                {
+                    Logger.LogWarning(
+                        "FASTER logger '{LoggerName}' is already initialized.",
+                        TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+                    return;
+                }
 
-            Configuration.Configure?.Invoke(settings);
-            Log = new FasterLog(settings);
+                // Validate configuration
+                if (string.IsNullOrWhiteSpace(Options.RootPath))
+                {
+                    throw new InvalidOperationException(
+                        $"RootPath must be configured in AbpFasterOptions for logger type '{TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T))}'.");
+                }
 
-            Iter = Log.Scan(
-                Log.BeginAddress,
-                long.MaxValue,
-                Configuration.IteratorName,
-                true,
-                ScanBufferingMode.DoublePageBuffering,
-                Configuration.ScanUncommitted,
-                Logger);
+                if (string.IsNullOrWhiteSpace(Configuration.FileName))
+                {
+                    throw new InvalidOperationException(
+                        $"FileName must be configured for logger type '{TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T))}'.");
+                }
 
-            _completedUntilAddress = Math.Max(Iter.CompletedUntilAddress, Iter.BeginAddress);
+                var fileName = Path.Combine(
+                    Options.RootPath,
+                    TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
+                    Configuration.FileName);
 
-            // Start background tasks
-            StartScheduleCommit();
-            StartScheduleScan();
-            StartScheduleComplete();
-            StartScheduleTruncate();
+                var device = Devices.CreateLogDevice(
+                    fileName,
+                    Configuration.PreallocateFile,
+                    false,
+                    Configuration.Capacity,
+                    Configuration.RecoverDevice,
+                    Configuration.UseIoCompletionPort,
+                    Configuration.DisableFileBuffering);
 
-            _initialized = true;
+                var settings = new FasterLogSettings()
+                {
+                    LogDevice = device,
+                    PageSizeBits = Configuration.PageSizeBits,
+                    MemorySizeBits = Configuration.MemorySizeBits,
+                    SegmentSizeBits = Configuration.SegmentSizeBits,
+                    AutoRefreshSafeTailAddress = Configuration.AutoRefreshSafeTailAddress,
+                    AutoCommit = false
+                };
 
-            Logger.LogInformation(
-                "FASTER logger '{LoggerName}' initialized successfully. Begin address: {BeginAddress}, Completed address: {CompletedAddress}, File: {FileName}.",
-                TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
-                Iter.BeginAddress,
-                _completedUntilAddress,
-                fileName);
+                Configuration.Configure?.Invoke(settings);
+                Log = new FasterLog(settings);
+
+                Iter = Log.Scan(
+                    Log.BeginAddress,
+                    long.MaxValue,
+                    Configuration.IteratorName,
+                    true,
+                    ScanBufferingMode.DoublePageBuffering,
+                    Configuration.ScanUncommitted,
+                    Logger);
+
+                Interlocked.Exchange(ref _truncateBeforeAddress, Math.Max(Iter.CompletedUntilAddress, Iter.BeginAddress));
+
+                // Start background tasks
+                StartScheduleCommit();
+                StartScheduleScan();
+                StartScheduleComplete();
+                StartScheduleTruncate();
+
+                _initialized = true;
+
+                Logger.LogInformation(
+                    "FASTER logger '{LoggerName}' initialized successfully. Begin address: {BeginAddress}, Truncate before address: {TruncateAddress}, File: {FileName}.",
+                    TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
+                    Iter.BeginAddress,
+                    _truncateBeforeAddress,
+                    fileName);
+            }
+            finally
+            {
+                _initializeSemaphore.Release();
+            }
         }
 
         /// <summary>
@@ -147,30 +254,39 @@ namespace SharpAbp.Abp.Faster
         /// </summary>
         protected virtual void StartScheduleCommit()
         {
-            Task.Factory.StartNew(async () =>
+            var task = Task.Factory.StartNew(async () =>
             {
-                while (!CancellationTokenProvider.Token.IsCancellationRequested)
+                while (!CombinedCancellationToken.IsCancellationRequested)
                 {
-                    await Task.Delay(Configuration.CommitIntervalMillis, CancellationTokenProvider.Token);
                     try
                     {
-                        await _commitSemaphore.WaitAsync(CancellationTokenProvider.Token);
+                        await _commitSemaphore.WaitAsync(CombinedCancellationToken);
                         if (Log != null)
                         {
-                            await Log.CommitAsync(CancellationTokenProvider.Token);
+                            await Log.CommitAsync(CombinedCancellationToken);
                         }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        // Expected during shutdown, no logging needed
+                        break;
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError(ex, "Error committing FASTER log data for type '{TypeName}': {Message}", 
+                        Logger.LogError(ex, "Error committing FASTER log data for type '{TypeName}': {Message}",
                             TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)), ex.Message);
                     }
                     finally
                     {
                         _commitSemaphore.Release();
                     }
+
+                    // Delay after the commit attempt to avoid initial delay
+                    await Task.Delay(Configuration.CommitIntervalMillis, CombinedCancellationToken);
                 }
-            }, TaskCreationOptions.LongRunning);
+            }, TaskCreationOptions.LongRunning).Unwrap();
+
+            _backgroundTasks.Add(task);
         }
 
         /// <summary>
@@ -178,9 +294,9 @@ namespace SharpAbp.Abp.Faster
         /// </summary>
         protected virtual void StartScheduleScan()
         {
-            Task.Factory.StartNew(async () =>
+            var task = Task.Factory.StartNew(async () =>
             {
-                while (!CancellationTokenProvider.Token.IsCancellationRequested)
+                while (!CombinedCancellationToken.IsCancellationRequested)
                 {
                     try
                     {
@@ -193,124 +309,186 @@ namespace SharpAbp.Abp.Faster
                         {
                             while (!Iter.GetNext(out buffer, out entryLength, out currentAddress, out nextAddress))
                             {
-                                await Iter.WaitAsync(CancellationTokenProvider.Token);
+                                await Iter.WaitAsync(CombinedCancellationToken);
                             }
                         }
-
-                        Logger.LogTrace(
-                            "Retrieved iterator message for type '{TypeName}'. Current address: {CurrentAddress}, Next address: {NextAddress}.",
-                            TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
-                            currentAddress,
-                            nextAddress);
 
                         if (buffer != null && entryLength > 0)
                         {
                             var entry = new BufferedLogEntry
                             {
                                 Data = buffer,
-                                EntryLength = entryLength,
                                 CurrentAddress = currentAddress,
                                 NextAddress = nextAddress
                             };
 
-                            await _pendingChannel.Writer.WriteAsync(entry, CancellationTokenProvider.Token);
+                            await _pendingChannel.Writer.WriteAsync(entry, CombinedCancellationToken);
                         }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        // Expected during shutdown, no logging needed
+                        break;
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError(ex, "Error during scheduled log scan for type '{TypeName}': {Message}", 
+                        Logger.LogError(ex, "Error during scheduled log scan for type '{TypeName}': {Message}",
                             TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)), ex.Message);
+
+                        // Add delay to prevent rapid failure loop
+                        await Task.Delay(1000, CombinedCancellationToken);
                     }
                 }
-            }, TaskCreationOptions.LongRunning);
+            }, TaskCreationOptions.LongRunning).Unwrap();
+
+            _backgroundTasks.Add(task);
         }
 
         /// <summary>
         /// Starts the scheduled completion task to process completed log entries.
+        /// Uses interval merging to find the largest continuous range from the beginning.
         /// </summary>
         protected virtual void StartScheduleComplete()
         {
-            Task.Factory.StartNew(async () =>
+            var task = Task.Factory.StartNew(async () =>
             {
-                while (!CancellationTokenProvider.Token.IsCancellationRequested)
+                while (!CombinedCancellationToken.IsCancellationRequested)
                 {
                     try
                     {
-                        long commitAddress = _completedUntilAddress;
-                        var removeIds = new List<long>();
+                        long currentTruncateAddress = Interlocked.Read(ref _truncateBeforeAddress);
+                        long newTruncateAddress = currentTruncateAddress;
+                        var rangesToRemove = new List<CompletedRange>();
 
-                        // Pre-sort _committing to avoid repeated sorting in the loop
-                        var sortedCommits = _committing.Values.OrderBy(x => x.Position!.Address).ToList();
-                        Logger.LogDebug("Processing {Count} pending commit operations for type '{TypeName}'.", 
-                            _committing.Count, TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
-
-                        foreach (var commit in sortedCommits)
+                        lock (_completedRangesLock)
                         {
-                            if (commit.Position != null && !commit.Position.IsMatch(commitAddress))
+                            if (_completedRanges.Count > 0)
                             {
-                                Logger.LogDebug(
-                                    "Commit position mismatch for type '{TypeName}'. Expected: {ExpectedAddress}, Actual - Address: {Address}, Next: {NextAddress}",
-                                    TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
-                                    commitAddress,
-                                    commit.Position.Address,
-                                    commit.Position.NextAddress);
+                                // Find the largest continuous range from the beginning
+                                // Tolerance allows small gaps to be considered continuous
+                                long currentEnd = currentTruncateAddress;
 
-                                if (commit.IsMax(Configuration.MaxCommitSkip))
+                                foreach (var range in _completedRanges)
                                 {
-                                    // If max retry count reached, update commitAddress and log
-                                    if (Iter != null && commitAddress <= Iter.EndAddress)
+                                    // Check if this range connects to or overlaps with the current continuous end
+                                    // Allow tolerance for small gaps
+                                    if (range.Start <= currentEnd + Configuration.AddressMatchTolerance)
                                     {
-                                        commitAddress = commit.Position.NextAddress;
-                                        removeIds.Add(commit.Position.Address);
-                                        Logger.LogDebug(
-                                            "Maximum commit skip count reached for address {Address} in type '{TypeName}'. Proceeding to next.",
-                                            commit.Position.Address,
-                                            TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+                                        // Extend the continuous range
+                                        currentEnd = Math.Max(currentEnd, range.End);
+                                        rangesToRemove.Add(range);
+                                    }
+                                    else
+                                    {
+                                        // Gap detected, stop merging
+                                        long gapSize = range.Start - currentEnd;
+
+                                        // Update gap metrics
+                                        Interlocked.Exchange(ref _largestGapSize, Math.Max(Interlocked.Read(ref _largestGapSize), gapSize));
+
+                                        // Check for stale gap timeout
+                                        if (Configuration.GapTimeoutMillis > 0)
+                                        {
+                                            bool isNewGap = _lastGapStart != range.Start;
+
+                                            if (isNewGap)
+                                            {
+                                                _lastGapStart = range.Start;
+                                                _lastGapWarningTime = DateTime.UtcNow;
+                                            }
+                                            else
+                                            {
+                                                var gapDuration = DateTime.UtcNow - _lastGapWarningTime;
+                                                if (gapDuration.TotalMilliseconds > Configuration.GapTimeoutMillis)
+                                                {
+                                                    Logger.LogWarning(
+                                                        "Gap at address {GapStart} has persisted for {Duration:F1} seconds (size: {GapSize} bytes) for type '{TypeName}'. " +
+                                                        "This may indicate missing data or out-of-order processing issues.",
+                                                        range.Start,
+                                                        gapDuration.TotalSeconds,
+                                                        gapSize,
+                                                        TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+
+                                                    // Reset timer to avoid repeated warnings
+                                                    _lastGapWarningTime = DateTime.UtcNow;
+                                                }
+                                            }
+                                        }
+
+                                        break;
                                     }
                                 }
-                                else
+
+                                newTruncateAddress = currentEnd;
+
+                                // Remove merged ranges
+                                foreach (var range in rangesToRemove)
                                 {
-                                    // Increment retry count and update dictionary
-                                    var gainPosition = new RetryPosition(commit.Position, commit.RetryCount + 1);
-                                    if (!_committing.TryUpdate(commit.Position.Address, gainPosition, commit))
+                                    _completedRanges.Remove(range);
+                                }
+
+                                // Check if we have too many ranges (memory protection)
+                                if (Configuration.MaxCompletedRanges > 0 &&
+                                    _completedRanges.Count > Configuration.MaxCompletedRanges)
+                                {
+                                    int excessCount = _completedRanges.Count - Configuration.MaxCompletedRanges;
+                                    var rangesArray = _completedRanges.ToArray();
+
+                                    // Remove the oldest ranges beyond the limit
+                                    // Keep ranges from the end (most recent) rather than beginning (which has the gap)
+                                    for (int i = _completedRanges.Count - excessCount; i < _completedRanges.Count; i++)
                                     {
-                                        Logger.LogWarning(
-                                            "Failed to update retry position for address {Address} in type '{TypeName}'.",
-                                            commit.Position.Address,
-                                            TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+                                        _completedRanges.Remove(rangesArray[i]);
                                     }
-                                    break; // Exit loop to wait for next schedule
+
+                                    Logger.LogWarning(
+                                        "Removed {Count} excess ranges from completed set for type '{TypeName}' to prevent memory growth. " +
+                                        "Total ranges: {Total}, Max allowed: {Max}",
+                                        excessCount,
+                                        TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
+                                        _completedRanges.Count,
+                                        Configuration.MaxCompletedRanges);
                                 }
-                            }
-                            else
-                            {
-                                if (Iter != null && commitAddress <= Iter.EndAddress && commit.Position != null)
-                                {
-                                    commitAddress = commit.Position.NextAddress;
-                                    removeIds.Add(commit.Position.Address);
-                                }
+
+                                // Update gap count metric
+                                // If there are remaining ranges, there's at least one gap
+                                // The number of gaps equals the number of remaining ranges (each represents a gap segment)
+                                Interlocked.Exchange(ref _currentGapCount, _completedRanges.Count > 0 ? _completedRanges.Count : 0);
                             }
                         }
 
-                        // Check if we need to commit completed records
-                        if (commitAddress > _completedUntilAddress &&
-                            Iter != null &&
-                            commitAddress <= Iter.EndAddress)
+                        // Commit and complete if we have progress
+                        long currentTruncate = Interlocked.Read(ref _truncateBeforeAddress);
+                        if (newTruncateAddress > currentTruncate && Iter != null)
                         {
-                            await CompleteUntilRecordAtAsync(commitAddress);
-                            _completedUntilAddress = commitAddress;
-                            RemoveProcessedCommits(removeIds);
+                            await CompleteUntilRecordAtAsync(newTruncateAddress);
+                            Interlocked.Exchange(ref _truncateBeforeAddress, newTruncateAddress);
+
+                            Logger.LogInformation(
+                                "Advanced truncate address to {TruncateAddress} for type '{TypeName}'. Removed {Count} ranges.",
+                                newTruncateAddress,
+                                TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
+                                rangesToRemove.Count);
                         }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        // Expected during shutdown, no logging needed
+                        break;
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError(ex, "Error during commit completion for type '{TypeName}': {Message}", 
+                        Logger.LogError(ex, "Error during commit completion for type '{TypeName}': {Message}",
                             TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)), ex.Message);
+
+                        // Add delay to prevent rapid failure loop (delay happens below)
                     }
 
-                    await Task.Delay(Configuration.CompleteIntervalMillis, CancellationTokenProvider.Token);
+                    await Task.Delay(Configuration.CompleteIntervalMillis, CombinedCancellationToken);
                 }
-            }, TaskCreationOptions.LongRunning);
+            }, TaskCreationOptions.LongRunning).Unwrap();
+
+            _backgroundTasks.Add(task);
         }
 
         /// <summary>
@@ -319,19 +497,17 @@ namespace SharpAbp.Abp.Faster
         /// <param name="commitAddress">The address up to which records should be completed.</param>
         private async Task CompleteUntilRecordAtAsync(long commitAddress)
         {
-            Logger.LogDebug("Completing records up to address {CommitAddress} for type '{TypeName}'.", 
-                commitAddress, TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
-            await _commitSemaphore.WaitAsync(CancellationTokenProvider.Token);
+            await _commitSemaphore.WaitAsync(CombinedCancellationToken);
             try
             {
                 if (Log != null)
                 {
-                    await Log.CommitAsync(CancellationTokenProvider.Token);
+                    await Log.CommitAsync(CombinedCancellationToken);
                 }
 
                 if (Iter != null)
                 {
-                    await Iter.CompleteUntilRecordAtAsync(commitAddress, CancellationTokenProvider.Token);
+                    await Iter.CompleteUntilRecordAtAsync(commitAddress, CombinedCancellationToken);
                 }
             }
             finally
@@ -341,59 +517,48 @@ namespace SharpAbp.Abp.Faster
         }
 
         /// <summary>
-        /// Removes processed commit entries from the committing dictionary.
-        /// </summary>
-        /// <param name="removeIds">The list of IDs to remove.</param>
-        private void RemoveProcessedCommits(List<long> removeIds)
-        {
-            foreach (var id in removeIds)
-            {
-                if (!_committing.TryRemove(id, out _))
-                {
-                    Logger.LogWarning("Failed to remove commit entry with ID {Id} for type '{TypeName}'.", 
-                        id, TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
-                }
-            }
-        }
-
-        /// <summary>
         /// Starts the scheduled truncation task to remove completed log segments.
         /// </summary>
         protected virtual void StartScheduleTruncate()
         {
-            Task.Factory.StartNew(async () =>
+            var task = Task.Factory.StartNew(async () =>
             {
-                while (!CancellationTokenProvider.Token.IsCancellationRequested)
+                long lastTruncateAddress = -1L;
+
+                while (!CombinedCancellationToken.IsCancellationRequested)
                 {
                     try
                     {
-                        if (_truncateUntilAddress < _completedUntilAddress && Log != null)
+                        long currentTruncateAddress = Interlocked.Read(ref _truncateBeforeAddress);
+
+                        if (currentTruncateAddress > lastTruncateAddress && Log != null)
                         {
-                            Log.TruncateUntilPageStart(_completedUntilAddress);
-                            Logger.LogDebug(
+                            Log.TruncateUntilPageStart(currentTruncateAddress);
+                            Logger.LogInformation(
                                 "Truncated log until page start. Address: {TruncateAddress} for type '{TypeName}'.",
-                                _completedUntilAddress,
+                                currentTruncateAddress,
                                 TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
-                            _truncateUntilAddress = _completedUntilAddress;
+                            lastTruncateAddress = currentTruncateAddress;
                         }
-                        else
-                        {
-                            Logger.LogDebug(
-                                "Skipping truncation for type '{TypeName}'. Truncate address ({TruncateAddress}) >= completed address ({CompletedAddress}).",
-                                TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
-                                _truncateUntilAddress,
-                                _completedUntilAddress);
-                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        // Expected during shutdown, no logging needed
+                        break;
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError(ex, "Error during log truncation for type '{TypeName}': {Message}", 
+                        Logger.LogError(ex, "Error during log truncation for type '{TypeName}': {Message}",
                             TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)), ex.Message);
+
+                        // Add delay to prevent rapid failure loop (delay happens below)
                     }
 
-                    await Task.Delay(Configuration.TruncateIntervalMillis, CancellationTokenProvider.Token);
+                    await Task.Delay(Configuration.TruncateIntervalMillis, CombinedCancellationToken);
                 }
-            }, TaskCreationOptions.LongRunning);
+            }, TaskCreationOptions.LongRunning).Unwrap();
+
+            _backgroundTasks.Add(task);
         }
 
         /// <summary>
@@ -415,7 +580,12 @@ namespace SharpAbp.Abp.Faster
                 throw new InvalidOperationException("Logger has not been initialized.");
             }
 
-            return await Log.EnqueueAsync(buffer, cancellationToken);
+            var address = await Log.EnqueueAsync(buffer, cancellationToken);
+
+            // Update metrics
+            Interlocked.Increment(ref _totalWriteCount);
+
+            return address;
         }
 
         /// <summary>
@@ -424,6 +594,11 @@ namespace SharpAbp.Abp.Faster
         /// <param name="values">The entities to write.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The positions of the written entries.</returns>
+        /// <remarks>
+        /// Note: This method currently serializes and enqueues entries sequentially.
+        /// FASTER's FasterLog.EnqueueAsync is already optimized for high throughput,
+        /// and batching is handled internally by the commit mechanism.
+        /// </remarks>
         public virtual async Task<List<long>> BatchWriteAsync(List<T> values, CancellationToken cancellationToken = default)
         {
             if (values == null)
@@ -431,18 +606,25 @@ namespace SharpAbp.Abp.Faster
                 throw new ArgumentNullException(nameof(values));
             }
 
-            var positions = new List<long>();
             if (Log == null)
             {
                 throw new InvalidOperationException("Logger has not been initialized.");
             }
 
+            // Pre-allocate the list with known capacity to avoid resizing
+            var positions = new List<long>(values.Count);
+
+            // Serialize and enqueue all entries
+            // Note: EnqueueAsync is already optimized for sequential writes
             foreach (var entity in values)
             {
                 var buffer = Serializer.Serialize(entity);
                 var position = await Log.EnqueueAsync(buffer, cancellationToken);
                 positions.Add(position);
             }
+
+            // Update metrics
+            Interlocked.Add(ref _totalWriteCount, values.Count);
 
             return positions;
         }
@@ -478,41 +660,81 @@ namespace SharpAbp.Abp.Faster
                     {
                         Data = Serializer.Deserialize<T>(entry.Data),
                         CurrentAddress = entry.CurrentAddress,
-                        EntryLength = entry.EntryLength,
                         NextAddress = entry.NextAddress,
                     });
                 }
             }
 
+            // Update metrics
+            Interlocked.Add(ref _totalReadCount, entries.Count);
+
             return entries;
         }
 
         /// <summary>
-        /// Commits the specified log entry positions.
+        /// Commits the specified log entry positions by adding them to the completed ranges.
+        /// The background task will merge these ranges and advance the truncation point.
         /// </summary>
-        /// <param name="entryPosition">The positions to commit.</param>
+        /// <param name="positions">The positions to commit.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public virtual Task CommitAsync(LogEntryPosition entryPosition, CancellationToken cancellationToken = default)
+        public virtual Task CommitAsync(IEnumerable<Position> positions, CancellationToken cancellationToken = default)
         {
-            if (entryPosition == null)
+            if (positions == null)
             {
-                throw new ArgumentNullException(nameof(entryPosition));
+                throw new ArgumentNullException(nameof(positions));
             }
 
-            Logger.LogDebug("Committing {Count} positions for type '{TypeName}'.", 
-                entryPosition.Count, TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+            var positionList = positions as ICollection<Position> ?? positions.ToList();
 
-            foreach (var position in entryPosition)
+            int invalidCount = 0;
+            int duplicateCount = 0;
+            int addedCount = 0;
+
+            lock (_completedRangesLock)
             {
-                if (!_committing.TryAdd(position.Address, new RetryPosition(position, 0)))
+                foreach (var position in positionList)
                 {
-                    Logger.LogDebug("Failed to add position {Address} to committing dictionary for type '{TypeName}'.", 
-                        position.Address, TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+                    // Validate position before adding
+                    if (!position.IsValid())
+                    {
+                        invalidCount++;
+                        continue;
+                    }
+
+                    var range = new CompletedRange(position);
+
+                    // Check for duplicate (though SortedSet handles this)
+                    if (!_completedRanges.Add(range))
+                    {
+                        duplicateCount++;
+                        continue;
+                    }
+
+                    // Update metrics
+                    Interlocked.Increment(ref _totalCommittedRanges);
+                    addedCount++;
+                }
+
+                // Only log if there were issues or at debug level
+                if (invalidCount > 0)
+                {
+                    Logger.LogWarning(
+                        "Skipped {InvalidCount} invalid positions during commit for type '{TypeName}'.",
+                        invalidCount,
+                        TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+                }
+
+                if (Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    Logger.LogDebug(
+                        "Committed {AddedCount} positions ({DuplicateCount} duplicates, {InvalidCount} invalid) for type '{TypeName}'. Total ranges: {TotalRanges}",
+                        addedCount,
+                        duplicateCount,
+                        invalidCount,
+                        TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
+                        _completedRanges.Count);
                 }
             }
-
-            Logger.LogDebug("Finished committing positions for type '{TypeName}'.", 
-                TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
 
             return Task.CompletedTask;
         }
@@ -522,9 +744,113 @@ namespace SharpAbp.Abp.Faster
         /// </summary>
         public void Dispose()
         {
+            // Prevent multiple dispose calls
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+
+            // Signal cancellation to all background tasks
+            _disposeCts?.Cancel();
+
+            // Complete the channel to signal no more writes
+            // This allows the scan task to finish gracefully
+            _pendingChannel?.Writer.Complete();
+
+            // Wait for all background tasks to complete gracefully with timeout
+            if (_backgroundTasks.Count > 0)
+            {
+                try
+                {
+                    // Wait up to 5 seconds for graceful shutdown
+                    Task.WaitAll(_backgroundTasks.ToArray(), TimeSpan.FromSeconds(5));
+                    Logger.LogInformation("All background tasks completed gracefully for type '{TypeName}'.",
+                        TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+                }
+                catch (AggregateException ex)
+                {
+                    // Tasks were cancelled or failed - this is expected during shutdown
+                    Logger.LogDebug("Background tasks completed with exceptions during shutdown for type '{TypeName}': {Message}",
+                        TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
+                        ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning(ex, "Error while waiting for background tasks to complete for type '{TypeName}': {Message}",
+                        TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
+                        ex.Message);
+                }
+            }
+
+            // Dispose resources
             Log?.Dispose();
             Iter?.Dispose();
             _commitSemaphore?.Dispose();
+            _initializeSemaphore?.Dispose();
+            _linkedCts?.Dispose();
+            _disposeCts?.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Represents a completed range of log addresses.
+    /// Wraps a Position to provide immutable range semantics for tracking completed entries.
+    /// </summary>
+    internal class CompletedRange : IAddressRange, IComparable<CompletedRange>
+    {
+        public long Start { get; }
+        public long End { get; }
+
+        /// <summary>
+        /// Creates a completed range from a position.
+        /// </summary>
+        public CompletedRange(Position position)
+        {
+            if (position == null)
+                throw new ArgumentNullException(nameof(position));
+
+            Start = position.Address;
+            End = position.NextAddress;
+        }
+
+        /// <summary>
+        /// Creates a completed range from explicit start and end addresses.
+        /// </summary>
+        public CompletedRange(long start, long end)
+        {
+            if (start < 0)
+            {
+                throw new ArgumentException($"Start must be non-negative. Got: {start}", nameof(start));
+            }
+
+            if (end <= start)
+            {
+                throw new ArgumentException(
+                    $"End must be greater than start. Start: {start}, End: {end}",
+                    nameof(end));
+            }
+
+            Start = start;
+            End = end;
+        }
+
+        public int CompareTo(CompletedRange? other)
+        {
+            if (other == null) return 1;
+
+            // Sort by start address
+            int startComparison = Start.CompareTo(other.Start);
+            if (startComparison != 0)
+                return startComparison;
+
+            return End.CompareTo(other.End);
+        }
+
+        public override string ToString()
+        {
+            return $"[{Start}, {End})";
         }
     }
 }
