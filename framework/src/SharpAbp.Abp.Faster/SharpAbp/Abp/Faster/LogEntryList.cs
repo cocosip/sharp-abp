@@ -13,23 +13,20 @@ namespace SharpAbp.Abp.Faster
         /// Extracts position information from all log entries in the collection.
         /// </summary>
         /// <returns>
-        /// A LogEntryPosition object containing position information for all entries.
-        /// Returns an empty LogEntryPosition if the collection is empty.
+        /// A list of Position objects containing address range information for all entries.
+        /// Returns an empty list if the collection is empty.
         /// </returns>
-        public LogEntryPosition GetPosition()
+        public List<Position> GetPositions()
         {
-            var position = new LogEntryPosition();
-            if (Count == 0)
-            {
-                return position;
-            }
+            var positions = new List<Position>(Count);
 
             foreach (var entry in this)
             {
-                position.Add(new Position(entry.CurrentAddress, entry.EntryLength, entry.NextAddress));
+                // Use the simplified Position constructor with just address and nextAddress
+                positions.Add(new Position(entry.CurrentAddress, entry.NextAddress));
             }
 
-            return position;
+            return positions;
         }
     }
 }

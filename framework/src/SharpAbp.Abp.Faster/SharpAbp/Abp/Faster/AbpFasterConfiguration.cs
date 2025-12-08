@@ -84,9 +84,28 @@ namespace SharpAbp.Abp.Faster
         public int PreReadCapacity { get; set; } = 5000;
 
         /// <summary>
-        /// Gets or sets the maximum number of commits that can be skipped
+        /// Gets or sets the address tolerance for gap merging in completed ranges.
+        /// When merging completed ranges, gaps smaller than this value are considered continuous.
+        /// This allows for small address variations in log entries to be tolerated.
+        /// Default is 10 bytes.
         /// </summary>
-        public int MaxCommitSkip { get; set; } = 50;
+        public long AddressMatchTolerance { get; set; } = 10;
+
+        /// <summary>
+        /// Gets or sets the timeout in milliseconds for detecting stale gaps.
+        /// If a gap persists for longer than this duration, a warning is logged.
+        /// Set to 0 to disable gap timeout detection.
+        /// Default is 10 minutes (600000 ms).
+        /// </summary>
+        public int GapTimeoutMillis { get; set; } = 10 * 60 * 1000;
+
+        /// <summary>
+        /// Gets or sets the maximum number of ranges to keep in the completed ranges set.
+        /// If exceeded, the oldest ranges beyond the gap will be removed to prevent memory growth.
+        /// Set to 0 for unlimited (not recommended).
+        /// Default is 10000.
+        /// </summary>
+        public int MaxCompletedRanges { get; set; } = 10000;
 
         /// <summary>
         /// Gets or sets the name of the iterator
