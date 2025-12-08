@@ -2,13 +2,13 @@ using FASTER.core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using Volo.Abp.Json;
 using Volo.Abp.Reflection;
 using Volo.Abp.Serialization;
 using Volo.Abp.Threading;
@@ -30,13 +30,17 @@ namespace SharpAbp.Abp.Faster
         private bool _disposed = false;
 
         // Use interval tracking instead of retry-based commit tracking
-        private readonly SortedSet<CompletedRange> _completedRanges = new SortedSet<CompletedRange>();
+        private readonly SortedSet<CompletedRange> _completedRanges = [];
         private readonly object _completedRangesLock = new object();
         private DateTime _lastGapWarningTime = DateTime.MinValue;
         private long _lastGapStart = -1;
 
         // Background task tracking for graceful shutdown
         private readonly List<Task> _backgroundTasks = new List<Task>();
+
+        // Persistence tracking
+        private bool _rangesModified = false;
+        private DateTime _lastPersistTime = DateTime.MinValue;
 
         // Monitoring metrics for observability
         private long _totalCommittedRanges = 0;
@@ -227,11 +231,23 @@ namespace SharpAbp.Abp.Faster
 
                 Interlocked.Exchange(ref _truncateBeforeAddress, Math.Max(Iter.CompletedUntilAddress, Iter.BeginAddress));
 
+                // Load persisted completed ranges if enabled
+                if (Configuration.EnableRangePersistence)
+                {
+                    LoadCompletedRanges();
+                }
+
                 // Start background tasks
                 StartScheduleCommit();
                 StartScheduleScan();
                 StartScheduleComplete();
                 StartScheduleTruncate();
+
+                // Start persistence task if enabled
+                if (Configuration.EnableRangePersistence)
+                {
+                    StartSchedulePersist();
+                }
 
                 _initialized = true;
 
@@ -380,13 +396,14 @@ namespace SharpAbp.Abp.Faster
                                     }
                                     else
                                     {
-                                        // Gap detected, stop merging
+                                        // Gap detected
                                         long gapSize = range.Start - currentEnd;
 
                                         // Update gap metrics
                                         Interlocked.Exchange(ref _largestGapSize, Math.Max(Interlocked.Read(ref _largestGapSize), gapSize));
 
                                         // Check for stale gap timeout
+                                        bool shouldForceComplete = false;
                                         if (Configuration.GapTimeoutMillis > 0)
                                         {
                                             bool isNewGap = _lastGapStart != range.Start;
@@ -409,19 +426,74 @@ namespace SharpAbp.Abp.Faster
                                                         gapSize,
                                                         TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
 
-                                                    // Reset timer to avoid repeated warnings
-                                                    _lastGapWarningTime = DateTime.UtcNow;
+                                                    // Check if we should force complete past this gap
+                                                    if (Configuration.ForceCompleteGapTimeoutMillis > 0 &&
+                                                        gapDuration.TotalMilliseconds > Configuration.ForceCompleteGapTimeoutMillis)
+                                                    {
+                                                        shouldForceComplete = true;
+                                                    }
+                                                    else
+                                                    {
+                                                        // Reset timer to avoid repeated warnings
+                                                        _lastGapWarningTime = DateTime.UtcNow;
+                                                    }
                                                 }
                                             }
                                         }
 
+                                        // Force complete past the gap if timeout exceeded
+                                        if (shouldForceComplete)
+                                        {
+                                            Logger.LogError(
+                                                "FORCING COMPLETION past gap at address {GapStart} (size: {GapSize} bytes) for type '{TypeName}' " +
+                                                "due to timeout of {Duration:F1} seconds. " +
+                                                "⚠️ DATA IN RANGE [{GapStart}, {GapEnd}) WILL BE SKIPPED AND MAY BE LOST! " +
+                                                "Current truncate: {CurrentEnd}, Next range starts at: {RangeStart}",
+                                                currentEnd,
+                                                gapSize,
+                                                TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
+                                                (DateTime.UtcNow - _lastGapWarningTime).TotalSeconds,
+                                                currentEnd,
+                                                range.Start,
+                                                currentEnd,
+                                                range.Start);
+
+                                            // Skip the gap and continue merging from this range
+                                            currentEnd = Math.Max(currentEnd, range.End);
+                                            rangesToRemove.Add(range);
+
+                                            // Reset gap tracking
+                                            _lastGapStart = -1;
+                                            _lastGapWarningTime = DateTime.MinValue;
+
+                                            // Continue to merge subsequent ranges
+                                            continue;
+                                        }
+
+                                        // Normal gap handling - stop merging
                                         break;
                                     }
                                 }
 
                                 newTruncateAddress = currentEnd;
 
-                                // Remove merged ranges
+                                // Don't remove ranges yet - wait until CompleteUntilRecordAtAsync succeeds
+                            }
+                        }
+
+                        // Commit and complete if we have progress
+                        long currentTruncate = Interlocked.Read(ref _truncateBeforeAddress);
+                        if (newTruncateAddress > currentTruncate && Iter != null)
+                        {
+                            // Try to complete the records first
+                            await CompleteUntilRecordAtAsync(newTruncateAddress);
+
+                            // Only if successful, update the address and remove ranges
+                            Interlocked.Exchange(ref _truncateBeforeAddress, newTruncateAddress);
+
+                            lock (_completedRangesLock)
+                            {
+                                // Now safe to remove the merged ranges
                                 foreach (var range in rangesToRemove)
                                 {
                                     _completedRanges.Remove(range);
@@ -434,35 +506,29 @@ namespace SharpAbp.Abp.Faster
                                     int excessCount = _completedRanges.Count - Configuration.MaxCompletedRanges;
                                     var rangesArray = _completedRanges.ToArray();
 
-                                    // Remove the oldest ranges beyond the limit
-                                    // Keep ranges from the end (most recent) rather than beginning (which has the gap)
-                                    for (int i = _completedRanges.Count - excessCount; i < _completedRanges.Count; i++)
+                                    // Remove the oldest ranges from the beginning (they have gaps and can't be merged)
+                                    // Keep ranges from the end (most recent, more likely to merge in the future)
+                                    for (int i = 0; i < excessCount; i++)
                                     {
                                         _completedRanges.Remove(rangesArray[i]);
                                     }
 
                                     Logger.LogWarning(
                                         "Removed {Count} excess ranges from completed set for type '{TypeName}' to prevent memory growth. " +
+                                        "Removed ranges: [{FirstStart}-{LastEnd}), Kept ranges start from: {KeptStart}. " +
                                         "Total ranges: {Total}, Max allowed: {Max}",
                                         excessCount,
                                         TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
+                                        rangesArray[0].Start,
+                                        rangesArray[excessCount - 1].End,
+                                        excessCount < rangesArray.Length ? rangesArray[excessCount].Start : -1,
                                         _completedRanges.Count,
                                         Configuration.MaxCompletedRanges);
                                 }
 
                                 // Update gap count metric
-                                // If there are remaining ranges, there's at least one gap
-                                // The number of gaps equals the number of remaining ranges (each represents a gap segment)
                                 Interlocked.Exchange(ref _currentGapCount, _completedRanges.Count > 0 ? _completedRanges.Count : 0);
                             }
-                        }
-
-                        // Commit and complete if we have progress
-                        long currentTruncate = Interlocked.Read(ref _truncateBeforeAddress);
-                        if (newTruncateAddress > currentTruncate && Iter != null)
-                        {
-                            await CompleteUntilRecordAtAsync(newTruncateAddress);
-                            Interlocked.Exchange(ref _truncateBeforeAddress, newTruncateAddress);
 
                             Logger.LogInformation(
                                 "Advanced truncate address to {TruncateAddress} for type '{TypeName}'. Removed {Count} ranges.",
@@ -713,6 +779,9 @@ namespace SharpAbp.Abp.Faster
                     // Update metrics
                     Interlocked.Increment(ref _totalCommittedRanges);
                     addedCount++;
+
+                    // Mark ranges as modified for persistence
+                    _rangesModified = true;
                 }
 
                 // Only log if there were issues or at debug level
@@ -740,6 +809,283 @@ namespace SharpAbp.Abp.Faster
         }
 
         /// <summary>
+        /// Manually forces completion past a persistent gap by marking the gap range as processed.
+        /// ⚠️ WARNING: This will cause data loss for entries in the specified gap range!
+        /// Only use this method when you're certain the gap data is permanently lost or unrecoverable.
+        /// </summary>
+        /// <param name="gapStart">The start address of the gap to skip.</param>
+        /// <param name="gapEnd">The end address of the gap to skip.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <exception cref="ArgumentException">Thrown when gapStart or gapEnd are invalid.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when logger is not initialized.</exception>
+        public virtual Task ForceCommitGap(long gapStart, long gapEnd, CancellationToken cancellationToken = default)
+        {
+            if (!_initialized)
+            {
+                throw new InvalidOperationException("Logger must be initialized before calling ForceCommitGap.");
+            }
+
+            if (gapStart < 0)
+            {
+                throw new ArgumentException($"Gap start address must be non-negative. Got: {gapStart}", nameof(gapStart));
+            }
+
+            if (gapEnd <= gapStart)
+            {
+                throw new ArgumentException(
+                    $"Gap end address must be greater than gap start. Start: {gapStart}, End: {gapEnd}",
+                    nameof(gapEnd));
+            }
+
+            lock (_completedRangesLock)
+            {
+                // Create a completed range for the gap
+                var gapRange = new CompletedRange(gapStart, gapEnd);
+
+                // Add it to completed ranges
+                if (_completedRanges.Add(gapRange))
+                {
+                    _rangesModified = true;
+
+                    Logger.LogError(
+                        "⚠️ MANUAL GAP FILL: Forcibly marked gap [{GapStart}, {GapEnd}) as completed. " +
+                        "Data in this range will be SKIPPED and MAY BE LOST! " +
+                        "Gap size: {GapSize} bytes. Type: '{TypeName}'",
+                        gapStart,
+                        gapEnd,
+                        gapEnd - gapStart,
+                        TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+
+                    // Reset gap tracking since we just filled it
+                    if (_lastGapStart == gapStart)
+                    {
+                        _lastGapStart = -1;
+                        _lastGapWarningTime = DateTime.MinValue;
+                    }
+                }
+                else
+                {
+                    Logger.LogWarning(
+                        "Gap range [{GapStart}, {GapEnd}) was already in completed ranges. Type: '{TypeName}'",
+                        gapStart,
+                        gapEnd,
+                        TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+                }
+            }
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Starts the scheduled persistence task to save completed ranges periodically.
+        /// </summary>
+        protected virtual void StartSchedulePersist()
+        {
+            var task = Task.Factory.StartNew(async () =>
+            {
+                while (!CombinedCancellationToken.IsCancellationRequested)
+                {
+                    try
+                    {
+                        await Task.Delay(Configuration.PersistIntervalMillis, CombinedCancellationToken);
+
+                        // Only persist if data has changed
+                        if (_rangesModified)
+                        {
+                            await PersistCompletedRangesAsync();
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        // Final save before exit
+                        if (_rangesModified)
+                        {
+                            await PersistCompletedRangesAsync();
+                        }
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(ex, "Error persisting completed ranges for type '{TypeName}': {Message}",
+                            TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)), ex.Message);
+
+                        // Add delay to prevent rapid failure loop
+                        await Task.Delay(1000, CombinedCancellationToken);
+                    }
+                }
+            }, TaskCreationOptions.LongRunning).Unwrap();
+
+            _backgroundTasks.Add(task);
+        }
+
+        /// <summary>
+        /// Persists the completed ranges to disk.
+        /// Only persists ranges that are beyond the current truncate address to reduce file size.
+        /// </summary>
+        private async Task PersistCompletedRangesAsync()
+        {
+            List<CompletedRange> snapshot;
+            long currentTruncate;
+
+            lock (_completedRangesLock)
+            {
+                if (_completedRanges.Count == 0)
+                {
+                    // No data to persist
+                    _rangesModified = false;
+                    return;
+                }
+
+                currentTruncate = Interlocked.Read(ref _truncateBeforeAddress);
+
+                // Only persist ranges beyond the current truncate address
+                // Ranges before truncate address are already committed and don't need recovery
+                snapshot = [.. _completedRanges.Where(r => r.End > currentTruncate)];
+
+                // If all ranges are before truncate, clear the file
+                if (snapshot.Count == 0)
+                {
+                    _rangesModified = false;
+
+                    // Clear the persistence file since no ranges need to be saved
+                    var filePath = GetRangesFilePath();
+                    if (File.Exists(filePath))
+                    {
+                        try
+                        {
+                            File.Delete(filePath);
+                            Logger.LogDebug("Deleted completed ranges file (all ranges before truncate) for type '{TypeName}'",
+                                TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogWarning(ex, "Failed to delete completed ranges file for type '{TypeName}': {Message}",
+                                TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)), ex.Message);
+                        }
+                    }
+                    return;
+                }
+
+                // Warn if we're persisting too many ranges
+                if (snapshot.Count > Configuration.MaxCompletedRanges * 0.8)
+                {
+                    Logger.LogWarning(
+                        "Persisting {Count} ranges (approaching limit of {Max}) for type '{TypeName}'. " +
+                        "This may indicate a persistent gap preventing progress.",
+                        snapshot.Count,
+                        Configuration.MaxCompletedRanges,
+                        TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+                }
+            }
+
+            try
+            {
+                var filePath = GetRangesFilePath();
+
+                // Ensure directory exists
+                var directory = Path.GetDirectoryName(filePath);
+                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                // Serialize to JSON
+                var json = System.Text.Json.JsonSerializer.Serialize(snapshot, new System.Text.Json.JsonSerializerOptions
+                {
+                    WriteIndented = false // Compact format for performance
+                });
+
+                // Write to file atomically by writing to temp file first
+                var tempFilePath = filePath + ".tmp";
+
+                // Use FileStream for .NET Standard 2.0 compatibility
+                using (var stream = new FileStream(tempFilePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync: true))
+                using (var writer = new StreamWriter(stream, System.Text.Encoding.UTF8))
+                {
+                    await writer.WriteAsync(json);
+                    await writer.FlushAsync();
+                }
+
+                // Atomic rename (on most filesystems)
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                }
+                File.Move(tempFilePath, filePath);
+
+                _rangesModified = false;
+                _lastPersistTime = DateTime.UtcNow;
+
+                Logger.LogDebug("Persisted {Count} completed ranges to {Path} for type '{TypeName}'",
+                    snapshot.Count, filePath, TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Failed to persist completed ranges for type '{TypeName}': {Message}",
+                    TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)), ex.Message);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Loads persisted completed ranges from disk.
+        /// </summary>
+        private void LoadCompletedRanges()
+        {
+            var filePath = GetRangesFilePath();
+
+            if (!File.Exists(filePath))
+            {
+                Logger.LogInformation("No persisted ranges file found at {Path} for type '{TypeName}'",
+                    filePath, TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+                return;
+            }
+
+            try
+            {
+                var json = File.ReadAllText(filePath);
+                var ranges = System.Text.Json.JsonSerializer.Deserialize<List<CompletedRange>>(json);
+
+                if (ranges == null || ranges.Count == 0)
+                {
+                    Logger.LogWarning("Persisted ranges file is empty at {Path} for type '{TypeName}'",
+                        filePath, TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+                    return;
+                }
+
+                lock (_completedRangesLock)
+                {
+                    foreach (var range in ranges)
+                    {
+                        _completedRanges.Add(range);
+                    }
+                }
+
+                Logger.LogInformation("Loaded {Count} persisted completed ranges from {Path} for type '{TypeName}'",
+                    ranges.Count, filePath, TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Failed to load persisted ranges from {Path} for type '{TypeName}': {Message}",
+                    filePath, TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)), ex.Message);
+                // Don't throw - continue with empty ranges rather than failing to start
+            }
+        }
+
+        /// <summary>
+        /// Gets the file path for persisting completed ranges.
+        /// Each logger type has its own independent persistence file.
+        /// </summary>
+        private string GetRangesFilePath()
+        {
+            var directory = Path.Combine(
+                Options.RootPath,
+                TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+
+            return Path.Combine(directory, "completed_ranges.json");
+        }
+
+        /// <summary>
         /// Disposes of the logger resources.
         /// </summary>
         public void Dispose()
@@ -758,6 +1104,22 @@ namespace SharpAbp.Abp.Faster
             // Complete the channel to signal no more writes
             // This allows the scan task to finish gracefully
             _pendingChannel?.Writer.Complete();
+
+            // Final persist before shutdown if enabled and有 has changes
+            if (Configuration.EnableRangePersistence && _rangesModified)
+            {
+                try
+                {
+                    PersistCompletedRangesAsync().GetAwaiter().GetResult();
+                    Logger.LogInformation("Final persist completed successfully for type '{TypeName}'.",
+                        TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, "Failed to perform final persist for type '{TypeName}': {Message}",
+                        TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)), ex.Message);
+                }
+            }
 
             // Wait for all background tasks to complete gracefully with timeout
             if (_backgroundTasks.Count > 0)

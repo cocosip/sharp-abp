@@ -24,12 +24,12 @@ namespace SharpAbp.Abp.Faster
     public class Position : IAddressRange, IComparable<Position>
     {
         /// <summary>
-        /// Gets or sets the starting address of this position.
+        /// Gets the starting address of this position.
         /// </summary>
         public long Address { get; set; }
 
         /// <summary>
-        /// Gets or sets the next address after this position (end of range).
+        /// Gets the next address after this position (end of range).
         /// </summary>
         public long NextAddress { get; set; }
 
@@ -47,13 +47,6 @@ namespace SharpAbp.Abp.Faster
         /// Gets the length of this position's range.
         /// </summary>
         public long Length => NextAddress - Address;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Position"/> class.
-        /// </summary>
-        public Position()
-        {
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Position"/> class.
