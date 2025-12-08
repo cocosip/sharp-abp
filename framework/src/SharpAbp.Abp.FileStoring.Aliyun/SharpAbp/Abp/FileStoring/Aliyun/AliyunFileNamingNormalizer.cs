@@ -41,7 +41,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
 
                 if (containerName.Length > 63)
                 {
-                    containerName = containerName.Substring(0, 63);
+                    containerName = containerName[..63];
                 }
 
                 return containerName;
