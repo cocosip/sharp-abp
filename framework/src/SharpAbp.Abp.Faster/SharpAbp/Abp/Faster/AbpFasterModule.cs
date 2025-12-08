@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.IO;
+using Volo.Abp.Json;
 using Volo.Abp.Modularity;
 using Volo.Abp.Serialization;
 using Volo.Abp.Threading;
@@ -13,6 +14,7 @@ namespace SharpAbp.Abp.Faster
 {
     [DependsOn(
         typeof(AbpSerializationModule),
+        typeof(AbpJsonModule),
         typeof(AbpThreadingModule)
         )]
     public class AbpFasterModule : AbpModule

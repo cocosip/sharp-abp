@@ -108,6 +108,32 @@ namespace SharpAbp.Abp.Faster
         public int MaxCompletedRanges { get; set; } = 10000;
 
         /// <summary>
+        /// Gets or sets whether to enable persistence of completed ranges.
+        /// When enabled, completed ranges are saved to disk periodically and on shutdown,
+        /// allowing recovery after restart without re-processing data.
+        /// Default is true.
+        /// </summary>
+        public bool EnableRangePersistence { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the interval in milliseconds for persisting completed ranges to disk.
+        /// Only applies when EnableRangePersistence is true.
+        /// Default is 30000 ms (30 seconds).
+        /// </summary>
+        public int PersistIntervalMillis { get; set; } = 30000;
+
+        /// <summary>
+        /// Gets or sets the timeout in milliseconds for forcing completion past a persistent gap.
+        /// If a gap persists longer than this duration, the system will automatically skip the gap
+        /// and continue processing subsequent ranges. This prevents indefinite blocking but may
+        /// result in data loss for the skipped range.
+        /// Set to 0 to disable automatic gap skipping (manual intervention required).
+        /// Default is 0 (disabled).
+        /// WARNING: Enabling this may cause data loss in the gap range!
+        /// </summary>
+        public int ForceCompleteGapTimeoutMillis { get; set; } = 0;
+
+        /// <summary>
         /// Gets or sets the name of the iterator
         /// </summary>
         public string IteratorName { get; set; } = "default";

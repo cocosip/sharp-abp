@@ -21,6 +21,7 @@
 		<PackageReference Include="Microsoft.FASTER.Core" />
 		<PackageReference Include="Volo.Abp.Serialization" />
 		<PackageReference Include="Volo.Abp.Threading" />
+		<PackageReference Include="Volo.Abp.Json" />
 		<PackageReference Include="System.Threading.Channels" />
 	</ItemGroup>
 

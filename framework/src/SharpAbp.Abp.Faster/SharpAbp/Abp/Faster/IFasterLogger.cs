@@ -95,5 +95,16 @@ namespace SharpAbp.Abp.Faster
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task CommitAsync(IEnumerable<Position> positions, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Manually forces completion past a persistent gap by marking the gap range as processed.
+        /// ⚠️ WARNING: This will cause data loss for entries in the specified gap range!
+        /// Only use this method when you're certain the gap data is permanently lost or unrecoverable.
+        /// </summary>
+        /// <param name="gapStart">The start address of the gap to skip.</param>
+        /// <param name="gapEnd">The end address of the gap to skip.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task ForceCommitGap(long gapStart, long gapEnd, CancellationToken cancellationToken = default);
     }
 }
