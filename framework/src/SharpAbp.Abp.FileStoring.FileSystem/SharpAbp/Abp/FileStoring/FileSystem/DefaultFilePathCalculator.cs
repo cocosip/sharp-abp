@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Microsoft.Extensions.Options;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.MultiTenancy;
 
@@ -7,10 +8,14 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
     public class DefaultFilePathCalculator : IFilePathCalculator, ITransientDependency
     {
         protected ICurrentTenant CurrentTenant { get; }
+        protected AbpFileStoringAbstractionsOptions Options { get; }
 
-        public DefaultFilePathCalculator(ICurrentTenant currentTenant)
+        public DefaultFilePathCalculator(
+            ICurrentTenant currentTenant,
+            IOptions<AbpFileStoringAbstractionsOptions> options)
         {
             CurrentTenant = currentTenant;
+            Options = options.Value;
         }
 
         public virtual string Calculate(FileProviderArgs args)
@@ -18,21 +23,35 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
             var fileSystemConfiguration = args.Configuration.GetFileSystemConfiguration();
             var filePath = fileSystemConfiguration.BasePath;
 
-            if (CurrentTenant.Id == null)
+            if (Options.FilePathStrategy == FilePathGenerationStrategy.DirectFileId)
             {
-                filePath = Path.Combine(filePath, "host");
+                // Use FileId directly without tenant path prefix
+                if (fileSystemConfiguration.AppendContainerNameToBasePath)
+                {
+                    filePath = Path.Combine(filePath, args.ContainerName);
+                }
+
+                filePath = Path.Combine(filePath, args.FileId);
             }
             else
             {
-                filePath = Path.Combine(filePath, "tenants", CurrentTenant.Id.Value.ToString("D"));
-            }
+                // Use tenant-based path structure (default behavior)
+                if (CurrentTenant.Id == null)
+                {
+                    filePath = Path.Combine(filePath, "host");
+                }
+                else
+                {
+                    filePath = Path.Combine(filePath, "tenants", CurrentTenant.Id.Value.ToString("D"));
+                }
 
-            if (fileSystemConfiguration.AppendContainerNameToBasePath)
-            {
-                filePath = Path.Combine(filePath, args.ContainerName);
-            }
+                if (fileSystemConfiguration.AppendContainerNameToBasePath)
+                {
+                    filePath = Path.Combine(filePath, args.ContainerName);
+                }
 
-            filePath = Path.Combine(filePath, args.FileId);
+                filePath = Path.Combine(filePath, args.FileId);
+            }
 
             return filePath;
         }
