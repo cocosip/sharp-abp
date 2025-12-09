@@ -1,0 +1,233 @@
+name: "CI/CD"
+
+on:
+  pull_request:
+    branches:
+      - master
+      - dev
+      - net10
+  push:
+    branches:
+      - master
+      - dev
+      - net10
+    tags:
+      - v*
+
+env:
+  # 定义所有需要构建/测试/打包的解决方案路径
+  SOLUTION_PATHS: |
+    framework
+    modules/file-storing-database
+    modules/file-storing-management
+    modules/map-tenancy-management
+    modules/tenant-group-management
+    modules/dbconnections
+    modules/Identity
+    modules/IdentityServer
+    modules/openiddict
+    modules/audit-logging
+    modules/account
+    modules/minid
+    modules/crypto-vault
+    modules/transform-security-management
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+
+    - name: Extract version from tag
+      if: startsWith(github.ref, 'refs/tags/v')
+      id: version
+      shell: pwsh
+      run: |
+        $tag = "${{ github.ref_name }}"
+        $version = $tag -replace '^v', ''
+        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        echo "TAG=$tag" >> $env:GITHUB_OUTPUT
+        echo "Release version: $version"
+
+    - name: Build All Solutions
+      shell: pwsh
+      run: |
+        $solutions = @(
+          "framework",
+          "modules/file-storing-database",
+          "modules/file-storing-management",
+          "modules/map-tenancy-management",
+          "modules/tenant-group-management",
+          "modules/dbconnections",
+          "modules/Identity",
+          "modules/IdentityServer",
+          "modules/openiddict",
+          "modules/audit-logging",
+          "modules/account",
+          "modules/minid",
+          "modules/crypto-vault",
+          "modules/transform-security-management"
+        )
+
+        foreach ($solution in $solutions) {
+          Write-Host "Building solution: $solution" -ForegroundColor Cyan
+          dotnet build "$solution" -c Release
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Build failed for solution: $solution"
+            exit $LASTEXITCODE
+          }
+        }
+        Write-Host "All solutions built successfully!" -ForegroundColor Green
+
+    - name: Test All Solutions
+      shell: pwsh
+      run: |
+        $solutions = @(
+          "framework",
+          "modules/file-storing-database",
+          "modules/file-storing-management",
+          "modules/map-tenancy-management",
+          "modules/tenant-group-management",
+          "modules/dbconnections",
+          "modules/Identity",
+          "modules/IdentityServer",
+          "modules/openiddict",
+          "modules/audit-logging",
+          "modules/account",
+          "modules/minid",
+          "modules/crypto-vault",
+          "modules/transform-security-management"
+        )
+
+        foreach ($solution in $solutions) {
+          Write-Host "Testing solution: $solution" -ForegroundColor Cyan
+          dotnet test "$solution" --no-build -c Release
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Test failed for solution: $solution"
+            exit $LASTEXITCODE
+          }
+        }
+        Write-Host "All tests passed successfully!" -ForegroundColor Green
+
+    # 以下步骤仅在 tag 推送时执行
+    - name: Pack All Solutions
+      if: startsWith(github.ref, 'refs/tags/v')
+      shell: pwsh
+      run: |
+        # 创建输出目录
+        New-Item -ItemType Directory -Force -Path "dest" | Out-Null
+
+        $solutions = @(
+          "framework",
+          "modules/file-storing-database",
+          "modules/file-storing-management",
+          "modules/map-tenancy-management",
+          "modules/tenant-group-management",
+          "modules/dbconnections",
+          "modules/Identity",
+          "modules/IdentityServer",
+          "modules/openiddict",
+          "modules/audit-logging",
+          "modules/account",
+          "modules/minid",
+          "modules/crypto-vault",
+          "modules/transform-security-management"
+        )
+
+        foreach ($solution in $solutions) {
+          Write-Host "Packing solution: $solution" -ForegroundColor Cyan
+          dotnet pack "$solution" -c Release --include-symbols --no-build -o dest
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Pack failed for solution: $solution"
+            exit $LASTEXITCODE
+          }
+        }
+        Write-Host "All solutions packed successfully!" -ForegroundColor Green
+
+    - name: Publish to NuGet
+      if: startsWith(github.ref, 'refs/tags/v')
+      shell: pwsh
+      run: |
+        Write-Host "Publishing NuGet packages..." -ForegroundColor Cyan
+
+        # 检查 dest 目录是否存在
+        if (-not (Test-Path "dest")) {
+          Write-Error "dest directory does not exist"
+          exit 1
+        }
+
+        # 获取所有 .nupkg 文件（排除 symbols 包）
+        $packages = Get-ChildItem -Path "dest" -Filter "*.nupkg" | Where-Object { $_.Name -notlike "*.symbols.nupkg" }
+
+        if ($packages.Count -eq 0) {
+          Write-Error "No NuGet packages found in dest directory"
+          exit 1
+        }
+
+        Write-Host "Found $($packages.Count) packages to publish" -ForegroundColor Yellow
+
+        # 发布每个包
+        foreach ($package in $packages) {
+          Write-Host "Publishing: $($package.Name)" -ForegroundColor Cyan
+          dotnet nuget push $package.FullName -k ${{secrets.NUGET_API_KEY}} -s https://www.nuget.org --skip-duplicate
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Failed to publish: $($package.Name)"
+            exit $LASTEXITCODE
+          }
+        }
+
+        Write-Host "All NuGet packages published successfully!" -ForegroundColor Green
+
+    - name: Generate release notes
+      if: startsWith(github.ref, 'refs/tags/v')
+      id: release_notes
+      shell: pwsh
+      run: |
+        $delimiter = "EOF_DELIMITER_$(Get-Random)"
+        $notes = @"
+        ## SharpAbp ${{ steps.version.outputs.VERSION }}
+
+        ### 📦 NuGet Packages
+        This release has been published to NuGet.org. You can install the packages using:
+        ``````
+        dotnet add package <PackageName> --version ${{ steps.version.outputs.VERSION }}
+        ``````
+
+        ### 📝 Changes
+        See the full changelog below for detailed changes in this release.
+
+        ### 🔗 Links
+        - [NuGet Gallery](https://www.nuget.org/profiles/SharpAbp)
+        - [Documentation](https://github.com/${{ github.repository }})
+
+        ---
+        🤖 This release was automatically generated by GitHub Actions.
+        "@
+        echo "NOTES<<$delimiter" >> $env:GITHUB_OUTPUT
+        echo "$notes" >> $env:GITHUB_OUTPUT
+        echo "$delimiter" >> $env:GITHUB_OUTPUT
+
+    - name: Create GitHub Release
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: softprops/action-gh-release@v2
+      with:
+        name: Release ${{ steps.version.outputs.VERSION }}
+        body: ${{ steps.release_notes.outputs.NOTES }}
+        draft: false
+        prerelease: ${{ contains(steps.version.outputs.VERSION, '-') }}
+        generate_release_notes: true
+        files: |
+          dest/*.nupkg
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

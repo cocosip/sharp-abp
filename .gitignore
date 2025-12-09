@@ -37,6 +37,8 @@ logs/
 # vscode
 .vscode/
 
+.claude/
+
 # nuget包
 nupkgs/
 
