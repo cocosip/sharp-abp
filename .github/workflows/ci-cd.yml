@@ -160,12 +160,34 @@ jobs:
       shell: pwsh
       run: |
         Write-Host "Publishing NuGet packages..." -ForegroundColor Cyan
-        dotnet nuget push dest/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://www.nuget.org --skip-duplicate
-        if ($LASTEXITCODE -ne 0) {
-          Write-Error "NuGet publish failed"
-          exit $LASTEXITCODE
+
+        # 检查 dest 目录是否存在
+        if (-not (Test-Path "dest")) {
+          Write-Error "dest directory does not exist"
+          exit 1
         }
-        Write-Host "NuGet packages published successfully!" -ForegroundColor Green
+
+        # 获取所有 .nupkg 文件（排除 symbols 包）
+        $packages = Get-ChildItem -Path "dest" -Filter "*.nupkg" | Where-Object { $_.Name -notlike "*.symbols.nupkg" }
+
+        if ($packages.Count -eq 0) {
+          Write-Error "No NuGet packages found in dest directory"
+          exit 1
+        }
+
+        Write-Host "Found $($packages.Count) packages to publish" -ForegroundColor Yellow
+
+        # 发布每个包
+        foreach ($package in $packages) {
+          Write-Host "Publishing: $($package.Name)" -ForegroundColor Cyan
+          dotnet nuget push $package.FullName -k ${{secrets.NUGET_API_KEY}} -s https://www.nuget.org --skip-duplicate
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Failed to publish: $($package.Name)"
+            exit $LASTEXITCODE
+          }
+        }
+
+        Write-Host "All NuGet packages published successfully!" -ForegroundColor Green
 
     - name: Generate release notes
       if: startsWith(github.ref, 'refs/tags/v')
