@@ -19,7 +19,7 @@
 
 
 	<ItemGroup>
-		<PackageReference Include="FastDFSCore"  />
+		<PackageReference Include="FastDFS.Client"  />
 		<PackageReference Include="Volo.Abp" />
 	</ItemGroup>
 

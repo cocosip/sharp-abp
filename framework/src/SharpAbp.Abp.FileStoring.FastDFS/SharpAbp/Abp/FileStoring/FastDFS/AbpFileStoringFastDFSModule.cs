@@ -1,7 +1,6 @@
-﻿using FastDFSCore;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using SharpAbp.Abp.FastDFS.DotNetty;
+using SharpAbp.Abp.FastDFS;
 using SharpAbp.Abp.FileStoring.FastDFS.Localization;
 using System.Threading.Tasks;
 using Volo.Abp.Localization;
@@ -15,7 +14,7 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
 {
     [DependsOn(
         typeof(AbpFileStoringModule),
-        typeof(AbpFastDFSDotNettyModule)
+        typeof(AbpFastDFSModule)
         )]
     public class AbpFileStoringFastDFSModule : AbpModule
     {
@@ -42,7 +41,7 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            context.Services.Replace(ServiceDescriptor.Singleton<IClusterSelector, FileConfigurationClusterSelector>());
+            //context.Services.Replace(ServiceDescriptor.Singleton<IClusterSelector, FileConfigurationClusterSelector>());
 
             Configure<AbpVirtualFileSystemOptions>(options =>
             {

@@ -1,5 +1,4 @@
-﻿using FastDFSCore;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using Volo.Abp;
@@ -27,14 +26,13 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
         }
 
 
-        public static IEnumerable<Tracker> ToTrackers([NotNull] this string value)
+        public static IEnumerable<string> ToTrackers([NotNull] this string value)
         {
             Check.NotNullOrWhiteSpace(value, nameof(value));
 
             foreach (var tracker in value.Split(','))
             {
-                var address = tracker.Split(':');
-                yield return new Tracker(address[0], int.Parse(address[1]));
+                yield return tracker.Trim();
             }
         }
 
