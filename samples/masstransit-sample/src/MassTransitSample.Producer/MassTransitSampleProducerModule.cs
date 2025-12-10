@@ -65,14 +65,15 @@ namespace MassTransitSample.Producer
             {
                 PreConfigure<AbpMassTransitKafkaOptions>(options =>
                 {
-                    options.Producers.Add(new KafkaProducerConfiguration()
-                    {
-                        Topic = KafkaTopics.Topic1,
-                        Configure = new Action<string, IRiderRegistrationConfigurator>((topic, c) =>
-                        {
-                            c.AddProducer<string, MassTransitSampleMessage>(topic);
-                        })
-                    });
+                    //options.Producers.Add(new KafkaProducerConfiguration()
+                    //{
+                    //    Topic = KafkaTopics.Topic1,
+                    //    Configure = new Action<string, IRiderRegistrationConfigurator>((topic, c) =>
+                    //    {
+                    //        c.AddProducer<string, MassTransitSampleMessage>(topic);
+
+                    //    })
+                    //});
                 });
             }
             else if (abpMassTransitOptions.Provider.Equals(MassTransitActiveMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
