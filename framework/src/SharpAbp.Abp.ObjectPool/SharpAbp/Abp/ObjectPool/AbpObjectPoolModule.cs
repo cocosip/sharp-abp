@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
 using Volo.Abp.Modularity;
@@ -18,5 +18,7 @@ namespace SharpAbp.Abp.ObjectPool
             context.Services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
             return Task.CompletedTask;
         }
+
+
     }
 }
