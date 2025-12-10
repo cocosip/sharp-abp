@@ -28,5 +28,51 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
         {
             await RabbitMqProduceService.PublishAsync(message, cancellationToken);
         }
+
+        /// <summary>
+        /// Publish message
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="messageType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task PublishAsync(
+            object message,
+            System.Type? messageType = null,
+            CancellationToken cancellationToken = default)
+        {
+            await RabbitMqProduceService.PublishAsync(message, messageType, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send message
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="uriString"></param>
+        /// <param name="message"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task SendAsync<T>(
+            string uriString,
+            T message,
+            CancellationToken cancellationToken = default) where T : class
+        {
+            await RabbitMqProduceService.SendAsync(uriString, message, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send message
+        /// </summary>
+        /// <param name="uriString"></param>
+        /// <param name="message"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task SendAsync(
+            string uriString,
+            object message,
+            CancellationToken cancellationToken = default)
+        {
+            await RabbitMqProduceService.SendAsync(uriString, message, cancellationToken);
+        }
     }
 }
