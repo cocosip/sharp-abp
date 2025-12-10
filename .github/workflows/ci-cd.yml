@@ -248,7 +248,7 @@ jobs:
           echo "$changelog"
           echo ""
           echo "### 🔗 Useful Links"
-          echo "- [NuGet Gallery](https://www.nuget.org/profiles/SharpAbp)"
+          echo "- [NuGet Gallery](https://www.nuget.org/profiles/virtual)"
           echo "- [Documentation](https://github.com/${{ github.repository }})"
           [ -n "$full_changelog_line" ] && echo "$full_changelog_line"
           echo ""
