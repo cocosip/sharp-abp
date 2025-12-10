@@ -204,66 +204,58 @@ jobs:
     - name: Generate release notes
       if: startsWith(github.ref, 'refs/tags/v')
       id: release_notes
-      shell: pwsh
+      shell: bash
       run: |
-        $currentTag = "${{ steps.version.outputs.TAG }}"
+        current_tag="${{ steps.version.outputs.TAG }}"
 
         # 获取上一个 tag
-        $previousTag = git describe --tags --abbrev=0 "$currentTag^" 2>$null
+        previous_tag=$(git describe --tags --abbrev=0 "$current_tag^" 2>/dev/null || echo "")
 
-        if ($previousTag) {
-          Write-Host "Generating changelog from $previousTag to $currentTag" -ForegroundColor Cyan
+        if [ -n "$previous_tag" ]; then
+          echo "Generating changelog from $previous_tag to $current_tag"
 
           # 获取两个 tag 之间的提交历史
-          $commits = git log "$previousTag..$currentTag" --pretty=format:"%h - %s (%an)" --no-merges
-
-          # 格式化为 markdown 列表
-          $changelog = ""
-          if ($commits) {
-            $commitLines = $commits -split "`n"
-            foreach ($commit in $commitLines) {
-              $changelog += "- $commit`n"
-            }
-          }
+          changelog=$(git log "$previous_tag..$current_tag" --pretty=format:"- %h - %s (%an)" --no-merges)
 
           # 统计信息
-          $commitCount = ($commits -split "`n").Count
-          $changedFiles = (git diff --name-only "$previousTag..$currentTag" | Measure-Object).Count
-        } else {
-          Write-Host "No previous tag found, this is the first release" -ForegroundColor Yellow
-          $changelog = "This is the first release."
-          $commitCount = 0
-          $changedFiles = 0
-        }
+          commit_count=$(git log "$previous_tag..$current_tag" --oneline --no-merges | wc -l)
+          changed_files=$(git diff --name-only "$previous_tag..$current_tag" | wc -l)
+
+          stats_line="**$commit_count commits** | **$changed_files files changed** | Changes from [\`$previous_tag\`](https://github.com/${{ github.repository }}/releases/tag/$previous_tag) to [\`$current_tag\`](https://github.com/${{ github.repository }}/releases/tag/$current_tag)"
+          full_changelog_line="- [Full Changelog](https://github.com/${{ github.repository }}/compare/$previous_tag...$current_tag)"
+        else
+          echo "No previous tag found, this is the first release"
+          changelog="This is the first release."
+          stats_line=""
+          full_changelog_line=""
+        fi
 
         # 生成 Release Notes
-        $delimiter = "EOF_DELIMITER_$(Get-Random)"
-        $notes = @"
-        ## SharpAbp ${{ steps.version.outputs.VERSION }}
-
-        ### 📦 NuGet Packages
-        This release has been published to NuGet.org. You can install the packages using:
-        ``````bash
-        dotnet add package <PackageName> --version ${{ steps.version.outputs.VERSION }}
-        ``````
-
-        ### 📝 What's Changed
-        $(if ($previousTag) { "**$commitCount commits** | **$changedFiles files changed** | Changes from [\`$previousTag\`](https://github.com/${{ github.repository }}/releases/tag/$previousTag) to [\`$currentTag\`](https://github.com/${{ github.repository }}/releases/tag/$currentTag)" } else { "" })
-
-        $changelog
-
-        ### 🔗 Useful Links
-        - [NuGet Gallery](https://www.nuget.org/profiles/SharpAbp)
-        - [Documentation](https://github.com/${{ github.repository }})
-        $(if ($previousTag) { "- [Full Changelog](https://github.com/${{ github.repository }}/compare/$previousTag...$currentTag)" } else { "" })
-
-        ---
-        🤖 This release was automatically created by GitHub Actions
-        "@
-
-        echo "NOTES<<$delimiter" >> $env:GITHUB_OUTPUT
-        echo "$notes" >> $env:GITHUB_OUTPUT
-        echo "$delimiter" >> $env:GITHUB_OUTPUT
+        delimiter="EOF_DELIMITER_$RANDOM"
+        {
+          echo "NOTES<<$delimiter"
+          echo "## SharpAbp ${{ steps.version.outputs.VERSION }}"
+          echo ""
+          echo "### 📦 NuGet Packages"
+          echo "This release has been published to NuGet.org. You can install the packages using:"
+          echo '```bash'
+          echo "dotnet add package <PackageName> --version ${{ steps.version.outputs.VERSION }}"
+          echo '```'
+          echo ""
+          echo "### 📝 What's Changed"
+          [ -n "$stats_line" ] && echo "$stats_line"
+          echo ""
+          echo "$changelog"
+          echo ""
+          echo "### 🔗 Useful Links"
+          echo "- [NuGet Gallery](https://www.nuget.org/profiles/SharpAbp)"
+          echo "- [Documentation](https://github.com/${{ github.repository }})"
+          [ -n "$full_changelog_line" ] && echo "$full_changelog_line"
+          echo ""
+          echo "---"
+          echo "🤖 This release was automatically created by GitHub Actions"
+          echo "$delimiter"
+        } >> $GITHUB_OUTPUT
 
     - name: Create GitHub Release
       if: startsWith(github.ref, 'refs/tags/v')
