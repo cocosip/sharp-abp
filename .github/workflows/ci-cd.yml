@@ -52,142 +52,154 @@ jobs:
     - name: Extract version from tag
       if: startsWith(github.ref, 'refs/tags/v')
       id: version
-      shell: pwsh
+      shell: bash
       run: |
-        $tag = "${{ github.ref_name }}"
-        $version = $tag -replace '^v', ''
-        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
-        echo "TAG=$tag" >> $env:GITHUB_OUTPUT
+        tag="${{ github.ref_name }}"
+        version="${tag#v}"
+        echo "VERSION=$version" >> $GITHUB_OUTPUT
+        echo "TAG=$tag" >> $GITHUB_OUTPUT
         echo "Release version: $version"
 
     - name: Build All Solutions
-      shell: pwsh
+      shell: bash
       run: |
-        $solutions = @(
-          "framework",
-          "modules/file-storing-database",
-          "modules/file-storing-management",
-          "modules/map-tenancy-management",
-          "modules/tenant-group-management",
-          "modules/dbconnections",
-          "modules/Identity",
-          "modules/IdentityServer",
-          "modules/openiddict",
-          "modules/audit-logging",
-          "modules/account",
-          "modules/minid",
-          "modules/crypto-vault",
+        solutions=(
+          "framework"
+          "modules/file-storing-database"
+          "modules/file-storing-management"
+          "modules/map-tenancy-management"
+          "modules/tenant-group-management"
+          "modules/dbconnections"
+          "modules/Identity"
+          "modules/IdentityServer"
+          "modules/openiddict"
+          "modules/audit-logging"
+          "modules/account"
+          "modules/minid"
+          "modules/crypto-vault"
           "modules/transform-security-management"
         )
 
-        foreach ($solution in $solutions) {
-          Write-Host "Building solution: $solution" -ForegroundColor Cyan
+        for solution in "${solutions[@]}"; do
+          echo "::group::Building solution: $solution"
           dotnet build "$solution" -c Release
-          if ($LASTEXITCODE -ne 0) {
-            Write-Error "Build failed for solution: $solution"
-            exit $LASTEXITCODE
-          }
-        }
-        Write-Host "All solutions built successfully!" -ForegroundColor Green
+          if [ $? -ne 0 ]; then
+            echo "::error::Build failed for solution: $solution"
+            exit 1
+          fi
+          echo "::endgroup::"
+        done
+        echo "✓ All solutions built successfully!"
 
     - name: Test All Solutions
-      shell: pwsh
+      shell: bash
       run: |
-        $solutions = @(
-          "framework",
-          "modules/file-storing-database",
-          "modules/file-storing-management",
-          "modules/map-tenancy-management",
-          "modules/tenant-group-management",
-          "modules/dbconnections",
-          "modules/Identity",
-          "modules/IdentityServer",
-          "modules/openiddict",
-          "modules/audit-logging",
-          "modules/account",
-          "modules/minid",
-          "modules/crypto-vault",
+        solutions=(
+          "framework"
+          "modules/file-storing-database"
+          "modules/file-storing-management"
+          "modules/map-tenancy-management"
+          "modules/tenant-group-management"
+          "modules/dbconnections"
+          "modules/Identity"
+          "modules/IdentityServer"
+          "modules/openiddict"
+          "modules/audit-logging"
+          "modules/account"
+          "modules/minid"
+          "modules/crypto-vault"
           "modules/transform-security-management"
         )
 
-        foreach ($solution in $solutions) {
-          Write-Host "Testing solution: $solution" -ForegroundColor Cyan
+        for solution in "${solutions[@]}"; do
+          echo "::group::Testing solution: $solution"
           dotnet test "$solution" --no-build -c Release
-          if ($LASTEXITCODE -ne 0) {
-            Write-Error "Test failed for solution: $solution"
-            exit $LASTEXITCODE
-          }
-        }
-        Write-Host "All tests passed successfully!" -ForegroundColor Green
+          if [ $? -ne 0 ]; then
+            echo "::error::Test failed for solution: $solution"
+            exit 1
+          fi
+          echo "::endgroup::"
+        done
+        echo "✓ All tests passed successfully!"
 
     # 以下步骤仅在 tag 推送时执行
     - name: Pack All Solutions
       if: startsWith(github.ref, 'refs/tags/v')
-      shell: pwsh
+      shell: bash
       run: |
         # 创建输出目录
-        New-Item -ItemType Directory -Force -Path "dest" | Out-Null
+        mkdir -p dest
 
-        $solutions = @(
-          "framework",
-          "modules/file-storing-database",
-          "modules/file-storing-management",
-          "modules/map-tenancy-management",
-          "modules/tenant-group-management",
-          "modules/dbconnections",
-          "modules/Identity",
-          "modules/IdentityServer",
-          "modules/openiddict",
-          "modules/audit-logging",
-          "modules/account",
-          "modules/minid",
-          "modules/crypto-vault",
+        solutions=(
+          "framework"
+          "modules/file-storing-database"
+          "modules/file-storing-management"
+          "modules/map-tenancy-management"
+          "modules/tenant-group-management"
+          "modules/dbconnections"
+          "modules/Identity"
+          "modules/IdentityServer"
+          "modules/openiddict"
+          "modules/audit-logging"
+          "modules/account"
+          "modules/minid"
+          "modules/crypto-vault"
           "modules/transform-security-management"
         )
 
-        foreach ($solution in $solutions) {
-          Write-Host "Packing solution: $solution" -ForegroundColor Cyan
+        for solution in "${solutions[@]}"; do
+          echo "::group::Packing solution: $solution"
           dotnet pack "$solution" -c Release --include-symbols --no-build -o dest
-          if ($LASTEXITCODE -ne 0) {
-            Write-Error "Pack failed for solution: $solution"
-            exit $LASTEXITCODE
-          }
-        }
-        Write-Host "All solutions packed successfully!" -ForegroundColor Green
+          if [ $? -ne 0 ]; then
+            echo "::error::Pack failed for solution: $solution"
+            exit 1
+          fi
+          echo "::endgroup::"
+        done
+        echo "✓ All solutions packed successfully!"
 
     - name: Publish to NuGet
       if: startsWith(github.ref, 'refs/tags/v')
-      shell: pwsh
+      shell: bash
       run: |
-        Write-Host "Publishing NuGet packages..." -ForegroundColor Cyan
+        echo "Publishing NuGet packages..."
 
         # 检查 dest 目录是否存在
-        if (-not (Test-Path "dest")) {
-          Write-Error "dest directory does not exist"
+        if [ ! -d "dest" ]; then
+          echo "::error::dest directory does not exist"
           exit 1
-        }
+        fi
 
         # 获取所有 .nupkg 文件（排除 symbols 包）
-        $packages = Get-ChildItem -Path "dest" -Filter "*.nupkg" | Where-Object { $_.Name -notlike "*.symbols.nupkg" }
+        shopt -s nullglob
+        packages=(dest/*.nupkg)
+        filtered_packages=()
 
-        if ($packages.Count -eq 0) {
-          Write-Error "No NuGet packages found in dest directory"
+        for pkg in "${packages[@]}"; do
+          if [[ ! "$pkg" == *.symbols.nupkg ]]; then
+            filtered_packages+=("$pkg")
+          fi
+        done
+
+        if [ ${#filtered_packages[@]} -eq 0 ]; then
+          echo "::error::No NuGet packages found in dest directory"
           exit 1
-        }
+        fi
 
-        Write-Host "Found $($packages.Count) packages to publish" -ForegroundColor Yellow
+        echo "Found ${#filtered_packages[@]} packages to publish"
 
         # 发布每个包
-        foreach ($package in $packages) {
-          Write-Host "Publishing: $($package.Name)" -ForegroundColor Cyan
-          dotnet nuget push $package.FullName -k ${{secrets.NUGET_API_KEY}} -s https://www.nuget.org --skip-duplicate
-          if ($LASTEXITCODE -ne 0) {
-            Write-Error "Failed to publish: $($package.Name)"
-            exit $LASTEXITCODE
-          }
-        }
+        for package in "${filtered_packages[@]}"; do
+          echo "::group::Publishing: $(basename "$package")"
+          dotnet nuget push "$package" -k ${{secrets.NUGET_API_KEY}} -s https://www.nuget.org --skip-duplicate
+          if [ $? -ne 0 ]; then
+            echo "::error::Failed to publish: $(basename "$package")"
+            exit 1
+          fi
+          echo "::endgroup::"
+        done
 
-        Write-Host "All NuGet packages published successfully!" -ForegroundColor Green
+        echo "✓ All NuGet packages published successfully!"
 
     - name: Generate release notes
       if: startsWith(github.ref, 'refs/tags/v')
