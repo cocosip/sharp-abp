@@ -58,7 +58,7 @@ namespace SharpAbp.Abp.MassTransit.TestImplementations
         }
 
         /// <summary>
-        /// Produce string key message (test implementation)
+        /// Produce string key message (test implementation - Kafka-specific)
         /// </summary>
         /// <typeparam name="TValue">The type of the message value</typeparam>
         /// <param name="value">The message value</param>
@@ -70,7 +70,7 @@ namespace SharpAbp.Abp.MassTransit.TestImplementations
         {
             var key = System.Guid.NewGuid().ToString("D").ToUpperInvariant();
             _logger.LogInformation("Test Kafka ProduceStringKeyAsync called with generated key: {Key}, value: {Value}", key, value);
-            
+
             ProducedMessages.Add(new ProducedMessage
             {
                 Key = key,
@@ -83,7 +83,31 @@ namespace SharpAbp.Abp.MassTransit.TestImplementations
         }
 
         /// <summary>
-        /// Publish message (test implementation)
+        /// Publish message (test implementation - uses MassTransit abstraction)
+        /// </summary>
+        /// <typeparam name="T">The type of the message</typeparam>
+        /// <param name="message">The message to publish</param>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>A task representing the asynchronous operation</returns>
+        public virtual async Task PublishAsync<T>(
+            T message,
+            CancellationToken cancellationToken = default) where T : class
+        {
+            _logger.LogInformation("Test Kafka PublishAsync<T> called with message type: {MessageType}", typeof(T).Name);
+
+            ProducedMessages.Add(new ProducedMessage
+            {
+                Key = null,
+                Value = message,
+                KeyType = "Publish",
+                ValueType = typeof(T).Name
+            });
+
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Publish message (test implementation - uses MassTransit abstraction)
         /// </summary>
         /// <param name="message">The message to publish</param>
         /// <param name="messageType">The type of the message</param>
@@ -95,13 +119,13 @@ namespace SharpAbp.Abp.MassTransit.TestImplementations
             CancellationToken cancellationToken = default)
         {
             var typeName = messageType?.Name ?? message.GetType().Name;
-            _logger.LogInformation("Test Kafka PublishAsync called with message type: {MessageType}", typeName);
+            _logger.LogInformation("Test Kafka PublishAsync(object) called with message type: {MessageType}", typeName);
 
             ProducedMessages.Add(new ProducedMessage
             {
                 Key = null,
                 Value = message,
-                KeyType = "None",
+                KeyType = "Publish",
                 ValueType = typeName
             });
 

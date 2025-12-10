@@ -35,7 +35,7 @@ namespace SharpAbp.Abp.MassTransit.Kafka
         }
 
         /// <summary>
-        /// Produce string key message
+        /// Produce string key message (Kafka-specific, uses ITopicProducer)
         /// </summary>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="value"></param>
@@ -52,7 +52,23 @@ namespace SharpAbp.Abp.MassTransit.Kafka
         }
 
         /// <summary>
-        /// Publish message
+        /// Publish message (uses MassTransit's IPublishEndpoint abstraction)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="message"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task PublishAsync<T>(
+            T message,
+            CancellationToken cancellationToken = default) where T : class
+        {
+            using var scope = ServiceScopeFactory.CreateScope();
+            var publishEndpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
+            await publishEndpoint.Publish<T>(message, cancellationToken);
+        }
+
+        /// <summary>
+        /// Publish message (uses MassTransit's IPublishEndpoint abstraction)
         /// </summary>
         /// <param name="message"></param>
         /// <param name="messageType"></param>

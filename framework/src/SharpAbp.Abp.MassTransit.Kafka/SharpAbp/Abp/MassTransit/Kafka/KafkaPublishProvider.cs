@@ -26,7 +26,7 @@ namespace SharpAbp.Abp.MassTransit.Kafka
             T message,
             CancellationToken cancellationToken = default) where T : class
         {
-            await KafkaProduceService.ProduceStringKeyAsync(message, cancellationToken);
+            await KafkaProduceService.PublishAsync(message, cancellationToken);
         }
 
         /// <summary>

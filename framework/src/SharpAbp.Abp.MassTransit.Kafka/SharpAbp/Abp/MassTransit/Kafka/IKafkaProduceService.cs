@@ -6,7 +6,7 @@ namespace SharpAbp.Abp.MassTransit.Kafka
     public interface IKafkaProduceService
     {
         /// <summary>
-        /// Produce message
+        /// Produce message with specific key (Kafka-specific, uses ITopicProducer)
         /// </summary>
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TValue"></typeparam>
@@ -17,7 +17,7 @@ namespace SharpAbp.Abp.MassTransit.Kafka
         Task ProduceAsync<TKey, TValue>(TKey key, TValue value, CancellationToken cancellationToken = default) where TValue : class;
 
         /// <summary>
-        /// Produce string key message
+        /// Produce message with auto-generated string key (Kafka-specific, uses ITopicProducer)
         /// </summary>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="value"></param>
@@ -26,7 +26,16 @@ namespace SharpAbp.Abp.MassTransit.Kafka
         Task ProduceStringKeyAsync<TValue>(TValue value, CancellationToken cancellationToken = default) where TValue : class;
 
         /// <summary>
-        /// Publish message
+        /// Publish message (uses MassTransit's IPublishEndpoint abstraction)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="message"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task PublishAsync<T>(T message, CancellationToken cancellationToken = default) where T : class;
+
+        /// <summary>
+        /// Publish message (uses MassTransit's IPublishEndpoint abstraction)
         /// </summary>
         /// <param name="message"></param>
         /// <param name="messageType"></param>
