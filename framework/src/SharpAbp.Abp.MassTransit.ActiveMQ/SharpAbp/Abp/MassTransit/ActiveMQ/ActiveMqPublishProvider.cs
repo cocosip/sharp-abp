@@ -26,7 +26,53 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
             T message,
             CancellationToken cancellationToken = default) where T : class
         {
-            await ActiveMqProduceService.SendAsync(message, cancellationToken);
+            await ActiveMqProduceService.PublishAsync(message, cancellationToken);
+        }
+
+        /// <summary>
+        /// Publish message
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="messageType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task PublishAsync(
+            object message,
+            System.Type? messageType = null,
+            CancellationToken cancellationToken = default)
+        {
+            await ActiveMqProduceService.PublishAsync(message, messageType, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send message
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="uriString"></param>
+        /// <param name="message"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task SendAsync<T>(
+            string uriString,
+            T message,
+            CancellationToken cancellationToken = default) where T : class
+        {
+            await ActiveMqProduceService.SendAsync(uriString, message, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send message
+        /// </summary>
+        /// <param name="uriString"></param>
+        /// <param name="message"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task SendAsync(
+            string uriString,
+            object message,
+            CancellationToken cancellationToken = default)
+        {
+            await ActiveMqProduceService.SendAsync(uriString, message, cancellationToken);
         }
     }
 }

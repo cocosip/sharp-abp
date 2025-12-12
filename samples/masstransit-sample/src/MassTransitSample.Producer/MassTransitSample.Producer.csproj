@@ -9,13 +9,12 @@
 
 	<ItemGroup>
 		<None Remove="appsettings.json" />
-		<None Remove="appsettings.secrets.json" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<Content Include="appsettings.secrets.json">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		  <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>
 		<Content Include="appsettings.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>

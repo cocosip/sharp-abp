@@ -1,5 +1,7 @@
+#nullable enable
 using Microsoft.Extensions.Logging;
 using SharpAbp.Abp.MassTransit.Kafka;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,7 +58,7 @@ namespace SharpAbp.Abp.MassTransit.TestImplementations
         }
 
         /// <summary>
-        /// Produce string key message (test implementation)
+        /// Produce string key message (test implementation - Kafka-specific)
         /// </summary>
         /// <typeparam name="TValue">The type of the message value</typeparam>
         /// <param name="value">The message value</param>
@@ -68,13 +70,114 @@ namespace SharpAbp.Abp.MassTransit.TestImplementations
         {
             var key = System.Guid.NewGuid().ToString("D").ToUpperInvariant();
             _logger.LogInformation("Test Kafka ProduceStringKeyAsync called with generated key: {Key}, value: {Value}", key, value);
-            
+
             ProducedMessages.Add(new ProducedMessage
             {
                 Key = key,
                 Value = value,
                 KeyType = "String",
                 ValueType = typeof(TValue).Name
+            });
+
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Publish message (test implementation - uses MassTransit abstraction)
+        /// </summary>
+        /// <typeparam name="T">The type of the message</typeparam>
+        /// <param name="message">The message to publish</param>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>A task representing the asynchronous operation</returns>
+        public virtual async Task PublishAsync<T>(
+            T message,
+            CancellationToken cancellationToken = default) where T : class
+        {
+            _logger.LogInformation("Test Kafka PublishAsync<T> called with message type: {MessageType}", typeof(T).Name);
+
+            ProducedMessages.Add(new ProducedMessage
+            {
+                Key = null,
+                Value = message,
+                KeyType = "Publish",
+                ValueType = typeof(T).Name
+            });
+
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Publish message (test implementation - uses MassTransit abstraction)
+        /// </summary>
+        /// <param name="message">The message to publish</param>
+        /// <param name="messageType">The type of the message</param>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>A task representing the asynchronous operation</returns>
+        public virtual async Task PublishAsync(
+            object message,
+            Type? messageType = null,
+            CancellationToken cancellationToken = default)
+        {
+            var typeName = messageType?.Name ?? message.GetType().Name;
+            _logger.LogInformation("Test Kafka PublishAsync(object) called with message type: {MessageType}", typeName);
+
+            ProducedMessages.Add(new ProducedMessage
+            {
+                Key = null,
+                Value = message,
+                KeyType = "Publish",
+                ValueType = typeName
+            });
+
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Send message (test implementation)
+        /// </summary>
+        /// <typeparam name="T">The type of the message</typeparam>
+        /// <param name="uriString">The destination URI</param>
+        /// <param name="message">The message to send</param>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>A task representing the asynchronous operation</returns>
+        public virtual async Task SendAsync<T>(
+            string uriString,
+            T message,
+            CancellationToken cancellationToken = default) where T : class
+        {
+            _logger.LogInformation("Test Kafka SendAsync called with URI: {Uri}, message type: {MessageType}", uriString, typeof(T).Name);
+
+            ProducedMessages.Add(new ProducedMessage
+            {
+                Key = uriString,
+                Value = message,
+                KeyType = "Uri",
+                ValueType = typeof(T).Name
+            });
+
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Send message (test implementation)
+        /// </summary>
+        /// <param name="uriString">The destination URI</param>
+        /// <param name="message">The message to send</param>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>A task representing the asynchronous operation</returns>
+        public virtual async Task SendAsync(
+            string uriString,
+            object message,
+            CancellationToken cancellationToken = default)
+        {
+            _logger.LogInformation("Test Kafka SendAsync called with URI: {Uri}, message type: {MessageType}", uriString, message.GetType().Name);
+
+            ProducedMessages.Add(new ProducedMessage
+            {
+                Key = uriString,
+                Value = message,
+                KeyType = "Uri",
+                ValueType = message.GetType().Name
             });
 
             await Task.CompletedTask.ConfigureAwait(false);
