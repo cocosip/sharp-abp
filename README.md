@@ -1,19 +1,105 @@
 # **sharp-abp**
 
-> Abp vNext extension modules
+> Enterprise extension modules for ABP vNext
 
-## Basic modules
+An enterprise-grade extension module collection based on ABP vNext framework, consisting of 77 core framework packages and 13 business modules, providing complete enterprise application solutions including multi-database support, distributed file storage, message queuing, authentication, multi-tenancy isolation, and more.
 
+## Project Structure
 
-| Name | Description | Base module
-| ---- | ----------- | ----------- |
-| AutoS3 Module | AWSSDK.S3 Adapter | [doc](/docs/AutoS3.md) |
-| FreeRedis Module | FreeRedis ABP Adapter | [doc](/docs/FreeRedis.md) |
-| DotCommon | DotCommon ABP Adapter | [doc](/docs/DotCommon.md) |
-| FastDFS | FastDFS ABP Adapter | [doc](/docs/FastDFS.md) |
-| FileStoring | ABP Store File | [doc](/docs/FileStoring.md) |
-| DbConnections | DbConnections Manager | [doc](/docs/DbConnections.md) |
-| MassTransit | MassTransit integration | [doc](/docs/MassTransit.md) |
+- **Framework**: 77 core framework packages providing infrastructure support
+- **Modules**: 13 business modules providing complete enterprise-grade functionality
+- **Samples**: Sample projects demonstrating module usage
+
+## Key Features
+
+- **Multi-Database Support**: MySQL, PostgreSQL, SQL Server, Oracle, SQLite, DM (DaMeng), GaussDB
+- **Multi-ORM Support**: Entity Framework Core, FreeSql, Dapper
+- **File Storage**: Support for 11 storage providers including Aliyun OSS, Azure, AWS, MinIO, KS3, Huawei OBS, FastDFS, S3
+- **Message Queue**: RabbitMQ, Kafka, ActiveMQ (via MassTransit)
+- **Authentication**: IdentityServer4, OpenIddict OAuth2/OIDC support
+- **Multi-Tenancy**: Map-based tenancy isolation, tenant grouping isolation
+- **Observability**: OpenTelemetry, Zipkin, Prometheus integration
+- **Data Security**: SM2/AES encryption, secret management, transform security
+
+## Framework Modules
+
+### Core Modules
+
+| Name | Description | Documentation |
+| ---- | ----------- | ------------- |
+| **DotCommon** | DotCommon ABP adapter with Snowflake ID generation | [docs](/docs/Core.md#dotcommon) |
+| **Snowflakes** | Distributed unique ID generator | [docs](/docs/Core.md#snowflakes) |
+| **Crypto** | Encryption and decryption with SM2/AES support | [docs](/docs/Core.md#crypto) |
+| **FreeRedis** | FreeRedis cache library ABP adapter | [docs](/docs/Core.md#freeredis) |
+| **Validation** | Data validation module | [docs](/docs/Core.md#validation) |
+| **AspNetCore** | AspNetCore integration extensions | [docs](/docs/Core.md#aspnetcore) |
+| **Swashbuckle** | Swagger/Swashbuckle API documentation support | [docs](/docs/Core.md#swashbuckle) |
+| **Swashbuckle.Versioning** | API versioning management | [docs](/docs/Core.md#swashbuckleversioning) |
+
+### ORM Frameworks
+
+| Name | Description | Documentation |
+| ---- | ----------- | ------------- |
+| **FreeSql** | FreeSql ORM framework integration (supports MySQL/PostgreSQL/SQLServer/Oracle/SQLite/DM) | [docs](/docs/ORM.md#freesql) |
+| **Dapper** | Dapper micro-ORM framework integration | [docs](/docs/ORM.md#dapper) |
+| **EntityFrameworkCore** | EF Core integration (supports DM, GaussDB) | [docs](/docs/ORM.md#entityframeworkcore) |
+
+### File Storage
+
+| Name | Description | Documentation |
+| ---- | ----------- | ------------- |
+| **FileStoring** | Unified file storage abstraction and core implementation | [docs](/docs/FileStorage.md#filestoring) |
+| **AutoS3** | AWSSDK.S3 adapter (supports KS3) | [docs](/docs/FileStorage.md#autos3) |
+| **FastDFS** | FastDFS distributed file system adapter | [docs](/docs/FileStorage.md#fastdfs) |
+
+### Database Connections
+
+| Name | Description | Documentation |
+| ---- | ----------- | ------------- |
+| **DbConnections** | Multi-database connection management (supports MySQL/PostgreSQL/SQLServer/Oracle/SQLite/DM/GaussDB) | [docs](/docs/DatabaseConnections.md) |
+
+### Message Queue
+
+| Name | Description | Documentation |
+| ---- | ----------- | ------------- |
+| **MassTransit** | MassTransit message bus integration (supports RabbitMQ/Kafka/ActiveMQ) | [docs](/docs/MassTransit.md) |
+
+### Multi-Tenancy
+
+| Name | Description | Documentation |
+| ---- | ----------- | ------------- |
+| **MapTenancy** | Map-based tenancy isolation (domain-tenant binding) | [docs](/docs/MultiTenancy.md#maptenancy) |
+| **TenancyGrouping** | Tenant grouping isolation | [docs](/docs/MultiTenancy.md#tenancygrouping) |
+
+### Security & Encryption
+
+| Name | Description | Documentation |
+| ---- | ----------- | ------------- |
+| **TransformSecurity** | Data transform security (SM2/AES encryption) | [docs](/docs/Security.md) |
+
+### Observability
+
+| Name | Description | Documentation |
+| ---- | ----------- | ------------- |
+| **OpenTelemetry** | OpenTelemetry observability platform (supports Zipkin/Prometheus/OTLP) | [docs](/docs/Observability.md) |
+
+## Business Modules
+
+| Name | Description | Documentation |
+| ---- | ----------- | ------------- |
+| **Account** | Account management (registration, login, verification) | [docs](/docs/BusinessModules.md#account) |
+| **Identity** | Identity management (users, roles, permissions, organizations) | [docs](/docs/BusinessModules.md#identity) |
+| **IdentityServer** | IdentityServer4 OAuth2/OIDC integration | [docs](/docs/BusinessModules.md#identityserver--openiddict) |
+| **OpenIddict** | OpenIddict OAuth2/OIDC implementation | [docs](/docs/BusinessModules.md#identityserver--openiddict) |
+| **AuditLogging** | Audit logging (operation audit, compliance tracking) | [docs](/docs/BusinessModules.md#auditlogging) |
+| **MinId** | Distributed ID generation service | [docs](/docs/BusinessModules.md#minid) |
+| **FileStoringManagement** | File storage management (upload, download, configuration) | [docs](/docs/BusinessModules.md#filestoringmanagement) |
+| **FileStoringDatabase** | Database file storage provider | [docs](/docs/BusinessModules.md#filestoringdatabase) |
+| **DbConnectionsManagement** | Database connection configuration management | [docs](/docs/BusinessModules.md#dbconnectionsmanagement) |
+| **MapTenancyManagement** | Map-based tenancy management | [docs](/docs/BusinessModules.md#maptenancymanagement) |
+| **TenantGroupManagement** | Tenant group management | [docs](/docs/BusinessModules.md#tenantgroupmanagement) |
+| **CryptoVault** | Crypto vault and secret management | [docs](/docs/BusinessModules.md#cryptovault) |
+| **TransformSecurityManagement** | Data transform security management | [docs](/docs/BusinessModules.md#transformsecuritymanagement) |
 
 
 ## Packages
@@ -27,9 +113,6 @@
 | `SharpAbp.Abp.AspNetCore` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.AspNetCore.svg)](https://www.nuget.org/packages/SharpAbp.Abp.AspNetCore) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.AspNetCore.svg)|
 | `SharpAbp.Abp.Swashbuckle` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Swashbuckle.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Swashbuckle) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Swashbuckle.svg)|
 | `SharpAbp.Abp.Swashbuckle.Versioning` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Swashbuckle.Versioning.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Swashbuckle.Versioning) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Swashbuckle.Versioning.svg)|
-| **AutoS3** | - | - | 
-| `SharpAbp.Abp.AutoS3` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.AutoS3.svg)](https://www.nuget.org/packages/SharpAbp.Abp.AutoS3) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.AutoS3.svg)|
-| `SharpAbp.Abp.AutoS3.KS3` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.AutoS3.KS3.svg)](https://www.nuget.org/packages/SharpAbp.Abp.AutoS3.KS3) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.AutoS3.KS3.svg)|
 | **FastDFS** | - | - |
 | `SharpAbp.Abp.FastDFS` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FastDFS.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FastDFS) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FastDFS.svg)|
 | `SharpAbp.Abp.FastDFS.DotNetty` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FastDFS.DotNetty.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FastDFS.DotNetty) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FastDFS.DotNetty.svg)|
