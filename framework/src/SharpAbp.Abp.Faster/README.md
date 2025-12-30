@@ -59,7 +59,7 @@ Configure in `appsettings.json`:
         "ForceCompleteGapTimeoutMillis": 0,
         "MaxCompletedRanges": 10000,
         "EnableRangePersistence": true,
-        "PersistIntervalMillis": 30000,
+        "PersistIntervalMillis": 5000,
         "IteratorName": "default-iter"
       }
     }
@@ -98,8 +98,8 @@ Configure in `appsettings.json`:
 ##### Interval Settings
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
-| `CommitIntervalMillis` | `int` | `1000` | Interval for committing written data (ms) |
-| `CompleteIntervalMillis` | `int` | `1000` | Interval for processing completed ranges (ms) |
+| `CommitIntervalMillis` | `int` | `2000` | Interval for committing written data to FASTER log (ms) |
+| `CompleteIntervalMillis` | `int` | `3000` | Interval for processing completed ranges and advancing iterator (ms) |
 | `TruncateIntervalMillis` | `int` | `300000` | Interval for truncating old log segments (ms) |
 
 ##### Advanced Settings
@@ -110,7 +110,7 @@ Configure in `appsettings.json`:
 | `ForceCompleteGapTimeoutMillis` | `int` | `0` | Auto-skip gap timeout (0=disabled, WARNING: data loss!) |
 | `MaxCompletedRanges` | `int` | `10000` | Maximum number of ranges to track (memory protection) |
 | `EnableRangePersistence` | `bool` | `true` | Enable persistence of completed ranges to disk |
-| `PersistIntervalMillis` | `int` | `5000` | Interval for persisting completed ranges (5 sec) |
+| `PersistIntervalMillis` | `int` | `30000` | Interval for persisting completed ranges to disk (30 sec) |
 | `PageSizeBits` | `int` | `25` | Page size as power of 2 (default: 32MB) |
 | `MemorySizeBits` | `int` | `26` | Memory size as power of 2 (default: 64MB) |
 | `SegmentSizeBits` | `int` | `30` | Segment size as power of 2 (default: 1GB) |
@@ -249,6 +249,101 @@ public class LogEntry<T> : IAddressRange
 
 ## Advanced Topics
 
+### Understanding CommitAsync and Persistence Timing
+
+**⚠️ CRITICAL**: `CommitAsync()` does NOT immediately persist data to disk. Understanding the timing is essential to avoid data reprocessing.
+
+#### Commit Pipeline Stages
+
+When you call `await logger.CommitAsync(positions)`, the data goes through multiple stages:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│ Stage 1: CommitAsync() called                                       │
+│ - Action: Positions added to in-memory _completedRanges            │
+│ - Timing: IMMEDIATE (< 1ms)                                        │
+│ - Persistence: ❌ NOT PERSISTED (only in RAM)                       │
+└─────────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────────┐
+│ Stage 2: Background Complete Task runs                              │
+│ - Action: Merges ranges, calls Iter.CompleteUntilRecordAtAsync()   │
+│ - Timing: Up to CompleteIntervalMillis (default: 3 seconds)        │
+│ - Persistence: ⚠️ PARTIALLY PERSISTED (FASTER.Core only)            │
+└─────────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────────┐
+│ Stage 3: Background Persist Task runs                               │
+│ - Action: Saves _completedRanges to completed_ranges.json          │
+│ - Timing: Up to PersistIntervalMillis (default: 30 seconds)        │
+│ - Persistence: ✅ FULLY PERSISTED (survives restart)                │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+#### Restart Behavior Examples
+
+**Example 1: Restart before Stage 3 completes**
+```csharp
+// T+0s: Process and commit data
+var entries = await logger.ReadAsync(100);
+await logger.CommitAsync(entries.GetPositions()); // ✅ Returns immediately
+
+// T+2s: Application crashes ❌
+// Result: Data will be REPROCESSED on restart (persistence hasn't occurred yet)
+```
+
+**Example 2: Restart after Stage 3 completes**
+```csharp
+// T+0s: Process and commit data
+var entries = await logger.ReadAsync(100);
+await logger.CommitAsync(entries.GetPositions());
+
+// T+35s: Application crashes ❌ (after 30s persist interval)
+// Result: Data will NOT be reprocessed (ranges were persisted to disk)
+```
+
+#### Solutions for Faster Persistence
+
+**Option 1: Reduce intervals (Recommended)**
+```json
+{
+  "FasterOptions": {
+    "Configurations": {
+      "default": {
+        "CompleteIntervalMillis": 500,   // 3000 → 500ms
+        "PersistIntervalMillis": 2000     // 30000 → 2s
+      }
+    }
+  }
+}
+```
+
+**Option 2: Implement manual flush (Future enhancement)**
+```csharp
+// Not currently implemented, but could be added:
+await logger.CommitAsync(positions);
+await logger.FlushAsync(); // Would immediately trigger persistence
+```
+
+**Option 3: Ensure graceful shutdown**
+```csharp
+// On application shutdown, Dispose() triggers final persistence
+// But only works if shutdown is graceful (not crash/kill -9)
+```
+
+#### Performance vs Reliability Trade-off
+
+| Configuration | Persistence Time | Disk I/O | Reprocessing Risk |
+|---------------|------------------|----------|-------------------|
+| Default (2s/30s) | Up to 33s | Low | Medium |
+| Balanced (1s/5s) | Up to 6s | Medium | Low |
+| Fast (500ms/2s) | Up to 2.5s | High | Very Low |
+| Custom (100ms/1s) | Up to 1.1s | Very High | Minimal |
+
+**Recommendation**: Start with balanced configuration (1s/5s) and adjust based on:
+- **Reduce intervals** if you need faster recovery and can tolerate higher I/O
+- **Increase intervals** if you have idempotent processing and need maximum throughput
+
 ### Out-of-Order Commit Handling
 
 The module is designed for scenarios where commits arrive out of order:
@@ -281,7 +376,7 @@ After restart: [100-999) will be reprocessed! ❌
 
 The module solves this by persisting `_completedRanges` to disk:
 
-1. **Automatic Persistence**: Ranges saved every `PersistIntervalMillis` (default: 5 seconds)
+1. **Automatic Persistence**: Ranges saved every `PersistIntervalMillis` (default: 30 seconds)
 2. **Shutdown Persistence**: Final save on graceful shutdown
 3. **Startup Recovery**: Loads persisted ranges on initialization
 4. **Optimized Storage**: Only saves ranges beyond current truncate address
@@ -300,7 +395,7 @@ The module solves this by persisting `_completedRanges` to disk:
 ```json
 {
   "EnableRangePersistence": true,    // Enable/disable persistence
-  "PersistIntervalMillis": 5000      // Save interval (5 sec)
+  "PersistIntervalMillis": 30000     // Save interval (30 sec default)
 }
 ```
 
@@ -316,9 +411,10 @@ The module solves this by persisting `_completedRanges` to disk:
 | Scenario | Data Loss | Impact |
 |----------|-----------|--------|
 | **Normal Shutdown** | None | Ranges saved in Dispose |
+| **Crash (default 30s interval)** | Up to 30 seconds | May reprocess up to 30s of data |
 | **Crash (5s interval)** | Up to 5 seconds | May reprocess recent data |
 | **Crash (1s interval)** | Up to 1 second | Minimal reprocessing |
-| **Persistence Disabled** | All uncommitted | Full reprocessing |
+| **Persistence Disabled** | All uncommitted | Full reprocessing on restart |
 
 #### Best Practices
 
@@ -340,17 +436,32 @@ The module solves this by persisting `_completedRanges` to disk:
    await MarkAsProcessed(entry.Data.Id);
    ```
 
-3. **Tune Persistence Interval**:
+3. **Tune Persistence Interval Based on Requirements**:
    ```csharp
-   // High reliability (more I/O)
-   "PersistIntervalMillis": 1000  // 1 second
+   // High reliability - minimal data reprocessing on crash (more I/O)
+   "PersistIntervalMillis": 1000   // 1 second
+   "CompleteIntervalMillis": 500   // 0.5 second
 
-   // Balanced (recommended)
-   "PersistIntervalMillis": 5000  // 5 seconds
+   // Balanced - good reliability with reasonable performance (recommended)
+   "PersistIntervalMillis": 5000   // 5 seconds
+   "CompleteIntervalMillis": 1000  // 1 second
 
-   // High performance (less reliable)
-   "PersistIntervalMillis": 30000 // 30 seconds
+   // Default - balanced for most scenarios
+   "PersistIntervalMillis": 30000  // 30 seconds (default)
+   "CompleteIntervalMillis": 3000  // 3 seconds (default)
+
+   // High throughput - maximum performance, accepts more reprocessing risk
+   "PersistIntervalMillis": 60000  // 60 seconds
+   "CompleteIntervalMillis": 5000  // 5 seconds
    ```
+
+   **Important**: After calling `CommitAsync()`, there are multiple layers before data is fully persisted:
+   - **Immediate**: Positions added to in-memory `_completedRanges`
+   - **After CompleteIntervalMillis** (default 3s): Iterator completes ranges in FASTER.Core
+   - **After PersistIntervalMillis** (default 30s): Ranges persisted to disk
+
+   If your application restarts before persistence, you may reprocess up to 30 seconds of data.
+   For critical applications requiring faster recovery, reduce both intervals.
 
 4. **Monitor Range Growth**:
    ```csharp
@@ -525,16 +636,44 @@ All operations are thread-safe:
 
 ### 1. Configuration Tuning
 
-```csharp
-// For high-throughput scenarios
-"CommitIntervalMillis": 5000,      // Less frequent commits
-"PreReadCapacity": 10000,          // Larger buffer
-"MaxCompletedRanges": 50000        // More gap tracking
+Choose configuration based on your requirements:
 
-// For low-latency scenarios
-"CommitIntervalMillis": 100,       // Frequent commits
-"PreReadCapacity": 1000,           // Smaller buffer
-"GapTimeoutMillis": 30000          // Quick gap detection
+```json
+// Production Default - Balanced performance and reliability
+{
+  "CommitIntervalMillis": 1000,
+  "CompleteIntervalMillis": 1000,
+  "PersistIntervalMillis": 5000,
+  "PreReadCapacity": 5000,
+  "MaxCompletedRanges": 10000
+}
+
+// High Reliability - Minimal data reprocessing on crash
+{
+  "CommitIntervalMillis": 500,
+  "CompleteIntervalMillis": 500,
+  "PersistIntervalMillis": 2000,     // Persist every 2s
+  "PreReadCapacity": 5000,
+  "MaxCompletedRanges": 10000,
+  "EnableRangePersistence": true     // Critical!
+}
+
+// High Throughput - Maximum performance, idempotent processing required
+{
+  "CommitIntervalMillis": 5000,
+  "CompleteIntervalMillis": 5000,
+  "PersistIntervalMillis": 60000,    // Persist every 60s
+  "PreReadCapacity": 10000,
+  "MaxCompletedRanges": 50000
+}
+
+// Development/Testing - Fast feedback, can tolerate reprocessing
+{
+  "CommitIntervalMillis": 2000,
+  "CompleteIntervalMillis": 3000,
+  "PersistIntervalMillis": 30000,
+  "EnableRangePersistence": false    // Disable for clean restarts
+}
 ```
 
 ### 2. Error Handling
@@ -581,6 +720,80 @@ if (_logger.LargestGapSize > 1_000_000)
 ```
 
 ## Troubleshooting
+
+### Issue: Progress Lost on Restart / Data Reprocessing
+
+**Symptoms**: After application restart, data that was already processed is being read and processed again.
+
+**Root Cause**: `CommitAsync()` positions were not persisted to disk before the restart.
+
+**Diagnosis**:
+```csharp
+// Check how long ago ranges were persisted
+// Look for these log entries:
+// [DEBUG] Persisted {Count} completed ranges to {Path}
+
+// If you see this on restart:
+// [INFO] Loaded {Count} persisted completed ranges from {Path}
+// And Count is 0 or low, ranges weren't persisted
+```
+
+**Solutions**:
+
+1. **Immediate: Reduce persistence intervals**
+   ```json
+   {
+     "FasterOptions": {
+       "Configurations": {
+         "default": {
+           "CompleteIntervalMillis": 500,    // Default: 3000
+           "PersistIntervalMillis": 2000,    // Default: 30000
+           "CommitIntervalMillis": 500       // Default: 2000
+         }
+       }
+     }
+   }
+   ```
+
+2. **Verify persistence is enabled**
+   ```json
+   {
+     "EnableRangePersistence": true  // Must be true
+   }
+   ```
+
+3. **Ensure graceful shutdown**
+   - Avoid `kill -9` or force termination
+   - Use proper shutdown signals (Ctrl+C, SIGTERM)
+   - The `Dispose()` method performs final persistence
+
+4. **Check file permissions**
+   ```bash
+   # Ensure app can write to persistence file
+   ls -la {RootPath}/{TypeName}/completed_ranges.json
+   ```
+
+5. **Make processing idempotent** (Long-term solution)
+   ```csharp
+   // Track processed IDs to handle reprocessing gracefully
+   var entries = await logger.ReadAsync(100);
+   foreach (var entry in entries)
+   {
+       if (await IsAlreadyProcessed(entry.Data.Id))
+       {
+           continue; // Skip without error
+       }
+       await ProcessData(entry.Data);
+       await MarkAsProcessed(entry.Data.Id);
+   }
+   await logger.CommitAsync(entries.GetPositions());
+   ```
+
+**Prevention**:
+- Use balanced intervals (1s/5s) for production
+- Monitor persistence logs
+- Implement graceful shutdown handlers
+- Design idempotent message processing
 
 ### Issue: Gaps Not Clearing
 
@@ -648,7 +861,7 @@ if (_logger.LargestGapSize > 1_000_000)
 
 #### v2.3 - Range Persistence
 - ✅ **Implemented range persistence** to prevent data reprocessing after restart
-- ✅ Automatic persistence every 5 seconds (configurable)
+- ✅ Automatic persistence every 30 seconds by default (configurable via `PersistIntervalMillis`)
 - ✅ Final persistence on graceful shutdown
 - ✅ Optimized storage (only persists ranges beyond truncate)
 - ✅ Independent persistence files per logger configuration
