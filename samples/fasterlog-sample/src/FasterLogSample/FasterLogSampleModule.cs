@@ -35,6 +35,9 @@ public class FasterLogSampleModule : AbpModule
                 c.CompleteIntervalMillis = 1000;
                 c.TruncateIntervalMillis = 5000;
 
+                // 方案C：强制跳过间隙（支持多线程并发消费）
+                c.GapTimeoutMillis = 60000;                // 60秒后警告间隙
+                c.ForceCompleteGapTimeoutMillis = 120000;  // 120秒后强制跳过间隙
             });
         });
 
