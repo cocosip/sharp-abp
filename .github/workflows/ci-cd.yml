@@ -265,7 +265,5 @@ jobs:
         body: ${{ steps.release_notes.outputs.NOTES }}
         draft: false
         prerelease: ${{ contains(steps.version.outputs.VERSION, '-') }}
-        files: |
-          dest/*.nupkg
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
