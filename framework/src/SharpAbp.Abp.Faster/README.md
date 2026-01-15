@@ -110,13 +110,26 @@ The module works out-of-the-box with sensible defaults optimized for multi-threa
 
 ```json
 {
+  "FileName": null,                           // Name of the log file (required)
+  "IteratorName": "default",                  // Unique identifier for the log iterator
+  "PreallocateFile": false,                   // Preallocate the log file for better performance
+  "Capacity": 4294967296,                     // Maximum capacity of the log file in bytes (4GB)
+  "RecoverDevice": true,                      // Recover device state on startup
+  "UseIoCompletionPort": false,               // Use I/O completion ports (Windows only)
+  "DisableFileBuffering": true,               // Disable OS file buffering for direct I/O
+  "ScanUncommitted": false,                   // Scan uncommitted entries that haven't been fully written
+  "AutoRefreshSafeTailAddress": false,        // Automatically refresh the safe tail address
+  "PageSizeBits": 22,                         // Page size (2^22 = 4MB)
+  "MemorySizeBits": 23,                       // Memory size (2^23 = 8MB)
+  "SegmentSizeBits": 30,                      // Segment size (2^30 = 1GB)
   "CommitIntervalMillis": 2000,              // Commit log data every 2 seconds
   "CompleteIntervalMillis": 3000,            // Merge ranges every 3 seconds
   "TruncateIntervalMillis": 300000,          // Truncate old data every 5 minutes
+  "PreReadCapacity": 5000,                   // Buffered channel capacity
+  "AddressMatchTolerance": 10,               // Bytes tolerance for considering ranges continuous
   "GapTimeoutMillis": 600000,                // Warn about gaps after 10 minutes
-  "ForceCompleteGapTimeoutMillis": 120000,   // Auto-skip gaps after 2 minutes ✅
   "MaxCompletedRanges": 10000,               // Memory protection limit
-  "PreReadCapacity": 5000                    // Buffered channel capacity
+  "ForceCompleteGapTimeoutMillis": 120000    // Auto-skip gaps after 2 minutes ✅
 }
 ```
 
@@ -126,7 +139,7 @@ The module works out-of-the-box with sensible defaults optimized for multi-threa
 | Property | Type | Description |
 |----------|------|-------------|
 | `RootPath` | `string` | Root directory for storing FASTER log files (required) |
-| `Configurations` | `Dictionary` | Named configurations for different log instances |
+| `Configurations` | `Dictionary<string, AbpFasterConfiguration>` | Named configurations for different log instances |
 
 #### Logger Configuration Properties
 
@@ -148,6 +161,8 @@ The module works out-of-the-box with sensible defaults optimized for multi-threa
 | `PreReadCapacity` | `int` | `5000` | Channel capacity for pre-reading entries |
 | `UseIoCompletionPort` | `bool` | `false` | Use I/O completion ports (Windows only) |
 | `DisableFileBuffering` | `bool` | `true` | Disable OS file buffering for direct I/O |
+| `ScanUncommitted` | `bool` | `false` | Scan uncommitted entries that haven't been fully written |
+| `AutoRefreshSafeTailAddress` | `bool` | `false` | Automatically refresh the safe tail address |
 
 ##### Interval Settings
 | Property | Type | Default | Description |
