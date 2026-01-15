@@ -112,7 +112,7 @@ The module works out-of-the-box with sensible defaults optimized for multi-threa
 {
   "FileName": null,                           // Name of the log file (required)
   "IteratorName": "default",                  // Unique identifier for the log iterator
-  "PreallocateFile": false,                   // Preallocate the log file for better performance
+  "PreallocateFile": true,                   // Preallocate the log file for better performance
   "Capacity": 4294967296,                     // Maximum capacity of the log file in bytes (4GB)
   "RecoverDevice": true,                      // Recover device state on startup
   "UseIoCompletionPort": false,               // Use I/O completion ports (Windows only)
