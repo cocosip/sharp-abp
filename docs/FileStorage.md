@@ -215,6 +215,297 @@ public class DocumentService : ApplicationService
 
 ---
 
+## File Path Building
+
+All storage providers delegate path/key construction to a centralised `IFilePathBuilder` service.
+This makes it possible to control how files are laid out in your bucket or file system **without touching provider-specific code**.
+
+### Architecture
+
+```
+IFileContainer.SaveAsync / GetAsync / DeleteAsync / ...
+        │
+        ▼
+DefaultXxxFileNameCalculator.Calculate(args)   ← one per provider, all delegate to ↓
+        │
+        ▼
+IFilePathBuilder.Build(args)                   ← single point of path logic
+        │
+        ├─ reads AbpFileStoringAbstractionsOptions.FilePathBuilder  (global config)
+        ├─ reads AbpFileStoringAbstractionsOptions.FilePathStrategy (TenantBased / DirectFileId)
+        └─ reads IFilePathContextAccessor.Current                   (per-operation context)
+```
+
+### Default Path Patterns
+
+| Strategy | Tenant | Result |
+|----------|--------|--------|
+| `TenantBased` | Host | `host/{fileId}` |
+| `TenantBased` | Tenant | `tenants/{tenantId}/{fileId}` |
+| `TenantBased` + Prefix | Host | `{prefix}/host/{fileId}` |
+| `TenantBased` + TenantName | Tenant | `tenants/{tenantName}/{fileId}` |
+| `DirectFileId` | Any | `{fileId}` |
+
+---
+
+### Method 1: Configure via appsettings.json
+
+Add a `FilePathBuilder` block inside `FileStoringOptions`:
+
+```json
+{
+  "FileStoringOptions": {
+    "FilePathBuilder": {
+      "FilePathStrategy": "TenantBased",
+      "Prefix": "uploads",
+      "HostSegment": "host",
+      "TenantsSegment": "tenants",
+      "TenantIdentifierMode": "TenantName"
+    },
+    "default": {
+      "Provider": "Minio",
+      "Properties": { ... }
+    }
+  }
+}
+```
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `FilePathStrategy` | `TenantBased` / `DirectFileId` | `TenantBased` | Overall path building mode |
+| `Prefix` | string | _(empty)_ | Static prefix prepended to every path |
+| `HostSegment` | string | `host` | Segment name used for host (non-tenant) paths |
+| `TenantsSegment` | string | `tenants` | Directory name for tenant paths |
+| `TenantIdentifierMode` | `TenantId` / `TenantName` | `TenantId` | Which tenant property is used in the path |
+
+> The `FilePathBuilder` key is reserved and will be skipped when iterating container entries.
+
+Load configuration in your Module:
+
+```csharp
+public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
+{
+    var configuration = context.Services.GetConfiguration();
+
+    Configure<AbpFileStoringOptions>(c =>
+    {
+        c.Configure(configuration, context);
+    });
+
+    return Task.CompletedTask;
+}
+```
+
+---
+
+### Method 2: Configure via code in Module
+
+Use `Configure<AbpFileStoringAbstractionsOptions>` for full control, including factory delegates:
+
+```csharp
+Configure<AbpFileStoringAbstractionsOptions>(opts =>
+{
+    // Global prefix
+    opts.FilePathBuilder.Prefix = "uploads";
+
+    // Use tenant Name as path segment instead of GUID
+    opts.FilePathBuilder.TenantIdentifierFactory = (id, name, ctx) =>
+        ctx?.TenantCode              // highest priority: per-operation code
+        ?? name                      // second: tenant Name
+        ?? id.ToString("D");         // fallback: GUID
+
+    // Dynamic prefix driven by per-operation context
+    opts.FilePathBuilder.PrefixFactory = ctx =>
+        ctx?.Prefix                                          // per-operation override
+        ?? ctx?.Extra.GetValueOrDefault("category") as string  // extra param
+        ?? "files";                                          // global default
+});
+```
+
+---
+
+### Method 3: Per-Operation Context (runtime parameters)
+
+Inject `IFilePathContextAccessor` to pass parameters at the call site.
+Context is restored automatically when the `using` block exits (async-safe via `AsyncLocal`).
+
+```csharp
+public class MyFileService : ITransientDependency
+{
+    private readonly IFileContainer _fileContainer;
+    private readonly IFilePathContextAccessor _filePathContextAccessor;
+
+    public MyFileService(
+        IFileContainer fileContainer,
+        IFilePathContextAccessor filePathContextAccessor)
+    {
+        _fileContainer = fileContainer;
+        _filePathContextAccessor = filePathContextAccessor;
+    }
+
+    // Use a custom tenant code in the path
+    public async Task SaveAsync(string fileId, Stream stream, string tenantCode)
+    {
+        using (_filePathContextAccessor.Change(new FilePathContext { TenantCode = tenantCode }))
+        {
+            await _fileContainer.SaveAsync(fileId, stream, "jpg");
+            // path: tenants/{tenantCode}/{fileId}
+        }
+    }
+
+    // Add a path prefix for this operation only
+    public async Task SaveImageAsync(string fileId, Stream stream)
+    {
+        using (_filePathContextAccessor.Change(new FilePathContext { Prefix = "images" }))
+        {
+            await _fileContainer.SaveAsync(fileId, stream, "png");
+            // path: images/host/{fileId}
+        }
+    }
+
+    // Combine tenant code + prefix + arbitrary extra data
+    public async Task SaveWithFullContextAsync(string fileId, Stream stream, Tenant tenant)
+    {
+        using (_filePathContextAccessor.Change(new FilePathContext
+        {
+            TenantCode = tenant.Code,
+            Prefix = "docs",
+            Extra = { ["region"] = "cn-north" }   // available to PrefixFactory / TenantIdentifierFactory
+        }))
+        {
+            await _fileContainer.SaveAsync(fileId, stream, "pdf");
+            // path: docs/tenants/{tenant.Code}/{fileId}
+        }
+    }
+}
+```
+
+> **Important**: Use the same `FilePathContext` for both write and read operations, otherwise the computed paths will differ and the file will not be found.
+
+#### FilePathContext Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `TenantCode` | `string?` | Custom tenant identifier. Passed as the third argument to `TenantIdentifierFactory`. |
+| `Prefix` | `string?` | Per-operation path prefix. Overrides `FilePathBuilderOptions.Prefix` when `PrefixFactory` is not set. |
+| `Extra` | `Dictionary<string, object?>` | Arbitrary key-value pairs accessible inside both factory delegates. |
+
+---
+
+### Method 4: Custom Rules by Overriding DefaultFilePathBuilder
+
+For moderately complex requirements (e.g. look up an in-memory cache, combine multiple context fields), **override `DefaultFilePathBuilder`**:
+
+```csharp
+public class MyFilePathBuilder : DefaultFilePathBuilder
+{
+    private readonly ICurrentUser _currentUser;
+
+    public MyFilePathBuilder(
+        ICurrentTenant currentTenant,
+        IFilePathContextAccessor filePathContextAccessor,
+        IOptions<AbpFileStoringAbstractionsOptions> options,
+        ICurrentUser currentUser)
+        : base(currentTenant, filePathContextAccessor, options)
+    {
+        _currentUser = currentUser;
+    }
+
+    // Override only the tenant segment logic
+    protected override string? ResolvePrefix(FilePathBuilderOptions options, FilePathContext? context)
+    {
+        // Prepend current user's department as a path segment
+        var dept = _currentUser.FindClaim("department")?.Value;
+        var basePrefix = base.ResolvePrefix(options, context);
+        return dept != null ? $"{dept}/{basePrefix}" : basePrefix;
+    }
+}
+```
+
+Register in your Module to replace the default:
+
+```csharp
+context.Services.AddTransient<IFilePathBuilder, MyFilePathBuilder>();
+```
+
+---
+
+### Method 5: Full Custom IFilePathBuilder (most complex scenarios)
+
+For requirements that `DefaultFilePathBuilder` cannot support even with overrides — e.g. **async tenant code lookup from database** — implement `IFilePathBuilder` from scratch:
+
+```csharp
+public class DbTenantCodeFilePathBuilder : IFilePathBuilder, ITransientDependency
+{
+    private readonly ICurrentTenant _currentTenant;
+    private readonly IFilePathContextAccessor _filePathContextAccessor;
+    private readonly ITenantCodeCache _tenantCodeCache;   // your own service
+    private readonly AbpFileStoringAbstractionsOptions _options;
+
+    public DbTenantCodeFilePathBuilder(
+        ICurrentTenant currentTenant,
+        IFilePathContextAccessor filePathContextAccessor,
+        ITenantCodeCache tenantCodeCache,
+        IOptions<AbpFileStoringAbstractionsOptions> options)
+    {
+        _currentTenant = currentTenant;
+        _filePathContextAccessor = filePathContextAccessor;
+        _tenantCodeCache = tenantCodeCache;
+        _options = options.Value;
+    }
+
+    public string Build(FileProviderArgs args)
+    {
+        var context = _filePathContextAccessor.Current;
+
+        if (_options.FilePathStrategy == FilePathGenerationStrategy.DirectFileId)
+        {
+            return args.FileId;
+        }
+
+        var segments = new List<string>();
+
+        if (_currentTenant.Id == null)
+        {
+            segments.Add("host");
+        }
+        else
+        {
+            // Use explicitly provided code, or look up from cache (sync wrapper)
+            var code = context?.TenantCode
+                ?? _tenantCodeCache.GetCode(_currentTenant.Id.Value)
+                ?? _currentTenant.Id.Value.ToString("D");
+
+            segments.Add($"tenants/{code}");
+        }
+
+        segments.Add(args.FileId);
+        return string.Join("/", segments);
+    }
+}
+```
+
+> When `ITransientDependency` is present, ABP's DI auto-registration maps the concrete class.
+> To register as the implementation of `IFilePathBuilder`, explicitly add:
+>
+> ```csharp
+> context.Services.AddTransient<IFilePathBuilder, DbTenantCodeFilePathBuilder>();
+> ```
+
+---
+
+### Extension Points Summary
+
+| Scenario | Recommended approach |
+|----------|----------------------|
+| Static prefix / tenant-as-Name | `appsettings.json` → `FilePathBuilder` |
+| Factory with runtime logic | `Configure<AbpFileStoringAbstractionsOptions>` in Module |
+| Per-call parameters (code, prefix, extras) | `IFilePathContextAccessor.Change()` at call site |
+| Custom logic reusing base behavior | Override `DefaultFilePathBuilder` |
+| Fully custom / async lookup | Implement `IFilePathBuilder` from scratch |
+
+---
+
 ## Provider-Specific Configurations
 
 ### FileSystem Provider

@@ -8,13 +8,16 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
     public class DefaultFilePathCalculator : IFilePathCalculator, ITransientDependency
     {
         protected ICurrentTenant CurrentTenant { get; }
+        protected IFilePathContextAccessor FilePathContextAccessor { get; }
         protected AbpFileStoringAbstractionsOptions Options { get; }
 
         public DefaultFilePathCalculator(
             ICurrentTenant currentTenant,
+            IFilePathContextAccessor filePathContextAccessor,
             IOptions<AbpFileStoringAbstractionsOptions> options)
         {
             CurrentTenant = currentTenant;
+            FilePathContextAccessor = filePathContextAccessor;
             Options = options.Value;
         }
 
@@ -22,10 +25,11 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
         {
             var fileSystemConfiguration = args.Configuration.GetFileSystemConfiguration();
             var filePath = fileSystemConfiguration.BasePath;
+            var builderOptions = Options.FilePathBuilder;
+            var context = FilePathContextAccessor.Current;
 
             if (Options.FilePathStrategy == FilePathGenerationStrategy.DirectFileId)
             {
-                // Use FileId directly without tenant path prefix
                 if (fileSystemConfiguration.AppendContainerNameToBasePath)
                 {
                     filePath = Path.Combine(filePath, args.ContainerName);
@@ -35,14 +39,25 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
             }
             else
             {
-                // Use tenant-based path structure (default behavior)
+                // Optional prefix
+                var prefix = ResolvePrefixSegment(builderOptions, context);
+                if (!string.IsNullOrEmpty(prefix))
+                {
+                    filePath = Path.Combine(filePath, prefix!);
+                }
+
+                // Tenant segment
                 if (CurrentTenant.Id == null)
                 {
-                    filePath = Path.Combine(filePath, "host");
+                    filePath = Path.Combine(filePath, builderOptions.HostSegment);
                 }
                 else
                 {
-                    filePath = Path.Combine(filePath, "tenants", CurrentTenant.Id.Value.ToString("D"));
+                    var identifier = builderOptions.TenantIdentifierFactory != null
+                        ? builderOptions.TenantIdentifierFactory(CurrentTenant.Id.Value, CurrentTenant.Name, context)
+                        : CurrentTenant.Id.Value.ToString("D");
+
+                    filePath = Path.Combine(filePath, builderOptions.TenantsSegment, identifier);
                 }
 
                 if (fileSystemConfiguration.AppendContainerNameToBasePath)
@@ -54,6 +69,21 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
             }
 
             return filePath;
+        }
+
+        protected virtual string? ResolvePrefixSegment(FilePathBuilderOptions options, FilePathContext? context)
+        {
+            if (options.PrefixFactory != null)
+            {
+                return options.PrefixFactory(context);
+            }
+
+            if (!string.IsNullOrEmpty(context?.Prefix))
+            {
+                return context!.Prefix;
+            }
+
+            return options.Prefix;
         }
     }
 }

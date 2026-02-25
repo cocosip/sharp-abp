@@ -10,6 +10,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Volo.Abp.MultiTenancy;
 using Xunit;
+using Volo.Abp;
 
 namespace SharpAbp.Abp.FileStoring
 {
@@ -159,6 +160,103 @@ namespace SharpAbp.Abp.FileStoring
             Assert.Equal(0, s3Configuration.Protocol); //0-HTTPS,1-HTTP
             Assert.Equal("2.0", s3Configuration.SignatureVersion);
             Assert.False(s3Configuration.CreateBucketIfNotExists);
+        }
+
+        // ─── FilePathBuilder — appsettings config ────────────────────────────────
+
+        [Fact]
+        public void FilePathBuilder_Appsettings_Config_Test()
+        {
+            // appsettings.json: FilePathStrategy=TenantBased, HostSegment=host,
+            //                   TenantsSegment=tenants, TenantIdentifierMode=TenantId
+            Assert.Equal(FilePathGenerationStrategy.TenantBased, _abstractionsOptions.FilePathStrategy);
+            Assert.Equal("host", _abstractionsOptions.FilePathBuilder.HostSegment);
+            Assert.Equal("tenants", _abstractionsOptions.FilePathBuilder.TenantsSegment);
+            // TenantIdentifierMode=TenantId → factory is null (uses default GUID)
+            Assert.Null(_abstractionsOptions.FilePathBuilder.TenantIdentifierFactory);
+            // Prefix is empty in appsettings
+            Assert.True(string.IsNullOrEmpty(_abstractionsOptions.FilePathBuilder.Prefix));
+        }
+
+        // ─── FilePathBuilder — IFilePathBuilder.Build() integration tests ────────
+
+        [Fact]
+        public void FilePathBuilder_Build_Host_Integration_Test()
+        {
+            var builder = GetRequiredService<IFilePathBuilder>();
+            var configuration = _configurationProvider.Get("minio-container");
+            var args = new FileProviderSaveArgs("minio-container", configuration, "images/photo.jpg");
+
+            // No tenant → host segment used
+            var path = builder.Build(args);
+            Assert.Equal("host/images/photo.jpg", path);
+        }
+
+        [Fact]
+        public void FilePathBuilder_Build_Tenant_Integration_Test()
+        {
+            var builder = GetRequiredService<IFilePathBuilder>();
+            var configuration = _configurationProvider.Get("minio-container");
+            var args = new FileProviderSaveArgs("minio-container", configuration, "images/photo.jpg");
+
+            var tenantId = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa6");
+            using (_currentTenant.Change(tenantId))
+            {
+                var path = builder.Build(args);
+                // Default (TenantId mode): tenants/{guid}/...
+                Assert.Equal("tenants/3fa85f64-5717-4562-b3fc-2c963f66afa6/images/photo.jpg", path);
+            }
+        }
+
+        [Fact]
+        public void FilePathBuilder_Build_WithContextPrefix_Integration_Test()
+        {
+            var builder = GetRequiredService<IFilePathBuilder>();
+            var accessor = GetRequiredService<IFilePathContextAccessor>();
+            var configuration = _configurationProvider.Get("minio-container");
+            var args = new FileProviderSaveArgs("minio-container", configuration, "images/photo.jpg");
+
+            using (accessor.Change(new FilePathContext { Prefix = "uploads" }))
+            {
+                var path = builder.Build(args);
+                Assert.Equal("uploads/host/images/photo.jpg", path);
+            }
+        }
+
+        [Fact]
+        public void FilePathBuilder_Build_ContextPrefix_RestoredAfterDispose_Integration_Test()
+        {
+            var builder = GetRequiredService<IFilePathBuilder>();
+            var accessor = GetRequiredService<IFilePathContextAccessor>();
+            var configuration = _configurationProvider.Get("minio-container");
+            var args = new FileProviderSaveArgs("minio-container", configuration, "images/photo.jpg");
+
+            using (accessor.Change(new FilePathContext { Prefix = "uploads" }))
+            {
+                Assert.Equal("uploads/host/images/photo.jpg", builder.Build(args));
+            }
+
+            // Context restored — no prefix
+            Assert.Equal("host/images/photo.jpg", builder.Build(args));
+        }
+
+        [Fact]
+        public void FilePathBuilder_Build_TenantWithContextPrefix_Integration_Test()
+        {
+            var builder = GetRequiredService<IFilePathBuilder>();
+            var accessor = GetRequiredService<IFilePathContextAccessor>();
+            var configuration = _configurationProvider.Get("minio-container");
+            var args = new FileProviderSaveArgs("minio-container", configuration, "images/photo.jpg");
+
+            var tenantId = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa6");
+            using (_currentTenant.Change(tenantId))
+            using (accessor.Change(new FilePathContext { Prefix = "prod" }))
+            {
+                var path = builder.Build(args);
+                Assert.Equal(
+                    "prod/tenants/3fa85f64-5717-4562-b3fc-2c963f66afa6/images/photo.jpg",
+                    path);
+            }
         }
 
         [Fact]

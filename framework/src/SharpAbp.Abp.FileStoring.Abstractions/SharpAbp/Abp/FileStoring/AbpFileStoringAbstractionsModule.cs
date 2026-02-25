@@ -11,6 +11,21 @@ namespace SharpAbp.Abp.FileStoring
         )]
     public class AbpFileStoringAbstractionsModule : AbpModule
     {
+
+        public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+        }
+
+        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
+        {
+            Configure<AbpFileStoringAbstractionsOptions>(options => { });
+
+            return Task.CompletedTask;
+        }
+
+
+
         public override void PostConfigureServices(ServiceConfigurationContext context)
         {
             AsyncHelper.RunSync(() => PostConfigureServicesAsync(context));
