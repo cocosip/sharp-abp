@@ -5,10 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using Volo.Abp.Json;
+using Volo.Abp.IO;
 using Volo.Abp.Reflection;
 using Volo.Abp.Serialization;
 using Volo.Abp.Threading;
@@ -36,7 +37,7 @@ namespace SharpAbp.Abp.Faster
         private long _lastGapStart = -1;
 
         // Background task tracking for graceful shutdown
-        private readonly List<Task> _backgroundTasks = new List<Task>();
+        private readonly List<Task> _backgroundTasks = [];
 
         // Monitoring metrics for observability
         private long _totalCommittedRanges = 0;
@@ -855,6 +856,178 @@ namespace SharpAbp.Abp.Faster
             }
 
             return Task.CompletedTask;
+        }
+
+        // Static newline byte to avoid repeated allocation
+        private static readonly byte[] _newLineByte = [(byte)'\n'];
+
+        /// <summary>
+        /// Gets the begin address of the log (earliest valid data address).
+        /// </summary>
+        public long BeginAddress => Log?.BeginAddress ?? 0L;
+
+        /// <summary>
+        /// Gets the committed-until address of the log (latest durably written address).
+        /// </summary>
+        public long CommittedUntilAddress => Log?.CommittedUntilAddress ?? 0L;
+
+        /// <summary>
+        /// Exports log entries from the specified address range to files in the target directory.
+        /// Uses a temporary unnamed scan iterator that does not affect the main consumer position or truncation.
+        /// Files are split when the entry count reaches entriesPerFile.
+        /// Each line in the output file is the raw serialized bytes of one entry (JSON by default).
+        /// </summary>
+        public virtual async Task<FasterExportResult> ExportAsync(
+            string targetDirectory,
+            long fromAddress,
+            long? toAddress = null,
+            int entriesPerFile = 10000,
+            CancellationToken cancellationToken = default)
+        {
+            if (Log == null)
+            {
+                throw new InvalidOperationException("Logger has not been initialized.");
+            }
+
+            var actualToAddress = toAddress ?? Log.CommittedUntilAddress;
+            var typeName = TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T));
+
+            // Guard: if fromAddress has been truncated away, adjust to BeginAddress to avoid scan failure
+            if (fromAddress < Log.BeginAddress)
+            {
+                Logger.LogWarning(
+                    "Export fromAddress {From} is below BeginAddress {Begin} for '{TypeName}'. " +
+                    "Data in [{From}, {Begin}) has been truncated and cannot be exported. " +
+                    "Adjusting fromAddress to BeginAddress.",
+                    fromAddress, Log.BeginAddress, typeName);
+                fromAddress = Log.BeginAddress;
+            }
+
+            var result = new FasterExportResult
+            {
+                FromAddress = fromAddress,
+                ToAddress = fromAddress,
+            };
+
+            if (fromAddress >= actualToAddress)
+            {
+                Logger.LogInformation(
+                    "No data to export for '{TypeName}'. FromAddress:{From} >= ToAddress:{To}.",
+                    typeName, fromAddress, actualToAddress);
+                return result;
+            }
+
+            DirectoryHelper.CreateIfNotExists(targetDirectory);
+
+            // Use millisecond precision + short guid to prevent filename collisions on concurrent exports
+            var exportTimestamp = $"{DateTime.UtcNow:yyyyMMddHHmmssffff}_{Guid.NewGuid().ToString("N").Substring(0, 8)}";
+            var safeTypeName = SanitizeFileName(typeof(T).Name);
+            var fileIndex = 0;
+            var fileEntryCount = 0;
+            FileStream? currentStream = null;
+
+            string NextFilePath()
+            {
+                var fileName = $"{safeTypeName}_{fromAddress}_part{fileIndex++}_{exportTimestamp}.jsonl";
+                return Path.Combine(targetDirectory, fileName);
+            }
+
+            Logger.LogInformation(
+                "Starting export for '{TypeName}'. From:{From}, To:{To}, EntriesPerFile:{EntriesPerFile}.",
+                typeName, fromAddress, actualToAddress, entriesPerFile);
+
+            try
+            {
+                // Use an UNNAMED temporary iterator to guarantee full isolation from the main consumer:
+                // - Does NOT move the named iterator (Iter)'s position or CompletedUntilAddress
+                // - Does NOT write to _pendingChannel, so ReadAsync callers are unaffected
+                // - Is NOT registered in FASTER's state machine, so it has zero effect on
+                //   checkpoint, recovery, or truncation decisions
+                // - FASTER supports concurrent reads from multiple independent iterators on the same log
+                using var tempIter = Log.Scan(fromAddress, actualToAddress);
+
+                var scanDone = false;
+                while (!scanDone && !cancellationToken.IsCancellationRequested)
+                {
+                    byte[]? buffer = null;
+                    int entryLength = 0;
+                    long currentAddress = 0;
+                    long nextAddress = 0;
+
+                    // Wait until an entry is available or scan is complete
+                    while (!tempIter.GetNext(out buffer, out entryLength, out currentAddress, out nextAddress))
+                    {
+                        // WaitAsync returns false when no more entries exist up to actualToAddress
+                        if (!await tempIter.WaitAsync(cancellationToken))
+                        {
+                            scanDone = true;
+                            break;
+                        }
+                    }
+
+                    if (scanDone || buffer == null || entryLength == 0)
+                    {
+                        break;
+                    }
+
+                    // Open new file if needed
+                    if (currentStream == null)
+                    {
+                        var filePath = NextFilePath();
+                        currentStream = new FileStream(
+                            filePath,
+                            FileMode.Create,
+                            FileAccess.Write,
+                            FileShare.None,
+                            bufferSize: 65536,
+                            useAsync: true);
+                        result.FilePaths.Add(filePath);
+                        fileEntryCount = 0;
+                    }
+
+                    // Write raw entry bytes + newline (buffer[0..entryLength] is the serialized JSON)
+                    await currentStream.WriteAsync(buffer, 0, entryLength, cancellationToken);
+                    await currentStream.WriteAsync(_newLineByte, 0, 1, cancellationToken);
+
+                    fileEntryCount++;
+                    result.Count++;
+                    result.ToAddress = nextAddress;
+
+                    // Split to next file when limit reached
+                    if (fileEntryCount >= entriesPerFile)
+                    {
+                        await currentStream.FlushAsync(cancellationToken);
+                        currentStream.Dispose();
+                        currentStream = null;
+                    }
+                }
+
+                if (currentStream != null)
+                {
+                    await currentStream.FlushAsync(cancellationToken);
+                }
+            }
+            finally
+            {
+                currentStream?.Dispose();
+            }
+
+            Logger.LogInformation(
+                "Export completed for '{TypeName}'. Count:{Count}, Files:{FileCount}, ToAddress:{ToAddress}.",
+                typeName, result.Count, result.FilePaths.Count, result.ToAddress);
+
+            return result;
+        }
+
+        private static string SanitizeFileName(string name)
+        {
+            var invalid = Path.GetInvalidFileNameChars();
+            var sb = new StringBuilder(name.Length);
+            foreach (var c in name)
+            {
+                sb.Append(Array.IndexOf(invalid, c) >= 0 ? '_' : c);
+            }
+            return sb.ToString();
         }
 
         /// <summary>
