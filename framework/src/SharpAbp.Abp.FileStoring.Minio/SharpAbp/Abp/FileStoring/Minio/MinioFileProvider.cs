@@ -219,7 +219,10 @@ namespace SharpAbp.Abp.FileStoring.Minio
                 var getObjectArgs = new GetObjectArgs()
                     .WithBucket(containerName)
                     .WithObject(objectKey)
-                    .WithFile(args.Path);
+                    .WithCallbackStream(async (stream, ct) =>
+                    {
+                        await TryWriteToFileAsync(stream, args.Path, ct);
+                    });
 
                 await minioClient.GetObjectAsync(getObjectArgs, args.CancellationToken);
                 return true;
