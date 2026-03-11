@@ -120,6 +120,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
 
                 if (!await FileExistsAsync(amazonS3Client, containerName, objectKey))
                 {
+                    Logger.LogWarning("File not found in AWS S3 when deleting. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return false;
                 }
 
@@ -170,6 +171,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             {
                 if (!await FileExistsAsync(amazonS3Client, containerName, objectKey))
                 {
+                    Logger.LogWarning("File not found in AWS S3. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return null;
                 }
 
@@ -200,6 +202,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             {
                 if (!await FileExistsAsync(amazonS3Client, containerName, objectKey))
                 {
+                    Logger.LogWarning("File not found in AWS S3. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return false;
                 }
 

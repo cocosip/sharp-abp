@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Blobs;
+using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -9,12 +10,15 @@ namespace SharpAbp.Abp.FileStoring.Azure
     [ExposeKeyedService<IFileProvider>(AzureFileProviderConfigurationNames.ProviderName)]
     public class AzureFileProvider : FileProviderBase, ITransientDependency
     {
+        protected ILogger Logger { get; }
         protected IAzureFileNameCalculator AzureFileNameCalculator { get; }
         protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
         public AzureFileProvider(
+            ILogger<AzureFileProvider> logger,
             IAzureFileNameCalculator azureFileNameCalculator,
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
+            Logger = logger;
             AzureFileNameCalculator = azureFileNameCalculator;
             FileNormalizeNamingService = fileNormalizeNamingService;
         }
@@ -49,6 +53,7 @@ namespace SharpAbp.Abp.FileStoring.Azure
                 return await GetBlobClient(args, fileName).DeleteIfExistsAsync();
             }
 
+            Logger.LogWarning("File not found in Azure Blob Storage when deleting. Container: {ContainerName}, FileName: {FileName}, FileId: {FileId}", GetContainerName(args), fileName, args.FileId);
             return false;
         }
 
@@ -64,6 +69,7 @@ namespace SharpAbp.Abp.FileStoring.Azure
             var fileName = AzureFileNameCalculator.Calculate(args);
             if (!await FileExistsAsync(args, fileName))
             {
+                Logger.LogWarning("File not found in Azure Blob Storage. Container: {ContainerName}, FileName: {FileName}, FileId: {FileId}", GetContainerName(args), fileName, args.FileId);
                 return null;
             }
 
@@ -78,6 +84,7 @@ namespace SharpAbp.Abp.FileStoring.Azure
             var fileName = AzureFileNameCalculator.Calculate(args);
             if (!await FileExistsAsync(args, fileName))
             {
+                Logger.LogWarning("File not found in Azure Blob Storage. Container: {ContainerName}, FileName: {FileName}, FileId: {FileId}", GetContainerName(args), fileName, args.FileId);
                 return false;
             }
             var blobClient = GetBlobClient(args, fileName);

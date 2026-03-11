@@ -81,6 +81,14 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
             var fileId = FileNameCalculator.Calculate(args);
             var containerName = GetContainerName(configuration, args);
             var storageNode = await Client.GetStorageNodeAsync(containerName, configuration.ClusterName);
+
+            var fileInfo = await Client.GetFileInfo(storageNode, fileId, configuration.ClusterName);
+            if (fileInfo == null)
+            {
+                Logger.LogWarning("File not found in FastDFS. Container: {ContainerName}, FileId: {FileId}, Cluster: {ClusterName}", containerName, fileId, configuration.ClusterName);
+                return false;
+            }
+
             try
             {
                 await Client.DownloadFileEx(storageNode, fileId, args.Path, configuration.ClusterName);
@@ -88,7 +96,7 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Failed to download file '{FileId}' from FastDFS. Container: {ContainerName}, Cluster: {ClusterName}", 
+                Logger.LogError(ex, "Failed to download file '{FileId}' from FastDFS. Container: {ContainerName}, Cluster: {ClusterName}",
                     fileId, containerName, configuration.ClusterName);
                 return false;
             }
@@ -104,6 +112,13 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
             var containerName = GetContainerName(configuration, args);
             var storageNode = await Client.GetStorageNodeAsync(containerName, configuration.ClusterName);
 
+            var fileInfo = await Client.GetFileInfo(storageNode, fileId, configuration.ClusterName);
+            if (fileInfo == null)
+            {
+                Logger.LogWarning("File not found in FastDFS. Container: {ContainerName}, FileId: {FileId}, Cluster: {ClusterName}", containerName, fileId, configuration.ClusterName);
+                return null;
+            }
+
             try
             {
                 var content = await Client.DownloadFileAsync(storageNode, fileId, configuration.ClusterName);
@@ -113,7 +128,7 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Failed to get file '{FileId}' from FastDFS. Container: {ContainerName}, Cluster: {ClusterName}", 
+                Logger.LogError(ex, "Failed to get file '{FileId}' from FastDFS. Container: {ContainerName}, Cluster: {ClusterName}",
                     fileId, containerName, configuration.ClusterName);
                 return null;
             }

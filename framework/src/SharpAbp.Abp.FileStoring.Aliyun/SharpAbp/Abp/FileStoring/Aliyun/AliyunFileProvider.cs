@@ -115,6 +115,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
 
                 if (!FileExistsAsync(ossClient, containerName, objectKey))
                 {
+                    Logger.LogWarning("File not found in Aliyun OSS when deleting. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return Task.FromResult(false);
                 }
                 ossClient.DeleteObject(containerName, objectKey);
@@ -158,6 +159,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             {
                 if (!FileExistsAsync(ossClient, containerName, objectKey))
                 {
+                    Logger.LogWarning("File not found in Aliyun OSS. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return null;
                 }
                 var result = ossClient.GetObject(containerName, objectKey);
@@ -183,6 +185,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             {
                 if (!FileExistsAsync(ossClient, containerName, objectKey))
                 {
+                    Logger.LogWarning("File not found in Aliyun OSS. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return false;
                 }
 

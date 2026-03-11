@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using Microsoft.Extensions.Logging;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
@@ -9,17 +10,20 @@ namespace SharpAbp.Abp.FileStoring.Database
 {
     public class DatabaseFileProvider : FileProviderBase, ITransientDependency
     {
+        protected ILogger Logger { get; }
         protected IDatabaseFileRepository DatabaseFileRepository { get; }
         protected IDatabaseFileContainerRepository DatabaseFileContainerRepository { get; }
         protected IGuidGenerator GuidGenerator { get; }
         protected ICurrentTenant CurrentTenant { get; }
 
         public DatabaseFileProvider(
+           ILogger<DatabaseFileProvider> logger,
            IDatabaseFileRepository databaseFileRepository,
            IDatabaseFileContainerRepository databaseFileContainerRepository,
            IGuidGenerator guidGenerator,
            ICurrentTenant currentTenant)
         {
+            Logger = logger;
             DatabaseFileRepository = databaseFileRepository;
             DatabaseFileContainerRepository = databaseFileContainerRepository;
             GuidGenerator = guidGenerator;
@@ -70,6 +74,7 @@ namespace SharpAbp.Abp.FileStoring.Database
 
             if (container == null)
             {
+                Logger.LogWarning("Container not found in Database when deleting. ContainerName: {ContainerName}, FileId: {FileId}", args.ContainerName, args.FileId);
                 return false;
             }
 
@@ -109,6 +114,7 @@ namespace SharpAbp.Abp.FileStoring.Database
 
             if (container == null)
             {
+                Logger.LogWarning("Container not found in Database. ContainerName: {ContainerName}", args.ContainerName);
                 return null;
             }
 
@@ -120,6 +126,7 @@ namespace SharpAbp.Abp.FileStoring.Database
 
             if (file == null)
             {
+                Logger.LogWarning("File not found in Database. ContainerName: {ContainerName}, FileId: {FileId}", args.ContainerName, args.FileId);
                 return null;
             }
 
@@ -135,6 +142,7 @@ namespace SharpAbp.Abp.FileStoring.Database
 
             if (container == null)
             {
+                Logger.LogWarning("Container not found in Database. ContainerName: {ContainerName}", args.ContainerName);
                 return false;
             }
 
@@ -146,6 +154,7 @@ namespace SharpAbp.Abp.FileStoring.Database
 
             if (file == null)
             {
+                Logger.LogWarning("File not found in Database. ContainerName: {ContainerName}, FileId: {FileId}", args.ContainerName, args.FileId);
                 return false;
             }
 

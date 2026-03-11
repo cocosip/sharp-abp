@@ -122,6 +122,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
 
                 if (!FileExists(ks3Client, containerName, objectKey))
                 {
+                    Logger.LogWarning("File not found in KS3 when deleting. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return Task.FromResult(false);
                 }
                 ks3Client.DeleteObject(containerName, objectKey);
@@ -167,6 +168,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
 
                 if (!FileExists(ks3Client, containerName, objectKey))
                 {
+                    Logger.LogWarning("File not found in KS3. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return null;
                 }
                 var result = ks3Client.GetObject(containerName, objectKey);
@@ -193,6 +195,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
 
                 if (!FileExists(ks3Client, containerName, objectKey))
                 {
+                    Logger.LogWarning("File not found in KS3. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return false;
                 }
 

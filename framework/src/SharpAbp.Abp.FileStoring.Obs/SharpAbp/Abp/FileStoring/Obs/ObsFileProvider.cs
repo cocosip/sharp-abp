@@ -119,6 +119,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
 
                 if (!FileExistsAsync(obsClient, containerName, objectKey))
                 {
+                    Logger.LogWarning("File not found in OBS when deleting. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return Task.FromResult(false);
                 }
                 obsClient.DeleteObject(new DeleteObjectRequest()
@@ -167,6 +168,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
             {
                 if (!FileExistsAsync(obsClient, containerName, objectKey))
                 {
+                    Logger.LogWarning("File not found in OBS. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return null;
                 }
                 var result = obsClient.GetObject(new GetObjectRequest() { BucketName = containerName, ObjectKey = objectKey });
@@ -193,6 +195,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
             {
                 if (!FileExistsAsync(obsClient, containerName, objectKey))
                 {
+                    Logger.LogWarning("File not found in OBS. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return false;
                 }
 
