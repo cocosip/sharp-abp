@@ -84,17 +84,19 @@ namespace SharpAbp.Abp.FileStoring
             Assert.Equal("default", fastDFSConfiguration.ClusterName);
             Assert.Equal("http://192.168.0.100", fastDFSConfiguration.HttpServer);
             Assert.Equal("group1", fastDFSConfiguration.GroupName);
-            Assert.True(fastDFSConfiguration.AppendGroupNameToUrl);
             Assert.Equal("192.168.0.101:22122,192.168.0.102:22122", fastDFSConfiguration.Trackers);
             Assert.True(fastDFSConfiguration.AntiStealCheckToken);
             Assert.Equal("123456", fastDFSConfiguration.SecretKey);
             Assert.Equal("utf-8", fastDFSConfiguration.Charset);
-            Assert.Equal(300, fastDFSConfiguration.ConnectionTimeout);
+            Assert.Equal(3600, fastDFSConfiguration.DefaultTokenExpireSeconds);
+            Assert.Equal(30, fastDFSConfiguration.NetworkTimeout);
+            Assert.Equal(50, fastDFSConfiguration.MaxConnectionPerServer);
+            Assert.Equal(5, fastDFSConfiguration.MinConnectionPerServer);
+            Assert.Equal(300, fastDFSConfiguration.ConnectionIdleTimeout);
             Assert.Equal(600, fastDFSConfiguration.ConnectionLifeTime);
-            Assert.Equal(1, fastDFSConfiguration.ConnectionConcurrentThread);
-            Assert.Equal(100, fastDFSConfiguration.ScanTimeoutConnectionInterval);
-            Assert.Equal(10, fastDFSConfiguration.TrackerMaxConnection);
-            Assert.Equal(30, fastDFSConfiguration.StorageMaxConnection);
+            Assert.Equal(30000, fastDFSConfiguration.ConnectionTimeout);
+            Assert.Equal(30000, fastDFSConfiguration.SendTimeout);
+            Assert.Equal(30000, fastDFSConfiguration.ReceiveTimeout);
 
         }
 

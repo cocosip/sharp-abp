@@ -18,7 +18,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\SharpAbp.Abp.FastDFS.DotNetty\SharpAbp.Abp.FastDFS.DotNetty.csproj" />
+		<ProjectReference Include="..\SharpAbp.Abp.FastDFS\SharpAbp.Abp.FastDFS.csproj" />
 		<ProjectReference Include="..\SharpAbp.Abp.FileStoring\SharpAbp.Abp.FileStoring.csproj" />
 	</ItemGroup>
 

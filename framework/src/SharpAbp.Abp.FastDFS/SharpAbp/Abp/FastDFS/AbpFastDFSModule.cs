@@ -1,4 +1,4 @@
-﻿using FastDFSCore;
+using FastDFS.Client.DependencyInjection;
 using System.Threading.Tasks;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
@@ -14,7 +14,7 @@ namespace SharpAbp.Abp.FastDFS
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            context.Services.AddFastDFSCore();
+            context.Services.AddFastDFS();
             return Task.CompletedTask;
         }
     }

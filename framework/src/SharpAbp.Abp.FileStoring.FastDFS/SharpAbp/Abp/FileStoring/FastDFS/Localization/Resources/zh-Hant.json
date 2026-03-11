@@ -4,16 +4,18 @@
     "FastDFS.ClusterName": "集群名稱",
     "FastDFS.HttpServer": "Http服務器地址",
     "FastDFS.GroupName": "組名",
-    "FastDFS.Trackers": "Tracker服務器",
-    "FastDFS.AppendGroupNameToUrl": "是否在Url上添加組名",
-    "FastDFS.AntiStealCheckToken": "是否開啟Token校驗",
-    "FastDFS.SecretKey": "Token校驗密鑰",
-    "FastDFS.ConnectionTimeout": "連接超時時間",
-    "FastDFS.ConnectionLifeTime": "連接有效時間",
+    "FastDFS.Trackers": "Tracker服務器地址",
+    "FastDFS.AntiStealCheckToken": "是否開啟防盜鏈Token校驗",
+    "FastDFS.SecretKey": "防盜鏈Token密鑰",
+    "FastDFS.DefaultTokenExpireSeconds": "Token預設過期時間（秒）",
     "FastDFS.Charset": "編碼",
-    "FastDFS.ConnectionConcurrentThread": "連接並發數",
-    "FastDFS.ScanTimeoutConnectionInterval": "掃描超時時間",
-    "FastDFS.TrackerMaxConnection": "Tracker最大連接數",
-    "FastDFS.StorageMaxConnection": "Storage最大連接數"
+    "FastDFS.NetworkTimeout": "網路超時時間（秒）",
+    "FastDFS.MaxConnectionPerServer": "每服務器最大連接數",
+    "FastDFS.MinConnectionPerServer": "每服務器最小連接數",
+    "FastDFS.ConnectionIdleTimeout": "連接空閒超時（秒）",
+    "FastDFS.ConnectionLifeTime": "連接最大生命週期（秒）",
+    "FastDFS.ConnectionTimeout": "連接超時時間（毫秒）",
+    "FastDFS.SendTimeout": "發送超時時間（毫秒）",
+    "FastDFS.ReceiveTimeout": "接收超時時間（毫秒）"
   }
 }
