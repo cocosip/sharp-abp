@@ -40,7 +40,10 @@ namespace SharpAbp.Abp.FileStoring.Azure
                 await CreateContainerIfNotExists(args);
             }
 
-            await GetBlobClient(args, fileName).UploadAsync(args.FileStream, true);
+            await GetBlobClient(args, fileName).UploadAsync(
+                args.FileStream,
+                args.OverrideExisting,
+                args.CancellationToken);
             return args.FileId;
         }
 
@@ -75,7 +78,8 @@ namespace SharpAbp.Abp.FileStoring.Azure
 
             var blobClient = GetBlobClient(args, fileName);
             var download = await blobClient.DownloadAsync(args.CancellationToken);
-            return await TryCopyToMemoryStreamAsync(download.Value.Content, args.CancellationToken);
+            using var content = download.Value.Content;
+            return await TryCopyToMemoryStreamAsync(content, args.CancellationToken);
         }
 
 

@@ -171,7 +171,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
                     Logger.LogWarning("File not found in OBS. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return null;
                 }
-                var result = obsClient.GetObject(new GetObjectRequest() { BucketName = containerName, ObjectKey = objectKey });
+                using var result = obsClient.GetObject(new GetObjectRequest() { BucketName = containerName, ObjectKey = objectKey });
 
                 return await TryCopyToMemoryStreamAsync(result.OutputStream, args.CancellationToken);
             }
@@ -199,7 +199,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
                     return false;
                 }
 
-                var result = obsClient.GetObject(new GetObjectRequest() { BucketName = containerName, ObjectKey = objectKey });
+                using var result = obsClient.GetObject(new GetObjectRequest() { BucketName = containerName, ObjectKey = objectKey });
                 await TryWriteToFileAsync(result.OutputStream, args.Path, args.CancellationToken);
                 return true;
             }
@@ -305,63 +305,94 @@ namespace SharpAbp.Abp.FileStoring.Obs
                 ObjectKey = objectKey
             });
 
-            // Upload ID
             var uploadId = initiateMultipartUploadResponse.UploadId;
-            // Calculate the total number of shards
-            var partSize = args.Configuration.MultiPartUploadShardingSize;
 
-            var fileSize = args.FileStream!.Length;
-            var partCount = fileSize / partSize;
-            if (fileSize % partSize != 0)
+            try
             {
-                partCount++;
-            }
+                // Calculate the total number of shards
+                var partSize = args.Configuration.MultiPartUploadShardingSize;
 
-            // Start multipart upload. partETags is a list that stores partETag. After OBS receives the shard list submitted by the user,
-            // it will verify the validity of each shard data one by one. After all data shards pass the verification,
-            // OBS will combine these shards into a complete file.
-            var partETags = new List<PartETag>();
+                var fileSize = args.FileStream!.Length;
+                var partCount = fileSize / partSize;
+                if (fileSize % partSize != 0)
+                {
+                    partCount++;
+                }
 
-            for (var i = 0; i < partCount; i++)
-            {
-                var skipBytes = (long)partSize * i;
-                args.FileStream.Seek(skipBytes, 0);
+                // Start multipart upload. partETags is a list that stores partETag. After OBS receives the shard list submitted by the user,
+                // it will verify the validity of each shard data one by one. After all data shards pass the verification,
+                // OBS will combine these shards into a complete file.
+                var partETags = new List<PartETag>();
 
-                // Calculate the size of the shard to be uploaded this time. The last shard is the remaining data size.
-                var size = (partSize < fileSize - skipBytes) ? partSize : (fileSize - skipBytes);
-                var buffer = new byte[size];
-                await args.FileStream.ReadAsync(buffer, 0, buffer.Length);
+                for (var i = 0; i < partCount; i++)
+                {
+                    var skipBytes = (long)partSize * i;
+                    args.FileStream.Seek(skipBytes, 0);
 
-                var request = new UploadPartRequest()
+                    // Calculate the size of the shard to be uploaded this time. The last shard is the remaining data size.
+                    var size = (partSize < fileSize - skipBytes) ? partSize : (fileSize - skipBytes);
+                    var buffer = new byte[size];
+                    await args.FileStream.ReadAsync(buffer, 0, buffer.Length, args.CancellationToken);
+
+                    using var partStream = new MemoryStream(buffer);
+                    var request = new UploadPartRequest()
+                    {
+                        BucketName = containerName,
+                        ObjectKey = objectKey,
+                        UploadId = uploadId,
+                        InputStream = partStream,
+                        PartSize = size,
+                        PartNumber = i + 1
+                    };
+                    // Call the UploadPart interface to perform the upload function. The result contains the ETag value of this data shard.
+                    var result = obsClient.UploadPart(request);
+                    partETags.Add(new PartETag(result.PartNumber, result.ETag));
+
+                    Logger.LogDebug("Multipart upload progress for file '{FileId}' with UploadId '{UploadId}': {CompletedParts}/{TotalParts} completed.",
+                        args.FileId, uploadId, partETags.Count, partCount);
+                }
+
+                var completeMultipartUploadResponse = obsClient.CompleteMultipartUpload(new CompleteMultipartUploadRequest()
                 {
                     BucketName = containerName,
                     ObjectKey = objectKey,
                     UploadId = uploadId,
-                    InputStream = new MemoryStream(buffer),
-                    PartSize = size,
-                    PartNumber = i + 1
-                };
-                // Call the UploadPart interface to perform the upload function. The result contains the ETag value of this data shard.
-                var result = obsClient.UploadPart(request);
-                partETags.Add(new PartETag(result.PartNumber, result.ETag));
+                    PartETags = partETags
+                });
 
-                Logger.LogDebug("Multipart upload progress for file '{FileId}' with UploadId '{UploadId}': {CompletedParts}/{TotalParts} completed.", 
-                    args.FileId, uploadId, partETags.Count, partCount);
+                Logger.LogInformation("Multipart upload completed for file '{FileId}' with key '{ObjectKey}'. ETag: {ETag}",
+                    args.FileId, completeMultipartUploadResponse.ObjectKey, completeMultipartUploadResponse.ETag);
+                return args.FileId;
             }
-
-            var completeMultipartUploadResponse = obsClient.CompleteMultipartUpload(new CompleteMultipartUploadRequest()
+            catch (Exception ex)
             {
-                BucketName = containerName,
-                ObjectKey = objectKey,
-                UploadId = uploadId,
-                PartETags = partETags
-            });
-
-            Logger.LogInformation("Multipart upload completed for file '{FileId}' with key '{ObjectKey}'. ETag: {ETag}", 
-                args.FileId, completeMultipartUploadResponse.ObjectKey, completeMultipartUploadResponse.ETag);
-            return args.FileId;
+                Logger.LogError(ex, "Multipart upload failed for file '{FileId}' with UploadId '{UploadId}'. Bucket: {BucketName}, Key: {ObjectKey}",
+                    args.FileId, uploadId, containerName, objectKey);
+                AbortMultipartUploadSilently(obsClient, containerName, objectKey, uploadId);
+                throw;
+            }
         }
 
+        protected virtual void AbortMultipartUploadSilently(
+            ObsClient obsClient,
+            string containerName,
+            string objectKey,
+            string uploadId)
+        {
+            try
+            {
+                obsClient.AbortMultipartUpload(new AbortMultipartUploadRequest()
+                {
+                    BucketName = containerName,
+                    ObjectKey = objectKey,
+                    UploadId = uploadId
+                });
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning(ex, "Failed to abort multipart upload '{UploadId}'. Bucket: {BucketName}, Key: {ObjectKey}", uploadId, containerName, objectKey);
+            }
+        }
 
     }
 }

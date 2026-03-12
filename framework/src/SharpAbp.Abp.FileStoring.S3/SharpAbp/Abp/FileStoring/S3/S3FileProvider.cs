@@ -101,8 +101,6 @@ namespace SharpAbp.Abp.FileStoring.S3
                     fileId = await SingleUploadAsync(s3Client, containerName, objectKey, s3Configuration, args);
                 }
 
-                args.FileStream?.Dispose();
-
                 return fileId;
             }
             finally
@@ -176,8 +174,8 @@ namespace SharpAbp.Abp.FileStoring.S3
                     return false;
                 }
 
-                var getObjectResponse = await s3Client.GetObjectAsync(containerName, objectKey, args.CancellationToken);
-                await getObjectResponse.WriteResponseStreamToFileAsync(args.Path, true, args.CancellationToken);
+                using var getObjectResponse = await s3Client.GetObjectAsync(containerName, objectKey, args.CancellationToken);
+                await TryWriteToFileAsync(getObjectResponse.ResponseStream, args.Path, args.CancellationToken);
                 return true;
 
             }
@@ -205,7 +203,7 @@ namespace SharpAbp.Abp.FileStoring.S3
                     return null;
                 }
 
-                var getObjectResponse = await s3Client.GetObjectAsync(containerName, objectKey, args.CancellationToken);
+                using var getObjectResponse = await s3Client.GetObjectAsync(containerName, objectKey, args.CancellationToken);
                 return await TryCopyToMemoryStreamAsync(getObjectResponse.ResponseStream, args.CancellationToken);
             }
             finally
@@ -270,7 +268,7 @@ namespace SharpAbp.Abp.FileStoring.S3
                 BucketName = containerName,
                 Key = objectKey,
                 InputStream = args.FileStream,
-                AutoCloseStream = true,
+                AutoCloseStream = false,
                 UseChunkEncoding = configuration.UseChunkEncoding,
             };
             await client.PutObjectAsync(putObjectRequest, args.CancellationToken);
@@ -287,65 +285,95 @@ namespace SharpAbp.Abp.FileStoring.S3
             FileProviderSaveArgs args)
         {
             var initiateMultipartUploadResponse = await client.InitiateMultipartUploadAsync(containerName, objectKey, args.CancellationToken);
-            // Upload ID
             var uploadId = initiateMultipartUploadResponse.UploadId;
-            // Calculate slice part count
-            var partSize = args.Configuration.MultiPartUploadShardingSize;
-            //var fi = new FileInfo(spoolFile.FilePath);//?
-            var fileSize = args.FileStream!.Length;
-            var partCount = fileSize / partSize;
-            if (fileSize % partSize != 0)
+
+            try
             {
-                partCount++;
-            }
+                // Calculate slice part count
+                var partSize = args.Configuration.MultiPartUploadShardingSize;
+                var fileSize = args.FileStream!.Length;
+                var partCount = fileSize / partSize;
+                if (fileSize % partSize != 0)
+                {
+                    partCount++;
+                }
 
-            // Start multipart upload. partETags is a list that stores partETag. After S3 receives the shard list submitted by the user,
-            // it will verify the validity of each shard data one by one. After all data shards pass the verification,
-            // S3 will combine these shards into a complete file.
-            var partETags = new List<PartETag>();
+                // Start multipart upload. partETags is a list that stores partETag. After S3 receives the shard list submitted by the user,
+                // it will verify the validity of each shard data one by one. After all data shards pass the verification,
+                // S3 will combine these shards into a complete file.
+                var partETags = new List<PartETag>();
 
-            for (var i = 0; i < partCount; i++)
-            {
-                var skipBytes = (long)partSize * i;
-                // Calculate the size of the shard to be uploaded this time. The last shard is the remaining data size.
-                var size = (int)((partSize < fileSize - skipBytes) ? partSize : (fileSize - skipBytes));
+                for (var i = 0; i < partCount; i++)
+                {
+                    var skipBytes = (long)partSize * i;
+                    var size = (int)((partSize < fileSize - skipBytes) ? partSize : (fileSize - skipBytes));
 
-                byte[] buffer = new byte[size];
-                args.FileStream.Read(buffer, 0, size);
+                    var buffer = new byte[size];
+                    await args.FileStream.ReadAsync(buffer, 0, size, args.CancellationToken);
 
-                // Upload part
-                var uploadPartResponse = await client.UploadPartAsync(new UploadPartRequest()
+                    using var partStream = new MemoryStream(buffer);
+
+                    var uploadPartResponse = await client.UploadPartAsync(new UploadPartRequest()
+                    {
+                        BucketName = containerName,
+                        UploadId = uploadId,
+                        Key = objectKey,
+                        InputStream = partStream,
+                        PartSize = size,
+                        PartNumber = i + 1,
+                        UseChunkEncoding = configuration.UseChunkEncoding,
+                    }, args.CancellationToken);
+                    partETags.Add(new PartETag(uploadPartResponse.PartNumber, uploadPartResponse.ETag));
+                    Logger.LogDebug("Multipart upload progress for file '{FileId}' with UploadId '{UploadId}': {CompletedParts}/{TotalParts} completed. Bucket: {BucketName}, Key: {ObjectKey}",
+                        args.FileId, uploadId, partETags.Count, partCount, containerName, objectKey);
+                }
+
+                var completeMultipartUploadRequest = new CompleteMultipartUploadRequest()
                 {
                     BucketName = containerName,
-                    UploadId = uploadId,
                     Key = objectKey,
-                    InputStream = new MemoryStream(buffer),
-                    PartSize = size,
-                    PartNumber = i + 1,
-                    UseChunkEncoding = configuration.UseChunkEncoding,
-                }, args.CancellationToken);
-                partETags.Add(new PartETag(uploadPartResponse.PartNumber, uploadPartResponse.ETag));
-                Logger.LogDebug("Multipart upload progress for file '{FileId}' with UploadId '{UploadId}': {CompletedParts}/{TotalParts} completed. Bucket: {BucketName}, Key: {ObjectKey}", 
-                    args.FileId, uploadId, partETags.Count, partCount, containerName, objectKey);
+                    UploadId = uploadId,
+                    PartETags = partETags
+                };
+
+                var completeMultipartUploadResponse = await client.CompleteMultipartUploadAsync(completeMultipartUploadRequest, args.CancellationToken);
+                Logger.LogInformation("Multipart upload completed for file '{FileId}' with key '{ObjectKey}'. ETag: {ETag}, Bucket: {BucketName}",
+                    args.FileId, completeMultipartUploadResponse.Key, completeMultipartUploadResponse.ETag, containerName);
+                return args.FileId;
             }
-
-            // Complete multipart upload
-            var completeMultipartUploadRequest = new CompleteMultipartUploadRequest()
+            catch (Exception ex)
             {
-                BucketName = containerName,
-                Key = objectKey,
-                UploadId = uploadId,
-                PartETags = partETags
-            };
-
-            var completeMultipartUploadResponse = await client.CompleteMultipartUploadAsync(completeMultipartUploadRequest, args.CancellationToken);
-            Logger.LogInformation("Multipart upload completed for file '{FileId}' with key '{ObjectKey}'. ETag: {ETag}, Bucket: {BucketName}", 
-                args.FileId, completeMultipartUploadResponse.Key, completeMultipartUploadResponse.ETag, containerName);
-            return args.FileId;
+                Logger.LogError(ex, "Multipart upload failed for file '{FileId}' with UploadId '{UploadId}'. Bucket: {BucketName}, Key: {ObjectKey}",
+                    args.FileId, uploadId, containerName, objectKey);
+                await AbortMultipartUploadSilentlyAsync(client, containerName, objectKey, uploadId, args.CancellationToken);
+                throw;
+            }
         }
 
 
 
+
+        protected virtual async Task AbortMultipartUploadSilentlyAsync(
+            IAmazonS3 client,
+            string containerName,
+            string objectKey,
+            string uploadId,
+            CancellationToken cancellationToken)
+        {
+            try
+            {
+                await client.AbortMultipartUploadAsync(new AbortMultipartUploadRequest
+                {
+                    BucketName = containerName,
+                    Key = objectKey,
+                    UploadId = uploadId
+                }, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning(ex, "Failed to abort multipart upload '{UploadId}'. Bucket: {BucketName}, Key: {ObjectKey}", uploadId, containerName, objectKey);
+            }
+        }
 
         protected virtual async Task CreateBucketIfNotExists(IAmazonS3 client, string containerName)
         {

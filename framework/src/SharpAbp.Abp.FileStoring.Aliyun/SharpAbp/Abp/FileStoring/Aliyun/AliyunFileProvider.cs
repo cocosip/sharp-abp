@@ -162,7 +162,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
                     Logger.LogWarning("File not found in Aliyun OSS. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return null;
                 }
-                var result = ossClient.GetObject(containerName, objectKey);
+                using var result = ossClient.GetObject(containerName, objectKey);
 
                 return await TryCopyToMemoryStreamAsync(result.Content, args.CancellationToken);
             }
@@ -189,7 +189,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
                     return false;
                 }
 
-                var result = ossClient.GetObject(containerName, objectKey);
+                using var result = ossClient.GetObject(containerName, objectKey);
                 await TryWriteToFileAsync(result.Content, args.Path, args.CancellationToken);
                 return true;
             }
@@ -266,58 +266,83 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             FileProviderSaveArgs args)
         {
             var initiateMultipartUploadResult = ossClient.InitiateMultipartUpload(new InitiateMultipartUploadRequest(containerName, objectKey));
-
-            // Upload ID
             var uploadId = initiateMultipartUploadResult.UploadId;
-            // Calculate the total number of shards
-            var partSize = args.Configuration.MultiPartUploadShardingSize;
-            //var fi = new FileInfo(spoolFile.FilePath);//?
-            var fileSize = args.FileStream!.Length;
-            var partCount = fileSize / partSize;
-            if (fileSize % partSize != 0)
+
+            try
             {
-                partCount++;
-            }
-
-            // Start multipart upload. partETags is a list that stores partETag. After OSS receives the shard list submitted by the user, 
-            // it will verify the validity of each shard data one by one. After all data shards pass the verification, 
-            // OSS will combine these shards into a complete file.
-            var partETags = new List<PartETag>();
-
-            for (var i = 0; i < partCount; i++)
-            {
-                var skipBytes = (long)partSize * i;
-                args.FileStream.Seek(skipBytes, 0);
-
-                // Calculate the size of the shard to be uploaded this time. The last shard is the remaining data size.
-                var size = (partSize < fileSize - skipBytes) ? partSize : (fileSize - skipBytes);
-                var buffer = new byte[size];
-                await args.FileStream.ReadAsync(buffer, 0, buffer.Length);
-
-                var request = new UploadPartRequest(containerName, objectKey, uploadId)
+                // Calculate the total number of shards
+                var partSize = args.Configuration.MultiPartUploadShardingSize;
+                var fileSize = args.FileStream!.Length;
+                var partCount = fileSize / partSize;
+                if (fileSize % partSize != 0)
                 {
-                    InputStream = new MemoryStream(buffer),
-                    PartSize = size,
-                    PartNumber = i + 1
-                };
-                // Call the UploadPart interface to perform the upload function. The result contains the ETag value of this data shard.
-                var result = ossClient.UploadPart(request);
-                partETags.Add(result.PartETag);
+                    partCount++;
+                }
 
-                Logger.LogDebug("Multipart upload progress for file '{FileId}' with UploadId '{UploadId}': {CompletedParts}/{TotalParts} completed.", 
-                    args.FileId, uploadId, partETags.Count, partCount);
+                // Start multipart upload. partETags is a list that stores partETag. After OSS receives the shard list submitted by the user,
+                // it will verify the validity of each shard data one by one. After all data shards pass the verification,
+                // OSS will combine these shards into a complete file.
+                var partETags = new List<PartETag>();
+
+                for (var i = 0; i < partCount; i++)
+                {
+                    var skipBytes = (long)partSize * i;
+                    args.FileStream.Seek(skipBytes, 0);
+
+                    // Calculate the size of the shard to be uploaded this time. The last shard is the remaining data size.
+                    var size = (partSize < fileSize - skipBytes) ? partSize : (fileSize - skipBytes);
+                    var buffer = new byte[size];
+                    await args.FileStream.ReadAsync(buffer, 0, buffer.Length, args.CancellationToken);
+
+                    using var partStream = new MemoryStream(buffer);
+                    var request = new UploadPartRequest(containerName, objectKey, uploadId)
+                    {
+                        InputStream = partStream,
+                        PartSize = size,
+                        PartNumber = i + 1
+                    };
+                    // Call the UploadPart interface to perform the upload function. The result contains the ETag value of this data shard.
+                    var result = ossClient.UploadPart(request);
+                    partETags.Add(result.PartETag);
+
+                    Logger.LogDebug("Multipart upload progress for file '{FileId}' with UploadId '{UploadId}': {CompletedParts}/{TotalParts} completed.",
+                        args.FileId, uploadId, partETags.Count, partCount);
+                }
+
+                var completeMultipartUploadRequest = new CompleteMultipartUploadRequest(containerName, objectKey, uploadId);
+                foreach (var partETag in partETags)
+                {
+                    completeMultipartUploadRequest.PartETags.Add(partETag);
+                }
+
+                var completeMultipartUploadResult = ossClient.CompleteMultipartUpload(completeMultipartUploadRequest);
+                Logger.LogInformation("Multipart upload completed for file '{FileId}' with key '{ObjectKey}'. ETag: {ETag}",
+                    args.FileId, completeMultipartUploadResult.Key, completeMultipartUploadResult.ETag);
+                return args.FileId;
             }
-            
-            var completeMultipartUploadRequest = new CompleteMultipartUploadRequest(containerName, objectKey, uploadId);
-            foreach (var partETag in partETags)
+            catch (Exception ex)
             {
-                completeMultipartUploadRequest.PartETags.Add(partETag);
+                Logger.LogError(ex, "Multipart upload failed for file '{FileId}' with UploadId '{UploadId}'. Bucket: {BucketName}, Key: {ObjectKey}",
+                    args.FileId, uploadId, containerName, objectKey);
+                AbortMultipartUploadSilently(ossClient, containerName, objectKey, uploadId);
+                throw;
             }
+        }
 
-            var completeMultipartUploadResult = ossClient.CompleteMultipartUpload(completeMultipartUploadRequest);
-            Logger.LogInformation("Multipart upload completed for file '{FileId}' with key '{ObjectKey}'. ETag: {ETag}", 
-                args.FileId, completeMultipartUploadResult.Key, completeMultipartUploadResult.ETag);
-            return args.FileId;
+        protected virtual void AbortMultipartUploadSilently(
+            IOss ossClient,
+            string containerName,
+            string objectKey,
+            string uploadId)
+        {
+            try
+            {
+                ossClient.AbortMultipartUpload(new AbortMultipartUploadRequest(containerName, objectKey, uploadId));
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning(ex, "Failed to abort multipart upload '{UploadId}'. Bucket: {BucketName}, Key: {ObjectKey}", uploadId, containerName, objectKey);
+            }
         }
 
 
