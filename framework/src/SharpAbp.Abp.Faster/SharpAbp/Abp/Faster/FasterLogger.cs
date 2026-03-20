@@ -333,6 +333,46 @@ namespace SharpAbp.Abp.Faster
                         // Expected during shutdown, no logging needed
                         break;
                     }
+                    catch (Exception ex) when (ex.Message.Contains("Uninitialized page found during scan"))
+                    {
+                        // Uninitialized pages occur after an unclean shutdown (e.g. SIGKILL/OOM kill).
+                        // Pages were allocated but never written — retrying at the same position loops forever.
+                        // Recovery: recreate the iterator from the last committed safe address, skipping
+                        // the corrupt tail (those pages contained no committed data and cannot be recovered).
+                        var safeAddress = Log?.CommittedUntilAddress ?? -1L;
+                        Logger.LogWarning(
+                            "Uninitialized page detected in FASTER log for type '{TypeName}' (likely caused by unclean shutdown). " +
+                            "Recovering iterator from last committed address {SafeAddress}. Unprocessed entries in corrupt pages are permanently lost.",
+                            TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)), safeAddress);
+                        try
+                        {
+                            Iter?.Dispose();
+                            Iter = null;
+                            if (Log != null && safeAddress >= 0)
+                            {
+                                Iter = Log.Scan(
+                                    safeAddress,
+                                    long.MaxValue,
+                                    Configuration.IteratorName,
+                                    recover: false,
+                                    ScanBufferingMode.DoublePageBuffering,
+                                    Configuration.ScanUncommitted,
+                                    Logger);
+                                Interlocked.Exchange(ref _truncateBeforeAddress, Math.Max(Iter.CompletedUntilAddress, Iter.BeginAddress));
+                                Logger.LogInformation(
+                                    "FASTER iterator for type '{TypeName}' successfully recreated at address {Address}.",
+                                    TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)), safeAddress);
+                            }
+                        }
+                        catch (Exception recoverEx)
+                        {
+                            Logger.LogError(recoverEx,
+                                "Failed to recreate FASTER iterator for type '{TypeName}' after uninitialized page error.",
+                                TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+                        }
+
+                        await Task.Delay(1000, CombinedCancellationToken);
+                    }
                     catch (Exception ex)
                     {
                         Logger.LogError(ex, "Error during scheduled log scan for type '{TypeName}': {Message}",
