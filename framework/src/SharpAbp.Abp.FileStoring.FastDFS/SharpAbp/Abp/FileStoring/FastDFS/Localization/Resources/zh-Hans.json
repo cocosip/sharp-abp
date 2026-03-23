@@ -4,16 +4,18 @@
     "FastDFS.ClusterName": "集群名称",
     "FastDFS.HttpServer": "Http服务器地址",
     "FastDFS.GroupName": "组名",
-    "FastDFS.Trackers": "Tracker服务器",
-    "FastDFS.AppendGroupNameToUrl": "是否在Url上添加组名",
-    "FastDFS.AntiStealCheckToken": "是否开启Token校验",
-    "FastDFS.SecretKey": "Token校验密钥",
-    "FastDFS.ConnectionTimeout": "连接超时时间",
-    "FastDFS.ConnectionLifeTime": "连接有效时间",
+    "FastDFS.Trackers": "Tracker服务器地址",
+    "FastDFS.AntiStealCheckToken": "是否开启防盗链Token校验",
+    "FastDFS.SecretKey": "防盗链Token密钥",
+    "FastDFS.DefaultTokenExpireSeconds": "Token默认过期时间（秒）",
     "FastDFS.Charset": "编码",
-    "FastDFS.ConnectionConcurrentThread": "连接并发数",
-    "FastDFS.ScanTimeoutConnectionInterval": "扫描超时时间",
-    "FastDFS.TrackerMaxConnection": "Tracker最大连接数",
-    "FastDFS.StorageMaxConnection": "Storage最大连接数"
+    "FastDFS.NetworkTimeout": "网络超时时间（秒）",
+    "FastDFS.MaxConnectionPerServer": "每服务器最大连接数",
+    "FastDFS.MinConnectionPerServer": "每服务器最小连接数",
+    "FastDFS.ConnectionIdleTimeout": "连接空闲超时（秒）",
+    "FastDFS.ConnectionLifeTime": "连接最大生命周期（秒）",
+    "FastDFS.ConnectionTimeout": "连接超时时间（毫秒）",
+    "FastDFS.SendTimeout": "发送超时时间（毫秒）",
+    "FastDFS.ReceiveTimeout": "接收超时时间（毫秒）"
   }
 }

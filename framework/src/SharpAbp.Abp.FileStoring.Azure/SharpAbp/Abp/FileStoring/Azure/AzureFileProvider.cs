@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Blobs;
+using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -9,12 +10,15 @@ namespace SharpAbp.Abp.FileStoring.Azure
     [ExposeKeyedService<IFileProvider>(AzureFileProviderConfigurationNames.ProviderName)]
     public class AzureFileProvider : FileProviderBase, ITransientDependency
     {
+        protected ILogger Logger { get; }
         protected IAzureFileNameCalculator AzureFileNameCalculator { get; }
         protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
         public AzureFileProvider(
+            ILogger<AzureFileProvider> logger,
             IAzureFileNameCalculator azureFileNameCalculator,
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
+            Logger = logger;
             AzureFileNameCalculator = azureFileNameCalculator;
             FileNormalizeNamingService = fileNormalizeNamingService;
         }
@@ -36,7 +40,10 @@ namespace SharpAbp.Abp.FileStoring.Azure
                 await CreateContainerIfNotExists(args);
             }
 
-            await GetBlobClient(args, fileName).UploadAsync(args.FileStream, true);
+            await GetBlobClient(args, fileName).UploadAsync(
+                args.FileStream,
+                args.OverrideExisting,
+                args.CancellationToken);
             return args.FileId;
         }
 
@@ -49,6 +56,7 @@ namespace SharpAbp.Abp.FileStoring.Azure
                 return await GetBlobClient(args, fileName).DeleteIfExistsAsync();
             }
 
+            Logger.LogWarning("File not found in Azure Blob Storage when deleting. Container: {ContainerName}, FileName: {FileName}, FileId: {FileId}", GetContainerName(args), fileName, args.FileId);
             return false;
         }
 
@@ -64,12 +72,14 @@ namespace SharpAbp.Abp.FileStoring.Azure
             var fileName = AzureFileNameCalculator.Calculate(args);
             if (!await FileExistsAsync(args, fileName))
             {
+                Logger.LogWarning("File not found in Azure Blob Storage. Container: {ContainerName}, FileName: {FileName}, FileId: {FileId}", GetContainerName(args), fileName, args.FileId);
                 return null;
             }
 
             var blobClient = GetBlobClient(args, fileName);
             var download = await blobClient.DownloadAsync(args.CancellationToken);
-            return await TryCopyToMemoryStreamAsync(download.Value.Content, args.CancellationToken);
+            using var content = download.Value.Content;
+            return await TryCopyToMemoryStreamAsync(content, args.CancellationToken);
         }
 
 
@@ -78,15 +88,12 @@ namespace SharpAbp.Abp.FileStoring.Azure
             var fileName = AzureFileNameCalculator.Calculate(args);
             if (!await FileExistsAsync(args, fileName))
             {
+                Logger.LogWarning("File not found in Azure Blob Storage. Container: {ContainerName}, FileName: {FileName}, FileId: {FileId}", GetContainerName(args), fileName, args.FileId);
                 return false;
             }
             var blobClient = GetBlobClient(args, fileName);
             var download = await blobClient.DownloadToAsync(args.Path, args.CancellationToken);
-            if (!download.IsError)
-            {
-                await TryWriteToFileAsync(download.Content.ToStream(), args.Path, args.CancellationToken);
-            }
-            return false;
+            return !download.IsError;
         }
 
         public override Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)

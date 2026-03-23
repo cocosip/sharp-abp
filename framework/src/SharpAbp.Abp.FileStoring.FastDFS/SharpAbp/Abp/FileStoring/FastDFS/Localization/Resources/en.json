@@ -5,15 +5,17 @@
     "FastDFS.HttpServer": "Http server address",
     "FastDFS.GroupName": "Group name",
     "FastDFS.Trackers": "Tracker server address",
-    "FastDFS.AppendGroupNameToUrl": "Whether append group name to url",
-    "FastDFS.AntiStealCheckToken": "Enable token validate",
-    "FastDFS.SecretKey": "Token validate secret key",
-    "FastDFS.ConnectionTimeout": "Connection time out",
-    "FastDFS.ConnectionLifeTime": "Connection lifetime",
+    "FastDFS.AntiStealCheckToken": "Enable anti-steal token validation",
+    "FastDFS.SecretKey": "Anti-steal token secret key",
+    "FastDFS.DefaultTokenExpireSeconds": "Default token expire seconds",
     "FastDFS.Charset": "Charset",
-    "FastDFS.ConnectionConcurrentThread": "Concurrent thread count",
-    "FastDFS.ScanTimeoutConnectionInterval": "Scan timeout connection interval",
-    "FastDFS.TrackerMaxConnection": "Tracker max connection count",
-    "FastDFS.StorageMaxConnection": "Storage max connection count"
+    "FastDFS.NetworkTimeout": "Network timeout (seconds)",
+    "FastDFS.MaxConnectionPerServer": "Max connections per server",
+    "FastDFS.MinConnectionPerServer": "Min connections per server",
+    "FastDFS.ConnectionIdleTimeout": "Connection idle timeout (seconds)",
+    "FastDFS.ConnectionLifeTime": "Connection lifetime (seconds)",
+    "FastDFS.ConnectionTimeout": "Connection timeout (milliseconds)",
+    "FastDFS.SendTimeout": "Send timeout (milliseconds)",
+    "FastDFS.ReceiveTimeout": "Receive timeout (milliseconds)"
   }
 }

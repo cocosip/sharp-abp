@@ -1,32 +1,19 @@
-﻿using Microsoft.Extensions.Options;
-using Volo.Abp.DependencyInjection;
-using Volo.Abp.MultiTenancy;
+﻿using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.FileStoring.S3
 {
     public class DefaultS3FileNameCalculator : IS3FileNameCalculator, ITransientDependency
     {
-        protected ICurrentTenant CurrentTenant { get; }
-        protected AbpFileStoringAbstractionsOptions Options { get; }
+        protected IFilePathBuilder FilePathBuilder { get; }
 
-        public DefaultS3FileNameCalculator(
-            ICurrentTenant currentTenant,
-            IOptions<AbpFileStoringAbstractionsOptions> options)
+        public DefaultS3FileNameCalculator(IFilePathBuilder filePathBuilder)
         {
-            CurrentTenant = currentTenant;
-            Options = options.Value;
+            FilePathBuilder = filePathBuilder;
         }
 
         public virtual string Calculate(FileProviderArgs args)
         {
-            if (Options.FilePathStrategy == FilePathGenerationStrategy.DirectFileId)
-            {
-                return args.FileId;
-            }
-
-            return CurrentTenant.Id == null
-                ? $"host/{args.FileId}"
-                : $"tenants/{CurrentTenant.Id.Value:D}/{args.FileId}";
+            return FilePathBuilder.Build(args);
         }
     }
 }

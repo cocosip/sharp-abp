@@ -30,6 +30,8 @@ namespace SharpAbp.Abp.Dapper
                 DapperOracleExtensions.ConfigureOracleTypeHandlers();
             }
 
+            DapperTypeHandlerExtensions.ConfigureTypeHandlers();
+
             return Task.CompletedTask;
         }
 

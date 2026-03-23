@@ -18,9 +18,52 @@ namespace SharpAbp.Abp.FileStoring
 
         public AbpFileStoringOptions Configure(IConfiguration configuration, ServiceConfigurationContext context)
         {
-            var entries = configuration
-                .GetSection("FileStoringOptions")
-                .Get<Dictionary<string, FileContainerConfigurationEntry>>();
+            var section = configuration.GetSection("FileStoringOptions");
+
+            // Apply FilePathBuilder configuration if present
+            var filePathBuilderEntry = section.GetSection("FilePathBuilder").Get<FilePathBuilderEntry>();
+            if (filePathBuilderEntry != null)
+            {
+                context.Services.Configure<AbpFileStoringAbstractionsOptions>(opts =>
+                {
+                    if (filePathBuilderEntry.FilePathStrategy.HasValue)
+                    {
+                        opts.FilePathStrategy = filePathBuilderEntry.FilePathStrategy.Value;
+                    }
+
+                    if (!string.IsNullOrEmpty(filePathBuilderEntry.Prefix))
+                    {
+                        opts.FilePathBuilder.Prefix = filePathBuilderEntry.Prefix;
+                    }
+
+                    if (filePathBuilderEntry.HostSegment != null)
+                    {
+                        opts.FilePathBuilder.HostSegment = filePathBuilderEntry.HostSegment;
+                    }
+
+                    if (filePathBuilderEntry.TenantsSegment != null)
+                    {
+                        opts.FilePathBuilder.TenantsSegment = filePathBuilderEntry.TenantsSegment;
+                    }
+
+                    if (filePathBuilderEntry.TenantIdentifierMode.HasValue)
+                    {
+                        if (filePathBuilderEntry.TenantIdentifierMode.Value == TenantIdentifierMode.TenantName)
+                        {
+                            opts.FilePathBuilder.TenantIdentifierFactory = (id, name, ctx) =>
+                                ctx?.TenantCode
+                                ?? (!string.IsNullOrEmpty(name) ? name! : id.ToString("D"));
+                        }
+                        else
+                        {
+                            // TenantId mode: clear any previously set factory → DefaultFilePathBuilder uses GUID
+                            opts.FilePathBuilder.TenantIdentifierFactory = null;
+                        }
+                    }
+                });
+            }
+
+            var entries = section.Get<Dictionary<string, FileContainerConfigurationEntry>>();
 
             var abstractionsOptions = context.Services.ExecutePreConfiguredActions<AbpFileStoringAbstractionsOptions>();
 
@@ -28,6 +71,12 @@ namespace SharpAbp.Abp.FileStoring
             {
                 foreach (var entryKv in entries)
                 {
+                    // Skip the reserved "FilePathBuilder" key
+                    if (string.Equals(entryKv.Key, "FilePathBuilder", System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
                     var entry = entryKv.Value!;
 
                     var fileProviderConfiguration = abstractionsOptions.Providers.GetConfiguration(entry.Provider!);
@@ -60,7 +109,6 @@ namespace SharpAbp.Abp.FileStoring
                             }
                         }
                     });
-
                 }
             }
             return this;

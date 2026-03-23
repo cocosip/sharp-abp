@@ -1,32 +1,19 @@
-﻿using Microsoft.Extensions.Options;
-using Volo.Abp.DependencyInjection;
-using Volo.Abp.MultiTenancy;
+﻿using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.FileStoring.Azure
 {
     public class DefaultAzureFileNameCalculator : IAzureFileNameCalculator, ITransientDependency
     {
-        protected ICurrentTenant CurrentTenant { get; }
-        protected AbpFileStoringAbstractionsOptions Options { get; }
+        protected IFilePathBuilder FilePathBuilder { get; }
 
-        public DefaultAzureFileNameCalculator(
-            ICurrentTenant currentTenant,
-            IOptions<AbpFileStoringAbstractionsOptions> options)
+        public DefaultAzureFileNameCalculator(IFilePathBuilder filePathBuilder)
         {
-            CurrentTenant = currentTenant;
-            Options = options.Value;
+            FilePathBuilder = filePathBuilder;
         }
 
         public virtual string Calculate(FileProviderArgs args)
         {
-            if (Options.FilePathStrategy == FilePathGenerationStrategy.DirectFileId)
-            {
-                return args.FileId;
-            }
-
-            return CurrentTenant.Id == null
-                ? $"host/{args.FileId}"
-                : $"tenants/{CurrentTenant.Id.Value:D}/{args.FileId}";
+            return FilePathBuilder.Build(args);
         }
     }
 }

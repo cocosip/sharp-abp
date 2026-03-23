@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Model;
@@ -120,6 +121,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
 
                 if (!await FileExistsAsync(amazonS3Client, containerName, objectKey))
                 {
+                    Logger.LogWarning("File not found in AWS S3 when deleting. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return false;
                 }
 
@@ -170,10 +172,11 @@ namespace SharpAbp.Abp.FileStoring.Aws
             {
                 if (!await FileExistsAsync(amazonS3Client, containerName, objectKey))
                 {
+                    Logger.LogWarning("File not found in AWS S3. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return null;
                 }
 
-                var response = await amazonS3Client.GetObjectAsync(new GetObjectRequest
+                using var response = await amazonS3Client.GetObjectAsync(new GetObjectRequest
                 {
                     BucketName = containerName,
                     Key = objectKey
@@ -200,10 +203,11 @@ namespace SharpAbp.Abp.FileStoring.Aws
             {
                 if (!await FileExistsAsync(amazonS3Client, containerName, objectKey))
                 {
+                    Logger.LogWarning("File not found in AWS S3. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return false;
                 }
 
-                var response = await amazonS3Client.GetObjectAsync(new GetObjectRequest
+                using var response = await amazonS3Client.GetObjectAsync(new GetObjectRequest
                 {
                     BucketName = containerName,
                     Key = objectKey
@@ -334,63 +338,97 @@ namespace SharpAbp.Abp.FileStoring.Aws
                 Key = objectKey
             }, args.CancellationToken);
 
-            // Upload ID
             var uploadId = initiateMultipartUploadResponse.UploadId;
-            // Calculate the total number of shards
-            var partSize = args.Configuration.MultiPartUploadShardingSize;
 
-            var fileSize = args.FileStream!.Length;
-            var partCount = fileSize / partSize;
-            if (fileSize % partSize != 0)
+            try
             {
-                partCount++;
-            }
+                // Calculate the total number of shards
+                var partSize = args.Configuration.MultiPartUploadShardingSize;
 
-            // Start multipart upload. partETags is a list that stores partETag. After S3 receives the shard list submitted by the user, 
-            // it will verify the validity of each shard data one by one. After all data shards pass the verification, 
-            // S3 will combine these shards into a complete file.
-            var partETags = new List<PartETag>();
+                var fileSize = args.FileStream!.Length;
+                var partCount = fileSize / partSize;
+                if (fileSize % partSize != 0)
+                {
+                    partCount++;
+                }
 
-            for (var i = 0; i < partCount; i++)
-            {
-                var skipBytes = (long)partSize * i;
-                args.FileStream.Seek(skipBytes, 0);
+                // Start multipart upload. partETags is a list that stores partETag. After S3 receives the shard list submitted by the user,
+                // it will verify the validity of each shard data one by one. After all data shards pass the verification,
+                // S3 will combine these shards into a complete file.
+                var partETags = new List<PartETag>();
 
-                // Calculate the size of the shard to be uploaded this time. The last shard is the remaining data size.
-                var size = (partSize < fileSize - skipBytes) ? partSize : (fileSize - skipBytes);
-                var buffer = new byte[size];
-                await args.FileStream.ReadAsync(buffer, 0, buffer.Length);
+                for (var i = 0; i < partCount; i++)
+                {
+                    var skipBytes = (long)partSize * i;
+                    args.FileStream.Seek(skipBytes, 0);
 
-                var request = new UploadPartRequest()
+                    // Calculate the size of the shard to be uploaded this time. The last shard is the remaining data size.
+                    var size = (partSize < fileSize - skipBytes) ? partSize : (fileSize - skipBytes);
+                    var buffer = new byte[size];
+                    await args.FileStream.ReadAsync(buffer, 0, buffer.Length, args.CancellationToken);
+
+                    using var partStream = new MemoryStream(buffer);
+
+                    var request = new UploadPartRequest()
+                    {
+                        BucketName = containerName,
+                        Key = objectKey,
+                        UploadId = uploadId,
+                        InputStream = partStream,
+                        PartSize = size,
+                        PartNumber = i + 1,
+                    };
+
+                    // Call the UploadPart interface to perform the upload function. The result contains the ETag value of this data shard.
+                    var result = await amazonS3Client.UploadPartAsync(request, args.CancellationToken);
+                    partETags.Add(new PartETag(result.PartNumber, result.ETag));
+
+                    Logger.LogDebug("Multipart upload progress for file '{FileId}' with UploadId '{UploadId}': {CompletedParts}/{TotalParts} completed.",
+                        args.FileId, uploadId, partETags.Count, partCount);
+                }
+
+                var completeMultipartUploadResponse = await amazonS3Client.CompleteMultipartUploadAsync(new CompleteMultipartUploadRequest()
                 {
                     BucketName = containerName,
                     Key = objectKey,
                     UploadId = uploadId,
-                    InputStream = new MemoryStream(buffer),
-                    PartSize = size,
-                    PartNumber = i + 1,
-                };
+                    PartETags = partETags
+                }, args.CancellationToken);
 
-                // Call the UploadPart interface to perform the upload function. The result contains the ETag value of this data shard.
-                var result = await amazonS3Client.UploadPartAsync(request, args.CancellationToken);
-                partETags.Add(new PartETag(result.PartNumber, result.ETag));
+                Logger.LogInformation("Multipart upload completed for file '{FileId}' with key '{ObjectKey}'. ETag: {ETag}",
+                    args.FileId, completeMultipartUploadResponse.Key, completeMultipartUploadResponse.ETag);
 
-                Logger.LogDebug("Multipart upload progress for file '{FileId}' with UploadId '{UploadId}': {CompletedParts}/{TotalParts} completed.", 
-                    args.FileId, uploadId, partETags.Count, partCount);
+                return args.FileId;
             }
-
-            var completeMultipartUploadResponse = await amazonS3Client.CompleteMultipartUploadAsync(new CompleteMultipartUploadRequest()
+            catch (Exception ex)
             {
-                BucketName = containerName,
-                Key = objectKey,
-                UploadId = uploadId,
-                PartETags = partETags
-            }, args.CancellationToken);
+                Logger.LogError(ex, "Multipart upload failed for file '{FileId}' with UploadId '{UploadId}'. Bucket: {BucketName}, Key: {ObjectKey}",
+                    args.FileId, uploadId, containerName, objectKey);
+                await AbortMultipartUploadSilentlyAsync(amazonS3Client, containerName, objectKey, uploadId, args.CancellationToken);
+                throw;
+            }
+        }
 
-            Logger.LogInformation("Multipart upload completed for file '{FileId}' with key '{ObjectKey}'. ETag: {ETag}", 
-                args.FileId, completeMultipartUploadResponse.Key, completeMultipartUploadResponse.ETag);
-
-            return args.FileId;
+        protected virtual async Task AbortMultipartUploadSilentlyAsync(
+            IAmazonS3 amazonS3Client,
+            string containerName,
+            string objectKey,
+            string uploadId,
+            CancellationToken cancellationToken)
+        {
+            try
+            {
+                await amazonS3Client.AbortMultipartUploadAsync(new AbortMultipartUploadRequest
+                {
+                    BucketName = containerName,
+                    Key = objectKey,
+                    UploadId = uploadId
+                }, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning(ex, "Failed to abort multipart upload '{UploadId}'. Bucket: {BucketName}, Key: {ObjectKey}", uploadId, containerName, objectKey);
+            }
         }
 
  

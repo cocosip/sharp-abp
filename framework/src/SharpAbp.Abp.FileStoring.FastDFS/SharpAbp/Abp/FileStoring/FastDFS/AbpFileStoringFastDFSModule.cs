@@ -1,5 +1,3 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using SharpAbp.Abp.FastDFS;
 using SharpAbp.Abp.FileStoring.FastDFS.Localization;
 using System.Threading.Tasks;
@@ -33,7 +31,6 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
             return Task.CompletedTask;
         }
 
-
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
@@ -41,8 +38,6 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            //context.Services.Replace(ServiceDescriptor.Singleton<IClusterSelector, FileConfigurationClusterSelector>());
-
             Configure<AbpVirtualFileSystemOptions>(options =>
             {
                 options.FileSets.AddEmbedded<AbpFileStoringFastDFSModule>();
@@ -63,7 +58,6 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
             return Task.CompletedTask;
         }
 
-
         private FileProviderConfiguration GetFileProviderConfiguration()
         {
             var configuration = new FileProviderConfiguration(
@@ -72,20 +66,22 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
 
             configuration.DefaultNamingNormalizers.TryAdd<FastDFSFileNamingNormalizer>();
             configuration
-                .AddItem(FastDFSFileProviderConfigurationNames.ClusterName, typeof(string), "default1")
+                .AddItem(FastDFSFileProviderConfigurationNames.ClusterName, typeof(string), "default")
                 .AddItem(FastDFSFileProviderConfigurationNames.GroupName, typeof(string), "group1")
                 .AddItem(FastDFSFileProviderConfigurationNames.HttpServer, typeof(string), "http://192.168.0.100:8080")
-                .AddItem(FastDFSFileProviderConfigurationNames.AppendGroupNameToUrl, typeof(bool), "true")
-                .AddItem(FastDFSFileProviderConfigurationNames.Trackers, typeof(string), "192.168.0.100:23000,192.168.0.101:23000")
-                .AddItem(FastDFSFileProviderConfigurationNames.AntiStealCheckToken, typeof(bool), "true")
-                .AddItem(FastDFSFileProviderConfigurationNames.SecretKey, typeof(string), "abc123456789")
-                .AddItem(FastDFSFileProviderConfigurationNames.ConnectionTimeout, typeof(int), "3600")
-                .AddItem(FastDFSFileProviderConfigurationNames.ConnectionLifeTime, typeof(int), "300")
-                .AddItem(FastDFSFileProviderConfigurationNames.Charset, typeof(string), "utf-8")
-                .AddItem(FastDFSFileProviderConfigurationNames.ConnectionConcurrentThread, typeof(int), "3")
-                .AddItem(FastDFSFileProviderConfigurationNames.ScanTimeoutConnectionInterval, typeof(int), "10")
-                .AddItem(FastDFSFileProviderConfigurationNames.TrackerMaxConnection, typeof(int), "10")
-                .AddItem(FastDFSFileProviderConfigurationNames.StorageMaxConnection, typeof(int), "20");
+                .AddItem(FastDFSFileProviderConfigurationNames.Trackers, typeof(string), "192.168.0.100:22122,192.168.0.101:22122")
+                .AddItem(FastDFSFileProviderConfigurationNames.AntiStealCheckToken, typeof(bool), "false")
+                .AddItem(FastDFSFileProviderConfigurationNames.SecretKey, typeof(string), "")
+                .AddItem(FastDFSFileProviderConfigurationNames.DefaultTokenExpireSeconds, typeof(int), "3600")
+                .AddItem(FastDFSFileProviderConfigurationNames.Charset, typeof(string), "UTF-8")
+                .AddItem(FastDFSFileProviderConfigurationNames.NetworkTimeout, typeof(int), "30")
+                .AddItem(FastDFSFileProviderConfigurationNames.MaxConnectionPerServer, typeof(int), "50")
+                .AddItem(FastDFSFileProviderConfigurationNames.MinConnectionPerServer, typeof(int), "5")
+                .AddItem(FastDFSFileProviderConfigurationNames.ConnectionIdleTimeout, typeof(int), "300")
+                .AddItem(FastDFSFileProviderConfigurationNames.ConnectionLifeTime, typeof(int), "3600")
+                .AddItem(FastDFSFileProviderConfigurationNames.ConnectionTimeout, typeof(int), "30000")
+                .AddItem(FastDFSFileProviderConfigurationNames.SendTimeout, typeof(int), "30000")
+                .AddItem(FastDFSFileProviderConfigurationNames.ReceiveTimeout, typeof(int), "30000");
             return configuration;
         }
     }

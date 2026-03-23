@@ -19,7 +19,8 @@
 
 
 	<ItemGroup>
-		<PackageReference Include="FastDFS.Client"  />
+		<PackageReference Include="FastDFS.Client" />
+		<PackageReference Include="FastDFS.Client.DependencyInjection" />
 		<PackageReference Include="Volo.Abp" />
 	</ItemGroup>
 

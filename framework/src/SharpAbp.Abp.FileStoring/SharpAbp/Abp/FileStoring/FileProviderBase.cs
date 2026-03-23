@@ -88,13 +88,29 @@ namespace SharpAbp.Abp.FileStoring
         /// <param name="cancellationToken">The cancellation token for the operation.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         protected virtual async Task TryWriteToFileAsync(
-            Stream stream, 
-            [NotNull] string path, 
+            Stream stream,
+            [NotNull] string path,
             CancellationToken cancellationToken = default)
         {
+            Check.NotNull(stream, nameof(stream));
             Check.NotNullOrWhiteSpace(path, nameof(path));
-            using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+
+            var directory = Path.GetDirectoryName(path);
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            using var fs = new FileStream(
+                path,
+                FileMode.Create,
+                FileAccess.Write,
+                FileShare.None,
+                81920,
+                useAsync: true);
+
             await stream.CopyToAsync(fs, cancellationToken);
+            await fs.FlushAsync(cancellationToken);
         }
     }
 }

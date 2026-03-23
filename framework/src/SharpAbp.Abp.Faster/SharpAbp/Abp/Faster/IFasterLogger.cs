@@ -25,6 +25,17 @@ namespace SharpAbp.Abp.Faster
         bool Initialized { get; }
 
         /// <summary>
+        /// Gets the begin address of the log (earliest valid data address).
+        /// </summary>
+        long BeginAddress { get; }
+
+        /// <summary>
+        /// Gets the committed-until address of the log (latest durably written address).
+        /// Use this as the toAddress upper bound for exports.
+        /// </summary>
+        long CommittedUntilAddress { get; }
+
+        /// <summary>
         /// Gets the total number of committed ranges since initialization.
         /// </summary>
         long TotalCommittedRanges { get; }
@@ -106,5 +117,23 @@ namespace SharpAbp.Abp.Faster
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task ForceCommitGap(long gapStart, long gapEnd, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Exports log entries from the specified address range to files in the target directory.
+        /// Uses a temporary scan iterator that does not affect the main consumer position.
+        /// Large exports are automatically split into multiple files based on entriesPerFile.
+        /// </summary>
+        /// <param name="targetDirectory">The directory to write export files into.</param>
+        /// <param name="fromAddress">The start address to export from (use BeginAddress for full export, or ToAddress from a previous result for incremental export).</param>
+        /// <param name="toAddress">The end address to export to. Defaults to CommittedUntilAddress if not specified.</param>
+        /// <param name="entriesPerFile">Maximum number of entries per file before splitting. Default is 10000.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>Export result containing file paths and address range for next incremental export.</returns>
+        Task<FasterExportResult> ExportAsync(
+            string targetDirectory,
+            long fromAddress,
+            long? toAddress = null,
+            int entriesPerFile = 10000,
+            CancellationToken cancellationToken = default);
     }
 }

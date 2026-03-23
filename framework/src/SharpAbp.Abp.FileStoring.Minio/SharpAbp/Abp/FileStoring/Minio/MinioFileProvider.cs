@@ -129,6 +129,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
                     return true;
                 }
 
+                Logger.LogWarning("File not found in Minio when deleting. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                 return false;
             }
             finally
@@ -170,6 +171,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
 
                 if (!await FileExistsAsync(minioClient, containerName, objectKey))
                 {
+                    Logger.LogWarning("File not found in Minio. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return null;
                 }
 
@@ -213,13 +215,17 @@ namespace SharpAbp.Abp.FileStoring.Minio
 
                 if (!await FileExistsAsync(minioClient, containerName, objectKey, args.CancellationToken))
                 {
+                    Logger.LogWarning("File not found in Minio. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return false;
                 }
 
                 var getObjectArgs = new GetObjectArgs()
                     .WithBucket(containerName)
                     .WithObject(objectKey)
-                    .WithFile(args.Path);
+                    .WithCallbackStream(async (stream, ct) =>
+                    {
+                        await TryWriteToFileAsync(stream, args.Path, ct);
+                    });
 
                 await minioClient.GetObjectAsync(getObjectArgs, args.CancellationToken);
                 return true;

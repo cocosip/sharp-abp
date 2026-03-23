@@ -122,6 +122,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
 
                 if (!FileExists(ks3Client, containerName, objectKey))
                 {
+                    Logger.LogWarning("File not found in KS3 when deleting. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return Task.FromResult(false);
                 }
                 ks3Client.DeleteObject(containerName, objectKey);
@@ -167,6 +168,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
 
                 if (!FileExists(ks3Client, containerName, objectKey))
                 {
+                    Logger.LogWarning("File not found in KS3. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return null;
                 }
                 var result = ks3Client.GetObject(containerName, objectKey);
@@ -193,6 +195,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
 
                 if (!FileExists(ks3Client, containerName, objectKey))
                 {
+                    Logger.LogWarning("File not found in KS3. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return false;
                 }
 
@@ -296,76 +299,106 @@ namespace SharpAbp.Abp.FileStoring.KS3
             FileProviderSaveArgs args)
         {
             var initiateMultipartUploadResult = ks3.InitiateMultipartUpload(new InitiateMultipartUploadRequest(containerName, objectKey));
-
-            // Upload ID
             var uploadId = initiateMultipartUploadResult.UploadId;
-            // Calculate the total number of shards
-            var partSize = args.Configuration.MultiPartUploadShardingSize;
-            //var fi = new FileInfo(spoolFile.FilePath);//?
-            var fileSize = args.FileStream!.Length;
-            var partCount = fileSize / partSize;
-            if (fileSize % partSize != 0)
+
+            try
             {
-                partCount++;
-            }
+                // Calculate the total number of shards
+                var partSize = args.Configuration.MultiPartUploadShardingSize;
+                var fileSize = args.FileStream!.Length;
+                var partCount = fileSize / partSize;
+                if (fileSize % partSize != 0)
+                {
+                    partCount++;
+                }
 
-            // Start multipart upload. partETags is a list that stores partETag. After KS3 receives the shard list submitted by the user,
-            // it will verify the validity of each shard data one by one. After all data shards pass the verification,
-            // KS3 will combine these shards into a complete file.
-            var partETags = new List<PartETag>();
-            for (var i = 0; i < partCount; i++)
-            {
-                var skipBytes = (long)partSize * i;
-                // Position to the starting point of this upload.
-                args.FileStream.Seek(skipBytes, 0);
+                // Start multipart upload. partETags is a list that stores partETag. After KS3 receives the shard list submitted by the user,
+                // it will verify the validity of each shard data one by one. After all data shards pass the verification,
+                // KS3 will combine these shards into a complete file.
+                var partETags = new List<PartETag>();
+                for (var i = 0; i < partCount; i++)
+                {
+                    var skipBytes = (long)partSize * i;
+                    // Position to the starting point of this upload.
+                    args.FileStream.Seek(skipBytes, 0);
 
-                // Calculate the size of the shard to be uploaded this time. The last shard is the remaining data size.
-                var size = (partSize < fileSize - skipBytes) ? partSize : (fileSize - skipBytes);
-                var buffer = new byte[size];
-                await args.FileStream.ReadAsync(buffer, 0, buffer.Length);
+                    // Calculate the size of the shard to be uploaded this time. The last shard is the remaining data size.
+                    var size = (partSize < fileSize - skipBytes) ? partSize : (fileSize - skipBytes);
+                    var buffer = new byte[size];
+                    await args.FileStream.ReadAsync(buffer, 0, buffer.Length, args.CancellationToken);
 
-                var request = new UploadPartRequest()
+                    using var partStream = new MemoryStream(buffer);
+                    var request = new UploadPartRequest()
+                    {
+                        BucketName = containerName,
+                        ObjectKey = objectKey,
+                        UploadId = uploadId,
+                        InputStream = partStream,
+                        PartNumber = i + 1
+                    };
+
+                    // Call the UploadPart interface to perform the upload function. The result contains the ETag value of this data shard.
+                    var partETag = ks3.UploadPart(request);
+                    partETags.Add(partETag);
+
+                    Logger.LogDebug("Multipart upload progress for file '{FileId}' with UploadId '{UploadId}': {CompletedParts}/{TotalParts} completed.",
+                        args.FileId, uploadId, partETags.Count, partCount);
+                }
+
+                var root = new XElement("CompleteMultipartUpload");
+                foreach (var partETag in partETags)
+                {
+                    var partE = new XElement("Part");
+                    partE.Add(new XElement("PartNumber", partETag.PartNumber));
+                    partE.Add(new XElement("ETag", partETag.ETag));
+                    root.Add(partE);
+                }
+
+                var contentBuffer = Encoding.UTF8.GetBytes(root.ToString());
+
+                using var contentStream = new MemoryStream(contentBuffer);
+                var completeMultipartUploadRequest = new CompleteMultipartUploadRequest()
                 {
                     BucketName = containerName,
                     ObjectKey = objectKey,
                     UploadId = uploadId,
-                    InputStream = new MemoryStream(buffer),
-                    PartNumber = i + 1
+                    Content = contentStream
                 };
 
-                // Call the UploadPart interface to perform the upload function. The result contains the ETag value of this data shard.
-                var partETag = ks3.UploadPart(request);
-                partETags.Add(partETag);
-
-                Logger.LogDebug("Multipart upload progress for file '{FileId}' with UploadId '{UploadId}': {CompletedParts}/{TotalParts} completed.", 
-                    args.FileId, uploadId, partETags.Count, partCount);
+                var completeMultipartUploadResult = ks3.CompleteMultipartUpload(completeMultipartUploadRequest);
+                Logger.LogInformation("Multipart upload completed for file '{FileId}' with key '{ObjectKey}'. ETag: {ETag}",
+                    args.FileId, completeMultipartUploadResult.Key, completeMultipartUploadResult.ETag);
+                return args.FileId;
             }
-
-            var root = new XElement("CompleteMultipartUpload");
-            foreach (var partETag in partETags)
+            catch (Exception ex)
             {
-                var partE = new XElement("Part");
-                partE.Add(new XElement("PartNumber", partETag.PartNumber));
-                partE.Add(new XElement("ETag", partETag.ETag));
-                root.Add(partE);
+                Logger.LogError(ex, "Multipart upload failed for file '{FileId}' with UploadId '{UploadId}'. Bucket: {BucketName}, Key: {ObjectKey}",
+                    args.FileId, uploadId, containerName, objectKey);
+                AbortMultipartUploadSilently(ks3, containerName, objectKey, uploadId);
+                throw;
             }
-
-            var contentBuffer = Encoding.UTF8.GetBytes(root.ToString());
-
-            var completeMultipartUploadRequest = new CompleteMultipartUploadRequest()
-            {
-                BucketName = containerName,
-                ObjectKey = objectKey,
-                UploadId = uploadId,
-                Content = new MemoryStream(contentBuffer)
-            };
-
-            var completeMultipartUploadResult = ks3.CompleteMultipartUpload(completeMultipartUploadRequest);
-            Logger.LogInformation("Multipart upload completed for file '{FileId}' with key '{ObjectKey}'. ETag: {ETag}", 
-                args.FileId, completeMultipartUploadResult.Key, completeMultipartUploadResult.ETag);
-            return args.FileId;
         }
  
-
+        protected virtual void AbortMultipartUploadSilently(
+            IKS3 ks3,
+            string containerName,
+            string objectKey,
+            string uploadId)
+        {
+            try
+            {
+                ks3.AbortMultipartUpload(new AbortMultipartUploadRequest()
+                {
+                    BucketName = containerName,
+                    ObjectKey = objectKey,
+                    UploadId = uploadId
+                });
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning(ex, "Failed to abort multipart upload '{UploadId}'. Bucket: {BucketName}, Key: {ObjectKey}", uploadId, containerName, objectKey);
+            }
+        }
+ 
     }
 }

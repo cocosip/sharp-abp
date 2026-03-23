@@ -1,10 +1,13 @@
-﻿using System;
+using System;
 using Volo.Abp;
 
 namespace SharpAbp.Abp.FileStoring.FastDFS
 {
     public class FastDFSFileProviderConfiguration
     {
+        /// <summary>
+        /// Cluster name, used as the named client key in IFastDFSClientFactory.
+        /// </summary>
         public string ClusterName
         {
             get => _containerConfiguration.GetConfiguration<string>(FastDFSFileProviderConfigurationNames.ClusterName);
@@ -12,7 +15,7 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
         }
 
         /// <summary>
-        /// Storage group name
+        /// Storage group name (e.g. "group1").
         /// </summary>
         public string GroupName
         {
@@ -21,26 +24,17 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
         }
 
         /// <summary>
-        /// Access server url
+        /// HTTP access server URL for file URL generation (e.g. "http://192.168.0.100:8080").
+        /// Required when HttpAccess is enabled.
         /// </summary>
         public string HttpServer
         {
             get => _containerConfiguration.GetConfiguration<string>(FastDFSFileProviderConfigurationNames.HttpServer);
-            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.HttpServer, Check.NotNullOrWhiteSpace(value, nameof(value)));
+            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.HttpServer, value);
         }
 
         /// <summary>
-        /// The url contain group name or not
-        /// </summary>
-        public bool AppendGroupNameToUrl
-        {
-            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.AppendGroupNameToUrl, true);
-            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.AppendGroupNameToUrl, value);
-        }
-
-
-        /// <summary>
-        /// Trackers, 192.168.0.100:22122,192.168.0.101:22122
+        /// Tracker server endpoints, comma-separated (e.g. "192.168.0.100:22122,192.168.0.101:22122").
         /// </summary>
         public string Trackers
         {
@@ -49,16 +43,16 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
         }
 
         /// <summary>
-        /// AntiStealToken
+        /// Enable anti-steal token validation for HTTP access. Default: false.
         /// </summary>
         public bool AntiStealCheckToken
         {
-            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.AntiStealCheckToken, true);
+            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.AntiStealCheckToken, false);
             set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.AntiStealCheckToken, value);
         }
 
         /// <summary>
-        /// SecretKey, to create access token
+        /// Secret key for anti-steal token generation. Must match FastDFS Nginx module config.
         /// </summary>
         public string SecretKey
         {
@@ -67,25 +61,16 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
         }
 
         /// <summary>
-        /// ConnectionLifeTime
+        /// Default token expiration time in seconds. Default: 3600 (1 hour).
         /// </summary>
-        public int ConnectionLifeTime
+        public int DefaultTokenExpireSeconds
         {
-            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.ConnectionLifeTime, 600);
-            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.ConnectionLifeTime, value);
+            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.DefaultTokenExpireSeconds, 3600);
+            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.DefaultTokenExpireSeconds, value);
         }
 
         /// <summary>
-        /// ConnectionTimeout
-        /// </summary>
-        public int ConnectionTimeout
-        {
-            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.ConnectionTimeout, 5);
-            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.ConnectionTimeout, value);
-        }
-
-        /// <summary>
-        /// Charset
+        /// Charset encoding name. Default: "UTF-8".
         /// </summary>
         public string Charset
         {
@@ -94,42 +79,76 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
         }
 
         /// <summary>
-        /// ConnectionConcurrentThread
+        /// General network timeout in seconds. Default: 30.
         /// </summary>
-        public int ConnectionConcurrentThread
+        public int NetworkTimeout
         {
-            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.ConnectionConcurrentThread, 3);
-            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.ConnectionConcurrentThread, value);
-        }
-
-
-        /// <summary>
-        /// ScanTimeoutConnectionInterval
-        /// </summary>
-        public int ScanTimeoutConnectionInterval
-        {
-            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.ScanTimeoutConnectionInterval, 10);
-            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.ScanTimeoutConnectionInterval, value);
+            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.NetworkTimeout, 30);
+            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.NetworkTimeout, value);
         }
 
         /// <summary>
-        /// TrackerMaxConnection 
+        /// Maximum connections per server in the connection pool. Default: 50.
         /// </summary>
-        public int TrackerMaxConnection
+        public int MaxConnectionPerServer
         {
-            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.TrackerMaxConnection, 3);
-            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.TrackerMaxConnection, value);
+            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.MaxConnectionPerServer, 50);
+            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.MaxConnectionPerServer, value);
         }
 
         /// <summary>
-        /// StorageMaxConnection  
+        /// Minimum connections per server (pre-warmed). Default: 5.
         /// </summary>
-        public int StorageMaxConnection
+        public int MinConnectionPerServer
         {
-            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.StorageMaxConnection, 10);
-            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.StorageMaxConnection, value);
+            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.MinConnectionPerServer, 5);
+            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.MinConnectionPerServer, value);
         }
 
+        /// <summary>
+        /// Connection idle timeout in seconds. Idle connections are closed after this period. Default: 300 (5 min).
+        /// </summary>
+        public int ConnectionIdleTimeout
+        {
+            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.ConnectionIdleTimeout, 300);
+            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.ConnectionIdleTimeout, value);
+        }
+
+        /// <summary>
+        /// Maximum connection lifetime in seconds. Default: 3600 (1 hour). 0 = no limit.
+        /// </summary>
+        public int ConnectionLifeTime
+        {
+            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.ConnectionLifeTime, 3600);
+            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.ConnectionLifeTime, value);
+        }
+
+        /// <summary>
+        /// Connection timeout in milliseconds. Default: 30000 (30 seconds).
+        /// </summary>
+        public int ConnectionTimeout
+        {
+            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.ConnectionTimeout, 30000);
+            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.ConnectionTimeout, value);
+        }
+
+        /// <summary>
+        /// Send timeout in milliseconds. Default: 30000 (30 seconds).
+        /// </summary>
+        public int SendTimeout
+        {
+            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.SendTimeout, 30000);
+            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.SendTimeout, value);
+        }
+
+        /// <summary>
+        /// Receive timeout in milliseconds. Default: 30000 (30 seconds).
+        /// </summary>
+        public int ReceiveTimeout
+        {
+            get => _containerConfiguration.GetConfigurationOrDefault(FastDFSFileProviderConfigurationNames.ReceiveTimeout, 30000);
+            set => _containerConfiguration.SetConfiguration(FastDFSFileProviderConfigurationNames.ReceiveTimeout, value);
+        }
 
         private readonly FileContainerConfiguration _containerConfiguration;
 
