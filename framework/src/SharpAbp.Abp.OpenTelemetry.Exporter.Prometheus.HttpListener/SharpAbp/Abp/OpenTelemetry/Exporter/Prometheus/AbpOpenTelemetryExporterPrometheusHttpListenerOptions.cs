@@ -19,14 +19,14 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus
         public AbpOpenTelemetryExporterPrometheusHttpListenerOptions PreConfigure(IConfiguration configuration)
         {
             var openTelemetryExporterPrometheusHttpListenerOptions = configuration
-                .GetSection("OpenTelemetryOptions:Exporters:PrometheusHttpListener")
+                .GetSection("OpenTelemetryExporters:PrometheusHttpListener")
                 .Get<AbpOpenTelemetryExporterPrometheusHttpListenerOptions>();
 
             if (openTelemetryExporterPrometheusHttpListenerOptions != null)
             {
                 Name = openTelemetryExporterPrometheusHttpListenerOptions.Name;
                 ScrapeEndpointPath = openTelemetryExporterPrometheusHttpListenerOptions.ScrapeEndpointPath;
-                UriPrefixes = openTelemetryExporterPrometheusHttpListenerOptions.UriPrefixes;
+                UriPrefixes = openTelemetryExporterPrometheusHttpListenerOptions.UriPrefixes ?? new List<string>();
             }
 
             return this;

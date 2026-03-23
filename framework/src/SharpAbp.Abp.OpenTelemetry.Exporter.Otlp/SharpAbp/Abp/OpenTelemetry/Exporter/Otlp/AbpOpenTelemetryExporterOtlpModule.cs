@@ -1,18 +1,14 @@
-﻿using global::OpenTelemetry.Logs;
+using global::OpenTelemetry.Logs;
 using global::OpenTelemetry.Metrics;
 using global::OpenTelemetry.Trace;
 using Microsoft.Extensions.DependencyInjection;
-using OpenTelemetry.Exporter;
-using System;
 using System.Threading.Tasks;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.OpenTelemetry.Exporter.Otlp
 {
-    [DependsOn(
-        typeof(AbpOpenTelemetryModule)
-        )]
+    [DependsOn(typeof(AbpOpenTelemetryModule))]
     public class AbpOpenTelemetryExporterOtlpModule : AbpModule
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
@@ -39,35 +35,44 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Otlp
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            var openTelemetryExporterOtlpOptions = context.Services.ExecutePreConfiguredActions<AbpOpenTelemetryExporterOtlpOptions>();
+            var otlpOptions = context.Services.ExecutePreConfiguredActions<AbpOpenTelemetryExporterOtlpOptions>();
 
             PreConfigure<AbpOpenTelemetryOptions>(options =>
             {
-                var action = new Action<OtlpExporterOptions>(c =>
-                {
-                    c.Endpoint = new Uri(openTelemetryExporterOtlpOptions.Endpoint);
-                });
-
-                options.TracingExporters.Add(OpenTelemetryExporterNames.Otlp, new Action<TracerProviderBuilder>(builder =>
-                {
-                    builder.AddOtlpExporter(openTelemetryExporterOtlpOptions.Name, action);
-                }));
-
-                options.MetricsExporters.Add(OpenTelemetryExporterNames.Otlp, new Action<MeterProviderBuilder>(builder =>
-                {
-                    builder.AddOtlpExporter(openTelemetryExporterOtlpOptions.Name, action);
-                }));
-
-                options.LoggingExporters.Add(OpenTelemetryExporterNames.Otlp, new Action<OpenTelemetryLoggerOptions>(builder =>
-                {
-                    builder.AddOtlpExporter((exporterOptions, processorOptions) =>
-                    {
-                        exporterOptions.Endpoint = new Uri(openTelemetryExporterOtlpOptions.Endpoint);
-                    });
-                }));
+                RegisterExporter(options, OpenTelemetryExporterNames.Otlp, otlpOptions);
             });
 
             return Task.CompletedTask;
+        }
+
+        private static void RegisterExporter(
+            AbpOpenTelemetryOptions options,
+            string exporterName,
+            AbpOpenTelemetryExporterOtlpOptions exporterOptions)
+        {
+            options.TracingExporters[exporterName] = builder =>
+            {
+                builder.AddOtlpExporter(exporterOptions.Name, otlpOptions =>
+                {
+                    exporterOptions.ApplyTo(otlpOptions, exporterOptions.Tracing);
+                });
+            };
+
+            options.MetricsExporters[exporterName] = builder =>
+            {
+                builder.AddOtlpExporter(exporterOptions.Name, otlpOptions =>
+                {
+                    exporterOptions.ApplyTo(otlpOptions, exporterOptions.Metrics);
+                });
+            };
+
+            options.LoggingExporters[exporterName] = builder =>
+            {
+                builder.AddOtlpExporter((otlpOptions, _) =>
+                {
+                    exporterOptions.ApplyTo(otlpOptions, exporterOptions.Logging);
+                });
+            };
         }
     }
 }

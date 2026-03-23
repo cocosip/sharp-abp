@@ -121,7 +121,7 @@
 		<PackageVersion Include="AutoS3.KS3" Version="2.2.0" />
 		<PackageVersion Include="BouncyCastle.Cryptography" Version="2.6.2" />
 		<PackageVersion Include="Cocosip.KS3SDK" Version="1.0.0" />
-		<PackageVersion Include="DotCommon" Version="8.0.1" />
+		<PackageVersion Include="DotCommon" Version="8.0.2" />
 		<PackageVersion Include="FastDFS.Client" Version="1.1.0" />
 		<PackageVersion Include="FastDFS.Client.DependencyInjection" Version="1.1.0" />
 		<PackageVersion Include="Microsoft.FASTER.Core" Version="2.6.5" />
@@ -213,7 +213,6 @@
 		<PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.15.0" />
 		<PackageVersion Include="OpenTelemetry.Exporter.Console" Version="1.15.0" />
 		<PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.0" />
-		<PackageVersion Include="OpenTelemetry.Exporter.Zipkin" Version="1.15.0" />
 		<PackageVersion Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.15.0-beta.1" />
 		<PackageVersion Include="OpenTelemetry.Exporter.Prometheus.HttpListener" Version="1.15.0-beta.1" />
 		<PackageVersion Include="protobuf-net" Version="3.2.56" />

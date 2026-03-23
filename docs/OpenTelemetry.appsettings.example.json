@@ -1,0 +1,56 @@
+{
+  "OpenTelemetry": {
+    "Resource": {
+      "IsEnabled": true,
+      "ServiceName": "SharpAbp.SampleService",
+      "ServiceNamespace": "SharpAbp.Samples",
+      "ServiceVersion": "1.0.0",
+      "AutoGenerateServiceInstanceId": true,
+      "ServiceInstanceId": ""
+    },
+    "Tracing": {
+      "IsEnabled": true,
+      "ExporterName": "Otlp"
+    },
+    "Metrics": {
+      "IsEnabled": true,
+      "ExporterName": "PrometheusAspNetCore"
+    },
+    "Logging": {
+      "IsEnabled": true,
+      "ExporterName": "Otlp",
+      "ClearProviders": false,
+      "IncludeFormattedMessage": true,
+      "IncludeScopes": true,
+      "ParseStateValues": true
+    }
+  },
+  "OpenTelemetryExporters": {
+    "Console": {
+      "Name": "console",
+      "Targets": "Console"
+    },
+    "Otlp": {
+      "Name": "otlp",
+      "Endpoint": "http://otel-collector:4318",
+      "Headers": "x-api-key=demo",
+      "TimeoutMilliseconds": 10000,
+      "Protocol": "HttpProtobuf",
+      "Tracing": {
+        "Endpoint": "http://otel-collector:4318/v1/traces"
+      },
+      "Metrics": {
+        "Endpoint": "http://otel-collector:4318/v1/metrics"
+      },
+      "Logging": {
+        "Endpoint": "http://otel-collector:4318/v1/logs"
+      }
+    },
+    "PrometheusAspNetCore": {
+      "Name": "prometheus-aspnetcore",
+      "ScrapeEndpointPath": "/metrics",
+      "ScrapeResponseCacheDurationMilliseconds": 0,
+      "UsePrometheusScrapingEndpoint": true
+    }
+  }
+}

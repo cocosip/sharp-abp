@@ -1,4 +1,4 @@
-﻿using global::OpenTelemetry.Exporter;
+using global::OpenTelemetry.Exporter;
 using global::OpenTelemetry.Metrics;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,10 +12,7 @@ using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus
 {
-    [DependsOn(
-        typeof(AbpOpenTelemetryModule),
-        typeof(AbpAspNetCoreModule)
-        )]
+    [DependsOn(typeof(AbpOpenTelemetryModule), typeof(AbpAspNetCoreModule))]
     public class AbpOpenTelemetryExporterPrometheusAspNetCoreModule : AbpModule
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
@@ -42,18 +39,18 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            var openTelemetryExporterPrometheusAspNetCoreOptions = context.Services.ExecutePreConfiguredActions<AbpOpenTelemetryExporterPrometheusAspNetCoreOptions>();
+            var exporterOptions = context.Services.ExecutePreConfiguredActions<AbpOpenTelemetryExporterPrometheusAspNetCoreOptions>();
 
             PreConfigure<AbpOpenTelemetryOptions>(options =>
             {
-                options.MetricsExporters.Add(OpenTelemetryExporterNames.PrometheusAspNetCore, new Action<MeterProviderBuilder>(builder =>
+                options.MetricsExporters[OpenTelemetryExporterNames.PrometheusAspNetCore] = builder =>
                 {
-                    builder.AddPrometheusExporter(openTelemetryExporterPrometheusAspNetCoreOptions.Name, new Action<PrometheusAspNetCoreOptions>(builder =>
+                    builder.AddPrometheusExporter(exporterOptions.Name, prometheusOptions =>
                     {
-                        builder.ScrapeEndpointPath = openTelemetryExporterPrometheusAspNetCoreOptions.ScrapeEndpointPath;
-                        builder.ScrapeResponseCacheDurationMilliseconds = openTelemetryExporterPrometheusAspNetCoreOptions.ScrapeResponseCacheDurationMilliseconds;
-                    }));
-                }));
+                        prometheusOptions.ScrapeEndpointPath = exporterOptions.ScrapeEndpointPath;
+                        prometheusOptions.ScrapeResponseCacheDurationMilliseconds = exporterOptions.ScrapeResponseCacheDurationMilliseconds;
+                    });
+                };
             });
 
             return Task.CompletedTask;
@@ -74,6 +71,7 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus
                     preConfigure?.Invoke(options);
                 }
             });
+
             return Task.CompletedTask;
         }
 
@@ -85,14 +83,17 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus
         public override Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
         {
             var options = context.ServiceProvider.GetRequiredService<IOptions<AbpOpenTelemetryOptions>>().Value;
-            var openTelemetryExporterPrometheusAspNetCoreOptions = context.ServiceProvider.GetRequiredService<IOptions<AbpOpenTelemetryExporterPrometheusAspNetCoreOptions>>().Value;
-
+            var exporterOptions = context.ServiceProvider.GetRequiredService<IOptions<AbpOpenTelemetryExporterPrometheusAspNetCoreOptions>>().Value;
             var applicationBuilder = context.GetApplicationBuilder();
 
-            if (options.UseMetricsExporter!.Equals(OpenTelemetryExporterNames.PrometheusAspNetCore, StringComparison.OrdinalIgnoreCase))
+            if (options.Metrics.IsEnabled &&
+                string.Equals(options.Metrics.ExporterName, OpenTelemetryExporterNames.PrometheusAspNetCore, StringComparison.OrdinalIgnoreCase))
             {
-                openTelemetryExporterPrometheusAspNetCoreOptions.PrometheusScrapingEndpointConfigure?.Invoke(applicationBuilder);
-                if (openTelemetryExporterPrometheusAspNetCoreOptions.PrometheusScrapingEndpointConfigure != null)
+                if (exporterOptions.PrometheusScrapingEndpointConfigure != null)
+                {
+                    exporterOptions.PrometheusScrapingEndpointConfigure(applicationBuilder);
+                }
+                else if (exporterOptions.UsePrometheusScrapingEndpoint)
                 {
                     applicationBuilder.UseOpenTelemetryPrometheusScrapingEndpoint();
                 }
@@ -100,6 +101,5 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus
 
             return Task.CompletedTask;
         }
-
     }
 }

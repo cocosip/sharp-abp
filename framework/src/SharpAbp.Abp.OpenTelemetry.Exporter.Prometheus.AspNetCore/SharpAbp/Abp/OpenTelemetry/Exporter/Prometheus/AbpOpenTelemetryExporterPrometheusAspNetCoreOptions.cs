@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using System;
 
@@ -12,20 +12,24 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus
 
         public int ScrapeResponseCacheDurationMilliseconds { get; set; }
 
+        public bool UsePrometheusScrapingEndpoint { get; set; } = true;
+
         public Action<IApplicationBuilder>? PrometheusScrapingEndpointConfigure { get; set; }
 
         public AbpOpenTelemetryExporterPrometheusAspNetCoreOptions PreConfigure(IConfiguration configuration)
         {
-            var openTelemetryExporterPrometheusAspNetCoreOptions = configuration
-                .GetSection("OpenTelemetryOptions:Exporters:PrometheusAspNetCore")
+            var options = configuration
+                .GetSection("OpenTelemetryExporters:PrometheusAspNetCore")
                 .Get<AbpOpenTelemetryExporterPrometheusAspNetCoreOptions>();
 
-            if (openTelemetryExporterPrometheusAspNetCoreOptions != null)
+            if (options != null)
             {
-                Name = openTelemetryExporterPrometheusAspNetCoreOptions.Name;
-                ScrapeEndpointPath = openTelemetryExporterPrometheusAspNetCoreOptions.ScrapeEndpointPath;
-                ScrapeResponseCacheDurationMilliseconds = openTelemetryExporterPrometheusAspNetCoreOptions.ScrapeResponseCacheDurationMilliseconds;
+                Name = options.Name;
+                ScrapeEndpointPath = options.ScrapeEndpointPath;
+                ScrapeResponseCacheDurationMilliseconds = options.ScrapeResponseCacheDurationMilliseconds;
+                UsePrometheusScrapingEndpoint = options.UsePrometheusScrapingEndpoint;
             }
+
             return this;
         }
     }

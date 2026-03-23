@@ -1,464 +1,308 @@
 # Observability
 
-OpenTelemetry integration for comprehensive application observability including tracing, metrics, and logging.
+OpenTelemetry integration for tracing, metrics, and logging in SharpAbp modules.
 
 ## OpenTelemetry
 
-Complete OpenTelemetry observability platform with support for Zipkin, Prometheus, and OTLP exporters.
+`SharpAbp.Abp.OpenTelemetry` provides the core ABP module and configuration model.
 
-### Installation
+Exporter packages add concrete output targets such as OTLP, Console, and Prometheus.
+
+## Installation
 
 ```bash
-# Core OpenTelemetry
+# Core packages
 dotnet add package SharpAbp.Abp.OpenTelemetry
 dotnet add package SharpAbp.Abp.OpenTelemetry.Abstractions
 
-# Exporters (choose one or more):
-dotnet add package SharpAbp.Abp.OpenTelemetry.Exporter.Console
-dotnet add package SharpAbp.Abp.OpenTelemetry.Exporter.Zipkin
+# Exporters
 dotnet add package SharpAbp.Abp.OpenTelemetry.Exporter.Otlp
+dotnet add package SharpAbp.Abp.OpenTelemetry.Exporter.Console
 dotnet add package SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.AspNetCore
 dotnet add package SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.HttpListener
 ```
 
-### Configuration
+## Configuration First
 
-Configure in `appsettings.json`:
+Configuration file setup is the recommended default path.
+
+The core configuration is split into four sections:
+
+- `OpenTelemetry:Resource`
+- `OpenTelemetry:Tracing`
+- `OpenTelemetry:Metrics`
+- `OpenTelemetry:Logging`
+
+For common scenarios, `Tracing:SourceNames` and `Metrics:MeterNames` can be omitted.
+When they are empty, SharpAbp uses `OpenTelemetry:Resource:ServiceName` as the default source and meter name.
+
+Exporter-specific settings are configured separately, for example:
+
+- `OpenTelemetryExporters:Otlp`
+- `OpenTelemetryExporters:PrometheusAspNetCore`
+
+A complete sample file is available at [OpenTelemetry.appsettings.example.json](/D:/dotnet-code/sharp-abp/docs/OpenTelemetry.appsettings.example.json).
+
+The OTLP sample in that file already uses OpenTelemetry Collector:
+
+- `OpenTelemetryExporters:Otlp:Endpoint = http://otel-collector:4318`
+- `Tracing/Metrics/Logging` can optionally override to Collector signal paths such as `/v1/traces`
+
+### Minimal OTLP Example
 
 ```json
 {
   "OpenTelemetry": {
-    "ServiceName": "MyApplication",
-    "ServiceVersion": "1.0.0",
+    "Resource": {
+      "IsEnabled": true,
+      "ServiceName": "MyApplication",
+      "ServiceNamespace": "SharpAbp.Sample",
+      "ServiceVersion": "1.0.0",
+      "AutoGenerateServiceInstanceId": true
+    },
     "Tracing": {
-      "Enabled": true,
-      "Zipkin": {
-        "Endpoint": "http://localhost:9411/api/v2/spans"
-      },
-      "Otlp": {
-        "Endpoint": "http://localhost:4317"
-      }
+      "IsEnabled": true,
+      "ExporterName": "Otlp"
     },
     "Metrics": {
-      "Enabled": true,
-      "Prometheus": {
-        "Port": 9090,
-        "Path": "/metrics"
+      "IsEnabled": true,
+      "ExporterName": "Otlp"
+    },
+    "Logging": {
+      "IsEnabled": true,
+      "ExporterName": "Otlp",
+      "IncludeFormattedMessage": true,
+      "IncludeScopes": true,
+      "ParseStateValues": true
+    }
+  },
+  "OpenTelemetryExporters": {
+    "Otlp": {
+      "Endpoint": "http://localhost:4318",
+      "Protocol": "HttpProtobuf",
+      "TimeoutMilliseconds": 10000
+    }
+  }
+}
+```
+
+### OTLP and Collector
+
+There is only one OTLP exporter in the module design.
+
+If the OTLP endpoint points to an OpenTelemetry Collector, then the application is exporting through Collector.
+
+Examples:
+
+- direct OTLP backend: `http://vendor-endpoint:4318`
+- OpenTelemetry Collector: `http://otel-collector:4318`
+
+This means Collector is a deployment target for OTLP, not a separate exporter type.
+
+### Collector Example
+
+```json
+{
+  "OpenTelemetry": {
+    "Resource": {
+      "IsEnabled": true,
+      "ServiceName": "MyApplication"
+    },
+    "Tracing": {
+      "IsEnabled": true,
+      "ExporterName": "Otlp"
+    },
+    "Metrics": {
+      "IsEnabled": true,
+      "ExporterName": "Otlp"
+    },
+    "Logging": {
+      "IsEnabled": true,
+      "ExporterName": "Otlp",
+      "IncludeFormattedMessage": true,
+      "IncludeScopes": true,
+      "ParseStateValues": true
+    }
+  },
+  "OpenTelemetryExporters": {
+    "Otlp": {
+      "Endpoint": "http://otel-collector:4318",
+      "Protocol": "HttpProtobuf",
+      "TimeoutMilliseconds": 10000,
+      "Tracing": {
+        "Endpoint": "http://otel-collector:4318/v1/traces"
+      },
+      "Metrics": {
+        "Endpoint": "http://otel-collector:4318/v1/metrics"
+      },
+      "Logging": {
+        "Endpoint": "http://otel-collector:4318/v1/logs"
       }
     }
   }
 }
 ```
 
-Add the module dependency:
+Nothing special is required in code for Collector mode.
+
+The current implementation already supports it because:
+
+- OTLP exporter configuration binds `Endpoint`, `Protocol`, `Headers`, and per-signal overrides from `OpenTelemetryExporters:Otlp`
+- the exporter module applies those values directly into `AddOtlpExporter(...)`
+- if the endpoint is a Collector address, the application exports to Collector through the standard OTLP exporter
+
+### Prometheus Example
+
+```json
+{
+  "OpenTelemetry": {
+    "Resource": {
+      "IsEnabled": true,
+      "ServiceName": "MyApplication"
+    },
+    "Metrics": {
+      "IsEnabled": true,
+      "ExporterName": "PrometheusAspNetCore"
+    }
+  },
+  "OpenTelemetryExporters": {
+    "PrometheusAspNetCore": {
+      "Name": "prometheus-aspnetcore",
+      "ScrapeEndpointPath": "/metrics",
+      "ScrapeResponseCacheDurationMilliseconds": 0,
+      "UsePrometheusScrapingEndpoint": true
+    }
+  }
+}
+```
+
+For ASP.NET Core applications, `PrometheusAspNetCore` is the usual choice.
+
+`UsePrometheusScrapingEndpoint = true` means SharpAbp will register the default scraping endpoint middleware.
+
+If you provide a custom `PrometheusScrapingEndpointConfigure` action in code, that custom action replaces the default endpoint registration path.
+
+### Prometheus HttpListener Example
+
+Use `PrometheusHttpListener` only for standalone listener scenarios where ASP.NET Core endpoint middleware is not the right fit.
+
+```json
+{
+  "OpenTelemetry": {
+    "Resource": {
+      "IsEnabled": true,
+      "ServiceName": "MyApplication"
+    },
+    "Metrics": {
+      "IsEnabled": true,
+      "ExporterName": "PrometheusHttpListener"
+    }
+  },
+  "OpenTelemetryExporters": {
+    "PrometheusHttpListener": {
+      "Name": "prometheus-httplistener",
+      "ScrapeEndpointPath": "/metrics",
+      "UriPrefixes": [ "http://localhost:9464/" ]
+    }
+  }
+}
+```
+
+`UriPrefixes` must contain at least one non-empty URI prefix.
+
+## Module Setup
 
 ```csharp
 [DependsOn(
     typeof(AbpOpenTelemetryModule),
-    typeof(AbpOpenTelemetryExporterZipkinModule),
+    typeof(AbpOpenTelemetryExporterOtlpModule),
     typeof(AbpOpenTelemetryExporterPrometheusAspNetCoreModule)
 )]
-public class YourModule : AbpModule
+public class MyModule : AbpModule
 {
-    public override void ConfigureServices(ServiceConfigurationContext context)
-    {
-        var configuration = context.Services.GetConfiguration();
-        var serviceName = configuration["OpenTelemetry:ServiceName"];
-
-        Configure<AbpOpenTelemetryOptions>(options =>
-        {
-            options.ServiceName = serviceName;
-            options.ServiceVersion = "1.0.0";
-        });
-
-        // Configure tracing
-        context.Services.AddOpenTelemetryTracing(builder =>
-        {
-            builder
-                .SetResourceBuilder(ResourceBuilder.CreateDefault()
-                    .AddService(serviceName))
-                .AddAspNetCoreInstrumentation()
-                .AddHttpClientInstrumentation()
-                .AddSqlClientInstrumentation()
-                .AddZipkinExporter(options =>
-                {
-                    options.Endpoint = new Uri(
-                        configuration["OpenTelemetry:Tracing:Zipkin:Endpoint"]
-                    );
-                });
-        });
-
-        // Configure metrics
-        context.Services.AddOpenTelemetryMetrics(builder =>
-        {
-            builder
-                .SetResourceBuilder(ResourceBuilder.CreateDefault()
-                    .AddService(serviceName))
-                .AddAspNetCoreInstrumentation()
-                .AddHttpClientInstrumentation()
-                .AddPrometheusExporter();
-        });
-    }
-
-    public override void OnApplicationInitialization(ApplicationInitializationContext context)
-    {
-        var app = context.GetApplicationBuilder();
-
-        // Add Prometheus scraping endpoint
-        app.UseOpenTelemetryPrometheusScrapingEndpoint();
-    }
 }
 ```
 
-### Usage Example
+For common scenarios, configuration file setup is enough.
 
-#### Custom Tracing
+## Code Configuration
+
+Code configuration is useful when you need custom instrumentation or advanced builder behavior.
 
 ```csharp
-public class OrderService : ApplicationService
+public override void PreConfigureServices(ServiceConfigurationContext context)
 {
-    private readonly ActivitySource _activitySource;
-
-    public OrderService()
+    PreConfigure<AbpOpenTelemetryOptions>(options =>
     {
-        _activitySource = new ActivitySource("OrderService");
-    }
+        options.Resource.ServiceName = "MyApplication";
+        options.Resource.ServiceVersion = "1.0.0";
 
-    public async Task<OrderDto> CreateOrderAsync(CreateOrderDto input)
-    {
-        using (var activity = _activitySource.StartActivity("CreateOrder"))
-        {
-            activity?.SetTag("order.customerId", input.CustomerId);
-            activity?.SetTag("order.totalAmount", input.TotalAmount);
+        options.Tracing.IsEnabled = true;
+        options.Tracing.ExporterName = OpenTelemetryExporterNames.Otlp;
 
-            try
-            {
-                // Validate order
-                using (var validateActivity = _activitySource.StartActivity("ValidateOrder"))
-                {
-                    await ValidateOrderAsync(input);
-                    validateActivity?.SetTag("validation.result", "success");
-                }
+        options.Metrics.IsEnabled = true;
+        options.Metrics.ExporterName = OpenTelemetryExporterNames.PrometheusAspNetCore;
 
-                // Create order
-                var order = await CreateOrderInternalAsync(input);
-
-                activity?.SetTag("order.id", order.Id);
-                activity?.SetStatus(ActivityStatusCode.Ok);
-
-                return ObjectMapper.Map<Order, OrderDto>(order);
-            }
-            catch (Exception ex)
-            {
-                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                activity?.RecordException(ex);
-                throw;
-            }
-        }
-    }
-
-    private async Task<Order> CreateOrderInternalAsync(CreateOrderDto input)
-    {
-        using (var activity = _activitySource.StartActivity("CreateOrderInternal"))
-        {
-            // Implementation
-            return new Order();
-        }
-    }
+        options.Logging.IsEnabled = true;
+        options.Logging.ExporterName = OpenTelemetryExporterNames.Otlp;
+        options.Logging.IncludeScopes = true;
+    });
 }
 ```
 
-#### Custom Metrics
+If you need custom `ActivitySource` or `Meter` names that differ from `Resource.ServiceName`, configure `Tracing.SourceNames` or `Metrics.MeterNames` explicitly.
 
-```csharp
-public class MetricsService : ITransientDependency
-{
-    private readonly Meter _meter;
-    private readonly Counter<long> _orderCounter;
-    private readonly Histogram<double> _orderAmount;
-    private readonly ObservableGauge<int> _activeOrders;
+## Exporter Configuration Notes
 
-    public MetricsService()
-    {
-        _meter = new Meter("OrderMetrics", "1.0.0");
+### OTLP
 
-        // Counter: tracks number of orders
-        _orderCounter = _meter.CreateCounter<long>(
-            "orders.created",
-            description: "Number of orders created"
-        );
+`OpenTelemetryExporters:Otlp` supports:
 
-        // Histogram: tracks distribution of order amounts
-        _orderAmount = _meter.CreateHistogram<double>(
-            "orders.amount",
-            unit: "USD",
-            description: "Distribution of order amounts"
-        );
+- `Name`
+- `Endpoint`
+- `Headers`
+- `TimeoutMilliseconds`
+- `Protocol`
+- `Tracing`
+- `Metrics`
+- `Logging`
 
-        // Gauge: tracks current active orders
-        _activeOrders = _meter.CreateObservableGauge<int>(
-            "orders.active",
-            () => GetActiveOrderCount(),
-            description: "Number of active orders"
-        );
-    }
+The nested `Tracing`, `Metrics`, and `Logging` sections are optional and are only needed when a signal must override the shared OTLP settings.
 
-    public void RecordOrderCreated(decimal amount, string status)
-    {
-        _orderCounter.Add(1,
-            new KeyValuePair<string, object>("status", status)
-        );
+### Console
 
-        _orderAmount.Record((double)amount,
-            new KeyValuePair<string, object>("status", status)
-        );
-    }
+Console exporter can be used for tracing, metrics, or logging in development.
 
-    private int GetActiveOrderCount()
-    {
-        // Implementation
-        return 0;
-    }
-}
-```
+### Prometheus
 
-#### Distributed Tracing
-
-```csharp
-public class DistributedService : ApplicationService
-{
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ActivitySource _activitySource;
-
-    public DistributedService(IHttpClientFactory httpClientFactory)
-    {
-        _httpClientFactory = httpClientFactory;
-        _activitySource = new ActivitySource("DistributedService");
-    }
-
-    public async Task<Result> ProcessDistributedOperationAsync()
-    {
-        using (var activity = _activitySource.StartActivity("DistributedOperation"))
-        {
-            activity?.SetTag("operation.type", "distributed");
-
-            // Call external service - trace context is automatically propagated
-            var client = _httpClientFactory.CreateClient();
-            var response = await client.GetAsync("https://api.example.com/data");
-
-            activity?.SetTag("external.status", (int)response.StatusCode);
-
-            // Process response
-            var data = await response.Content.ReadAsStringAsync();
-
-            return new Result { Data = data };
-        }
-    }
-}
-```
-
-#### Logging with OpenTelemetry
-
-```csharp
-public class LoggingService : ApplicationService
-{
-    private readonly ILogger<LoggingService> _logger;
-
-    public async Task ProcessWithLoggingAsync()
-    {
-        using (_logger.BeginScope(new Dictionary<string, object>
-        {
-            ["OrderId"] = Guid.NewGuid(),
-            ["CustomerId"] = 123
-        }))
-        {
-            _logger.LogInformation("Processing order");
-
-            try
-            {
-                await ProcessAsync();
-                _logger.LogInformation("Order processed successfully");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to process order");
-                throw;
-            }
-        }
-    }
-}
-```
-
----
-
-## Exporter Configurations
-
-### Zipkin Exporter
-
-```csharp
-builder.AddZipkinExporter(options =>
-{
-    options.Endpoint = new Uri("http://localhost:9411/api/v2/spans");
-    options.MaxPayloadSizeInBytes = 4096;
-});
-```
-
-### Jaeger Exporter (via OTLP)
-
-```csharp
-builder.AddOtlpExporter(options =>
-{
-    options.Endpoint = new Uri("http://localhost:4317");
-    options.Protocol = OtlpExportProtocol.Grpc;
-});
-```
-
-### Prometheus Exporter
-
-```csharp
-// AspNetCore
-builder.AddPrometheusExporter();
-
-// Configure endpoint in OnApplicationInitialization
-app.UseOpenTelemetryPrometheusScrapingEndpoint(options =>
-{
-    options.Path = "/metrics";
-});
-
-// HttpListener (standalone)
-builder.AddPrometheusHttpListener(options =>
-{
-    options.Uris = new[] { "http://localhost:9090/" };
-});
-```
-
-### Console Exporter (Development)
-
-```csharp
-builder.AddConsoleExporter();
-```
-
----
+- `PrometheusAspNetCore` is for ASP.NET Core applications and can expose `/metrics`
+- `PrometheusHttpListener` is for standalone listener scenarios
+- enable only the metrics exporter you actually want to use for the current process
 
 ## Best Practices
 
-### 1. Naming Conventions
+### Resource
 
-Follow OpenTelemetry semantic conventions:
+Keep `ServiceName`, `ServiceNamespace`, and `ServiceVersion` stable and meaningful across environments.
 
-```csharp
-public class BestPracticeService
-{
-    private readonly ActivitySource _activitySource;
+### Signal Naming
 
-    public BestPracticeService()
-    {
-        // Use descriptive, hierarchical names
-        _activitySource = new ActivitySource("MyApp.OrderService");
-    }
+- use clear `ActivitySource` names for tracing
+- use stable `Meter` names for metrics
+- prefer hierarchical names such as `MyCompany.Ordering`
 
-    public async Task ProcessOrderAsync(Guid orderId)
-    {
-        using (var activity = _activitySource.StartActivity(
-            "ProcessOrder",
-            ActivityKind.Internal))
-        {
-            // Use semantic convention tags
-            activity?.SetTag("order.id", orderId);
-            activity?.SetTag("order.status", "processing");
+### OTLP Protocol
 
-            // Add events for significant moments
-            activity?.AddEvent(new ActivityEvent("order.validation.started"));
+For this repository's target frameworks, `HttpProtobuf` is the safest default.
 
-            await ValidateOrderAsync(orderId);
+Use `Grpc` only when your runtime and infrastructure requirements are confirmed.
 
-            activity?.AddEvent(new ActivityEvent("order.validation.completed"));
-        }
-    }
-}
-```
+### Configuration Simplicity
 
-### 2. Sampling
+Prefer:
 
-Configure sampling to control data volume:
+- one shared OTLP exporter block
+- signal-level exporter names
+- per-signal OTLP overrides only when required
 
-```csharp
-context.Services.AddOpenTelemetryTracing(builder =>
-{
-    builder
-        .SetSampler(new TraceIdRatioBasedSampler(0.1)) // Sample 10% of traces
-        .AddAspNetCoreInstrumentation();
-});
-```
-
-### 3. Resource Attributes
-
-Add resource attributes for better identification:
-
-```csharp
-builder.SetResourceBuilder(
-    ResourceBuilder.CreateDefault()
-        .AddService(
-            serviceName: "MyService",
-            serviceVersion: "1.0.0",
-            serviceInstanceId: Environment.MachineName)
-        .AddAttributes(new[]
-        {
-            new KeyValuePair<string, object>("environment", "production"),
-            new KeyValuePair<string, object>("region", "us-east-1")
-        })
-);
-```
-
-### 4. Error Handling
-
-Always record exceptions:
-
-```csharp
-public async Task SafeOperationAsync()
-{
-    using (var activity = _activitySource.StartActivity("SafeOperation"))
-    {
-        try
-        {
-            await RiskyOperationAsync();
-            activity?.SetStatus(ActivityStatusCode.Ok);
-        }
-        catch (Exception ex)
-        {
-            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-            activity?.RecordException(ex);
-            throw;
-        }
-    }
-}
-```
-
-### 5. Performance Considerations
-
-Be mindful of performance overhead:
-
-```csharp
-// Don't create too many spans for simple operations
-public async Task<int> GetCountAsync()
-{
-    // NO - too granular
-    // using (var activity = _activitySource.StartActivity("GetCount"))
-    // {
-    //     return await _repository.CountAsync();
-    // }
-
-    // YES - appropriate granularity
-    return await _repository.CountAsync();
-}
-
-// DO create spans for significant operations
-public async Task<ComplexResult> ComplexOperationAsync()
-{
-    using (var activity = _activitySource.StartActivity("ComplexOperation"))
-    {
-        // This is worth tracing
-        return await PerformComplexCalculationAsync();
-    }
-}
-```
+Avoid duplicating exporter configuration across tracing, metrics, and logging unless the destinations really differ.

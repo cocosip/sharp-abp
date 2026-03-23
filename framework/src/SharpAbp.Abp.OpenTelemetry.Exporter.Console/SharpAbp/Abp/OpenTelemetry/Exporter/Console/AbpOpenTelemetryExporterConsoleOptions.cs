@@ -11,7 +11,7 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Console
         public AbpOpenTelemetryExporterConsoleOptions PreConfigure(IConfiguration configuration)
         {
             var openTelemetryExporterConsoleOptions = configuration
-                .GetSection("OpenTelemetryOptions:Exporters:Console")
+                .GetSection("OpenTelemetryExporters:Console")
                 .Get<AbpOpenTelemetryExporterConsoleOptions>();
 
             if (openTelemetryExporterConsoleOptions != null)

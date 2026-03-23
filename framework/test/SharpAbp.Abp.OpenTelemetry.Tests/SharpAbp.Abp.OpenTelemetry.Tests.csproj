@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\common.test.props" />
+  <PropertyGroup>
+    <TargetFramework>$(NetCoreFx)</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <RootNamespace />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.OpenTelemetry.Abstractions\SharpAbp.Abp.OpenTelemetry.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.OpenTelemetry\SharpAbp.Abp.OpenTelemetry.csproj" />
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.OpenTelemetry.Exporter.Otlp\SharpAbp.Abp.OpenTelemetry.Exporter.Otlp.csproj" />
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.AspNetCore\SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.HttpListener\SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.HttpListener.csproj" />
+  </ItemGroup>
+
+</Project>

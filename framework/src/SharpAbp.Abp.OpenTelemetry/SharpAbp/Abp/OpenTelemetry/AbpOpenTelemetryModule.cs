@@ -1,18 +1,18 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
 
 namespace SharpAbp.Abp.OpenTelemetry
 {
-    [DependsOn(
-        typeof(AbpOpenTelemetryAbstractionsModule)
-        )]
+    [DependsOn(typeof(AbpOpenTelemetryAbstractionsModule))]
     public class AbpOpenTelemetryModule : AbpModule
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
@@ -24,22 +24,26 @@ namespace SharpAbp.Abp.OpenTelemetry
         {
             var configuration = context.Services.GetConfiguration();
 
+            PreConfigure<AbpOpenTelemetryResourceOptions>(options =>
+            {
+                options.PreConfigure(configuration);
+            });
+
             PreConfigure<AbpOpenTelemetryOptions>(options =>
             {
-                //read from configuration
                 options.PreConfigure(configuration);
 
-                options.SamplerConfigure = new Action<TracerProviderBuilder>(builder =>
+                options.Tracing.SamplerConfigure = builder =>
                 {
                     builder.SetSampler(new AlwaysOnSampler());
-                });
+                };
 
-                options.ExemplarFilterConfigure = new Action<MeterProviderBuilder>(builder =>
+                options.Metrics.ExemplarFilterConfigure = builder =>
                 {
 #if EXPOSE_EXPERIMENTAL_FEATURES
                     builder.SetExemplarFilter();
 #endif
-                });
+                };
             });
 
             return Task.CompletedTask;
@@ -50,54 +54,37 @@ namespace SharpAbp.Abp.OpenTelemetry
             AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
         }
 
-
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
             var openTelemetryOptions = context.Services.ExecutePreConfiguredActions<AbpOpenTelemetryOptions>();
-            if (openTelemetryOptions.WithTracing)
+
+            if (openTelemetryOptions.Tracing.IsEnabled &&
+                TryResolveExporter(openTelemetryOptions.Tracing.ExporterName, openTelemetryOptions.TracingExporters, out var tracingExporter))
             {
-                foreach (var keyValuePair in openTelemetryOptions.TracingExporters)
+                PreConfigure<AbpOpenTelemetryOptions>(options =>
                 {
-                    if (openTelemetryOptions.UseTracingExporter!.Equals(keyValuePair.Key, StringComparison.OrdinalIgnoreCase))
-                    {
-                        PreConfigure<AbpOpenTelemetryOptions>(options =>
-                        {
-                            options.TracingExporter = keyValuePair.Value;
-                        });
-                        break;
-                    }
-                }
+                    options.Tracing.ExporterConfigure = tracingExporter;
+                });
             }
 
-            if (openTelemetryOptions.WithMetrics)
+            if (openTelemetryOptions.Metrics.IsEnabled &&
+                TryResolveExporter(openTelemetryOptions.Metrics.ExporterName, openTelemetryOptions.MetricsExporters, out var metricsExporter))
             {
-                foreach (var keyValuePair in openTelemetryOptions.MetricsExporters)
+                PreConfigure<AbpOpenTelemetryOptions>(options =>
                 {
-                    if (openTelemetryOptions.UseMetricsExporter!.Equals(keyValuePair.Key, StringComparison.OrdinalIgnoreCase))
-                    {
-                        PreConfigure<AbpOpenTelemetryOptions>(options =>
-                        {
-                            options.MetricsExporter = keyValuePair.Value;
-                        });
-                        break;
-                    }
-                }
+                    options.Metrics.ExporterConfigure = metricsExporter;
+                });
             }
 
-            if (openTelemetryOptions.WithLogging)
+            if (openTelemetryOptions.Logging.IsEnabled &&
+                TryResolveExporter(openTelemetryOptions.Logging.ExporterName, openTelemetryOptions.LoggingExporters, out var loggingExporter))
             {
-                foreach (var keyValuePair in openTelemetryOptions.LoggingExporters)
+                PreConfigure<AbpOpenTelemetryOptions>(options =>
                 {
-                    if (openTelemetryOptions.UseLoggingExporter!.Equals(keyValuePair.Key, StringComparison.OrdinalIgnoreCase))
-                    {
-                        PreConfigure<AbpOpenTelemetryOptions>(options =>
-                        {
-                            options.LoggingExporter = keyValuePair.Value;
-                        });
-                        break;
-                    }
-                }
+                    options.Logging.ExporterConfigure = loggingExporter;
+                });
             }
+
             return Task.CompletedTask;
         }
 
@@ -108,6 +95,15 @@ namespace SharpAbp.Abp.OpenTelemetry
 
         public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
         {
+            var resourcePreConfigureActions = context.Services.GetPreConfigureActions<AbpOpenTelemetryResourceOptions>();
+            Configure<AbpOpenTelemetryResourceOptions>(options =>
+            {
+                foreach (var preConfigureAction in resourcePreConfigureActions)
+                {
+                    preConfigureAction(options);
+                }
+            });
+
             var preConfigureActions = context.Services.GetPreConfigureActions<AbpOpenTelemetryOptions>();
             Configure<AbpOpenTelemetryOptions>(options =>
             {
@@ -117,135 +113,174 @@ namespace SharpAbp.Abp.OpenTelemetry
                 }
             });
 
-
-            var openTelemetryBuilderOptions = context.Services.ExecutePreConfiguredActions<AbpOpenTelemetryBuilderOptions>();
+            var resourceOptions = context.Services.ExecutePreConfiguredActions<AbpOpenTelemetryResourceOptions>();
             var openTelemetryOptions = context.Services.ExecutePreConfiguredActions<AbpOpenTelemetryOptions>();
 
-            if (openTelemetryBuilderOptions.IsEnabled)
+            if (!resourceOptions.IsEnabled && !openTelemetryOptions.Resource.IsEnabled)
             {
-                void configureResource(ResourceBuilder r) => r.AddService(
-                    openTelemetryBuilderOptions.ServiceName!,
-                    openTelemetryBuilderOptions.ServiceVersion,
-                    openTelemetryBuilderOptions.ServiceVersion,
-                    openTelemetryBuilderOptions.AutoGenerateServiceInstanceId,
-                    openTelemetryBuilderOptions.ServiceInstanceId);
-
-                var openTelemetryBuilder = context.Services
-                    .AddOpenTelemetry()
-                    .ConfigureResource(configureResource);
-
-                foreach (var preConfigure in openTelemetryOptions.OpenTelemetryBuilderPreConfigures)
-                {
-                    preConfigure?.Invoke(openTelemetryBuilder);
-                }
-
-                if (openTelemetryOptions.WithTracing)
-                {
-                    openTelemetryBuilder.WithTracing(builder =>
-                    {
-                        var sourceNames = openTelemetryOptions.SourceNames.ToArray();
-                        if (sourceNames.Length == 0)
-                        {
-                            sourceNames = ["SharpAbp"];
-                        }
-                        //addSource
-                        builder.AddSource(sourceNames);
-
-                        //addLegacySource 
-                        if (!openTelemetryOptions.OperationName.IsNullOrWhiteSpace())
-                        {
-                            builder.AddLegacySource(openTelemetryOptions.OperationName);
-                        }
-
-                        //setSampler
-                        openTelemetryOptions.SamplerConfigure?.Invoke(builder);
-
-                        //instrumentations
-                        foreach (var instrumentationConfigure in openTelemetryOptions.TracingInstrumentationConfigures)
-                        {
-                            instrumentationConfigure?.Invoke(builder);
-                        }
-
-                        //exporter
-                        openTelemetryOptions.TracingExporter?.Invoke(builder);
-
-                        //Configure
-                        foreach (var configure in openTelemetryOptions.TracingConfigures)
-                        {
-                            configure?.Invoke(builder);
-                        }
-
-                    });
-                }
-
-                if (openTelemetryOptions.WithMetrics)
-                {
-                    openTelemetryBuilder.WithMetrics(builder =>
-                    {
-                        var meterNames = openTelemetryOptions.MeterNames.ToArray();
-                        if (meterNames.Length == 0)
-                        {
-                            meterNames = ["SharpAbp"];
-                        }
-
-                        //addMeter
-                        builder.AddMeter(meterNames);
-
-                        //setExemplarFilter
-                        openTelemetryOptions.ExemplarFilterConfigure?.Invoke(builder);
-
-                        //instrumentations
-                        foreach (var instrumentationConfigure in openTelemetryOptions.MetricsInstrumentationConfigures)
-                        {
-                            instrumentationConfigure?.Invoke(builder);
-                        }
-
-                        //view
-                        foreach (var viewConfigure in openTelemetryOptions.MetricsViewConfigures)
-                        {
-                            viewConfigure?.Invoke(builder);
-                        }
-
-                        //exporter
-                        openTelemetryOptions.MetricsExporter?.Invoke(builder);
-
-                        //configure
-                        foreach (var configure in openTelemetryOptions.MetricsConfigures)
-                        {
-                            configure?.Invoke(builder);
-                        }
-                    });
-                }
-
-                if (openTelemetryOptions.WithLogging)
-                {
-                    context.Services.AddLogging(builder =>
-                    {
-                        if (openTelemetryOptions.LoggingExporter != null)
-                        {
-                            //ClearProviders
-                            builder.ClearProviders();
-
-                            builder.AddOpenTelemetry(options =>
-                            {
-                                var resourceBuilder = ResourceBuilder.CreateDefault();
-                                configureResource(resourceBuilder);
-                                options.SetResourceBuilder(resourceBuilder);
-
-                                openTelemetryOptions.LoggingExporter?.Invoke(options);
-                            });
-                        }
-                    });
-
-                }
-
-                foreach (var postConfigure in openTelemetryOptions.OpenTelemetryBuilderPostConfigures)
-                {
-                    postConfigure?.Invoke(openTelemetryBuilder);
-                }
+                return Task.CompletedTask;
             }
+
+            var serviceName = string.IsNullOrWhiteSpace(openTelemetryOptions.Resource.ServiceName)
+                ? resourceOptions.ServiceName
+                : openTelemetryOptions.Resource.ServiceName;
+            serviceName = string.IsNullOrWhiteSpace(serviceName)
+                ? (AppDomain.CurrentDomain.FriendlyName ?? "SharpAbp")
+                : serviceName!;
+
+            var serviceNamespace = string.IsNullOrWhiteSpace(openTelemetryOptions.Resource.ServiceNamespace)
+                ? resourceOptions.ServiceNamespace
+                : openTelemetryOptions.Resource.ServiceNamespace;
+
+            var serviceVersion = string.IsNullOrWhiteSpace(openTelemetryOptions.Resource.ServiceVersion)
+                ? resourceOptions.ServiceVersion
+                : openTelemetryOptions.Resource.ServiceVersion;
+
+            var autoGenerateServiceInstanceId =
+                openTelemetryOptions.Resource.AutoGenerateServiceInstanceId || resourceOptions.AutoGenerateServiceInstanceId;
+
+            var serviceInstanceId = string.IsNullOrWhiteSpace(openTelemetryOptions.Resource.ServiceInstanceId)
+                ? resourceOptions.ServiceInstanceId
+                : openTelemetryOptions.Resource.ServiceInstanceId;
+
+            void ConfigureResource(ResourceBuilder resourceBuilder) => resourceBuilder.AddService(
+                serviceName,
+                serviceNamespace,
+                serviceVersion,
+                autoGenerateServiceInstanceId,
+                serviceInstanceId);
+
+            var openTelemetryBuilder = context.Services
+                .AddOpenTelemetry()
+                .ConfigureResource(ConfigureResource);
+
+            foreach (var preConfigure in openTelemetryOptions.OpenTelemetryBuilderPreConfigures)
+            {
+                preConfigure?.Invoke(openTelemetryBuilder);
+            }
+
+            if (openTelemetryOptions.Tracing.IsEnabled)
+            {
+                openTelemetryBuilder.WithTracing(builder =>
+                {
+                    var sourceNames = openTelemetryOptions.Tracing.SourceNames.ToArray();
+                    if (sourceNames.Length == 0)
+                    {
+                        sourceNames = [serviceName];
+                    }
+
+                    builder.AddSource(sourceNames);
+
+                    openTelemetryOptions.Tracing.SamplerConfigure?.Invoke(builder);
+
+                    foreach (var instrumentationConfigure in openTelemetryOptions.Tracing.InstrumentationConfigures)
+                    {
+                        instrumentationConfigure?.Invoke(builder);
+                    }
+
+                    openTelemetryOptions.Tracing.ExporterConfigure?.Invoke(builder);
+
+                    foreach (var configure in openTelemetryOptions.Tracing.BuilderConfigures)
+                    {
+                        configure?.Invoke(builder);
+                    }
+                });
+            }
+
+            if (openTelemetryOptions.Metrics.IsEnabled)
+            {
+                openTelemetryBuilder.WithMetrics(builder =>
+                {
+                    var meterNames = openTelemetryOptions.Metrics.MeterNames.ToArray();
+                    if (meterNames.Length == 0)
+                    {
+                        meterNames = [serviceName];
+                    }
+
+                    builder.AddMeter(meterNames);
+
+                    openTelemetryOptions.Metrics.ExemplarFilterConfigure?.Invoke(builder);
+
+                    foreach (var instrumentationConfigure in openTelemetryOptions.Metrics.InstrumentationConfigures)
+                    {
+                        instrumentationConfigure?.Invoke(builder);
+                    }
+
+                    foreach (var viewConfigure in openTelemetryOptions.Metrics.ViewConfigures)
+                    {
+                        viewConfigure?.Invoke(builder);
+                    }
+
+                    openTelemetryOptions.Metrics.ExporterConfigure?.Invoke(builder);
+
+                    foreach (var configure in openTelemetryOptions.Metrics.BuilderConfigures)
+                    {
+                        configure?.Invoke(builder);
+                    }
+                });
+            }
+
+            if (openTelemetryOptions.Logging.IsEnabled)
+            {
+                context.Services.AddLogging(builder =>
+                {
+                    if (openTelemetryOptions.Logging.ClearProviders)
+                    {
+                        builder.ClearProviders();
+                    }
+
+                    if (openTelemetryOptions.Logging.ExporterConfigure != null)
+                    {
+                        builder.AddOpenTelemetry(options =>
+                        {
+                            var resourceBuilder = ResourceBuilder.CreateDefault();
+                            ConfigureResource(resourceBuilder);
+                            options.SetResourceBuilder(resourceBuilder);
+                            options.IncludeFormattedMessage = openTelemetryOptions.Logging.IncludeFormattedMessage;
+                            options.IncludeScopes = openTelemetryOptions.Logging.IncludeScopes;
+                            options.ParseStateValues = openTelemetryOptions.Logging.ParseStateValues;
+
+                            openTelemetryOptions.Logging.ExporterConfigure(options);
+
+                            foreach (var configure in openTelemetryOptions.Logging.BuilderConfigures)
+                            {
+                                configure?.Invoke(options);
+                            }
+                        });
+                    }
+                });
+            }
+
+            foreach (var postConfigure in openTelemetryOptions.OpenTelemetryBuilderPostConfigures)
+            {
+                postConfigure?.Invoke(openTelemetryBuilder);
+            }
+
             return Task.CompletedTask;
         }
 
+        private static bool TryResolveExporter<TBuilder>(
+            string? exporterName,
+            IDictionary<string, Action<TBuilder>> exporters,
+            out Action<TBuilder>? exporter)
+        {
+            exporter = default;
+            if (string.IsNullOrWhiteSpace(exporterName))
+            {
+                return false;
+            }
+
+            foreach (var keyValuePair in exporters)
+            {
+                if (string.Equals(exporterName, keyValuePair.Key, StringComparison.OrdinalIgnoreCase))
+                {
+                    exporter = keyValuePair.Value;
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }
+
