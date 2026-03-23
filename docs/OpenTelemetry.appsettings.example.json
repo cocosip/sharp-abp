@@ -10,11 +10,13 @@
     },
     "Tracing": {
       "IsEnabled": true,
-      "ExporterName": "Otlp"
+      "ExporterName": "Otlp",
+      "SourceNames": [ "SharpAbp.Ordering.Application", "SharpAbp.Ordering.Domain" ]
     },
     "Metrics": {
       "IsEnabled": true,
-      "ExporterName": "PrometheusAspNetCore"
+      "ExporterName": "PrometheusAspNetCore",
+      "MeterNames": [ "SharpAbp.Ordering", "SharpAbp.Inventory" ]
     },
     "Logging": {
       "IsEnabled": true,

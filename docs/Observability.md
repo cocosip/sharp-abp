@@ -1,14 +1,31 @@
 # Observability
 
-OpenTelemetry integration for tracing, metrics, and logging in SharpAbp modules.
+本文档用于说明 SharpAbp 当前 OpenTelemetry 相关模块的使用方式，包括：
 
-## OpenTelemetry
+- 基础安装
+- 配置文件结构
+- OTLP / Prometheus exporter 说明
+- `traces` 与 `metrics` 的业务埋点方式
+- `ServiceName`、`SourceNames`、`MeterNames` 的区别
 
-`SharpAbp.Abp.OpenTelemetry` provides the core ABP module and configuration model.
+## 1. 总体说明
 
-Exporter packages add concrete output targets such as OTLP, Console, and Prometheus.
+`SharpAbp.Abp.OpenTelemetry` 提供 OpenTelemetry 的核心 ABP 模块与配置模型。
 
-## Installation
+可选 exporter 由独立包提供，例如：
+
+- `SharpAbp.Abp.OpenTelemetry.Exporter.Otlp`
+- `SharpAbp.Abp.OpenTelemetry.Exporter.Console`
+- `SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.AspNetCore`
+- `SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.HttpListener`
+
+当前代码结构已经完成收敛：
+
+- `SharpAbp.Abp.OpenTelemetry.Abstractions` 主要负责配置契约与公共结构
+- `SharpAbp.Abp.OpenTelemetry` 负责配置绑定与运行时装配
+- 各 exporter 模块负责 exporter 自身行为与 exporter 选项
+
+## 2. 安装
 
 ```bash
 # Core packages
@@ -22,33 +39,79 @@ dotnet add package SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.AspNetCore
 dotnet add package SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.HttpListener
 ```
 
-## Configuration First
+## 3. 配置模型
 
-Configuration file setup is the recommended default path.
+推荐优先使用配置文件方式。
 
-The core configuration is split into four sections:
+当前核心配置分成四个部分：
 
 - `OpenTelemetry:Resource`
 - `OpenTelemetry:Tracing`
 - `OpenTelemetry:Metrics`
 - `OpenTelemetry:Logging`
 
-For common scenarios, `Tracing:SourceNames` and `Metrics:MeterNames` can be omitted.
-When they are empty, SharpAbp uses `OpenTelemetry:Resource:ServiceName` as the default source and meter name.
-
-Exporter-specific settings are configured separately, for example:
+exporter 配置放在：
 
 - `OpenTelemetryExporters:Otlp`
+- `OpenTelemetryExporters:Console`
 - `OpenTelemetryExporters:PrometheusAspNetCore`
+- `OpenTelemetryExporters:PrometheusHttpListener`
 
-A complete sample file is available at [OpenTelemetry.appsettings.example.json](/D:/dotnet-code/sharp-abp/docs/OpenTelemetry.appsettings.example.json).
+完整示例可以参考 [OpenTelemetry.appsettings.example.json](/D:/dotnet-code/sharp-abp/docs/OpenTelemetry.appsettings.example.json)。
 
-The OTLP sample in that file already uses OpenTelemetry Collector:
+## 4. 三个容易混淆的名称
 
-- `OpenTelemetryExporters:Otlp:Endpoint = http://otel-collector:4318`
-- `Tracing/Metrics/Logging` can optionally override to Collector signal paths such as `/v1/traces`
+在当前实现里，下面三个名字语义不同：
 
-### Minimal OTLP Example
+- `Resource.ServiceName`
+- `Tracing.SourceNames`
+- `Metrics.MeterNames`
+
+### 4.1 ServiceName
+
+`ServiceName` 表示“当前服务是谁”。
+
+例如：
+
+- `OrderService`
+- `IdentityService`
+- `PaymentService`
+
+### 4.2 SourceNames
+
+`SourceNames` 表示当前应用中会使用哪些 `ActivitySource`。
+
+它应该与业务代码中的 `new ActivitySource("...")` 一致。
+
+例如：
+
+- `SharpAbp.Ordering`
+- `SharpAbp.Ordering.Application`
+- `SharpAbp.Ordering.Domain`
+
+### 4.3 MeterNames
+
+`MeterNames` 表示当前应用中会使用哪些 `Meter`。
+
+它应该与业务代码中的 `new Meter("...")` 一致。
+
+例如：
+
+- `SharpAbp.Ordering`
+- `SharpAbp.Inventory`
+
+### 4.4 默认行为
+
+如果没有显式配置 `Tracing.SourceNames` 和 `Metrics.MeterNames`，当前实现会回退到 `Resource.ServiceName`。
+
+这意味着：
+
+- 简单场景下可以少配一层
+- 复杂场景下也可以显式自定义 source 和 meter 名称
+
+## 5. 配置示例
+
+### 5.1 最小 OTLP 示例
 
 ```json
 {
@@ -86,20 +149,69 @@ The OTLP sample in that file already uses OpenTelemetry Collector:
 }
 ```
 
-### OTLP and Collector
+### 5.2 自定义 SourceNames / MeterNames 示例
 
-There is only one OTLP exporter in the module design.
+```json
+{
+  "OpenTelemetry": {
+    "Resource": {
+      "IsEnabled": true,
+      "ServiceName": "OrderService",
+      "ServiceNamespace": "SharpAbp.Samples",
+      "ServiceVersion": "1.0.0",
+      "AutoGenerateServiceInstanceId": true
+    },
+    "Tracing": {
+      "IsEnabled": true,
+      "ExporterName": "Otlp",
+      "SourceNames": [ "SharpAbp.Ordering.Application", "SharpAbp.Ordering.Domain" ]
+    },
+    "Metrics": {
+      "IsEnabled": true,
+      "ExporterName": "PrometheusAspNetCore",
+      "MeterNames": [ "SharpAbp.Ordering", "SharpAbp.Inventory" ]
+    },
+    "Logging": {
+      "IsEnabled": true,
+      "ExporterName": "Otlp",
+      "IncludeFormattedMessage": true,
+      "IncludeScopes": true,
+      "ParseStateValues": true
+    }
+  },
+  "OpenTelemetryExporters": {
+    "Otlp": {
+      "Endpoint": "http://otel-collector:4318",
+      "Protocol": "HttpProtobuf",
+      "TimeoutMilliseconds": 10000
+    },
+    "PrometheusAspNetCore": {
+      "Name": "prometheus-aspnetcore",
+      "ScrapeEndpointPath": "/metrics",
+      "ScrapeResponseCacheDurationMilliseconds": 0,
+      "UsePrometheusScrapingEndpoint": true
+    }
+  }
+}
+```
 
-If the OTLP endpoint points to an OpenTelemetry Collector, then the application is exporting through Collector.
+## 6. OTLP 与 Collector
 
-Examples:
+当前模块设计中只有一个 OTLP exporter。
 
-- direct OTLP backend: `http://vendor-endpoint:4318`
-- OpenTelemetry Collector: `http://otel-collector:4318`
+如果 OTLP 的目标地址指向 OpenTelemetry Collector，那么它本质上仍然是 OTLP 导出，只是目标端是 Collector。
 
-This means Collector is a deployment target for OTLP, not a separate exporter type.
+例如：
 
-### Collector Example
+- 直连后端：`http://vendor-endpoint:4318`
+- 通过 Collector：`http://otel-collector:4318`
+
+这表示：
+
+- Collector 是 OTLP 的目标场景
+- Collector 不是单独的一类 exporter
+
+### 6.1 Collector 示例
 
 ```json
 {
@@ -143,15 +255,11 @@ This means Collector is a deployment target for OTLP, not a separate exporter ty
 }
 ```
 
-Nothing special is required in code for Collector mode.
+## 7. Prometheus 说明
 
-The current implementation already supports it because:
+### 7.1 PrometheusAspNetCore
 
-- OTLP exporter configuration binds `Endpoint`, `Protocol`, `Headers`, and per-signal overrides from `OpenTelemetryExporters:Otlp`
-- the exporter module applies those values directly into `AddOtlpExporter(...)`
-- if the endpoint is a Collector address, the application exports to Collector through the standard OTLP exporter
-
-### Prometheus Example
+`PrometheusAspNetCore` 适合 ASP.NET Core 应用，通过 middleware 暴露抓取端点。
 
 ```json
 {
@@ -176,15 +284,15 @@ The current implementation already supports it because:
 }
 ```
 
-For ASP.NET Core applications, `PrometheusAspNetCore` is the usual choice.
+当前行为说明：
 
-`UsePrometheusScrapingEndpoint = true` means SharpAbp will register the default scraping endpoint middleware.
+- 只有 `Metrics.IsEnabled = true` 且 exporter 选中了 `PrometheusAspNetCore`，才会启用对应 endpoint 行为
+- `UsePrometheusScrapingEndpoint = true` 表示使用默认 scraping endpoint middleware
+- 如果在代码中提供 `PrometheusScrapingEndpointConfigure`，则由自定义逻辑替代默认 endpoint 注册路径
 
-If you provide a custom `PrometheusScrapingEndpointConfigure` action in code, that custom action replaces the default endpoint registration path.
+### 7.2 PrometheusHttpListener
 
-### Prometheus HttpListener Example
-
-Use `PrometheusHttpListener` only for standalone listener scenarios where ASP.NET Core endpoint middleware is not the right fit.
+`PrometheusHttpListener` 适合非 ASP.NET Core middleware 的独立监听场景。
 
 ```json
 {
@@ -208,101 +316,327 @@ Use `PrometheusHttpListener` only for standalone listener scenarios where ASP.NE
 }
 ```
 
-`UriPrefixes` must contain at least one non-empty URI prefix.
+当前行为说明：
 
-## Module Setup
+- `UriPrefixes` 必须至少包含一个非空 URI 前缀
+- 如果为空，运行时会抛出明确异常
 
-```csharp
-[DependsOn(
-    typeof(AbpOpenTelemetryModule),
-    typeof(AbpOpenTelemetryExporterOtlpModule),
-    typeof(AbpOpenTelemetryExporterPrometheusAspNetCoreModule)
-)]
-public class MyModule : AbpModule
-{
-}
-```
+### 7.3 使用建议
 
-For common scenarios, configuration file setup is enough.
+同一个进程里建议只启用你真正需要的 metrics exporter。
 
-## Code Configuration
+通常：
 
-Code configuration is useful when you need custom instrumentation or advanced builder behavior.
+- ASP.NET Core Web 应用优先考虑 `PrometheusAspNetCore`
+- 独立监听场景使用 `PrometheusHttpListener`
+
+## 8. 模块中如何配置
+
+如果你希望在模块中通过代码而不是仅通过配置文件来控制 OpenTelemetry，可以使用：
 
 ```csharp
 public override void PreConfigureServices(ServiceConfigurationContext context)
 {
     PreConfigure<AbpOpenTelemetryOptions>(options =>
     {
-        options.Resource.ServiceName = "MyApplication";
+        options.Resource.ServiceName = "OrderService";
         options.Resource.ServiceVersion = "1.0.0";
 
-        options.Tracing.IsEnabled = true;
+        options.EnableTracing("SharpAbp.Ordering.Application", "SharpAbp.Ordering.Domain");
+        options.EnableMetrics("SharpAbp.Ordering", "SharpAbp.Inventory");
+
         options.Tracing.ExporterName = OpenTelemetryExporterNames.Otlp;
-
-        options.Metrics.IsEnabled = true;
         options.Metrics.ExporterName = OpenTelemetryExporterNames.PrometheusAspNetCore;
-
-        options.Logging.IsEnabled = true;
         options.Logging.ExporterName = OpenTelemetryExporterNames.Otlp;
-        options.Logging.IncludeScopes = true;
     });
 }
 ```
 
-If you need custom `ActivitySource` or `Meter` names that differ from `Resource.ServiceName`, configure `Tracing.SourceNames` or `Metrics.MeterNames` explicitly.
+也可以逐个追加：
 
-## Exporter Configuration Notes
+```csharp
+public override void PreConfigureServices(ServiceConfigurationContext context)
+{
+    PreConfigure<AbpOpenTelemetryOptions>(options =>
+    {
+        options.Resource.ServiceName = "OrderService";
 
-### OTLP
+        options.EnableTracing();
+        options.EnableMetrics();
 
-`OpenTelemetryExporters:Otlp` supports:
+        options.AddSource("SharpAbp.Ordering.Application");
+        options.AddSource("SharpAbp.Ordering.Domain");
 
-- `Name`
-- `Endpoint`
-- `Headers`
-- `TimeoutMilliseconds`
-- `Protocol`
-- `Tracing`
-- `Metrics`
-- `Logging`
+        options.AddMeter("SharpAbp.Ordering");
+        options.AddMeter("SharpAbp.Inventory");
+    });
+}
+```
 
-The nested `Tracing`, `Metrics`, and `Logging` sections are optional and are only needed when a signal must override the shared OTLP settings.
+## 9. traces 与 metrics 的埋点说明
 
-### Console
+自动采集通常只能覆盖基础链路，例如：
 
-Console exporter can be used for tracing, metrics, or logging in development.
+- ASP.NET Core 请求
+- HttpClient
+- 数据库访问
+- 某些通用框架行为
 
-### Prometheus
+如果要采集更细的业务信息，就需要自己写埋点代码。
 
-- `PrometheusAspNetCore` is for ASP.NET Core applications and can expose `/metrics`
-- `PrometheusHttpListener` is for standalone listener scenarios
-- enable only the metrics exporter you actually want to use for the current process
+### 9.1 traces 适合解决什么问题
 
-## Best Practices
+`traces` 更适合看单次调用过程，例如：
 
-### Resource
+- 某个接口为什么慢
+- 某一笔业务在哪一步失败
+- 一个请求内部经过了哪些关键步骤
 
-Keep `ServiceName`, `ServiceNamespace`, and `ServiceVersion` stable and meaningful across environments.
+### 9.2 metrics 适合解决什么问题
 
-### Signal Naming
+`metrics` 更适合看整体统计趋势，例如：
 
-- use clear `ActivitySource` names for tracing
-- use stable `Meter` names for metrics
-- prefer hierarchical names such as `MyCompany.Ordering`
+- 成功次数
+- 失败次数
+- 平均耗时
+- 金额分布
+- 队列长度
 
-### OTLP Protocol
+## 10. traces 如何埋点
 
-For this repository's target frameworks, `HttpProtobuf` is the safest default.
+如果要记录业务过程，应使用 `ActivitySource`。
 
-Use `Grpc` only when your runtime and infrastructure requirements are confirmed.
+### 10.1 基本示例
 
-### Configuration Simplicity
+```csharp
+using System.Diagnostics;
 
-Prefer:
+public class OrderAppService : ApplicationService
+{
+    private static readonly ActivitySource ActivitySource = new("SharpAbp.Ordering.Application");
 
-- one shared OTLP exporter block
-- signal-level exporter names
-- per-signal OTLP overrides only when required
+    public async Task<OrderDto> CreateAsync(CreateOrderInput input)
+    {
+        using var activity = ActivitySource.StartActivity("Order.Create");
 
-Avoid duplicating exporter configuration across tracing, metrics, and logging unless the destinations really differ.
+        activity?.SetTag("order.customer_id", input.CustomerId);
+        activity?.SetTag("order.item_count", input.Items.Count);
+        activity?.SetTag("order.currency", input.Currency);
+
+        try
+        {
+            var order = await CreateOrderInternalAsync(input);
+            activity?.SetTag("order.id", order.Id);
+            activity?.SetStatus(ActivityStatusCode.Ok);
+            return ObjectMapper.Map<Order, OrderDto>(order);
+        }
+        catch (Exception ex)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+            activity?.RecordException(ex);
+            throw;
+        }
+    }
+}
+```
+
+### 10.2 关键步骤拆分
+
+如果一个接口内部有几个重要步骤，可以拆成多个 span：
+
+```csharp
+using var activity = ActivitySource.StartActivity("Order.Create");
+
+using (var validateActivity = ActivitySource.StartActivity("Order.Validate"))
+{
+    await ValidateAsync(input);
+}
+
+using (var pricingActivity = ActivitySource.StartActivity("Order.CalculatePrice"))
+{
+    await CalculatePriceAsync(input);
+}
+
+using (var persistActivity = ActivitySource.StartActivity("Order.Persist"))
+{
+    await SaveAsync(input);
+}
+```
+
+### 10.3 traces 里建议记录什么
+
+建议重点记录：
+
+- 业务主键或关联键
+- 租户、渠道、支付方式等业务维度
+- 关键业务分支
+- 异常与错误原因
+- 核心步骤边界
+
+不建议记录：
+
+- 敏感数据
+- 超长正文
+- 高基数且没有聚合价值的字段组合
+
+## 11. metrics 如何埋点
+
+业务指标建议通过 `Meter` 进行定义与记录。
+
+### 11.1 基本示例
+
+```csharp
+using System.Diagnostics.Metrics;
+
+public static class OrderingMetrics
+{
+    public static readonly Meter Meter = new("SharpAbp.Ordering");
+
+    public static readonly Counter<long> OrderCreatedCounter =
+        Meter.CreateCounter<long>("orders.created");
+
+    public static readonly Counter<long> OrderFailedCounter =
+        Meter.CreateCounter<long>("orders.failed");
+
+    public static readonly Histogram<double> OrderAmountHistogram =
+        Meter.CreateHistogram<double>("orders.amount");
+
+    public static readonly Histogram<double> OrderDurationHistogram =
+        Meter.CreateHistogram<double>("orders.duration.ms");
+}
+```
+
+记录方式示例：
+
+```csharp
+OrderingMetrics.OrderCreatedCounter.Add(1,
+    new KeyValuePair<string, object?>("payment_method", input.PaymentMethod),
+    new KeyValuePair<string, object?>("currency", input.Currency));
+
+OrderingMetrics.OrderAmountHistogram.Record(input.TotalAmount,
+    new KeyValuePair<string, object?>("currency", input.Currency));
+```
+
+### 11.2 metrics 里建议记录什么
+
+建议重点记录：
+
+- 成功次数
+- 失败次数
+- 金额分布
+- 接口耗时
+- 队列长度
+- 任务执行次数
+- 库存变化等业务统计
+
+### 11.3 metrics 标签建议
+
+推荐使用稳定、可控的标签：
+
+- `status`
+- `payment_method`
+- `currency`
+- `channel`
+- `tenant_type`
+
+谨慎使用：
+
+- 用户 ID
+- 订单 ID
+- 请求 ID
+
+因为高基数标签容易让指标系统压力过大。
+
+## 12. traces 与 metrics 如何分工
+
+可以简单理解为：
+
+- `traces` 看单次调用过程
+- `metrics` 看整体趋势和聚合统计
+
+例如订单创建场景：
+
+- trace 适合定位某一笔订单为何失败、卡在哪一步
+- metrics 适合看失败率、吞吐量、金额分布、平均耗时
+
+这两者通常应该搭配使用。
+
+## 13. 当前结构下如何方便扩展
+
+当前结构已经支持以下扩展方式。
+
+### 13.1 注册自定义 source / meter
+
+```csharp
+PreConfigure<AbpOpenTelemetryOptions>(options =>
+{
+    options.EnableTracing("SharpAbp.Ordering.Application");
+    options.EnableMetrics("SharpAbp.Ordering");
+});
+```
+
+### 13.2 添加 instrumentation
+
+```csharp
+PreConfigure<AbpOpenTelemetryOptions>(options =>
+{
+    options.AddTracingInstrumentation(builder =>
+    {
+        builder.AddAspNetCoreInstrumentation();
+        builder.AddHttpClientInstrumentation();
+    });
+
+    options.AddMetricsInstrumentation(builder =>
+    {
+        builder.AddAspNetCoreInstrumentation();
+        builder.AddHttpClientInstrumentation();
+    });
+});
+```
+
+### 13.3 做更细的 builder 定制
+
+如果需要更高级的行为，也可以继续追加 builder 配置，例如：
+
+- 自定义视图
+- 自定义过滤
+- 高级 exporter 行为
+
+## 14. 推荐团队实践
+
+建议在团队中统一如下约定：
+
+- `ServiceName` 使用服务级名称
+- `ActivitySource` / `Meter` 使用模块级名称
+- `ActivitySource` 与 `Meter` 是否分层命名要统一规范
+- trace tag 命名风格统一
+- metrics 名称统一使用稳定、明确的英文名
+- 控制高基数标签
+
+一个较稳妥的约定示例：
+
+- `ServiceName = OrderService`
+- `ActivitySource = SharpAbp.Ordering.Application`
+- `Meter = SharpAbp.Ordering`
+
+## 15. 推荐落地顺序
+
+如果项目还没有开始做业务埋点，建议按下面顺序推进：
+
+1. 先启用基础 OpenTelemetry 配置
+2. 先让自动采集跑起来
+3. 给最核心接口补 trace 埋点
+4. 给关键业务指标补 metrics
+5. 再逐步细化标签和模块划分
+
+## 16. 当前结论
+
+当前 SharpAbp OpenTelemetry 结构已经支持：
+
+- 使用 `ServiceName` 作为默认回退值
+- 自定义 `Tracing.SourceNames`
+- 自定义 `Metrics.MeterNames`
+- 在模块中通过 `PreConfigure<AbpOpenTelemetryOptions>` 做代码配置
+- 在业务代码中通过 `ActivitySource` 和 `Meter` 做自定义埋点
+
+因此，如果后续要在接口、应用服务、领域服务中补更细的 traces 或 metrics，现有结构已经可以直接支持，不需要再做额外的框架级改造。
