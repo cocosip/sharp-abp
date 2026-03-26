@@ -1,3 +1,4 @@
+using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using Volo.Abp.Modularity;
@@ -32,6 +33,11 @@ namespace SharpAbp.Abp.MassTransit
             {
                 options.Prefix = "SharpAbp";
                 options.PreConfigure(configuration);
+
+                options.PreConfigures.Add(c =>
+                {
+                    c.DisableUsageTelemetry();
+                });
             });
 
             return Task.CompletedTask;
