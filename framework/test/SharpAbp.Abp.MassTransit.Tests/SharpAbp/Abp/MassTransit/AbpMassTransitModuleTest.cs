@@ -39,6 +39,8 @@ namespace SharpAbp.Abp.MassTransit
             Assert.Equal("SharpAbp", options.Prefix);
             Assert.NotNull(options.PreConfigures);
             Assert.NotNull(options.PostConfigures);
+            Assert.Single(options.PreConfigures);
+            Assert.Empty(options.PostConfigures);
         }
 
         /// <summary>
@@ -69,6 +71,8 @@ namespace SharpAbp.Abp.MassTransit
             Assert.Equal("SharpAbp", options.Prefix);
             Assert.NotNull(options.PreConfigures);
             Assert.NotNull(options.PostConfigures);
+            Assert.Single(options.PreConfigures);
+            Assert.Empty(options.PostConfigures);
             
             // Verify default timeout values are set
             Assert.True(options.StartTimeoutMilliSeconds > 0);

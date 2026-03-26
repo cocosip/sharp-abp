@@ -72,5 +72,61 @@ namespace SharpAbp.Abp.MassTransit.SqlServer
 
             return this;
         }
+
+        public AbpMassTransitSqlServerOptions CopyFrom(AbpMassTransitSqlServerOptions options)
+        {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            ConnectionString = options.ConnectionString;
+            Create = options.Create;
+            Delete = options.Delete;
+            AutoDeleteOnIdle = options.AutoDeleteOnIdle;
+            AutoStart = options.AutoStart;
+            ConcurrentMessageLimit = options.ConcurrentMessageLimit;
+            PrefetchCount = options.PrefetchCount;
+            DefaultPublishTopologyConfigurator = options.DefaultPublishTopologyConfigurator;
+            DefaultFilter = options.DefaultFilter;
+            SqlTransportConfigure = options.SqlTransportConfigure;
+
+            SqlTransportOptions = options.SqlTransportOptions == null
+                ? null
+                : new SqlTransportOptions
+                {
+                    Host = options.SqlTransportOptions.Host,
+                    Port = options.SqlTransportOptions.Port,
+                    Database = options.SqlTransportOptions.Database,
+                    Schema = options.SqlTransportOptions.Schema,
+                    Role = options.SqlTransportOptions.Role,
+                    Username = options.SqlTransportOptions.Username,
+                    Password = options.SqlTransportOptions.Password,
+                    AdminUsername = options.SqlTransportOptions.AdminUsername,
+                    AdminPassword = options.SqlTransportOptions.AdminPassword
+                };
+
+            SqlServerPreConfigures ??= [];
+            SqlServerPreConfigures.Clear();
+            SqlServerPreConfigures.AddRange(options.SqlServerPreConfigures ?? []);
+
+            SqlServerConfigures ??= [];
+            SqlServerConfigures.Clear();
+            SqlServerConfigures.AddRange(options.SqlServerConfigures ?? []);
+
+            SqlServerPostConfigures ??= [];
+            SqlServerPostConfigures.Clear();
+            SqlServerPostConfigures.AddRange(options.SqlServerPostConfigures ?? []);
+
+            Producers ??= [];
+            Producers.Clear();
+            Producers.AddRange(options.Producers ?? []);
+
+            Consumers ??= [];
+            Consumers.Clear();
+            Consumers.AddRange(options.Consumers ?? []);
+
+            return this;
+        }
     }
 }

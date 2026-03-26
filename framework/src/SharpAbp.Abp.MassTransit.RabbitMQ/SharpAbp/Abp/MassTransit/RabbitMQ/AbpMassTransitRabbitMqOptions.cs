@@ -87,6 +87,54 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
             return this;
         }
 
+        public AbpMassTransitRabbitMqOptions CopyFrom(AbpMassTransitRabbitMqOptions options)
+        {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            Host = options.Host;
+            Port = options.Port;
+            VirtualHost = options.VirtualHost;
+            Username = options.Username;
+            Password = options.Password;
+            ConnectionName = options.ConnectionName;
+            UseSSL = options.UseSSL;
+            UseCluster = options.UseCluster;
+            ClusterNodes = [.. options.ClusterNodes];
+
+            DefaultQueuePrefix = options.DefaultQueuePrefix;
+            DefaultConcurrentMessageLimit = options.DefaultConcurrentMessageLimit;
+            DefaultPrefetchCount = options.DefaultPrefetchCount;
+            DefaultDurable = options.DefaultDurable;
+            DefaultAutoDelete = options.DefaultAutoDelete;
+            DefaultExchangeType = options.DefaultExchangeType;
+
+            ConfigureSsl = options.ConfigureSsl;
+            DefaultExchangeNameFormatFunc = options.DefaultExchangeNameFormatFunc;
+            DefaultQueueNameFormatFunc = options.DefaultQueueNameFormatFunc;
+            DefaultPublishTopologyConfigure = options.DefaultPublishTopologyConfigure;
+            DefaultReceiveEndpointConfigure = options.DefaultReceiveEndpointConfigure;
+
+            RabbitMqPreConfigures.Clear();
+            RabbitMqPreConfigures.AddRange(options.RabbitMqPreConfigures);
+
+            RabbitMqConfigures.Clear();
+            RabbitMqConfigures.AddRange(options.RabbitMqConfigures);
+
+            RabbitMqPostConfigures.Clear();
+            RabbitMqPostConfigures.AddRange(options.RabbitMqPostConfigures);
+
+            Producers.Clear();
+            Producers.AddRange(options.Producers);
+
+            Consumers.Clear();
+            Consumers.AddRange(options.Consumers);
+
+            return this;
+        }
+
 
     }
 }

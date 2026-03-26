@@ -87,6 +87,34 @@ namespace SharpAbp.Abp.MassTransit
         }
 
         /// <summary>
+        /// Copies values from another options instance.
+        /// </summary>
+        /// <param name="options">The source options instance</param>
+        /// <returns>The current options instance for method chaining</returns>
+        /// <exception cref="ArgumentNullException">Thrown when options is null</exception>
+        public AbpMassTransitOptions CopyFrom(AbpMassTransitOptions options)
+        {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            Prefix = options.Prefix;
+            Provider = options.Provider;
+            WaitUntilStarted = options.WaitUntilStarted;
+            StartTimeoutMilliSeconds = options.StartTimeoutMilliSeconds;
+            StopTimeoutMilliSeconds = options.StopTimeoutMilliSeconds;
+
+            PreConfigures.Clear();
+            PreConfigures.AddRange(options.PreConfigures);
+
+            PostConfigures.Clear();
+            PostConfigures.AddRange(options.PostConfigures);
+
+            return this;
+        }
+
+        /// <summary>
         /// Validates the current configuration options
         /// </summary>
         /// <returns>True if the configuration is valid; otherwise, false</returns>

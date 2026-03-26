@@ -169,16 +169,10 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
             if (abpMassTransitOptions.Provider!.Equals(MassTransitActiveMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
-                Configure<AbpMassTransitActiveMqOptions>(options =>
-                {
-                    var actions = context.Services.GetPreConfigureActions<AbpMassTransitActiveMqOptions>();
-                    foreach (var action in actions)
-                    {
-                        action(options);
-                    }
-                });
+                var activeMqPreConfiguredOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitActiveMqOptions>();
+                Configure<AbpMassTransitActiveMqOptions>(options => options.CopyFrom(activeMqPreConfiguredOptions));
 
-                var activeMqOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitActiveMqOptions>();
+                var activeMqOptions = activeMqPreConfiguredOptions;
 
                 context.Services.AddMassTransit(x =>
                 {

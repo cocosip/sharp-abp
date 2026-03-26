@@ -72,5 +72,61 @@ namespace SharpAbp.Abp.MassTransit.PostgreSql
 
             return this;
         }
+
+        public AbpMassTransitPostgreSqlOptions CopyFrom(AbpMassTransitPostgreSqlOptions options)
+        {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            ConnectionString = options.ConnectionString;
+            Create = options.Create;
+            Delete = options.Delete;
+            AutoDeleteOnIdle = options.AutoDeleteOnIdle;
+            AutoStart = options.AutoStart;
+            ConcurrentMessageLimit = options.ConcurrentMessageLimit;
+            PrefetchCount = options.PrefetchCount;
+            DefaultPublishTopologyConfigurator = options.DefaultPublishTopologyConfigurator;
+            DefaultFilter = options.DefaultFilter;
+            SqlTransportConfigure = options.SqlTransportConfigure;
+
+            SqlTransportOptions = options.SqlTransportOptions == null
+                ? null
+                : new SqlTransportOptions
+                {
+                    Host = options.SqlTransportOptions.Host,
+                    Port = options.SqlTransportOptions.Port,
+                    Database = options.SqlTransportOptions.Database,
+                    Schema = options.SqlTransportOptions.Schema,
+                    Role = options.SqlTransportOptions.Role,
+                    Username = options.SqlTransportOptions.Username,
+                    Password = options.SqlTransportOptions.Password,
+                    AdminUsername = options.SqlTransportOptions.AdminUsername,
+                    AdminPassword = options.SqlTransportOptions.AdminPassword
+                };
+
+            PostgreSqlPreConfigures ??= [];
+            PostgreSqlPreConfigures.Clear();
+            PostgreSqlPreConfigures.AddRange(options.PostgreSqlPreConfigures ?? []);
+
+            PostgreSqlConfigures ??= [];
+            PostgreSqlConfigures.Clear();
+            PostgreSqlConfigures.AddRange(options.PostgreSqlConfigures ?? []);
+
+            PostgreSqlPostConfigures ??= [];
+            PostgreSqlPostConfigures.Clear();
+            PostgreSqlPostConfigures.AddRange(options.PostgreSqlPostConfigures ?? []);
+
+            Producers ??= [];
+            Producers.Clear();
+            Producers.AddRange(options.Producers ?? []);
+
+            Consumers ??= [];
+            Consumers.Clear();
+            Consumers.AddRange(options.Consumers ?? []);
+
+            return this;
+        }
     }
 }

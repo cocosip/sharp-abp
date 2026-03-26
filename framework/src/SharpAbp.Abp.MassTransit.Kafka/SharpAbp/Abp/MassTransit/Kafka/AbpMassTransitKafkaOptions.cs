@@ -169,6 +169,65 @@ namespace SharpAbp.Abp.MassTransit.Kafka
             return this;
         }
 
+        public AbpMassTransitKafkaOptions CopyFrom(AbpMassTransitKafkaOptions options)
+        {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            Server = options.Server;
+            UseSSL = options.UseSSL;
+            DefaultGroupId = options.DefaultGroupId;
+            DefaultClientId = options.DefaultClientId;
+            DefaultConcurrentMessageLimit = options.DefaultConcurrentMessageLimit;
+            AutoCreateTopic = options.AutoCreateTopic;
+            DefaultNumPartitions = options.DefaultNumPartitions;
+            DefaultReplicationFactor = options.DefaultReplicationFactor;
+            DefaultConcurrentConsumerLimit = options.DefaultConcurrentConsumerLimit;
+            DefaultMessageLimit = options.DefaultMessageLimit;
+            DefaultPrefetchCount = options.DefaultPrefetchCount;
+            DefaultMaxPollInterval = options.DefaultMaxPollInterval;
+            DefaultSessionTimeout = options.DefaultSessionTimeout;
+            DefaultCheckpointInterval = options.DefaultCheckpointInterval;
+            DefaultCheckpointMessageCount = options.DefaultCheckpointMessageCount;
+            DefaultEnableAutoOffsetStore = options.DefaultEnableAutoOffsetStore;
+            DefaultAutoOffsetReset = options.DefaultAutoOffsetReset;
+            DefaultHeartbeatInterval = options.DefaultHeartbeatInterval;
+            DefaultReconnectBackoff = options.DefaultReconnectBackoff;
+            DefaultReconnectBackoffMax = options.DefaultReconnectBackoffMax;
+
+            ConfigureSsl = options.ConfigureSsl;
+            DefaultTopicFormatFunc = options.DefaultTopicFormatFunc;
+            DefaultReceiveEndpointConfigure = options.DefaultReceiveEndpointConfigure;
+
+            RiderPreConfigures.Clear();
+            RiderPreConfigures.AddRange(options.RiderPreConfigures);
+
+            RiderConfigures.Clear();
+            RiderConfigures.AddRange(options.RiderConfigures);
+
+            RiderPostConfigures.Clear();
+            RiderPostConfigures.AddRange(options.RiderPostConfigures);
+
+            KafkaPreConfigures.Clear();
+            KafkaPreConfigures.AddRange(options.KafkaPreConfigures);
+
+            KafkaConfigures.Clear();
+            KafkaConfigures.AddRange(options.KafkaConfigures);
+
+            KafkaPostConfigures.Clear();
+            KafkaPostConfigures.AddRange(options.KafkaPostConfigures);
+
+            Producers.Clear();
+            Producers.AddRange(options.Producers);
+
+            Consumers.Clear();
+            Consumers.AddRange(options.Consumers);
+
+            return this;
+        }
+
 
     }
 }
