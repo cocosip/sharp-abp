@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using Volo.Abp;
@@ -6,54 +7,84 @@ using Volo.Abp.Application.Dtos;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.Integration;
 using Volo.Abp.Users;
+using Volo.Abp.AspNetCore.Mvc;
 
 namespace SharpAbp.Abp.Identity
 {
     [RemoteService(Name = IdentityRemoteServiceConsts.RemoteServiceName)]
-    [Area("identity")]
-    [Route("api/identity/users/integration")]
-    public class IdentityUserIntegrationController : IdentityController, IIdentityUserIntegrationService
+    [Area(IdentityRemoteServiceConsts.ModuleName)]
+    [ControllerName("UserIntegration")]
+    [Route("integration-api/identity/users")]
+    public class IdentityUserIntegrationController : AbpControllerBase, IIdentityUserIntegrationService
     {
-        protected IIdentityUserIntegrationService IdentityUserIntegrationService { get; }
+        protected IIdentityUserIntegrationService UserIntegrationService { get; }
 
-        public IdentityUserIntegrationController(IIdentityUserIntegrationService identityUserIntegrationService)
+        public IdentityUserIntegrationController(IIdentityUserIntegrationService userIntegrationService)
         {
-            IdentityUserIntegrationService = identityUserIntegrationService;
+            UserIntegrationService = userIntegrationService;
+        }
+
+        [HttpGet]
+        [Route("{id}/role-names")]
+        public virtual Task<string[]> GetRoleNamesAsync(Guid id)
+        {
+            return UserIntegrationService.GetRoleNamesAsync(id);
         }
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<UserData> FindByIdAsync(Guid id)
+        public Task<UserData> FindByIdAsync(Guid id)
         {
-            return await IdentityUserIntegrationService.FindByIdAsync(id);
+            return UserIntegrationService.FindByIdAsync(id);
         }
 
         [HttpGet]
         [Route("by-username/{userName}")]
-        public async Task<UserData> FindByUserNameAsync(string userName)
+        public Task<UserData> FindByUserNameAsync(string userName)
         {
-            return await IdentityUserIntegrationService.FindByUserNameAsync(userName);
+            return UserIntegrationService.FindByUserNameAsync(userName);
         }
 
         [HttpGet]
         [Route("search")]
-        public async Task<ListResultDto<UserData>> SearchAsync(UserLookupSearchInputDto input)
+        public Task<ListResultDto<UserData>> SearchAsync(UserLookupSearchInputDto input)
         {
-            return await IdentityUserIntegrationService.SearchAsync(input);
+            return UserIntegrationService.SearchAsync(input);
+        }
+
+        [HttpGet]
+        [Route("search/by-ids")]
+        public virtual Task<ListResultDto<UserData>> SearchByIdsAsync(Guid[] ids)
+        {
+            return UserIntegrationService.SearchByIdsAsync(ids);
         }
 
         [HttpGet]
         [Route("count")]
-        public async Task<long> GetCountAsync(UserLookupCountInputDto input)
+        public Task<long> GetCountAsync(UserLookupCountInputDto input)
         {
-            return await IdentityUserIntegrationService.GetCountAsync(input);
+            return UserIntegrationService.GetCountAsync(input);
         }
 
         [HttpGet]
-        [Route("role-names")]
-        public async Task<string[]> GetRoleNamesAsync(Guid id)
+        [Route("search/roles")]
+        public virtual Task<ListResultDto<RoleData>> SearchRoleAsync(RoleLookupSearchInputDto input)
         {
-            return await IdentityUserIntegrationService.GetRoleNamesAsync(id);
+            return UserIntegrationService.SearchRoleAsync(input);
+        }
+
+        [HttpGet]
+        [Route("search/roles/by-names")]
+        public virtual Task<ListResultDto<RoleData>> SearchRoleByNamesAsync(string[] names)
+        {
+            return UserIntegrationService.SearchRoleByNamesAsync(names);
+        }
+
+        [HttpGet]
+        [Route("count/roles")]
+        public virtual Task<long> GetRoleCountAsync(RoleLookupCountInputDto input)
+        {
+            return UserIntegrationService.GetRoleCountAsync(input);
         }
     }
 }
