@@ -227,5 +227,46 @@ namespace SharpAbp.Abp.MassTransit
             Assert.Null(options.Provider);
             Assert.Equal(30000, options.StartTimeoutMilliSeconds); // Default value
         }
+
+        /// <summary>
+        /// Tests that CopyFrom copies scalar values and actions without duplication
+        /// </summary>
+        [Fact]
+        public void CopyFrom_Should_Copy_All_Values()
+        {
+            // Arrange
+            Action<global::MassTransit.IBusRegistrationConfigurator> preConfigure = _ => { };
+            Action<global::MassTransit.IBusRegistrationConfigurator> postConfigure = _ => { };
+
+            var source = new AbpMassTransitOptions
+            {
+                Prefix = "TestPrefix",
+                Provider = "RabbitMQ",
+                WaitUntilStarted = false,
+                StartTimeoutMilliSeconds = 45000,
+                StopTimeoutMilliSeconds = 15000
+            };
+            source.PreConfigures.Add(preConfigure);
+            source.PostConfigures.Add(postConfigure);
+
+            var target = new AbpMassTransitOptions();
+            target.PreConfigures.Add(_ => { });
+            target.PostConfigures.Add(_ => { });
+
+            // Act
+            var result = target.CopyFrom(source);
+
+            // Assert
+            Assert.Same(target, result);
+            Assert.Equal(source.Prefix, target.Prefix);
+            Assert.Equal(source.Provider, target.Provider);
+            Assert.Equal(source.WaitUntilStarted, target.WaitUntilStarted);
+            Assert.Equal(source.StartTimeoutMilliSeconds, target.StartTimeoutMilliSeconds);
+            Assert.Equal(source.StopTimeoutMilliSeconds, target.StopTimeoutMilliSeconds);
+            Assert.Single(target.PreConfigures);
+            Assert.Single(target.PostConfigures);
+            Assert.Same(preConfigure, target.PreConfigures[0]);
+            Assert.Same(postConfigure, target.PostConfigures[0]);
+        }
     }
 }

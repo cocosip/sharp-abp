@@ -67,16 +67,10 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
             {
                 if (abpMassTransitOptions.Provider!.Equals(MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
                 {
-                    Configure<AbpMassTransitRabbitMqOptions>(options =>
-                    {
-                        var actions = context.Services.GetPreConfigureActions<AbpMassTransitRabbitMqOptions>();
-                        foreach (var action in actions)
-                        {
-                            action(options);
-                        }
-                    });
+                    var rabbitMqPreConfiguredOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitRabbitMqOptions>();
+                    Configure<AbpMassTransitRabbitMqOptions>(options => options.CopyFrom(rabbitMqPreConfiguredOptions));
 
-                    var rabbitMqOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitRabbitMqOptions>();
+                    var rabbitMqOptions = rabbitMqPreConfiguredOptions;
                     context.Services.AddMassTransit(x =>
                     {
                         //Masstransit preConfigure

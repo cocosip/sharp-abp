@@ -56,16 +56,10 @@ namespace SharpAbp.Abp.MassTransit.PostgreSql
             {
                 if (abpMassTransitOptions.Provider!.Equals(MassTransitPostgreSqlConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
                 {
-                    Configure<AbpMassTransitPostgreSqlOptions>(options =>
-                    {
-                        var actions = context.Services.GetPreConfigureActions<AbpMassTransitPostgreSqlOptions>();
-                        foreach (var action in actions)
-                        {
-                            action(options);
-                        }
-                    });
+                    var postgreSqlPreConfiguredOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitPostgreSqlOptions>();
+                    Configure<AbpMassTransitPostgreSqlOptions>(options => options.CopyFrom(postgreSqlPreConfiguredOptions));
 
-                    var postgreSqlOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitPostgreSqlOptions>();
+                    var postgreSqlOptions = postgreSqlPreConfiguredOptions;
                     var builder = new NpgsqlConnectionStringBuilder(postgreSqlOptions.ConnectionString);
                     context.Services.AddOptions<SqlTransportOptions>().Configure(options =>
                     {

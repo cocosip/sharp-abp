@@ -59,14 +59,8 @@ namespace SharpAbp.Abp.MassTransit
         /// <returns>A task representing the asynchronous operation</returns>
         public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            var actions = context.Services.GetPreConfigureActions<AbpMassTransitOptions>();
-            Configure<AbpMassTransitOptions>(options =>
-            {
-                foreach (var action in actions)
-                {
-                    action(options);
-                }
-            });
+            var preConfiguredOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
+            Configure<AbpMassTransitOptions>(options => options.CopyFrom(preConfiguredOptions));
 
             // Register the default publisher
             context.Services.AddTransient<IMassTransitPublisher, DefaultMassTransitPublisher>();

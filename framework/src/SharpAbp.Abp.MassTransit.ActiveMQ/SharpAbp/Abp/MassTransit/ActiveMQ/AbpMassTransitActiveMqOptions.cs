@@ -66,5 +66,47 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
 
             return this;
         }
+
+        public AbpMassTransitActiveMqOptions CopyFrom(AbpMassTransitActiveMqOptions options)
+        {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            Host = options.Host;
+            Port = options.Port;
+            Username = options.Username;
+            Password = options.Password;
+            UseSSL = options.UseSSL;
+
+            DefaultConcurrentMessageLimit = options.DefaultConcurrentMessageLimit;
+            DefaultPrefetchCount = options.DefaultPrefetchCount;
+            DefaultDurable = options.DefaultDurable;
+            DefaultAutoDelete = options.DefaultAutoDelete;
+            DefaultExclude = options.DefaultExclude;
+            DefaultEnableArtemisCompatibility = options.DefaultEnableArtemisCompatibility;
+
+            DefaultQueueNameFormatFunc = options.DefaultQueueNameFormatFunc;
+            DefaultPublishTopologyConfigure = options.DefaultPublishTopologyConfigure;
+            DefaultReceiveEndpointConfigure = options.DefaultReceiveEndpointConfigure;
+
+            ActiveMqPreConfigures.Clear();
+            ActiveMqPreConfigures.AddRange(options.ActiveMqPreConfigures);
+
+            ActiveMqConfigures.Clear();
+            ActiveMqConfigures.AddRange(options.ActiveMqConfigures);
+
+            ActiveMqPostConfigures.Clear();
+            ActiveMqPostConfigures.AddRange(options.ActiveMqPostConfigures);
+
+            Producers.Clear();
+            Producers.AddRange(options.Producers);
+
+            Consumers.Clear();
+            Consumers.AddRange(options.Consumers);
+
+            return this;
+        }
     }
 }

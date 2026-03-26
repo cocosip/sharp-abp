@@ -55,16 +55,10 @@ namespace SharpAbp.Abp.MassTransit.SqlServer
             {
                 if (abpMassTransitOptions.Provider!.Equals(MassTransitSqlServerConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
                 {
-                    Configure<AbpMassTransitSqlServerOptions>(options =>
-                    {
-                        var actions = context.Services.GetPreConfigureActions<AbpMassTransitSqlServerOptions>();
-                        foreach (var action in actions)
-                        {
-                            action(options);
-                        }
-                    });
+                    var sqlServerPreConfiguredOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitSqlServerOptions>();
+                    Configure<AbpMassTransitSqlServerOptions>(options => options.CopyFrom(sqlServerPreConfiguredOptions));
 
-                    var sqlServerOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitSqlServerOptions>()!;
+                    var sqlServerOptions = sqlServerPreConfiguredOptions;
                     var builder = new SqlConnectionStringBuilder(sqlServerOptions.ConnectionString);
                     context.Services.AddOptions<SqlTransportOptions>().Configure(options =>
                     {

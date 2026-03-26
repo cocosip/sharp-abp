@@ -95,16 +95,10 @@ namespace SharpAbp.Abp.MassTransit.Kafka
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
             if (abpMassTransitOptions.Provider!.Equals(MassTransitKafkaConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
-                Configure<AbpMassTransitKafkaOptions>(options =>
-                {
-                    var actions = context.Services.GetPreConfigureActions<AbpMassTransitKafkaOptions>();
-                    foreach (var action in actions)
-                    {
-                        action(options);
-                    }
-                });
+                var kafkaPreConfiguredOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitKafkaOptions>();
+                Configure<AbpMassTransitKafkaOptions>(options => options.CopyFrom(kafkaPreConfiguredOptions));
 
-                var kafkaOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitKafkaOptions>();
+                var kafkaOptions = kafkaPreConfiguredOptions;
                 context.Services.AddMassTransit(x =>
                 {
                     //PreConfigure
