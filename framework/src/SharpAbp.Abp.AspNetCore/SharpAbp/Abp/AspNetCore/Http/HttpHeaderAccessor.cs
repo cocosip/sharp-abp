@@ -135,7 +135,29 @@ namespace SharpAbp.Abp.AspNetCore.Http
 
                 if (httpContext != null)
                 {
-                    hostURL = $"{httpContext.Request.Scheme}://{httpContext.Request.Host.Value}";
+                    var request = httpContext.Request;
+
+                    var scheme = request.Headers["X-Forwarded-Proto"].ToString();
+                    if (!scheme.IsNullOrWhiteSpace())
+                    {
+                        scheme = scheme.Split(',')[0].Trim();
+                    }
+                    else
+                    {
+                        scheme = request.Scheme;
+                    }
+
+                    var host = request.Headers["X-Forwarded-Host"].ToString();
+                    if (!host.IsNullOrWhiteSpace())
+                    {
+                        host = host.Split(',')[0].Trim();
+                    }
+                    else
+                    {
+                        host = request.Host.Value;
+                    }
+
+                    hostURL = $"{scheme}://{host}";
                 }
             }
             catch (Exception ex)

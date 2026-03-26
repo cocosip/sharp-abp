@@ -300,5 +300,43 @@ namespace SharpAbp.Abp.AspNetCore.Http
             // Assert
             Assert.Equal("http://localhost:3000", result);
         }
+
+        [Fact]
+        public void GetRequesHostURL_Should_Prefer_Forwarded_Headers()
+        {
+            // Arrange
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Scheme = "http";
+            httpContext.Request.Host = new HostString("openapi.default.svc.cluster.local");
+            httpContext.Request.Headers["X-Forwarded-Proto"] = "https";
+            httpContext.Request.Headers["X-Forwarded-Host"] = "hidos-openapi.kayisoft.dev";
+
+            _mockHttpContextAccessor.SetupGet(x => x.HttpContext).Returns(httpContext);
+
+            // Act
+            var result = _httpHeaderAccessor.GetRequesHostURL();
+
+            // Assert
+            Assert.Equal("https://hidos-openapi.kayisoft.dev", result);
+        }
+
+        [Fact]
+        public void GetRequesHostURL_Should_Use_First_Forwarded_Header_Value()
+        {
+            // Arrange
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Scheme = "http";
+            httpContext.Request.Host = new HostString("openapi.default.svc.cluster.local");
+            httpContext.Request.Headers["X-Forwarded-Proto"] = "https,http";
+            httpContext.Request.Headers["X-Forwarded-Host"] = "hidos-openapi.kayisoft.dev,internal.local";
+
+            _mockHttpContextAccessor.SetupGet(x => x.HttpContext).Returns(httpContext);
+
+            // Act
+            var result = _httpHeaderAccessor.GetRequesHostURL();
+
+            // Assert
+            Assert.Equal("https://hidos-openapi.kayisoft.dev", result);
+        }
     }
 }

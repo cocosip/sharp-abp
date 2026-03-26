@@ -60,7 +60,6 @@ namespace SharpAbp.Abp.AspNetCore.Http
                 AppendQueryParameters(urlBuilder, extends);
 
                 var result = urlBuilder.ToString();
-                Logger.LogDebug("Generated URL: {Url}", result);
 
                 return result;
             }
@@ -121,7 +120,7 @@ namespace SharpAbp.Abp.AspNetCore.Http
 
             if (queryParams.Count > 0)
             {
-                urlBuilder.Append("?").Append(string.Join("&", queryParams));
+                urlBuilder.Append('?').Append(string.Join("&", queryParams));
             }
         }
     }
