@@ -349,7 +349,7 @@ ASALocalRun/
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
 
-
+*.csproj.lscache
 
 ###### -- Custom Ignore Section, Make sure all files you add to the git repo are below this line  --  ######
 
