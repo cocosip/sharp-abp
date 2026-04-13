@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -32,6 +33,13 @@ namespace SharpAbp.Abp.Faster
         public void BeginAddress_ShouldBeNonNegative()
         {
             Assert.True(_logger.BeginAddress >= 0);
+        }
+
+        [Fact]
+        public void IFasterLogger_ShouldNotResolveDirectlyFromDependencyInjection()
+        {
+            Assert.Null(GetService<IFasterLogger>());
+            Assert.Null(GetService<IFasterLogger<FasterTestEntry>>());
         }
 
         [Fact]
@@ -95,7 +103,6 @@ namespace SharpAbp.Abp.Faster
             var entries = await _logger.ReadAsync(count: 1);
             Assert.NotEmpty(entries);
 
-            var beforeRangeCount = _logger.CompletedRangeCount;
             await _logger.CommitAsync(entries.GetPositions());
 
             Assert.True(_logger.TotalCommittedRanges > 0);
@@ -208,7 +215,6 @@ namespace SharpAbp.Abp.Faster
             {
                 // First export
                 var result1 = await _logger.ExportAsync(exportDir, _logger.BeginAddress);
-                var count1 = result1.Count;
 
                 // Write more data
                 await _logger.WriteAsync(new FasterTestEntry { Id = 701, Value = "incremental-2" });
@@ -226,6 +232,79 @@ namespace SharpAbp.Abp.Faster
                 if (Directory.Exists(exportDir))
                     Directory.Delete(exportDir, true);
             }
+        }
+
+        [Fact]
+        public void GetOrCreate_WithSameNameAndDifferentTypes_ShouldReturnDistinctInstances()
+        {
+            var loggerA = _factory.GetOrCreate<FasterAlternateEntryA>("shared-cache-key");
+            var loggerB = _factory.GetOrCreate<FasterAlternateEntryB>("shared-cache-key");
+
+            Assert.NotSame((object)loggerA, loggerB);
+            Assert.True(loggerA.Initialized);
+            Assert.True(loggerB.Initialized);
+        }
+
+        [Fact]
+        public async Task ReadAsync_ShouldSupportConcurrentConsumers()
+        {
+            var concurrentLogger = _factory.GetOrCreate<FasterConcurrentTestEntry>(
+                FasterLogNameAttribute.GetLogName<FasterConcurrentTestEntry>());
+            var ids = Enumerable.Range(800, 12)
+                .Select(id => new FasterConcurrentTestEntry { Id = id })
+                .ToList();
+
+            await concurrentLogger.BatchWriteAsync(ids);
+            await Task.Delay(CommitWaitMs);
+
+            var readers = Enumerable.Range(0, 3)
+                .Select(_ => Task.Run(async () =>
+                {
+                    var batch = await concurrentLogger.ReadAsync(4);
+                    await concurrentLogger.CommitAsync(batch.GetPositions());
+                    return batch.Select(x => x.Data!.Id).ToList();
+                }))
+                .ToArray();
+
+            var results = await Task.WhenAll(readers);
+            var allIds = results.SelectMany(x => x).OrderBy(x => x).ToList();
+
+            Assert.Equal(ids.Count, allIds.Count);
+            Assert.Equal(ids.Select(x => x.Id).OrderBy(x => x), allIds);
+        }
+
+        [Fact]
+        public async Task CommitAsync_ShouldIgnoreLateCommits_AfterGapWasForceCompleted()
+        {
+            var lateCommitLogger = _factory.GetOrCreate<FasterLateCommitTestEntry>(
+                FasterLogNameAttribute.GetLogName<FasterLateCommitTestEntry>());
+
+            await lateCommitLogger.BatchWriteAsync(new List<FasterLateCommitTestEntry>
+            {
+                new FasterLateCommitTestEntry { Id = 1 },
+                new FasterLateCommitTestEntry { Id = 2 }
+            });
+            await Task.Delay(CommitWaitMs);
+
+            var entries = await lateCommitLogger.ReadAsync(2);
+            Assert.Equal(2, entries.Count);
+
+            var first = entries[0];
+            var second = entries[1];
+
+            await lateCommitLogger.CommitAsync(new[] { new Position(second.CurrentAddress, second.NextAddress) });
+            await lateCommitLogger.ForceCommitGap(first.CurrentAddress, first.NextAddress);
+            await Task.Delay(CommitWaitMs * 2);
+
+            Assert.True(lateCommitLogger.TruncateBeforeAddress >= second.NextAddress);
+
+            var committedBeforeLateCommit = lateCommitLogger.TotalCommittedRanges;
+            var rangesBeforeLateCommit = lateCommitLogger.CompletedRangeCount;
+
+            await lateCommitLogger.CommitAsync(new[] { new Position(first.CurrentAddress, first.NextAddress) });
+
+            Assert.Equal(committedBeforeLateCommit, lateCommitLogger.TotalCommittedRanges);
+            Assert.Equal(rangesBeforeLateCommit, lateCommitLogger.CompletedRangeCount);
         }
     }
 }

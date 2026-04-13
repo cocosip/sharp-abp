@@ -16,7 +16,7 @@ namespace SharpAbp.Abp.Faster
         /// <summary>
         /// Gets the concurrent dictionary that stores created logger instances with lazy initialization
         /// </summary>
-        protected ConcurrentDictionary<string, Lazy<IFasterLogger>> Loggers { get; }
+        protected ConcurrentDictionary<LoggerCacheKey, Lazy<IFasterLogger>> Loggers { get; }
         
         /// <summary>
         /// Gets the ABP Faster options configuration
@@ -59,7 +59,8 @@ namespace SharpAbp.Abp.Faster
         public virtual IFasterLogger<T> GetOrCreate<T>(string name) where T : class
         {
             // Use Lazy<T> to ensure thread-safe lazy initialization
-            var lazyLogger = Loggers.GetOrAdd(name, key => new Lazy<IFasterLogger>(() => CreateLogger<T>(key)));
+            var cacheKey = new LoggerCacheKey(typeof(T), name);
+            var lazyLogger = Loggers.GetOrAdd(cacheKey, key => new Lazy<IFasterLogger>(() => CreateLogger<T>(key.Name)));
             Check.NotNull(lazyLogger.Value, nameof(IFasterLogger<T>));
             return (lazyLogger.Value as IFasterLogger<T>)!;
         }
@@ -95,17 +96,48 @@ namespace SharpAbp.Abp.Faster
                     try
                     {
                         kvp.Value.Value?.Dispose();
-                        Logger.LogDebug("Disposed logger: {LoggerName}", kvp.Key);
+                        Logger.LogDebug("Disposed logger: {LoggerName}", kvp.Key.Name);
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError(ex, "Error disposing logger '{LoggerName}': {Message}", kvp.Key, ex.Message);
+                        Logger.LogError(ex, "Error disposing logger '{LoggerName}': {Message}", kvp.Key.Name, ex.Message);
                     }
                 }
             }
 
             Loggers.Clear();
             Logger.LogInformation("FasterLoggerFactory disposed successfully.");
+        }
+
+        protected readonly struct LoggerCacheKey : IEquatable<LoggerCacheKey>
+        {
+            public Type Type { get; }
+
+            public string Name { get; }
+
+            public LoggerCacheKey(Type type, string name)
+            {
+                Type = type;
+                Name = name;
+            }
+
+            public bool Equals(LoggerCacheKey other)
+            {
+                return Type == other.Type && string.Equals(Name, other.Name, StringComparison.Ordinal);
+            }
+
+            public override bool Equals(object? obj)
+            {
+                return obj is LoggerCacheKey other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    return ((Type?.GetHashCode() ?? 0) * 397) ^ StringComparer.Ordinal.GetHashCode(Name);
+                }
+            }
         }
     }
 }

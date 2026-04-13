@@ -54,12 +54,16 @@ namespace SharpAbp.Abp.Faster
                         c.DisableFileBuffering = val.DisableFileBuffering;
                         c.ScanUncommitted = val.ScanUncommitted;
                         c.AutoRefreshSafeTailAddress = val.AutoRefreshSafeTailAddress;
+                        c.PageSizeBits = val.PageSizeBits;
+                        c.MemorySizeBits = val.MemorySizeBits;
+                        c.SegmentSizeBits = val.SegmentSizeBits;
                         c.CommitIntervalMillis = val.CommitIntervalMillis;
                         c.CompleteIntervalMillis = val.CompleteIntervalMillis;
                         c.TruncateIntervalMillis = val.TruncateIntervalMillis;
                         c.PreReadCapacity = val.PreReadCapacity;
                         c.AddressMatchTolerance = val.AddressMatchTolerance;
                         c.GapTimeoutMillis = val.GapTimeoutMillis;
+                        c.ForceCompleteGapTimeoutMillis = val.ForceCompleteGapTimeoutMillis;
                         c.MaxCompletedRanges = val.MaxCompletedRanges;
                         c.IteratorName = val.IteratorName;
                     });

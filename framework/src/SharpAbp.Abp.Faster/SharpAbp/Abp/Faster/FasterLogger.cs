@@ -33,8 +33,10 @@ namespace SharpAbp.Abp.Faster
         // Use interval tracking instead of retry-based commit tracking
         private readonly SortedSet<CompletedRange> _completedRanges = [];
         private readonly object _completedRangesLock = new object();
+        private DateTime _lastGapDetectedTime = DateTime.MinValue;
         private DateTime _lastGapWarningTime = DateTime.MinValue;
         private long _lastGapStart = -1;
+        private long _lastGapEnd = -1;
 
         // Background task tracking for graceful shutdown
         private readonly List<Task> _backgroundTasks = [];
@@ -148,7 +150,7 @@ namespace SharpAbp.Abp.Faster
             var channelOptions = new BoundedChannelOptions(Configuration.PreReadCapacity)
             {
                 FullMode = BoundedChannelFullMode.Wait,
-                SingleReader = true,  // Only one ReadAsync consumer
+                SingleReader = false, // ReadAsync supports multiple concurrent consumers
                 SingleWriter = true   // Only one scan task writing
             };
             _pendingChannel = Channel.CreateBounded<BufferedLogEntry>(channelOptions);
@@ -261,9 +263,11 @@ namespace SharpAbp.Abp.Faster
             {
                 while (!CombinedCancellationToken.IsCancellationRequested)
                 {
+                    var lockTaken = false;
                     try
                     {
                         await _commitSemaphore.WaitAsync(CombinedCancellationToken);
+                        lockTaken = true;
                         if (Log != null)
                         {
                             await Log.CommitAsync(CombinedCancellationToken);
@@ -281,7 +285,10 @@ namespace SharpAbp.Abp.Faster
                     }
                     finally
                     {
-                        _commitSemaphore.Release();
+                        if (lockTaken)
+                        {
+                            _commitSemaphore.Release();
+                        }
                     }
 
                     // Delay after the commit attempt to avoid initial delay
@@ -402,6 +409,7 @@ namespace SharpAbp.Abp.Faster
                         long currentTruncateAddress = Interlocked.Read(ref _truncateBeforeAddress);
                         long newTruncateAddress = currentTruncateAddress;
                         var rangesToRemove = new List<CompletedRange>();
+                        var gapDetected = false;
 
                         lock (_completedRangesLock)
                         {
@@ -423,65 +431,56 @@ namespace SharpAbp.Abp.Faster
                                     }
                                     else
                                     {
-                                        // Gap detected
-                                        long gapSize = range.Start - currentEnd;
+                                        gapDetected = true;
+                                        var gapStart = currentEnd;
+                                        var gapEnd = range.Start;
+                                        var gapSize = gapEnd - gapStart;
+                                        var utcNow = DateTime.UtcNow;
+                                        var isNewGap = _lastGapStart != gapStart || _lastGapEnd != gapEnd;
 
-                                        // Update gap metrics
-                                        Interlocked.Exchange(ref _largestGapSize, Math.Max(Interlocked.Read(ref _largestGapSize), gapSize));
-
-                                        // Check for stale gap timeout
-                                        bool shouldForceComplete = false;
-                                        if (Configuration.GapTimeoutMillis > 0)
+                                        if (isNewGap)
                                         {
-                                            bool isNewGap = _lastGapStart != range.Start;
+                                            _lastGapStart = gapStart;
+                                            _lastGapEnd = gapEnd;
+                                            _lastGapDetectedTime = utcNow;
+                                            _lastGapWarningTime = DateTime.MinValue;
+                                        }
 
-                                            if (isNewGap)
-                                            {
-                                                _lastGapStart = range.Start;
-                                                _lastGapWarningTime = DateTime.UtcNow;
-                                            }
-                                            else
-                                            {
-                                                var gapDuration = DateTime.UtcNow - _lastGapWarningTime;
-                                                if (gapDuration.TotalMilliseconds > Configuration.GapTimeoutMillis)
-                                                {
-                                                    Logger.LogWarning(
-                                                        "Gap at address {GapStart} has persisted for {Duration:F1} seconds (size: {GapSize} bytes) for type '{TypeName}'. " +
-                                                        "This may indicate missing data or out-of-order processing issues.",
-                                                        range.Start,
-                                                        gapDuration.TotalSeconds,
-                                                        gapSize,
-                                                        TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+                                        var gapDuration = utcNow - _lastGapDetectedTime;
 
-                                                    // Check if we should force complete past this gap
-                                                    if (Configuration.ForceCompleteGapTimeoutMillis > 0 &&
-                                                        gapDuration.TotalMilliseconds > Configuration.ForceCompleteGapTimeoutMillis)
-                                                    {
-                                                        shouldForceComplete = true;
-                                                    }
-                                                    else
-                                                    {
-                                                        // Reset timer to avoid repeated warnings
-                                                        _lastGapWarningTime = DateTime.UtcNow;
-                                                    }
-                                                }
-                                            }
+                                        Interlocked.Exchange(
+                                            ref _largestGapSize,
+                                            Math.Max(Interlocked.Read(ref _largestGapSize), gapSize));
+                                        if (Configuration.GapTimeoutMillis > 0 &&
+                                            gapDuration.TotalMilliseconds >= Configuration.GapTimeoutMillis &&
+                                            (_lastGapWarningTime == DateTime.MinValue ||
+                                             (utcNow - _lastGapWarningTime).TotalMilliseconds >= Configuration.GapTimeoutMillis))
+                                        {
+                                            Logger.LogWarning(
+                                                "Gap in range [{GapStart}, {GapEnd}) has persisted for {Duration:F1} seconds (size: {GapSize} bytes) for type '{TypeName}'. " +
+                                                "This may indicate missing data or out-of-order processing issues.",
+                                                gapStart,
+                                                gapEnd,
+                                                gapDuration.TotalSeconds,
+                                                gapSize,
+                                                TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+                                            _lastGapWarningTime = utcNow;
                                         }
 
                                         // Force complete past the gap if timeout exceeded
-                                        if (shouldForceComplete)
+                                        if (Configuration.ForceCompleteGapTimeoutMillis > 0 &&
+                                            gapDuration.TotalMilliseconds >= Configuration.ForceCompleteGapTimeoutMillis)
                                         {
                                             Logger.LogError(
-                                                "FORCING COMPLETION past gap at address {GapStart} (size: {GapSize} bytes) for type '{TypeName}' " +
+                                                "FORCING COMPLETION past gap in range [{GapStart}, {GapEnd}) (size: {GapSize} bytes) for type '{TypeName}' " +
                                                 "due to timeout of {Duration:F1} seconds. " +
                                                 "⚠️ DATA IN RANGE [{GapStart}, {GapEnd}) WILL BE SKIPPED AND MAY BE LOST! " +
                                                 "Current truncate: {CurrentEnd}, Next range starts at: {RangeStart}",
-                                                currentEnd,
+                                                gapStart,
+                                                gapEnd,
                                                 gapSize,
                                                 TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
-                                                (DateTime.UtcNow - _lastGapWarningTime).TotalSeconds,
-                                                currentEnd,
-                                                range.Start,
+                                                gapDuration.TotalSeconds,
                                                 currentEnd,
                                                 range.Start);
 
@@ -489,11 +488,7 @@ namespace SharpAbp.Abp.Faster
                                             currentEnd = Math.Max(currentEnd, range.End);
                                             rangesToRemove.Add(range);
 
-                                            // Reset gap tracking
-                                            _lastGapStart = -1;
-                                            _lastGapWarningTime = DateTime.MinValue;
-
-                                            // Continue to merge subsequent ranges
+                                            ResetGapTracking();
                                             continue;
                                         }
 
@@ -504,7 +499,16 @@ namespace SharpAbp.Abp.Faster
 
                                 newTruncateAddress = currentEnd;
 
+                                if (!gapDetected)
+                                {
+                                    ResetGapTracking();
+                                }
+
                                 // Don't remove ranges yet - wait until CompleteUntilRecordAtAsync succeeds
+                            }
+                            else
+                            {
+                                ResetGapTracking();
                             }
                         }
 
@@ -553,8 +557,8 @@ namespace SharpAbp.Abp.Faster
                                         Configuration.MaxCompletedRanges);
                                 }
 
-                                // Update gap count metric
-                                Interlocked.Exchange(ref _currentGapCount, _completedRanges.Count > 0 ? _completedRanges.Count : 0);
+                                // Update gap count metric using actual discontinuities from the truncate point.
+                                Interlocked.Exchange(ref _currentGapCount, CountCurrentGaps(currentTruncate));
                             }
 
                             Logger.LogInformation(
@@ -590,9 +594,11 @@ namespace SharpAbp.Abp.Faster
         /// <param name="commitAddress">The address up to which records should be completed.</param>
         private async Task CompleteUntilRecordAtAsync(long commitAddress)
         {
-            await _commitSemaphore.WaitAsync(CombinedCancellationToken);
+            var lockTaken = false;
             try
             {
+                await _commitSemaphore.WaitAsync(CombinedCancellationToken);
+                lockTaken = true;
                 if (Log != null)
                 {
                     await Log.CommitAsync(CombinedCancellationToken);
@@ -605,7 +611,10 @@ namespace SharpAbp.Abp.Faster
             }
             finally
             {
-                _commitSemaphore.Release();
+                if (lockTaken)
+                {
+                    _commitSemaphore.Release();
+                }
             }
         }
 
@@ -781,16 +790,35 @@ namespace SharpAbp.Abp.Faster
 
             int invalidCount = 0;
             int duplicateCount = 0;
+            int staleCount = 0;
+            int overlapCount = 0;
             int addedCount = 0;
 
             lock (_completedRangesLock)
             {
+                var currentTruncateAddress = Interlocked.Read(ref _truncateBeforeAddress);
+
                 foreach (var position in positionList)
                 {
                     // Validate position before adding
                     if (!position.IsValid())
                     {
                         invalidCount++;
+                        continue;
+                    }
+
+                    // Ignore late commits for data that has already been completed or truncated.
+                    if (position.NextAddress <= currentTruncateAddress)
+                    {
+                        staleCount++;
+                        continue;
+                    }
+
+                    // A partially overlapping range indicates the caller is committing a position
+                    // that crosses the current truncate boundary, which cannot be applied safely.
+                    if (position.Address < currentTruncateAddress)
+                    {
+                        overlapCount++;
                         continue;
                     }
 
@@ -817,13 +845,33 @@ namespace SharpAbp.Abp.Faster
                         TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
                 }
 
+                if (staleCount > 0)
+                {
+                    Logger.LogWarning(
+                        "Ignored {StaleCount} stale positions during commit for type '{TypeName}' because they were already completed or truncated before address {TruncateAddress}.",
+                        staleCount,
+                        TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
+                        currentTruncateAddress);
+                }
+
+                if (overlapCount > 0)
+                {
+                    Logger.LogWarning(
+                        "Ignored {OverlapCount} overlapping positions during commit for type '{TypeName}' because they crossed truncate address {TruncateAddress}.",
+                        overlapCount,
+                        TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
+                        currentTruncateAddress);
+                }
+
                 if (Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
                 {
                     Logger.LogDebug(
-                        "Committed {AddedCount} positions ({DuplicateCount} duplicates, {InvalidCount} invalid) for type '{TypeName}'. Total ranges: {TotalRanges}",
+                        "Committed {AddedCount} positions ({DuplicateCount} duplicates, {InvalidCount} invalid, {StaleCount} stale, {OverlapCount} overlapping) for type '{TypeName}'. Total ranges: {TotalRanges}",
                         addedCount,
                         duplicateCount,
                         invalidCount,
+                        staleCount,
+                        overlapCount,
                         TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
                         _completedRanges.Count);
                 }
@@ -879,11 +927,7 @@ namespace SharpAbp.Abp.Faster
                         TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
 
                     // Reset gap tracking since we just filled it
-                    if (_lastGapStart == gapStart)
-                    {
-                        _lastGapStart = -1;
-                        _lastGapWarningTime = DateTime.MinValue;
-                    }
+                    ResetGapTracking();
                 }
                 else
                 {
@@ -896,6 +940,37 @@ namespace SharpAbp.Abp.Faster
             }
 
             return Task.CompletedTask;
+        }
+
+        private void ResetGapTracking()
+        {
+            _lastGapStart = -1;
+            _lastGapEnd = -1;
+            _lastGapDetectedTime = DateTime.MinValue;
+            _lastGapWarningTime = DateTime.MinValue;
+        }
+
+        private long CountCurrentGaps(long currentTruncateAddress)
+        {
+            if (_completedRanges.Count == 0)
+            {
+                return 0;
+            }
+
+            long gapCount = 0;
+            long currentEnd = currentTruncateAddress;
+
+            foreach (var range in _completedRanges)
+            {
+                if (range.Start > currentEnd + Configuration.AddressMatchTolerance)
+                {
+                    gapCount++;
+                }
+
+                currentEnd = Math.Max(currentEnd, range.End);
+            }
+
+            return gapCount;
         }
 
         // Static newline byte to avoid repeated allocation
@@ -1096,9 +1171,18 @@ namespace SharpAbp.Abp.Faster
                 try
                 {
                     // Wait up to 5 seconds for graceful shutdown
-                    Task.WaitAll(_backgroundTasks.ToArray(), TimeSpan.FromSeconds(5));
-                    Logger.LogInformation("All background tasks completed gracefully for type '{TypeName}'.",
-                        TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+                    var completed = Task.WaitAll(_backgroundTasks.ToArray(), TimeSpan.FromSeconds(5));
+                    if (completed)
+                    {
+                        Logger.LogInformation("All background tasks completed gracefully for type '{TypeName}'.",
+                            TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+                    }
+                    else
+                    {
+                        Logger.LogWarning(
+                            "Timed out waiting for background tasks to stop for type '{TypeName}'. Shutdown will continue with pending tasks.",
+                            TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)));
+                    }
                 }
                 catch (AggregateException ex)
                 {
