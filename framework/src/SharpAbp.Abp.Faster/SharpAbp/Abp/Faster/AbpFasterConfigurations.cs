@@ -7,7 +7,11 @@ namespace SharpAbp.Abp.Faster
 {
     public class AbpFasterConfigurations
     {
-        private AbpFasterConfiguration Default => GetConfiguration<DefaultFasterLog>();
+        private const string DefaultConfigurationName = DefaultFasterLog.Name;
+
+        private AbpFasterConfiguration Default => _configurations.GetOrAdd(
+            DefaultConfigurationName,
+            () => new AbpFasterConfiguration());
 
         private readonly Dictionary<string, AbpFasterConfiguration> _configurations;
 
@@ -67,8 +71,7 @@ namespace SharpAbp.Abp.Faster
         public AbpFasterConfiguration GetConfiguration([NotNull] string name)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            return _configurations.GetOrDefault(name) ??
-                   Default;
+            return _configurations.GetOrDefault(name) ?? Default;
         }
     }
 }

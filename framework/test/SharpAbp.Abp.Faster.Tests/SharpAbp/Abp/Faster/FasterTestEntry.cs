@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace SharpAbp.Abp.Faster
 {
     [FasterLogName("faster-test-entry")]

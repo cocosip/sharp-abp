@@ -93,7 +93,8 @@ public class MyService
                         await MarkAsProcessed(entry.Data.Id);
                     }
 
-                    // Out-of-order commits are handled automatically
+                    // Commit successfully processed work promptly so the earliest item
+                    // does not become a long-lived gap.
                     await _logger.CommitAsync(entries.GetPositions(), cancellationToken);
                 }
             });
@@ -235,7 +236,8 @@ public void StartConsumers(int concurrency = 3)
                     await MarkAsProcessed(entry.Data.Id);
                 }
 
-                // Out-of-order commits handled automatically
+                // Commit successful work promptly so earlier items do not remain stuck
+                // at the head of the batch and become long-lived gaps.
                 await _logger.CommitAsync(batch.GetPositions(), cancellationToken);
 
                 await Task.Delay(100, cancellationToken);

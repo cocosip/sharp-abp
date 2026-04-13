@@ -26,17 +26,6 @@ namespace SharpAbp.Abp.Faster
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            context.Services.AddTransient(
-                typeof(IFasterLogger<>),
-                typeof(FasterLogger<>)
-            );
-
-            context.Services.AddTransient(
-                typeof(IFasterLogger),
-                serviceProvider => serviceProvider
-                    .GetRequiredService<IFasterLogger<DefaultFasterLog>>()
-            );
-
             Configure<AbpFasterOptions>(options =>
             {
                 options.RootPath = Path.Combine(AppContext.BaseDirectory, "faster-logs");
