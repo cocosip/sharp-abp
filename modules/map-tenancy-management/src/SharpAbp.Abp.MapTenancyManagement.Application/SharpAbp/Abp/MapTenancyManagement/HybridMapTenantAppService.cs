@@ -224,7 +224,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
                  input.Code,
                  input.MapCode);
 
-            await MapTenantManager.CreateAsync(mapTenant);
+            await MapTenantManager.CreateAsync(mapTenant, tenant);
 
             await CurrentUnitOfWork.SaveChangesAsync();
 

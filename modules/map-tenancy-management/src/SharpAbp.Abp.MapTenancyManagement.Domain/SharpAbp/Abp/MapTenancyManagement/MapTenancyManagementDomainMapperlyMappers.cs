@@ -8,10 +8,12 @@ namespace SharpAbp.Abp.MapTenancyManagement
     {
         [MapperIgnoreTarget(nameof(MapTenantEto.KeysAsString))]
         [MapperIgnoreTarget(nameof(MapTenantEto.EntityType))]
+        [MapperIgnoreTarget(nameof(MapTenantEto.Properties))]
         public override partial MapTenantEto Map(MapTenant source);
 
         [MapperIgnoreTarget(nameof(MapTenantEto.KeysAsString))]
         [MapperIgnoreTarget(nameof(MapTenantEto.EntityType))]
+        [MapperIgnoreTarget(nameof(MapTenantEto.Properties))]
         public override partial void Map(MapTenant source, MapTenantEto destination);
     }
 }

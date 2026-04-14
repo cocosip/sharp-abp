@@ -64,6 +64,42 @@ namespace SharpAbp.Abp.MapTenancyManagement
         }
 
         /// <summary>
+        /// Creates a new map tenant with a preloaded tenant entity to avoid redundant tenant queries.
+        /// </summary>
+        /// <param name="mapTenant">The map tenant entity to create</param>
+        /// <param name="tenant">The already loaded tenant entity</param>
+        /// <returns>The created map tenant entity</returns>
+        /// <exception cref="UserFriendlyException">Thrown when validation fails</exception>
+        public virtual async Task<MapTenant> CreateAsync(MapTenant mapTenant, Tenant tenant)
+        {
+            Check.NotNull(mapTenant, nameof(mapTenant));
+            Check.NotNull(tenant, nameof(tenant));
+
+            Logger.LogInformation("Creating map tenant for tenant ID: {TenantId}, Code: {Code}, MapCode: {MapCode}",
+                mapTenant.TenantId, mapTenant.Code, mapTenant.MapCode);
+
+            try
+            {
+                await ValidateTenantAsync(tenant);
+                await ValidateCodeAsync(mapTenant.Code);
+                await ValidateMapCodeAsync(mapTenant.MapCode);
+
+                var result = await MapTenantRepository.InsertAsync(mapTenant);
+
+                Logger.LogInformation("Successfully created map tenant with ID: {Id} for tenant: {TenantId}",
+                    result.Id, result.TenantId);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Failed to create map tenant for tenant ID: {TenantId}, Code: {Code}, MapCode: {MapCode}",
+                    mapTenant.TenantId, mapTenant.Code, mapTenant.MapCode);
+                throw;
+            }
+        }
+
+        /// <summary>
         /// Updates an existing map tenant with validation
         /// </summary>
         /// <param name="id">The unique identifier of the map tenant to update</param>
@@ -138,6 +174,40 @@ namespace SharpAbp.Abp.MapTenancyManagement
             {
                 Logger.LogError(ex, "Error occurred while validating tenant ID: {TenantId}", tenantId);
                 throw new UserFriendlyException($"Failed to validate tenant with ID: {tenantId}");
+            }
+        }
+
+        /// <summary>
+        /// Validates a preloaded tenant entity and uniqueness constraints.
+        /// </summary>
+        /// <param name="tenant">The tenant entity to validate</param>
+        /// <param name="expectedId">Optional expected ID for update scenarios</param>
+        /// <returns>The validated tenant entity</returns>
+        /// <exception cref="UserFriendlyException">Thrown when tenant validation fails</exception>
+        public virtual async Task<Tenant> ValidateTenantAsync(Tenant tenant, Guid? expectedId = null)
+        {
+            Check.NotNull(tenant, nameof(tenant));
+
+            Logger.LogDebug("Validating tenant ID: {TenantId} with expected ID: {ExpectedId}", tenant.Id, expectedId);
+
+            try
+            {
+                var existingMapTenant = await MapTenantRepository.FindExpectedTenantIdAsync(tenant.Id, expectedId);
+
+                if (existingMapTenant != null)
+                {
+                    Logger.LogWarning("Tenant ID {TenantId} is already mapped to another map tenant with ID: {ExistingId}",
+                        tenant.Id, existingMapTenant.Id);
+                    throw new UserFriendlyException(Localizer["MapTenancyManagement.DuplicateTenantId", tenant.Id]);
+                }
+
+                Logger.LogDebug("Successfully validated tenant ID: {TenantId}", tenant.Id);
+                return tenant;
+            }
+            catch (Exception ex) when (!(ex is UserFriendlyException))
+            {
+                Logger.LogError(ex, "Error occurred while validating tenant ID: {TenantId}", tenant.Id);
+                throw new UserFriendlyException($"Failed to validate tenant with ID: {tenant.Id}");
             }
         }
 

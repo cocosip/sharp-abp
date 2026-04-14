@@ -19,6 +19,15 @@ namespace SharpAbp.Abp.MapTenancyManagement
         Task<MapTenant> CreateAsync(MapTenant mapTenant);
 
         /// <summary>
+        /// Creates a new map tenant with a preloaded tenant entity to avoid redundant tenant lookups.
+        /// </summary>
+        /// <param name="mapTenant">The map tenant entity to create</param>
+        /// <param name="tenant">The already loaded tenant entity associated with the map tenant</param>
+        /// <returns>The created map tenant entity</returns>
+        /// <exception cref="Volo.Abp.UserFriendlyException">Thrown when validation fails</exception>
+        Task<MapTenant> CreateAsync(MapTenant mapTenant, Tenant tenant);
+
+        /// <summary>
         /// Updates an existing map tenant with validation
         /// </summary>
         /// <param name="id">The unique identifier of the map tenant to update</param>
@@ -38,6 +47,15 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <returns>The validated tenant entity</returns>
         /// <exception cref="Volo.Abp.UserFriendlyException">Thrown when tenant validation fails</exception>
         Task<Tenant> ValidateTenantAsync(Guid tenantId, Guid? expectedId = null);
+
+        /// <summary>
+        /// Validates a preloaded tenant entity and uniqueness constraints.
+        /// </summary>
+        /// <param name="tenant">The tenant entity to validate</param>
+        /// <param name="expectedId">Optional expected ID for update scenarios</param>
+        /// <returns>The validated tenant entity</returns>
+        /// <exception cref="Volo.Abp.UserFriendlyException">Thrown when tenant validation fails</exception>
+        Task<Tenant> ValidateTenantAsync(Tenant tenant, Guid? expectedId = null);
 
         /// <summary>
         /// Validates code uniqueness within the system
