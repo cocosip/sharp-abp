@@ -16,9 +16,6 @@ namespace PerformanceSample
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            var configuration = context.Services.GetConfiguration();
-            var hostEnvironment = context.Services.GetSingletonInstance<IHostEnvironment>();
-
             Configure<AbpPerformanceOptions>(options =>
             {
                 options.Configurations.Configure("service1", c =>

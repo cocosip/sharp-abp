@@ -21,7 +21,7 @@
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETStandard' And $([MSBuild]::VersionGreaterThanOrEquals($(TargetFrameworkVersion), '2.1')) ">
-		<PackageReference Include="System.ComponentModel.Annotations" Version="$(SystemComponentModelAnnotationsPackageVersion)" />
+		<PackageReference Include="System.ComponentModel.Annotations" />
 	</ItemGroup>
 
 	<ItemGroup>
