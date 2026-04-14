@@ -134,6 +134,7 @@
 		<PackageVersion Include="FreeSql.Provider.SqlServer" Version="$(FreeSqlPackageVersion)" />
 		<PackageVersion Include="FreeSql.Provider.Dameng" Version="$(FreeSqlPackageVersion)" />
 		<PackageVersion Include="HuaweiCloud.OBS.SDK" Version="3.20.7" />
+		<PackageVersion Include="log4net" Version="[2.0.17,)" />
 		<PackageVersion Include="MassTransit" Version="$(MassTransitPackageVersion)" />
 		<PackageVersion Include="MassTransit.ActiveMQ" Version="$(MassTransitPackageVersion)" />
 		<PackageVersion Include="MassTransit.Kafka" Version="$(MassTransitPackageVersion)" />
@@ -141,8 +142,9 @@
 		<PackageVersion Include="MassTransit.Azure.ServiceBus.Core" Version="$(MassTransitPackageVersion)" />
 		<PackageVersion Include="MassTransit.SqlTransport.PostgreSQL" Version="$(MassTransitPackageVersion)" />
 		<PackageVersion Include="MassTransit.SqlTransport.SqlServer" Version="$(MassTransitPackageVersion)" />
-		<PackageVersion Include="DM.Microsoft.EntityFrameworkCore" Version="[9.0.0.37033,)" />
+		<PackageVersion Include="Sharp.EntityFrameworkCore.DM" Version="[10.0.0,)" />
 		<PackageVersion Include="DM.DmProvider" Version="[8.3.1.35543,)" />
+		<PackageVersion Include="Devart.Data.Oracle.EFCore" Version="[11.1.35.10,)" />
 		<PackageVersion Include="DotNetCore.EntityFrameworkCore.GaussDB" Version="[10.0.0,)" />
 		<PackageVersion Include="DotNetCore.GaussDB" Version="[10.0.0,)" />
 		<PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.1" />

@@ -19,6 +19,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="HuaweiCloud.OBS.SDK" />
+		<PackageReference Include="log4net" />
 		<PackageReference Include="Volo.Abp.Timing" />
 	</ItemGroup>
 

@@ -18,7 +18,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Devart.Data.Oracle.EFCore" />
 		<PackageReference Include="Volo.Abp.EntityFrameworkCore.Oracle.Devart" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
 	</ItemGroup>
 
 	<ItemGroup>
