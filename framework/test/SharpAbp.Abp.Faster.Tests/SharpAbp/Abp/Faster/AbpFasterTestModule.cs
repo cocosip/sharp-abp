@@ -53,6 +53,27 @@ namespace SharpAbp.Abp.Faster
                     c.CompleteIntervalMillis = 200;
                     c.TruncateIntervalMillis = 600000;
                 });
+
+                options.Configurations.Configure("faster-generic-payload-entry", c =>
+                {
+                    c.FileName = "generic-payload-entry.log";
+                    c.PreallocateFile = false;
+                    c.CommitIntervalMillis = 100;
+                    c.CompleteIntervalMillis = 200;
+                    c.TruncateIntervalMillis = 600000;
+                });
+
+                options.Configurations.Configure<FasterRangeLimitTestEntry>(c =>
+                {
+                    c.FileName = "range-limit-test-entry.log";
+                    c.PreallocateFile = false;
+                    c.CommitIntervalMillis = 100;
+                    c.CompleteIntervalMillis = 200;
+                    c.TruncateIntervalMillis = 600000;
+                    c.GapTimeoutMillis = 0;
+                    c.ForceCompleteGapTimeoutMillis = 0;
+                    c.MaxCompletedRanges = 2;
+                });
             });
         }
     }

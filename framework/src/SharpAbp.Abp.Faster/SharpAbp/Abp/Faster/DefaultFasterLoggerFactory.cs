@@ -61,8 +61,17 @@ namespace SharpAbp.Abp.Faster
             // Use Lazy<T> to ensure thread-safe lazy initialization
             var cacheKey = new LoggerCacheKey(typeof(T), name);
             var lazyLogger = Loggers.GetOrAdd(cacheKey, key => new Lazy<IFasterLogger>(() => CreateLogger<T>(key.Name)));
-            Check.NotNull(lazyLogger.Value, nameof(IFasterLogger<T>));
-            return (lazyLogger.Value as IFasterLogger<T>)!;
+            try
+            {
+                Check.NotNull(lazyLogger.Value, nameof(IFasterLogger<T>));
+                return (lazyLogger.Value as IFasterLogger<T>)!;
+            }
+            catch
+            {
+                // Remove failed lazy instances so transient initialization problems can recover.
+                Loggers.TryRemove(cacheKey, out _);
+                throw;
+            }
         }
 
         /// <summary>

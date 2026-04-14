@@ -21,4 +21,20 @@ namespace SharpAbp.Abp.Faster
     {
         public int Id { get; set; }
     }
+
+    public class FasterGenericPayloadEntry<T>
+    {
+        public T Payload { get; set; }
+    }
+
+    [FasterLogName("faster-range-limit-test-entry")]
+    public class FasterRangeLimitTestEntry
+    {
+        public int Id { get; set; }
+    }
+
+    public class FasterRecoverableInitEntry
+    {
+        public int Id { get; set; }
+    }
 }

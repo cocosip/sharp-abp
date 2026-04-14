@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace SharpAbp.Abp.Faster
@@ -305,6 +306,74 @@ namespace SharpAbp.Abp.Faster
 
             Assert.Equal(committedBeforeLateCommit, lateCommitLogger.TotalCommittedRanges);
             Assert.Equal(rangesBeforeLateCommit, lateCommitLogger.CompletedRangeCount);
+        }
+
+        [Fact]
+        public async Task GetOrCreate_ShouldInitializeGenericTypeLoggers_WithFilesystemSafePaths()
+        {
+            var logger = _factory.GetOrCreate<FasterGenericPayloadEntry<string>>("faster-generic-payload-entry");
+
+            Assert.True(logger.Initialized);
+
+            var address = await logger.WriteAsync(new FasterGenericPayloadEntry<string> { Payload = "hello" });
+
+            Assert.True(address >= 0);
+        }
+
+        [Fact]
+        public async Task GetOrCreate_ShouldRecoverAfterInitializationFailure()
+        {
+            const string logName = "recoverable-init-entry";
+            var options = GetRequiredService<IOptions<AbpFasterOptions>>().Value;
+
+            var exception = Assert.Throws<InvalidOperationException>(
+                () => _factory.GetOrCreate<FasterRecoverableInitEntry>(logName));
+
+            Assert.Contains("FileName must be configured", exception.Message);
+
+            options.Configurations.Configure(logName, c =>
+            {
+                c.FileName = "recoverable-init-entry.log";
+                c.PreallocateFile = false;
+                c.CommitIntervalMillis = 100;
+                c.CompleteIntervalMillis = 200;
+                c.TruncateIntervalMillis = 600000;
+            });
+
+            var recoveredLogger = _factory.GetOrCreate<FasterRecoverableInitEntry>(logName);
+            var address = await recoveredLogger.WriteAsync(new FasterRecoverableInitEntry { Id = 1 });
+
+            Assert.True(recoveredLogger.Initialized);
+            Assert.True(address >= 0);
+        }
+
+        [Fact]
+        public async Task CommitAsync_ShouldForceOldestGap_WhenCompletedRangeLimitIsExceeded()
+        {
+            var rangeLimitLogger = _factory.GetOrCreate<FasterRangeLimitTestEntry>(
+                FasterLogNameAttribute.GetLogName<FasterRangeLimitTestEntry>());
+
+            await rangeLimitLogger.BatchWriteAsync(new List<FasterRangeLimitTestEntry>
+            {
+                new FasterRangeLimitTestEntry { Id = 1 },
+                new FasterRangeLimitTestEntry { Id = 2 },
+                new FasterRangeLimitTestEntry { Id = 3 },
+                new FasterRangeLimitTestEntry { Id = 4 }
+            });
+            await Task.Delay(CommitWaitMs);
+
+            var entries = await rangeLimitLogger.ReadAsync(4);
+            Assert.Equal(4, entries.Count);
+
+            await rangeLimitLogger.CommitAsync(entries.Skip(1).Select(x => new Position(x.CurrentAddress, x.NextAddress)));
+            await Task.Delay(CommitWaitMs * 3);
+
+            Assert.True(rangeLimitLogger.TruncateBeforeAddress >= entries[^1].NextAddress);
+
+            var committedBeforeLateCommit = rangeLimitLogger.TotalCommittedRanges;
+            await rangeLimitLogger.CommitAsync(new[] { new Position(entries[0].CurrentAddress, entries[0].NextAddress) });
+
+            Assert.Equal(committedBeforeLateCommit, rangeLimitLogger.TotalCommittedRanges);
         }
     }
 }

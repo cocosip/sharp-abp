@@ -194,7 +194,7 @@ namespace SharpAbp.Abp.Faster
 
                 var fileName = Path.Combine(
                     Options.RootPath,
-                    TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
+                    GetTypeStorageDirectoryName(typeof(T)),
                     Configuration.FileName);
 
                 var device = Devices.CreateLogDevice(
@@ -468,8 +468,10 @@ namespace SharpAbp.Abp.Faster
                                         }
 
                                         // Force complete past the gap if timeout exceeded
-                                        if (Configuration.ForceCompleteGapTimeoutMillis > 0 &&
-                                            gapDuration.TotalMilliseconds >= Configuration.ForceCompleteGapTimeoutMillis)
+                                        if ((Configuration.ForceCompleteGapTimeoutMillis > 0 &&
+                                             gapDuration.TotalMilliseconds >= Configuration.ForceCompleteGapTimeoutMillis) ||
+                                            (Configuration.MaxCompletedRanges > 0 &&
+                                             _completedRanges.Count > Configuration.MaxCompletedRanges))
                                         {
                                             Logger.LogError(
                                                 "FORCING COMPLETION past gap in range [{GapStart}, {GapEnd}) (size: {GapSize} bytes) for type '{TypeName}' " +
@@ -530,35 +532,8 @@ namespace SharpAbp.Abp.Faster
                                     _completedRanges.Remove(range);
                                 }
 
-                                // Check if we have too many ranges (memory protection)
-                                if (Configuration.MaxCompletedRanges > 0 &&
-                                    _completedRanges.Count > Configuration.MaxCompletedRanges)
-                                {
-                                    int excessCount = _completedRanges.Count - Configuration.MaxCompletedRanges;
-                                    var rangesArray = _completedRanges.ToArray();
-
-                                    // Remove the oldest ranges from the beginning (they have gaps and can't be merged)
-                                    // Keep ranges from the end (most recent, more likely to merge in the future)
-                                    for (int i = 0; i < excessCount; i++)
-                                    {
-                                        _completedRanges.Remove(rangesArray[i]);
-                                    }
-
-                                    Logger.LogWarning(
-                                        "Removed {Count} excess ranges from completed set for type '{TypeName}' to prevent memory growth. " +
-                                        "Removed ranges: [{FirstStart}-{LastEnd}), Kept ranges start from: {KeptStart}. " +
-                                        "Total ranges: {Total}, Max allowed: {Max}",
-                                        excessCount,
-                                        TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
-                                        rangesArray[0].Start,
-                                        rangesArray[excessCount - 1].End,
-                                        excessCount < rangesArray.Length ? rangesArray[excessCount].Start : -1,
-                                        _completedRanges.Count,
-                                        Configuration.MaxCompletedRanges);
-                                }
-
                                 // Update gap count metric using actual discontinuities from the truncate point.
-                                Interlocked.Exchange(ref _currentGapCount, CountCurrentGaps(currentTruncate));
+                                Interlocked.Exchange(ref _currentGapCount, CountCurrentGaps(newTruncateAddress));
                             }
 
                             Logger.LogInformation(
@@ -1142,6 +1117,31 @@ namespace SharpAbp.Abp.Faster
             {
                 sb.Append(Array.IndexOf(invalid, c) >= 0 ? '_' : c);
             }
+            return sb.ToString();
+        }
+
+        private static string GetTypeStorageDirectoryName(Type type)
+        {
+            var typeName = TypeHelper.GetFullNameHandlingNullableAndGenerics(type) ?? type.FullName ?? type.Name;
+            return SanitizePathSegment(typeName);
+        }
+
+        private static string SanitizePathSegment(string name)
+        {
+            var invalid = Path.GetInvalidFileNameChars();
+            var sb = new StringBuilder(name.Length);
+            foreach (var c in name)
+            {
+                if (Array.IndexOf(invalid, c) >= 0 || c == Path.DirectorySeparatorChar || c == Path.AltDirectorySeparatorChar)
+                {
+                    sb.Append('_');
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+
             return sb.ToString();
         }
 
