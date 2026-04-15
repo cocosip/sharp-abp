@@ -1,5 +1,9 @@
 ﻿using System.IO;
 using Microsoft.Extensions.Options;
+using Volo.Abp;
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.MultiTenancy;
 
@@ -24,32 +28,45 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
         public virtual string Calculate(FileProviderArgs args)
         {
             var fileSystemConfiguration = args.Configuration.GetFileSystemConfiguration();
-            var filePath = fileSystemConfiguration.BasePath;
+            var basePath = fileSystemConfiguration.BasePath;
+            var relativePath = CalculateRelativePath(args);
+            var filePath = Path.Combine(basePath, relativePath.Replace('/', Path.DirectorySeparatorChar));
+
+            return EnsurePathIsUnderBasePath(basePath, filePath, args.FileId);
+        }
+
+        public virtual string CalculateRelativePath(FileProviderArgs args)
+        {
+            var fileSystemConfiguration = args.Configuration.GetFileSystemConfiguration();
             var builderOptions = Options.FilePathBuilder;
             var context = FilePathContextAccessor.Current;
+            var parts = new List<string>();
+
+            EnsureValidFileId(args.FileId);
 
             if (Options.FilePathStrategy == FilePathGenerationStrategy.DirectFileId)
             {
                 if (fileSystemConfiguration.AppendContainerNameToBasePath)
                 {
-                    filePath = Path.Combine(filePath, args.ContainerName);
+                    parts.Add(NormalizeRelativeSegmentPath(args.ContainerName));
                 }
 
-                filePath = Path.Combine(filePath, args.FileId);
+                parts.Add(NormalizeRelativeSegmentPath(args.FileId));
             }
             else
             {
-                // Optional prefix
                 var prefix = ResolvePrefixSegment(builderOptions, context);
                 if (!string.IsNullOrEmpty(prefix))
                 {
-                    filePath = Path.Combine(filePath, prefix!);
+                    parts.Add(NormalizeRelativeSegmentPath(prefix!));
                 }
 
-                // Tenant segment
                 if (CurrentTenant.Id == null)
                 {
-                    filePath = Path.Combine(filePath, builderOptions.HostSegment);
+                    if (!string.IsNullOrEmpty(builderOptions.HostSegment))
+                    {
+                        parts.Add(NormalizeRelativeSegmentPath(builderOptions.HostSegment));
+                    }
                 }
                 else
                 {
@@ -57,18 +74,23 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
                         ? builderOptions.TenantIdentifierFactory(CurrentTenant.Id.Value, CurrentTenant.Name, context)
                         : CurrentTenant.Id.Value.ToString("D");
 
-                    filePath = Path.Combine(filePath, builderOptions.TenantsSegment, identifier);
+                    if (!string.IsNullOrEmpty(builderOptions.TenantsSegment))
+                    {
+                        parts.Add(NormalizeRelativeSegmentPath(builderOptions.TenantsSegment));
+                    }
+
+                    parts.Add(NormalizeRelativeSegmentPath(identifier));
                 }
 
                 if (fileSystemConfiguration.AppendContainerNameToBasePath)
                 {
-                    filePath = Path.Combine(filePath, args.ContainerName);
+                    parts.Add(NormalizeRelativeSegmentPath(args.ContainerName));
                 }
 
-                filePath = Path.Combine(filePath, args.FileId);
+                parts.Add(NormalizeRelativeSegmentPath(args.FileId));
             }
 
-            return filePath;
+            return string.Join("/", parts);
         }
 
         protected virtual string? ResolvePrefixSegment(FilePathBuilderOptions options, FilePathContext? context)
@@ -84,6 +106,64 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
             }
 
             return options.Prefix;
+        }
+
+        protected virtual string EnsurePathIsUnderBasePath(string basePath, string filePath, string fileId)
+        {
+            var comparisonType = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? StringComparison.OrdinalIgnoreCase
+                : StringComparison.Ordinal;
+
+            var fullBasePath = Path.GetFullPath(basePath);
+            var fullFilePath = Path.GetFullPath(filePath);
+            var normalizedBasePath = AppendDirectorySeparator(fullBasePath);
+
+            if (!fullFilePath.StartsWith(normalizedBasePath, comparisonType))
+            {
+                throw new AbpException($"The file identifier '{fileId}' resolves outside the configured file system base path.");
+            }
+
+            return fullFilePath;
+        }
+
+        protected virtual string AppendDirectorySeparator(string path)
+        {
+            if (!string.IsNullOrEmpty(path))
+            {
+                var lastChar = path[path.Length - 1];
+                if (lastChar == Path.DirectorySeparatorChar || lastChar == Path.AltDirectorySeparatorChar)
+                {
+                    return path;
+                }
+            }
+
+            return path + Path.DirectorySeparatorChar;
+        }
+
+        protected virtual void EnsureValidFileId(string fileId)
+        {
+            if (Path.IsPathRooted(fileId) || fileId.Contains(":") || ContainsTraversalSegment(fileId))
+            {
+                throw new AbpException($"The file identifier '{fileId}' must be a relative path without traversal segments.");
+            }
+        }
+
+        protected virtual bool ContainsTraversalSegment(string path)
+        {
+            foreach (var segment in path.Split(new[] { '/', '\\' }, StringSplitOptions.None))
+            {
+                if (segment == "." || segment == "..")
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        protected virtual string NormalizeRelativeSegmentPath(string path)
+        {
+            return path.Replace('\\', '/').Trim('/');
         }
     }
 }
