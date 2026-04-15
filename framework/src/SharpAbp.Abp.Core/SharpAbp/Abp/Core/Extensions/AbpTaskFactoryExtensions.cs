@@ -45,12 +45,13 @@ namespace SharpAbp.Abp.Core.Extensions
 
             // Create the timer but don't start it yet to avoid race conditions
             // with cancellation token registration
-            var timer = new Timer(self =>
+            Timer? timer = null;
+            timer = new Timer(_ =>
             {
                 // Clean up both the cancellation token registration and the timer,
                 // then try to transition the task to completed state
                 ctr.Dispose();
-                ((Timer)self!).Dispose();
+                timer?.Dispose();
                 tcs.TrySetResult(null);
             }, null, Timeout.Infinite, Timeout.Infinite);
 
