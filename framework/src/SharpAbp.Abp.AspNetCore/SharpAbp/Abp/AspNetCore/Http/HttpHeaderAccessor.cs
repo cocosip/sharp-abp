@@ -106,7 +106,7 @@ namespace SharpAbp.Abp.AspNetCore.Http
                         {
                             foreach (var headerKv in httpContext.Request.Headers)
                             {
-                                if (headerKv.Key.StartsWith(prefix))
+                                if (headerKv.Key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                                 {
                                     headers[headerKv.Key] = headerKv.Value;
                                 }
@@ -137,27 +137,13 @@ namespace SharpAbp.Abp.AspNetCore.Http
                 {
                     var request = httpContext.Request;
 
-                    var scheme = request.Headers["X-Forwarded-Proto"].ToString();
-                    if (!scheme.IsNullOrWhiteSpace())
-                    {
-                        scheme = scheme.Split(',')[0].Trim();
-                    }
-                    else
-                    {
-                        scheme = request.Scheme;
-                    }
+                    var scheme = request.Scheme;
+                    var host = request.Host.Value;
 
-                    var host = request.Headers["X-Forwarded-Host"].ToString();
-                    if (!host.IsNullOrWhiteSpace())
+                    if (!scheme.IsNullOrWhiteSpace() && !host.IsNullOrWhiteSpace())
                     {
-                        host = host.Split(',')[0].Trim();
+                        hostURL = $"{scheme}://{host}";
                     }
-                    else
-                    {
-                        host = request.Host.Value;
-                    }
-
-                    hostURL = $"{scheme}://{host}";
                 }
             }
             catch (Exception ex)

@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
-using Volo.Abp;
 using Volo.Abp.AspNetCore.Middleware;
 using Volo.Abp.DependencyInjection;
 
@@ -48,27 +47,15 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
                     await handler.HandleAsync(context, identifier, default);
                 }
             }
-            catch (AbpException ex)
-            {
-                Logger.LogWarning(ex, "AbpTransformSecurityMiddleware rejected an invalid request.");
-                await WriteErrorResponseAsync(context, StatusCodes.Status400BadRequest, "The transform security request is invalid.");
-                return;
-            }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "AbpTransformSecurityMiddleware execute exception.");
-                await WriteErrorResponseAsync(context, StatusCodes.Status500InternalServerError, "An unexpected fault happened.");
+                Logger.LogError(ex, "AbpTransformSecurityMiddleware execute exception: {Message}", ex.Message);
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                await context.Response.WriteAsync("An unexpected fault happened.");
                 return;
             }
 
             await next(context);
-        }
-
-        protected virtual async Task WriteErrorResponseAsync(HttpContext context, int statusCode, string message)
-        {
-            context.Response.StatusCode = statusCode;
-            context.Response.ContentType = "text/plain; charset=utf-8";
-            await context.Response.WriteAsync(message);
         }
     }
 }
