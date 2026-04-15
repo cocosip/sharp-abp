@@ -105,13 +105,6 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
             EnsurePathDoesNotUseReparsePoints(normalizedRoot, normalizedPath);
         }
 
-        private static string NormalizeConfiguredPath(string path)
-        {
-            return (path ?? string.Empty)
-                .Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar)
-                .Replace('\\', Path.DirectorySeparatorChar);
-        }
-
         private static bool IsAbsoluteConfiguredPath(string path)
         {
             if (Path.IsPathRooted(path))
