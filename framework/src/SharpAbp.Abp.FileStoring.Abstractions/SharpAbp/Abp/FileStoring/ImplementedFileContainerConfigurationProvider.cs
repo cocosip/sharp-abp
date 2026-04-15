@@ -1,14 +1,13 @@
 ﻿using JetBrains.Annotations;
-using System;
-using Volo.Abp.DependencyInjection;
+using Volo.Abp;
 
 namespace SharpAbp.Abp.FileStoring
 {
-    public class ImplementedFileContainerConfigurationProvider : IFileContainerConfigurationProvider, ITransientDependency
+    public class ImplementedFileContainerConfigurationProvider : IFileContainerConfigurationProvider
     {
         public FileContainerConfiguration Get([NotNull] string name)
         {
-            throw new NotImplementedException();
+            throw new AbpException("IFileContainerConfigurationProvider is not available in SharpAbp.Abp.FileStoring.Abstractions. Reference SharpAbp.Abp.FileStoring to resolve container configurations.");
         }
     }
 }

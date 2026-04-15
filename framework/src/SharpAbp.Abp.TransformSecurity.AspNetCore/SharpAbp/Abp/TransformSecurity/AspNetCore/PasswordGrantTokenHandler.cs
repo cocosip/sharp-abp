@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -74,11 +74,11 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
                     {
                         _logger.LogDebug("Processing form data for token authentication with identifier: {Identifier}", identifier);
                         
-                        var query = QueryHelpers.ParseQuery(body);
-                        var form = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                        var grantType = query.TryGetValue("grant_type", out var grantTypeValues)
-                            ? grantTypeValues.ToString()
-                            : string.Empty;
+                        var requestEntries = ParseFormBody(body);
+                        var form = new List<KeyValuePair<string, string>>(requestEntries.Count);
+                        var grantType = requestEntries
+                            .FirstOrDefault(x => x.Key.Equals("grant_type", StringComparison.OrdinalIgnoreCase))
+                            .Value ?? string.Empty;
                         var isPasswordGrant = grantType.Equals("password", StringComparison.OrdinalIgnoreCase);
 
                         // Only require identifier and perform decryption for password grant type
@@ -91,7 +91,9 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
                         }
 
                         // For password grant, if password is missing, skip silently
-                        var hasPassword = query.TryGetValue("password", out var passwordValues) && !passwordValues.ToString().IsNullOrEmpty();
+                        var hasPassword = requestEntries.Any(x =>
+                            x.Key.Equals("password", StringComparison.OrdinalIgnoreCase) &&
+                            !x.Value.IsNullOrEmpty());
                         if (!hasPassword)
                         {
                             const string errorMessage = "'password' is required for 'password' grant type.";
@@ -107,18 +109,18 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
                             throw new AbpException(errorMessage);
                         }
 
-                        foreach (var item in query)
+                        foreach (var item in requestEntries)
                         {
                             if (item.Key.Equals("password", StringComparison.OrdinalIgnoreCase))
                             {
                                 try
                                 {
-                                    var encryptedPassword = WebUtility.UrlDecode(item.Value.ToString());
+                                    var encryptedPassword = item.Value;
                                     _logger.LogDebug("Decrypting password for token authentication");
                                     
                                     // Decrypt the encrypted password to plain text
                                     var plainPassword = await _securityEncryptionService.DecryptAsync(encryptedPassword, identifier, cancellationToken);
-                                    form.Add(item.Key, plainPassword);
+                                    form.Add(new KeyValuePair<string, string>(item.Key, plainPassword));
                                     
                                     _logger.LogDebug("Password decryption completed successfully");
                                 }
@@ -130,11 +132,12 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
                             }
                             else
                             {
-                                form.Add(item.Key, item.Value.ToString());
+                                form.Add(new KeyValuePair<string, string>(item.Key, item.Value));
                             }
                         }
 
                         context.Request.Body = await new FormUrlEncodedContent(form).ReadAsStreamAsync(cancellationToken);
+                        context.Request.Body.Position = 0;
                         context.Request.ContentLength = context.Request.Body.Length;
                         context.Request.ContentType = "application/x-www-form-urlencoded";
                         
@@ -154,6 +157,24 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
                 _logger.LogError(ex, "Unexpected error occurred while processing token authentication request");
                 throw new AbpException("An error occurred while processing the token authentication request", ex);
             }
+        }
+
+        protected virtual List<KeyValuePair<string, string>> ParseFormBody(string body)
+        {
+            var items = new List<KeyValuePair<string, string>>();
+
+            foreach (var segment in body.Split('&', StringSplitOptions.RemoveEmptyEntries))
+            {
+                var separatorIndex = segment.IndexOf('=');
+                var encodedKey = separatorIndex >= 0 ? segment[..separatorIndex] : segment;
+                var encodedValue = separatorIndex >= 0 ? segment[(separatorIndex + 1)..] : string.Empty;
+
+                items.Add(new KeyValuePair<string, string>(
+                    WebUtility.UrlDecode(encodedKey),
+                    WebUtility.UrlDecode(encodedValue)));
+            }
+
+            return items;
         }
     }
 }

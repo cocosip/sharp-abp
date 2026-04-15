@@ -1,6 +1,8 @@
-﻿using System.Runtime;
+﻿using System.IO;
+using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.FileStoring.FileSystem
@@ -26,6 +28,11 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
 
         protected virtual string Normalize(string name)
         {
+            if (Path.IsPathRooted(name) || name.Contains(":") || ContainsTraversalSegment(name))
+            {
+                throw new AbpException($"The value '{name}' must be a relative path without traversal segments.");
+            }
+
             var os = _iosPlatformProvider.GetCurrentOSPlatform();
             if (os == OSPlatform.Windows)
             {
@@ -35,6 +42,19 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
             }
 
             return name;
+        }
+
+        protected virtual bool ContainsTraversalSegment(string name)
+        {
+            foreach (var segment in name.Split(['/', '\\'], System.StringSplitOptions.None))
+            {
+                if (segment == "." || segment == "..")
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

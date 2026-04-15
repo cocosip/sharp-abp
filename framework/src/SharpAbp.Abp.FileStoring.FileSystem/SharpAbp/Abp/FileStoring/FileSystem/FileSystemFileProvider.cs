@@ -2,7 +2,6 @@ using Microsoft.Extensions.Logging;
 using Polly;
 using System;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.IO;
@@ -163,9 +162,9 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
                 return string.Empty;
             }
 
-            var configuration = args.Configuration.GetFileSystemConfiguration();
-            var relativePath = CalculateRelativePath(args);
             var filePath = FilePathCalculator.Calculate(args);
+            var configuration = args.Configuration.GetFileSystemConfiguration();
+            var relativePath = CalculateRelativePath(configuration, filePath);
             
             if (args.CheckFileExist && !await ExistsAsync(filePath))
             {
@@ -191,27 +190,14 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
             return accessUrl;
         }
 
-        protected virtual string CalculateRelativePath(FileProviderArgs args)
+        protected virtual string CalculateRelativePath(FileSystemFileProviderConfiguration configuration, string filePath)
         {
-            var fileSystemConfiguration = args.Configuration.GetFileSystemConfiguration();
-            var relativePathBuilder = new StringBuilder();
+            var basePath = Path.GetFullPath(configuration.BasePath);
+            var relativePath = Path.GetRelativePath(basePath, filePath);
 
-            if (CurrentTenant.Id == null)
-            {
-                relativePathBuilder.Append("/host");
-            }
-            else
-            {
-                relativePathBuilder.Append($"/tenants/{CurrentTenant.Id.Value:D}");
-            }
-
-            if (fileSystemConfiguration.AppendContainerNameToBasePath)
-            {
-                relativePathBuilder.Append($"/{args.ContainerName}");
-            }
-
-            relativePathBuilder.Append($"/{args.FileId}");
-            return relativePathBuilder.ToString();
+            return relativePath
+                .Replace(Path.DirectorySeparatorChar, '/')
+                .Replace(Path.AltDirectorySeparatorChar, '/');
         }
     }
 }
