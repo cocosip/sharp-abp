@@ -59,17 +59,19 @@ namespace SharpAbp.Abp.AspNetCore.Http
 
             foreach (var headerKv in headers)
             {
-                if (headerKv.Key == schemeName || headerKv.Key == hostName || headerKv.Key == routerName)
+                if (headerKv.Key.Equals(schemeName, StringComparison.OrdinalIgnoreCase)
+                    || headerKv.Key.Equals(hostName, StringComparison.OrdinalIgnoreCase)
+                    || headerKv.Key.Equals(routerName, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (headerKv.Key == schemeName)
+                    if (headerKv.Key.Equals(schemeName, StringComparison.OrdinalIgnoreCase))
                     {
                         routeTranslationHeader.Scheme = headerKv.Value!;
                     }
-                    if (headerKv.Key == hostName)
+                    if (headerKv.Key.Equals(hostName, StringComparison.OrdinalIgnoreCase))
                     {
                         routeTranslationHeader.Host = headerKv.Value!;
                     }
-                    if (headerKv.Key == routerName)
+                    if (headerKv.Key.Equals(routerName, StringComparison.OrdinalIgnoreCase))
                     {
                         routeTranslationHeader.Router = headerKv.Value!;
                     }

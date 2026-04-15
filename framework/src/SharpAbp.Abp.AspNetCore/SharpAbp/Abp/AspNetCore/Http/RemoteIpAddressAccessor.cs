@@ -55,25 +55,5 @@ namespace SharpAbp.Abp.AspNetCore.Http
             return string.Empty;
         }
 
-        /// <summary>
-        /// Raw proxy headers are not trusted here. Configure forwarded header middleware and use
-        /// <see cref="GetRemoteIpAddress"/> to read the normalized connection address instead.
-        /// </summary>
-        /// <returns>An empty string.</returns>
-        public virtual string GetXForwardedForRemoteIpAddress()
-        {
-            return string.Empty;
-        }
-
-        /// <summary>
-        /// Raw proxy headers are not trusted here. Configure forwarded header middleware and use
-        /// <see cref="GetRemoteIpAddress"/> to read the normalized connection address instead.
-        /// </summary>
-        /// <returns>An empty string.</returns>
-        public virtual string GetXRealIPRemoteIpAddress()
-        {
-            return string.Empty;
-        }
-
     }
 }

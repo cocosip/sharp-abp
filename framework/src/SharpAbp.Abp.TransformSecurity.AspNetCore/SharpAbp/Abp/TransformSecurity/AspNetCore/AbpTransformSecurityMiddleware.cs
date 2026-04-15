@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.AspNetCore.Middleware;
 using Volo.Abp.DependencyInjection;
@@ -44,8 +45,12 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
                 foreach (var type in AspNetCoreOptions.MiddlewareHandlers)
                 {
                     var handler = ServiceProvider.GetRequiredService(type).As<IAbpTransformSecurityMiddlewareHandler>();
-                    await handler.HandleAsync(context, identifier, default);
+                    await handler.HandleAsync(context, identifier, context.RequestAborted);
                 }
+            }
+            catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
+            {
+                return;
             }
             catch (Exception ex)
             {
