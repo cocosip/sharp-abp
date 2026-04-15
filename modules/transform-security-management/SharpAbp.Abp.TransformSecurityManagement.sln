@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2B1C5A47-7425-42F1-9B73-936E317AAAC4}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{3EC0C892-2D29-4B00-9E1A-5A8F5F157131}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.TransformSecurityManagement.Domain.Shared", "src\SharpAbp.Abp.TransformSecurityManagement.Domain.Shared\SharpAbp.Abp.TransformSecurityManagement.Domain.Shared.csproj", "{2A147A58-AB56-47F4-A457-B43E96B7D93B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.TransformSecurityManagement.Domain", "src\SharpAbp.Abp.TransformSecurityManagement.Domain\SharpAbp.Abp.TransformSecurityManagement.Domain.csproj", "{B67FBA6C-5B5A-4266-B11D-EDE514053097}"
@@ -20,6 +22,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.TransformSecurityManagement.MongoDB", "src\SharpAbp.Abp.TransformSecurityManagement.MongoDB\SharpAbp.Abp.TransformSecurityManagement.MongoDB.csproj", "{CD84C9DA-CF9D-4FAA-9A1F-60CAB6D619BF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.TransformSecurityManagement.HttpApi.Client", "src\SharpAbp.Abp.TransformSecurityManagement.HttpApi.Client\SharpAbp.Abp.TransformSecurityManagement.HttpApi.Client.csproj", "{E1F30BFC-DF07-48FC-92E3-D99E7DB5011E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAbp.Abp.TransformSecurityManagement.Application.Tests", "test\SharpAbp.Abp.TransformSecurityManagement.Application.Tests\SharpAbp.Abp.TransformSecurityManagement.Application.Tests.csproj", "{B9FAD5F9-EE38-49B8-BFA3-48CB48A7CB9C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +63,10 @@ Global
 		{E1F30BFC-DF07-48FC-92E3-D99E7DB5011E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1F30BFC-DF07-48FC-92E3-D99E7DB5011E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1F30BFC-DF07-48FC-92E3-D99E7DB5011E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9FAD5F9-EE38-49B8-BFA3-48CB48A7CB9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9FAD5F9-EE38-49B8-BFA3-48CB48A7CB9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9FAD5F9-EE38-49B8-BFA3-48CB48A7CB9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9FAD5F9-EE38-49B8-BFA3-48CB48A7CB9C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -72,6 +80,7 @@ Global
 		{A746D5CF-E0DB-4091-9CD6-A93F5C4656CB} = {2B1C5A47-7425-42F1-9B73-936E317AAAC4}
 		{CD84C9DA-CF9D-4FAA-9A1F-60CAB6D619BF} = {2B1C5A47-7425-42F1-9B73-936E317AAAC4}
 		{E1F30BFC-DF07-48FC-92E3-D99E7DB5011E} = {2B1C5A47-7425-42F1-9B73-936E317AAAC4}
+		{B9FAD5F9-EE38-49B8-BFA3-48CB48A7CB9C} = {3EC0C892-2D29-4B00-9E1A-5A8F5F157131}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C68AD5E-D4FE-4EE2-8FA9-4F45627659CC}
