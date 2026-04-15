@@ -68,16 +68,9 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
 
             var array = new string[paths.Length + 1];
             array[0] = rootFullPath;
-
             for (var i = 0; i < paths.Length; i++)
             {
-                var normalizedPath = NormalizeConfiguredPath(paths[i]);
-                if (IsAbsoluteConfiguredPath(normalizedPath))
-                {
-                    throw new InvalidOperationException($"Configured front-host path '{paths[i]}' must be relative to root '{rootFullPath}'.");
-                }
-
-                array[i + 1] = normalizedPath;
+                array[i + 1] = NormalizeConfiguredPath(paths[i]);
             }
 
             var fullPath = Path.GetFullPath(Path.Combine(array));
@@ -90,6 +83,13 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
             EnsurePathIsSafe(rootFullPath, fullPath);
 
             return fullPath;
+        }
+
+        private static string NormalizeConfiguredPath(string path)
+        {
+            return path
+                .Replace('\\', Path.DirectorySeparatorChar)
+                .Replace('/', Path.DirectorySeparatorChar);
         }
 
         internal static void EnsurePathIsSafe(string rootFullPath, string fullPath)
