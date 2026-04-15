@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace SharpAbp.Abp.AspNetCore.FrontHost
 {
@@ -16,6 +17,7 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
 
         public AbpFrontHostOptions Configure(IConfiguration configuration, string contentRootPath)
         {
+            var contentRootFullPath = Path.GetFullPath(contentRootPath);
             var appConfigurations = configuration
                 .GetSection("FrontHostOptions:Apps")
                 .Get<List<FrontApplicationEntry>>();
@@ -27,7 +29,7 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
                     var app = new FrontApplication()
                     {
                         Name = appConfiguration.Name,
-                        RootPath = PathCombine(contentRootPath, appConfiguration.RootPaths),
+                        RootPath = ResolveChildPath(contentRootFullPath, appConfiguration.RootPaths),
                     };
                     Apps.Add(app);
 
@@ -37,7 +39,7 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
                         {
                             Route = p.Route,
                             ContentType = p.ContentType,
-                            Path = PathCombine(app.RootPath, p.Paths)
+                            Path = ResolveChildPath(app.RootPath!, p.Paths)
                         };
                         app.Pages.Add(page);
                     }
@@ -47,7 +49,7 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
                         var staticDir = new FrontApplicationStaticDirectory()
                         {
                             RequestPath = s.RequestPath,
-                            Path = PathCombine(app.RootPath, s.Paths)
+                            Path = ResolveChildPath(app.RootPath!, s.Paths)
                         };
                         app.StaticDirs.Add(staticDir);
                     }
@@ -56,16 +58,89 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
             return this;
         }
 
-        private static string PathCombine(string root, params string[] paths)
+        private static string ResolveChildPath(string root, params string[] paths)
         {
+            var rootFullPath = Path.GetFullPath(root);
             if (paths == null || paths.Length == 0)
             {
-                return root;
+                return rootFullPath;
             }
+
             var array = new string[paths.Length + 1];
-            array[0] = root;
+            array[0] = rootFullPath;
             Array.Copy(paths, 0, array, 1, paths.Length);
-            return Path.Join(array);
+            var fullPath = Path.GetFullPath(Path.Combine(array));
+
+            if (!IsPathWithinRoot(rootFullPath, fullPath))
+            {
+                throw new InvalidOperationException($"Configured front-host path '{fullPath}' must stay within root '{rootFullPath}'.");
+            }
+
+            EnsurePathIsSafe(rootFullPath, fullPath);
+
+            return fullPath;
+        }
+
+        internal static void EnsurePathIsSafe(string rootFullPath, string fullPath)
+        {
+            var normalizedRoot = Path.GetFullPath(rootFullPath);
+            var normalizedPath = Path.GetFullPath(fullPath);
+
+            if (!IsPathWithinRoot(normalizedRoot, normalizedPath))
+            {
+                throw new InvalidOperationException($"Configured front-host path '{normalizedPath}' must stay within root '{normalizedRoot}'.");
+            }
+
+            EnsurePathDoesNotUseReparsePoints(normalizedRoot, normalizedPath);
+        }
+
+        private static bool IsPathWithinRoot(string rootFullPath, string fullPath)
+        {
+            var normalizedRoot = rootFullPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                + Path.DirectorySeparatorChar;
+            var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? StringComparison.OrdinalIgnoreCase
+                : StringComparison.Ordinal;
+            return fullPath.StartsWith(normalizedRoot, comparison)
+                || string.Equals(fullPath, rootFullPath, comparison);
+        }
+
+        private static void EnsurePathDoesNotUseReparsePoints(string rootFullPath, string fullPath)
+        {
+            ValidatePathSegmentIfExists(rootFullPath);
+
+            var relativePath = Path.GetRelativePath(rootFullPath, fullPath);
+            if (string.IsNullOrWhiteSpace(relativePath) || relativePath == ".")
+            {
+                return;
+            }
+
+            var currentPath = rootFullPath;
+            var segments = relativePath.Split([Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar], StringSplitOptions.RemoveEmptyEntries);
+            foreach (var segment in segments)
+            {
+                currentPath = Path.Combine(currentPath, segment);
+                if (!File.Exists(currentPath) && !Directory.Exists(currentPath))
+                {
+                    break;
+                }
+
+                ValidatePathSegmentIfExists(currentPath);
+            }
+        }
+
+        private static void ValidatePathSegmentIfExists(string path)
+        {
+            if (!File.Exists(path) && !Directory.Exists(path))
+            {
+                return;
+            }
+
+            var attributes = File.GetAttributes(path);
+            if ((attributes & FileAttributes.ReparsePoint) != 0)
+            {
+                throw new InvalidOperationException($"Configured front-host path '{path}' cannot use symbolic links or reparse points.");
+            }
         }
 
 

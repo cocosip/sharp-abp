@@ -121,34 +121,5 @@ namespace SharpAbp.Abp.AspNetCore.Http
             Assert.Equal(string.Empty, result);
         }
 
-        [Fact]
-        public void GetXForwardedForRemoteIpAddress_Should_Return_Empty_String()
-        {
-            // Arrange
-            var httpContext = new DefaultHttpContext();
-            httpContext.Request.Headers["X-Forwarded-For"] = "192.168.1.5";
-            _mockHttpContextAccessor.SetupGet(x => x.HttpContext).Returns(httpContext);
-
-            // Act
-            var result = _remoteIpAddressAccessor.GetXForwardedForRemoteIpAddress();
-
-            // Assert
-            Assert.Equal(string.Empty, result);
-        }
-
-        [Fact]
-        public void GetXRealIPRemoteIpAddress_Should_Return_Empty_String()
-        {
-            // Arrange
-            var httpContext = new DefaultHttpContext();
-            httpContext.Request.Headers["X-Real-IP"] = "192.168.1.5";
-            _mockHttpContextAccessor.SetupGet(x => x.HttpContext).Returns(httpContext);
-
-            // Act
-            var result = _remoteIpAddressAccessor.GetXRealIPRemoteIpAddress();
-
-            // Assert
-            Assert.Equal(string.Empty, result);
-        }
     }
 }

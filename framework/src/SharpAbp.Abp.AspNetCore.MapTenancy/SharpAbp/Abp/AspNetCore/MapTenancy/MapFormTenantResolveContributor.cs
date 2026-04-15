@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.MapTenancy;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.MultiTenancy;
@@ -21,7 +22,20 @@ namespace SharpAbp.Abp.AspNetCore.MapTenancy
                 return null;
             }
 
-            var form = await httpContext.Request.ReadFormAsync();
+            IFormCollection form;
+            try
+            {
+                form = await httpContext.Request.ReadFormAsync();
+            }
+            catch (InvalidDataException)
+            {
+                return null;
+            }
+            catch (IOException)
+            {
+                return null;
+            }
+
             var code = form[context.GetAbpAspNetCoreMapTenancyOptions().MapTenantKey];
             if (!code.ToString().IsNullOrWhiteSpace())
             {

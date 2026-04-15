@@ -81,6 +81,7 @@ namespace SharpAbp.Abp.TenancyGrouping
                     catch (Exception ex)
                     {
                         Logger.LogError(ex, "Resolve connection by tenant failed. {Message}", ex.Message);
+                        throw;
                     }
                 }
             }

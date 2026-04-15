@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -46,15 +46,7 @@ namespace SharpAbp.Abp.AspNetCore.TenancyGrouping
 
         public async override Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            TenantGroupConfiguration? tenantGroup = null;
-            try
-            {
-                tenantGroup = await _tenantGroupConfigurationProvider.GetAsync(saveResolveResult: true);
-            }
-            catch (Exception e)
-            {
-                Logger.LogException(e);
-            }
+            var tenantGroup = await _tenantGroupConfigurationProvider.GetAsync(saveResolveResult: true);
 
             if (tenantGroup?.Id != _currentTenantGroup.Id)
             {

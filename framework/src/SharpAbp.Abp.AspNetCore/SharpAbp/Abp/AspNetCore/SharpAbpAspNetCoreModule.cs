@@ -25,11 +25,8 @@ namespace SharpAbp.Abp.AspNetCore
                 options.IsEnabled = false;
             });
 
-            Configure<AbpFrontHostOptions>(options =>
-            {
+            Configure<AbpFrontHostOptions>(options => { });
 
-            });
-            
             Configure<AbpHttpHeadersOptions>(options =>
             {
                 options.RouteTranslationPrefix = "X-Abp";

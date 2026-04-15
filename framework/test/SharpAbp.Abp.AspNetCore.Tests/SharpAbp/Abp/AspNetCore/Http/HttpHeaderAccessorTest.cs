@@ -305,6 +305,29 @@ namespace SharpAbp.Abp.AspNetCore.Http
         }
 
         [Fact]
+        public void GetRouteTranslationHeader_Should_Match_WellKnown_Headers_Case_Insensitively()
+        {
+            // Arrange
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Headers["x-abp-scheme"] = "https";
+            httpContext.Request.Headers["X-ABP-HOST"] = "example.com";
+            httpContext.Request.Headers["x-Abp-router"] = "/api/users";
+            httpContext.Request.Headers["x-abp-custom"] = "custom-value";
+
+            _mockHttpContextAccessor.SetupGet(x => x.HttpContext).Returns(httpContext);
+
+            // Act
+            var result = _httpHeaderAccessor.GetRouteTranslationHeader();
+
+            // Assert
+            Assert.Equal("https", result.Scheme);
+            Assert.Equal("example.com", result.Host);
+            Assert.Equal("/api/users", result.Router);
+            Assert.Single(result.Extends);
+            Assert.Equal("custom-value", result.Extends["x-abp-custom"]);
+        }
+
+        [Fact]
         public void GetRequesHostURL_Should_Handle_Different_Schemes()
         {
             // Arrange
