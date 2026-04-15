@@ -68,7 +68,18 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
 
             var array = new string[paths.Length + 1];
             array[0] = rootFullPath;
-            Array.Copy(paths, 0, array, 1, paths.Length);
+
+            for (var i = 0; i < paths.Length; i++)
+            {
+                var normalizedPath = NormalizeConfiguredPath(paths[i]);
+                if (IsAbsoluteConfiguredPath(normalizedPath))
+                {
+                    throw new InvalidOperationException($"Configured front-host path '{paths[i]}' must be relative to root '{rootFullPath}'.");
+                }
+
+                array[i + 1] = normalizedPath;
+            }
+
             var fullPath = Path.GetFullPath(Path.Combine(array));
 
             if (!IsPathWithinRoot(rootFullPath, fullPath))
@@ -92,6 +103,31 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
             }
 
             EnsurePathDoesNotUseReparsePoints(normalizedRoot, normalizedPath);
+        }
+
+        private static string NormalizeConfiguredPath(string path)
+        {
+            return (path ?? string.Empty)
+                .Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar)
+                .Replace('\\', Path.DirectorySeparatorChar);
+        }
+
+        private static bool IsAbsoluteConfiguredPath(string path)
+        {
+            if (Path.IsPathRooted(path))
+            {
+                return true;
+            }
+
+            if (path.StartsWith(@"\\", StringComparison.Ordinal) || path.StartsWith("//", StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            return path.Length >= 3
+                && char.IsLetter(path[0])
+                && path[1] == ':'
+                && (path[2] == '\\' || path[2] == '/');
         }
 
         private static bool IsPathWithinRoot(string rootFullPath, string fullPath)

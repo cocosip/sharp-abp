@@ -6,6 +6,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.AspNetCore.Middleware;
+using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.TransformSecurity.AspNetCore
@@ -50,6 +51,13 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
             }
             catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
             {
+                return;
+            }
+            catch (AbpException ex)
+            {
+                Logger.LogWarning(ex, "AbpTransformSecurityMiddleware rejected request: {Message}", ex.Message);
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await context.Response.WriteAsync("The transform security request is invalid.");
                 return;
             }
             catch (Exception ex)

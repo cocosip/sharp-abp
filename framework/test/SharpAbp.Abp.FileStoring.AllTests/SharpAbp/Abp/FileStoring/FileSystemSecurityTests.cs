@@ -86,12 +86,37 @@ namespace SharpAbp.Abp.FileStoring
 
             var currentTenant = new Mock<ICurrentTenant>();
             currentTenant.Setup(x => x.Id).Returns(tenantId);
+            currentTenant.Setup(x => x.Name).Returns("tenant-a");
+
             var provider = new FileSystemFileProvider(NullLogger<FileSystemFileProvider>.Instance, currentTenant.Object, calculator);
             var args = new FileProviderAccessArgs("reports", configuration, "daily/summary.txt");
 
             var url = await provider.GetAccessUrlAsync(args);
 
             Assert.Equal("https://cdn.example.com/files/uploads/orgs/tenant-a/reports/daily/summary.txt", url);
+        }
+
+        [Fact]
+        public void CalculateRelativePath_Should_Reuse_Custom_Path_Segments()
+        {
+            var tenantId = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa6");
+            var basePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            var configuration = CreateFileSystemConfiguration(basePath);
+            var context = new FilePathContext { Prefix = "uploads" };
+            var calculator = CreateCalculator(
+                tenantId: tenantId,
+                tenantName: "tenant-a",
+                context: context,
+                configure: options =>
+                {
+                    options.FilePathBuilder.TenantsSegment = "orgs";
+                    options.FilePathBuilder.TenantIdentifierFactory = (id, name, current) => current?.TenantCode ?? name ?? id.ToString("D");
+                });
+            var args = new FileProviderAccessArgs("reports", configuration, "daily/summary.txt");
+
+            var relativePath = calculator.CalculateRelativePath(args);
+
+            Assert.Equal("uploads/orgs/tenant-a/reports/daily/summary.txt", relativePath);
         }
 
         [Fact]

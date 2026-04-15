@@ -2,7 +2,6 @@ using Microsoft.Extensions.Logging;
 using Polly;
 using System;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.IO;
@@ -14,7 +13,6 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
     public class FileSystemFileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }
-        protected ICurrentTenant CurrentTenant { get; }
         protected IFilePathCalculator FilePathCalculator { get; }
         public FileSystemFileProvider(
             ILogger<FileSystemFileProvider> logger,
@@ -22,7 +20,6 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
             IFilePathCalculator filePathCalculator)
         {
             Logger = logger;
-            CurrentTenant = currentTenant;
             FilePathCalculator = filePathCalculator;
         }
 
@@ -164,8 +161,8 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
             }
 
             var configuration = args.Configuration.GetFileSystemConfiguration();
-            var relativePath = CalculateRelativePath(args);
             var filePath = FilePathCalculator.Calculate(args);
+            var relativePath = FilePathCalculator.CalculateRelativePath(args);
             
             if (args.CheckFileExist && !await ExistsAsync(filePath))
             {
@@ -189,29 +186,6 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
         {
             var accessUrl = $"{configuration.HttpServer.EnsureEndsWith('/')}{relativePath.TrimStart('/')}";
             return accessUrl;
-        }
-
-        protected virtual string CalculateRelativePath(FileProviderArgs args)
-        {
-            var fileSystemConfiguration = args.Configuration.GetFileSystemConfiguration();
-            var relativePathBuilder = new StringBuilder();
-
-            if (CurrentTenant.Id == null)
-            {
-                relativePathBuilder.Append("/host");
-            }
-            else
-            {
-                relativePathBuilder.Append($"/tenants/{CurrentTenant.Id.Value:D}");
-            }
-
-            if (fileSystemConfiguration.AppendContainerNameToBasePath)
-            {
-                relativePathBuilder.Append($"/{args.ContainerName}");
-            }
-
-            relativePathBuilder.Append($"/{args.FileId}");
-            return relativePathBuilder.ToString();
         }
     }
 }
