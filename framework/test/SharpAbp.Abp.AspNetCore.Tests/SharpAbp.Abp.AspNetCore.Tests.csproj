@@ -26,6 +26,9 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\SharpAbp.Abp.AspNetCore\SharpAbp.Abp.AspNetCore.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.AspNetCore.MapTenancy\SharpAbp.Abp.AspNetCore.MapTenancy.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.AspNetCore.TenancyGrouping\SharpAbp.Abp.AspNetCore.TenancyGrouping.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.TenancyGrouping\SharpAbp.Abp.TenancyGrouping.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

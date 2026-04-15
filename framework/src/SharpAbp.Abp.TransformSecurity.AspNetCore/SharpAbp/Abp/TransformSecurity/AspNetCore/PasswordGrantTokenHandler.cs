@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -75,7 +76,7 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
                         _logger.LogDebug("Processing form data for token authentication with identifier: {Identifier}", identifier);
                         
                         var query = QueryHelpers.ParseQuery(body);
-                        var form = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                        var form = new List<KeyValuePair<string, string>>();
                         var grantType = query.TryGetValue("grant_type", out var grantTypeValues)
                             ? grantTypeValues.ToString()
                             : string.Empty;
@@ -111,26 +112,29 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
                         {
                             if (item.Key.Equals("password", StringComparison.OrdinalIgnoreCase))
                             {
-                                try
+                                foreach (var value in item.Value)
                                 {
-                                    var encryptedPassword = WebUtility.UrlDecode(item.Value.ToString());
-                                    _logger.LogDebug("Decrypting password for token authentication");
-                                    
-                                    // Decrypt the encrypted password to plain text
-                                    var plainPassword = await _securityEncryptionService.DecryptAsync(encryptedPassword, identifier, cancellationToken);
-                                    form.Add(item.Key, plainPassword);
-                                    
-                                    _logger.LogDebug("Password decryption completed successfully");
-                                }
-                                catch (Exception ex)
-                                {
-                                    _logger.LogError(ex, "Failed to decrypt password for token authentication with identifier: {Identifier}", identifier);
-                                    throw new AbpException("Failed to decrypt password for token authentication", ex);
+                                    try
+                                    {
+                                        var encryptedPassword = WebUtility.UrlDecode(value) ?? string.Empty;
+                                        _logger.LogDebug("Decrypting password for token authentication");
+
+                                        // Decrypt the encrypted password to plain text
+                                        var plainPassword = await _securityEncryptionService.DecryptAsync(encryptedPassword, identifier, cancellationToken);
+                                        form.Add(new KeyValuePair<string, string>(item.Key, plainPassword));
+
+                                        _logger.LogDebug("Password decryption completed successfully");
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        _logger.LogError(ex, "Failed to decrypt password for token authentication with identifier: {Identifier}", identifier);
+                                        throw new AbpException("Failed to decrypt password for token authentication", ex);
+                                    }
                                 }
                             }
                             else
                             {
-                                form.Add(item.Key, item.Value.ToString());
+                                form.AddRange(item.Value.Select(value => new KeyValuePair<string, string>(item.Key, value ?? string.Empty)));
                             }
                         }
 
