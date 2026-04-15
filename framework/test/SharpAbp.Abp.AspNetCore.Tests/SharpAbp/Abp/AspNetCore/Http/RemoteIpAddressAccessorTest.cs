@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -32,28 +31,27 @@ namespace SharpAbp.Abp.AspNetCore.Http
         }
 
         [Fact]
-        public void GetRemoteIpAddress_Should_Return_XForwardedFor_When_Available()
+        public void GetRemoteIpAddress_Should_Ignore_XForwardedFor_When_Available()
         {
             // Arrange
-            var expectedIp = "192.168.1.1";
             var httpContext = new DefaultHttpContext();
-            httpContext.Request.Headers["X-Forwarded-For"] = new StringValues(expectedIp);
+            httpContext.Request.Headers["X-Forwarded-For"] = "192.168.1.1";
+            httpContext.Connection.RemoteIpAddress = IPAddress.Parse("192.168.1.10");
             _mockHttpContextAccessor.SetupGet(x => x.HttpContext).Returns(httpContext);
 
             // Act
             var result = _remoteIpAddressAccessor.GetRemoteIpAddress();
 
             // Assert
-            Assert.Equal(expectedIp, result);
+            Assert.Equal("192.168.1.10", result);
         }
 
         [Fact]
-        public void GetRemoteIpAddress_Should_Return_XRealIP_When_XForwardedFor_Not_Available()
+        public void GetRemoteIpAddress_Should_Ignore_XRealIP_When_XForwardedFor_Not_Available()
         {
             // Arrange
-            var expectedIp = "192.168.1.2";
             var httpContext = new DefaultHttpContext();
-            httpContext.Request.Headers["X-Real-IP"] = new StringValues(expectedIp);
+            httpContext.Request.Headers["X-Real-IP"] = "192.168.1.2";
             httpContext.Connection.RemoteIpAddress = IPAddress.Parse("192.168.1.3");
             _mockHttpContextAccessor.SetupGet(x => x.HttpContext).Returns(httpContext);
 
@@ -61,7 +59,7 @@ namespace SharpAbp.Abp.AspNetCore.Http
             var result = _remoteIpAddressAccessor.GetRemoteIpAddress();
 
             // Assert
-            Assert.Equal(expectedIp, result);
+            Assert.Equal("192.168.1.3", result);
         }
 
         [Fact]
@@ -95,19 +93,19 @@ namespace SharpAbp.Abp.AspNetCore.Http
         }
 
         [Fact]
-        public void GetRemoteIpAddress_Should_Return_First_IP_From_XForwardedFor_List()
+        public void GetRemoteIpAddress_Should_Ignore_XForwardedFor_List()
         {
             // Arrange
-            var expectedIp = "192.168.1.5";
             var httpContext = new DefaultHttpContext();
-            httpContext.Request.Headers["X-Forwarded-For"] = new StringValues("192.168.1.5, 10.0.0.1, 172.16.0.1");
+            httpContext.Request.Headers["X-Forwarded-For"] = "192.168.1.5, 10.0.0.1, 172.16.0.1";
+            httpContext.Connection.RemoteIpAddress = IPAddress.Parse("192.168.1.6");
             _mockHttpContextAccessor.SetupGet(x => x.HttpContext).Returns(httpContext);
 
             // Act
             var result = _remoteIpAddressAccessor.GetRemoteIpAddress();
 
             // Assert
-            Assert.Equal(expectedIp, result);
+            Assert.Equal("192.168.1.6", result);
         }
 
         [Fact]
@@ -118,6 +116,36 @@ namespace SharpAbp.Abp.AspNetCore.Http
 
             // Act
             var result = _remoteIpAddressAccessor.GetRemoteIpAddress();
+
+            // Assert
+            Assert.Equal(string.Empty, result);
+        }
+
+        [Fact]
+        public void GetXForwardedForRemoteIpAddress_Should_Return_Empty_String()
+        {
+            // Arrange
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Headers["X-Forwarded-For"] = "192.168.1.5";
+            _mockHttpContextAccessor.SetupGet(x => x.HttpContext).Returns(httpContext);
+
+            // Act
+            var result = _remoteIpAddressAccessor.GetXForwardedForRemoteIpAddress();
+
+            // Assert
+            Assert.Equal(string.Empty, result);
+        }
+
+        [Fact]
+        public void GetXRealIPRemoteIpAddress_Should_Return_Empty_String()
+        {
+            // Arrange
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Headers["X-Real-IP"] = "192.168.1.5";
+            _mockHttpContextAccessor.SetupGet(x => x.HttpContext).Returns(httpContext);
+
+            // Act
+            var result = _remoteIpAddressAccessor.GetXRealIPRemoteIpAddress();
 
             // Assert
             Assert.Equal(string.Empty, result);

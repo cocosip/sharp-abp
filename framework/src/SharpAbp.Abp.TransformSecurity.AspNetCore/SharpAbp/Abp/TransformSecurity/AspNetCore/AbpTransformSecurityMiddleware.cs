@@ -51,7 +51,7 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
             {
                 Logger.LogError(ex, "AbpTransformSecurityMiddleware execute exception: {Message}", ex.Message);
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                await context.Response.WriteAsync("An unexpected fault happened. Exception details: " + ex.Message);
+                await context.Response.WriteAsync("An unexpected fault happened.");
                 return;
             }
 

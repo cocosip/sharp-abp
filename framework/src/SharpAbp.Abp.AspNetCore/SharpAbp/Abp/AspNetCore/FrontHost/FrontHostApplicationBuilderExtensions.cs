@@ -44,11 +44,20 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
             return builder;
         }
 
-        private static Task MapPage(FrontApplicationPage page, HttpContext context)
+        private static async Task MapPage(FrontApplicationPage page, HttpContext context)
         {
-            var buffer = File.ReadAllBytes(page.Path!);
-            context.Response.ContentType = page.ContentType;
-            return context.Response.Body.WriteAsync(buffer, 0, buffer.Length);
+            if (string.IsNullOrWhiteSpace(page.Path) || !File.Exists(page.Path))
+            {
+                context.Response.StatusCode = StatusCodes.Status404NotFound;
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(page.ContentType))
+            {
+                context.Response.ContentType = page.ContentType;
+            }
+
+            await context.Response.SendFileAsync(page.Path);
         }
     }
 }

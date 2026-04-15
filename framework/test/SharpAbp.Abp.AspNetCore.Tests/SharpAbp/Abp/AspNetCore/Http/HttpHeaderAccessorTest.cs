@@ -133,6 +133,26 @@ namespace SharpAbp.Abp.AspNetCore.Http
         }
 
         [Fact]
+        public void GetPrefixHeaders_Should_Match_Prefix_Case_Insensitively()
+        {
+            // Arrange
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Headers["x-abp-header1"] = "value1";
+            httpContext.Request.Headers["X-ABP-Header2"] = "value2";
+            httpContext.Request.Headers["X-Other-Header"] = "other";
+
+            _mockHttpContextAccessor.SetupGet(x => x.HttpContext).Returns(httpContext);
+
+            // Act
+            var result = _httpHeaderAccessor.GetPrefixHeaders("X-Abp");
+
+            // Assert
+            Assert.Equal(2, result.Count);
+            Assert.True(result.ContainsKey("x-abp-header1"));
+            Assert.True(result.ContainsKey("X-ABP-Header2"));
+        }
+
+        [Fact]
         public void GetPrefixHeaders_Should_Return_Empty_When_HttpContext_Is_Null()
         {
             // Arrange
@@ -302,7 +322,7 @@ namespace SharpAbp.Abp.AspNetCore.Http
         }
 
         [Fact]
-        public void GetRequesHostURL_Should_Prefer_Forwarded_Headers()
+        public void GetRequesHostURL_Should_Ignore_Raw_Forwarded_Headers()
         {
             // Arrange
             var httpContext = new DefaultHttpContext();
@@ -317,11 +337,11 @@ namespace SharpAbp.Abp.AspNetCore.Http
             var result = _httpHeaderAccessor.GetRequesHostURL();
 
             // Assert
-            Assert.Equal("https://hidos-openapi.kayisoft.dev", result);
+            Assert.Equal("http://openapi.default.svc.cluster.local", result);
         }
 
         [Fact]
-        public void GetRequesHostURL_Should_Use_First_Forwarded_Header_Value()
+        public void GetRequesHostURL_Should_Ignore_Forwarded_Header_Lists()
         {
             // Arrange
             var httpContext = new DefaultHttpContext();
@@ -336,7 +356,7 @@ namespace SharpAbp.Abp.AspNetCore.Http
             var result = _httpHeaderAccessor.GetRequesHostURL();
 
             // Assert
-            Assert.Equal("https://hidos-openapi.kayisoft.dev", result);
+            Assert.Equal("http://openapi.default.svc.cluster.local", result);
         }
     }
 }
