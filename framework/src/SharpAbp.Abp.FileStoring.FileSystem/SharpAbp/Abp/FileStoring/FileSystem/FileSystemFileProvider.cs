@@ -193,11 +193,38 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
         protected virtual string CalculateRelativePath(FileSystemFileProviderConfiguration configuration, string filePath)
         {
             var basePath = Path.GetFullPath(configuration.BasePath);
-            var relativePath = Path.GetRelativePath(basePath, filePath);
+            var relativePath = GetRelativePath(basePath, filePath);
 
             return relativePath
                 .Replace(Path.DirectorySeparatorChar, '/')
                 .Replace(Path.AltDirectorySeparatorChar, '/');
+        }
+
+        protected virtual string GetRelativePath(string basePath, string filePath)
+        {
+#if NETSTANDARD2_0
+            var baseUri = new Uri(AppendDirectorySeparator(basePath));
+            var fileUri = new Uri(Path.GetFullPath(filePath));
+            var relativeUri = baseUri.MakeRelativeUri(fileUri);
+
+            return Uri.UnescapeDataString(relativeUri.ToString()).Replace('/', Path.DirectorySeparatorChar);
+#else
+            return Path.GetRelativePath(basePath, filePath);
+#endif
+        }
+
+        protected virtual string AppendDirectorySeparator(string path)
+        {
+            if (!string.IsNullOrEmpty(path))
+            {
+                var lastChar = path[path.Length - 1];
+                if (lastChar == Path.DirectorySeparatorChar || lastChar == Path.AltDirectorySeparatorChar)
+                {
+                    return path;
+                }
+            }
+
+            return path + Path.DirectorySeparatorChar;
         }
     }
 }

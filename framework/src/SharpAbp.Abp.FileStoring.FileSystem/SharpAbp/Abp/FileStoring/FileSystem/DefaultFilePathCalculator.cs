@@ -112,9 +112,13 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
 
         protected virtual string AppendDirectorySeparator(string path)
         {
-            if (path.EndsWith(Path.DirectorySeparatorChar) || path.EndsWith(Path.AltDirectorySeparatorChar))
+            if (!string.IsNullOrEmpty(path))
             {
-                return path;
+                var lastChar = path[path.Length - 1];
+                if (lastChar == Path.DirectorySeparatorChar || lastChar == Path.AltDirectorySeparatorChar)
+                {
+                    return path;
+                }
             }
 
             return path + Path.DirectorySeparatorChar;
