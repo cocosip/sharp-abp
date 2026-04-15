@@ -68,7 +68,11 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
 
             var array = new string[paths.Length + 1];
             array[0] = rootFullPath;
-            Array.Copy(paths, 0, array, 1, paths.Length);
+            for (var i = 0; i < paths.Length; i++)
+            {
+                array[i + 1] = NormalizeConfiguredPath(paths[i]);
+            }
+
             var fullPath = Path.GetFullPath(Path.Combine(array));
 
             if (!IsPathWithinRoot(rootFullPath, fullPath))
@@ -79,6 +83,13 @@ namespace SharpAbp.Abp.AspNetCore.FrontHost
             EnsurePathIsSafe(rootFullPath, fullPath);
 
             return fullPath;
+        }
+
+        private static string NormalizeConfiguredPath(string path)
+        {
+            return path
+                .Replace('\\', Path.DirectorySeparatorChar)
+                .Replace('/', Path.DirectorySeparatorChar);
         }
 
         internal static void EnsurePathIsSafe(string rootFullPath, string fullPath)
