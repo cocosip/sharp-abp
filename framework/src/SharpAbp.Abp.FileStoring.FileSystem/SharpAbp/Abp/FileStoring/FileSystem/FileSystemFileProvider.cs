@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Polly;
 using System;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.IO;
@@ -162,9 +163,9 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
                 return string.Empty;
             }
 
-            var filePath = FilePathCalculator.Calculate(args);
             var configuration = args.Configuration.GetFileSystemConfiguration();
-            var relativePath = CalculateRelativePath(configuration, filePath);
+            var relativePath = CalculateRelativePath(args);
+            var filePath = FilePathCalculator.Calculate(args);
             
             if (args.CheckFileExist && !await ExistsAsync(filePath))
             {
@@ -190,41 +191,27 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
             return accessUrl;
         }
 
-        protected virtual string CalculateRelativePath(FileSystemFileProviderConfiguration configuration, string filePath)
+        protected virtual string CalculateRelativePath(FileProviderArgs args)
         {
-            var basePath = Path.GetFullPath(configuration.BasePath);
-            var relativePath = GetRelativePath(basePath, filePath);
+            var fileSystemConfiguration = args.Configuration.GetFileSystemConfiguration();
+            var relativePathBuilder = new StringBuilder();
 
-            return relativePath
-                .Replace(Path.DirectorySeparatorChar, '/')
-                .Replace(Path.AltDirectorySeparatorChar, '/');
-        }
-
-        protected virtual string GetRelativePath(string basePath, string filePath)
-        {
-#if NETSTANDARD2_0
-            var baseUri = new Uri(AppendDirectorySeparator(basePath));
-            var fileUri = new Uri(Path.GetFullPath(filePath));
-            var relativeUri = baseUri.MakeRelativeUri(fileUri);
-
-            return Uri.UnescapeDataString(relativeUri.ToString()).Replace('/', Path.DirectorySeparatorChar);
-#else
-            return Path.GetRelativePath(basePath, filePath);
-#endif
-        }
-
-        protected virtual string AppendDirectorySeparator(string path)
-        {
-            if (!string.IsNullOrEmpty(path))
+            if (CurrentTenant.Id == null)
             {
-                var lastChar = path[path.Length - 1];
-                if (lastChar == Path.DirectorySeparatorChar || lastChar == Path.AltDirectorySeparatorChar)
-                {
-                    return path;
-                }
+                relativePathBuilder.Append("/host");
+            }
+            else
+            {
+                relativePathBuilder.Append($"/tenants/{CurrentTenant.Id.Value:D}");
             }
 
-            return path + Path.DirectorySeparatorChar;
+            if (fileSystemConfiguration.AppendContainerNameToBasePath)
+            {
+                relativePathBuilder.Append($"/{args.ContainerName}");
+            }
+
+            relativePathBuilder.Append($"/{args.FileId}");
+            return relativePathBuilder.ToString();
         }
     }
 }
