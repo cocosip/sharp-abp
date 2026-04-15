@@ -1,9 +1,10 @@
-﻿using SharpAbp.Abp.CryptoVault;
+using Microsoft.Extensions.DependencyInjection;
+using SharpAbp.Abp.CryptoVault;
 using SharpAbp.Abp.TransformSecurity;
 using System.Threading.Tasks;
-using Volo.Abp.AutoMapper;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain;
+using Volo.Abp.Mapperly;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
 
@@ -12,7 +13,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
     [DependsOn(
         typeof(AbpDddDomainModule),
         typeof(AbpCachingModule),
-        typeof(AbpAutoMapperModule),
+        typeof(AbpMapperlyModule),
         typeof(AbpTransformSecurityModule),
         typeof(AbpCryptoVaultDomainModule)
         )]
@@ -23,11 +24,11 @@ namespace SharpAbp.Abp.TransformSecurityManagement
             AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
         }
 
-
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
+            context.Services.AddMapperlyObjectMapper<AbpTransformSecurityManagementDomainModule>();
+
             return Task.CompletedTask;
         }
-
     }
 }

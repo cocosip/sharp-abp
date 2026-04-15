@@ -112,7 +112,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
 
             await _securityCredentialInfoAppService.DeleteAsync(created.Id);
 
-            await Assert.ThrowsAsync<EntityNotFoundException>(() =>
+            await Assert.ThrowsAsync<EntityNotFoundException<SecurityCredentialInfo>>(() =>
             {
                 return _securityCredentialInfoAppService.GetAsync(created.Id);
             });
