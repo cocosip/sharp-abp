@@ -96,6 +96,30 @@ namespace SharpAbp.Abp.TransformSecurity
         }
 
         [Fact]
+        public async Task SetAsync_Should_Honor_Credential_Expiration()
+        {
+            // Arrange
+            var credential = new SecurityCredential
+            {
+                Identifier = Guid.NewGuid().ToString("N"),
+                BizType = "Login",
+                KeyType = AbpTransformSecurityNames.RSA,
+                PublicKey = "public",
+                PrivateKey = "private",
+                CreationTime = DateTime.UtcNow,
+                Expires = DateTime.UtcNow.AddMilliseconds(200)
+            };
+
+            // Act
+            await _store.SetAsync(credential);
+            await Task.Delay(800);
+
+            // Assert
+            var retrieved = await _store.GetAsync(credential.Identifier!);
+            Assert.Null(retrieved);
+        }
+
+        [Fact]
         public async Task Store_Should_Support_Multiple_Credentials()
         {
             // Arrange

@@ -28,6 +28,8 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
             var filePath = FilePathCalculator.Calculate(args);
+            var sourceStream = args.FileStream!;
+            var initialPosition = sourceStream.CanSeek ? sourceStream.Position : 0;
 
             Logger.LogDebug("Saving file to file system. File: {FilePath}", filePath);
 
@@ -43,26 +45,55 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
                 ? FileMode.Create
                 : FileMode.CreateNew;
 
-            await Policy.Handle<IOException>()
-                .WaitAndRetryAsync(2, retryCount => TimeSpan.FromSeconds(retryCount))
-                .ExecuteAsync(async () =>
-                {
-                    try
-                    {
-                        using var fileStream = File.Open(filePath, fileMode, FileAccess.Write);
-                        await args.FileStream!.CopyToAsync(
-                            fileStream,
-                            args.CancellationToken
-                        );
+            async Task SaveFileAsync()
+            {
+                using var fileStream = File.Open(filePath, fileMode, FileAccess.Write);
+                await sourceStream.CopyToAsync(
+                    fileStream,
+                    args.CancellationToken
+                );
 
-                        await fileStream.FlushAsync();
-                    }
-                    catch (IOException ex)
+                await fileStream.FlushAsync(args.CancellationToken);
+            }
+
+            if (sourceStream.CanSeek)
+            {
+                await Policy.Handle<IOException>()
+                    .WaitAndRetryAsync(
+                        2,
+                        retryCount => TimeSpan.FromSeconds(retryCount),
+                        (_, _, _, _) =>
+                        {
+                            sourceStream.Position = initialPosition;
+                            FileHelper.DeleteIfExists(filePath);
+                            return Task.CompletedTask;
+                        })
+                    .ExecuteAsync(async () =>
                     {
-                        Logger.LogError(ex, "Failed to save file '{FileId}' to file system. Path: {FilePath}", args.FileId, filePath);
-                        throw;
-                    }
-                });
+                        try
+                        {
+                            sourceStream.Position = initialPosition;
+                            await SaveFileAsync();
+                        }
+                        catch (IOException ex)
+                        {
+                            Logger.LogError(ex, "Failed to save file '{FileId}' to file system. Path: {FilePath}", args.FileId, filePath);
+                            throw;
+                        }
+                    });
+            }
+            else
+            {
+                try
+                {
+                    await SaveFileAsync();
+                }
+                catch (IOException ex)
+                {
+                    Logger.LogError(ex, "Failed to save file '{FileId}' to file system. Path: {FilePath}", args.FileId, filePath);
+                    throw;
+                }
+            }
 
             Logger.LogInformation("Successfully saved file '{FileId}' to file system. Path: {FilePath}", args.FileId, filePath);
             return args.FileId;
