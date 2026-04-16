@@ -122,7 +122,7 @@ namespace SharpAbp.Abp.TransformSecurity
         /// <exception cref="AbpException">Thrown when the security credential is not found or has an invalid key type</exception>
         public virtual async Task<string> EncryptAsync(string plainText, string identifier, CancellationToken cancellationToken = default)
         {
-            var credential = await SecurityCredentialStore.GetAsync(identifier, cancellationToken) ?? throw new AbpException($"Security credential with identifier '{identifier}' was not found. Please ensure the credential exists and is valid.");
+            var credential = await GetValidCredentialAsync(identifier, cancellationToken);
             if (credential.IsRSA())
             {
                 return RSAEncryptionService.EncryptFromBase64(credential.PublicKey!, plainText, Encoding.UTF8, RSAOptions.Padding);
@@ -147,7 +147,7 @@ namespace SharpAbp.Abp.TransformSecurity
         /// <exception cref="AbpException">Thrown when the security credential is not found or has an invalid key type</exception>
         public virtual async Task<string> DecryptAsync(string cipherText, string identifier, CancellationToken cancellationToken = default)
         {
-            var credential = await SecurityCredentialStore.GetAsync(identifier, cancellationToken) ?? throw new AbpException($"Security credential with identifier '{identifier}' was not found. Please ensure the credential exists and is valid.");
+            var credential = await GetValidCredentialAsync(identifier, cancellationToken);
 
             if (credential.IsRSA())
             {
@@ -161,6 +161,17 @@ namespace SharpAbp.Abp.TransformSecurity
             {
                 throw new AbpException($"The security credential with identifier '{identifier}' has an unsupported key type '{credential.KeyType}'. Supported key types are RSA and SM2.");
             }
+        }
+
+        protected virtual async Task<SecurityCredential> GetValidCredentialAsync(string identifier, CancellationToken cancellationToken)
+        {
+            var credential = await SecurityCredentialStore.GetAsync(identifier, cancellationToken) ?? throw new AbpException($"Security credential with identifier '{identifier}' was not found. Please ensure the credential exists and is valid.");
+            if (credential.IsExpires(Clock.Now))
+            {
+                throw new AbpException($"Security credential with identifier '{identifier}' has expired. Please generate a new credential and retry the operation.");
+            }
+
+            return credential;
         }
 
     }

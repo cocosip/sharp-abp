@@ -97,7 +97,7 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
                         {
                             const string errorMessage = "'password' is required for 'password' grant type.";
                             _logger.LogError(errorMessage);
-                            throw new AbpException(errorMessage);
+                            throw new TransformSecurityRequestException(StatusCodes.Status400BadRequest, errorMessage);
                         }
 
                         // For password grant with password present, identifier must be provided
@@ -105,7 +105,7 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
                         {
                             const string errorMessage = "Security identifier is required for 'password' grant type.";
                             _logger.LogError(errorMessage);
-                            throw new AbpException(errorMessage);
+                            throw new TransformSecurityRequestException(StatusCodes.Status400BadRequest, errorMessage);
                         }
 
                         foreach (var item in query)
@@ -128,7 +128,7 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
                                     catch (Exception ex)
                                     {
                                         _logger.LogError(ex, "Failed to decrypt password for token authentication with identifier: {Identifier}", identifier);
-                                        throw new AbpException("Failed to decrypt password for token authentication", ex);
+                                        throw new TransformSecurityRequestException(StatusCodes.Status400BadRequest, "Failed to decrypt password for token authentication", ex);
                                     }
                                 }
                             }

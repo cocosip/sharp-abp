@@ -134,5 +134,39 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
             Assert.Equal(StatusCodes.Status200OK, httpContext.Response.StatusCode);
             Assert.Equal(string.Empty, await reader.ReadToEndAsync());
         }
+
+        [Fact]
+        public async Task InvokeAsync_Should_Map_Request_Errors_To_BadRequest()
+        {
+            var transformOptions = Options.Create(new AbpTransformSecurityOptions());
+            var aspNetCoreOptions = new AbpTransformSecurityAspNetCoreOptions();
+            aspNetCoreOptions.MiddlewareHandlers.Add(typeof(IAbpTransformSecurityMiddlewareHandler));
+
+            var handler = new Mock<IAbpTransformSecurityMiddlewareHandler>();
+            handler
+                .Setup(x => x.HandleAsync(It.IsAny<HttpContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new TransformSecurityRequestException(StatusCodes.Status400BadRequest, "invalid token request"));
+
+            var serviceProvider = new Mock<IServiceProvider>();
+            serviceProvider
+                .Setup(x => x.GetService(typeof(IAbpTransformSecurityMiddlewareHandler)))
+                .Returns(handler.Object);
+
+            var middleware = new AbpTransformSecurityMiddleware(
+                NullLogger<AbpTransformSecurityMiddleware>.Instance,
+                transformOptions,
+                Options.Create(aspNetCoreOptions),
+                serviceProvider.Object);
+
+            var httpContext = new DefaultHttpContext();
+            httpContext.Response.Body = new MemoryStream();
+
+            await middleware.InvokeAsync(httpContext, _ => Task.CompletedTask);
+
+            httpContext.Response.Body.Position = 0;
+            using var reader = new StreamReader(httpContext.Response.Body, Encoding.UTF8, leaveOpen: true);
+            Assert.Equal(StatusCodes.Status400BadRequest, httpContext.Response.StatusCode);
+            Assert.Equal("invalid token request", await reader.ReadToEndAsync());
+        }
     }
 }

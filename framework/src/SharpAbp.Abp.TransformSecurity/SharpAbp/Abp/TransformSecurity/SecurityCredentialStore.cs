@@ -1,4 +1,6 @@
-﻿using System.Threading;
+using Microsoft.Extensions.Caching.Distributed;
+using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
@@ -20,7 +22,25 @@ namespace SharpAbp.Abp.TransformSecurity
 
         public virtual async Task SetAsync(SecurityCredential credential, CancellationToken cancellationToken = default)
         {
-            await Cache.SetAsync(credential.Identifier!, credential, token: cancellationToken);
+            await Cache.RemoveAsync(credential.Identifier!, token: cancellationToken);
+            await Cache.SetAsync(
+                credential.Identifier!,
+                credential,
+                options: CreateCacheOptions(credential),
+                token: cancellationToken);
+        }
+
+        protected virtual DistributedCacheEntryOptions? CreateCacheOptions(SecurityCredential credential)
+        {
+            if (!credential.Expires.HasValue || credential.Expires.Value <= DateTime.UtcNow)
+            {
+                return null;
+            }
+
+            return new DistributedCacheEntryOptions
+            {
+                AbsoluteExpiration = new DateTimeOffset(credential.Expires.Value)
+            };
         }
     }
 }

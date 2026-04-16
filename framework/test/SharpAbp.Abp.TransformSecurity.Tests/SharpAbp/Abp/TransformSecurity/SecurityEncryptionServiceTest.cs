@@ -1,10 +1,14 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Moq;
+using SharpAbp.Abp.Crypto.RSA;
+using SharpAbp.Abp.Crypto.SM2;
 using System;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
+using Volo.Abp.Guids;
 using Volo.Abp.Timing;
 using Xunit;
 
@@ -21,6 +25,12 @@ namespace SharpAbp.Abp.TransformSecurity
         private readonly ISecurityCredentialStore _securityCredentialStore;
         private readonly IClock _clock;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IOptions<AbpTransformSecurityOptions> _options;
+        private readonly IOptions<AbpTransformSecurityRSAOptions> _rsaOptions;
+        private readonly IOptions<AbpTransformSecuritySM2Options> _sm2Options;
+        private readonly IGuidGenerator _guidGenerator;
+        private readonly IRSAEncryptionService _rsaEncryptionService;
+        private readonly ISm2EncryptionService _sm2EncryptionService;
 
         public SecurityEncryptionServiceTest()
         {
@@ -29,6 +39,12 @@ namespace SharpAbp.Abp.TransformSecurity
             _securityCredentialStore = GetRequiredService<ISecurityCredentialStore>();
             _clock = GetRequiredService<IClock>();
             _serviceProvider = GetRequiredService<IServiceProvider>();
+            _options = GetRequiredService<IOptions<AbpTransformSecurityOptions>>();
+            _rsaOptions = GetRequiredService<IOptions<AbpTransformSecurityRSAOptions>>();
+            _sm2Options = GetRequiredService<IOptions<AbpTransformSecuritySM2Options>>();
+            _guidGenerator = GetRequiredService<IGuidGenerator>();
+            _rsaEncryptionService = GetRequiredService<IRSAEncryptionService>();
+            _sm2EncryptionService = GetRequiredService<ISm2EncryptionService>();
         }
 
         [Fact]
@@ -62,13 +78,11 @@ namespace SharpAbp.Abp.TransformSecurity
         {
             // Arrange
             var credential = await _securityCredentialManager.GenerateAsync("Login");
-            
-            // Manually set expiration to past
             credential.Expires = _clock.Now.AddMinutes(-1);
-            await _securityCredentialStore.SetAsync(credential);
+            var encryptionService = CreateEncryptionService(credential);
 
             // Act
-            var result = await _securityEncryptionService.ValidateAsync(credential.Identifier!);
+            var result = await encryptionService.ValidateAsync(credential.Identifier!);
 
             // Assert
             Assert.Equal(SecurityCredentialResultType.Expired, result.Result);
@@ -312,20 +326,53 @@ namespace SharpAbp.Abp.TransformSecurity
         }
 
         [Fact]
-        public async Task EncryptAsync_Should_Work_Even_For_Expired_Credential()
+        public async Task EncryptAsync_Should_Throw_Exception_For_Expired_Credential()
         {
-            // Arrange - Note: EncryptAsync doesn't check expiration, only ValidateAsync does
+            // Arrange
             var credential = await _securityCredentialManager.GenerateAsync("Login");
-            
-            // Manually expire the credential
             credential.Expires = _clock.Now.AddMinutes(-1);
-            await _securityCredentialStore.SetAsync(credential);
+            var encryptionService = CreateEncryptionService(credential);
 
-            // Act - Should not throw exception as EncryptAsync doesn't validate expiration
-            var result = await _securityEncryptionService.EncryptAsync("test", credential.Identifier!);
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<AbpException>(
+                () => encryptionService.EncryptAsync("test", credential.Identifier!));
             
-            // Assert
-            Assert.NotNull(result);
+            Assert.Contains("has expired", exception.Message);
+        }
+
+        [Fact]
+        public async Task DecryptAsync_Should_Throw_Exception_For_Expired_Credential()
+        {
+            // Arrange
+            var credential = await _securityCredentialManager.GenerateAsync("Login");
+            var cipherText = await _securityEncryptionService.EncryptAsync("test", credential.Identifier!);
+
+            credential.Expires = _clock.Now.AddMinutes(-1);
+            var encryptionService = CreateEncryptionService(credential);
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<AbpException>(
+                () => encryptionService.DecryptAsync(cipherText, credential.Identifier!));
+
+            Assert.Contains("has expired", exception.Message);
+        }
+
+        private SecurityEncryptionService CreateEncryptionService(SecurityCredential credential)
+        {
+            var store = new Mock<ISecurityCredentialStore>();
+            store
+                .Setup(x => x.GetAsync(credential.Identifier!, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(credential);
+
+            return new SecurityEncryptionService(
+                _options,
+                _rsaOptions,
+                _sm2Options,
+                _guidGenerator,
+                _clock,
+                store.Object,
+                _rsaEncryptionService,
+                _sm2EncryptionService);
         }
 
         #endregion

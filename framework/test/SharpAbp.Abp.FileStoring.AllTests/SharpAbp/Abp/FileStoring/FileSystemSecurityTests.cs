@@ -1,6 +1,8 @@
 #nullable enable
 using System;
 using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -14,6 +16,40 @@ namespace SharpAbp.Abp.FileStoring
 {
     public class FileSystemSecurityTests
     {
+        private sealed class RetryableReadStream : MemoryStream
+        {
+            private bool _hasThrown;
+
+            public RetryableReadStream(byte[] buffer)
+                : base(buffer)
+            {
+            }
+
+            public override int Read(byte[] buffer, int offset, int count)
+            {
+                if (!_hasThrown)
+                {
+                    _ = base.Read(buffer, offset, Math.Min(count, 4));
+                    _hasThrown = true;
+                    throw new IOException("Transient read failure");
+                }
+
+                return base.Read(buffer, offset, count);
+            }
+
+            public override ValueTask<int> ReadAsync(Memory<byte> buffer, System.Threading.CancellationToken cancellationToken = default)
+            {
+                if (!_hasThrown)
+                {
+                    _ = base.Read(buffer.Span[..Math.Min(buffer.Length, 4)]);
+                    _hasThrown = true;
+                    throw new IOException("Transient read failure");
+                }
+
+                return base.ReadAsync(buffer, cancellationToken);
+            }
+        }
+
         private static FileContainerConfiguration CreateFileSystemConfiguration(string basePath, bool appendContainerName = true)
         {
             var configuration = new FileContainerConfiguration
@@ -133,6 +169,34 @@ namespace SharpAbp.Abp.FileStoring
             var exception = Assert.Throws<AbpException>(() => provider.Get("default"));
 
             Assert.Contains("Reference SharpAbp.Abp.FileStoring", exception.Message);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task SaveAsync_Should_Retry_From_Original_Stream_Position()
+        {
+            var basePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(basePath);
+
+            try
+            {
+                var configuration = CreateFileSystemConfiguration(basePath);
+                var calculator = CreateCalculator();
+                var currentTenant = new Mock<ICurrentTenant>();
+                var provider = new FileSystemFileProvider(NullLogger<FileSystemFileProvider>.Instance, currentTenant.Object, calculator);
+                var content = Encoding.UTF8.GetBytes("retry-safe-content");
+                await using var stream = new RetryableReadStream(content);
+                var args = new FileProviderSaveArgs("docs", configuration, "files/retry.txt", stream, ".txt");
+
+                await provider.SaveAsync(args);
+
+                var savedFilePath = calculator.Calculate(args);
+                Assert.True(File.Exists(savedFilePath));
+                Assert.Equal("retry-safe-content", await File.ReadAllTextAsync(savedFilePath));
+            }
+            finally
+            {
+                Directory.Delete(basePath, recursive: true);
+            }
         }
     }
 }

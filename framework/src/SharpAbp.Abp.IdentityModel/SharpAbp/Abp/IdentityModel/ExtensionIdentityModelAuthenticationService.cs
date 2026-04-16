@@ -88,7 +88,7 @@ namespace SharpAbp.Abp.IdentityModel
             }
         }
 
-        protected virtual IdentityClientConfiguration GetClientConfiguration(
+        protected virtual IdentityClientConfiguration? GetClientConfiguration(
             string userName,
             string userPassword,
             string? identityClientName = null)
@@ -104,16 +104,24 @@ namespace SharpAbp.Abp.IdentityModel
                     ClientOptions.IdentityClients.Default;
             }
 
+            if (identityClientConfiguration == null ||
+                identityClientConfiguration.Authority.IsNullOrWhiteSpace() ||
+                identityClientConfiguration.ClientId.IsNullOrWhiteSpace() ||
+                identityClientConfiguration.GrantType.IsNullOrWhiteSpace())
+            {
+                return null;
+            }
+
             var configuration = new IdentityClientConfiguration(
-                identityClientConfiguration?.Authority!,
-                identityClientConfiguration?.Scope!,
-                identityClientConfiguration?.ClientId!,
-                identityClientConfiguration?.ClientSecret!,
-                identityClientConfiguration?.GrantType!,
+                identityClientConfiguration.Authority,
+                identityClientConfiguration.Scope ?? string.Empty,
+                identityClientConfiguration.ClientId,
+                identityClientConfiguration.ClientSecret ?? string.Empty,
+                identityClientConfiguration.GrantType,
                 userName,
                 userPassword,
-                identityClientConfiguration?.RequireHttps ?? false,
-                identityClientConfiguration?.CacheAbsoluteExpiration ?? 1800);
+                identityClientConfiguration.RequireHttps,
+                identityClientConfiguration.CacheAbsoluteExpiration);
 
             return configuration;
         }
