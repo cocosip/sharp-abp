@@ -15,7 +15,6 @@ $solutionPaths = @(
     'modules/tenant-group-management'
     'modules/dbconnections'
     'modules/Identity'
-    'modules/IdentityServer'
     'modules/openiddict'
     'modules/audit-logging'
     'modules/account'
