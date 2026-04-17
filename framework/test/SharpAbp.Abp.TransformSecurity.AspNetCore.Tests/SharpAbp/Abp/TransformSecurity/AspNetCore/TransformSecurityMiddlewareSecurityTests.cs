@@ -64,6 +64,7 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
 
             Assert.Equal(StatusCodes.Status400BadRequest, context.Response.StatusCode);
             Assert.Equal("The transform security request is invalid.", body);
+            Assert.DoesNotContain("invalid-request-details", body);
         }
 
         [Fact]

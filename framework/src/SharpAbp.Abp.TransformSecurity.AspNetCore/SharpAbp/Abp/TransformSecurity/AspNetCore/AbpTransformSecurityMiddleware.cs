@@ -60,6 +60,13 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
                 await context.Response.WriteAsync(ex.Message);
                 return;
             }
+            catch (AbpException ex)
+            {
+                Logger.LogWarning(ex, "AbpTransformSecurityMiddleware rejected invalid request: {Message}", ex.Message);
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await context.Response.WriteAsync("The transform security request is invalid.");
+                return;
+            }
             catch (Exception ex)
             {
                 Logger.LogError(ex, "AbpTransformSecurityMiddleware execute exception: {Message}", ex.Message);
