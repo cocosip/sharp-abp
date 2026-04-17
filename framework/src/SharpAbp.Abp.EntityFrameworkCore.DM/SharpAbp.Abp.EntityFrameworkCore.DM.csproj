@@ -23,6 +23,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Sharp.EntityFrameworkCore.DM" />
+		<PackageReference Include="DM.DmProvider" />
 	</ItemGroup>
 
 </Project>
