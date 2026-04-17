@@ -140,7 +140,7 @@
 		<PackageVersion Include="MassTransit.SqlTransport.PostgreSQL" Version="$(MassTransitPackageVersion)" />
 		<PackageVersion Include="MassTransit.SqlTransport.SqlServer" Version="$(MassTransitPackageVersion)" />
 		<PackageVersion Include="DM.Microsoft.EntityFrameworkCore" Version="[9.0.0.43760,)" />
-		<PackageVersion Include="DM.DmProvider" Version="[8.3.1.35543,)" />
+		<PackageVersion Include="DM.DmProvider" Version="[8.3.1.47463,)" />
 		<PackageVersion Include="DotNetCore.EntityFrameworkCore.GaussDB" Version="[9.0.0,)" />
 		<PackageVersion Include="DotNetCore.GaussDB" Version="[9.0.0,)" />
 		<PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.1" />
