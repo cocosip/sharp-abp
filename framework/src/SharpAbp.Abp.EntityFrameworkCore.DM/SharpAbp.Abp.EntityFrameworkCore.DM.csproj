@@ -23,6 +23,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="DM.Microsoft.EntityFrameworkCore" />
+		<PackageReference Include="DM.DmProvider" />
 	</ItemGroup>
 
 </Project>
