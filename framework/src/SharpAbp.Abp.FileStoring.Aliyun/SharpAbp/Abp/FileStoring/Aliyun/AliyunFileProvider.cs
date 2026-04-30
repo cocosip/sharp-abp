@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Aliyun.OSS;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.ObjectPool;
@@ -18,7 +19,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
     public class AliyunFileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }
-        protected IOssClientFactory OssClientFactory { get; }
+        protected IServiceScopeFactory ServiceScopeFactory { get; }
         protected AbpFileStoringAbstractionsOptions Options { get; }
         protected IClock Clock { get; }
         protected IPoolOrchestrator PoolOrchestrator { get; }
@@ -27,7 +28,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
 
         public AliyunFileProvider(
             ILogger<AliyunFileProvider> logger,
-            IOssClientFactory ossClientFactory,
+            IServiceScopeFactory serviceScopeFactory,
             IOptions<AbpFileStoringAbstractionsOptions> options,
             IClock clock,
             IPoolOrchestrator poolOrchestrator,
@@ -35,7 +36,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
             Logger = logger;
-            OssClientFactory = ossClientFactory;
+            ServiceScopeFactory = serviceScopeFactory;
             Options = options.Value;
             Clock = clock;
             PoolOrchestrator = poolOrchestrator;
@@ -51,7 +52,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             var poolName = NormalizePoolName(aliyunConfiguration);
             var pool = PoolOrchestrator.GetObjectPool<IOss, AliyunOssClientPolicy>(
                 poolName,
-                () => new AliyunOssClientPolicy(OssClientFactory, aliyunConfiguration),
+                () => new AliyunOssClientPolicy(ServiceScopeFactory, aliyunConfiguration),
                 Options.DefaultClientMaximumRetained);
             return pool;
         }

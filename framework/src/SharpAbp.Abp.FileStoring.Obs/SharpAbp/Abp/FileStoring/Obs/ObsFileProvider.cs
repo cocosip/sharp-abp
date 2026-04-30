@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OBS;
@@ -19,7 +20,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
     public class ObsFileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }
-        protected IObsClientFactory ObsClientFactory { get; }
+        protected IServiceScopeFactory ServiceScopeFactory { get; }
         protected AbpFileStoringAbstractionsOptions Options { get; }
         protected IClock Clock { get; }
         protected IPoolOrchestrator PoolOrchestrator { get; }
@@ -28,7 +29,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
 
         public ObsFileProvider(
             ILogger<ObsFileProvider> logger,
-            IObsClientFactory obsClientFactory,
+            IServiceScopeFactory serviceScopeFactory,
             IOptions<AbpFileStoringAbstractionsOptions> options,
             IClock clock,
             IPoolOrchestrator poolOrchestrator,
@@ -36,7 +37,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
             Logger = logger;
-            ObsClientFactory = obsClientFactory;
+            ServiceScopeFactory = serviceScopeFactory;
             Options = options.Value;
 
             Clock = clock;
@@ -53,7 +54,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
             var poolName = NormalizePoolName(obsConfiguration);
             var pool = PoolOrchestrator.GetObjectPool<ObsClient, ObsClientPolicy>(
                 poolName,
-                () => new ObsClientPolicy(ObsClientFactory, obsConfiguration),
+                () => new ObsClientPolicy(ServiceScopeFactory, obsConfiguration),
                 Options.DefaultClientMaximumRetained);
             return pool;
         }
