@@ -1,27 +1,24 @@
-﻿using System;
 using Amazon.S3;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.ObjectPool;
+using SharpAbp.Abp.ObjectPool;
 
 namespace SharpAbp.Abp.FileStoring.S3
 {
-    public class S3ClientPolicy : IPooledObjectPolicy<IAmazonS3>
+    public class S3ClientPolicy : IObjectPoolPolicy<IAmazonS3>
     {
-        protected IServiceProvider ServiceProvider { get; }
+        protected IS3ClientFactory S3ClientFactory { get; }
         protected S3FileProviderConfiguration S3FileProviderConfiguration { get; }
+
         public S3ClientPolicy(
-            IServiceProvider serviceProvider,
+            IS3ClientFactory s3ClientFactory,
             S3FileProviderConfiguration s3FileProviderConfiguration)
         {
-            ServiceProvider = serviceProvider;
+            S3ClientFactory = s3ClientFactory;
             S3FileProviderConfiguration = s3FileProviderConfiguration;
         }
 
         public IAmazonS3 Create()
         {
-            using var scope = ServiceProvider.CreateScope();
-            var s3ClientFactory = scope.ServiceProvider.GetRequiredService<IS3ClientFactory>();
-            return s3ClientFactory.Create(S3FileProviderConfiguration);
+            return S3ClientFactory.Create(S3FileProviderConfiguration);
         }
 
         public bool Return(IAmazonS3 obj)

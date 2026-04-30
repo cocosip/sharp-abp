@@ -1,19 +1,15 @@
-﻿using System;
-using Microsoft.Extensions.ObjectPool;
 using Minio;
+using SharpAbp.Abp.ObjectPool;
 
 namespace SharpAbp.Abp.FileStoring.Minio
 {
-    public class MinioClientPolicy : IPooledObjectPolicy<IMinioClient>
+    public class MinioClientPolicy : IObjectPoolPolicy<IMinioClient>
     {
-        protected IServiceProvider ServiceProvider { get; }
         protected MinioFileProviderConfiguration MinioFileProviderConfiguration { get; }
 
         public MinioClientPolicy(
-            IServiceProvider serviceProvider,
             MinioFileProviderConfiguration minioFileProviderConfiguration)
         {
-            ServiceProvider = serviceProvider;
             MinioFileProviderConfiguration = minioFileProviderConfiguration;
         }
 

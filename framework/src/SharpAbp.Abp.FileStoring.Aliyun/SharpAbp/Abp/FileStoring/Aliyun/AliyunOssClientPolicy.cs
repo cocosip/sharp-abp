@@ -1,28 +1,24 @@
-﻿using System;
 using Aliyun.OSS;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.ObjectPool;
+using SharpAbp.Abp.ObjectPool;
 
 namespace SharpAbp.Abp.FileStoring.Aliyun
 {
-    public class AliyunOssClientPolicy : IPooledObjectPolicy<IOss>
+    public class AliyunOssClientPolicy : IObjectPoolPolicy<IOss>
     {
-        protected IServiceProvider ServiceProvider { get; }
+        protected IOssClientFactory OssClientFactory { get; }
         protected AliyunFileProviderConfiguration AliyunFileProviderConfiguration { get; }
+
         public AliyunOssClientPolicy(
-            IServiceProvider serviceProvider,
+            IOssClientFactory ossClientFactory,
             AliyunFileProviderConfiguration aliyunFileProviderConfiguration)
         {
-            ServiceProvider = serviceProvider;
+            OssClientFactory = ossClientFactory;
             AliyunFileProviderConfiguration = aliyunFileProviderConfiguration;
         }
 
         public IOss Create()
         {
-            // 创建临时作用域解析 Scoped 服务
-            using var scope = ServiceProvider.CreateScope();
-            var ossClientFactory = scope.ServiceProvider.GetRequiredService<IOssClientFactory>();
-            return ossClientFactory.Create(AliyunFileProviderConfiguration);
+            return OssClientFactory.Create(AliyunFileProviderConfiguration);
         }
 
         public bool Return(IOss obj)

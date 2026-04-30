@@ -138,5 +138,162 @@ namespace SharpAbp.Abp.ObjectPool
 
             return (ObjectPool<T>)metadata.Pool;
         }
+
+        /// <summary>
+        /// Gets or creates an object pool for the specified type and name.
+        /// </summary>
+        /// <typeparam name="T">The type of objects in the pool.</typeparam>
+        /// <param name="poolName">The name of the pool.</param>
+        /// <param name="policyFactory">The factory to create the policy only when the pool is first created.</param>
+        /// <param name="maxSize">The maximum size of the pool.</param>
+        /// <returns>The object pool.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when attempting to get a pool with different parameters than previously used.</exception>
+        public virtual ObjectPool<T> GetPool<T>([NotNull] string poolName, Func<IPooledObjectPolicy<T>> policyFactory, int? maxSize = null) where T : class
+        {
+            Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
+            Check.NotNull(policyFactory, nameof(policyFactory));
+
+            return GetPool(poolName, policyFactory, typeof(IPooledObjectPolicy<T>), maxSize);
+        }
+
+        /// <summary>
+        /// Gets or creates an object pool for the specified type and name.
+        /// </summary>
+        /// <typeparam name="T">The type of objects in the pool.</typeparam>
+        /// <typeparam name="TPolicy">The type of policy used by the pool.</typeparam>
+        /// <param name="poolName">The name of the pool.</param>
+        /// <param name="policyFactory">The factory to create the policy only when the pool is first created.</param>
+        /// <param name="maxSize">The maximum size of the pool.</param>
+        /// <returns>The object pool.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when attempting to get a pool with different parameters than previously used.</exception>
+        public virtual ObjectPool<T> GetPool<T, TPolicy>([NotNull] string poolName, Func<TPolicy> policyFactory, int? maxSize = null)
+            where T : class
+            where TPolicy : IPooledObjectPolicy<T>
+        {
+            Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
+            Check.NotNull(policyFactory, nameof(policyFactory));
+
+            return GetPool<T>(poolName, () => policyFactory(), typeof(TPolicy), maxSize);
+        }
+
+        /// <summary>
+        /// Gets or creates an object pool for the specified type and name.
+        /// </summary>
+        /// <typeparam name="T">The type of objects in the pool.</typeparam>
+        /// <param name="poolName">The name of the pool.</param>
+        /// <param name="policy">The policy to use for creating and resetting objects.</param>
+        /// <param name="maxSize">The maximum size of the pool.</param>
+        /// <returns>The object pool.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when attempting to get a pool with different parameters than previously used.</exception>
+        public virtual IObjectPool<T> GetObjectPool<T>([NotNull] string poolName, IObjectPoolPolicy<T> policy, int? maxSize = null) where T : class
+        {
+            Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
+            Check.NotNull(policy, nameof(policy));
+
+            var pool = GetPool<T>(poolName, () => new ObjectPoolPolicyAdapter<T>(policy), policy.GetType(), maxSize);
+            return new ObjectPoolAdapter<T>(pool);
+        }
+
+        /// <summary>
+        /// Gets or creates an object pool for the specified type and name.
+        /// </summary>
+        /// <typeparam name="T">The type of objects in the pool.</typeparam>
+        /// <param name="poolName">The name of the pool.</param>
+        /// <param name="policyFactory">The factory to create the policy only when the pool is first created.</param>
+        /// <param name="maxSize">The maximum size of the pool.</param>
+        /// <returns>The object pool.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when attempting to get a pool with different parameters than previously used.</exception>
+        public virtual IObjectPool<T> GetObjectPool<T>([NotNull] string poolName, Func<IObjectPoolPolicy<T>> policyFactory, int? maxSize = null) where T : class
+        {
+            Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
+            Check.NotNull(policyFactory, nameof(policyFactory));
+
+            return GetObjectPool<T>(poolName, policyFactory, typeof(IObjectPoolPolicy<T>), maxSize);
+        }
+
+        /// <summary>
+        /// Gets or creates an object pool for the specified type and name.
+        /// </summary>
+        /// <typeparam name="T">The type of objects in the pool.</typeparam>
+        /// <typeparam name="TPolicy">The type of policy used by the pool.</typeparam>
+        /// <param name="poolName">The name of the pool.</param>
+        /// <param name="policyFactory">The factory to create the policy only when the pool is first created.</param>
+        /// <param name="maxSize">The maximum size of the pool.</param>
+        /// <returns>The object pool.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when attempting to get a pool with different parameters than previously used.</exception>
+        public virtual IObjectPool<T> GetObjectPool<T, TPolicy>([NotNull] string poolName, Func<TPolicy> policyFactory, int? maxSize = null)
+            where T : class
+            where TPolicy : IObjectPoolPolicy<T>
+        {
+            Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
+            Check.NotNull(policyFactory, nameof(policyFactory));
+
+            return GetObjectPool<T>(poolName, () => policyFactory(), typeof(TPolicy), maxSize);
+        }
+
+        protected virtual ObjectPool<T> GetPool<T>(
+            [NotNull] string poolName,
+            Func<IPooledObjectPolicy<T>> policyFactory,
+            Type policyType,
+            int? maxSize = null) where T : class
+        {
+            var key = new PoolKey(typeof(T), poolName);
+
+            var metadata = PoolMetadatas.GetOrAdd(key, _ =>
+            {
+                var policy = policyFactory();
+                Check.NotNull(policy, nameof(policyFactory));
+                ObjectPool<T> pool;
+
+                // If maxSize is specified, create a DefaultObjectPool with the specified size
+                if (maxSize.HasValue)
+                {
+                    pool = new DefaultObjectPool<T>(policy, maxSize.Value);
+                }
+                else
+                {
+                    // Otherwise, use the injected Provider to create the pool
+                    pool = Provider.Create(policy);
+                }
+
+                return new PoolMetadata(policyType, maxSize, pool);
+            });
+
+            if (metadata.PolicyType != policyType)
+            {
+                throw new InvalidOperationException(
+                    $"Pool '{poolName}' for type '{typeof(T).FullName}' already exists with policy type '{metadata.PolicyType.FullName}', " +
+                    $"but was requested with policy type '{policyType.FullName}'.");
+            }
+
+            if (metadata.MaxSize != maxSize)
+            {
+                throw new InvalidOperationException(
+                    $"Pool '{poolName}' for type '{typeof(T).FullName}' already exists with maxSize '{metadata.MaxSize}', " +
+                    $"but was requested with maxSize '{maxSize}'.");
+            }
+
+            return (ObjectPool<T>)metadata.Pool;
+        }
+
+        protected virtual IObjectPool<T> GetObjectPool<T>(
+            [NotNull] string poolName,
+            Func<IObjectPoolPolicy<T>> policyFactory,
+            Type policyType,
+            int? maxSize = null) where T : class
+        {
+            var pool = GetPool(
+                poolName,
+                () =>
+                {
+                    var policy = policyFactory();
+                    Check.NotNull(policy, nameof(policyFactory));
+                    return new ObjectPoolPolicyAdapter<T>(policy);
+                },
+                policyType,
+                maxSize);
+
+            return new ObjectPoolAdapter<T>(pool);
+        }
     }
 }

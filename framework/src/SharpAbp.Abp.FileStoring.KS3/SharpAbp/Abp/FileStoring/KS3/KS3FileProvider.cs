@@ -9,9 +9,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using KS3;
 using KS3.Model;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.ObjectPool;
 using Volo.Abp.DependencyInjection;
@@ -23,7 +21,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
     public class KS3FileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }
-        protected IServiceProvider ServiceProvider { get; }
+        protected IKS3ClientFactory KS3ClientFactory { get; }
         protected AbpFileStoringAbstractionsOptions Options { get; }
         protected IClock Clock { get; }
         protected IPoolOrchestrator PoolOrchestrator { get; }
@@ -32,7 +30,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
 
         public KS3FileProvider(
             ILogger<KS3FileProvider> logger,
-            IServiceProvider serviceProvider,
+            IKS3ClientFactory kS3ClientFactory,
             IOptions<AbpFileStoringAbstractionsOptions> options,
             IClock clock,
             IPoolOrchestrator poolOrchestrator,
@@ -40,7 +38,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
             Logger = logger;
-            ServiceProvider = serviceProvider;
+            KS3ClientFactory = kS3ClientFactory;
             Options = options.Value;
             Clock = clock;
             PoolOrchestrator = poolOrchestrator;
@@ -51,11 +49,13 @@ namespace SharpAbp.Abp.FileStoring.KS3
 
         public override string Provider => KS3FileProviderConfigurationNames.ProviderName;
 
-        protected virtual ObjectPool<IKS3> GetKS3ClientPool(KS3FileProviderConfiguration ks3Configuration)
+        protected virtual IObjectPool<IKS3> GetKS3ClientPool(KS3FileProviderConfiguration ks3Configuration)
         {
             var poolName = NormalizePoolName(ks3Configuration);
-            var ks3ClientPolicy = ActivatorUtilities.CreateInstance<KS3ClientPolicy>(ServiceProvider, ks3Configuration);
-            var pool = PoolOrchestrator.GetPool(poolName, ks3ClientPolicy, Options.DefaultClientMaximumRetained);
+            var pool = PoolOrchestrator.GetObjectPool<IKS3, KS3ClientPolicy>(
+                poolName,
+                () => new KS3ClientPolicy(KS3ClientFactory, ks3Configuration),
+                Options.DefaultClientMaximumRetained);
             return pool;
         }
 

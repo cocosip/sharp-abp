@@ -5,9 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 using Minio;
 using Minio.DataModel.Args;
@@ -23,7 +21,6 @@ namespace SharpAbp.Abp.FileStoring.Minio
     public class MinioFileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }
-        protected IServiceProvider ServiceProvider { get; }
         protected AbpFileStoringAbstractionsOptions Options { get; }
         protected IClock Clock { get; }
         protected IPoolOrchestrator PoolOrchestrator { get; }
@@ -31,7 +28,6 @@ namespace SharpAbp.Abp.FileStoring.Minio
         protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
         public MinioFileProvider(
             ILogger<MinioFileProvider> logger,
-            IServiceProvider serviceProvider,
             IOptions<AbpFileStoringAbstractionsOptions> options,
             IClock clock,
             IPoolOrchestrator poolOrchestrator,
@@ -39,7 +35,6 @@ namespace SharpAbp.Abp.FileStoring.Minio
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
             Logger = logger;
-            ServiceProvider = serviceProvider;
             Options = options.Value;
             Clock = clock;
             PoolOrchestrator = poolOrchestrator;
@@ -49,11 +44,13 @@ namespace SharpAbp.Abp.FileStoring.Minio
 
         public override string Provider => MinioFileProviderConfigurationNames.ProviderName;
 
-        protected virtual ObjectPool<IMinioClient> GetMinioClientPool(MinioFileProviderConfiguration minioConfiguration)
+        protected virtual IObjectPool<IMinioClient> GetMinioClientPool(MinioFileProviderConfiguration minioConfiguration)
         {
             var poolName = NormalizePoolName(minioConfiguration);
-            var minioClientPolicy = ActivatorUtilities.CreateInstance<MinioClientPolicy>(ServiceProvider, minioConfiguration);
-            var pool = PoolOrchestrator.GetPool(poolName, minioClientPolicy, Options.DefaultClientMaximumRetained);
+            var pool = PoolOrchestrator.GetObjectPool<IMinioClient, MinioClientPolicy>(
+                poolName,
+                () => new MinioClientPolicy(minioConfiguration),
+                Options.DefaultClientMaximumRetained);
             return pool;
         }
 
