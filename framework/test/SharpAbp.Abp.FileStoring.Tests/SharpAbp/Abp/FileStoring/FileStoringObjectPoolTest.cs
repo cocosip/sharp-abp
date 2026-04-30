@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.ObjectPool;
@@ -74,8 +75,44 @@ namespace SharpAbp.Abp.FileStoring
             Assert.NotNull(item);
         }
 
+        [Fact]
+        public async Task Async_Object_Pool_Should_Dispose_Rejected_Items()
+        {
+            var pool = new AsyncObjectPool<DisposablePooledObject>(
+                new RejectingDisposableAsyncObjectPoolPolicy(),
+                1);
+            var item = await pool.GetAsync();
+
+            pool.Return(item);
+
+            Assert.True(item.IsDisposed);
+        }
+
+        [Fact]
+        public async Task Async_Object_Pool_Should_Dispose_Items_Over_Maximum_Retained()
+        {
+            var pool = new AsyncObjectPool<DisposablePooledObject>(
+                new DisposableAsyncObjectPoolPolicy(),
+                0);
+            var item = await pool.GetAsync();
+
+            pool.Return(item);
+
+            Assert.True(item.IsDisposed);
+        }
+
         private class PooledObject
         {
+        }
+
+        private class DisposablePooledObject : IDisposable
+        {
+            public bool IsDisposed { get; private set; }
+
+            public void Dispose()
+            {
+                IsDisposed = true;
+            }
         }
 
         private class TestObjectPoolPolicy : IObjectPoolPolicy<PooledObject>
@@ -101,6 +138,27 @@ namespace SharpAbp.Abp.FileStoring
             public bool Return(PooledObject obj)
             {
                 return obj != null;
+            }
+        }
+
+        private class DisposableAsyncObjectPoolPolicy : IAsyncObjectPoolPolicy<DisposablePooledObject>
+        {
+            public ValueTask<DisposablePooledObject> CreateAsync()
+            {
+                return new ValueTask<DisposablePooledObject>(new DisposablePooledObject());
+            }
+
+            public virtual bool Return(DisposablePooledObject obj)
+            {
+                return obj != null;
+            }
+        }
+
+        private class RejectingDisposableAsyncObjectPoolPolicy : DisposableAsyncObjectPoolPolicy
+        {
+            public override bool Return(DisposablePooledObject obj)
+            {
+                return false;
             }
         }
     }

@@ -112,9 +112,40 @@ namespace SharpAbp.Abp.FileStoring
             }
         }
 
+        [Fact]
+        public void Aws_Temporary_Credential_Clients_Should_Not_Be_Returned_To_Long_Lived_Pool()
+        {
+            var source = File.ReadAllText(GetProviderFile("Aws", "AwsFileProvider.cs"));
+
+            Assert.Contains("ShouldUseClientPool", source);
+            Assert.Contains("!awsConfiguration.UseTemporaryCredentials", source);
+            Assert.Contains("!awsConfiguration.UseTemporaryFederatedCredentials", source);
+            Assert.Contains("new AmazonS3ClientPolicy(ServiceScopeFactory, awsConfiguration).CreateAsync()", source);
+        }
+
+        [Fact]
+        public void Aliyun_STS_Clients_Should_Not_Be_Returned_To_Long_Lived_Pool()
+        {
+            var source = File.ReadAllText(GetProviderFile("Aliyun", "AliyunFileProvider.cs"));
+
+            Assert.Contains("ShouldUseClientPool", source);
+            Assert.Contains("!aliyunConfiguration.UseSecurityTokenService", source);
+            Assert.Contains("new AliyunOssClientPolicy(ServiceScopeFactory, aliyunConfiguration).Create()", source);
+        }
+
         private static IEnumerable<string> GetPooledProviderFiles(string pattern)
         {
             return GetProviderFiles(PooledProviderNames, pattern);
+        }
+
+        private static string GetProviderFile(string provider, string fileName)
+        {
+            var root = GetRepositoryRoot();
+            return Directory.GetFiles(
+                    Path.Combine(root, "framework", "src", $"SharpAbp.Abp.FileStoring.{provider}"),
+                    fileName,
+                    SearchOption.AllDirectories)
+                .Single();
         }
 
         private static IEnumerable<string> GetProviderFiles(IEnumerable<string> providers, string pattern)
