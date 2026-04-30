@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,6 +38,7 @@ namespace SharpAbp.Abp.ObjectPool
         {
             if (!Policy.Return(obj))
             {
+                DisposeItem(obj);
                 return;
             }
 
@@ -47,6 +49,21 @@ namespace SharpAbp.Abp.ObjectPool
             }
 
             Interlocked.Decrement(ref _retained);
+            DisposeItem(obj);
+        }
+
+        protected virtual void DisposeItem(T obj)
+        {
+            if (obj is IAsyncDisposable asyncDisposable)
+            {
+                asyncDisposable.DisposeAsync().AsTask().GetAwaiter().GetResult();
+                return;
+            }
+
+            if (obj is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
         }
     }
 }

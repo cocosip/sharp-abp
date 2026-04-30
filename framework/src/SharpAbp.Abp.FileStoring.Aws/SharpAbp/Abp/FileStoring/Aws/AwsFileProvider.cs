@@ -58,6 +58,24 @@ namespace SharpAbp.Abp.FileStoring.Aws
             return pool;
         }
 
+        protected virtual async Task<AmazonS3ClientLease> GetAmazonS3ClientAsync(AwsFileProviderConfiguration awsConfiguration)
+        {
+            if (ShouldUseClientPool(awsConfiguration))
+            {
+                var pool = GetAmazonS3Pool(awsConfiguration);
+                return new AmazonS3ClientLease(await pool.GetAsync(), pool);
+            }
+
+            var client = await new AmazonS3ClientPolicy(ServiceScopeFactory, awsConfiguration).CreateAsync();
+            return new AmazonS3ClientLease(client, null);
+        }
+
+        protected virtual bool ShouldUseClientPool(AwsFileProviderConfiguration awsConfiguration)
+        {
+            return !awsConfiguration.UseTemporaryCredentials &&
+                   !awsConfiguration.UseTemporaryFederatedCredentials;
+        }
+
 
         protected virtual string NormalizePoolName(AwsFileProviderConfiguration awsConfiguration)
         {
@@ -75,8 +93,8 @@ namespace SharpAbp.Abp.FileStoring.Aws
             var containerName = GetContainerName(args);
 
             var awsConfiguration = args.Configuration.GetAwsConfiguration();
-            var pool = GetAmazonS3Pool(awsConfiguration);
-            var amazonS3Client = await pool.GetAsync();
+            var lease = await GetAmazonS3ClientAsync(awsConfiguration);
+            var amazonS3Client = lease.Client;
 
             try
             {
@@ -104,7 +122,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             }
             finally
             {
-                pool.Return(amazonS3Client);
+                lease.Return();
             }
         }
 
@@ -114,8 +132,8 @@ namespace SharpAbp.Abp.FileStoring.Aws
             var containerName = GetContainerName(args);
 
             var awsConfiguration = args.Configuration.GetAwsConfiguration();
-            var pool = GetAmazonS3Pool(awsConfiguration);
-            var amazonS3Client = await pool.GetAsync();
+            var lease = await GetAmazonS3ClientAsync(awsConfiguration);
+            var amazonS3Client = lease.Client;
 
             try
             {
@@ -136,7 +154,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             }
             finally
             {
-                pool.Return(amazonS3Client);
+                lease.Return();
             }
         }
 
@@ -146,8 +164,8 @@ namespace SharpAbp.Abp.FileStoring.Aws
             var containerName = GetContainerName(args);
 
             var awsConfiguration = args.Configuration.GetAwsConfiguration();
-            var pool = GetAmazonS3Pool(awsConfiguration);
-            var amazonS3Client = await pool.GetAsync();
+            var lease = await GetAmazonS3ClientAsync(awsConfiguration);
+            var amazonS3Client = lease.Client;
 
             try
             {
@@ -156,7 +174,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             }
             finally
             {
-                pool.Return(amazonS3Client);
+                lease.Return();
             }
         }
 
@@ -166,8 +184,8 @@ namespace SharpAbp.Abp.FileStoring.Aws
             var containerName = GetContainerName(args);
 
             var awsConfiguration = args.Configuration.GetAwsConfiguration();
-            var pool = GetAmazonS3Pool(awsConfiguration);
-            var amazonS3Client = await pool.GetAsync();
+            var lease = await GetAmazonS3ClientAsync(awsConfiguration);
+            var amazonS3Client = lease.Client;
 
             try
             {
@@ -187,7 +205,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             }
             finally
             {
-                pool.Return(amazonS3Client);
+                lease.Return();
             }
         }
 
@@ -197,8 +215,8 @@ namespace SharpAbp.Abp.FileStoring.Aws
             var containerName = GetContainerName(args);
 
             var awsConfiguration = args.Configuration.GetAwsConfiguration();
-            var pool = GetAmazonS3Pool(awsConfiguration);
-            var amazonS3Client = await pool.GetAsync();
+            var lease = await GetAmazonS3ClientAsync(awsConfiguration);
+            var amazonS3Client = lease.Client;
 
             try
             {
@@ -219,7 +237,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             }
             finally
             {
-                pool.Return(amazonS3Client);
+                lease.Return();
             }
         }
 
@@ -234,8 +252,8 @@ namespace SharpAbp.Abp.FileStoring.Aws
             var containerName = GetContainerName(args);
 
             var awsConfiguration = args.Configuration.GetAwsConfiguration();
-            var pool = GetAmazonS3Pool(awsConfiguration);
-            var amazonS3Client = await pool.GetAsync();
+            var lease = await GetAmazonS3ClientAsync(awsConfiguration);
+            var amazonS3Client = lease.Client;
 
             try
             {
@@ -256,7 +274,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             }
             finally
             {
-                pool.Return(amazonS3Client);
+                lease.Return();
             }
         }
 
@@ -433,6 +451,33 @@ namespace SharpAbp.Abp.FileStoring.Aws
         }
 
  
+
+        protected class AmazonS3ClientLease
+        {
+            protected IAsyncObjectPool<IAmazonS3>? Pool { get; }
+
+            public IAmazonS3 Client { get; }
+
+            public AmazonS3ClientLease(IAmazonS3 client, IAsyncObjectPool<IAmazonS3>? pool)
+            {
+                Client = client;
+                Pool = pool;
+            }
+
+            public virtual void Return()
+            {
+                if (Pool != null)
+                {
+                    Pool.Return(Client);
+                    return;
+                }
+
+                if (Client is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+            }
+        }
 
     }
 }

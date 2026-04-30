@@ -57,6 +57,23 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             return pool;
         }
 
+        protected virtual OssClientLease GetOssClient(AliyunFileProviderConfiguration aliyunConfiguration)
+        {
+            if (ShouldUseClientPool(aliyunConfiguration))
+            {
+                var pool = GetOssClientPool(aliyunConfiguration);
+                return new OssClientLease(pool.Get(), pool);
+            }
+
+            var client = new AliyunOssClientPolicy(ServiceScopeFactory, aliyunConfiguration).Create();
+            return new OssClientLease(client, null);
+        }
+
+        protected virtual bool ShouldUseClientPool(AliyunFileProviderConfiguration aliyunConfiguration)
+        {
+            return !aliyunConfiguration.UseSecurityTokenService;
+        }
+
         protected virtual string NormalizePoolName(AliyunFileProviderConfiguration aliyunConfiguration)
         {
             var v = $"{aliyunConfiguration.Endpoint}-{aliyunConfiguration.AccessKeyId}-{aliyunConfiguration.AccessKeySecret}";
@@ -71,8 +88,8 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             var containerName = GetContainerName(args);
             var objectKey = AliyunFileNameCalculator.Calculate(args);
             var aliyunConfiguration = args.Configuration.GetAliyunConfiguration();
-            var pool = GetOssClientPool(aliyunConfiguration);
-            var ossClient = pool.Get();
+            var lease = GetOssClient(aliyunConfiguration);
+            var ossClient = lease.Client;
             try
             {
 
@@ -99,7 +116,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             }
             finally
             {
-                pool.Return(ossClient);
+                lease.Return();
             }
         }
 
@@ -109,8 +126,8 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             var objectKey = AliyunFileNameCalculator.Calculate(args);
 
             var aliyunConfiguration = args.Configuration.GetAliyunConfiguration();
-            var pool = GetOssClientPool(aliyunConfiguration);
-            var ossClient = pool.Get();
+            var lease = GetOssClient(aliyunConfiguration);
+            var ossClient = lease.Client;
             try
             {
 
@@ -124,7 +141,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             }
             finally
             {
-                pool.Return(ossClient);
+                lease.Return();
             }
         }
 
@@ -134,8 +151,8 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             var objectKey = AliyunFileNameCalculator.Calculate(args);
 
             var aliyunConfiguration = args.Configuration.GetAliyunConfiguration();
-            var pool = GetOssClientPool(aliyunConfiguration);
-            var ossClient = pool.Get();
+            var lease = GetOssClient(aliyunConfiguration);
+            var ossClient = lease.Client;
 
             try
             {
@@ -143,7 +160,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             }
             finally
             {
-                pool.Return(ossClient);
+                lease.Return();
             }
         }
 
@@ -153,8 +170,8 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             var objectKey = AliyunFileNameCalculator.Calculate(args);
 
             var aliyunConfiguration = args.Configuration.GetAliyunConfiguration();
-            var pool = GetOssClientPool(aliyunConfiguration);
-            var ossClient = pool.Get();
+            var lease = GetOssClient(aliyunConfiguration);
+            var ossClient = lease.Client;
 
             try
             {
@@ -169,7 +186,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             }
             finally
             {
-                pool.Return(ossClient);
+                lease.Return();
             }
         }
 
@@ -179,8 +196,8 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             var objectKey = AliyunFileNameCalculator.Calculate(args);
 
             var aliyunConfiguration = args.Configuration.GetAliyunConfiguration();
-            var pool = GetOssClientPool(aliyunConfiguration);
-            var ossClient = pool.Get();
+            var lease = GetOssClient(aliyunConfiguration);
+            var ossClient = lease.Client;
 
             try
             {
@@ -196,7 +213,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             }
             finally
             {
-                pool.Return(ossClient);
+                lease.Return();
             }
         }
 
@@ -211,8 +228,8 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             var objectKey = AliyunFileNameCalculator.Calculate(args);
 
             var aliyunConfiguration = args.Configuration.GetAliyunConfiguration();
-            var pool = GetOssClientPool(aliyunConfiguration);
-            var ossClient = pool.Get();
+            var lease = GetOssClient(aliyunConfiguration);
+            var ossClient = lease.Client;
 
             try
             {
@@ -229,7 +246,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             }
             finally
             {
-                pool.Return(ossClient);
+                lease.Return();
             }
         }
 
@@ -346,6 +363,33 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             }
         }
 
+
+        protected class OssClientLease
+        {
+            protected IObjectPool<IOss>? Pool { get; }
+
+            public IOss Client { get; }
+
+            public OssClientLease(IOss client, IObjectPool<IOss>? pool)
+            {
+                Client = client;
+                Pool = pool;
+            }
+
+            public virtual void Return()
+            {
+                if (Pool != null)
+                {
+                    Pool.Return(Client);
+                    return;
+                }
+
+                if (Client is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+            }
+        }
 
     }
 }
