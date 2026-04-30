@@ -76,6 +76,85 @@ namespace SharpAbp.Abp.FileStoring
         }
 
         [Fact]
+        public void Object_Pool_Non_Generic_Policy_Factory_Should_Run_Only_On_First_Creation()
+        {
+            var orchestrator = new PoolOrchestrator(new DefaultObjectPoolProvider());
+            var policyFactoryCallCount = 0;
+
+            var firstPool = orchestrator.GetPool<PooledObject>(
+                "non-generic-factory-first-use",
+                () =>
+                {
+                    policyFactoryCallCount++;
+                    return new TestPooledObjectPolicy();
+                });
+
+            var secondPool = orchestrator.GetPool<PooledObject>(
+                "non-generic-factory-first-use",
+                () =>
+                {
+                    policyFactoryCallCount++;
+                    return new AlternatePooledObjectPolicy();
+                });
+
+            Assert.Same(firstPool, secondPool);
+            Assert.Equal(1, policyFactoryCallCount);
+        }
+
+        [Fact]
+        public void Object_Pool_Abstraction_Non_Generic_Policy_Factory_Should_Run_Only_On_First_Creation()
+        {
+            var orchestrator = new PoolOrchestrator(new DefaultObjectPoolProvider());
+            var policyFactoryCallCount = 0;
+
+            var firstPool = orchestrator.GetObjectPool<PooledObject>(
+                "object-pool-non-generic-factory-first-use",
+                () =>
+                {
+                    policyFactoryCallCount++;
+                    return new TestObjectPoolPolicy();
+                });
+
+            var secondPool = orchestrator.GetObjectPool<PooledObject>(
+                "object-pool-non-generic-factory-first-use",
+                () =>
+                {
+                    policyFactoryCallCount++;
+                    return new AlternateObjectPoolPolicy();
+                });
+
+            Assert.NotSame(firstPool, secondPool);
+            Assert.Equal(1, policyFactoryCallCount);
+        }
+
+        [Fact]
+        public async Task Async_Object_Pool_Non_Generic_Policy_Factory_Should_Run_Only_On_First_Creation()
+        {
+            var orchestrator = new PoolOrchestrator(new DefaultObjectPoolProvider());
+            var policyFactoryCallCount = 0;
+
+            var firstPool = orchestrator.GetAsyncObjectPool<PooledObject>(
+                "async-pool-non-generic-factory-first-use",
+                () =>
+                {
+                    policyFactoryCallCount++;
+                    return new TestAsyncObjectPoolPolicy();
+                });
+
+            var secondPool = orchestrator.GetAsyncObjectPool<PooledObject>(
+                "async-pool-non-generic-factory-first-use",
+                () =>
+                {
+                    policyFactoryCallCount++;
+                    return new AlternateAsyncObjectPoolPolicy();
+                });
+
+            Assert.Same(firstPool, secondPool);
+            Assert.NotNull(await secondPool.GetAsync());
+            Assert.Equal(1, policyFactoryCallCount);
+        }
+
+        [Fact]
         public async Task Async_Object_Pool_Should_Dispose_Rejected_Items()
         {
             var pool = new AsyncObjectPool<DisposablePooledObject>(
@@ -102,19 +181,19 @@ namespace SharpAbp.Abp.FileStoring
         }
 
         [Fact]
-        public void Object_Pool_Factory_Should_Reject_Different_Concrete_Policy_For_Existing_Pool()
+        public void Object_Pool_Should_Reject_Different_Concrete_Policy_For_Existing_Pool()
         {
             var orchestrator = new PoolOrchestrator(new DefaultObjectPoolProvider());
 
             orchestrator.GetPool<PooledObject>(
                 "same-name-different-policy",
-                () => new TestPooledObjectPolicy());
+                new TestPooledObjectPolicy());
 
             Assert.Throws<InvalidOperationException>(() =>
             {
                 orchestrator.GetPool<PooledObject>(
                     "same-name-different-policy",
-                    () => new AlternatePooledObjectPolicy());
+                    new AlternatePooledObjectPolicy());
             });
         }
 
@@ -174,6 +253,10 @@ namespace SharpAbp.Abp.FileStoring
             }
         }
 
+        private class AlternateObjectPoolPolicy : TestObjectPoolPolicy
+        {
+        }
+
         private class TestPooledObjectPolicy : IPooledObjectPolicy<PooledObject>
         {
             public PooledObject Create()
@@ -202,6 +285,10 @@ namespace SharpAbp.Abp.FileStoring
             {
                 return obj != null;
             }
+        }
+
+        private class AlternateAsyncObjectPoolPolicy : TestAsyncObjectPoolPolicy
+        {
         }
 
         private class DisposableAsyncObjectPoolPolicy : IAsyncObjectPoolPolicy<DisposablePooledObject>

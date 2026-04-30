@@ -148,7 +148,7 @@ namespace SharpAbp.Abp.ObjectPool
         /// </summary>
         /// <typeparam name="T">The type of objects in the pool.</typeparam>
         /// <param name="poolName">The name of the pool.</param>
-        /// <param name="policyFactory">The factory to create the policy for this request.</param>
+        /// <param name="policyFactory">The factory to create the policy only when the pool is first created.</param>
         /// <param name="maxSize">The maximum size of the pool.</param>
         /// <returns>The object pool.</returns>
         /// <exception cref="InvalidOperationException">Thrown when attempting to get a pool with different parameters than previously used.</exception>
@@ -157,10 +157,7 @@ namespace SharpAbp.Abp.ObjectPool
             Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
             Check.NotNull(policyFactory, nameof(policyFactory));
 
-            var policy = policyFactory();
-            Check.NotNull(policy, nameof(policyFactory));
-
-            return GetPool(poolName, policy, maxSize);
+            return GetPool(poolName, policyFactory, typeof(IPooledObjectPolicy<T>), maxSize);
         }
 
         /// <summary>
@@ -206,7 +203,7 @@ namespace SharpAbp.Abp.ObjectPool
         /// </summary>
         /// <typeparam name="T">The type of objects in the pool.</typeparam>
         /// <param name="poolName">The name of the pool.</param>
-        /// <param name="policyFactory">The factory to create the policy for this request.</param>
+        /// <param name="policyFactory">The factory to create the policy only when the pool is first created.</param>
         /// <param name="maxSize">The maximum size of the pool.</param>
         /// <returns>The object pool.</returns>
         /// <exception cref="InvalidOperationException">Thrown when attempting to get a pool with different parameters than previously used.</exception>
@@ -215,10 +212,7 @@ namespace SharpAbp.Abp.ObjectPool
             Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
             Check.NotNull(policyFactory, nameof(policyFactory));
 
-            var policy = policyFactory();
-            Check.NotNull(policy, nameof(policyFactory));
-
-            return GetObjectPool(poolName, policy, maxSize);
+            return GetObjectPool<T>(poolName, policyFactory, typeof(IObjectPoolPolicy<T>), maxSize);
         }
 
         /// <summary>
@@ -263,7 +257,7 @@ namespace SharpAbp.Abp.ObjectPool
         /// </summary>
         /// <typeparam name="T">The type of objects in the pool.</typeparam>
         /// <param name="poolName">The name of the pool.</param>
-        /// <param name="policyFactory">The factory to create the policy for this request.</param>
+        /// <param name="policyFactory">The factory to create the policy only when the pool is first created.</param>
         /// <param name="maxSize">The maximum size of the pool.</param>
         /// <returns>The async object pool.</returns>
         /// <exception cref="InvalidOperationException">Thrown when attempting to get a pool with different parameters than previously used.</exception>
@@ -272,10 +266,7 @@ namespace SharpAbp.Abp.ObjectPool
             Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
             Check.NotNull(policyFactory, nameof(policyFactory));
 
-            var policy = policyFactory();
-            Check.NotNull(policy, nameof(policyFactory));
-
-            return GetAsyncObjectPool(poolName, policy, maxSize);
+            return GetAsyncObjectPool<T>(poolName, policyFactory, typeof(IAsyncObjectPoolPolicy<T>), maxSize);
         }
 
         /// <summary>
