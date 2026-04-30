@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Model;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.ObjectPool;
@@ -21,7 +22,7 @@ namespace SharpAbp.Abp.FileStoring.S3
     public class S3FileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }
-        protected IS3ClientFactory S3ClientFactory { get; }
+        protected IServiceScopeFactory ServiceScopeFactory { get; }
         protected AbpFileStoringAbstractionsOptions Options { get; }
         protected IClock Clock { get; }
         protected IPoolOrchestrator PoolOrchestrator { get; }
@@ -30,7 +31,7 @@ namespace SharpAbp.Abp.FileStoring.S3
 
         public S3FileProvider(
             ILogger<S3FileProvider> logger,
-            IS3ClientFactory s3ClientFactory,
+            IServiceScopeFactory serviceScopeFactory,
             IOptions<AbpFileStoringAbstractionsOptions> options,
             IClock clock,
             IPoolOrchestrator poolOrchestrator,
@@ -38,7 +39,7 @@ namespace SharpAbp.Abp.FileStoring.S3
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
             Logger = logger;
-            S3ClientFactory = s3ClientFactory;
+            ServiceScopeFactory = serviceScopeFactory;
             Options = options.Value;
             Clock = clock;
             PoolOrchestrator = poolOrchestrator;
@@ -53,7 +54,7 @@ namespace SharpAbp.Abp.FileStoring.S3
             var poolName = NormalizePoolName(s3Configuration);
             var pool = PoolOrchestrator.GetObjectPool<IAmazonS3, S3ClientPolicy>(
                 poolName,
-                () => new S3ClientPolicy(S3ClientFactory, s3Configuration),
+                () => new S3ClientPolicy(ServiceScopeFactory, s3Configuration),
                 Options.DefaultClientMaximumRetained);
             return pool;
         }

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using KS3;
 using KS3.Model;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.ObjectPool;
@@ -21,7 +22,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
     public class KS3FileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }
-        protected IKS3ClientFactory KS3ClientFactory { get; }
+        protected IServiceScopeFactory ServiceScopeFactory { get; }
         protected AbpFileStoringAbstractionsOptions Options { get; }
         protected IClock Clock { get; }
         protected IPoolOrchestrator PoolOrchestrator { get; }
@@ -30,7 +31,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
 
         public KS3FileProvider(
             ILogger<KS3FileProvider> logger,
-            IKS3ClientFactory kS3ClientFactory,
+            IServiceScopeFactory serviceScopeFactory,
             IOptions<AbpFileStoringAbstractionsOptions> options,
             IClock clock,
             IPoolOrchestrator poolOrchestrator,
@@ -38,7 +39,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
             Logger = logger;
-            KS3ClientFactory = kS3ClientFactory;
+            ServiceScopeFactory = serviceScopeFactory;
             Options = options.Value;
             Clock = clock;
             PoolOrchestrator = poolOrchestrator;
@@ -54,7 +55,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
             var poolName = NormalizePoolName(ks3Configuration);
             var pool = PoolOrchestrator.GetObjectPool<IKS3, KS3ClientPolicy>(
                 poolName,
-                () => new KS3ClientPolicy(KS3ClientFactory, ks3Configuration),
+                () => new KS3ClientPolicy(ServiceScopeFactory, ks3Configuration),
                 Options.DefaultClientMaximumRetained);
             return pool;
         }

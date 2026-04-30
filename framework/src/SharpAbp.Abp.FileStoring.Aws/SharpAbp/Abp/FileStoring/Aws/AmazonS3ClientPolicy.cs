@@ -1,28 +1,28 @@
 using Amazon.S3;
+using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.ObjectPool;
-using Volo.Abp.Threading;
+using System.Threading.Tasks;
 
 namespace SharpAbp.Abp.FileStoring.Aws
 {
-    public class AmazonS3ClientPolicy : IObjectPoolPolicy<IAmazonS3>
+    public class AmazonS3ClientPolicy : IAsyncObjectPoolPolicy<IAmazonS3>
     {
-        protected IAmazonS3ClientFactory AmazonS3ClientFactory { get; }
+        protected IServiceScopeFactory ServiceScopeFactory { get; }
         protected AwsFileProviderConfiguration AwsFileProviderConfiguration { get; }
 
         public AmazonS3ClientPolicy(
-            IAmazonS3ClientFactory amazonS3ClientFactory,
+            IServiceScopeFactory serviceScopeFactory,
             AwsFileProviderConfiguration awsFileProviderConfiguration)
         {
-            AmazonS3ClientFactory = amazonS3ClientFactory;
+            ServiceScopeFactory = serviceScopeFactory;
             AwsFileProviderConfiguration = awsFileProviderConfiguration;
         }
 
-        public IAmazonS3 Create()
+        public async ValueTask<IAmazonS3> CreateAsync()
         {
-            return AsyncHelper.RunSync(() =>
-            {
-                return AmazonS3ClientFactory.GetAmazonS3Client(AwsFileProviderConfiguration);
-            });
+            using var scope = ServiceScopeFactory.CreateScope();
+            var amazonS3ClientFactory = scope.ServiceProvider.GetRequiredService<IAmazonS3ClientFactory>();
+            return await amazonS3ClientFactory.GetAmazonS3Client(AwsFileProviderConfiguration);
         }
 
         public bool Return(IAmazonS3 obj)

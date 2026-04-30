@@ -1,24 +1,27 @@
 using Aliyun.OSS;
+using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.ObjectPool;
 
 namespace SharpAbp.Abp.FileStoring.Aliyun
 {
     public class AliyunOssClientPolicy : IObjectPoolPolicy<IOss>
     {
-        protected IOssClientFactory OssClientFactory { get; }
+        protected IServiceScopeFactory ServiceScopeFactory { get; }
         protected AliyunFileProviderConfiguration AliyunFileProviderConfiguration { get; }
 
         public AliyunOssClientPolicy(
-            IOssClientFactory ossClientFactory,
+            IServiceScopeFactory serviceScopeFactory,
             AliyunFileProviderConfiguration aliyunFileProviderConfiguration)
         {
-            OssClientFactory = ossClientFactory;
+            ServiceScopeFactory = serviceScopeFactory;
             AliyunFileProviderConfiguration = aliyunFileProviderConfiguration;
         }
 
         public IOss Create()
         {
-            return OssClientFactory.Create(AliyunFileProviderConfiguration);
+            using var scope = ServiceScopeFactory.CreateScope();
+            var ossClientFactory = scope.ServiceProvider.GetRequiredService<IOssClientFactory>();
+            return ossClientFactory.Create(AliyunFileProviderConfiguration);
         }
 
         public bool Return(IOss obj)

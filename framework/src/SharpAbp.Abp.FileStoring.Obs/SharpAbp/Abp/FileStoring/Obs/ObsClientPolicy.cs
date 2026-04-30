@@ -1,24 +1,27 @@
 using OBS;
+using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.ObjectPool;
 
 namespace SharpAbp.Abp.FileStoring.Obs
 {
     public class ObsClientPolicy : IObjectPoolPolicy<ObsClient>
     {
-        protected IObsClientFactory ObsClientFactory { get; }
+        protected IServiceScopeFactory ServiceScopeFactory { get; }
         protected ObsFileProviderConfiguration ObsFileProviderConfiguration { get; }
 
         public ObsClientPolicy(
-            IObsClientFactory obsClientFactory,
+            IServiceScopeFactory serviceScopeFactory,
             ObsFileProviderConfiguration obsFileProviderConfiguration)
         {
-            ObsClientFactory = obsClientFactory;
+            ServiceScopeFactory = serviceScopeFactory;
             ObsFileProviderConfiguration = obsFileProviderConfiguration;
         }
 
         public ObsClient Create()
         {
-            return ObsClientFactory.Create(ObsFileProviderConfiguration);
+            using var scope = ServiceScopeFactory.CreateScope();
+            var obsClientFactory = scope.ServiceProvider.GetRequiredService<IObsClientFactory>();
+            return obsClientFactory.Create(ObsFileProviderConfiguration);
         }
 
         public bool Return(ObsClient obj)

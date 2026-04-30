@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\SharpAbp.Abp.FileStoring\SharpAbp.Abp.FileStoring.csproj" />
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.ObjectPool\SharpAbp.Abp.ObjectPool.csproj" />
   </ItemGroup>
 
 </Project>

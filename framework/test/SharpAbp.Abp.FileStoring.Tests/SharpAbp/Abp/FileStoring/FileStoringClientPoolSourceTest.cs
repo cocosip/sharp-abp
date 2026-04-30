@@ -19,6 +19,15 @@ namespace SharpAbp.Abp.FileStoring
             "S3"
         };
 
+        private static readonly string[] FactoryProviderNames =
+        {
+            "Aliyun",
+            "Aws",
+            "KS3",
+            "Obs",
+            "S3"
+        };
+
         private static readonly string[] AllProviderNames =
         {
             "Aliyun",
@@ -33,15 +42,26 @@ namespace SharpAbp.Abp.FileStoring
         };
 
         [Fact]
-        public void Client_Policies_Should_Not_Capture_ServiceProvider_Or_Create_Scopes()
+        public void Client_Policies_Should_Not_Capture_ServiceProvider()
         {
             foreach (var file in GetPooledProviderFiles("*ClientPolicy.cs"))
             {
                 var source = File.ReadAllText(file);
 
                 Assert.DoesNotContain("IServiceProvider", source);
-                Assert.DoesNotContain("CreateScope", source);
-                Assert.DoesNotContain("GetRequiredService", source);
+            }
+        }
+
+        [Fact]
+        public void Factory_Based_Client_Policies_Should_Not_Capture_Client_Factory_Instances()
+        {
+            foreach (var file in GetProviderFiles(FactoryProviderNames, "*ClientPolicy.cs"))
+            {
+                var source = File.ReadAllText(file);
+
+                Assert.Contains("IServiceScopeFactory", source);
+                Assert.DoesNotContain("ClientFactory { get; }", source);
+                Assert.DoesNotContain("AsyncHelper.RunSync", source);
             }
         }
 
@@ -61,7 +81,7 @@ namespace SharpAbp.Abp.FileStoring
         [Fact]
         public void File_Storing_Providers_Should_Not_Use_ServiceProvider_Based_Pool_Creation()
         {
-            foreach (var file in GetProviderFiles(AllProviderNames, "*.cs"))
+            foreach (var file in GetProviderFiles(AllProviderNames, "*FileProvider.cs"))
             {
                 var source = File.ReadAllText(file);
 

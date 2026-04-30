@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Util;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.ObjectPool;
@@ -23,7 +24,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
         public override string Provider => AwsFileProviderConfigurationNames.ProviderName;
 
         protected ILogger Logger { get; }
-        protected IAmazonS3ClientFactory AmazonS3ClientFactory { get; }
+        protected IServiceScopeFactory ServiceScopeFactory { get; }
         protected AbpFileStoringAbstractionsOptions Options { get; }
         protected IClock Clock { get; }
         protected IPoolOrchestrator PoolOrchestrator { get; }
@@ -31,7 +32,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
         protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
         public AwsFileProvider(
             ILogger<AwsFileProvider> logger,
-            IAmazonS3ClientFactory amazonS3ClientFactory,
+            IServiceScopeFactory serviceScopeFactory,
             IOptions<AbpFileStoringAbstractionsOptions> options,
             IClock clock,
             IPoolOrchestrator poolOrchestrator,
@@ -39,7 +40,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
             Logger = logger;
-            AmazonS3ClientFactory = amazonS3ClientFactory;
+            ServiceScopeFactory = serviceScopeFactory;
             Options = options.Value;
             Clock = clock;
             PoolOrchestrator = poolOrchestrator;
@@ -47,12 +48,12 @@ namespace SharpAbp.Abp.FileStoring.Aws
             FileNormalizeNamingService = fileNormalizeNamingService;
         }
 
-        protected virtual IObjectPool<IAmazonS3> GetAmazonS3Pool(AwsFileProviderConfiguration awsConfiguration)
+        protected virtual IAsyncObjectPool<IAmazonS3> GetAmazonS3Pool(AwsFileProviderConfiguration awsConfiguration)
         {
             var poolName = NormalizePoolName(awsConfiguration);
-            var pool = PoolOrchestrator.GetObjectPool<IAmazonS3, AmazonS3ClientPolicy>(
+            var pool = PoolOrchestrator.GetAsyncObjectPool<IAmazonS3, AmazonS3ClientPolicy>(
                 poolName,
-                () => new AmazonS3ClientPolicy(AmazonS3ClientFactory, awsConfiguration),
+                () => new AmazonS3ClientPolicy(ServiceScopeFactory, awsConfiguration),
                 Options.DefaultClientMaximumRetained);
             return pool;
         }
@@ -75,7 +76,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
 
             var awsConfiguration = args.Configuration.GetAwsConfiguration();
             var pool = GetAmazonS3Pool(awsConfiguration);
-            var amazonS3Client = pool.Get();
+            var amazonS3Client = await pool.GetAsync();
 
             try
             {
@@ -114,7 +115,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
 
             var awsConfiguration = args.Configuration.GetAwsConfiguration();
             var pool = GetAmazonS3Pool(awsConfiguration);
-            var amazonS3Client = pool.Get();
+            var amazonS3Client = await pool.GetAsync();
 
             try
             {
@@ -146,7 +147,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
 
             var awsConfiguration = args.Configuration.GetAwsConfiguration();
             var pool = GetAmazonS3Pool(awsConfiguration);
-            var amazonS3Client = pool.Get();
+            var amazonS3Client = await pool.GetAsync();
 
             try
             {
@@ -166,7 +167,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
 
             var awsConfiguration = args.Configuration.GetAwsConfiguration();
             var pool = GetAmazonS3Pool(awsConfiguration);
-            var amazonS3Client = pool.Get();
+            var amazonS3Client = await pool.GetAsync();
 
             try
             {
@@ -197,7 +198,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
 
             var awsConfiguration = args.Configuration.GetAwsConfiguration();
             var pool = GetAmazonS3Pool(awsConfiguration);
-            var amazonS3Client = pool.Get();
+            var amazonS3Client = await pool.GetAsync();
 
             try
             {
@@ -234,7 +235,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
 
             var awsConfiguration = args.Configuration.GetAwsConfiguration();
             var pool = GetAmazonS3Pool(awsConfiguration);
-            var amazonS3Client = pool.Get();
+            var amazonS3Client = await pool.GetAsync();
 
             try
             {
