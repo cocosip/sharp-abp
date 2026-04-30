@@ -290,7 +290,8 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             {
                 // Calculate the total number of shards
                 var partSize = args.Configuration.MultiPartUploadShardingSize;
-                var fileSize = args.FileStream!.Length;
+                var initialPosition = args.FileStream!.CanSeek ? args.FileStream.Position : 0;
+                var fileSize = args.FileStream.Length - initialPosition;
                 var partCount = fileSize / partSize;
                 if (fileSize % partSize != 0)
                 {
@@ -305,12 +306,19 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
                 for (var i = 0; i < partCount; i++)
                 {
                     var skipBytes = (long)partSize * i;
-                    args.FileStream.Seek(skipBytes, 0);
+                    if (args.FileStream.CanSeek)
+                    {
+                        args.FileStream.Seek(initialPosition + skipBytes, SeekOrigin.Begin);
+                    }
 
                     // Calculate the size of the shard to be uploaded this time. The last shard is the remaining data size.
-                    var size = (partSize < fileSize - skipBytes) ? partSize : (fileSize - skipBytes);
+                    var size = (int)((partSize < fileSize - skipBytes) ? partSize : (fileSize - skipBytes));
                     var buffer = new byte[size];
-                    await args.FileStream.ReadAsync(buffer, 0, buffer.Length, args.CancellationToken);
+                    var bytesRead = await ReadToBufferAsync(args.FileStream, buffer, size, args.CancellationToken);
+                    if (bytesRead != size)
+                    {
+                        throw new EndOfStreamException($"Unable to read multipart segment {i + 1} for file '{args.FileId}'. Expected {size} bytes, read {bytesRead} bytes.");
+                    }
 
                     using var partStream = new MemoryStream(buffer);
                     var request = new UploadPartRequest(containerName, objectKey, uploadId)
