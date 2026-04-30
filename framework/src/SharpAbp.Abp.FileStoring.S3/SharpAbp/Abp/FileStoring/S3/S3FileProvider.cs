@@ -9,9 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Model;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.ObjectPool;
 using Volo.Abp.DependencyInjection;
@@ -23,7 +21,7 @@ namespace SharpAbp.Abp.FileStoring.S3
     public class S3FileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }
-        protected IServiceProvider ServiceProvider { get; }
+        protected IS3ClientFactory S3ClientFactory { get; }
         protected AbpFileStoringAbstractionsOptions Options { get; }
         protected IClock Clock { get; }
         protected IPoolOrchestrator PoolOrchestrator { get; }
@@ -32,7 +30,7 @@ namespace SharpAbp.Abp.FileStoring.S3
 
         public S3FileProvider(
             ILogger<S3FileProvider> logger,
-            IServiceProvider serviceProvider,
+            IS3ClientFactory s3ClientFactory,
             IOptions<AbpFileStoringAbstractionsOptions> options,
             IClock clock,
             IPoolOrchestrator poolOrchestrator,
@@ -40,7 +38,7 @@ namespace SharpAbp.Abp.FileStoring.S3
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
             Logger = logger;
-            ServiceProvider = serviceProvider;
+            S3ClientFactory = s3ClientFactory;
             Options = options.Value;
             Clock = clock;
             PoolOrchestrator = poolOrchestrator;
@@ -50,11 +48,13 @@ namespace SharpAbp.Abp.FileStoring.S3
 
         public override string Provider => S3FileProviderConfigurationNames.ProviderName;
 
-        protected virtual ObjectPool<IAmazonS3> GetS3ClientPool(S3FileProviderConfiguration s3Configuration)
+        protected virtual IObjectPool<IAmazonS3> GetS3ClientPool(S3FileProviderConfiguration s3Configuration)
         {
             var poolName = NormalizePoolName(s3Configuration);
-            var aliyunOssClientPolicy = ActivatorUtilities.CreateInstance<S3ClientPolicy>(ServiceProvider, s3Configuration);
-            var pool = PoolOrchestrator.GetPool(poolName, aliyunOssClientPolicy, Options.DefaultClientMaximumRetained);
+            var pool = PoolOrchestrator.GetObjectPool<IAmazonS3, S3ClientPolicy>(
+                poolName,
+                () => new S3ClientPolicy(S3ClientFactory, s3Configuration),
+                Options.DefaultClientMaximumRetained);
             return pool;
         }
 

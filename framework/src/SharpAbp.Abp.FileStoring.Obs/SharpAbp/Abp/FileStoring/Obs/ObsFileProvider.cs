@@ -5,9 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 using OBS;
 using OBS.Model;
@@ -21,7 +19,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
     public class ObsFileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }
-        protected IServiceProvider ServiceProvider { get; }
+        protected IObsClientFactory ObsClientFactory { get; }
         protected AbpFileStoringAbstractionsOptions Options { get; }
         protected IClock Clock { get; }
         protected IPoolOrchestrator PoolOrchestrator { get; }
@@ -30,7 +28,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
 
         public ObsFileProvider(
             ILogger<ObsFileProvider> logger,
-            IServiceProvider serviceProvider,
+            IObsClientFactory obsClientFactory,
             IOptions<AbpFileStoringAbstractionsOptions> options,
             IClock clock,
             IPoolOrchestrator poolOrchestrator,
@@ -38,7 +36,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
             Logger = logger;
-            ServiceProvider = serviceProvider;
+            ObsClientFactory = obsClientFactory;
             Options = options.Value;
 
             Clock = clock;
@@ -50,11 +48,13 @@ namespace SharpAbp.Abp.FileStoring.Obs
         public override string Provider => ObsFileProviderConfigurationNames.ProviderName;
 
 
-        protected virtual ObjectPool<ObsClient> GetObsClientPool(ObsFileProviderConfiguration obsConfiguration)
+        protected virtual IObjectPool<ObsClient> GetObsClientPool(ObsFileProviderConfiguration obsConfiguration)
         {
             var poolName = NormalizePoolName(obsConfiguration);
-            var obsClientPolicy = ActivatorUtilities.CreateInstance<ObsClientPolicy>(ServiceProvider, obsConfiguration);
-            var pool = PoolOrchestrator.GetPool(poolName, obsClientPolicy, Options.DefaultClientMaximumRetained);
+            var pool = PoolOrchestrator.GetObjectPool<ObsClient, ObsClientPolicy>(
+                poolName,
+                () => new ObsClientPolicy(ObsClientFactory, obsConfiguration),
+                Options.DefaultClientMaximumRetained);
             return pool;
         }
 

@@ -6,9 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Aliyun.OSS;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.ObjectPool;
 using Volo.Abp.DependencyInjection;
@@ -20,7 +18,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
     public class AliyunFileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }
-        protected IServiceProvider ServiceProvider { get; }
+        protected IOssClientFactory OssClientFactory { get; }
         protected AbpFileStoringAbstractionsOptions Options { get; }
         protected IClock Clock { get; }
         protected IPoolOrchestrator PoolOrchestrator { get; }
@@ -29,7 +27,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
 
         public AliyunFileProvider(
             ILogger<AliyunFileProvider> logger,
-            IServiceProvider serviceProvider,
+            IOssClientFactory ossClientFactory,
             IOptions<AbpFileStoringAbstractionsOptions> options,
             IClock clock,
             IPoolOrchestrator poolOrchestrator,
@@ -37,7 +35,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
             Logger = logger;
-            ServiceProvider = serviceProvider;
+            OssClientFactory = ossClientFactory;
             Options = options.Value;
             Clock = clock;
             PoolOrchestrator = poolOrchestrator;
@@ -48,11 +46,13 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
         public override string Provider => AliyunFileProviderConfigurationNames.ProviderName;
 
 
-        protected virtual ObjectPool<IOss> GetOssClientPool(AliyunFileProviderConfiguration aliyunConfiguration)
+        protected virtual IObjectPool<IOss> GetOssClientPool(AliyunFileProviderConfiguration aliyunConfiguration)
         {
             var poolName = NormalizePoolName(aliyunConfiguration);
-            var aliyunOssClientPolicy = ActivatorUtilities.CreateInstance<AliyunOssClientPolicy>(ServiceProvider, aliyunConfiguration);
-            var pool = PoolOrchestrator.GetPool(poolName, aliyunOssClientPolicy, Options.DefaultClientMaximumRetained);
+            var pool = PoolOrchestrator.GetObjectPool<IOss, AliyunOssClientPolicy>(
+                poolName,
+                () => new AliyunOssClientPolicy(OssClientFactory, aliyunConfiguration),
+                Options.DefaultClientMaximumRetained);
             return pool;
         }
 

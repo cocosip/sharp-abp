@@ -1,8 +1,13 @@
-﻿using Azure.Storage.Blobs;
-using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using SharpAbp.Abp.ObjectPool;
 using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.FileStoring.Azure
@@ -11,14 +16,21 @@ namespace SharpAbp.Abp.FileStoring.Azure
     public class AzureFileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }
+        protected AbpFileStoringAbstractionsOptions Options { get; }
+        protected IPoolOrchestrator PoolOrchestrator { get; }
         protected IAzureFileNameCalculator AzureFileNameCalculator { get; }
         protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
+
         public AzureFileProvider(
             ILogger<AzureFileProvider> logger,
+            IOptions<AbpFileStoringAbstractionsOptions> options,
+            IPoolOrchestrator poolOrchestrator,
             IAzureFileNameCalculator azureFileNameCalculator,
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
             Logger = logger;
+            Options = options.Value;
+            PoolOrchestrator = poolOrchestrator;
             AzureFileNameCalculator = azureFileNameCalculator;
             FileNormalizeNamingService = fileNormalizeNamingService;
         }
@@ -82,7 +94,6 @@ namespace SharpAbp.Abp.FileStoring.Azure
             return await TryCopyToMemoryStreamAsync(content, args.CancellationToken);
         }
 
-
         public override async Task<bool> DownloadAsync(FileProviderDownloadArgs args)
         {
             var fileName = AzureFileNameCalculator.Calculate(args);
@@ -109,9 +120,31 @@ namespace SharpAbp.Abp.FileStoring.Azure
 
         protected virtual BlobContainerClient GetBlobContainerClient(FileProviderArgs args)
         {
+            var pool = GetBlobContainerClientPool(args);
+            var blobContainerClient = pool.Get();
+            pool.Return(blobContainerClient);
+            return blobContainerClient;
+        }
+
+        protected virtual IObjectPool<BlobContainerClient> GetBlobContainerClientPool(FileProviderArgs args)
+        {
             var configuration = args.Configuration.GetAzureConfiguration();
-            var blobServiceClient = new BlobServiceClient(configuration.ConnectionString);
-            return blobServiceClient.GetBlobContainerClient(GetContainerName(args));
+            var containerName = GetContainerName(args);
+            var poolName = NormalizePoolName(configuration.ConnectionString, containerName);
+
+            return PoolOrchestrator.GetObjectPool<BlobContainerClient, AzureBlobContainerClientPolicy>(
+                poolName,
+                () => new AzureBlobContainerClientPolicy(configuration.ConnectionString, containerName),
+                Options.DefaultClientMaximumRetained);
+        }
+
+        protected virtual string NormalizePoolName(string connectionString, string containerName)
+        {
+            var v = $"{connectionString}-{containerName}";
+            using var sha1 = SHA1.Create();
+            var hashBuffer = sha1.ComputeHash(Encoding.UTF8.GetBytes(v));
+            var hash = hashBuffer.Aggregate("", (current, b) => current + b.ToString("X2"));
+            return $"FileStoring-{AzureFileProviderConfigurationNames.ProviderName}-{hash}";
         }
 
         protected virtual async Task CreateContainerIfNotExists(FileProviderArgs args)
@@ -122,7 +155,6 @@ namespace SharpAbp.Abp.FileStoring.Azure
 
         private async Task<bool> FileExistsAsync(FileProviderArgs args, string fileName)
         {
-            // Make sure Blob Container exists.
             return await ContainerExistsAsync(GetBlobContainerClient(args)) &&
                    (await GetBlobClient(args, fileName).ExistsAsync()).Value;
         }
@@ -139,7 +171,5 @@ namespace SharpAbp.Abp.FileStoring.Azure
         {
             return (await blobContainerClient.ExistsAsync()).Value;
         }
-
-
     }
 }

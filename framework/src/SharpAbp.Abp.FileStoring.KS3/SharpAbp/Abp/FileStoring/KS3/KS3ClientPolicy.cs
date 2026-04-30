@@ -1,28 +1,24 @@
-﻿using System;
 using KS3;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.ObjectPool;
+using SharpAbp.Abp.ObjectPool;
 
 namespace SharpAbp.Abp.FileStoring.KS3
 {
-    public class KS3ClientPolicy : IPooledObjectPolicy<IKS3>
+    public class KS3ClientPolicy : IObjectPoolPolicy<IKS3>
     {
-
-        protected IServiceProvider ServiceProvider { get; }
+        protected IKS3ClientFactory KS3ClientFactory { get; }
         protected KS3FileProviderConfiguration KS3FileProviderConfiguration { get; }
+
         public KS3ClientPolicy(
-            IServiceProvider serviceProvider,
+            IKS3ClientFactory kS3ClientFactory,
             KS3FileProviderConfiguration kS3FileProviderConfiguration)
         {
-            ServiceProvider = serviceProvider;
+            KS3ClientFactory = kS3ClientFactory;
             KS3FileProviderConfiguration = kS3FileProviderConfiguration;
         }
 
         public IKS3 Create()
         {
-            using var scope = ServiceProvider.CreateScope();
-            var ks3ClientFactory = scope.ServiceProvider.GetRequiredService<IKS3ClientFactory>();
-            return ks3ClientFactory.Create(KS3FileProviderConfiguration);
+            return KS3ClientFactory.Create(KS3FileProviderConfiguration);
         }
 
         public bool Return(IKS3 obj)
