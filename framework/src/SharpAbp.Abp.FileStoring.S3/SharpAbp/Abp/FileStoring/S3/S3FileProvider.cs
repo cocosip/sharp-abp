@@ -61,7 +61,7 @@ namespace SharpAbp.Abp.FileStoring.S3
 
         protected virtual string NormalizePoolName(S3FileProviderConfiguration s3Configuration)
         {
-            var v = $"{s3Configuration.ServerUrl.TrimEnd('/')}-{s3Configuration.AccessKeyId}-{s3Configuration.SecretAccessKey}";
+            var v = $"{s3Configuration.ServerUrl.TrimEnd('/')}-{s3Configuration.SignatureVersion}-{s3Configuration.ForcePathStyle}-{s3Configuration.AccessKeyId}-{s3Configuration.SecretAccessKey}";
             using var sha1 = SHA1.Create();
             var hashBuffer = sha1.ComputeHash(Encoding.UTF8.GetBytes(v));
             var hash = hashBuffer.Aggregate("", (current, b) => current + b.ToString("X2"));

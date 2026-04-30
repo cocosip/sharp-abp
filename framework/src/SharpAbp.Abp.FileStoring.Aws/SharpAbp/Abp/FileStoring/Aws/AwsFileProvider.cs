@@ -79,7 +79,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
 
         protected virtual string NormalizePoolName(AwsFileProviderConfiguration awsConfiguration)
         {
-            var v = $"{awsConfiguration.Region}-{awsConfiguration.AccessKeyId}-{awsConfiguration.SecretAccessKey}";
+            var v = $"{awsConfiguration.Region}-{awsConfiguration.UseCredentials}-{awsConfiguration.ProfileName}-{awsConfiguration.ProfilesLocation}-{awsConfiguration.AccessKeyId}-{awsConfiguration.SecretAccessKey}";
             using var sha1 = SHA1.Create();
             var hashBuffer = sha1.ComputeHash(Encoding.UTF8.GetBytes(v));
             var hash = hashBuffer.Aggregate("", (current, b) => current + b.ToString("X2"));

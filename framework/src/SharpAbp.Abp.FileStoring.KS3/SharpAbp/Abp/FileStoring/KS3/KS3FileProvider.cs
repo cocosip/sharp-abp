@@ -62,7 +62,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
 
         protected virtual string NormalizePoolName(KS3FileProviderConfiguration ks3Configuration)
         {
-            var v = $"{ks3Configuration.Endpoint}-{ks3Configuration.AccessKey}-{ks3Configuration.SecretKey}";
+            var v = $"{ks3Configuration.Endpoint}-{ks3Configuration.Protocol}-{ks3Configuration.UserAgent}-{ks3Configuration.MaxConnections}-{ks3Configuration.Timeout}-{ks3Configuration.ReadWriteTimeout}-{ks3Configuration.AccessKey}-{ks3Configuration.SecretKey}";
             using var sha1 = SHA1.Create();
             var hashBuffer = sha1.ComputeHash(Encoding.UTF8.GetBytes(v));
             var hash = hashBuffer.Aggregate("", (current, b) => current + b.ToString("X2"));

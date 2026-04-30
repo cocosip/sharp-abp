@@ -56,7 +56,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
 
         protected virtual string NormalizePoolName(MinioFileProviderConfiguration minioConfiguration)
         {
-            var v = $"{minioConfiguration.EndPoint}-{minioConfiguration.AccessKey}-{minioConfiguration.SecretKey}";
+            var v = $"{minioConfiguration.EndPoint}-{minioConfiguration.WithSSL}-{minioConfiguration.AccessKey}-{minioConfiguration.SecretKey}";
             using var sha1 = SHA1.Create();
             var hashBuffer = sha1.ComputeHash(Encoding.UTF8.GetBytes(v));
             var hash = hashBuffer.Aggregate("", (current, b) => current + b.ToString("X2"));
