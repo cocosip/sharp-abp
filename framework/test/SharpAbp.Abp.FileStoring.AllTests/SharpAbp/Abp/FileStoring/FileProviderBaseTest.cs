@@ -47,6 +47,24 @@ namespace SharpAbp.Abp.FileStoring
             {
                 return TryWriteToFileAsync(stream, path);
             }
+
+            public Task<int> ReadToBufferAsync(Stream stream, byte[] buffer)
+            {
+                return ReadToBufferAsync(stream, buffer, buffer.Length);
+            }
+        }
+
+        private sealed class ShortReadStream : MemoryStream
+        {
+            public ShortReadStream(byte[] buffer)
+                : base(buffer)
+            {
+            }
+
+            public override Task<int> ReadAsync(byte[] buffer, int offset, int count, System.Threading.CancellationToken cancellationToken)
+            {
+                return base.ReadAsync(buffer, offset, Math.Min(count, 3), cancellationToken);
+            }
         }
 
         [Fact]
@@ -97,6 +115,20 @@ namespace SharpAbp.Abp.FileStoring
                     Directory.Delete(root, true);
                 }
             }
+        }
+
+        [Fact]
+        public async Task ReadToBufferAsync_Should_Fill_Buffer_Across_Short_Reads()
+        {
+            var provider = new TestFileProvider();
+            var expected = Encoding.UTF8.GetBytes("multipart-content");
+            await using var stream = new ShortReadStream(expected);
+            var buffer = new byte[expected.Length];
+
+            var bytesRead = await provider.ReadToBufferAsync(stream, buffer);
+
+            Assert.Equal(expected.Length, bytesRead);
+            Assert.Equal(expected, buffer);
         }
     }
 }

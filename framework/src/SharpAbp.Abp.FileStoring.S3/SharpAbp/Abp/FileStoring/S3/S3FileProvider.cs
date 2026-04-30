@@ -61,7 +61,7 @@ namespace SharpAbp.Abp.FileStoring.S3
 
         protected virtual string NormalizePoolName(S3FileProviderConfiguration s3Configuration)
         {
-            var v = $"{s3Configuration.ServerUrl.TrimEnd('/')}-{s3Configuration.AccessKeyId}-{s3Configuration.SecretAccessKey}";
+            var v = $"{s3Configuration.ServerUrl.TrimEnd('/')}-{s3Configuration.SignatureVersion}-{s3Configuration.ForcePathStyle}-{s3Configuration.AccessKeyId}-{s3Configuration.SecretAccessKey}";
             using var sha1 = SHA1.Create();
             var hashBuffer = sha1.ComputeHash(Encoding.UTF8.GetBytes(v));
             var hash = hashBuffer.Aggregate("", (current, b) => current + b.ToString("X2"));
@@ -292,7 +292,8 @@ namespace SharpAbp.Abp.FileStoring.S3
             {
                 // Calculate slice part count
                 var partSize = args.Configuration.MultiPartUploadShardingSize;
-                var fileSize = args.FileStream!.Length;
+                var initialPosition = args.FileStream!.CanSeek ? args.FileStream.Position : 0;
+                var fileSize = args.FileStream.Length - initialPosition;
                 var partCount = fileSize / partSize;
                 if (fileSize % partSize != 0)
                 {
@@ -307,10 +308,19 @@ namespace SharpAbp.Abp.FileStoring.S3
                 for (var i = 0; i < partCount; i++)
                 {
                     var skipBytes = (long)partSize * i;
+                    if (args.FileStream.CanSeek)
+                    {
+                        args.FileStream.Seek(initialPosition + skipBytes, SeekOrigin.Begin);
+                    }
+
                     var size = (int)((partSize < fileSize - skipBytes) ? partSize : (fileSize - skipBytes));
 
                     var buffer = new byte[size];
-                    await args.FileStream.ReadAsync(buffer, 0, size, args.CancellationToken);
+                    var bytesRead = await ReadToBufferAsync(args.FileStream, buffer, size, args.CancellationToken);
+                    if (bytesRead != size)
+                    {
+                        throw new EndOfStreamException($"Unable to read multipart segment {i + 1} for file '{args.FileId}'. Expected {size} bytes, read {bytesRead} bytes.");
+                    }
 
                     using var partStream = new MemoryStream(buffer);
 

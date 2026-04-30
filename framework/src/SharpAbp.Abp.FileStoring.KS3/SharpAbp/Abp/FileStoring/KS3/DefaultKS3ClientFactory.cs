@@ -12,7 +12,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
             Check.NotNullOrWhiteSpace(configuration.SecretKey, nameof(configuration.SecretKey));
             Check.NotNullOrWhiteSpace(configuration.Endpoint, nameof(configuration.Endpoint));
 
-            return new KS3Client(configuration.AccessKey, configuration.SecretKey, new ClientConfiguration()
+            var client = new KS3Client(configuration.AccessKey, configuration.SecretKey, new ClientConfiguration()
             {
                 Protocol = configuration.Protocol,
                 UserAgent = configuration.UserAgent,
@@ -20,6 +20,8 @@ namespace SharpAbp.Abp.FileStoring.KS3
                 Timeout = configuration.Timeout,
                 ReadWriteTimeout = configuration.ReadWriteTimeout
             });
+            client.SetEndpoint(configuration.Endpoint);
+            return client;
         }
     }
 }

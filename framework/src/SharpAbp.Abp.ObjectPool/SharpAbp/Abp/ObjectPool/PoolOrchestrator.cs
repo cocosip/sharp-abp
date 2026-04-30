@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 using JetBrains.Annotations;
 using Microsoft.Extensions.ObjectPool;
@@ -104,9 +105,9 @@ namespace SharpAbp.Abp.ObjectPool
             var key = new PoolKey(typeof(T), poolName);
             var policyType = policy.GetType();
 
-            var metadata = PoolMetadatas.GetOrAdd(
+            var metadata = GetOrCreateMetadata(
                 key,
-                _ => new Lazy<PoolMetadata>(
+                () => new Lazy<PoolMetadata>(
                     () =>
                     {
                         ObjectPool<T> pool;
@@ -122,7 +123,7 @@ namespace SharpAbp.Abp.ObjectPool
 
                         return new PoolMetadata(policyType, maxSize, pool);
                     },
-                    LazyThreadSafetyMode.ExecutionAndPublication)).Value;
+                    LazyThreadSafetyMode.ExecutionAndPublication));
 
             // Validate that the parameters match the existing pool configuration
             if (metadata.PolicyType != policyType)
@@ -296,9 +297,9 @@ namespace SharpAbp.Abp.ObjectPool
         {
             var key = new PoolKey(typeof(T), poolName);
 
-            var metadata = PoolMetadatas.GetOrAdd(
+            var metadata = GetOrCreateMetadata(
                 key,
-                _ => new Lazy<PoolMetadata>(
+                () => new Lazy<PoolMetadata>(
                     () =>
                     {
                         var policy = policyFactory();
@@ -316,7 +317,7 @@ namespace SharpAbp.Abp.ObjectPool
 
                         return new PoolMetadata(policyType, maxSize, pool);
                     },
-                    LazyThreadSafetyMode.ExecutionAndPublication)).Value;
+                    LazyThreadSafetyMode.ExecutionAndPublication));
 
             if (metadata.PolicyType != policyType)
             {
@@ -363,9 +364,9 @@ namespace SharpAbp.Abp.ObjectPool
         {
             var key = new PoolKey(typeof(T), poolName);
 
-            var metadata = PoolMetadatas.GetOrAdd(
+            var metadata = GetOrCreateMetadata(
                 key,
-                _ => new Lazy<PoolMetadata>(
+                () => new Lazy<PoolMetadata>(
                     () =>
                     {
                         var policy = policyFactory();
@@ -374,7 +375,7 @@ namespace SharpAbp.Abp.ObjectPool
 
                         return new PoolMetadata(policyType, maxSize, pool);
                     },
-                    LazyThreadSafetyMode.ExecutionAndPublication)).Value;
+                    LazyThreadSafetyMode.ExecutionAndPublication));
 
             if (metadata.PolicyType != policyType)
             {
@@ -391,6 +392,22 @@ namespace SharpAbp.Abp.ObjectPool
             }
 
             return (IAsyncObjectPool<T>)metadata.Pool;
+        }
+
+        protected virtual PoolMetadata GetOrCreateMetadata(PoolKey key, Func<Lazy<PoolMetadata>> metadataFactory)
+        {
+            var lazy = PoolMetadatas.GetOrAdd(key, _ => metadataFactory());
+
+            try
+            {
+                return lazy.Value;
+            }
+            catch
+            {
+                var item = new KeyValuePair<PoolKey, Lazy<PoolMetadata>>(key, lazy);
+                ((ICollection<KeyValuePair<PoolKey, Lazy<PoolMetadata>>>)PoolMetadatas).Remove(item);
+                throw;
+            }
         }
     }
 }

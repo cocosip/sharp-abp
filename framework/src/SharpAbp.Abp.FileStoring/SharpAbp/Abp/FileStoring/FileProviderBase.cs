@@ -80,6 +80,35 @@ namespace SharpAbp.Abp.FileStoring
             return memoryStream;
         }
 
+        protected virtual async Task<int> ReadToBufferAsync(
+            Stream stream,
+            byte[] buffer,
+            int count,
+            CancellationToken cancellationToken = default)
+        {
+            Check.NotNull(stream, nameof(stream));
+            Check.NotNull(buffer, nameof(buffer));
+
+            var totalBytesRead = 0;
+            while (totalBytesRead < count)
+            {
+                var bytesRead = await stream.ReadAsync(
+                    buffer,
+                    totalBytesRead,
+                    count - totalBytesRead,
+                    cancellationToken);
+
+                if (bytesRead == 0)
+                {
+                    break;
+                }
+
+                totalBytesRead += bytesRead;
+            }
+
+            return totalBytesRead;
+        }
+
         /// <summary>
         /// Attempts to write a stream to a file asynchronously.
         /// </summary>

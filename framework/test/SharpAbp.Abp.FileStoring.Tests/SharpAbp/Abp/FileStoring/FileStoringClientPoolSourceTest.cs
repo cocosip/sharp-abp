@@ -133,6 +133,53 @@ namespace SharpAbp.Abp.FileStoring
             Assert.Contains("new AliyunOssClientPolicy(ServiceScopeFactory, aliyunConfiguration).Create()", source);
         }
 
+        [Fact]
+        public void Aws_Pool_Name_Should_Include_Client_Creation_Options()
+        {
+            var normalizePoolName = GetNormalizePoolNameSource("Aws", "AwsFileProvider.cs");
+
+            Assert.Contains("UseCredentials", normalizePoolName);
+            Assert.Contains("ProfileName", normalizePoolName);
+            Assert.Contains("ProfilesLocation", normalizePoolName);
+        }
+
+        [Fact]
+        public void S3_Pool_Name_Should_Include_Client_Creation_Options()
+        {
+            var normalizePoolName = GetNormalizePoolNameSource("S3", "S3FileProvider.cs");
+
+            Assert.Contains("SignatureVersion", normalizePoolName);
+            Assert.Contains("ForcePathStyle", normalizePoolName);
+        }
+
+        [Fact]
+        public void KS3_Pool_Name_Should_Include_Client_Creation_Options()
+        {
+            var normalizePoolName = GetNormalizePoolNameSource("KS3", "KS3FileProvider.cs");
+
+            Assert.Contains("Protocol", normalizePoolName);
+            Assert.Contains("UserAgent", normalizePoolName);
+            Assert.Contains("MaxConnections", normalizePoolName);
+            Assert.Contains("Timeout", normalizePoolName);
+            Assert.Contains("ReadWriteTimeout", normalizePoolName);
+        }
+
+        [Fact]
+        public void KS3_Client_Factory_Should_Apply_Configured_Endpoint()
+        {
+            var source = File.ReadAllText(GetProviderFile("KS3", "DefaultKS3ClientFactory.cs"));
+
+            Assert.Contains(".SetEndpoint(configuration.Endpoint)", source);
+        }
+
+        [Fact]
+        public void Minio_Pool_Name_Should_Include_Client_Creation_Options()
+        {
+            var normalizePoolName = GetNormalizePoolNameSource("Minio", "MinioFileProvider.cs");
+
+            Assert.Contains("WithSSL", normalizePoolName);
+        }
+
         private static IEnumerable<string> GetPooledProviderFiles(string pattern)
         {
             return GetProviderFiles(PooledProviderNames, pattern);
@@ -146,6 +193,18 @@ namespace SharpAbp.Abp.FileStoring
                     fileName,
                     SearchOption.AllDirectories)
                 .Single();
+        }
+
+        private static string GetNormalizePoolNameSource(string provider, string fileName)
+        {
+            var source = File.ReadAllText(GetProviderFile(provider, fileName));
+            var methodStart = source.IndexOf("NormalizePoolName", StringComparison.Ordinal);
+            Assert.True(methodStart >= 0);
+
+            var nextMethodStart = source.IndexOf("public override", methodStart, StringComparison.Ordinal);
+            Assert.True(nextMethodStart > methodStart);
+
+            return source.Substring(methodStart, nextMethodStart - methodStart);
         }
 
         private static IEnumerable<string> GetProviderFiles(IEnumerable<string> providers, string pattern)
