@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 using JetBrains.Annotations;
 using Microsoft.Extensions.ObjectPool;
@@ -104,9 +105,9 @@ namespace SharpAbp.Abp.ObjectPool
             var key = new PoolKey(typeof(T), poolName);
             var policyType = policy.GetType();
 
-            var metadata = PoolMetadatas.GetOrAdd(
+            var metadata = GetOrCreateMetadata(
                 key,
-                _ => new Lazy<PoolMetadata>(
+                () => new Lazy<PoolMetadata>(
                     () =>
                     {
                         ObjectPool<T> pool;
@@ -122,7 +123,7 @@ namespace SharpAbp.Abp.ObjectPool
 
                         return new PoolMetadata(policyType, maxSize, pool);
                     },
-                    LazyThreadSafetyMode.ExecutionAndPublication)).Value;
+                    LazyThreadSafetyMode.ExecutionAndPublication));
 
             // Validate that the parameters match the existing pool configuration
             if (metadata.PolicyType != policyType)
@@ -147,7 +148,7 @@ namespace SharpAbp.Abp.ObjectPool
         /// </summary>
         /// <typeparam name="T">The type of objects in the pool.</typeparam>
         /// <param name="poolName">The name of the pool.</param>
-        /// <param name="policyFactory">The factory to create the policy only when the pool is first created.</param>
+        /// <param name="policyFactory">The factory to create the policy for this request.</param>
         /// <param name="maxSize">The maximum size of the pool.</param>
         /// <returns>The object pool.</returns>
         /// <exception cref="InvalidOperationException">Thrown when attempting to get a pool with different parameters than previously used.</exception>
@@ -156,7 +157,10 @@ namespace SharpAbp.Abp.ObjectPool
             Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
             Check.NotNull(policyFactory, nameof(policyFactory));
 
-            return GetPool(poolName, policyFactory, typeof(IPooledObjectPolicy<T>), maxSize);
+            var policy = policyFactory();
+            Check.NotNull(policy, nameof(policyFactory));
+
+            return GetPool(poolName, policy, maxSize);
         }
 
         /// <summary>
@@ -202,7 +206,7 @@ namespace SharpAbp.Abp.ObjectPool
         /// </summary>
         /// <typeparam name="T">The type of objects in the pool.</typeparam>
         /// <param name="poolName">The name of the pool.</param>
-        /// <param name="policyFactory">The factory to create the policy only when the pool is first created.</param>
+        /// <param name="policyFactory">The factory to create the policy for this request.</param>
         /// <param name="maxSize">The maximum size of the pool.</param>
         /// <returns>The object pool.</returns>
         /// <exception cref="InvalidOperationException">Thrown when attempting to get a pool with different parameters than previously used.</exception>
@@ -211,7 +215,10 @@ namespace SharpAbp.Abp.ObjectPool
             Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
             Check.NotNull(policyFactory, nameof(policyFactory));
 
-            return GetObjectPool<T>(poolName, policyFactory, typeof(IObjectPoolPolicy<T>), maxSize);
+            var policy = policyFactory();
+            Check.NotNull(policy, nameof(policyFactory));
+
+            return GetObjectPool(poolName, policy, maxSize);
         }
 
         /// <summary>
@@ -256,7 +263,7 @@ namespace SharpAbp.Abp.ObjectPool
         /// </summary>
         /// <typeparam name="T">The type of objects in the pool.</typeparam>
         /// <param name="poolName">The name of the pool.</param>
-        /// <param name="policyFactory">The factory to create the policy only when the pool is first created.</param>
+        /// <param name="policyFactory">The factory to create the policy for this request.</param>
         /// <param name="maxSize">The maximum size of the pool.</param>
         /// <returns>The async object pool.</returns>
         /// <exception cref="InvalidOperationException">Thrown when attempting to get a pool with different parameters than previously used.</exception>
@@ -265,7 +272,10 @@ namespace SharpAbp.Abp.ObjectPool
             Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
             Check.NotNull(policyFactory, nameof(policyFactory));
 
-            return GetAsyncObjectPool<T>(poolName, policyFactory, typeof(IAsyncObjectPoolPolicy<T>), maxSize);
+            var policy = policyFactory();
+            Check.NotNull(policy, nameof(policyFactory));
+
+            return GetAsyncObjectPool(poolName, policy, maxSize);
         }
 
         /// <summary>
@@ -296,9 +306,9 @@ namespace SharpAbp.Abp.ObjectPool
         {
             var key = new PoolKey(typeof(T), poolName);
 
-            var metadata = PoolMetadatas.GetOrAdd(
+            var metadata = GetOrCreateMetadata(
                 key,
-                _ => new Lazy<PoolMetadata>(
+                () => new Lazy<PoolMetadata>(
                     () =>
                     {
                         var policy = policyFactory();
@@ -316,7 +326,7 @@ namespace SharpAbp.Abp.ObjectPool
 
                         return new PoolMetadata(policyType, maxSize, pool);
                     },
-                    LazyThreadSafetyMode.ExecutionAndPublication)).Value;
+                    LazyThreadSafetyMode.ExecutionAndPublication));
 
             if (metadata.PolicyType != policyType)
             {
@@ -363,9 +373,9 @@ namespace SharpAbp.Abp.ObjectPool
         {
             var key = new PoolKey(typeof(T), poolName);
 
-            var metadata = PoolMetadatas.GetOrAdd(
+            var metadata = GetOrCreateMetadata(
                 key,
-                _ => new Lazy<PoolMetadata>(
+                () => new Lazy<PoolMetadata>(
                     () =>
                     {
                         var policy = policyFactory();
@@ -374,7 +384,7 @@ namespace SharpAbp.Abp.ObjectPool
 
                         return new PoolMetadata(policyType, maxSize, pool);
                     },
-                    LazyThreadSafetyMode.ExecutionAndPublication)).Value;
+                    LazyThreadSafetyMode.ExecutionAndPublication));
 
             if (metadata.PolicyType != policyType)
             {
@@ -391,6 +401,22 @@ namespace SharpAbp.Abp.ObjectPool
             }
 
             return (IAsyncObjectPool<T>)metadata.Pool;
+        }
+
+        protected virtual PoolMetadata GetOrCreateMetadata(PoolKey key, Func<Lazy<PoolMetadata>> metadataFactory)
+        {
+            var lazy = PoolMetadatas.GetOrAdd(key, _ => metadataFactory());
+
+            try
+            {
+                return lazy.Value;
+            }
+            catch
+            {
+                var item = new KeyValuePair<PoolKey, Lazy<PoolMetadata>>(key, lazy);
+                ((ICollection<KeyValuePair<PoolKey, Lazy<PoolMetadata>>>)PoolMetadatas).Remove(item);
+                throw;
+            }
         }
     }
 }

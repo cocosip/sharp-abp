@@ -101,6 +101,52 @@ namespace SharpAbp.Abp.FileStoring
             Assert.True(item.IsDisposed);
         }
 
+        [Fact]
+        public void Object_Pool_Factory_Should_Reject_Different_Concrete_Policy_For_Existing_Pool()
+        {
+            var orchestrator = new PoolOrchestrator(new DefaultObjectPoolProvider());
+
+            orchestrator.GetPool<PooledObject>(
+                "same-name-different-policy",
+                () => new TestPooledObjectPolicy());
+
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                orchestrator.GetPool<PooledObject>(
+                    "same-name-different-policy",
+                    () => new AlternatePooledObjectPolicy());
+            });
+        }
+
+        [Fact]
+        public void Object_Pool_Factory_Should_Retry_After_First_Creation_Failure()
+        {
+            var orchestrator = new PoolOrchestrator(new DefaultObjectPoolProvider());
+            var attempts = 0;
+
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                orchestrator.GetPool<PooledObject>(
+                    "retry-after-failure",
+                    () =>
+                    {
+                        attempts++;
+                        throw new InvalidOperationException("Factory failed.");
+                    });
+            });
+
+            var pool = orchestrator.GetPool<PooledObject>(
+                "retry-after-failure",
+                () =>
+                {
+                    attempts++;
+                    return new TestPooledObjectPolicy();
+                });
+
+            Assert.NotNull(pool.Get());
+            Assert.Equal(2, attempts);
+        }
+
         private class PooledObject
         {
         }
@@ -126,6 +172,23 @@ namespace SharpAbp.Abp.FileStoring
             {
                 return obj != null;
             }
+        }
+
+        private class TestPooledObjectPolicy : IPooledObjectPolicy<PooledObject>
+        {
+            public PooledObject Create()
+            {
+                return new PooledObject();
+            }
+
+            public bool Return(PooledObject obj)
+            {
+                return obj != null;
+            }
+        }
+
+        private class AlternatePooledObjectPolicy : TestPooledObjectPolicy
+        {
         }
 
         private class TestAsyncObjectPoolPolicy : IAsyncObjectPoolPolicy<PooledObject>
