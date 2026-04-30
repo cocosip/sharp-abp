@@ -165,6 +165,14 @@ namespace SharpAbp.Abp.FileStoring
         }
 
         [Fact]
+        public void KS3_Client_Factory_Should_Apply_Configured_Endpoint()
+        {
+            var source = File.ReadAllText(GetProviderFile("KS3", "DefaultKS3ClientFactory.cs"));
+
+            Assert.Contains(".SetEndpoint(configuration.Endpoint)", source);
+        }
+
+        [Fact]
         public void Minio_Pool_Name_Should_Include_Client_Creation_Options()
         {
             var normalizePoolName = GetNormalizePoolNameSource("Minio", "MinioFileProvider.cs");
