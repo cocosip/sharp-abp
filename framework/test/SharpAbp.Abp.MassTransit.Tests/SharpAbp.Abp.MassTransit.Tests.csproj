@@ -30,6 +30,7 @@
 		<ProjectReference Include="..\..\src\SharpAbp.Abp.MassTransit.Kafka\SharpAbp.Abp.MassTransit.Kafka.csproj" />
 		<ProjectReference Include="..\..\src\SharpAbp.Abp.MassTransit.RabbitMQ\SharpAbp.Abp.MassTransit.RabbitMQ.csproj" />
 		<ProjectReference Include="..\..\src\SharpAbp.Abp.MassTransit.PostgreSql\SharpAbp.Abp.MassTransit.PostgreSql.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.EventBus.MassTransit\SharpAbp.Abp.EventBus.MassTransit.csproj" />
 	</ItemGroup>
 
 

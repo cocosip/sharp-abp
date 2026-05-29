@@ -43,6 +43,11 @@ namespace SharpAbp.Abp.EventBus.MassTransit
         /// Gets the concurrent dictionary that stores event handler factories indexed by event type.
         /// </summary>
         protected ConcurrentDictionary<Type, List<IEventHandlerFactory>> HandlerFactories { get; }
+
+        /// <summary>
+        /// Gets the concurrent dictionary that stores dynamic event handler factories indexed by event name.
+        /// </summary>
+        protected ConcurrentDictionary<string, List<IEventHandlerFactory>> DynamicHandlerFactories { get; }
         
         /// <summary>
         /// Gets the concurrent dictionary that maps event names to their corresponding types.
@@ -81,6 +86,7 @@ namespace SharpAbp.Abp.EventBus.MassTransit
             Serializer = serializer;
 
             HandlerFactories = new ConcurrentDictionary<Type, List<IEventHandlerFactory>>();
+            DynamicHandlerFactories = new ConcurrentDictionary<string, List<IEventHandlerFactory>>();
             EventTypes = new ConcurrentDictionary<string, Type>();
         }
 
@@ -221,6 +227,29 @@ namespace SharpAbp.Abp.EventBus.MassTransit
         }
 
         /// <summary>
+        /// Subscribes a dynamic event handler factory to a specific event name.
+        /// </summary>
+        /// <param name="eventName">The name of the dynamic event to subscribe to.</param>
+        /// <param name="factory">The event handler factory that creates event handlers.</param>
+        /// <returns>A disposable object that can be used to unsubscribe the handler.</returns>
+        public override IDisposable Subscribe(string eventName, IEventHandlerFactory factory)
+        {
+            Check.NotNullOrWhiteSpace(eventName, nameof(eventName));
+            Check.NotNull(factory, nameof(factory));
+
+            var handlerFactories = GetOrCreateDynamicHandlerFactories(eventName);
+
+            if (factory.IsInFactories(handlerFactories))
+            {
+                return NullDisposable.Instance;
+            }
+
+            handlerFactories.Add(factory);
+
+            return new DynamicEventHandlerFactoryUnregistrar(this, eventName, factory);
+        }
+
+        /// <summary>
         /// Unsubscribes a specific action-based event handler from an event type.
         /// </summary>
         /// <typeparam name="TEvent">The type of event to unsubscribe from.</typeparam>
@@ -269,6 +298,27 @@ namespace SharpAbp.Abp.EventBus.MassTransit
         }
 
         /// <summary>
+        /// Unsubscribes a specific dynamic event handler instance from an event name.
+        /// </summary>
+        /// <param name="eventName">The name of the dynamic event to unsubscribe from.</param>
+        /// <param name="handler">The event handler instance to remove.</param>
+        public override void Unsubscribe(string eventName, IEventHandler handler)
+        {
+            Check.NotNullOrWhiteSpace(eventName, nameof(eventName));
+            Check.NotNull(handler, nameof(handler));
+
+            GetOrCreateDynamicHandlerFactories(eventName)
+                .Locking(factories =>
+                {
+                    factories.RemoveAll(
+                        factory =>
+                            factory is SingleInstanceHandlerFactory &&
+                            (factory as SingleInstanceHandlerFactory)!.HandlerInstance == handler
+                    );
+                });
+        }
+
+        /// <summary>
         /// Unsubscribes a specific event handler factory from an event type.
         /// </summary>
         /// <param name="eventType">The type of event to unsubscribe from.</param>
@@ -279,12 +329,36 @@ namespace SharpAbp.Abp.EventBus.MassTransit
         }
 
         /// <summary>
+        /// Unsubscribes a specific dynamic event handler factory from an event name.
+        /// </summary>
+        /// <param name="eventName">The name of the dynamic event to unsubscribe from.</param>
+        /// <param name="factory">The event handler factory to remove.</param>
+        public override void Unsubscribe(string eventName, IEventHandlerFactory factory)
+        {
+            Check.NotNullOrWhiteSpace(eventName, nameof(eventName));
+            Check.NotNull(factory, nameof(factory));
+
+            GetOrCreateDynamicHandlerFactories(eventName).Locking(factories => factories.Remove(factory));
+        }
+
+        /// <summary>
         /// Unsubscribes all event handlers from a specific event type.
         /// </summary>
         /// <param name="eventType">The type of event to unsubscribe all handlers from.</param>
         public override void UnsubscribeAll(Type eventType)
         {
             GetOrCreateHandlerFactories(eventType).Locking(factories => factories.Clear());
+        }
+
+        /// <summary>
+        /// Unsubscribes all dynamic event handlers from a specific event name.
+        /// </summary>
+        /// <param name="eventName">The name of the dynamic event to unsubscribe all handlers from.</param>
+        public override void UnsubscribeAll(string eventName)
+        {
+            Check.NotNullOrWhiteSpace(eventName, nameof(eventName));
+
+            GetOrCreateDynamicHandlerFactories(eventName).Locking(factories => factories.Clear());
         }
 
         /// <summary>
@@ -317,6 +391,20 @@ namespace SharpAbp.Abp.EventBus.MassTransit
         }
 
         /// <summary>
+        /// Gets the dynamic event handler factories for a specific event name.
+        /// </summary>
+        /// <param name="eventName">The name of the dynamic event to get handlers for.</param>
+        /// <returns>An enumerable collection of dynamic event type with its handler factories.</returns>
+        protected override IEnumerable<EventTypeWithEventHandlerFactories> GetDynamicHandlerFactories(string eventName)
+        {
+            Check.NotNullOrWhiteSpace(eventName, nameof(eventName));
+
+            return DynamicHandlerFactories.TryGetValue(eventName, out var handlerFactories) && handlerFactories.Any()
+                ? [new EventTypeWithEventHandlerFactories(typeof(DynamicEventData), handlerFactories)]
+                : [];
+        }
+
+        /// <summary>
         /// Publishes an event to the MassTransit event bus asynchronously.
         /// </summary>
         /// <param name="eventType">The type of the event to publish.</param>
@@ -324,7 +412,54 @@ namespace SharpAbp.Abp.EventBus.MassTransit
         /// <returns>A task representing the asynchronous operation.</returns>
         protected override async Task PublishToEventBusAsync(Type eventType, object eventData)
         {
-            await PublishToMassTransitAsync(eventType, eventData, CorrelationIdProvider.Get(), null);
+            await PublishToMassTransitAsync(GetEventName(eventType, eventData), GetEventData(eventData), CorrelationIdProvider.Get(), null);
+        }
+
+        /// <summary>
+        /// Publishes a dynamic event to the event bus asynchronously.
+        /// </summary>
+        /// <param name="eventName">The name of the dynamic event to publish.</param>
+        /// <param name="eventData">The event data to publish.</param>
+        /// <param name="onUnitOfWorkComplete">True to publish on unit of work completion; otherwise, false.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public override async Task PublishAsync(string eventName, object eventData, bool onUnitOfWorkComplete = true)
+        {
+            await PublishAsync(eventName, eventData, onUnitOfWorkComplete, useOutbox: true);
+        }
+
+        /// <summary>
+        /// Publishes a dynamic event to the event bus asynchronously.
+        /// </summary>
+        /// <param name="eventName">The name of the dynamic event to publish.</param>
+        /// <param name="eventData">The event data to publish.</param>
+        /// <param name="onUnitOfWorkComplete">True to publish on unit of work completion; otherwise, false.</param>
+        /// <param name="useOutbox">True to use the outbox if configured; otherwise, false.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public override async Task PublishAsync(string eventName, object eventData, bool onUnitOfWorkComplete, bool useOutbox)
+        {
+            Check.NotNullOrWhiteSpace(eventName, nameof(eventName));
+            Check.NotNull(eventData, nameof(eventData));
+
+            var dynamicEventData = eventData as DynamicEventData ?? new DynamicEventData(eventName, eventData);
+            if (!dynamicEventData.EventName.Equals(eventName, StringComparison.Ordinal))
+            {
+                dynamicEventData = new DynamicEventData(eventName, dynamicEventData.Data);
+            }
+
+            if (onUnitOfWorkComplete && UnitOfWorkManager.Current != null)
+            {
+                AddToUnitOfWork(
+                    UnitOfWorkManager.Current,
+                    new UnitOfWorkEventRecord(typeof(DynamicEventData), dynamicEventData, EventOrderGenerator.GetNext()));
+                return;
+            }
+
+            if (useOutbox && await AddToOutboxAsync(typeof(DynamicEventData), dynamicEventData))
+            {
+                return;
+            }
+
+            await PublishToEventBusAsync(typeof(DynamicEventData), dynamicEventData);
         }
 
         /// <summary>
@@ -348,6 +483,16 @@ namespace SharpAbp.Abp.EventBus.MassTransit
         }
 
         /// <summary>
+        /// Gets the event type based on the event name.
+        /// </summary>
+        /// <param name="eventName">The name of the event.</param>
+        /// <returns>The type of the event, or dynamic event data if it is a dynamic event.</returns>
+        protected override Type GetEventTypeByEventName(string eventName)
+        {
+            return GetEventType(eventName) ?? typeof(DynamicEventData);
+        }
+
+        /// <summary>
         /// Gets or creates a list of event handler factories for a specific event type.
         /// This method ensures thread-safe access to handler factories and registers the event type mapping.
         /// </summary>
@@ -364,6 +509,16 @@ namespace SharpAbp.Abp.EventBus.MassTransit
                     return [];
                 }
             );
+        }
+
+        /// <summary>
+        /// Gets or creates a list of dynamic event handler factories for a specific event name.
+        /// </summary>
+        /// <param name="eventName">The name of the dynamic event to get or create handlers for.</param>
+        /// <returns>A list of event handler factories for the specified event name.</returns>
+        private List<IEventHandlerFactory> GetOrCreateDynamicHandlerFactories(string eventName)
+        {
+            return DynamicHandlerFactories.GetOrAdd(eventName, _ => []);
         }
 
         /// <summary>
@@ -389,6 +544,28 @@ namespace SharpAbp.Abp.EventBus.MassTransit
             }
 
             return false;
+        }
+
+        private class DynamicEventHandlerFactoryUnregistrar : IDisposable
+        {
+            private readonly MassTransitDistributedEventBus _eventBus;
+            private readonly string _eventName;
+            private readonly IEventHandlerFactory _factory;
+
+            public DynamicEventHandlerFactoryUnregistrar(
+                MassTransitDistributedEventBus eventBus,
+                string eventName,
+                IEventHandlerFactory factory)
+            {
+                _eventBus = eventBus;
+                _eventName = eventName;
+                _factory = factory;
+            }
+
+            public void Dispose()
+            {
+                _eventBus.Unsubscribe(_eventName, _factory);
+            }
         }
 
 
