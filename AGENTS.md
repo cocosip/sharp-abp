@@ -1,46 +1,31 @@
-# Project Workflow
+# Repository Guidelines
 
-## Project Identity
+## Project Structure & Module Organization
 
-- Project name: sharp-abp
-- System name: codex-mem
-- Default memory scope: current project
+This repository is a .NET/ABP package collection. Shared infrastructure packages live under `framework/src`, with framework tests in `framework/test` and the main framework solution at `framework/SharpAbp.sln`. Business modules live under `modules/<module-name>` and usually contain their own `.sln`, `src`, and `test` trees. Runnable examples and integration samples are under `samples/`. Shared build settings are in `Directory.Build.props`, `Directory.Packages.props`, `common.props`, and `common.test.props`.
 
-## Memory Rules
+## Build, Test, and Development Commands
 
-- At the start of a fresh session in this repository, call `memory_bootstrap_session`.
-- Save a memory note when work produces a lasting decision, bugfix insight, reusable discovery, or durable implementation constraint.
-- Save a handoff before pausing, switching tasks, or ending the session.
+- `dotnet restore framework/SharpAbp.sln` restores the framework solution.
+- `dotnet build framework/SharpAbp.sln -c Release` builds the shared framework packages.
+- `dotnet test framework/test/SharpAbp.Abp.FileStoring.Tests/SharpAbp.Abp.FileStoring.Tests.csproj -c Release` runs a focused test project.
+- `dotnet build modules/file-storing-management/SharpAbp.Abp.FileStoringManagement.sln -c Release` builds one module solution.
+- `powershell -ExecutionPolicy Bypass -File scripts/windows-ci/Build-All.ps1` builds the framework and module solution list used by local Windows CI.
 
-## Related Project Policy
+In the Codex app, run `dotnet build` and `dotnet test` outside the sandbox with the approved `dotnet` prefix rule.
 
-- Related-project memory is disabled by default for this repository unless explicitly needed for an integration task.
-- Re-enable related-project memory only for explicit cross-repository work such as shared contracts, package publishing coordination, or deployment integration.
-- Do not pull memory from unrelated projects by default.
+## Coding Style & Naming Conventions
 
-## Preferred Tags
+Use C# with the shared `LangVersion` from `common.props` and `common.test.props`. Follow existing ABP conventions: PascalCase for public types and members, camelCase for locals and parameters, async method names ending in `Async`, and namespaces matching the `SharpAbp.*` project path. Keep indentation consistent with nearby files. Central package versions belong in `Directory.Packages.props`; project-wide MSBuild behavior belongs in the shared props files, not individual projects unless scoped.
 
-- Use tags where useful, especially: `dotnet`, `abp`, `opentelemetry`
+## Testing Guidelines
 
-## Project-Specific Notes
+Tests are ordinary .NET test projects under `framework/test` and `modules/*/test`, commonly named `*.Tests` or `*.TestBase`. Add regression coverage beside the affected package or module, and prefer focused runs before broader solution builds. Test classes typically use names such as `SomeServiceTest` or `SomeModule_Tests`; follow the local project pattern.
 
-- This repository is a modular .NET codebase built around ABP vNext module conventions.
-- Main library code lives under `framework/src`; tests live under `framework/test`.
-- OpenTelemetry, storage, event bus, database, and other infrastructure capabilities are split into separate packages/modules under `framework/src/SharpAbp.Abp.*`.
-- Preserve ABP module patterns: prefer `DependsOn`, options classes, `PreConfigure`/`Configure`, and module lifecycle methods instead of ad hoc startup wiring.
-- Prefer repository-wide package version management through `Directory.Packages.props`; avoid hardcoding package versions inside individual project files unless the repository already requires it.
-- When changing infrastructure modules, check whether matching abstractions, exporters, docs, and sample/test coverage should move together.
-- Be careful with dirty worktrees. Do not revert unrelated local changes.
-- For OpenTelemetry work in this repo, treat Collector support as a named OTLP export path unless the task explicitly requires a separate transport or deployment abstraction.
+## Commit & Pull Request Guidelines
 
-## System Relationships
+Recent history often uses emoji-prefixed Conventional Commit subjects, with scopes such as `fix(file-storing): ...` and `build(deps): ...`. Keep commits scoped, imperative, and tied to the affected package or module. Pull requests should state the problem, summarize the fix, list the exact build/test commands run, and call out configuration or package-version changes.
 
-- This repository belongs to system: codex-mem
-- No related repositories are currently declared for default memory expansion.
-- Use related-project memory only when the current task explicitly depends on another repository.
+## Security & Configuration Tips
 
-## Cross-Repo Memory Rules
-
-- Prefer current-project memory first.
-- Expand to related repositories only for integration-relevant work.
-- When using related-project memory, mention the source repository explicitly in your reasoning and outputs.
+Do not commit credentials, local endpoints, or machine-specific secrets. Keep sample configuration generic and document required environment-specific values in the relevant sample or module README.

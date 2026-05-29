@@ -17,6 +17,12 @@ namespace SharpAbp.Abp.FileStoring
         /// Use the tenant <c>Name</c> as the path segment (e.g. <c>my-org</c>).
         /// Falls back to <see cref="TenantId"/> format when Name is null or empty.
         /// </summary>
-        TenantName = 1
+        TenantName = 1,
+
+        /// <summary>
+        /// Use <see cref="FilePathContext.TenantCode"/> as the path segment.
+        /// Falls back to <see cref="TenantId"/> format when the current context has no tenant code.
+        /// </summary>
+        TenantCode = 2
     }
 }

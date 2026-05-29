@@ -54,5 +54,10 @@ namespace SharpAbp.Abp.MapTenancy
             return _mappers.Where(x => x.Value.MapCode == mapCode).FirstOrDefault().Value ;
         }
 
+        public MapTenancyConfiguration GetConfigurationByTenantId(Guid tenantId)
+        {
+            return _mappers.Where(x => x.Value.TenantId == tenantId).FirstOrDefault().Value;
+        }
+
     }
 }

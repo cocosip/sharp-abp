@@ -116,6 +116,9 @@ namespace SharpAbp.Abp.FileStoring
         protected ICancellationTokenProvider CancellationTokenProvider { get; }
         protected IServiceProvider ServiceProvider { get; }
         protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
+        protected IFilePathContextAccessor FilePathContextAccessor { get; }
+        protected IFilePathContextResolver FilePathContextResolver { get; }
+
         public FileContainer(
             string containerName,
             FileContainerConfiguration configuration,
@@ -123,7 +126,9 @@ namespace SharpAbp.Abp.FileStoring
             ICurrentTenant currentTenant,
             ICancellationTokenProvider cancellationTokenProvider,
             IFileNormalizeNamingService fileNormalizeNamingService,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            IFilePathContextAccessor filePathContextAccessor,
+            IFilePathContextResolver filePathContextResolver)
         {
             ContainerName = containerName;
             Configuration = configuration;
@@ -132,6 +137,8 @@ namespace SharpAbp.Abp.FileStoring
             CancellationTokenProvider = cancellationTokenProvider;
             FileNormalizeNamingService = fileNormalizeNamingService;
             ServiceProvider = serviceProvider;
+            FilePathContextAccessor = filePathContextAccessor;
+            FilePathContextResolver = filePathContextResolver;
         }
 
         public virtual FileContainerConfiguration GetConfiguration()
@@ -148,6 +155,9 @@ namespace SharpAbp.Abp.FileStoring
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
             {
+                var shouldChangeFilePathContext = FilePathContextAccessor.Current == null;
+                var filePathContext = shouldChangeFilePathContext ? await FilePathContextResolver.ResolveAsync() : null;
+                using var filePathContextChange = ChangeFilePathContext(shouldChangeFilePathContext, filePathContext);
                 var fileNormalizeNaming = FileNormalizeNamingService.NormalizeNaming(Configuration, ContainerName, fileId);
 
                 return await Provider.SaveAsync(
@@ -170,6 +180,9 @@ namespace SharpAbp.Abp.FileStoring
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
             {
+                var shouldChangeFilePathContext = FilePathContextAccessor.Current == null;
+                var filePathContext = shouldChangeFilePathContext ? await FilePathContextResolver.ResolveAsync() : null;
+                using var filePathContextChange = ChangeFilePathContext(shouldChangeFilePathContext, filePathContext);
                 var fileNormalizeNaming = FileNormalizeNamingService.NormalizeNaming(Configuration, ContainerName, fileId);
 
                 return await Provider.DeleteAsync(
@@ -189,6 +202,9 @@ namespace SharpAbp.Abp.FileStoring
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
             {
+                var shouldChangeFilePathContext = FilePathContextAccessor.Current == null;
+                var filePathContext = shouldChangeFilePathContext ? await FilePathContextResolver.ResolveAsync() : null;
+                using var filePathContextChange = ChangeFilePathContext(shouldChangeFilePathContext, filePathContext);
                 var fileNormalizeNaming = FileNormalizeNamingService.NormalizeNaming(Configuration, ContainerName, fileId);
 
                 return await Provider.ExistsAsync(
@@ -209,6 +225,9 @@ namespace SharpAbp.Abp.FileStoring
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
             {
+                var shouldChangeFilePathContext = FilePathContextAccessor.Current == null;
+                var filePathContext = shouldChangeFilePathContext ? await FilePathContextResolver.ResolveAsync() : null;
+                using var filePathContextChange = ChangeFilePathContext(shouldChangeFilePathContext, filePathContext);
                 var fileNormalizeNaming = FileNormalizeNamingService.NormalizeNaming(Configuration, ContainerName, fileId);
 
                 return await Provider.DownloadAsync(
@@ -247,6 +266,9 @@ namespace SharpAbp.Abp.FileStoring
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
             {
+                var shouldChangeFilePathContext = FilePathContextAccessor.Current == null;
+                var filePathContext = shouldChangeFilePathContext ? await FilePathContextResolver.ResolveAsync() : null;
+                using var filePathContextChange = ChangeFilePathContext(shouldChangeFilePathContext, filePathContext);
                 var fileNormalizeNaming = FileNormalizeNamingService.NormalizeNaming(Configuration, ContainerName, fileId);
 
                 return await Provider.GetOrNullAsync(
@@ -268,6 +290,9 @@ namespace SharpAbp.Abp.FileStoring
         {
             using (CurrentTenant.Change(GetTenantIdOrNull()))
             {
+                var shouldChangeFilePathContext = FilePathContextAccessor.Current == null;
+                var filePathContext = shouldChangeFilePathContext ? await FilePathContextResolver.ResolveAsync() : null;
+                using var filePathContextChange = ChangeFilePathContext(shouldChangeFilePathContext, filePathContext);
                 var fileNormalizeNaming = FileNormalizeNamingService.NormalizeNaming(Configuration, ContainerName, fileId);
 
                 return await Provider.GetAccessUrlAsync(
@@ -291,6 +316,16 @@ namespace SharpAbp.Abp.FileStoring
             }
 
             return CurrentTenant.Id;
+        }
+
+        protected virtual IDisposable ChangeFilePathContext(bool shouldChange, FilePathContext? filePathContext)
+        {
+            if (!shouldChange)
+            {
+                return NullDisposable.Instance;
+            }
+
+            return FilePathContextAccessor.Change(filePathContext);
         }
 
     }

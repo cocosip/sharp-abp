@@ -13,6 +13,9 @@ Unified file storage abstraction and core implementation that allows you to swit
 dotnet add package SharpAbp.Abp.FileStoring.Abstractions
 dotnet add package SharpAbp.Abp.FileStoring
 
+# Optional MapTenancy integration for automatic TenantCode resolution
+dotnet add package SharpAbp.Abp.FileStoring.MapTenancy
+
 # Choose one or more storage providers:
 dotnet add package SharpAbp.Abp.FileStoring.FileSystem     # Local file system
 dotnet add package SharpAbp.Abp.FileStoring.Aliyun         # Aliyun OSS
@@ -222,6 +225,10 @@ This makes it possible to control how files are laid out in your bucket or file 
 
 ### Architecture
 
+`IFilePathContextAccessor` provides explicit per-operation context, while `IFilePathContextResolver` provides automatic context when no explicit context is active.
+The default accessor and resolver are registered by `AbpFileStoringAbstractionsModule`.
+`IFilePathContextAccessor` is registered as a singleton because `AsyncLocalFilePathContextAccessor` stores `Current` in `AsyncLocal<FilePathContext?>`; the singleton is the accessor holder, and the current value is isolated per async execution flow.
+
 ```
 IFileContainer.SaveAsync / GetAsync / DeleteAsync / ...
         │
@@ -246,6 +253,14 @@ IFilePathBuilder.Build(args)                   ← single point of path logic
 | `TenantBased` + TenantName | Tenant | `tenants/{tenantName}/{fileId}` |
 | `DirectFileId` | Any | `{fileId}` |
 
+Before the provider calculates the final path, `FileContainer` follows this order:
+
+1. If `IFilePathContextAccessor.Current` already exists, keep that explicit context.
+2. Otherwise call `IFilePathContextResolver.ResolveAsync()`.
+3. `DefaultFilePathContextResolver` runs `AbpFilePathContextResolveOptions.Contributors` in order.
+4. The first contributor that sets `Handled = true` stops the chain.
+5. If no contributor resolves a context, the normal path builder fallback is used.
+
 ---
 
 ### Method 1: Configure via appsettings.json
@@ -260,7 +275,7 @@ Add a `FilePathBuilder` block inside `FileStoringOptions`:
       "Prefix": "uploads",
       "HostSegment": "host",
       "TenantsSegment": "tenants",
-      "TenantIdentifierMode": "TenantName"
+      "TenantIdentifierMode": "TenantCode"
     },
     "default": {
       "Provider": "Minio",
@@ -276,9 +291,48 @@ Add a `FilePathBuilder` block inside `FileStoringOptions`:
 | `Prefix` | string | _(empty)_ | Static prefix prepended to every path |
 | `HostSegment` | string | `host` | Segment name used for host (non-tenant) paths |
 | `TenantsSegment` | string | `tenants` | Directory name for tenant paths |
-| `TenantIdentifierMode` | `TenantId` / `TenantName` | `TenantId` | Which tenant property is used in the path |
+| `TenantIdentifierMode` | `TenantId` / `TenantName` / `TenantCode` | `TenantId` | Which tenant identifier is used in the path |
 
 > The `FilePathBuilder` key is reserved and will be skipped when iterating container entries.
+> It is not a file container named `FilePathBuilder`.
+
+`AbpFileStoringOptions.Configure(configuration, context)` reads this section from `FileStoringOptions:FilePathBuilder`.
+It binds the section to `FilePathBuilderEntry`, then applies the values to `AbpFileStoringAbstractionsOptions`.
+This means appsettings-based path configuration is still consumed through `AbpFileStoringOptions`, but the final runtime options used by `IFilePathBuilder` live in `AbpFileStoringAbstractionsOptions`.
+
+Mapping rules:
+
+| appsettings field | Runtime target |
+|-------------------|----------------|
+| `FilePathStrategy` | `AbpFileStoringAbstractionsOptions.FilePathStrategy` |
+| `Prefix` | `AbpFileStoringAbstractionsOptions.FilePathBuilder.Prefix` |
+| `HostSegment` | `AbpFileStoringAbstractionsOptions.FilePathBuilder.HostSegment` |
+| `TenantsSegment` | `AbpFileStoringAbstractionsOptions.FilePathBuilder.TenantsSegment` |
+| `TenantIdentifierMode = TenantId` | Clears the built-in `TenantIdentifierFactory`, so `DefaultFilePathBuilder` uses the tenant id. |
+| `TenantIdentifierMode = TenantName` | Sets a built-in `TenantIdentifierFactory` that uses `FilePathContext.TenantCode`, then tenant name, then tenant id. |
+| `TenantIdentifierMode = TenantCode` | Sets a built-in `TenantIdentifierFactory` that uses `FilePathContext.TenantCode`, then tenant id. It does not use tenant name as a fallback. |
+
+Only these simple values can be configured from JSON.
+Factory delegates such as `TenantIdentifierFactory` and `PrefixFactory` must be configured in code with `Configure<AbpFileStoringAbstractionsOptions>`.
+`TenantCode` is not a property of ABP's `ICurrentTenant`; it must come from `FilePathContext.TenantCode`.
+You can set it explicitly with `IFilePathContextAccessor.Change()` or resolve it globally with a contributor such as `MapTenancyFilePathContextResolveContributor`.
+
+For `DirectFileId`, only `Prefix` still affects the generated path.
+`HostSegment`, `TenantsSegment`, and `TenantIdentifierMode` are ignored by the path builder and can be omitted:
+
+```json
+{
+  "FileStoringOptions": {
+    "FilePathBuilder": {
+      "FilePathStrategy": "DirectFileId"
+    }
+  }
+}
+```
+
+With this configuration, the storage path is exactly `{fileId}`.
+If `Prefix` is configured, the path becomes `{prefix}/{fileId}`.
+An explicit `FilePathContext.Prefix` can also add a prefix for a single operation.
 
 Load configuration in your Module:
 
@@ -296,6 +350,28 @@ public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
 }
 ```
 
+You can configure only `FilePathBuilder` in appsettings and keep container/provider definitions in the database.
+In that setup, `AbpFileStoringOptions.Configure(configuration, context)` applies the global path settings, while `SharpAbp.Abp.FileStoringManagement.Domain` replaces `IFileContainerConfigurationProvider` with `DatabaseFileContainerConfigurationProvider`.
+`FileContainerFactory` and `DefaultFileProviderSelector` both read container settings from `IFileContainerConfigurationProvider`, so they will use the database-backed provider instead of `AbpFileStoringOptions.Containers`.
+
+Minimal appsettings example for database-backed containers:
+
+```json
+{
+  "FileStoringOptions": {
+    "FilePathBuilder": {
+      "FilePathStrategy": "TenantBased",
+      "Prefix": "uploads",
+      "HostSegment": "host",
+      "TenantsSegment": "tenants",
+      "TenantIdentifierMode": "TenantId"
+    }
+  }
+}
+```
+
+Use this style when storage containers are managed by `FileStoringManagement`, but path layout should still be controlled by application configuration.
+
 ---
 
 ### Method 2: Configure via code in Module
@@ -305,6 +381,8 @@ Use `Configure<AbpFileStoringAbstractionsOptions>` for full control, including f
 ```csharp
 Configure<AbpFileStoringAbstractionsOptions>(opts =>
 {
+    opts.FilePathStrategy = FilePathGenerationStrategy.TenantBased;
+
     // Global prefix
     opts.FilePathBuilder.Prefix = "uploads";
 
@@ -321,6 +399,25 @@ Configure<AbpFileStoringAbstractionsOptions>(opts =>
         ?? "files";                                          // global default
 });
 ```
+
+#### AbpFileStoringAbstractionsOptions Reference
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `DefaultClientMaximumRetained` | `int` | `Environment.ProcessorCount * 2` | Default retained client count used by provider client pools. |
+| `FilePathStrategy` | `FilePathGenerationStrategy` | `TenantBased` | Overall path generation mode. `DirectFileId` uses the raw file id except for optional prefix handling. |
+| `FilePathBuilder` | `FilePathBuilderOptions` | new instance | Shared path builder settings used by all providers. |
+| `Providers` | `FileProviderConfigurations` | new instance | Provider registration and value validator configuration. |
+
+`FilePathBuilderOptions` contains the common path layout knobs:
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| `Prefix` | `null` | Static global prefix. Used when `PrefixFactory` is not set and no context prefix overrides it. |
+| `HostSegment` | `host` | Segment used when `ICurrentTenant.Id` is null. |
+| `TenantsSegment` | `tenants` | Segment used before tenant-specific paths. |
+| `TenantIdentifierFactory` | `null` | Optional factory for the tenant path identifier. Receives `(tenantId, tenantName, filePathContext)`. |
+| `PrefixFactory` | `null` | Optional dynamic prefix factory. Receives the current `FilePathContext`. |
 
 ---
 
@@ -389,6 +486,107 @@ public class MyFileService : ITransientDependency
 | `TenantCode` | `string?` | Custom tenant identifier. Passed as the third argument to `TenantIdentifierFactory`. |
 | `Prefix` | `string?` | Per-operation path prefix. Overrides `FilePathBuilderOptions.Prefix` when `PrefixFactory` is not set. |
 | `Extra` | `Dictionary<string, object?>` | Arbitrary key-value pairs accessible inside both factory delegates. |
+
+### Automatic FilePathContext Resolution
+
+Use `IFilePathContextAccessor.Change()` when a call site already knows the exact path context.
+Use an `IFilePathContextResolveContributor` when the context should be resolved globally from the current tenant, current user, request metadata, or another ambient source.
+
+Register a custom contributor:
+
+```csharp
+Configure<AbpFilePathContextResolveOptions>(options =>
+{
+    options.Contributors.Add(new RegionFilePathContextResolveContributor());
+});
+```
+
+Implement the contributor:
+
+```csharp
+public class RegionFilePathContextResolveContributor : IFilePathContextResolveContributor
+{
+    public string Name => "Region";
+
+    public Task ResolveAsync(IFilePathContextResolveContext context)
+    {
+        context.FilePathContext = new FilePathContext
+        {
+            Prefix = "cn-north"
+        };
+        context.FilePathContext.Extra["Source"] = Name;
+        context.Handled = true;
+
+        return Task.CompletedTask;
+    }
+}
+```
+
+`IFilePathContextResolveContext.ServiceProvider` is available for contributors that need scoped services.
+Set `Handled = true` only when the contributor has resolved the context and later contributors should not run.
+
+### MapTenancy Integration
+
+`SharpAbp.Abp.FileStoring.MapTenancy` provides `MapTenancyFilePathContextResolveContributor`.
+It resolves `FilePathContext.TenantCode` from `IMapTenantCodeProvider` by using the current tenant id.
+
+Add the module dependency:
+
+```csharp
+[DependsOn(
+    typeof(AbpFileStoringModule),
+    typeof(AbpFileStoringMapTenancyModule)
+)]
+public class YourModule : AbpModule
+{
+}
+```
+
+Configure how the tenant path code is chosen:
+
+```csharp
+Configure<AbpFileStoringMapTenancyOptions>(options =>
+{
+    options.TenantCodeSource = FilePathTenantCodeSource.Code;
+    options.MissingMapTenantBehavior = MissingMapTenantBehavior.Ignore;
+});
+
+Configure<AbpFileStoringAbstractionsOptions>(options =>
+{
+    options.FilePathBuilder.TenantIdentifierFactory = (tenantId, tenantName, context) =>
+        context?.TenantCode ?? tenantId.ToString("D");
+});
+```
+
+The same tenant-code behaviour can also be configured from appsettings:
+
+```json
+{
+  "FileStoringOptions": {
+    "FilePathBuilder": {
+      "FilePathStrategy": "TenantBased",
+      "TenantIdentifierMode": "TenantCode"
+    }
+  }
+}
+```
+
+`TenantCodeSource` values:
+
+| Value | Description |
+|-------|-------------|
+| `Code` | Use `MapTenantCodeInfo.Code` as `FilePathContext.TenantCode`. This is the default. |
+| `MapCode` | Use `MapTenantCodeInfo.MapCode` as `FilePathContext.TenantCode`. |
+
+`MissingMapTenantBehavior` values:
+
+| Value | Description |
+|-------|-------------|
+| `Ignore` | Keep normal path builder fallback when no mapping is found. This is the default. |
+| `Throw` | Throw when the current tenant has no map tenant code. |
+
+The contributor also stores these values in `FilePathContext.Extra`: `TenantId`, `TenantName`, `Code`, `MapCode`, and `Source`.
+`TenantCode` is intentionally separate from `CurrentTenant.Id` and `CurrentTenant.Name`; by default it comes from MapTenancy's mapping code.
 
 ---
 
@@ -500,7 +698,9 @@ public class DbTenantCodeFilePathBuilder : IFilePathBuilder, ITransientDependenc
 |----------|----------------------|
 | Static prefix / tenant-as-Name | `appsettings.json` → `FilePathBuilder` |
 | Factory with runtime logic | `Configure<AbpFileStoringAbstractionsOptions>` in Module |
-| Per-call parameters (code, prefix, extras) | `IFilePathContextAccessor.Change()` at call site |
+| Explicit per-call parameters (code, prefix, extras) | `IFilePathContextAccessor.Change()` at call site |
+| Global automatic context | Add `IFilePathContextResolveContributor` through `AbpFilePathContextResolveOptions` |
+| MapTenancy tenant code | Add `SharpAbp.Abp.FileStoring.MapTenancy` and configure `AbpFileStoringMapTenancyOptions` |
 | Custom logic reusing base behavior | Override `DefaultFilePathBuilder` |
 | Fully custom / async lookup | Implement `IFilePathBuilder` from scratch |
 

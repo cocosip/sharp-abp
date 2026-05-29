@@ -25,42 +25,7 @@ namespace SharpAbp.Abp.FileStoring
             if (filePathBuilderEntry != null)
             {
                 context.Services.Configure<AbpFileStoringAbstractionsOptions>(opts =>
-                {
-                    if (filePathBuilderEntry.FilePathStrategy.HasValue)
-                    {
-                        opts.FilePathStrategy = filePathBuilderEntry.FilePathStrategy.Value;
-                    }
-
-                    if (!string.IsNullOrEmpty(filePathBuilderEntry.Prefix))
-                    {
-                        opts.FilePathBuilder.Prefix = filePathBuilderEntry.Prefix;
-                    }
-
-                    if (filePathBuilderEntry.HostSegment != null)
-                    {
-                        opts.FilePathBuilder.HostSegment = filePathBuilderEntry.HostSegment;
-                    }
-
-                    if (filePathBuilderEntry.TenantsSegment != null)
-                    {
-                        opts.FilePathBuilder.TenantsSegment = filePathBuilderEntry.TenantsSegment;
-                    }
-
-                    if (filePathBuilderEntry.TenantIdentifierMode.HasValue)
-                    {
-                        if (filePathBuilderEntry.TenantIdentifierMode.Value == TenantIdentifierMode.TenantName)
-                        {
-                            opts.FilePathBuilder.TenantIdentifierFactory = (id, name, ctx) =>
-                                ctx?.TenantCode
-                                ?? (!string.IsNullOrEmpty(name) ? name! : id.ToString("D"));
-                        }
-                        else
-                        {
-                            // TenantId mode: clear any previously set factory → DefaultFilePathBuilder uses GUID
-                            opts.FilePathBuilder.TenantIdentifierFactory = null;
-                        }
-                    }
-                });
+                    filePathBuilderEntry.ApplyTo(opts));
             }
 
             var entries = section.Get<Dictionary<string, FileContainerConfigurationEntry>>();

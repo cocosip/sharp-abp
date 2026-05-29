@@ -198,6 +198,8 @@ public class IdGenerationService : ApplicationService
 ## FileStoringManagement
 
 File storage management module for centralized file upload, download, and configuration.
+The domain package replaces `IFileContainerConfigurationProvider` with `DatabaseFileContainerConfigurationProvider`, so runtime file containers can be loaded from the database.
+Global path layout can still be configured separately with `FileStoringOptions:FilePathBuilder` in appsettings.
 
 ### Installation
 
@@ -327,6 +329,8 @@ public class ConnectionManagementService : ApplicationService
 ## MapTenancyManagement
 
 Map-based tenancy management module for domain-tenant mapping.
+The domain package also provides `DatabaseMapTenantCodeProvider`, which replaces the default `IMapTenantCodeProvider` and resolves tenant code data from `IMapTenantStore`.
+Consumers such as `SharpAbp.Abp.FileStoring.MapTenancy` can use it to build file paths with the mapped tenant code.
 
 ### Installation
 
