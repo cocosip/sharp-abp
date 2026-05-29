@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.Validation;
 using Volo.Abp.Modularity;
@@ -19,7 +20,20 @@ namespace SharpAbp.Abp.FileStoring
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            Configure<AbpFileStoringAbstractionsOptions>(options => { });
+            context.Services.AddSingleton<IFilePathContextAccessor>(
+                AsyncLocalFilePathContextAccessor.Instance
+            );
+            context.Services.AddTransient<IFilePathContextResolver, DefaultFilePathContextResolver>();
+
+            var configuration = context.Services.GetConfiguration();
+            Configure<AbpFileStoringAbstractionsOptions>(options =>
+            {
+                var filePathBuilderEntry = configuration
+                    .GetSection("FileStoringOptions:FilePathBuilder")
+                    .Get<FilePathBuilderEntry>();
+                filePathBuilderEntry?.ApplyTo(options);
+            });
+            Configure<AbpFilePathContextResolveOptions>(options => { });
 
             return Task.CompletedTask;
         }

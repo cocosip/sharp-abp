@@ -35,8 +35,53 @@ namespace SharpAbp.Abp.FileStoring
         /// Selects the built-in tenant identifier strategy.
         /// Maps to <see cref="FilePathBuilderOptions.TenantIdentifierFactory"/> via a built-in factory.
         /// Use <see cref="TenantIdentifierMode.TenantId"/> (default) for GUID-based paths,
-        /// or <see cref="TenantIdentifierMode.TenantName"/> to use the tenant Name.
+        /// <see cref="TenantIdentifierMode.TenantName"/> to use the tenant Name,
+        /// or <see cref="TenantIdentifierMode.TenantCode"/> to use <see cref="FilePathContext.TenantCode"/>.
         /// </summary>
         public TenantIdentifierMode? TenantIdentifierMode { get; set; }
+
+        public virtual void ApplyTo(AbpFileStoringAbstractionsOptions options)
+        {
+            if (FilePathStrategy.HasValue)
+            {
+                options.FilePathStrategy = FilePathStrategy.Value;
+            }
+
+            if (!string.IsNullOrEmpty(Prefix))
+            {
+                options.FilePathBuilder.Prefix = Prefix;
+            }
+
+            if (HostSegment != null)
+            {
+                options.FilePathBuilder.HostSegment = HostSegment;
+            }
+
+            if (TenantsSegment != null)
+            {
+                options.FilePathBuilder.TenantsSegment = TenantsSegment;
+            }
+
+            if (!TenantIdentifierMode.HasValue)
+            {
+                return;
+            }
+
+            if (TenantIdentifierMode.Value == FileStoring.TenantIdentifierMode.TenantCode)
+            {
+                options.FilePathBuilder.TenantIdentifierFactory = (id, name, ctx) =>
+                    ctx?.TenantCode ?? id.ToString("D");
+            }
+            else if (TenantIdentifierMode.Value == FileStoring.TenantIdentifierMode.TenantName)
+            {
+                options.FilePathBuilder.TenantIdentifierFactory = (id, name, ctx) =>
+                    ctx?.TenantCode
+                    ?? (!string.IsNullOrEmpty(name) ? name! : id.ToString("D"));
+            }
+            else
+            {
+                options.FilePathBuilder.TenantIdentifierFactory = null;
+            }
+        }
     }
 }

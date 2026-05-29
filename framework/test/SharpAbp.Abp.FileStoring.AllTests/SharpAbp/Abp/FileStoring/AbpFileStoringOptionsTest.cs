@@ -170,12 +170,11 @@ namespace SharpAbp.Abp.FileStoring
         public void FilePathBuilder_Appsettings_Config_Test()
         {
             // appsettings.json: FilePathStrategy=TenantBased, HostSegment=host,
-            //                   TenantsSegment=tenants, TenantIdentifierMode=TenantId
+            //                   TenantsSegment=tenants, TenantIdentifierMode=TenantCode
             Assert.Equal(FilePathGenerationStrategy.TenantBased, _abstractionsOptions.FilePathStrategy);
             Assert.Equal("host", _abstractionsOptions.FilePathBuilder.HostSegment);
             Assert.Equal("tenants", _abstractionsOptions.FilePathBuilder.TenantsSegment);
-            // TenantIdentifierMode=TenantId → factory is null (uses default GUID)
-            Assert.Null(_abstractionsOptions.FilePathBuilder.TenantIdentifierFactory);
+            Assert.NotNull(_abstractionsOptions.FilePathBuilder.TenantIdentifierFactory);
             // Prefix is empty in appsettings
             Assert.True(string.IsNullOrEmpty(_abstractionsOptions.FilePathBuilder.Prefix));
         }
@@ -258,6 +257,23 @@ namespace SharpAbp.Abp.FileStoring
                 Assert.Equal(
                     "prod/tenants/3fa85f64-5717-4562-b3fc-2c963f66afa6/images/photo.jpg",
                     path);
+            }
+        }
+
+        [Fact]
+        public void FilePathBuilder_Build_TenantWithContextTenantCode_Integration_Test()
+        {
+            var builder = GetRequiredService<IFilePathBuilder>();
+            var accessor = GetRequiredService<IFilePathContextAccessor>();
+            var configuration = _configurationProvider.Get("minio-container");
+            var args = new FileProviderSaveArgs("minio-container", configuration, "images/photo.jpg");
+
+            var tenantId = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa6");
+            using (_currentTenant.Change(tenantId))
+            using (accessor.Change(new FilePathContext { TenantCode = "T001" }))
+            {
+                var path = builder.Build(args);
+                Assert.Equal("tenants/T001/images/photo.jpg", path);
             }
         }
 

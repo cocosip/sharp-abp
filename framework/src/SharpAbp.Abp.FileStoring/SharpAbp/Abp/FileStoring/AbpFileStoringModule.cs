@@ -31,10 +31,6 @@ namespace SharpAbp.Abp.FileStoring
                     .GetRequiredService<IFileContainer<DefaultContainer>>()
             );
 
-            context.Services.AddSingleton<IFilePathContextAccessor>(
-                AsyncLocalFilePathContextAccessor.Instance
-            );
-
             return Task.CompletedTask;
         }
 

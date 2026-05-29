@@ -170,6 +170,41 @@ public class TenantMappingService : ApplicationService
 }
 ```
 
+#### Tenant Code Provider
+
+`IMapTenantCodeProvider` resolves a tenant id to the mapping code used by consumers that need a stable tenant code instead of a tenant GUID or tenant name.
+For example, `SharpAbp.Abp.FileStoring.MapTenancy` uses this provider to fill `FilePathContext.TenantCode`.
+
+```csharp
+public class StorageTenantCodeService : ITransientDependency
+{
+    private readonly IMapTenantCodeProvider _mapTenantCodeProvider;
+
+    public StorageTenantCodeService(IMapTenantCodeProvider mapTenantCodeProvider)
+    {
+        _mapTenantCodeProvider = mapTenantCodeProvider;
+    }
+
+    public async Task<string?> FindCodeAsync(Guid tenantId)
+    {
+        var codeInfo = await _mapTenantCodeProvider.FindByTenantIdAsync(tenantId);
+        return codeInfo?.Code;
+    }
+}
+```
+
+`MapTenantCodeInfo` contains:
+
+| Property | Description |
+|----------|-------------|
+| `TenantId` | Tenant id from the mapping. |
+| `TenantName` | Optional tenant display/name value from the mapping. |
+| `Code` | Tenant mapping code. This is the default tenant path code for FileStoring integration. |
+| `MapCode` | Optional alternate mapping code. FileStoring can opt into this with `FilePathTenantCodeSource.MapCode`. |
+
+The default provider reads from `AbpMapTenancyOptions`.
+When `SharpAbp.Abp.MapTenancyManagement.Domain` is installed, `DatabaseMapTenantCodeProvider` replaces it and reads tenant code information from `IMapTenantStore`.
+
 ---
 
 ## TenancyGrouping
