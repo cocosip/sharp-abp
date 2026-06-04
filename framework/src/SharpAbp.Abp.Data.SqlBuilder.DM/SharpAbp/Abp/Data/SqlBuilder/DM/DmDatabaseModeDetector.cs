@@ -1,5 +1,7 @@
 using System.Data;
 using Dm;
+using Microsoft.Extensions.Options;
+using SharpAbp.Abp.EntityFrameworkCore;
 using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.Data.SqlBuilder.DM
@@ -9,6 +11,13 @@ namespace SharpAbp.Abp.Data.SqlBuilder.DM
     /// </summary>
     public class DmDatabaseModeDetector : IDmDatabaseModeDetector, ITransientDependency
     {
+        protected SharpAbpEfCoreOptions Options { get; }
+
+        public DmDatabaseModeDetector(IOptions<SharpAbpEfCoreOptions> options)
+        {
+            Options = options.Value;
+        }
+
         /// <summary>
         /// Detect DM database compatibility mode
         /// </summary>
@@ -16,6 +25,12 @@ namespace SharpAbp.Abp.Data.SqlBuilder.DM
         /// <returns>Database mode</returns>
         public virtual DmDatabaseMode DetectMode(IDbConnection dbConnection)
         {
+            var configuredMode = Options.GetDmDatabaseModeOrNull();
+            if (configuredMode.HasValue)
+            {
+                return configuredMode.Value;
+            }
+
             var dmConnection = dbConnection as DmConnection;
             if (dmConnection != null)
             {

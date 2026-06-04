@@ -42,6 +42,11 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             /// Default schema property name.
             /// </summary>
             public const string DefaultSchema = "DefaultSchema";
+
+            /// <summary>
+            /// DM database compatibility mode property name.
+            /// </summary>
+            public const string DmDatabaseMode = "DmDatabaseMode";
         }
 
         /// <summary>
@@ -91,6 +96,16 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             "Version11",
             "Version12",
             "Version12a"
+        };
+
+        /// <summary>
+        /// Valid DM database compatibility modes.
+        /// </summary>
+        public static readonly HashSet<string> ValidDmDatabaseModes = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "Oracle",
+            "PostgreSql",
+            "MySql"
         };
     }
 }

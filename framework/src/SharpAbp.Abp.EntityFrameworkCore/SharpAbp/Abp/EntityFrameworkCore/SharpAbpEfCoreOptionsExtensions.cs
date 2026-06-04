@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SharpAbp.Abp.Data;
 using Volo.Abp;
 
 namespace SharpAbp.Abp.EntityFrameworkCore
@@ -81,6 +82,25 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             return options.GetPropertyValue(EfCoreConstants.PropertyNames.DefaultSchema, "");
         }
 
+        /// <summary>
+        /// Gets the DM database compatibility mode.
+        /// </summary>
+        /// <param name="options">The SharpAbpEfCoreOptions instance.</param>
+        /// <returns>The DM database compatibility mode, or null if not specified or invalid.</returns>
+        public static DmDatabaseMode? GetDmDatabaseModeOrNull(this SharpAbpEfCoreOptions options)
+        {
+            var mode = options.GetPropertyValue(
+                EfCoreConstants.PropertyNames.DmDatabaseMode,
+                "",
+                EfCoreConstants.ValidDmDatabaseModes);
+
+            if (mode.IsNullOrWhiteSpace())
+            {
+                return null;
+            }
+
+            return Enum.Parse<DmDatabaseMode>(mode, true);
+        }
 
     }
 }

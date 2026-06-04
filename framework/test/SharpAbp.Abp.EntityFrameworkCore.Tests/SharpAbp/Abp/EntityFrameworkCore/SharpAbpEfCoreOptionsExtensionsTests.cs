@@ -368,5 +368,65 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             // Assert
             Assert.Equal("", result);
         }
+
+        [Theory]
+        [InlineData("Oracle", DmDatabaseMode.Oracle)]
+        [InlineData("PostgreSql", DmDatabaseMode.PostgreSql)]
+        [InlineData("MySql", DmDatabaseMode.MySql)]
+        [InlineData("mysql", DmDatabaseMode.MySql)]
+        public void GetDmDatabaseModeOrNull_ShouldReturnConfiguredMode_WhenValidModeInProperties(
+            string configuredMode,
+            DmDatabaseMode expectedMode)
+        {
+            // Arrange
+            var options = new SharpAbpEfCoreOptions
+            {
+                Properties = new Dictionary<string, string>
+                {
+                    { EfCoreConstants.PropertyNames.DmDatabaseMode, configuredMode }
+                }
+            };
+
+            // Act
+            var result = options.GetDmDatabaseModeOrNull();
+
+            // Assert
+            Assert.Equal(expectedMode, result);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("   ")]
+        [InlineData("SqlServer")]
+        public void GetDmDatabaseModeOrNull_ShouldReturnNull_WhenModeIsInvalidOrEmpty(string configuredMode)
+        {
+            // Arrange
+            var options = new SharpAbpEfCoreOptions
+            {
+                Properties = new Dictionary<string, string>
+                {
+                    { EfCoreConstants.PropertyNames.DmDatabaseMode, configuredMode }
+                }
+            };
+
+            // Act
+            var result = options.GetDmDatabaseModeOrNull();
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetDmDatabaseModeOrNull_ShouldReturnNull_WhenModeNotConfigured()
+        {
+            // Arrange
+            var options = new SharpAbpEfCoreOptions();
+
+            // Act
+            var result = options.GetDmDatabaseModeOrNull();
+
+            // Assert
+            Assert.Null(result);
+        }
     }
 }

@@ -335,5 +335,65 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             // Assert
             Assert.Equal("", result);
         }
+
+        [Theory]
+        [InlineData("Oracle", DmDatabaseMode.Oracle)]
+        [InlineData("PostgreSql", DmDatabaseMode.PostgreSql)]
+        [InlineData("MySql", DmDatabaseMode.MySql)]
+        [InlineData("mysql", DmDatabaseMode.MySql)]
+        public void GetDmDatabaseModeOrNull_ShouldReturnConfiguredMode_WhenValidModeInConfiguration(
+            string configuredMode,
+            DmDatabaseMode expectedMode)
+        {
+            // Arrange
+            var configurationData = new Dictionary<string, string>
+            {
+                { "EfCoreOptions:Properties:DmDatabaseMode", configuredMode }
+            };
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(configurationData)
+                .Build();
+
+            // Act
+            var result = configuration.GetDmDatabaseModeOrNull();
+
+            // Assert
+            Assert.Equal(expectedMode, result);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("   ")]
+        [InlineData("SqlServer")]
+        public void GetDmDatabaseModeOrNull_ShouldReturnNull_WhenModeIsInvalidOrEmpty(string configuredMode)
+        {
+            // Arrange
+            var configurationData = new Dictionary<string, string>
+            {
+                { "EfCoreOptions:Properties:DmDatabaseMode", configuredMode }
+            };
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(configurationData)
+                .Build();
+
+            // Act
+            var result = configuration.GetDmDatabaseModeOrNull();
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetDmDatabaseModeOrNull_ShouldReturnNull_WhenModeNotConfigured()
+        {
+            // Arrange
+            var configuration = new ConfigurationBuilder().Build();
+
+            // Act
+            var result = configuration.GetDmDatabaseModeOrNull();
+
+            // Assert
+            Assert.Null(result);
+        }
     }
 }

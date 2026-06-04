@@ -109,6 +109,25 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             return configuration.GetProperties().GetPropertyValue(EfCoreConstants.PropertyNames.DefaultSchema, "");
         }
 
+        /// <summary>
+        /// Gets the DM database compatibility mode setting from configuration.
+        /// </summary>
+        /// <param name="configuration">The configuration instance.</param>
+        /// <returns>The DM database compatibility mode, or null if not specified or invalid.</returns>
+        public static DmDatabaseMode? GetDmDatabaseModeOrNull(this IConfiguration configuration)
+        {
+            var mode = configuration.GetProperties().GetPropertyValue(
+                EfCoreConstants.PropertyNames.DmDatabaseMode,
+                "",
+                EfCoreConstants.ValidDmDatabaseModes);
+
+            if (mode.IsNullOrWhiteSpace())
+            {
+                return null;
+            }
+
+            return Enum.Parse<DmDatabaseMode>(mode, true);
+        }
 
     }
 }
