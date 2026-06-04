@@ -26,6 +26,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\SharpAbp.Abp.Data.SqlBuilder\SharpAbp.Abp.Data.SqlBuilder.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.Data.SqlBuilder.DM\SharpAbp.Abp.Data.SqlBuilder.DM.csproj" />
 	</ItemGroup>
 
 </Project>
