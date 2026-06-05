@@ -1,8 +1,10 @@
 ﻿using Microsoft.Data.SqlClient;
 using SharpAbp.Abp.Data;
 using SharpAbp.Abp.DbConnections;
+using System;
 using System.Threading.Tasks;
 using Volo.Abp;
+using Volo.Abp.MultiTenancy;
 using Xunit;
 
 namespace SharpAbp.Abp.DbConnectionsManagement
@@ -11,10 +13,12 @@ namespace SharpAbp.Abp.DbConnectionsManagement
     {
         private readonly IDatabaseConnectionInfoAppService _databaseConnectionInfoAppService;
         private readonly IDbConnectionFactory _dbConnectionFactory;
+        private readonly ICurrentTenant _currentTenant;
         public DbConnectionFactoryTest()
         {
             _databaseConnectionInfoAppService = GetRequiredService<IDatabaseConnectionInfoAppService>();
             _dbConnectionFactory = GetRequiredService<IDbConnectionFactory>();
+            _currentTenant = GetRequiredService<ICurrentTenant>();
         }
 
         [Fact]
@@ -67,6 +71,38 @@ namespace SharpAbp.Abp.DbConnectionsManagement
                 return _dbConnectionFactory.GetDbConnectionAsync("sqlite5");
             });
 
+        }
+
+        [Fact]
+        public async Task Update_Should_Clear_Global_Cache_When_Connection_Is_Read_Under_Tenant()
+        {
+            var connectionInfo = await _databaseConnectionInfoAppService.CreateAsync(new CreateDatabaseConnectionInfoDto()
+            {
+                Name = "tenant-cache-update",
+                DatabaseProvider = DatabaseProvider.MySql.ToString(),
+                ConnectionString = "Server=old;"
+            });
+
+            var tenantId = Guid.NewGuid();
+
+            using (_currentTenant.Change(tenantId))
+            {
+                var cached = await _dbConnectionFactory.GetDbConnectionInfoAsync("tenant-cache-update");
+                Assert.Equal("Server=old;", cached.ConnectionString);
+            }
+
+            await _databaseConnectionInfoAppService.UpdateAsync(connectionInfo.Id, new UpdateDatabaseConnectionInfoDto()
+            {
+                Name = "tenant-cache-update",
+                DatabaseProvider = DatabaseProvider.MySql.ToString(),
+                ConnectionString = "Server=new;"
+            });
+
+            using (_currentTenant.Change(tenantId))
+            {
+                var refreshed = await _dbConnectionFactory.GetDbConnectionInfoAsync("tenant-cache-update");
+                Assert.Equal("Server=new;", refreshed.ConnectionString);
+            }
         }
 
     }
