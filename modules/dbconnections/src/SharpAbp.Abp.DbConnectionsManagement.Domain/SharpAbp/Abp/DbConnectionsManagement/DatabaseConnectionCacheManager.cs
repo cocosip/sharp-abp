@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using Volo.Abp;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
+using Volo.Abp.MultiTenancy;
 
 namespace SharpAbp.Abp.DbConnectionsManagement
 {
@@ -24,18 +25,23 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         /// Gets the repository for database connection information
         /// </summary>
         protected IDatabaseConnectionInfoRepository ConnectionInfoRepository { get; }
+
+        protected ICurrentTenant CurrentTenant { get; }
         
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseConnectionCacheManager"/> class
         /// </summary>
         /// <param name="connectionInfoCache">The distributed cache for connection information</param>
         /// <param name="connectionInfoRepository">The repository for database connection information</param>
+        /// <param name="currentTenant">The current tenant accessor used to normalize cache operations to host scope</param>
         public DatabaseConnectionCacheManager(
             IDistributedCache<DatabaseConnectionCacheItem> connectionInfoCache,
-            IDatabaseConnectionInfoRepository connectionInfoRepository)
+            IDatabaseConnectionInfoRepository connectionInfoRepository,
+            ICurrentTenant currentTenant)
         {
             ConnectionCache = connectionInfoCache;
             ConnectionInfoRepository = connectionInfoRepository;
+            CurrentTenant = currentTenant;
         }
 
         /// <summary>
@@ -50,15 +56,20 @@ namespace SharpAbp.Abp.DbConnectionsManagement
             CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            var cacheKey = DatabaseConnectionCacheItem.CalculateCacheKey(name);
-            var cacheItem = await ConnectionCache.GetOrAddAsync(
-                cacheKey,
-                async () =>
-                {
-                    var databaseConnectionInfo = await ConnectionInfoRepository.FindByNameAsync(name, true, cancellationToken);
-                    return databaseConnectionInfo?.AsCacheItem();
-                },
-                token: cancellationToken);
+            DatabaseConnectionCacheItem cacheItem;
+
+            using (CurrentTenant.Change(null))
+            {
+                var cacheKey = DatabaseConnectionCacheItem.CalculateCacheKey(name);
+                cacheItem = await ConnectionCache.GetOrAddAsync(
+                    cacheKey,
+                    async () =>
+                    {
+                        var databaseConnectionInfo = await ConnectionInfoRepository.FindByNameAsync(name, true, cancellationToken);
+                        return databaseConnectionInfo?.AsCacheItem();
+                    },
+                    token: cancellationToken);
+            }
 
             return cacheItem;
         }
@@ -75,8 +86,11 @@ namespace SharpAbp.Abp.DbConnectionsManagement
             CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            var cacheKey = DatabaseConnectionCacheItem.CalculateCacheKey(name);
-            await ConnectionCache.RemoveAsync(cacheKey, token: cancellationToken);
+            using (CurrentTenant.Change(null))
+            {
+                var cacheKey = DatabaseConnectionCacheItem.CalculateCacheKey(name);
+                await ConnectionCache.RemoveAsync(cacheKey, token: cancellationToken);
+            }
         }
 
         /// <summary>
@@ -91,8 +105,15 @@ namespace SharpAbp.Abp.DbConnectionsManagement
             CancellationToken cancellationToken = default)
         {
             Check.NotNull(names, nameof(names));
-            var cacheKeys = names.Where(x => !x.IsNullOrWhiteSpace()).Select(DatabaseConnectionCacheItem.CalculateCacheKey).ToList();
-            await ConnectionCache.RemoveManyAsync(cacheKeys, token: cancellationToken);
+            using (CurrentTenant.Change(null))
+            {
+                var cacheKeys = names
+                    .Where(x => !x.IsNullOrWhiteSpace())
+                    .Select(DatabaseConnectionCacheItem.CalculateCacheKey)
+                    .Distinct()
+                    .ToList();
+                await ConnectionCache.RemoveManyAsync(cacheKeys, token: cancellationToken);
+            }
         }
 
     }
