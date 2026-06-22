@@ -2,14 +2,14 @@
 
 ## Project Structure & Module Organization
 
-This repository is a .NET/ABP package collection. Shared infrastructure packages live under `framework/src`, with framework tests in `framework/test` and the main framework solution at `framework/SharpAbp.slnx`. Business modules live under `modules/<module-name>` and usually contain their own `.slnx`, `src`, and `test` trees. Runnable examples and integration samples are under `samples/`. Shared build settings are in `Directory.Build.props`, `Directory.Packages.props`, `common.props`, and `common.test.props`.
+This repository is a .NET/ABP package collection. Shared infrastructure packages live under `framework/src`, with framework tests in `framework/test` and the main framework solution at `framework/SharpAbp.sln`. Business modules live under `modules/<module-name>` and usually contain their own `.sln`, `src`, and `test` trees. Runnable examples and integration samples are under `samples/`. Shared build settings are in `Directory.Build.props`, `Directory.Packages.props`, `common.props`, and `common.test.props`.
 
 ## Build, Test, and Development Commands
 
-- `dotnet restore framework/SharpAbp.slnx` restores the framework solution.
-- `dotnet build framework/SharpAbp.slnx -c Release` builds the shared framework packages.
+- `dotnet restore framework/SharpAbp.sln` restores the framework solution.
+- `dotnet build framework/SharpAbp.sln -c Release` builds the shared framework packages.
 - `dotnet test framework/test/SharpAbp.Abp.FileStoring.Tests/SharpAbp.Abp.FileStoring.Tests.csproj -c Release` runs a focused test project.
-- `dotnet build modules/file-storing-management/SharpAbp.Abp.FileStoringManagement.slnx -c Release` builds one module solution.
+- `dotnet build modules/file-storing-management/SharpAbp.Abp.FileStoringManagement.sln -c Release` builds one module solution.
 - `powershell -ExecutionPolicy Bypass -File scripts/windows-ci/Build-All.ps1` builds the framework and module solution list used by local Windows CI.
 
 In the Codex app, run `dotnet build` and `dotnet test` outside the sandbox with the approved `dotnet` prefix rule.

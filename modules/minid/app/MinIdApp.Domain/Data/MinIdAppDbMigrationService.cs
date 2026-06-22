@@ -208,8 +208,7 @@ namespace MinIdApp.Data
             {
                 currentDirectory = Directory.GetParent(currentDirectory.FullName);
 
-                if (Directory.GetFiles(currentDirectory.FullName).Any(f =>
-                        f.EndsWith(".slnx", StringComparison.OrdinalIgnoreCase)))
+                if (Directory.GetFiles(currentDirectory.FullName).FirstOrDefault(f => f.EndsWith(".sln")) != null)
                 {
                     return currentDirectory.FullName;
                 }

@@ -1,7 +1,0 @@
-<Solution>
-  <Folder Name="/src/">
-    <Project Path="src/MassTransitSample.Common/MassTransitSample.Common.csproj" />
-    <Project Path="src/MassTransitSample.Consumer/MassTransitSample.Consumer.csproj" />
-    <Project Path="src/MassTransitSample.Producer/MassTransitSample.Producer.csproj" />
-  </Folder>
-</Solution>
