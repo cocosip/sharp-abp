@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="../../framework/src/SharpAbp.Abp.Faster/SharpAbp.Abp.Faster.csproj" />
+    <Project Path="src/FasterLogSample/FasterLogSample.csproj" />
+  </Folder>
+</Solution>

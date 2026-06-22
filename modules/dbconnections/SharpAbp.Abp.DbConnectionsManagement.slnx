@@ -1,0 +1,20 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/src/">
+    <Project Path="src/SharpAbp.Abp.DbConnectionsManagement.Application.Contracts/SharpAbp.Abp.DbConnectionsManagement.Application.Contracts.csproj" />
+    <Project Path="src/SharpAbp.Abp.DbConnectionsManagement.Application/SharpAbp.Abp.DbConnectionsManagement.Application.csproj" />
+    <Project Path="src/SharpAbp.Abp.DbConnectionsManagement.Domain.Shared/SharpAbp.Abp.DbConnectionsManagement.Domain.Shared.csproj" />
+    <Project Path="src/SharpAbp.Abp.DbConnectionsManagement.Domain/SharpAbp.Abp.DbConnectionsManagement.Domain.csproj" />
+    <Project Path="src/SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore/SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore.csproj" />
+    <Project Path="src/SharpAbp.Abp.DbConnectionsManagement.HttpApi.Client/SharpAbp.Abp.DbConnectionsManagement.HttpApi.Client.csproj" />
+    <Project Path="src/SharpAbp.Abp.DbConnectionsManagement.HttpApi/SharpAbp.Abp.DbConnectionsManagement.HttpApi.csproj" />
+    <Project Path="src/SharpAbp.Abp.DbConnectionsManagement.MongoDB/SharpAbp.Abp.DbConnectionsManagement.MongoDB.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/SharpAbp.Abp.DbConnectionsManagement.Tests/SharpAbp.Abp.DbConnectionsManagement.Tests.csproj" />
+  </Folder>
+</Solution>

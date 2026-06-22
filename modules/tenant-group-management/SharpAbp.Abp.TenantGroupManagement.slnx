@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SharpAbp.Abp.TenantGroupManagement.Application.Contracts/SharpAbp.Abp.TenantGroupManagement.Application.Contracts.csproj" />
+    <Project Path="src/SharpAbp.Abp.TenantGroupManagement.Application/SharpAbp.Abp.TenantGroupManagement.Application.csproj" />
+    <Project Path="src/SharpAbp.Abp.TenantGroupManagement.Domain.Shared/SharpAbp.Abp.TenantGroupManagement.Domain.Shared.csproj" />
+    <Project Path="src/SharpAbp.Abp.TenantGroupManagement.Domain/SharpAbp.Abp.TenantGroupManagement.Domain.csproj" />
+    <Project Path="src/SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore/SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore.csproj" />
+    <Project Path="src/SharpAbp.Abp.TenantGroupManagement.HttpApi/SharpAbp.Abp.TenantGroupManagement.HttpApi.csproj" />
+    <Project Path="src/SharpAbp.Abp.TenantGroupManagement.MongoDB/SharpAbp.Abp.TenantGroupManagement.MongoDB.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/SharpAbp.Abp.TenantGroupManagement.Application.Tests/SharpAbp.Abp.TenantGroupManagement.Application.Tests.csproj" />
+  </Folder>
+</Solution>

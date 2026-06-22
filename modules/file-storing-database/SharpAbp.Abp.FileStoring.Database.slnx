@@ -1,0 +1,14 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/src/">
+    <Project Path="src/SharpAbp.Abp.FileStoring.Database.Domain.Shared/SharpAbp.Abp.FileStoring.Database.Domain.Shared.csproj" />
+    <Project Path="src/SharpAbp.Abp.FileStoring.Database.Domain/SharpAbp.Abp.FileStoring.Database.Domain.csproj" />
+    <Project Path="src/SharpAbp.Abp.FileStoring.Database.EntityFrameworkCore/SharpAbp.Abp.FileStoring.Database.EntityFrameworkCore.csproj" />
+    <Project Path="src/SharpAbp.Abp.FileStoring.Database.MongoDB/SharpAbp.Abp.FileStoring.Database.MongoDB.csproj" />
+  </Folder>
+  <Folder Name="/test/" />
+</Solution>

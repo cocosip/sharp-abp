@@ -1,0 +1,20 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/src/">
+    <Project Path="src/SharpAbp.Abp.MapTenancyManagement.Application.Contracts/SharpAbp.Abp.MapTenancyManagement.Application.Contracts.csproj" />
+    <Project Path="src/SharpAbp.Abp.MapTenancyManagement.Application/SharpAbp.Abp.MapTenancyManagement.Application.csproj" />
+    <Project Path="src/SharpAbp.Abp.MapTenancyManagement.Domain.Shared/SharpAbp.Abp.MapTenancyManagement.Domain.Shared.csproj" />
+    <Project Path="src/SharpAbp.Abp.MapTenancyManagement.Domain/SharpAbp.Abp.MapTenancyManagement.Domain.csproj" />
+    <Project Path="src/SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore/SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore.csproj" />
+    <Project Path="src/SharpAbp.Abp.MapTenancyManagement.HttpApi.Client/SharpAbp.Abp.MapTenancyManagement.HttpApi.Client.csproj" />
+    <Project Path="src/SharpAbp.Abp.MapTenancyManagement.HttpApi/SharpAbp.Abp.MapTenancyManagement.HttpApi.csproj" />
+    <Project Path="src/SharpAbp.Abp.MapTenancyManagement.MongoDB/SharpAbp.Abp.MapTenancyManagement.MongoDB.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/SharpAbp.Abp.MapTenancyManagement.Application.Tests/SharpAbp.Abp.MapTenancyManagement.Application.Tests.csproj" />
+  </Folder>
+</Solution>

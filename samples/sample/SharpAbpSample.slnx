@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SharpSample.Application.Contracts/SharpSample.Application.Contracts.csproj" />
+    <Project Path="src/SharpSample.Application/SharpSample.Application.csproj" />
+    <Project Path="src/SharpSample.DbMigrator/SharpSample.DbMigrator.csproj" />
+    <Project Path="src/SharpSample.Domain.Shared/SharpSample.Domain.Shared.csproj" />
+    <Project Path="src/SharpSample.Domain/SharpSample.Domain.csproj" />
+    <Project Path="src/SharpSample.EntityFrameworkCore/SharpSample.EntityFrameworkCore.csproj" />
+    <Project Path="src/SharpSample.HttpApi.Client/SharpSample.HttpApi.Client.csproj" />
+    <Project Path="src/SharpSample.HttpApi.Host/SharpSample.HttpApi.Host.csproj" />
+    <Project Path="src/SharpSample.HttpApi/SharpSample.HttpApi.csproj" />
+  </Folder>
+</Solution>
