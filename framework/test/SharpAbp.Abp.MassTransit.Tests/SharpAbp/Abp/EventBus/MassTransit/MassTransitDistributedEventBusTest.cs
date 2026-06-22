@@ -71,7 +71,7 @@ namespace SharpAbp.Abp.EventBus.MassTransit
                 Times.Once);
         }
 
-        private static TestMassTransitDistributedEventBus CreateEventBus(IMassTransitPublisher? publisher = null)
+        private static TestMassTransitDistributedEventBus CreateEventBus(IMassTransitPublisher publisher = null)
         {
             var services = new ServiceCollection();
             services.AddLogging();

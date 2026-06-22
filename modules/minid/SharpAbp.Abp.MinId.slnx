@@ -1,16 +1,4 @@
 <Solution>
-  <Folder Name="/app/">
-    <Project Path="app/MinIdApp.Application.Contracts/MinIdApp.Application.Contracts.csproj" />
-    <Project Path="app/MinIdApp.Application/MinIdApp.Application.csproj" />
-    <Project Path="app/MinIdApp.DbMigrator/MinIdApp.DbMigrator.csproj" />
-    <Project Path="app/MinIdApp.Domain.Shared/MinIdApp.Domain.Shared.csproj" />
-    <Project Path="app/MinIdApp.Domain/MinIdApp.Domain.csproj" />
-    <Project Path="app/MinIdApp.EntityFrameworkCore.DbMigrations/MinIdApp.EntityFrameworkCore.DbMigrations.csproj" />
-    <Project Path="app/MinIdApp.EntityFrameworkCore/MinIdApp.EntityFrameworkCore.csproj" />
-    <Project Path="app/MinIdApp.HttpApi.Client/MinIdApp.HttpApi.Client.csproj" />
-    <Project Path="app/MinIdApp.HttpApi.Host/MinIdApp.HttpApi.Host.csproj" />
-    <Project Path="app/MinIdApp.HttpApi/MinIdApp.HttpApi.csproj" />
-  </Folder>
   <Folder Name="/src/">
     <Project Path="src/SharpAbp.MinId.Application.Contracts/SharpAbp.MinId.Application.Contracts.csproj" />
     <Project Path="src/SharpAbp.MinId.Application/SharpAbp.MinId.Application.csproj" />

@@ -77,11 +77,9 @@
     <Project Path="src/SharpAbp.Abp.OpenTelemetry.Exporter.Otlp/SharpAbp.Abp.OpenTelemetry.Exporter.Otlp.csproj" />
     <Project Path="src/SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.AspNetCore/SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.AspNetCore.csproj" />
     <Project Path="src/SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.HttpListener/SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus.HttpListener.csproj" />
-    <Project Path="src/SharpAbp.Abp.OpenTelemetry.Exporter.Zipkin/SharpAbp.Abp.OpenTelemetry.Exporter.Zipkin.csproj" />
     <Project Path="src/SharpAbp.Abp.OpenTelemetry/SharpAbp.Abp.OpenTelemetry.csproj" />
     <Project Path="src/SharpAbp.Abp.Snowflakes/SharpAbp.Abp.Snowflakes.csproj" />
     <Project Path="src/SharpAbp.Abp.Swashbuckle.Versioning/SharpAbp.Abp.Swashbuckle.Versioning.csproj" />
-    <Project Path="src/SharpAbp.Abp.Swashbuckle/SharpAbp.Abp.Swashbuckle.csproj" />
     <Project Path="src/SharpAbp.Abp.TenancyGrouping.Abstractions/SharpAbp.Abp.TenancyGrouping.Abstractions.csproj" />
     <Project Path="src/SharpAbp.Abp.TenancyGrouping/SharpAbp.Abp.TenancyGrouping.csproj" />
     <Project Path="src/SharpAbp.Abp.TransformSecurity.AspNetCore/SharpAbp.Abp.TransformSecurity.AspNetCore.csproj" />
