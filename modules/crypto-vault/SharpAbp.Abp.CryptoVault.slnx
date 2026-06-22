@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SharpAbp.Abp.CryptoVault.Application.Contracts/SharpAbp.Abp.CryptoVault.Application.Contracts.csproj" />
+    <Project Path="src/SharpAbp.Abp.CryptoVault.Application/SharpAbp.Abp.CryptoVault.Application.csproj" />
+    <Project Path="src/SharpAbp.Abp.CryptoVault.Domain.Shared/SharpAbp.Abp.CryptoVault.Domain.Shared.csproj" />
+    <Project Path="src/SharpAbp.Abp.CryptoVault.Domain/SharpAbp.Abp.CryptoVault.Domain.csproj" />
+    <Project Path="src/SharpAbp.Abp.CryptoVault.EntityFrameworkCore/SharpAbp.Abp.CryptoVault.EntityFrameworkCore.csproj" />
+    <Project Path="src/SharpAbp.Abp.CryptoVault.HttpApi.Client/SharpAbp.Abp.CryptoVault.HttpApi.Client.csproj" />
+    <Project Path="src/SharpAbp.Abp.CryptoVault.HttpApi/SharpAbp.Abp.CryptoVault.HttpApi.csproj" />
+    <Project Path="src/SharpAbp.Abp.CryptoVault.MongoDB/SharpAbp.Abp.CryptoVault.MongoDB.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/SharpAbp.Abp.CryptoVault.Application.Tests/SharpAbp.Abp.CryptoVault.Application.Tests.csproj" />
+  </Folder>
+</Solution>

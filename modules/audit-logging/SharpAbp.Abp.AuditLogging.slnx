@@ -1,0 +1,18 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/src/">
+    <Project Path="src/SharpAbp.Abp.AuditLogging.Application.Contracts/SharpAbp.Abp.AuditLogging.Application.Contracts.csproj" />
+    <Project Path="src/SharpAbp.Abp.AuditLogging.Application/SharpAbp.Abp.AuditLogging.Application.csproj" />
+    <Project Path="src/SharpAbp.Abp.AuditLogging.Domain.Shared/SharpAbp.Abp.AuditLogging.Domain.Shared.csproj" />
+    <Project Path="src/SharpAbp.Abp.AuditLogging.Domain/SharpAbp.Abp.AuditLogging.Domain.csproj" />
+    <Project Path="src/SharpAbp.Abp.AuditLogging.HttpApi.Client/SharpAbp.Abp.AuditLogging.HttpApi.Client.csproj" />
+    <Project Path="src/SharpAbp.Abp.AuditLogging.HttpApi/SharpAbp.Abp.AuditLogging.HttpApi.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/SharpAbp.Abp.AuditLogging.Application.Tests/SharpAbp.Abp.AuditLogging.Application.Tests.csproj" />
+  </Folder>
+</Solution>

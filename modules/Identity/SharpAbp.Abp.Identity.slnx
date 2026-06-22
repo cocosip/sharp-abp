@@ -1,0 +1,18 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/src/">
+    <Project Path="src/SharpAbp.Abp.Identity.Application.Contracts/SharpAbp.Abp.Identity.Application.Contracts.csproj" />
+    <Project Path="src/SharpAbp.Abp.Identity.Application/SharpAbp.Abp.Identity.Application.csproj" />
+    <Project Path="src/SharpAbp.Abp.Identity.Domain.Shared/SharpAbp.Abp.Identity.Domain.Shared.csproj" />
+    <Project Path="src/SharpAbp.Abp.Identity.Domain/SharpAbp.Abp.Identity.Domain.csproj" />
+    <Project Path="src/SharpAbp.Abp.Identity.HttpApi.Client/SharpAbp.Abp.Identity.HttpApi.Client.csproj" />
+    <Project Path="src/SharpAbp.Abp.Identity.HttpApi/SharpAbp.Abp.Identity.HttpApi.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/SharpAbp.Abp.Identity.Tests/SharpAbp.Abp.Identity.Tests.csproj" />
+  </Folder>
+</Solution>

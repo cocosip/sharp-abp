@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SharpAbp.Abp.OpenIddict.Application.Contracts/SharpAbp.Abp.OpenIddict.Application.Contracts.csproj" />
+    <Project Path="src/SharpAbp.Abp.OpenIddict.Application/SharpAbp.Abp.OpenIddict.Application.csproj" />
+    <Project Path="src/SharpAbp.Abp.OpenIddict.Domain.Shared/SharpAbp.Abp.OpenIddict.Domain.Shared.csproj" />
+    <Project Path="src/SharpAbp.Abp.OpenIddict.Domain/SharpAbp.Abp.OpenIddict.Domain.csproj" />
+    <Project Path="src/SharpAbp.Abp.OpenIddict.HttpApi.Client/SharpAbp.Abp.OpenIddict.HttpApi.Client.csproj" />
+    <Project Path="src/SharpAbp.Abp.OpenIddict.HttpApi/SharpAbp.Abp.OpenIddict.HttpApi.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/SharpAbp.Abp.OpenIddict.Application.Tests/SharpAbp.Abp.OpenIddict.Application.Tests.csproj" />
+  </Folder>
+</Solution>
