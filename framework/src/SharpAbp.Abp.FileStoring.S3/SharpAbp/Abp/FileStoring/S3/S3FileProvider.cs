@@ -61,7 +61,7 @@ namespace SharpAbp.Abp.FileStoring.S3
 
         protected virtual string NormalizePoolName(S3FileProviderConfiguration s3Configuration)
         {
-            var v = $"{s3Configuration.ServerUrl.TrimEnd('/')}-{s3Configuration.SignatureVersion}-{s3Configuration.ForcePathStyle}-{s3Configuration.AccessKeyId}-{s3Configuration.SecretAccessKey}";
+            var v = $"{s3Configuration.ServerUrl.TrimEnd('/')}-{s3Configuration.AuthenticationRegion}-{s3Configuration.ForcePathStyle}-{s3Configuration.AccessKeyId}-{s3Configuration.SecretAccessKey}";
             using var sha1 = SHA1.Create();
             var hashBuffer = sha1.ComputeHash(Encoding.UTF8.GetBytes(v));
             var hash = hashBuffer.Aggregate("", (current, b) => current + b.ToString("X2"));
@@ -334,7 +334,7 @@ namespace SharpAbp.Abp.FileStoring.S3
                         PartNumber = i + 1,
                         UseChunkEncoding = configuration.UseChunkEncoding,
                     }, args.CancellationToken);
-                    partETags.Add(new PartETag(uploadPartResponse.PartNumber, uploadPartResponse.ETag));
+                    partETags.Add(new PartETag(i + 1, uploadPartResponse.ETag));
                     Logger.LogDebug("Multipart upload progress for file '{FileId}' with UploadId '{UploadId}': {CompletedParts}/{TotalParts} completed. Bucket: {BucketName}, Key: {ObjectKey}",
                         args.FileId, uploadId, partETags.Count, partCount, containerName, objectKey);
                 }

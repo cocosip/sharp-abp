@@ -48,9 +48,6 @@ namespace SharpAbp.Abp.FileStoring.S3
             //Protocol
             ValidateHelper.ShouldInt(result, Provider, S3FileProviderConfigurationNames.Protocol, values.FindValue(S3FileProviderConfigurationNames.Protocol));
 
-            //SignatureVersion
-            ValidateHelper.NotNullOrWhiteSpace(result, Provider, S3FileProviderConfigurationNames.SignatureVersion, values.FindValue(S3FileProviderConfigurationNames.SignatureVersion));
-
             //CreateBucketIfNotExists
             ValidateHelper.ShouldBool(result, Provider, S3FileProviderConfigurationNames.CreateBucketIfNotExists, values.FindValue(S3FileProviderConfigurationNames.CreateBucketIfNotExists));
 

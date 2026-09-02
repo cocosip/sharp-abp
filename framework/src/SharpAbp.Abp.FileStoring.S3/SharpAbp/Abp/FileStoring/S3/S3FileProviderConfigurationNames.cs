@@ -15,7 +15,7 @@
         public const string Protocol = "S3.Protocol";
         //1-Amazon, 2-KS3,4-Other
         //public const string VendorType = "S3.VendorType";
-        public const string SignatureVersion = "S3.SignatureVersion";
+        public const string AuthenticationRegion = "S3.AuthenticationRegion";
         public const string CreateBucketIfNotExists = "S3.CreateBucketIfNotExists";
 
         public const string DefaultRegion = "us-east-1";

@@ -160,8 +160,25 @@ namespace SharpAbp.Abp.FileStoring
             Assert.False(s3Configuration.ForcePathStyle);
             Assert.False(s3Configuration.UseChunkEncoding);
             Assert.Equal(0, s3Configuration.Protocol); //0-HTTPS,1-HTTP
-            Assert.Equal("2.0", s3Configuration.SignatureVersion);
+            Assert.Equal("cn-north-1", s3Configuration.AuthenticationRegion);
             Assert.False(s3Configuration.CreateBucketIfNotExists);
+        }
+
+        [Fact]
+        public void S3_Default_AuthenticationRegion_Test()
+        {
+            var configuration = new FileContainerConfiguration();
+
+            Assert.Equal("us-east-1", configuration.GetS3Configuration().AuthenticationRegion);
+        }
+
+        [Fact]
+        public void S3_Empty_AuthenticationRegion_Should_Use_Default_Test()
+        {
+            var configuration = new FileContainerConfiguration();
+            configuration.SetConfiguration(S3FileProviderConfigurationNames.AuthenticationRegion, "");
+
+            Assert.Equal("us-east-1", configuration.GetS3Configuration().AuthenticationRegion);
         }
 
         // ─── FilePathBuilder — appsettings config ────────────────────────────────

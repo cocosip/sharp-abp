@@ -2,7 +2,6 @@ using global::OpenTelemetry.Exporter;
 using global::OpenTelemetry.Metrics;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
@@ -42,17 +41,24 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus
             {
                 options.MetricsExporters[OpenTelemetryExporterNames.PrometheusHttpListener] = builder =>
                 {
-                    if (exporterOptions.UriPrefixes == null || exporterOptions.UriPrefixes.Count == 0 ||
-                        exporterOptions.UriPrefixes.Any(string.IsNullOrWhiteSpace))
+                    if (string.IsNullOrWhiteSpace(exporterOptions.Host))
                     {
                         throw new InvalidOperationException(
-                            "OpenTelemetryExporters:PrometheusHttpListener:UriPrefixes must contain at least one non-empty URI prefix.");
+                            "OpenTelemetryExporters:PrometheusHttpListener:Host must be non-empty.");
+                    }
+
+                    if (exporterOptions.Port <= 0 || exporterOptions.Port > ushort.MaxValue)
+                    {
+                        throw new InvalidOperationException(
+                            "OpenTelemetryExporters:PrometheusHttpListener:Port must be between 1 and 65535.");
                     }
 
                     builder.AddPrometheusHttpListener(exporterOptions.Name, prometheusOptions =>
                     {
                         prometheusOptions.ScrapeEndpointPath = exporterOptions.ScrapeEndpointPath;
-                        prometheusOptions.UriPrefixes = exporterOptions.UriPrefixes;
+                        prometheusOptions.Host = exporterOptions.Host;
+                        prometheusOptions.Port = exporterOptions.Port;
+
                     });
                 };
             });

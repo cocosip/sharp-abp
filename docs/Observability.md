@@ -310,7 +310,8 @@ exporter 配置放在：
     "PrometheusHttpListener": {
       "Name": "prometheus-httplistener",
       "ScrapeEndpointPath": "/metrics",
-      "UriPrefixes": [ "http://localhost:9464/" ]
+      "Host": "localhost",
+      "Port": 9464
     }
   }
 }
@@ -318,8 +319,8 @@ exporter 配置放在：
 
 当前行为说明：
 
-- `UriPrefixes` 必须至少包含一个非空 URI 前缀
-- 如果为空，运行时会抛出明确异常
+- `Host` 必须是非空监听主机名
+- `Port` 必须介于 1 到 65535 之间
 
 ### 7.3 使用建议
 

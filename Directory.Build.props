@@ -5,15 +5,15 @@
 		<!--Net Core Framework-->
 		<NetCoreFx>net10.0</NetCoreFx>
 		<!--Microsoft-->
-		<MicrosoftPackageVersion>[10.0.9,)</MicrosoftPackageVersion>
+		<MicrosoftPackageVersion>[10.0.11,)</MicrosoftPackageVersion>
 		<!--EfCore-->
-		<EfCorePackageVersion>[10.0.9,)</EfCorePackageVersion>
+		<EfCorePackageVersion>[10.0.11,)</EfCorePackageVersion>
 		<!--Volo ABP packages-->
-		<VoloAbpPackageVersion>[10.4.1,)</VoloAbpPackageVersion>
+		<VoloAbpPackageVersion>[10.6.0,)</VoloAbpPackageVersion>
 		<!--FreeSql package-->
-		<FreeSqlPackageVersion>[3.5.310,)</FreeSqlPackageVersion>
+		<FreeSqlPackageVersion>[3.5.311,)</FreeSqlPackageVersion>
 		<!--Masstransit package-->
-		<MassTransitPackageVersion>[9.1.2,)</MassTransitPackageVersion>
+		<MassTransitPackageVersion>[9.2.1,)</MassTransitPackageVersion>
 	</PropertyGroup>
 
 	<PropertyGroup>

@@ -15,7 +15,7 @@ namespace SharpAbp.Abp.FileStoring.S3
             var clientConfig = new AmazonS3Config()
             {
                 ServiceURL = configuration.ServerUrl,
-                SignatureVersion = configuration.SignatureVersion,
+                AuthenticationRegion = configuration.AuthenticationRegion,
                 ForcePathStyle = configuration.ForcePathStyle,
             };
             return new AmazonS3Client(configuration.AccessKeyId, configuration.SecretAccessKey, clientConfig);

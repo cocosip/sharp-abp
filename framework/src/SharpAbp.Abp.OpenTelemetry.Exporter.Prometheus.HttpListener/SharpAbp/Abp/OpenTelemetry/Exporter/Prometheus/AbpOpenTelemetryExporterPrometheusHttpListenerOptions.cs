@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
 
 namespace SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus
 {
@@ -9,12 +8,9 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus
 
         public string? ScrapeEndpointPath { get; set; } = "/metrics";
 
-        public List<string> UriPrefixes { get; set; }
+        public string Host { get; set; } = "localhost";
 
-        public AbpOpenTelemetryExporterPrometheusHttpListenerOptions()
-        {
-            UriPrefixes = new List<string>();
-        }
+        public int Port { get; set; } = 9464;
 
         public AbpOpenTelemetryExporterPrometheusHttpListenerOptions PreConfigure(IConfiguration configuration)
         {
@@ -26,7 +22,8 @@ namespace SharpAbp.Abp.OpenTelemetry.Exporter.Prometheus
             {
                 Name = openTelemetryExporterPrometheusHttpListenerOptions.Name;
                 ScrapeEndpointPath = openTelemetryExporterPrometheusHttpListenerOptions.ScrapeEndpointPath;
-                UriPrefixes = openTelemetryExporterPrometheusHttpListenerOptions.UriPrefixes ?? new List<string>();
+                Host = openTelemetryExporterPrometheusHttpListenerOptions.Host;
+                Port = openTelemetryExporterPrometheusHttpListenerOptions.Port;
             }
 
             return this;

@@ -70,12 +70,21 @@ namespace SharpAbp.Abp.FileStoring.S3
         }
 
         /// <summary>
-        ///  SignatureVersion
+        /// The region used for AWS Signature Version 4 authentication.
         /// </summary>
-        public string SignatureVersion
+        public string AuthenticationRegion
         {
-            get => _containerConfiguration.GetConfiguration<string>(S3FileProviderConfigurationNames.SignatureVersion);
-            set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.SignatureVersion, Check.NotNullOrWhiteSpace(value, nameof(value)));
+            get
+            {
+                var authenticationRegion = _containerConfiguration.GetConfigurationOrDefault<string>(
+                    S3FileProviderConfigurationNames.AuthenticationRegion);
+                return string.IsNullOrWhiteSpace(authenticationRegion)
+                    ? S3FileProviderConfigurationNames.DefaultRegion
+                    : authenticationRegion!;
+            }
+            set => _containerConfiguration.SetConfiguration(
+                S3FileProviderConfigurationNames.AuthenticationRegion,
+                Check.NotNullOrWhiteSpace(value, nameof(value)));
         }
 
         /// <summary>

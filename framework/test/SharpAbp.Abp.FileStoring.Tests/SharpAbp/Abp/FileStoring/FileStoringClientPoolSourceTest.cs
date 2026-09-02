@@ -148,7 +148,7 @@ namespace SharpAbp.Abp.FileStoring
         {
             var normalizePoolName = GetNormalizePoolNameSource("S3", "S3FileProvider.cs");
 
-            Assert.Contains("SignatureVersion", normalizePoolName);
+            Assert.Contains("AuthenticationRegion", normalizePoolName);
             Assert.Contains("ForcePathStyle", normalizePoolName);
         }
 

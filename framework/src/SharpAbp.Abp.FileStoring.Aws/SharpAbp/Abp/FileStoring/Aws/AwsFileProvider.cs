@@ -408,7 +408,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
 
                     // Call the UploadPart interface to perform the upload function. The result contains the ETag value of this data shard.
                     var result = await amazonS3Client.UploadPartAsync(request, args.CancellationToken);
-                    partETags.Add(new PartETag(result.PartNumber, result.ETag));
+                    partETags.Add(new PartETag(i + 1, result.ETag));
 
                     Logger.LogDebug("Multipart upload progress for file '{FileId}' with UploadId '{UploadId}': {CompletedParts}/{TotalParts} completed.",
                         args.FileId, uploadId, partETags.Count, partCount);
