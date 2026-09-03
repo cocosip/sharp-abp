@@ -5,12 +5,12 @@ on:
     branches:
       - master
       - dev
-      - net10
+      - net9
   push:
     branches:
       - master
       - dev
-      - net10
+      - net9
     tags:
       - v*
 
