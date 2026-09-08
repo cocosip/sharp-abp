@@ -20,6 +20,13 @@
     <Project Path="src/SharpAbp.Abp.Binary/SharpAbp.Abp.Binary.csproj" />
     <Project Path="src/SharpAbp.Abp.Core/SharpAbp.Abp.Core.csproj" />
     <Project Path="src/SharpAbp.Abp.Crypto/SharpAbp.Abp.Crypto.csproj" />
+    <Project Path="src/SharpAbp.Abp.Dapper.DM/SharpAbp.Abp.Dapper.DM.csproj" />
+    <Project Path="src/SharpAbp.Abp.Dapper.GaussDB/SharpAbp.Abp.Dapper.GaussDB.csproj" />
+    <Project Path="src/SharpAbp.Abp.Dapper.MySQL/SharpAbp.Abp.Dapper.MySQL.csproj" />
+    <Project Path="src/SharpAbp.Abp.Dapper.Oracle/SharpAbp.Abp.Dapper.Oracle.csproj" />
+    <Project Path="src/SharpAbp.Abp.Dapper.PostgreSql/SharpAbp.Abp.Dapper.PostgreSql.csproj" />
+    <Project Path="src/SharpAbp.Abp.Dapper.Sqlite/SharpAbp.Abp.Dapper.Sqlite.csproj" />
+    <Project Path="src/SharpAbp.Abp.Dapper.SqlServer/SharpAbp.Abp.Dapper.SqlServer.csproj" />
     <Project Path="src/SharpAbp.Abp.Dapper/SharpAbp.Abp.Dapper.csproj" />
     <Project Path="src/SharpAbp.Abp.Data.SqlBuilder.DM/SharpAbp.Abp.Data.SqlBuilder.DM.csproj" />
     <Project Path="src/SharpAbp.Abp.Data.SqlBuilder/SharpAbp.Abp.Data.SqlBuilder.csproj" />
@@ -92,6 +99,7 @@
     <Project Path="test/SharpAbp.Abp.Core.Tests/SharpAbp.Abp.Core.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.Crypto.Tests/SharpAbp.Abp.Crypto.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.Data.SqlBuilder.Tests/SharpAbp.Abp.Data.SqlBuilder.Tests.csproj" />
+    <Project Path="test/SharpAbp.Abp.Dapper.Tests/SharpAbp.Abp.Dapper.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.DbConnections.Tests/SharpAbp.Abp.DbConnections.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.DotCommon.Tests/SharpAbp.Abp.DotCommon.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.EntityFrameworkCore.Tests/SharpAbp.Abp.EntityFrameworkCore.Tests.csproj" />

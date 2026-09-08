@@ -2,13 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text.Json;
-using Dapper;
 using Volo.Abp.Data;
 
 namespace SharpAbp.Abp.Dapper
 {
-    public class ExtraPropertyDictionaryTypeHandler : SqlMapper.TypeHandler<ExtraPropertyDictionary>
+    public class ExtraPropertyDictionaryTypeMapping : DapperTypeMapping<ExtraPropertyDictionary>
     {
+        public override bool CanSetValue(IDbDataParameter parameter) => true;
+
+        public override bool CanParse(object? value) => true;
+
         public override ExtraPropertyDictionary Parse(object value)
         {
             if (value == null || value is DBNull)
@@ -42,10 +45,21 @@ namespace SharpAbp.Abp.Dapper
             return extraProperties;
         }
 
-        public override void SetValue(IDbDataParameter parameter, ExtraPropertyDictionary? value)
+        public override object ParseNull(Type destinationType)
+        {
+            return new ExtraPropertyDictionary();
+        }
+
+        public override void SetValue(IDbDataParameter parameter, ExtraPropertyDictionary value)
         {
             parameter.DbType = DbType.String;
-            parameter.Value = JsonSerializer.Serialize(value ?? new ExtraPropertyDictionary());
+            parameter.Value = JsonSerializer.Serialize(value);
+        }
+
+        public override void SetNullValue(IDbDataParameter parameter)
+        {
+            parameter.DbType = DbType.String;
+            parameter.Value = JsonSerializer.Serialize(new ExtraPropertyDictionary());
         }
 
         private static object? NormalizeJsonElement(JsonElement element)
