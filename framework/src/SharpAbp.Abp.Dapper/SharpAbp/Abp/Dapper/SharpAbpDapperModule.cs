@@ -1,7 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using SharpAbp.Abp.Dapper.Oracle;
-using SharpAbp.Abp.Data;
 using SharpAbp.Abp.EntityFrameworkCore;
 using Volo.Abp.Dapper;
 using Volo.Abp.Modularity;
@@ -15,22 +13,35 @@ namespace SharpAbp.Abp.Dapper
         )]
     public class SharpAbpDapperModule : AbpModule
     {
-        public override void ConfigureServices(ServiceConfigurationContext context)
+        public override void PreConfigureServices(ServiceConfigurationContext context)
         {
-            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
+            AsyncHelper.RunSync(() => PreConfigureServicesAsync(context));
         }
 
-        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
+        public override Task PreConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            var configuration = context.Services.GetConfiguration();
-
-            var databaseProvider = configuration.GetDatabaseProvider();
-            if (databaseProvider == DatabaseProvider.Oracle)
+            PreConfigure<SharpAbpDapperOptions>(options =>
             {
-                DapperOracleExtensions.ConfigureOracleTypeHandlers();
+                options.TypeMappings.Add(new ExtraPropertyDictionaryTypeMapping());
+            });
+
+            return Task.CompletedTask;
+        }
+
+        public override void PostConfigureServices(ServiceConfigurationContext context)
+        {
+            AsyncHelper.RunSync(() => PostConfigureServicesAsync(context));
+        }
+
+        public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
+        {
+            var options = new SharpAbpDapperOptions();
+            foreach (var configureAction in context.Services.GetPreConfigureActions<SharpAbpDapperOptions>())
+            {
+                configureAction(options);
             }
 
-            DapperTypeHandlerExtensions.ConfigureTypeHandlers();
+            DapperTypeHandlerRegistrar.Register(options);
 
             return Task.CompletedTask;
         }

@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\..\..\common.test.props" />
+
+	<PropertyGroup>
+		<TargetFramework>$(NetCoreFx)</TargetFramework>
+		<IsPackable>false</IsPackable>
+		<Nullable>enable</Nullable>
+		<RootNamespace />
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" />
+		<PackageReference Include="xunit" />
+		<PackageReference Include="xunit.runner.visualstudio">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="coverlet.collector">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Volo.Abp.Autofac" />
+		<PackageReference Include="Volo.Abp.TestBase" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.Dapper\SharpAbp.Abp.Dapper.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.Dapper.DM\SharpAbp.Abp.Dapper.DM.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.Dapper.GaussDB\SharpAbp.Abp.Dapper.GaussDB.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.Dapper.MySQL\SharpAbp.Abp.Dapper.MySQL.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.Dapper.Oracle\SharpAbp.Abp.Dapper.Oracle.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.Dapper.PostgreSql\SharpAbp.Abp.Dapper.PostgreSql.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.Dapper.Sqlite\SharpAbp.Abp.Dapper.Sqlite.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.Dapper.SqlServer\SharpAbp.Abp.Dapper.SqlServer.csproj" />
+	</ItemGroup>
+
+</Project>
