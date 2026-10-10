@@ -25,6 +25,16 @@ namespace SharpAbp.Abp.OperationRateLimiting
         }
 
         [Fact]
+        public void Null_configuration_delegates_and_blank_attribute_names_fail_immediately()
+        {
+            var options = new SharpAbpOperationRateLimitingOptions();
+            Assert.Throws<ArgumentNullException>(() => options.AddPolicy("policy", null!));
+            Assert.Throws<ArgumentNullException>(() => options.ConfigurePolicy("policy", null!));
+            Assert.Throws<ArgumentNullException>(() => new OperationRateLimitingPolicyBuilder().AddRule(null!));
+            Assert.Throws<ArgumentException>(() => new OperationRateLimitingAttribute(" "));
+        }
+
+        [Fact]
         public void Replacement_configuration_and_snapshots_preserve_rule_identity()
         {
             var options = new SharpAbpOperationRateLimitingOptions();

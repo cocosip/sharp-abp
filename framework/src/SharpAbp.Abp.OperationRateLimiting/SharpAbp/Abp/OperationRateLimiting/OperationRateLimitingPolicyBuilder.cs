@@ -46,6 +46,10 @@ namespace SharpAbp.Abp.OperationRateLimiting
 
         public virtual OperationRateLimitingPolicyBuilder AddRule(Action<OperationRateLimitingRuleBuilder> configure)
         {
+            if (configure == null)
+            {
+                throw new ArgumentNullException(nameof(configure));
+            }
             var builder = new OperationRateLimitingRuleBuilder();
             configure(builder);
             Rules.Add(builder);

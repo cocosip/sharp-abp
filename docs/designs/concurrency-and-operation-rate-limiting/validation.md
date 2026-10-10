@@ -2,11 +2,11 @@
 
 Date: 2026-10-10
 
-Status: In Progress. The `net9` core modules and composite operation partitions are implemented. .NET 10 compatibility, real shared-infrastructure acceptance, and `net9` to `dev` integration remain separate delivery checks.
+Status: In Progress. The `net9` core modules and composite operation partitions are implemented, and the review fixes are applied locally. Current test/build execution is blocked during NuGet restore by the environment's TLS/credential failure for `https://api.nuget.org/v3/index.json`. .NET 10 compatibility, real shared-infrastructure acceptance, and `net9` to `dev` integration remain separate delivery checks.
 
 ## Operation rate limiting
 
-The focused `net9` test run currently passes 49 tests with one opt-in Redis acceptance test skipped because `SHARP_ABP_OPERATION_REDIS` is not configured. The new coverage includes:
+Before the review-fix changes, the focused `net9` test run recorded 49 passing tests with one opt-in Redis acceptance test skipped because `SHARP_ABP_OPERATION_REDIS` was not configured. The review adds coverage for:
 
 - single and composite built-in partitions;
 - named argument matching without DTO changes;
@@ -15,6 +15,10 @@ The focused `net9` test run currently passes 49 tests with one opt-in Redis acce
 - missing named argument errors;
 - legacy single-parameter resolver behavior;
 - existing fixed-window, multi-rule, interception, store, and simulated shared-store tests.
+- interface-level concurrency attributes;
+- unsupported composite argument objects and malformed expired cache state;
+- immediate configuration delegate validation;
+- single-rule consume fast path and concurrent fixed-window prechecks.
 
 Command:
 
@@ -24,7 +28,7 @@ dotnet test framework/test/SharpAbp.Abp.OperationRateLimiting.Tests/SharpAbp.Abp
 
 The real Redis test remains infrastructure acceptance evidence and is not replaced by the local or simulated tests.
 
-The same operation tests pass on isolated `.NET 10` with ABP `10.7.0`: 49 passed and one opt-in Redis test skipped. The independent concurrency tests pass on both `net9` and isolated `.NET 10` with 37 passed.
+The previous isolated `.NET 10` results are historical evidence for the pre-review code; they do not validate the current changes. The current environment has not produced a fresh test result because restore is blocked.
 
 The changed operation production package builds cleanly for `netstandard2.0`, `netstandard2.1`, and `net9.0` with zero compiler warnings. The isolated `.NET 10` runs report the existing `Microsoft.Build.Tasks.Git 8.0.0` NU1902 advisory; it is unrelated to these source changes.
 

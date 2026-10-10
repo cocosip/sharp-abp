@@ -69,5 +69,18 @@ namespace SharpAbp.Abp.OperationRateLimiting
                 await Assert.ThrowsAnyAsync<OperationCanceledException>(() => resolver.ResolveAsync(Rule("custom"), context, cancelled.Token));
             }
         }
+
+        [Fact]
+        public async Task Unsupported_argument_objects_are_rejected_instead_of_using_type_name()
+        {
+            var resolver = GetRequiredService<IOperationRateLimitingPartitionResolver>();
+            var rule = new OperationRateLimitingRuleDefinition("argument",
+                typeof(FixedWindowOperationRateLimitingRule), TimeSpan.FromMinutes(1), 1,
+                new[] { OperationRateLimitingPartition.Argument("Value") });
+            var context = OperationRateLimitingArguments.Create(("Value", new object()));
+
+            await Assert.ThrowsAsync<OperationRateLimitingContextException>(() =>
+                resolver.ResolveAsync(rule, new OperationRateLimitingContext(context)));
+        }
     }
 }

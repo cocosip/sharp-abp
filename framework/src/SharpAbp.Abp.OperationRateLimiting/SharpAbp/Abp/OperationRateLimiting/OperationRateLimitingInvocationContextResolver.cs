@@ -1,7 +1,7 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.DynamicProxy;
@@ -10,13 +10,13 @@ namespace SharpAbp.Abp.OperationRateLimiting
 {
     public static class OperationRateLimitingInvocationContextResolver
     {
-        private static readonly ConcurrentDictionary<Type, IReadOnlyDictionary<RuntimeMethodHandle, InvocationMetadata>> Metadata =
-            new ConcurrentDictionary<Type, IReadOnlyDictionary<RuntimeMethodHandle, InvocationMetadata>>();
+        private static readonly ConditionalWeakTable<Type, IReadOnlyDictionary<RuntimeMethodHandle, InvocationMetadata>> Metadata =
+            new ConditionalWeakTable<Type, IReadOnlyDictionary<RuntimeMethodHandle, InvocationMetadata>>();
         private static readonly InvocationMetadata Unrestricted = new InvocationMetadata(null, -1, -1, null);
 
         public static bool Warm(Type implementationType)
         {
-            if (Metadata.ContainsKey(implementationType))
+            if (Metadata.TryGetValue(implementationType, out _))
             {
                 return true;
             }
@@ -43,7 +43,7 @@ namespace SharpAbp.Abp.OperationRateLimiting
             {
                 return false;
             }
-            Metadata.TryAdd(implementationType, methods);
+            Metadata.GetValue(implementationType, _ => methods);
             return true;
         }
 
@@ -57,7 +57,7 @@ namespace SharpAbp.Abp.OperationRateLimiting
                 {
                     return Unrestricted;
                 }
-                Metadata.TryAdd(implementationType, methods);
+                Metadata.GetValue(implementationType, _ => methods);
             }
             if (method.IsGenericMethod && !method.IsGenericMethodDefinition)
             {

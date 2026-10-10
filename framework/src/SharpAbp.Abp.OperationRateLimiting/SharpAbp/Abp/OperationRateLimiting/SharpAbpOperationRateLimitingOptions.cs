@@ -20,6 +20,11 @@ namespace SharpAbp.Abp.OperationRateLimiting
 
         public virtual SharpAbpOperationRateLimitingOptions AddPolicy(string name, Action<OperationRateLimitingPolicyBuilder> configure)
         {
+            ValidateName(name, nameof(name));
+            if (configure == null)
+            {
+                throw new ArgumentNullException(nameof(configure));
+            }
             var builder = new OperationRateLimitingPolicyBuilder();
             configure(builder);
             Policies[name] = builder.Build(name);
@@ -28,6 +33,11 @@ namespace SharpAbp.Abp.OperationRateLimiting
 
         public virtual SharpAbpOperationRateLimitingOptions ConfigurePolicy(string name, Action<OperationRateLimitingPolicyBuilder> configure)
         {
+            ValidateName(name, nameof(name));
+            if (configure == null)
+            {
+                throw new ArgumentNullException(nameof(configure));
+            }
             if (!Policies.TryGetValue(name, out var policy))
             {
                 throw new OperationRateLimitingConfigurationException("Unknown policy: " + name);
@@ -40,6 +50,7 @@ namespace SharpAbp.Abp.OperationRateLimiting
 
         public virtual SharpAbpOperationRateLimitingOptions RemovePolicy(string name)
         {
+            ValidateName(name, nameof(name));
             Policies.Remove(name);
             return this;
         }
@@ -53,6 +64,14 @@ namespace SharpAbp.Abp.OperationRateLimiting
             }
             PartitionResolvers[name] = resolver ?? throw new ArgumentNullException(nameof(resolver));
             return this;
+        }
+
+        internal static void ValidateName(string name, string parameter)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("A nonempty name is required.", parameter);
+            }
         }
     }
 }

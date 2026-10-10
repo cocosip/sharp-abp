@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Volo.Abp.DynamicProxy;
 
@@ -9,8 +11,8 @@ namespace SharpAbp.Abp.ConcurrencyLimiting
 {
     internal static class ConcurrencyLimitingInvocationContextResolver
     {
-        private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<MethodInfo, InvocationMetadata>> MetadataCache =
-            new ConcurrentDictionary<Type, ConcurrentDictionary<MethodInfo, InvocationMetadata>>();
+        private static readonly ConditionalWeakTable<Type, ConcurrentDictionary<MethodInfo, InvocationMetadata>> MetadataCache =
+            new ConditionalWeakTable<Type, ConcurrentDictionary<MethodInfo, InvocationMetadata>>();
 
         private sealed class InvocationMetadata
         {
@@ -28,16 +30,43 @@ namespace SharpAbp.Abp.ConcurrencyLimiting
             }
         }
 
+        public static bool HasPolicy(Type implementationType)
+        {
+            if (implementationType.IsDefined(typeof(ConcurrencyLimitingAttribute), true) ||
+                implementationType.GetMethods().Any(method =>
+                    method.IsDefined(typeof(ConcurrencyLimitingAttribute), true)))
+            {
+                return true;
+            }
+
+            foreach (var interfaceType in implementationType.GetInterfaces())
+            {
+                if (interfaceType.IsDefined(typeof(DisableConcurrencyLimitingAttribute), true))
+                {
+                    continue;
+                }
+                if (interfaceType.IsDefined(typeof(ConcurrencyLimitingAttribute), true) ||
+                    interfaceType.GetMethods().Any(method =>
+                        method.IsDefined(typeof(ConcurrencyLimitingAttribute), true)))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public static bool Warm(Type implementationType)
         {
-            var methods = MetadataCache.GetOrAdd(implementationType,
+            var methods = MetadataCache.GetValue(implementationType,
                 _ => new ConcurrentDictionary<MethodInfo, InvocationMetadata>());
             var hasPolicy = false;
             var classHasPolicy = implementationType.IsDefined(typeof(ConcurrencyLimitingAttribute), true);
             foreach (var method in implementationType.GetMethods())
             {
                 if (method.DeclaringType == typeof(object) ||
-                    (!classHasPolicy && !method.IsDefined(typeof(ConcurrencyLimitingAttribute), true)))
+                    (!classHasPolicy && !method.IsDefined(typeof(ConcurrencyLimitingAttribute), true) &&
+                     !HasInterfacePolicy(implementationType, method)))
                 {
                     continue;
                 }
@@ -67,13 +96,37 @@ namespace SharpAbp.Abp.ConcurrencyLimiting
         private static InvocationMetadata GetMetadataOnCacheMiss(Type actualType, MethodInfo method)
         {
             var type = actualType;
-            while (!MetadataCache.ContainsKey(type) && type.BaseType != null)
+            ConcurrentDictionary<MethodInfo, InvocationMetadata> methods;
+            while (true)
             {
+                if (MetadataCache.TryGetValue(type, out methods))
+                {
+                    break;
+                }
+                if (type.BaseType == null)
+                {
+                    methods = MetadataCache.GetValue(type,
+                        _ => new ConcurrentDictionary<MethodInfo, InvocationMetadata>());
+                    break;
+                }
                 type = type.BaseType;
             }
-            var methods = MetadataCache.GetOrAdd(type, _ => new ConcurrentDictionary<MethodInfo, InvocationMetadata>());
-            MetadataCache.TryAdd(actualType, methods);
+            if (actualType != type)
+            {
+                MetadataCache.GetValue(actualType, _ => methods);
+            }
             return methods.GetOrAdd(method, candidate => BuildMetadata(type, candidate));
+        }
+
+        internal static int GetCachedMethodCount(Type implementationType)
+        {
+            return MetadataCache.TryGetValue(implementationType, out var methods) ? methods.Count : 0;
+        }
+
+        internal static object? GetCachedMetadata(Type implementationType, MethodInfo method)
+        {
+            return MetadataCache.TryGetValue(implementationType, out var methods) &&
+                   methods.TryGetValue(method, out var metadata) ? metadata : null;
         }
 
         private static InvocationMetadata BuildMetadata(Type type, MethodInfo method)
@@ -86,6 +139,10 @@ namespace SharpAbp.Abp.ConcurrencyLimiting
 
             var policy = method.GetCustomAttribute<ConcurrencyLimitingAttribute>(true)?.PolicyName ??
                 type.GetCustomAttribute<ConcurrencyLimitingAttribute>(true)?.PolicyName;
+            if (policy == null)
+            {
+                policy = GetInterfacePolicy(type, method);
+            }
             if (policy == null)
             {
                 return new InvocationMetadata(null, -1, -1, null);
@@ -124,6 +181,51 @@ namespace SharpAbp.Abp.ConcurrencyLimiting
                 }
             }
             return new InvocationMetadata(policy, parameterIndex, tokenIndex, error);
+        }
+
+        private static bool HasInterfacePolicy(Type implementationType, MethodInfo method)
+        {
+            return GetInterfacePolicy(implementationType, method) != null;
+        }
+
+        private static string? GetInterfacePolicy(Type implementationType, MethodInfo method)
+        {
+            foreach (var interfaceType in implementationType.GetInterfaces())
+            {
+                if (interfaceType.IsDefined(typeof(DisableConcurrencyLimitingAttribute), true))
+                {
+                    continue;
+                }
+
+                InterfaceMapping map;
+                try
+                {
+                    map = implementationType.GetInterfaceMap(interfaceType);
+                }
+                catch (ArgumentException)
+                {
+                    continue;
+                }
+
+                for (var index = 0; index < map.TargetMethods.Length; index++)
+                {
+                    if (map.TargetMethods[index] != method)
+                    {
+                        continue;
+                    }
+
+                    var interfaceMethod = map.InterfaceMethods[index];
+                    if (interfaceMethod.IsDefined(typeof(DisableConcurrencyLimitingAttribute), true))
+                    {
+                        return null;
+                    }
+
+                    return interfaceMethod.GetCustomAttribute<ConcurrencyLimitingAttribute>(true)?.PolicyName ??
+                        interfaceType.GetCustomAttribute<ConcurrencyLimitingAttribute>(true)?.PolicyName;
+                }
+            }
+
+            return null;
         }
 
         internal sealed class ResolvedInvocation

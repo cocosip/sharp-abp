@@ -78,13 +78,17 @@ namespace SharpAbp.Abp.OperationRateLimiting
         {
             cancellationToken.ThrowIfCancellationRequested();
             var item = await Cache.GetAsync(key, hideErrors: false, considerUow: false, token: cancellationToken).ConfigureAwait(false);
-            if (item == null || item.WindowEndUtc <= GetUtcNow())
+            if (item == null)
             {
                 return new OperationRateLimitingStoreState();
             }
             if (item.CurrentCount < 0 || item.WindowEndUtc.Kind != DateTimeKind.Utc)
             {
                 throw new InvalidOperationException("Invalid operation counter state.");
+            }
+            if (item.WindowEndUtc <= GetUtcNow())
+            {
+                return new OperationRateLimitingStoreState();
             }
             return new OperationRateLimitingStoreState(item.CurrentCount, item.WindowEndUtc);
         }
