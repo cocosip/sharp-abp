@@ -4,6 +4,7 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
 {
     public enum IpAccessDecisionReason
     {
+        Disabled,
         AllowedByDefault,
         AllowedAddress,
         DeniedAddress,
