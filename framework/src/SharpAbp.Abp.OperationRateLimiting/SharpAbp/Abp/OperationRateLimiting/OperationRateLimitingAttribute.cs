@@ -9,6 +9,14 @@ namespace SharpAbp.Abp.OperationRateLimiting
 
         public OperationRateLimitingAttribute(string policyName)
         {
+            if (policyName == null)
+            {
+                throw new ArgumentNullException(nameof(policyName));
+            }
+            if (string.IsNullOrWhiteSpace(policyName))
+            {
+                throw new ArgumentException("Policy name must be nonempty.", nameof(policyName));
+            }
             PolicyName = policyName;
         }
     }

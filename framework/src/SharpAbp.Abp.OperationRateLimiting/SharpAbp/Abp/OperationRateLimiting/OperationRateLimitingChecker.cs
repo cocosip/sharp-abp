@@ -108,10 +108,27 @@ namespace SharpAbp.Abp.OperationRateLimiting
             var policy = await PolicyProvider.GetAsync(policyName, cancellationToken).ConfigureAwait(false);
             var contexts = await ResolveAsync(policy, context, cancellationToken).ConfigureAwait(false);
             var rules = contexts.Select(ResolveRule).ToArray();
-            var statuses = new List<OperationRateLimitingRuleStatus>();
-            for (var index = 0; index < contexts.Count; index++)
+            if (contexts.Count == 1)
             {
-                statuses.Add(await rules[index].GetStatusAsync(contexts[index], cancellationToken).ConfigureAwait(false));
+                var result = await rules[0].ConsumeAsync(contexts[0], cancellationToken).ConfigureAwait(false);
+                if (!result.IsAccepted)
+                {
+                    throw CreateExceededException(policy, result.Status);
+                }
+                return;
+            }
+            var statuses = new List<OperationRateLimitingRuleStatus>();
+            if (rules.All(rule => rule.GetType() == typeof(FixedWindowOperationRateLimitingRule)))
+            {
+                statuses.AddRange(await Task.WhenAll(contexts.Select((context, index) =>
+                    rules[index].GetStatusAsync(context, cancellationToken))).ConfigureAwait(false));
+            }
+            else
+            {
+                for (var index = 0; index < contexts.Count; index++)
+                {
+                    statuses.Add(await rules[index].GetStatusAsync(contexts[index], cancellationToken).ConfigureAwait(false));
+                }
             }
             var blocked = statuses.Where(status => !status.IsAllowed).ToArray();
             if (blocked.Length > 0)

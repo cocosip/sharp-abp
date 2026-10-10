@@ -13,10 +13,12 @@ namespace SharpAbp.Abp.ConcurrencyLimiting
             Configure<SharpAbpConcurrencyLimitingOptions>(options => options
                 .AddPolicy("class", b => b.WithConcurrency(1))
                 .AddPolicy("method", b => b.WithConcurrency(1))
-                .AddPolicy("parameter", b => b.WithConcurrency(1).PartitionByParameter()));
+                .AddPolicy("parameter", b => b.WithConcurrency(1).PartitionByParameter())
+                .AddPolicy("interface", b => b.WithConcurrency(1)));
             context.Services.AddTransient<ProxyOperations>();
             context.Services.AddTransient<InvalidOperations>();
             context.Services.AddTransient<IInterfaceOperations, InterfaceOperations>();
+            context.Services.AddTransient<IInterfaceAttributedOperations, InterfaceAttributedOperations>();
         }
     }
 

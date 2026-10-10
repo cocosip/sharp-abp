@@ -154,7 +154,8 @@ namespace SharpAbp.Abp.OperationRateLimiting
                 return formattable.ToString(null, CultureInfo.InvariantCulture);
             }
 
-            return value.ToString() ?? string.Empty;
+            throw new OperationRateLimitingContextException(
+                "Operation rate limiting partition arguments must be strings or implement IFormattable.");
         }
 
         protected virtual string? NormalizePhone(string? phone)

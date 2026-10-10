@@ -74,6 +74,31 @@ namespace SharpAbp.Abp.OperationRateLimiting
         }
 
         [Fact]
+        public async Task Single_rule_check_uses_one_consume_path_without_a_precheck_read()
+        {
+            var store = new CompetitionStore();
+            using (var services = CreateServices(new SharpAbpOperationRateLimitingOptions(), store))
+            {
+                var checker = services.GetRequiredService<IOperationRateLimitingChecker>();
+                await checker.CheckAsync("single");
+                Assert.Equal(0, store.GetCalls);
+                Assert.Equal(1, store.IncrementCalls);
+            }
+        }
+
+        [Fact]
+        public async Task Fixed_window_rule_prechecks_can_run_concurrently()
+        {
+            var store = new CompetitionStore { GetDelayMilliseconds = 50 };
+            using (var services = CreateServices(new SharpAbpOperationRateLimitingOptions(), store))
+            {
+                var checker = services.GetRequiredService<IOperationRateLimitingChecker>();
+                await checker.CheckAsync("parallel");
+                Assert.True(store.MaxConcurrentGets >= 2);
+            }
+        }
+
+        [Fact]
         public async Task Custom_rule_resolves_in_scope_without_fixed_window_validation()
         {
             using (var services = CreateServices(new SharpAbpOperationRateLimitingOptions(), new CompetitionStore()))
@@ -144,6 +169,15 @@ namespace SharpAbp.Abp.OperationRateLimiting
                     rules.Add(new OperationRateLimitingRuleDefinition("ban", typeof(FixedWindowOperationRateLimitingRule), TimeSpan.FromMinutes(1), 0));
                 }
             }
+            else if (policyName == "single")
+            {
+                rules.Add(new OperationRateLimitingRuleDefinition("single", typeof(FixedWindowOperationRateLimitingRule), TimeSpan.FromMinutes(1), 1));
+            }
+            else if (policyName == "parallel")
+            {
+                rules.Add(new OperationRateLimitingRuleDefinition("first", typeof(FixedWindowOperationRateLimitingRule), TimeSpan.FromMinutes(1), 1));
+                rules.Add(new OperationRateLimitingRuleDefinition("second", typeof(FixedWindowOperationRateLimitingRule), TimeSpan.FromMinutes(1), 1));
+            }
             else
             {
                 throw new OperationRateLimitingConfigurationException("Unknown replacement policy.");
@@ -179,14 +213,45 @@ namespace SharpAbp.Abp.OperationRateLimiting
         private readonly Dictionary<string, OperationRateLimitingStoreState> _states = new Dictionary<string, OperationRateLimitingStoreState>();
         public bool CompeteOnSecondIncrement { get; set; }
         public int IncrementCalls { get; private set; }
+        public int GetCalls { get; private set; }
+        public int GetDelayMilliseconds { get; set; }
         public int ResetCalls { get; private set; }
         public int DefaultCount { get; set; }
+        private int _activeGets;
+        private int _maxConcurrentGets;
+        public int MaxConcurrentGets => Volatile.Read(ref _maxConcurrentGets);
 
         public Task<OperationRateLimitingStoreState> GetAsync(string key, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(_states.TryGetValue(key, out var state) ? state :
-                new OperationRateLimitingStoreState(DefaultCount, DefaultCount == 0 ? null :
-                    new DateTime(2030, 1, 1, 0, 1, 0, DateTimeKind.Utc)));
+            GetCalls++;
+            return ReadAsync(key, cancellationToken);
+        }
+
+        private async Task<OperationRateLimitingStoreState> ReadAsync(string key, CancellationToken cancellationToken)
+        {
+            var active = Interlocked.Increment(ref _activeGets);
+            while (true)
+            {
+                var observed = Volatile.Read(ref _maxConcurrentGets);
+                if (active <= observed || Interlocked.CompareExchange(ref _maxConcurrentGets, active, observed) == observed)
+                {
+                    break;
+                }
+            }
+            try
+            {
+                if (GetDelayMilliseconds > 0)
+                {
+                    await Task.Delay(GetDelayMilliseconds, cancellationToken);
+                }
+                return _states.TryGetValue(key, out var state) ? state :
+                    new OperationRateLimitingStoreState(DefaultCount, DefaultCount == 0 ? null :
+                        new DateTime(2030, 1, 1, 0, 1, 0, DateTimeKind.Utc));
+            }
+            finally
+            {
+                Interlocked.Decrement(ref _activeGets);
+            }
         }
 
         public Task<OperationRateLimitingStoreResult> IncrementAsync(string key, TimeSpan duration, int maxCount,

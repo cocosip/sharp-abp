@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.OperationRateLimiting.Fakes;
 using Volo.Abp.Caching;
@@ -70,6 +71,23 @@ namespace SharpAbp.Abp.OperationRateLimiting
             var timedOut = new DistributedCacheOperationRateLimitingStore(GetRequiredService<IDistributedCache<OperationRateLimitingCacheItem>>(),
                 new FailingLock(), GetRequiredService<MutableClock>(), GetRequiredService<OperationRateLimitingConfiguration>());
             await Assert.ThrowsAsync<TimeoutException>(() => timedOut.IncrementAsync("key", TimeSpan.FromMinutes(1), 1));
+        }
+
+        [Fact]
+        public async Task Expired_malformed_cache_state_is_rejected_before_expiration_is_applied()
+        {
+            var store = GetRequiredService<IOperationRateLimitingStore>();
+            var cache = GetRequiredService<IDistributedCache<OperationRateLimitingCacheItem>>();
+            await cache.SetAsync("malformed", new OperationRateLimitingCacheItem
+            {
+                CurrentCount = -1,
+                WindowEndUtc = DateTime.SpecifyKind(DateTime.UtcNow.AddMinutes(-1), DateTimeKind.Unspecified)
+            }, new DistributedCacheEntryOptions
+            {
+                AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(-1)
+            }, hideErrors: false, considerUow: false);
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => store.GetAsync("malformed"));
         }
 
         [Fact]

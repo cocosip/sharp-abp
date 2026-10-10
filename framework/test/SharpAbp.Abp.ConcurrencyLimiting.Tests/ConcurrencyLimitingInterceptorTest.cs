@@ -1,7 +1,5 @@
 using System;
 using System.Globalization;
-using System.Collections;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,19 +18,16 @@ namespace SharpAbp.Abp.ConcurrencyLimiting
         public async Task Registered_method_metadata_is_reused_on_hot_proxy_calls()
         {
             var service = GetRequiredService<ProxyOperations>();
-            var flags = BindingFlags.Static | BindingFlags.NonPublic;
-            var cache = (IDictionary)typeof(ConcurrencyLimitingInvocationContextResolver).GetField("MetadataCache", flags)!.GetValue(null)!;
-            var metadata = (IDictionary)cache[typeof(ProxyOperations)]!;
             var method = typeof(ProxyOperations).GetMethod(nameof(ProxyOperations.Override))!;
-            var original = metadata[method];
+            var original = ConcurrencyLimitingInvocationContextResolver.GetCachedMetadata(typeof(ProxyOperations), method);
             Assert.NotNull(original);
-            var originalCount = metadata.Count;
+            var originalCount = ConcurrencyLimitingInvocationContextResolver.GetCachedMethodCount(typeof(ProxyOperations));
             for (var i = 0; i < 50; i++)
             {
                 Assert.Equal(11, await service.Override());
             }
-            Assert.Equal(originalCount, metadata.Count);
-            Assert.Same(original, metadata[method]);
+            Assert.Equal(originalCount, ConcurrencyLimitingInvocationContextResolver.GetCachedMethodCount(typeof(ProxyOperations)));
+            Assert.Same(original, ConcurrencyLimitingInvocationContextResolver.GetCachedMetadata(typeof(ProxyOperations), method));
         }
 
         [Fact]
@@ -72,6 +67,16 @@ namespace SharpAbp.Abp.ConcurrencyLimiting
             await Assert.ThrowsAsync<ConcurrencyLimitExceededException>(() => service.Override());
             Assert.Equal(12, await service.Disabled());
             await Assert.ThrowsAsync<ConcurrencyLimitExceededException>(() => GetRequiredService<IInterfaceOperations>().Run());
+        }
+
+        [Fact]
+        public async Task Interface_level_attribute_is_applied_to_interface_proxy()
+        {
+            var service = GetRequiredService<IInterfaceAttributedOperations>();
+            var manager = GetRequiredService<IConcurrencyLimitingManager>();
+            using var held = manager.TryAcquire("interface");
+
+            await Assert.ThrowsAsync<ConcurrencyLimitExceededException>(() => service.Run());
         }
 
         [Fact]
@@ -216,6 +221,17 @@ namespace SharpAbp.Abp.ConcurrencyLimiting
     public class InterfaceOperations : IInterfaceOperations
     {
         [ConcurrencyLimiting("method")]
+        public Task Run() => Task.CompletedTask;
+    }
+
+    [ConcurrencyLimiting("interface")]
+    public interface IInterfaceAttributedOperations
+    {
+        Task Run();
+    }
+
+    public class InterfaceAttributedOperations : IInterfaceAttributedOperations
+    {
         public Task Run() => Task.CompletedTask;
     }
 

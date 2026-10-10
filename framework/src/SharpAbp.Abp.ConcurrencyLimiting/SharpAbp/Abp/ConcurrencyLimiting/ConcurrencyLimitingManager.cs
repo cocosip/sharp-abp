@@ -57,10 +57,6 @@ namespace SharpAbp.Abp.ConcurrencyLimiting
                 {
                     lease = await limiter.AcquireAsync(key, 1, linked.Token).ConfigureAwait(false);
                     cancellationToken.ThrowIfCancellationRequested();
-                    if (timeout.IsCancellationRequested)
-                    {
-                        throw new ConcurrencyLimitExceededException(policy, ConcurrencyLimitExceededReason.QueueTimeout);
-                    }
                     if (!lease.IsAcquired)
                     {
                         throw new ConcurrencyLimitExceededException(policy, policy.QueueLimit == 0 ? ConcurrencyLimitExceededReason.Capacity : ConcurrencyLimitExceededReason.QueueFull);

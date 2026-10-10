@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.DynamicProxy;
 
@@ -8,11 +8,23 @@ namespace SharpAbp.Abp.ConcurrencyLimiting
 {
     internal static class ConcurrencyLimitingInterceptorRegistrar
     {
-        private static readonly ConcurrentDictionary<Type, bool> InterceptionDecisions = new ConcurrentDictionary<Type, bool>();
+        private sealed class InterceptionDecision
+        {
+            public bool ShouldIntercept { get; }
+
+            public InterceptionDecision(bool shouldIntercept)
+            {
+                ShouldIntercept = shouldIntercept;
+            }
+        }
+
+        private static readonly ConditionalWeakTable<Type, InterceptionDecision> InterceptionDecisions =
+            new ConditionalWeakTable<Type, InterceptionDecision>();
 
         public static void RegisterIfNeeded(IOnServiceRegistredContext context)
         {
-            if (InterceptionDecisions.GetOrAdd(context.ImplementationType, ShouldIntercept))
+            if (InterceptionDecisions.GetValue(context.ImplementationType,
+                    type => new InterceptionDecision(ShouldIntercept(type))).ShouldIntercept)
             {
                 context.Interceptors.TryAdd<ConcurrencyLimitingInterceptor>();
             }
@@ -20,22 +32,13 @@ namespace SharpAbp.Abp.ConcurrencyLimiting
 
         private static bool ShouldIntercept(Type type)
         {
-            if (DynamicProxyIgnoreTypes.Contains(type) || type.IsDefined(typeof(DisableConcurrencyLimitingAttribute), true))
+            if (DynamicProxyIgnoreTypes.Contains(type) ||
+                type.IsDefined(typeof(DisableConcurrencyLimitingAttribute), true))
             {
                 return false;
             }
-            if (type.IsDefined(typeof(ConcurrencyLimitingAttribute), true))
-            {
-                return ConcurrencyLimitingInvocationContextResolver.Warm(type);
-            }
-            foreach (var method in type.GetMethods())
-            {
-                if (method.IsDefined(typeof(ConcurrencyLimitingAttribute), true))
-                {
-                    return ConcurrencyLimitingInvocationContextResolver.Warm(type);
-                }
-            }
-            return false;
+            return ConcurrencyLimitingInvocationContextResolver.HasPolicy(type) &&
+                ConcurrencyLimitingInvocationContextResolver.Warm(type);
         }
     }
 }
