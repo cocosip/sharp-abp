@@ -1,11 +1,9 @@
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.AspNetCore.Http;
 using System.Net;
 using Xunit;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
-using IPNetwork = Microsoft.AspNetCore.HttpOverrides.IPNetwork;
 
 namespace SharpAbp.Abp.AspNetCore.IpAccessControl
 {
@@ -52,6 +50,20 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
         }
 
         [Fact]
+        public void Evaluate_Should_Reject_Denied_Network_Even_When_Address_Is_Allowlisted()
+        {
+            var options = new AbpIpAccessControlOptions();
+            options.AllowedNetworks.Add(IPNetwork.Parse("203.0.113.0/24"));
+            options.DeniedNetworks.Add(IPNetwork.Parse("203.0.113.0/28"));
+            var service = CreateService(options);
+
+            var decision = service.Evaluate(CreateRequestInfo("203.0.113.10"));
+
+            Assert.False(decision.IsAllowed);
+            Assert.Equal(IpAccessDecisionReason.DeniedAddress, decision.Reason);
+        }
+
+        [Fact]
         public void Evaluate_Should_Reject_When_Client_Address_Is_Unavailable()
         {
             var service = CreateService(new AbpIpAccessControlOptions());
@@ -63,6 +75,24 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
             var decision = service.Evaluate(requestInfo);
 
             Assert.False(decision.IsAllowed);
+            Assert.Equal(IpAccessDecisionReason.ClientAddressUnavailable, decision.Reason);
+        }
+
+        [Fact]
+        public void Evaluate_Should_Allow_When_Client_Address_Is_Unavailable_And_Option_Allows_It()
+        {
+            var options = new AbpIpAccessControlOptions
+            {
+                DenyWhenClientAddressUnavailable = false
+            };
+            var service = CreateService(options);
+
+            var decision = service.Evaluate(new HttpRequestInfo
+            {
+                ResolutionStatus = RequestInfoResolutionStatus.UntrustedProxy
+            });
+
+            Assert.True(decision.IsAllowed);
             Assert.Equal(IpAccessDecisionReason.ClientAddressUnavailable, decision.Reason);
         }
 
@@ -102,6 +132,47 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
 
             Assert.Equal(StatusCodes.Status403Forbidden, context.Response.StatusCode);
             Assert.False(nextCalled);
+        }
+
+        [Fact]
+        public void ClientIpAddressAccessor_Should_Return_Resolved_Client_Address()
+        {
+            var requestInfo = CreateRequestInfo("203.0.113.10");
+            var accessor = new ClientIpAddressAccessor(new StubHttpRequestInfoAccessor(requestInfo));
+
+            var clientIpAddress = accessor.GetClientIpAddress();
+
+            Assert.Equal(IPAddress.Parse("203.0.113.10"), clientIpAddress);
+        }
+
+        [Fact]
+        public void ClientIpAddressAccessor_Should_Return_Null_For_Untrusted_Request()
+        {
+            var requestInfo = new HttpRequestInfo
+            {
+                ClientIpAddress = IPAddress.Parse("203.0.113.10"),
+                ResolutionStatus = RequestInfoResolutionStatus.UntrustedProxy
+            };
+            var accessor = new ClientIpAddressAccessor(new StubHttpRequestInfoAccessor(requestInfo));
+
+            var clientIpAddress = accessor.GetClientIpAddress();
+
+            Assert.Null(clientIpAddress);
+        }
+
+        [Fact]
+        public void ClientIpAddressAccessor_Should_Normalize_Mapped_Ipv4_Address()
+        {
+            var requestInfo = new HttpRequestInfo
+            {
+                ClientIpAddress = IPAddress.Parse("::ffff:203.0.113.10"),
+                ResolutionStatus = RequestInfoResolutionStatus.Resolved
+            };
+            var accessor = new ClientIpAddressAccessor(new StubHttpRequestInfoAccessor(requestInfo));
+
+            var clientIpAddress = accessor.GetClientIpAddress();
+
+            Assert.Equal(IPAddress.Parse("203.0.113.10"), clientIpAddress);
         }
 
         private static IIpAccessControlService CreateService(AbpIpAccessControlOptions options)

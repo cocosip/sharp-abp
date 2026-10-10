@@ -84,7 +84,7 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
         protected virtual bool Matches(
             IPAddress address,
             System.Collections.Generic.IEnumerable<IPAddress> addresses,
-            System.Collections.Generic.IEnumerable<Microsoft.AspNetCore.HttpOverrides.IPNetwork> networks)
+            System.Collections.Generic.IEnumerable<IPNetwork> networks)
         {
             return addresses.Any(item => Equals(Normalize(item), address))
                 || networks.Any(network => network.Contains(address));

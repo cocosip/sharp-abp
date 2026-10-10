@@ -1,6 +1,5 @@
 #nullable enable
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -8,7 +7,6 @@ using Moq;
 using System;
 using System.Net;
 using Xunit;
-using IPNetwork = Microsoft.AspNetCore.HttpOverrides.IPNetwork;
 
 namespace SharpAbp.Abp.AspNetCore.Http
 {

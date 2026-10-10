@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Net;
-using AspNetCoreIPNetwork = Microsoft.AspNetCore.HttpOverrides.IPNetwork;
 
 namespace SharpAbp.Abp.AspNetCore.Http
 {
@@ -12,6 +11,6 @@ namespace SharpAbp.Abp.AspNetCore.Http
 
         public IList<IPAddress> KnownProxies { get; } = new List<IPAddress>();
 
-        public IList<AspNetCoreIPNetwork> KnownNetworks { get; } = new List<AspNetCoreIPNetwork>();
+        public IList<IPNetwork> KnownNetworks { get; } = new List<IPNetwork>();
     }
 }
