@@ -105,7 +105,12 @@ namespace SharpAbp.Abp.AspNetCore.Http
             context.Request.Headers["X-Forwarded-For"] = "203.0.113.10";
             context.Connection.RemoteIpAddress = IPAddress.Parse("198.51.100.2");
 
-            var result = CreateAccessor(context).GetRequestInfo();
+            var options = new AbpForwardedRequestOptions
+            {
+                RequireTrustedProxy = true
+            };
+
+            var result = CreateAccessor(context, options).GetRequestInfo();
 
             Assert.Null(result.ClientIpAddress);
             Assert.Equal(IPAddress.Parse("198.51.100.2"), result.ConnectionIpAddress);
@@ -138,7 +143,8 @@ namespace SharpAbp.Abp.AspNetCore.Http
 
             var options = new AbpForwardedRequestOptions
             {
-                ForwardLimit = 2
+                ForwardLimit = 2,
+                RequireTrustedProxy = true
             };
             options.KnownProxies.Add(IPAddress.Parse("10.0.0.3"));
 
