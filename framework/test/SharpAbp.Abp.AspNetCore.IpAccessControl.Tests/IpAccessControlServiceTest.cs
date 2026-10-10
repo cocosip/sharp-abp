@@ -13,8 +13,8 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
         public void Evaluate_Should_Reject_Denied_Address_Even_When_Allowlisted()
         {
             var options = new AbpIpAccessControlOptions();
-            options.AllowedAddresses.Add(IPAddress.Parse("203.0.113.10"));
-            options.DeniedAddresses.Add(IPAddress.Parse("203.0.113.10"));
+            options.AllowedNetworks.Add(IPNetwork.Parse("203.0.113.10/32"));
+            options.DeniedNetworks.Add(IPNetwork.Parse("203.0.113.10/32"));
             var service = CreateService(options);
 
             var decision = service.Evaluate(CreateRequestInfo("203.0.113.10"));
@@ -40,7 +40,7 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
         public void Evaluate_Should_Reject_Address_Outside_Allowlist()
         {
             var options = new AbpIpAccessControlOptions();
-            options.AllowedAddresses.Add(IPAddress.Parse("203.0.113.10"));
+            options.AllowedNetworks.Add(IPNetwork.Parse("203.0.113.10/32"));
             var service = CreateService(options);
 
             var decision = service.Evaluate(CreateRequestInfo("203.0.113.11"));
@@ -100,7 +100,7 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
         public void EvaluateCurrentRequest_Should_Use_Request_Info_Accessor()
         {
             var options = new AbpIpAccessControlOptions();
-            options.AllowedAddresses.Add(IPAddress.Parse("203.0.113.10"));
+            options.AllowedNetworks.Add(IPNetwork.Parse("203.0.113.10/32"));
             var requestInfo = CreateRequestInfo("203.0.113.10");
             var service = new IpAccessControlService(
                 Options.Create(options),
@@ -116,7 +116,7 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
         public async Task Middleware_Should_Return_Forbidden_For_Denied_Request()
         {
             var options = new AbpIpAccessControlOptions();
-            options.DeniedAddresses.Add(IPAddress.Parse("203.0.113.10"));
+            options.DeniedNetworks.Add(IPNetwork.Parse("203.0.113.10/32"));
             var service = new IpAccessControlService(
                 Options.Create(options),
                 new StubHttpRequestInfoAccessor(CreateRequestInfo("203.0.113.10")));

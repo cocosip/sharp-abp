@@ -7,12 +7,14 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
     {
         public bool DenyWhenClientAddressUnavailable { get; set; } = true;
 
-        public IList<IPAddress> AllowedAddresses { get; } = new List<IPAddress>();
-
+        /// <summary>
+        /// CIDR networks that are allowed. Use /32 for one IPv4 address and /128 for one IPv6 address.
+        /// </summary>
         public IList<IPNetwork> AllowedNetworks { get; } = new List<IPNetwork>();
 
-        public IList<IPAddress> DeniedAddresses { get; } = new List<IPAddress>();
-
+        /// <summary>
+        /// CIDR networks that are denied. Denied networks always take precedence over allowed networks.
+        /// </summary>
         public IList<IPNetwork> DeniedNetworks { get; } = new List<IPNetwork>();
     }
 }

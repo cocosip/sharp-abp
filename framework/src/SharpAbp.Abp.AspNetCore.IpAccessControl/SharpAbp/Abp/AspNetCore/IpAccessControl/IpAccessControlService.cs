@@ -39,7 +39,7 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
             }
 
             var clientIpAddress = Normalize(requestInfo.ClientIpAddress);
-            if (Matches(clientIpAddress, Options.DeniedAddresses, Options.DeniedNetworks))
+            if (Matches(clientIpAddress, Options.DeniedNetworks))
             {
                 return new IpAccessDecision
                 {
@@ -49,7 +49,7 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
                 };
             }
 
-            if (Options.AllowedAddresses.Count == 0 && Options.AllowedNetworks.Count == 0)
+            if (Options.AllowedNetworks.Count == 0)
             {
                 return new IpAccessDecision
                 {
@@ -59,7 +59,7 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
                 };
             }
 
-            var isAllowed = Matches(clientIpAddress, Options.AllowedAddresses, Options.AllowedNetworks);
+            var isAllowed = Matches(clientIpAddress, Options.AllowedNetworks);
             return new IpAccessDecision
             {
                 ClientIpAddress = clientIpAddress,
@@ -83,11 +83,9 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
 
         protected virtual bool Matches(
             IPAddress address,
-            System.Collections.Generic.IEnumerable<IPAddress> addresses,
             System.Collections.Generic.IEnumerable<IPNetwork> networks)
         {
-            return addresses.Any(item => Equals(Normalize(item), address))
-                || networks.Any(network => network.Contains(address));
+            return networks.Any(network => network.Contains(address));
         }
 
         protected virtual IPAddress Normalize(IPAddress address)
