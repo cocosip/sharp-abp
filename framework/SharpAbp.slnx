@@ -15,6 +15,7 @@
     <Project Path="src/SharpAbp.Abp.AspNetCore.Mvc/SharpAbp.Abp.AspNetCore.Mvc.csproj" />
     <Project Path="src/SharpAbp.Abp.AspNetCore.TenancyGrouping/SharpAbp.Abp.AspNetCore.TenancyGrouping.csproj" />
     <Project Path="src/SharpAbp.Abp.AspNetCore/SharpAbp.Abp.AspNetCore.csproj" />
+    <Project Path="src/SharpAbp.Abp.AspNetCore.IpAccessControl/SharpAbp.Abp.AspNetCore.IpAccessControl.csproj" />
     <Project Path="src/SharpAbp.Abp.Binary.Abstractions/SharpAbp.Abp.Binary.Abstractions.csproj" />
     <Project Path="src/SharpAbp.Abp.Binary.Protobuf/SharpAbp.Abp.Binary.Protobuf.csproj" />
     <Project Path="src/SharpAbp.Abp.Binary/SharpAbp.Abp.Binary.csproj" />
@@ -97,6 +98,7 @@
   </Folder>
   <Folder Name="/test/">
     <Project Path="test/SharpAbp.Abp.AspNetCore.Tests/SharpAbp.Abp.AspNetCore.Tests.csproj" />
+    <Project Path="test/SharpAbp.Abp.AspNetCore.IpAccessControl.Tests/SharpAbp.Abp.AspNetCore.IpAccessControl.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.Binary.Tests/SharpAbp.Abp.Binary.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.Core.Tests/SharpAbp.Abp.Core.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.ConcurrencyLimiting.Tests/SharpAbp.Abp.ConcurrencyLimiting.Tests.csproj" />
