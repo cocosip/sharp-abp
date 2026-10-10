@@ -1,0 +1,6 @@
+{
+  "culture": "zh-Hant",
+  "texts": {
+    "ConcurrencyLimiting:LimitExceeded": "並行策略「{PolicyName}」目前已達容量上限。"
+  }
+}

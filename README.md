@@ -32,6 +32,8 @@ An enterprise-grade extension module collection based on ABP vNext framework, co
 | **Crypto** | Encryption and decryption with SM2/AES support | [docs](/docs/Core.md#crypto) |
 | **FreeRedis** | FreeRedis cache library ABP adapter | [docs](/docs/Core.md#freeredis) |
 | **Validation** | Data validation module | [docs](/docs/Core.md#validation) |
+| **ConcurrencyLimiting** | Process-local execution concurrency limits and queues | [docs](/docs/ConcurrencyLimiting.md) |
+| **OperationRateLimiting** | Fixed-window operation quotas with replaceable storage | [docs](/docs/OperationRateLimiting.md) |
 | **AspNetCore** | AspNetCore integration extensions | [docs](/docs/Core.md#aspnetcore) |
 | **Swashbuckle** | Swagger/Swashbuckle API documentation support | [docs](/docs/Core.md#swashbuckle) |
 | **Swashbuckle.Versioning** | API versioning management | [docs](/docs/Core.md#swashbuckleversioning) |

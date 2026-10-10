@@ -1,0 +1,8 @@
+{
+  "culture": "sl",
+  "texts": {
+    "DurationSeconds": "{0} sekund",
+    "OperationRateLimiting:LimitExceeded": "Politika operacij {PolicyName} je porabila kvoto pravila {RuleName}. Poskusite znova čez {RetryDescription}.",
+    "OperationRateLimiting:PermanentlyDenied": "Pravilo {RuleName} trajno zavrača politiko operacij {PolicyName}."
+  }
+}

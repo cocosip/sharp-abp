@@ -1,0 +1,6 @@
+{
+  "culture": "tr",
+  "texts": {
+    "ConcurrencyLimiting:LimitExceeded": "'{PolicyName}' eşzamanlılık ilkesi şu anda kapasite sınırında."
+  }
+}

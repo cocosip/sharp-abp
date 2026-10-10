@@ -1,0 +1,6 @@
+{
+  "culture": "vi",
+  "texts": {
+    "ConcurrencyLimiting:LimitExceeded": "Chính sách đồng thời '{PolicyName}' hiện đã đạt giới hạn."
+  }
+}

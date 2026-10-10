@@ -1,0 +1,4 @@
+{
+  "culture": "zh-Hans",
+  "texts": { "ConcurrencyLimiting:LimitExceeded": "并发策略“{PolicyName}”当前已达到容量上限。" }
+}

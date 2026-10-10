@@ -1,0 +1,8 @@
+{
+  "culture": "pt-BR",
+  "texts": {
+    "DurationSeconds": "{0} segundos",
+    "OperationRateLimiting:LimitExceeded": "A política de operações {PolicyName} esgotou a cota da regra {RuleName}. Tente novamente após {RetryDescription}.",
+    "OperationRateLimiting:PermanentlyDenied": "A política de operações {PolicyName} foi negada permanentemente pela regra {RuleName}."
+  }
+}

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../../common.props" />
+  <Import Project="../../../configureawait.props" />
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;$(NetCoreFx)</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <AssemblyName>SharpAbp.Abp.ConcurrencyLimiting</AssemblyName>
+    <PackageId>SharpAbp.Abp.ConcurrencyLimiting</PackageId>
+    <RootNamespace />
+    <Description>ABP process-local execution concurrency limiting</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Users.Abstractions" />
+    <PackageReference Include="Volo.Abp.MultiTenancy.Abstractions" />
+    <PackageReference Include="Volo.Abp.Localization" />
+    <PackageReference Include="Volo.Abp.VirtualFileSystem" />
+    <PackageReference Include="System.Threading.RateLimiting" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="SharpAbp\Abp\ConcurrencyLimiting\Localization\Resources\*.json" />
+    <Content Remove="SharpAbp\Abp\ConcurrencyLimiting\Localization\Resources\*.json" />
+  </ItemGroup>
+</Project>

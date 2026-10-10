@@ -1,0 +1,8 @@
+{
+  "culture": "zh-Hans",
+  "texts": {
+    "DurationSeconds": "{0} 秒",
+    "OperationRateLimiting:LimitExceeded": "操作策略 {PolicyName} 的规则 {RuleName} 已用尽配额。请在 {RetryDescription} 后重试。",
+    "OperationRateLimiting:PermanentlyDenied": "操作策略 {PolicyName} 被规则 {RuleName} 永久拒绝。"
+  }
+}

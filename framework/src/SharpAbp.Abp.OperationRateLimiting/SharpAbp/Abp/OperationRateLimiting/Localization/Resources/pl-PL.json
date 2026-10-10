@@ -1,0 +1,8 @@
+{
+  "culture": "pl-PL",
+  "texts": {
+    "DurationSeconds": "{0} sekund",
+    "OperationRateLimiting:LimitExceeded": "Polityka operacji {PolicyName} wyczerpała limit reguły {RuleName}. Spróbuj ponownie za {RetryDescription}.",
+    "OperationRateLimiting:PermanentlyDenied": "Polityka operacji {PolicyName} została trwale odrzucona przez regułę {RuleName}."
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "culture": "cs",
+  "texts": {
+    "ConcurrencyLimiting:LimitExceeded": "Zásada souběžnosti '{PolicyName}' nyní dosáhla limitu kapacity."
+  }
+}
