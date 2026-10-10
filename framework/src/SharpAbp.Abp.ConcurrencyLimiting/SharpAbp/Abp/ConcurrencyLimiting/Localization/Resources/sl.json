@@ -1,0 +1,6 @@
+{
+  "culture": "sl",
+  "texts": {
+    "ConcurrencyLimiting:LimitExceeded": "Pravilnik sočasnosti '{PolicyName}' je trenutno dosegel omejitev zmogljivosti."
+  }
+}

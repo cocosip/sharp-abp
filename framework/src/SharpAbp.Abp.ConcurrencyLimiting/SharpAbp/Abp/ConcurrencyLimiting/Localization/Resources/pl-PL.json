@@ -1,0 +1,6 @@
+{
+  "culture": "pl-PL",
+  "texts": {
+    "ConcurrencyLimiting:LimitExceeded": "Zasada współbieżności '{PolicyName}' osiągnęła limit pojemności."
+  }
+}

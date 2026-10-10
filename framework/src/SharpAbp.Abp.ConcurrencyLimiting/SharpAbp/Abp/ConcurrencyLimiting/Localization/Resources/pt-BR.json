@@ -1,0 +1,6 @@
+{
+  "culture": "pt-BR",
+  "texts": {
+    "ConcurrencyLimiting:LimitExceeded": "A política de concorrência '{PolicyName}' atingiu o limite de capacidade."
+  }
+}

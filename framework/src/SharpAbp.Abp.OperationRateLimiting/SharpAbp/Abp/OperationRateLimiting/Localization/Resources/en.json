@@ -1,0 +1,8 @@
+{
+  "culture": "en",
+  "texts": {
+    "DurationSeconds": "{0} seconds",
+    "OperationRateLimiting:LimitExceeded": "Operation policy {PolicyName} has exhausted rule {RuleName}. Retry after {RetryDescription}.",
+    "OperationRateLimiting:PermanentlyDenied": "Operation policy {PolicyName} is permanently denied by rule {RuleName}."
+  }
+}

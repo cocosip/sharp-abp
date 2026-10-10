@@ -1,0 +1,4 @@
+{
+  "culture": "en",
+  "texts": { "ConcurrencyLimiting:LimitExceeded": "Concurrency policy '{PolicyName}' is currently at capacity." }
+}

@@ -4,6 +4,11 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageVersion Include="Volo.Abp" Version="$(VoloAbpPackageVersion)" />
+		<PackageVersion Include="Volo.Abp.Users.Abstractions" Version="$(VoloAbpPackageVersion)" />
+		<PackageVersion Include="Volo.Abp.Localization" Version="$(VoloAbpPackageVersion)" />
+		<PackageVersion Include="Volo.Abp.DistributedLocking.Abstractions" Version="$(VoloAbpPackageVersion)" />
+		<PackageVersion Include="Volo.Abp.DistributedLocking" Version="$(VoloAbpPackageVersion)" />
+		<PackageVersion Include="Volo.Abp.VirtualFileSystem" Version="$(VoloAbpPackageVersion)" />
 		<PackageVersion Include="Volo.Abp.Json" Version="$(VoloAbpPackageVersion)" />
 		<PackageVersion Include="Volo.Abp.AutoMapper" Version="$(VoloAbpPackageVersion)" />
 		<PackageVersion Include="Volo.Abp.Mapperly" Version="$(VoloAbpPackageVersion)" />
@@ -162,9 +167,14 @@
 		<PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
 		<PackageVersion Include="Serilog.Sinks.File" Version="6.0.0" />
 		<PackageVersion Include="Shouldly" Version="4.3.0" />
+		<PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="$(MicrosoftPackageVersion)" />
+		<PackageVersion Include="StackExchange.Redis" Version="2.8.16" />
+		<PackageVersion Include="DistributedLock.Redis" Version="1.1.1" />
 		<PackageVersion Include="System.ComponentModel.Annotations" Version="5.0.0" />
 		<PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
 		<PackageVersion Include="System.Threading.Channels" Version="$(MicrosoftPackageVersion)" />
+		<PackageVersion Include="System.Threading.RateLimiting" Version="9.0.20" Condition="'$(NetCoreFx)' != 'net10.0'" />
+		<PackageVersion Include="System.Threading.RateLimiting" Version="10.0.12" Condition="'$(NetCoreFx)' == 'net10.0'" />
 		<PackageVersion Include="Moq" Version="4.20.72" />
 		<PackageVersion Include="xunit" Version="2.9.3" />
 		<PackageVersion Include="xunit.runner.visualstudio" Version="4.0.0" />

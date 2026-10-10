@@ -1,0 +1,8 @@
+{
+  "culture": "tr",
+  "texts": {
+    "DurationSeconds": "{0} saniye",
+    "OperationRateLimiting:LimitExceeded": "{PolicyName} işlem ilkesinin {RuleName} kuralı için kotası tükendi. {RetryDescription} sonra yeniden deneyin.",
+    "OperationRateLimiting:PermanentlyDenied": "{PolicyName} işlem ilkesi {RuleName} kuralı tarafından kalıcı olarak reddedildi."
+  }
+}

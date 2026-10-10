@@ -1,0 +1,8 @@
+{
+  "culture": "cs",
+  "texts": {
+    "DurationSeconds": "{0} sekund",
+    "OperationRateLimiting:LimitExceeded": "Zásada operací {PolicyName} vyčerpala limit pravidla {RuleName}. Zkuste to znovu za {RetryDescription}.",
+    "OperationRateLimiting:PermanentlyDenied": "Zásada operací {PolicyName} je trvale zamítnuta pravidlem {RuleName}."
+  }
+}

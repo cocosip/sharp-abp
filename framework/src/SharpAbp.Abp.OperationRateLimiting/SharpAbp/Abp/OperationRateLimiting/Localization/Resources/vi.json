@@ -1,0 +1,8 @@
+{
+  "culture": "vi",
+  "texts": {
+    "DurationSeconds": "{0} giây",
+    "OperationRateLimiting:LimitExceeded": "Chính sách thao tác {PolicyName} đã hết hạn mức của quy tắc {RuleName}. Hãy thử lại sau {RetryDescription}.",
+    "OperationRateLimiting:PermanentlyDenied": "Chính sách thao tác {PolicyName} bị quy tắc {RuleName} từ chối vĩnh viễn."
+  }
+}
