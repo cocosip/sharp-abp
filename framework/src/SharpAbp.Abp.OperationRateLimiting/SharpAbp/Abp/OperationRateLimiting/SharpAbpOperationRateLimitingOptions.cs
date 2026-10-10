@@ -20,7 +20,7 @@ namespace SharpAbp.Abp.OperationRateLimiting
 
         public virtual SharpAbpOperationRateLimitingOptions AddPolicy(string name, Action<OperationRateLimitingPolicyBuilder> configure)
         {
-            ValidateName(name, nameof(name));
+            ValidateName(name);
             if (configure == null)
             {
                 throw new ArgumentNullException(nameof(configure));
@@ -33,7 +33,7 @@ namespace SharpAbp.Abp.OperationRateLimiting
 
         public virtual SharpAbpOperationRateLimitingOptions ConfigurePolicy(string name, Action<OperationRateLimitingPolicyBuilder> configure)
         {
-            ValidateName(name, nameof(name));
+            ValidateName(name);
             if (configure == null)
             {
                 throw new ArgumentNullException(nameof(configure));
@@ -50,7 +50,7 @@ namespace SharpAbp.Abp.OperationRateLimiting
 
         public virtual SharpAbpOperationRateLimitingOptions RemovePolicy(string name)
         {
-            ValidateName(name, nameof(name));
+            ValidateName(name);
             Policies.Remove(name);
             return this;
         }
@@ -66,11 +66,11 @@ namespace SharpAbp.Abp.OperationRateLimiting
             return this;
         }
 
-        internal static void ValidateName(string name, string parameter)
+        internal static void ValidateName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                throw new ArgumentException("A nonempty name is required.", parameter);
+                throw new OperationRateLimitingConfigurationException("Policy name must be nonempty.");
             }
         }
     }
