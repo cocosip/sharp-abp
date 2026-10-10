@@ -31,6 +31,8 @@ namespace SharpAbp.Abp.AspNetCore
             {
                 options.RouteTranslationPrefix = "X-Abp";
             });
+
+            Configure<AbpForwardedRequestOptions>(options => { });
             return Task.CompletedTask;
         }
     }
