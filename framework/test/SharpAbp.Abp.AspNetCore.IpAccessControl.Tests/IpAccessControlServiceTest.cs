@@ -1,14 +1,59 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.AspNetCore.Http;
 using System.Net;
 using Xunit;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
+using System.IO;
+using System.Text;
 
 namespace SharpAbp.Abp.AspNetCore.IpAccessControl
 {
     public class IpAccessControlServiceTest
     {
+        [Fact]
+        public void Options_Should_Default_To_Unrestricted_Forwarded_Proxy_Mode()
+        {
+            var options = new SharpAbp.Abp.AspNetCore.Http.AbpForwardedRequestOptions();
+
+            Assert.False(options.RequireTrustedProxy);
+            Assert.Equal(2, options.ForwardLimit);
+        }
+
+        [Fact]
+        public void Options_Should_Load_IP_And_IPNetwork_Values_From_Json()
+        {
+            const string json = """
+            {
+              "ForwardedRequestOptions": {
+                "RequireTrustedProxy": false,
+                "ForwardLimit": 2,
+                "KnownProxies": [ "10.0.0.2" ],
+                "KnownNetworks": [ "10.0.0.0/8" ]
+              },
+              "IpAccessControlOptions": {
+                "IsEnabled": true,
+                "AllowedNetworks": [ "192.0.2.0/24" ],
+                "DeniedNetworks": [ "192.0.2.128/25" ]
+              }
+            }
+            """;
+
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+            var configuration = new ConfigurationBuilder().AddJsonStream(stream).Build();
+
+            var forwarded = new SharpAbp.Abp.AspNetCore.Http.AbpForwardedRequestOptions()
+                .Configure(configuration);
+            var access = new AbpIpAccessControlOptions().Configure(configuration);
+
+            Assert.Equal(IPAddress.Parse("10.0.0.2"), Assert.Single(forwarded.KnownProxies));
+            Assert.Equal(IPNetwork.Parse("10.0.0.0/8"), Assert.Single(forwarded.KnownNetworks));
+            Assert.True(access.IsEnabled);
+            Assert.Equal(IPNetwork.Parse("192.0.2.0/24"), Assert.Single(access.AllowedNetworks));
+            Assert.Equal(IPNetwork.Parse("192.0.2.128/25"), Assert.Single(access.DeniedNetworks));
+        }
+
         [Fact]
         public void Evaluate_Should_Reject_Denied_Address_Even_When_Allowlisted()
         {
