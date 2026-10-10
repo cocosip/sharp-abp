@@ -96,7 +96,7 @@ namespace SharpAbp.Abp.ConcurrencyLimiting
         private static InvocationMetadata GetMetadataOnCacheMiss(Type actualType, MethodInfo method)
         {
             var type = actualType;
-            ConcurrentDictionary<MethodInfo, InvocationMetadata> methods;
+            ConcurrentDictionary<MethodInfo, InvocationMetadata>? methods = null;
             while (true)
             {
                 if (MetadataCache.TryGetValue(type, out methods))
