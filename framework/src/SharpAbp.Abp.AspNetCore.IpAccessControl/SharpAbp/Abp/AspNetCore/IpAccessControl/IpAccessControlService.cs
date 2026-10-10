@@ -27,6 +27,18 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
 
         public virtual IpAccessDecision Evaluate(HttpRequestInfo requestInfo)
         {
+            if (!Options.IsEnabled)
+            {
+                return new IpAccessDecision
+                {
+                    ClientIpAddress = requestInfo.ResolutionStatus == RequestInfoResolutionStatus.Resolved
+                        ? requestInfo.ClientIpAddress == null ? null : Normalize(requestInfo.ClientIpAddress)
+                        : null,
+                    IsAllowed = true,
+                    Reason = IpAccessDecisionReason.Disabled
+                };
+            }
+
             if (requestInfo.ClientIpAddress == null
                 || requestInfo.ResolutionStatus != RequestInfoResolutionStatus.Resolved)
             {

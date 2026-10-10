@@ -5,6 +5,8 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
 {
     public class AbpIpAccessControlOptions
     {
+        public bool IsEnabled { get; set; }
+
         public bool DenyWhenClientAddressUnavailable { get; set; } = true;
 
         /// <summary>

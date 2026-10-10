@@ -12,7 +12,7 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
         [Fact]
         public void Evaluate_Should_Reject_Denied_Address_Even_When_Allowlisted()
         {
-            var options = new AbpIpAccessControlOptions();
+            var options = CreateEnabledOptions();
             options.AllowedNetworks.Add(IPNetwork.Parse("203.0.113.10/32"));
             options.DeniedNetworks.Add(IPNetwork.Parse("203.0.113.10/32"));
             var service = CreateService(options);
@@ -26,7 +26,7 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
         [Fact]
         public void Evaluate_Should_Allow_Address_In_Allowlist()
         {
-            var options = new AbpIpAccessControlOptions();
+            var options = CreateEnabledOptions();
             options.AllowedNetworks.Add(IPNetwork.Parse("203.0.113.0/24"));
             var service = CreateService(options);
 
@@ -39,7 +39,7 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
         [Fact]
         public void Evaluate_Should_Reject_Address_Outside_Allowlist()
         {
-            var options = new AbpIpAccessControlOptions();
+            var options = CreateEnabledOptions();
             options.AllowedNetworks.Add(IPNetwork.Parse("203.0.113.10/32"));
             var service = CreateService(options);
 
@@ -52,7 +52,7 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
         [Fact]
         public void Evaluate_Should_Reject_Denied_Network_Even_When_Address_Is_Allowlisted()
         {
-            var options = new AbpIpAccessControlOptions();
+            var options = CreateEnabledOptions();
             options.AllowedNetworks.Add(IPNetwork.Parse("203.0.113.0/24"));
             options.DeniedNetworks.Add(IPNetwork.Parse("203.0.113.0/28"));
             var service = CreateService(options);
@@ -66,7 +66,7 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
         [Fact]
         public void Evaluate_Should_Reject_When_Client_Address_Is_Unavailable()
         {
-            var service = CreateService(new AbpIpAccessControlOptions());
+            var service = CreateService(CreateEnabledOptions());
             var requestInfo = new HttpRequestInfo
             {
                 ResolutionStatus = RequestInfoResolutionStatus.UntrustedProxy
@@ -81,10 +81,8 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
         [Fact]
         public void Evaluate_Should_Allow_When_Client_Address_Is_Unavailable_And_Option_Allows_It()
         {
-            var options = new AbpIpAccessControlOptions
-            {
-                DenyWhenClientAddressUnavailable = false
-            };
+            var options = CreateEnabledOptions();
+            options.DenyWhenClientAddressUnavailable = false;
             var service = CreateService(options);
 
             var decision = service.Evaluate(new HttpRequestInfo
@@ -99,7 +97,7 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
         [Fact]
         public void EvaluateCurrentRequest_Should_Use_Request_Info_Accessor()
         {
-            var options = new AbpIpAccessControlOptions();
+            var options = CreateEnabledOptions();
             options.AllowedNetworks.Add(IPNetwork.Parse("203.0.113.10/32"));
             var requestInfo = CreateRequestInfo("203.0.113.10");
             var service = new IpAccessControlService(
@@ -115,7 +113,7 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
         [Fact]
         public async Task Middleware_Should_Return_Forbidden_For_Denied_Request()
         {
-            var options = new AbpIpAccessControlOptions();
+            var options = CreateEnabledOptions();
             options.DeniedNetworks.Add(IPNetwork.Parse("203.0.113.10/32"));
             var service = new IpAccessControlService(
                 Options.Create(options),
@@ -132,6 +130,36 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
 
             Assert.Equal(StatusCodes.Status403Forbidden, context.Response.StatusCode);
             Assert.False(nextCalled);
+        }
+
+        [Fact]
+        public void Evaluate_Should_Allow_When_Access_Control_Is_Disabled()
+        {
+            var options = new AbpIpAccessControlOptions();
+            options.DeniedNetworks.Add(IPNetwork.Parse("203.0.113.10/32"));
+            var service = CreateService(options);
+
+            var decision = service.Evaluate(CreateRequestInfo("203.0.113.10"));
+
+            Assert.True(decision.IsAllowed);
+            Assert.Equal(IpAccessDecisionReason.Disabled, decision.Reason);
+        }
+
+        [Fact]
+        public async Task Middleware_Should_Call_Next_When_Access_Control_Is_Disabled()
+        {
+            var nextCalled = false;
+            var middleware = new IpAccessControlMiddleware(_ =>
+            {
+                nextCalled = true;
+                return Task.CompletedTask;
+            }, new IpAccessControlService(
+                Options.Create(new AbpIpAccessControlOptions()),
+                new StubHttpRequestInfoAccessor(CreateRequestInfo("203.0.113.10"))));
+
+            await middleware.InvokeAsync(new DefaultHttpContext());
+
+            Assert.True(nextCalled);
         }
 
         [Fact]
@@ -179,6 +207,14 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
         {
             return new IpAccessControlService(Options.Create(options),
                 new StubHttpRequestInfoAccessor());
+        }
+
+        private static AbpIpAccessControlOptions CreateEnabledOptions()
+        {
+            return new AbpIpAccessControlOptions
+            {
+                IsEnabled = true
+            };
         }
 
         private static HttpRequestInfo CreateRequestInfo(string ip)
