@@ -154,6 +154,92 @@ namespace SharpAbp.Abp.AspNetCore.Http
             Assert.Equal(RequestInfoResolutionStatus.UntrustedProxy, result.ResolutionStatus);
         }
 
+        [Fact]
+        public void GetRequestInfo_Should_Reject_Empty_XForwarded_For_Hop()
+        {
+            var context = new DefaultHttpContext();
+            context.Request.Headers["X-Forwarded-For"] = "203.0.113.10,,10.0.0.2";
+            context.Connection.RemoteIpAddress = IPAddress.Parse("10.0.0.3");
+
+            var options = new AbpForwardedRequestOptions
+            {
+                ForwardLimit = 3
+            };
+            options.KnownNetworks.Add(IPNetwork.Parse("10.0.0.0/8"));
+
+            var result = CreateAccessor(context, options).GetRequestInfo();
+
+            Assert.Null(result.ClientIpAddress);
+            Assert.Equal(RequestInfoResolutionStatus.InvalidHeader, result.ResolutionStatus);
+        }
+
+        [Theory]
+        [InlineData("for=203.0.113.10;for=198.51.100.10")]
+        [InlineData("for=203.0.113.10;proto=https;proto=http")]
+        [InlineData("for=203.0.113.10;host=example.com;host=other.example.com")]
+        public void GetRequestInfo_Should_Reject_Duplicate_Forwarded_Parameters(string value)
+        {
+            var context = new DefaultHttpContext();
+            context.Request.Headers["Forwarded"] = value;
+            context.Connection.RemoteIpAddress = IPAddress.Parse("10.0.0.2");
+
+            var options = new AbpForwardedRequestOptions();
+            options.KnownProxies.Add(IPAddress.Parse("10.0.0.2"));
+
+            var result = CreateAccessor(context, options).GetRequestInfo();
+
+            Assert.Null(result.ClientIpAddress);
+            Assert.Equal(RequestInfoResolutionStatus.InvalidHeader, result.ResolutionStatus);
+        }
+
+        [Theory]
+        [InlineData("Forwarded", "for=203.0.113.10:65536")]
+        [InlineData("Forwarded", "for=203.0.113.10:-1")]
+        [InlineData("Forwarded", "for=203.0.113.10;host=example.com:65536")]
+        [InlineData("X-Forwarded-Port", "65536")]
+        public void GetRequestInfo_Should_Reject_Invalid_Forwarded_Port(string header, string value)
+        {
+            var context = new DefaultHttpContext();
+            if (header == "X-Forwarded-Port")
+            {
+                context.Request.Headers["X-Forwarded-For"] = "203.0.113.10";
+                context.Request.Headers[header] = value;
+            }
+            else
+            {
+                context.Request.Headers[header] = value;
+            }
+
+            context.Connection.RemoteIpAddress = IPAddress.Parse("10.0.0.2");
+
+            var options = new AbpForwardedRequestOptions();
+            options.KnownProxies.Add(IPAddress.Parse("10.0.0.2"));
+
+            var result = CreateAccessor(context, options).GetRequestInfo();
+
+            Assert.Null(result.ClientIpAddress);
+            Assert.Equal(RequestInfoResolutionStatus.InvalidHeader, result.ResolutionStatus);
+        }
+
+        [Fact]
+        public void GetRequestInfo_Should_Reject_NonPositive_ForwardLimit()
+        {
+            var context = new DefaultHttpContext();
+            context.Request.Headers["X-Forwarded-For"] = "203.0.113.10";
+            context.Connection.RemoteIpAddress = IPAddress.Parse("10.0.0.2");
+
+            var options = new AbpForwardedRequestOptions
+            {
+                ForwardLimit = 0
+            };
+            options.KnownProxies.Add(IPAddress.Parse("10.0.0.2"));
+
+            var result = CreateAccessor(context, options).GetRequestInfo();
+
+            Assert.Null(result.ClientIpAddress);
+            Assert.Equal(RequestInfoResolutionStatus.ForwardLimitExceeded, result.ResolutionStatus);
+        }
+
         private static IHttpRequestInfoAccessor CreateAccessor(
             HttpContext context,
             AbpForwardedRequestOptions? options = null)

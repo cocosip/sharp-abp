@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using Volo.Abp.DependencyInjection;
@@ -212,15 +213,31 @@ namespace SharpAbp.Abp.AspNetCore.Http
 
             var proto = FirstHeaderValue(context.Request.Headers["X-Forwarded-Proto"]);
             var hostValue = FirstHeaderValue(context.Request.Headers["X-Forwarded-Host"]);
-            var parsedHost = ParseHost(hostValue);
-            var portValue = FirstHeaderValue(context.Request.Headers["X-Forwarded-Port"]);
-            var port = parsedHost.Port ?? (int.TryParse(portValue, out var forwardedPort) ? forwardedPort : context.Request.Host.Port);
+            if (!TryParseHost(hostValue, out var parsedHost, out var hostPort))
+            {
+                return null;
+            }
+
+            var rawPortValue = context.Request.Headers["X-Forwarded-Port"].ToString();
+            var portValue = FirstHeaderValue(rawPortValue);
+            int? forwardedPort = null;
+            if (!string.IsNullOrWhiteSpace(rawPortValue))
+            {
+                if (portValue == null || !TryParsePort(portValue, out var parsedPort))
+                {
+                    return null;
+                }
+
+                forwardedPort = parsedPort;
+            }
+
+            var port = hostPort ?? forwardedPort ?? context.Request.Host.Port;
 
             var first = hops[0] with
             {
                 Proto = proto,
-                Host = parsedHost.Host,
-                HostPort = parsedHost.Port
+                Host = parsedHost,
+                HostPort = hostPort
             };
             hops[0] = first;
 
@@ -229,7 +246,7 @@ namespace SharpAbp.Abp.AspNetCore.Http
                 ClientIpAddress = clientIp,
                 ClientPort = clientPort,
                 Scheme = proto ?? context.Request.Scheme,
-                Host = parsedHost.Host ?? context.Request.Host.Host,
+                Host = parsedHost ?? context.Request.Host.Host,
                 Port = port,
                 ConnectionIpAddress = connectionIp,
                 ConnectionPort = context.Connection.RemotePort > 0 ? context.Connection.RemotePort : null,
@@ -255,7 +272,13 @@ namespace SharpAbp.Abp.AspNetCore.Http
                 return false;
             }
 
-            var forwardLimit = Math.Max(1, _options.ForwardLimit);
+            if (_options.ForwardLimit <= 0)
+            {
+                status = RequestInfoResolutionStatus.ForwardLimitExceeded;
+                return false;
+            }
+
+            var forwardLimit = _options.ForwardLimit;
             if (hops.Count > forwardLimit)
             {
                 status = RequestInfoResolutionStatus.ForwardLimitExceeded;
@@ -325,6 +348,9 @@ namespace SharpAbp.Abp.AspNetCore.Http
             foreach (var element in SplitOutsideQuotes(value, ','))
             {
                 var hop = new ForwardedHop();
+                var hasFor = false;
+                var hasProto = false;
+                var hasHost = false;
                 foreach (var parameter in SplitOutsideQuotes(element, ';'))
                 {
                     var separator = parameter.IndexOf('=');
@@ -337,18 +363,35 @@ namespace SharpAbp.Abp.AspNetCore.Http
                     var parameterValue = Unquote(parameter[(separator + 1)..].Trim());
                     if (name.Equals("for", StringComparison.OrdinalIgnoreCase))
                     {
+                        if (hasFor)
+                        {
+                            return false;
+                        }
+
+                        hasFor = true;
                         hop = ParseEndpoint(parameterValue, out var ip, out var port, out var token)
                             ? hop with { IpAddress = ip, Port = port }
                             : hop with { ForToken = token };
                     }
                     else if (name.Equals("proto", StringComparison.OrdinalIgnoreCase))
                     {
+                        if (hasProto)
+                        {
+                            return false;
+                        }
+
+                        hasProto = true;
                         hop = hop with { Proto = parameterValue.ToLowerInvariant() };
                     }
                     else if (name.Equals("host", StringComparison.OrdinalIgnoreCase))
                     {
-                        var host = ParseHost(parameterValue);
-                        hop = hop with { Host = host.Host, HostPort = host.Port };
+                        if (hasHost || !TryParseHost(parameterValue, out var host, out var hostPort))
+                        {
+                            return false;
+                        }
+
+                        hasHost = true;
+                        hop = hop with { Host = host, HostPort = hostPort };
                     }
                 }
 
@@ -367,7 +410,7 @@ namespace SharpAbp.Abp.AspNetCore.Http
         private static bool TryParseXForwardedFor(string value, out List<ForwardedHop> hops)
         {
             hops = new List<ForwardedHop>();
-            foreach (var item in value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            foreach (var item in value.Split(',', StringSplitOptions.TrimEntries))
             {
                 if (!ParseEndpoint(item, out var ip, out var port, out _))
                 {
@@ -398,7 +441,7 @@ namespace SharpAbp.Abp.AspNetCore.Http
 
                 if (value.Length > closingBracket + 1)
                 {
-                    if (value[closingBracket + 1] != ':' || !int.TryParse(value[(closingBracket + 2)..], out var parsedPort))
+                    if (value[closingBracket + 1] != ':' || !TryParsePort(value[(closingBracket + 2)..], out var parsedPort))
                     {
                         token = value;
                         ip = null;
@@ -417,7 +460,7 @@ namespace SharpAbp.Abp.AspNetCore.Http
             }
 
             var separator = value.LastIndexOf(':');
-            if (separator > 0 && int.TryParse(value[(separator + 1)..], out var portValue)
+            if (separator > 0 && TryParsePort(value[(separator + 1)..], out var portValue)
                 && IPAddress.TryParse(value[..separator], out ip))
             {
                 port = portValue;
@@ -428,37 +471,62 @@ namespace SharpAbp.Abp.AspNetCore.Http
             return false;
         }
 
-        private static (string? Host, int? Port) ParseHost(string? value)
+        private static bool TryParseHost(string? value, out string? host, out int? port)
         {
+            host = null;
+            port = null;
             if (string.IsNullOrWhiteSpace(value))
             {
-                return (null, null);
+                return true;
             }
 
             value = value.Trim();
             if (value.StartsWith("[", StringComparison.Ordinal))
             {
                 var closingBracket = value.IndexOf(']');
-                if (closingBracket < 0)
+                if (closingBracket <= 1)
                 {
-                    return (value, null);
+                    return false;
                 }
 
-                var host = value[1..closingBracket];
-                var port = closingBracket + 1 < value.Length && value[closingBracket + 1] == ':'
-                    && int.TryParse(value[(closingBracket + 2)..], out var parsedPort)
-                    ? parsedPort
-                    : (int?)null;
-                return (host, port);
+                host = value[1..closingBracket];
+                if (closingBracket + 1 == value.Length)
+                {
+                    return true;
+                }
+
+                if (value[closingBracket + 1] != ':'
+                    || !TryParsePort(value[(closingBracket + 2)..], out var parsedPort))
+                {
+                    return false;
+                }
+
+                port = parsedPort;
+                return true;
             }
 
             var separator = value.LastIndexOf(':');
-            if (separator > 0 && int.TryParse(value[(separator + 1)..], out var portValue))
+            if (separator > 0)
             {
-                return (value[..separator], portValue);
+                if (!TryParsePort(value[(separator + 1)..], out var parsedPort))
+                {
+                    return false;
+                }
+
+                host = value[..separator];
+                port = parsedPort;
+                return true;
             }
 
-            return (value, null);
+            host = value;
+            return true;
+        }
+
+        private static bool TryParsePort(string value, out int port)
+        {
+            return int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out port)
+                && port >= 0
+                && port <= ushort.MaxValue;
         }
 
         private static string? FirstHeaderValue(string? value)
