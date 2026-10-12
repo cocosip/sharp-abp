@@ -29,7 +29,7 @@ public override void ConfigureServices(ServiceConfigurationContext context)
 {
     var configuration = context.Services.GetConfiguration();
 
-    Configure<AbpForwardedRequestOptions>(options =>
+    Configure<ForwardedHeadersOptions>(options =>
         options.Configure(configuration));
 
     Configure<AbpIpAccessControlOptions>(options =>
@@ -37,17 +37,17 @@ public override void ConfigureServices(ServiceConfigurationContext context)
 }
 ```
 
-`IPAddress` 和 `IPNetwork` 不能由 .NET Configuration Binder 直接从 JSON 字符串转换。因此不要直接使用
-`configuration.GetSection("ForwardedRequestOptions").Get<AbpForwardedRequestOptions>()` 期望填充这些集合；应调用上面的
-`Configure(IConfiguration)` 方法。该方法仍然只读取 `appsettings.json`，并将地址和 CIDR 字符串解析成强类型集合。
+`ForwardedHeadersOptions` 使用 ASP.NET Core 原生的 `KnownProxies`、`KnownNetworks`、`ForwardLimit` 和
+`ForwardedHeaders` 配置。`KnownProxies`、`KnownNetworks` 中的地址和 CIDR 字符串由 SharpAbp 的
+`Configure(IConfiguration)` 扩展解析成强类型集合；模块本身不会读取配置文件。
 
 ## appsettings.json
 
 ```json
 {
-  "ForwardedRequestOptions": {
-    "RequireTrustedProxy": false,
-    "ForwardLimit": 2,
+  "ForwardedHeaders": {
+    "ForwardedHeaders": "XForwardedFor,XForwardedProto,XForwardedHost",
+    "ForwardLimit": 1,
     "KnownProxies": [
       "10.0.0.2"
     ],
@@ -71,7 +71,7 @@ public override void ConfigureServices(ServiceConfigurationContext context)
 }
 ```
 
-`RequireTrustedProxy` 默认值为 `false`，`ForwardLimit` 默认值为 `2`。应用有更严格的代理拓扑要求时，可以设置可信代理/可信网络并调整转发层数。
+`ForwardedHeadersOptions` 的默认值由 ASP.NET Core 决定。应用有更严格的代理拓扑要求时，可以设置可信代理/可信网络并调整转发层数。
 
 ## CIDR 规则
 
@@ -81,6 +81,21 @@ public override void ConfigureServices(ServiceConfigurationContext context)
 - `IsEnabled` 为 `true` 且没有可用客户端地址时，`DenyWhenClientAddressUnavailable` 决定是否拒绝请求。
 
 ## 使用中间件
+
+完整入口会按 native X-Forwarded middleware、RFC 7239 middleware 的顺序注册两种标准：
+
+```csharp
+app.UseSharpAbpForwardedHeaders();
+```
+
+如果宿主（例如 IIS 集成或应用入口）已经调用 `UseForwardedHeaders()`，只追加 RFC 入口：
+
+```csharp
+app.UseForwardedHeaders();
+app.UseSharpAbpRfc7239ForwardedHeaders();
+```
+
+两种入口都可以重复调用而不会重复注册 SharpAbp 的 RFC middleware；ASP.NET Core 原生 middleware 不会写入 SharpAbp 的注册标记。
 
 ```csharp
 app.UseIpAccessControl();
