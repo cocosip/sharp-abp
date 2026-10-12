@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Builder;
+using ForwardedHeadersOptions = Microsoft.AspNetCore.Builder.ForwardedHeadersOptions;
 using SharpAbp.Abp.AspNetCore.Http;
 using System.Net;
 using Xunit;
@@ -15,10 +17,10 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
         [Fact]
         public void Options_Should_Default_To_Unrestricted_Forwarded_Proxy_Mode()
         {
-            var options = new SharpAbp.Abp.AspNetCore.Http.AbpForwardedRequestOptions();
+            var options = new ForwardedHeadersOptions();
 
-            Assert.False(options.RequireTrustedProxy);
-            Assert.Equal(2, options.ForwardLimit);
+            Assert.Equal(1, options.ForwardLimit);
+            Assert.Contains(IPAddress.IPv6Loopback, options.KnownProxies);
         }
 
         [Fact]
@@ -26,8 +28,8 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
         {
             const string json = """
             {
-              "ForwardedRequestOptions": {
-                "RequireTrustedProxy": false,
+              "ForwardedHeaders": {
+                "ForwardedHeaders": "XForwardedFor,XForwardedProto",
                 "ForwardLimit": 2,
                 "KnownProxies": [ "10.0.0.2" ],
                 "KnownNetworks": [ "10.0.0.0/8" ]
@@ -43,12 +45,14 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
             var configuration = new ConfigurationBuilder().AddJsonStream(stream).Build();
 
-            var forwarded = new SharpAbp.Abp.AspNetCore.Http.AbpForwardedRequestOptions()
+            var forwarded = new ForwardedHeadersOptions()
                 .Configure(configuration);
             var access = new AbpIpAccessControlOptions().Configure(configuration);
 
             Assert.Equal(IPAddress.Parse("10.0.0.2"), Assert.Single(forwarded.KnownProxies));
-            Assert.Equal(IPNetwork.Parse("10.0.0.0/8"), Assert.Single(forwarded.KnownNetworks));
+            var knownNetwork = Assert.Single(forwarded.KnownNetworks);
+            Assert.Equal(IPAddress.Parse("10.0.0.0"), knownNetwork.Prefix);
+            Assert.Equal(8, knownNetwork.PrefixLength);
             Assert.True(access.IsEnabled);
             Assert.Equal(IPNetwork.Parse("192.0.2.0/24"), Assert.Single(access.AllowedNetworks));
             Assert.Equal(IPNetwork.Parse("192.0.2.128/25"), Assert.Single(access.DeniedNetworks));
