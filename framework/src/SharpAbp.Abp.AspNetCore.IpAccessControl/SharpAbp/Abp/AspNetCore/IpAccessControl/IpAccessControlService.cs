@@ -99,7 +99,14 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
             System.Collections.Generic.IEnumerable<IPNetwork> networks)
         {
             return addresses.Any(item => Equals(Normalize(item), address))
-                || networks.Any(network => network.Contains(address));
+                || Matches(address, networks);
+        }
+
+        protected virtual bool Matches(
+            IPAddress address,
+            System.Collections.Generic.IEnumerable<IPNetwork> networks)
+        {
+            return networks.Any(network => network.Contains(address));
         }
 
         protected virtual IPAddress Normalize(IPAddress address)
