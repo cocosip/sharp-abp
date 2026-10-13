@@ -29,11 +29,12 @@ public class HttpRequestInfoAccessor : IHttpRequestInfoAccessor, ITransientDepen
             }
 
             var requestContext = context.GetOrCreateForwardedRequestContext();
+            var isResolved = requestContext.ResolutionStatus == RequestInfoResolutionStatus.Resolved;
             var clientIp = ForwardedRequestContextExtensions.NormalizeIp(context.Connection.RemoteIpAddress);
             return new HttpRequestInfo
             {
-                ClientIpAddress = clientIp,
-                ClientPort = context.Connection.RemotePort > 0 ? context.Connection.RemotePort : null,
+                ClientIpAddress = isResolved ? clientIp : null,
+                ClientPort = isResolved && context.Connection.RemotePort > 0 ? context.Connection.RemotePort : null,
                 Scheme = context.Request.Scheme,
                 Host = context.Request.Host.Host,
                 Port = context.Request.Host.Port,
