@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace SharpAbp.Abp.AspNetCore.Http;
 
@@ -17,7 +19,8 @@ public static class SharpAbpForwardedHeadersApplicationBuilderExtensions
         // Capture the original connection before the native middleware rewrites it.
         app.Use(async (context, next) =>
         {
-            context.GetOrCreateForwardedRequestContext();
+            context.GetOrCreateForwardedRequestContext(
+                app.ApplicationServices.GetRequiredService<IOptions<ForwardedHeadersOptions>>().Value);
             await next();
         });
         app.UseForwardedHeaders();

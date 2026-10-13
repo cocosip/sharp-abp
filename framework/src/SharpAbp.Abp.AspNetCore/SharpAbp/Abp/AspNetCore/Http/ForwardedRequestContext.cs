@@ -1,6 +1,7 @@
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 
 namespace SharpAbp.Abp.AspNetCore.Http;
@@ -18,16 +19,29 @@ internal static class ForwardedRequestContextExtensions
 {
     internal const string ItemKey = "SharpAbp.Abp.AspNetCore.Http.ForwardedRequestContext";
 
-    public static ForwardedRequestContext GetOrCreateForwardedRequestContext(this HttpContext context)
+    public static ForwardedRequestContext GetOrCreateForwardedRequestContext(
+        this HttpContext context, ForwardedHeadersOptions? options = null)
     {
+        var hasForwarded = context.Request.Headers.ContainsKey("Forwarded");
+        var hasXForwarded = context.Request.Headers.ContainsKey(
+                options?.ForwardedForHeaderName ?? ForwardedHeadersDefaults.XForwardedForHeaderName)
+            || context.Request.Headers.ContainsKey(
+                options?.ForwardedProtoHeaderName ?? ForwardedHeadersDefaults.XForwardedProtoHeaderName)
+            || context.Request.Headers.ContainsKey(
+                options?.ForwardedHostHeaderName ?? ForwardedHeadersDefaults.XForwardedHostHeaderName)
+            || context.Request.Headers.ContainsKey(
+                options?.ForwardedPrefixHeaderName ?? ForwardedHeadersDefaults.XForwardedPrefixHeaderName);
         if (context.Items.TryGetValue(ItemKey, out var value) && value is ForwardedRequestContext requestContext)
         {
+            if (options != null && requestContext.Source == ForwardedHeaderSource.Direct)
+            {
+                requestContext.Source = hasForwarded ? ForwardedHeaderSource.Forwarded
+                    : hasXForwarded ? ForwardedHeaderSource.XForwarded : ForwardedHeaderSource.Direct;
+            }
             return requestContext;
         }
 
         var remoteIpAddress = context.Connection.RemoteIpAddress;
-        var hasForwarded = context.Request.Headers.ContainsKey("Forwarded");
-        var hasXForwarded = context.Request.Headers.Keys.Any(key => key.StartsWith("X-Forwarded-", System.StringComparison.OrdinalIgnoreCase));
         requestContext = new ForwardedRequestContext
         {
             ConnectionIpAddress = remoteIpAddress,
