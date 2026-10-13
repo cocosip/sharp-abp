@@ -38,7 +38,7 @@ public override void ConfigureServices(ServiceConfigurationContext context)
 ```
 
 `ForwardedHeadersOptions` 使用 ASP.NET Core 原生的 `KnownProxies`、`ForwardLimit` 和 `ForwardedHeaders`
-配置。可信网络在 .NET 9 使用 `KnownNetworks`，在 .NET 10 使用 `KnownIPNetworks`。
+配置。可信网络使用 ASP.NET Core .NET 10 的 `KnownIPNetworks`。
 `KnownProxies` 和可信网络中的地址与 CIDR 字符串由 SharpAbp 的
 `Configure(IConfiguration)` 扩展解析成强类型集合；模块本身不会读取配置文件。
 
@@ -52,7 +52,7 @@ public override void ConfigureServices(ServiceConfigurationContext context)
     "KnownProxies": [
       "10.0.0.2"
     ],
-    "KnownNetworks": [
+    "KnownIPNetworks": [
       "10.0.0.0/8",
       "2001:db8:100::/48"
     ]
@@ -82,7 +82,7 @@ public override void ConfigureServices(ServiceConfigurationContext context)
 
 `ForwardedHeadersOptions` 的默认值由 ASP.NET Core 决定。应用有更严格的代理拓扑要求时，可以设置可信代理/可信网络并调整转发层数。
 
-上述 JSON 用于 .NET 9；.NET 10 将 `KnownNetworks` 键改为 `KnownIPNetworks`，CIDR 数组内容不变。
+上述 JSON 使用 .NET 10 的 `KnownIPNetworks` 配置键，CIDR 数组内容不变。
 
 ## IP 地址与 CIDR 规则
 
