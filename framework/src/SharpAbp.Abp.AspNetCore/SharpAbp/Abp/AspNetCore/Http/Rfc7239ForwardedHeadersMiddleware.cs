@@ -36,8 +36,20 @@ internal sealed class Rfc7239ForwardedHeadersMiddleware
         }
 
         var status = RequestInfoResolutionStatus.InvalidHeader;
-        if (!TryParseForwarded(value, out var hops)
-            || !TryResolveClient(hops, context.Connection.RemoteIpAddress, out var clientIp, out var clientPort, out status))
+        var parsed = TryParseForwarded(value, out var hops);
+        var nativeClientIp = ForwardedRequestContextExtensions.NormalizeIp(context.Connection.RemoteIpAddress);
+        var nativeHeadersApplied = requestContext.ConnectionIpAddress != null
+            && !Equals(requestContext.ConnectionIpAddress, nativeClientIp);
+        if (nativeHeadersApplied
+            && (!parsed || !Equals(nativeClientIp, ForwardedRequestContextExtensions.NormalizeIp(hops[0].IpAddress))))
+        {
+            requestContext.ResolutionStatus = RequestInfoResolutionStatus.ConflictingHeaders;
+            await _next(context);
+            return;
+        }
+
+        if (!parsed
+            || !TryResolveClient(hops, requestContext.ConnectionIpAddress, out var clientIp, out var clientPort, out status))
         {
             requestContext.ResolutionStatus = status;
             await _next(context);
@@ -46,10 +58,7 @@ internal sealed class Rfc7239ForwardedHeadersMiddleware
 
         var first = hops[0];
         context.Connection.RemoteIpAddress = clientIp;
-        if (clientPort.HasValue)
-        {
-            context.Connection.RemotePort = clientPort.Value;
-        }
+        context.Connection.RemotePort = clientPort ?? 0;
 
         if (!string.IsNullOrWhiteSpace(first.Proto))
         {
@@ -58,7 +67,9 @@ internal sealed class Rfc7239ForwardedHeadersMiddleware
 
         if (!string.IsNullOrWhiteSpace(first.Host))
         {
-            context.Request.Host = new HostString(first.Host, first.HostPort ?? -1);
+            context.Request.Host = first.HostPort.HasValue
+                ? new HostString(first.Host, first.HostPort.Value)
+                : new HostString(first.Host);
         }
 
         requestContext.Source = ForwardedHeaderSource.Forwarded;
