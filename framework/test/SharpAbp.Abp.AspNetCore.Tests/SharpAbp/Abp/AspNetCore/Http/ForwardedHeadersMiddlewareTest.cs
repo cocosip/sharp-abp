@@ -29,6 +29,7 @@ public class ForwardedHeadersMiddlewareTest
 #endif
         var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
+            ["ForwardedHeaders:ForwardedHeaders"] = "XForwardedFor",
             [$"ForwardedHeaders:{networkOption}:0"] = network
         }).Build();
         var services = new ServiceCollection();
@@ -92,6 +93,9 @@ public class ForwardedHeadersMiddlewareTest
         services.AddHttpContextAccessor();
         services.AddOptions<ForwardedHeadersOptions>().Configure(options =>
         {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor |
+                                       ForwardedHeaders.XForwardedProto |
+                                       ForwardedHeaders.XForwardedHost;
             options.ForwardLimit = 1;
             options.KnownProxies.Add(IPAddress.Parse("10.0.0.2"));
         });
@@ -115,11 +119,12 @@ public class ForwardedHeadersMiddlewareTest
     }
 
     [Fact]
-    public async Task Rfc_middleware_should_not_return_client_address_when_forwarded_header_is_untrusted()
+    public async Task Rfc_middleware_should_keep_connection_address_when_forwarded_header_is_untrusted()
     {
         var services = new ServiceCollection();
         services.AddLogging();
-        services.AddOptions<ForwardedHeadersOptions>();
+        services.AddOptions<ForwardedHeadersOptions>().Configure(options =>
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor);
         var provider = services.BuildServiceProvider();
         var app = new ApplicationBuilder(provider);
         app.UseSharpAbpRfc7239ForwardedHeaders();
@@ -133,9 +138,9 @@ public class ForwardedHeadersMiddlewareTest
         var requestInfo = new HttpRequestInfoAccessor(
             NullLogger<HttpRequestInfoAccessor>.Instance,
             new HttpContextAccessor { HttpContext = context }).GetRequestInfo();
-        Assert.Equal(RequestInfoResolutionStatus.UntrustedProxy, requestInfo.ResolutionStatus);
-        Assert.Null(requestInfo.ClientIpAddress);
-        Assert.Null(requestInfo.ClientPort);
+        Assert.Equal(RequestInfoResolutionStatus.Resolved, requestInfo.ResolutionStatus);
+        Assert.Equal(IPAddress.Parse("10.0.0.2"), requestInfo.ClientIpAddress);
+        Assert.Equal(54321, requestInfo.ClientPort);
     }
 
     [Fact]
@@ -145,6 +150,7 @@ public class ForwardedHeadersMiddlewareTest
         services.AddLogging();
         services.AddOptions<ForwardedHeadersOptions>().Configure(options =>
         {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedHost;
             options.KnownProxies.Add(IPAddress.Parse("10.0.0.2"));
         });
         var provider = services.BuildServiceProvider();
@@ -167,6 +173,7 @@ public class ForwardedHeadersMiddlewareTest
         services.AddLogging();
         services.AddOptions<ForwardedHeadersOptions>().Configure(options =>
         {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor;
             options.KnownProxies.Add(IPAddress.Parse("10.0.0.2"));
         });
         var provider = services.BuildServiceProvider();
@@ -272,7 +279,9 @@ public class ForwardedHeadersMiddlewareTest
         services.AddLogging();
         services.AddOptions<ForwardedHeadersOptions>().Configure(options =>
         {
-            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor;
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor |
+                                       ForwardedHeaders.XForwardedProto |
+                                       ForwardedHeaders.XForwardedHost;
             options.KnownProxies.Add(IPAddress.Parse("10.0.0.2"));
         });
         var provider = services.BuildServiceProvider();
@@ -296,8 +305,9 @@ public class ForwardedHeadersMiddlewareTest
         var requestInfo = new HttpRequestInfoAccessor(
             NullLogger<HttpRequestInfoAccessor>.Instance,
             new HttpContextAccessor { HttpContext = context }).GetRequestInfo();
-        Assert.Equal(RequestInfoResolutionStatus.UntrustedProxy, requestInfo.ResolutionStatus);
-        Assert.Null(requestInfo.ClientIpAddress);
+        Assert.Equal(RequestInfoResolutionStatus.Resolved, requestInfo.ResolutionStatus);
+        Assert.Equal(IPAddress.Parse("198.51.100.20"), requestInfo.ClientIpAddress);
+        Assert.Equal(54321, requestInfo.ClientPort);
         Assert.Equal(IPAddress.Parse("198.51.100.20"), requestInfo.ConnectionIpAddress);
         Assert.Equal(54321, requestInfo.ConnectionPort);
         Assert.NotEqual("https", context.Request.Scheme);
