@@ -2,7 +2,7 @@
   <Import Project="../../../common.props" />
   <Import Project="../../../configureawait.props" />
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;$(NetCoreFx)</TargetFrameworks>
+    <TargetFrameworks>$(ProjectFrameworks)</TargetFrameworks>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
     <AssemblyName>SharpAbp.Abp.ConcurrencyLimiting</AssemblyName>

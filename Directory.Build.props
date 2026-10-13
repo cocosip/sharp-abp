@@ -9,11 +9,11 @@
 		<!--EfCore-->
 		<EfCorePackageVersion>[10.0.12,)</EfCorePackageVersion>
 		<!--Volo ABP packages-->
-		<VoloAbpPackageVersion>[10.6.1,)</VoloAbpPackageVersion>
+		<VoloAbpPackageVersion>[10.7.0,)</VoloAbpPackageVersion>
 		<!--FreeSql package-->
 		<FreeSqlPackageVersion>[3.5.311,)</FreeSqlPackageVersion>
 		<!--Masstransit package-->
-		<MassTransitPackageVersion>[9.2.2,)</MassTransitPackageVersion>
+		<MassTransitPackageVersion>[9.2.3,)</MassTransitPackageVersion>
 	</PropertyGroup>
 
 	<PropertyGroup>
