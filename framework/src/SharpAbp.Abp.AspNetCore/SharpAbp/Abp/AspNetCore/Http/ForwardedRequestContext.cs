@@ -25,7 +25,7 @@ internal static class ForwardedRequestContextExtensions
             return requestContext;
         }
 
-        var remoteIpAddress = NormalizeIp(context.Connection.RemoteIpAddress);
+        var remoteIpAddress = context.Connection.RemoteIpAddress;
         var hasForwarded = context.Request.Headers.ContainsKey("Forwarded");
         var hasXForwarded = context.Request.Headers.Keys.Any(key => key.StartsWith("X-Forwarded-", System.StringComparison.OrdinalIgnoreCase));
         requestContext = new ForwardedRequestContext

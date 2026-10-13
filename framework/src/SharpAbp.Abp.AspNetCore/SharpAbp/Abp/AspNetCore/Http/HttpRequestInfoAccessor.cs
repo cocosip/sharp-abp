@@ -38,7 +38,7 @@ public class HttpRequestInfoAccessor : IHttpRequestInfoAccessor, ITransientDepen
                 Scheme = context.Request.Scheme,
                 Host = context.Request.Host.Host,
                 Port = context.Request.Host.Port,
-                ConnectionIpAddress = requestContext.ConnectionIpAddress,
+                ConnectionIpAddress = ForwardedRequestContextExtensions.NormalizeIp(requestContext.ConnectionIpAddress),
                 ConnectionPort = requestContext.ConnectionPort,
                 Source = requestContext.Source,
                 ResolutionStatus = requestContext.ResolutionStatus,

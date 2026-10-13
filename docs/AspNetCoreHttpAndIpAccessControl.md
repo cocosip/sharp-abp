@@ -94,6 +94,18 @@ app.UseSharpAbpForwardedHeaders();
 同时处理两种标准时，应使用上面的完整入口，并让它先于任何其他 `UseForwardedHeaders()` 执行。
 两类头解析出的客户端地址不一致时，解析结果为 `ConflictingHeaders`，客户端地址和端口均不可用。
 
+RFC 7239 入口解析 `Forwarded` 中每一跳的 `for`、`proto`、`host`，不直接调用只读取 X 头的原生
+`ApplyForwarders`。两种标准使用同一份 `ForwardedHeadersOptions`：`XForwardedFor`、
+`XForwardedProto`、`XForwardedHost` 分别启用对应的 RFC 字段；默认不启用任何字段。
+`ForwardLimit`、`RequireHeaderSymmetry`、`AllowedHosts` 和可信代理设置同样适用。
+RFC 每一跳缺少的字段保持缺失，不会挪用其他跳的值；RFC 没有 `XForwardedPrefix` 的对应字段。
+
+两种标准都从最右侧开始处理代理链。遇到不可信代理或非空但无法解析的客户端 IP
+（包括 `unknown`、混淆标识和无效端口）时停止，保留已接受的近端跳；没有接受任何跳时保留当前连接地址和端口。
+超过 `ForwardLimit` 的部分不处理，不会因此废弃已处理的结果。畸形 RFC 语法会忽略整个 `Forwarded` 头，
+不会覆盖有效的原生 X 头结果；只有两类头都成功解析出的客户端 IP 不一致时才报告冲突。
+`KnownProxies` 与可信网络集合都为空时，和原生一样不执行代理信任检查。
+
 只处理 RFC 7239 `Forwarded` 时使用独立入口：
 
 ```csharp
@@ -109,4 +121,6 @@ app.UseSharpAbpRfc7239ForwardedHeaders();
 app.UseIpAccessControl();
 ```
 
-该中间件应放在应用希望执行 IP 控制的管道位置。客户端地址由请求信息模块根据 `Forwarded`、`X-Forwarded-For`、可信代理设置和转发层数解析；无法安全解析时不会把未经验证的代理地址当作客户端地址。
+该中间件应放在应用希望执行 IP 控制的管道位置，通常在转发头处理中间件之后。
+IP 访问控制使用请求信息模块提供的当前地址或转发后地址；转发头被忽略时仍可用的连接地址也参与访问控制。
+`DenyWhenClientAddressUnavailable` 仅属于 IP 访问控制包，决定地址不可用时是否拒绝请求，不影响转发头解析或代理信任判断。
