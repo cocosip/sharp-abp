@@ -26,13 +26,23 @@ public static class ForwardedHeadersOptionsExtensions
             }
         }
 
+#if NET10_0_OR_GREATER
+        var knownNetworks = section.GetSection(nameof(ForwardedHeadersOptions.KnownIPNetworks)).Get<string[]>();
+        var networks = options.KnownIPNetworks;
+#else
         var knownNetworks = section.GetSection(nameof(ForwardedHeadersOptions.KnownNetworks)).Get<string[]>();
+        var networks = options.KnownNetworks;
+#endif
         if (knownNetworks != null)
         {
-            options.KnownNetworks.Clear();
+            networks.Clear();
             foreach (var value in knownNetworks.Where(value => !string.IsNullOrWhiteSpace(value)))
             {
-                options.KnownNetworks.Add(Microsoft.AspNetCore.HttpOverrides.IPNetwork.Parse(value));
+#if NET10_0_OR_GREATER
+                networks.Add(System.Net.IPNetwork.Parse(value));
+#else
+                networks.Add(Microsoft.AspNetCore.HttpOverrides.IPNetwork.Parse(value));
+#endif
             }
         }
 

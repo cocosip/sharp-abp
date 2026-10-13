@@ -42,7 +42,12 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
             }
             """;
 
-            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+#if NET10_0_OR_GREATER
+            var forwardedJson = json.Replace("KnownNetworks", "KnownIPNetworks");
+#else
+            var forwardedJson = json;
+#endif
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(forwardedJson));
             var configuration = new ConfigurationBuilder().AddJsonStream(stream).Build();
 
             var forwarded = new ForwardedHeadersOptions()
@@ -50,8 +55,12 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
             var access = new AbpIpAccessControlOptions().Configure(configuration);
 
             Assert.Equal(IPAddress.Parse("10.0.0.2"), Assert.Single(forwarded.KnownProxies));
+#if NET10_0_OR_GREATER
+            var knownNetwork = Assert.Single(forwarded.KnownIPNetworks);
+#else
             var knownNetwork = Assert.Single(forwarded.KnownNetworks);
-            Assert.Equal(IPAddress.Parse("10.0.0.0"), knownNetwork.Prefix);
+#endif
+            Assert.True(knownNetwork.Contains(IPAddress.Parse("10.0.0.0")));
             Assert.Equal(8, knownNetwork.PrefixLength);
             Assert.True(access.IsEnabled);
             Assert.Equal(IPNetwork.Parse("192.0.2.0/24"), Assert.Single(access.AllowedNetworks));

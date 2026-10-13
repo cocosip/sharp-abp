@@ -17,6 +17,40 @@ namespace SharpAbp.Abp.AspNetCore.Http;
 
 public class ForwardedHeadersMiddlewareTest
 {
+    [Theory]
+    [InlineData("10.0.0.0/24", "10.0.0.2")]
+    [InlineData("2001:db8:100::/48", "2001:db8:100::2")]
+    public async Task Rfc_middleware_should_trust_networks_loaded_from_configuration(string network, string proxy)
+    {
+#if NET10_0_OR_GREATER
+        const string networkOption = "KnownIPNetworks";
+#else
+        const string networkOption = "KnownNetworks";
+#endif
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            [$"ForwardedHeaders:{networkOption}:0"] = network
+        }).Build();
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddOptions<ForwardedHeadersOptions>().Configure(options => options.Configure(configuration));
+        var provider = services.BuildServiceProvider();
+        var app = new ApplicationBuilder(provider);
+        app.UseSharpAbpRfc7239ForwardedHeaders();
+        var context = new DefaultHttpContext { RequestServices = provider };
+        context.Connection.RemoteIpAddress = IPAddress.Parse(proxy);
+        context.Request.Headers["Forwarded"] = "for=203.0.113.10";
+
+        await app.Build()(context);
+
+        var requestInfo = new HttpRequestInfoAccessor(
+            NullLogger<HttpRequestInfoAccessor>.Instance,
+            new HttpContextAccessor { HttpContext = context }).GetRequestInfo();
+        Assert.Equal(RequestInfoResolutionStatus.Resolved, requestInfo.ResolutionStatus);
+        Assert.Equal(IPAddress.Parse("203.0.113.10"), requestInfo.ClientIpAddress);
+        Assert.Equal(IPAddress.Parse(proxy), requestInfo.ConnectionIpAddress);
+    }
+
     [Fact]
     public async Task Complete_entry_point_should_process_x_forwarded_for_and_forwarded()
     {
