@@ -36,7 +36,9 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
               },
               "IpAccessControlOptions": {
                 "IsEnabled": true,
+                "AllowedAddresses": [ "198.51.100.10", "2001:db8::10" ],
                 "AllowedNetworks": [ "192.0.2.0/24" ],
+                "DeniedAddresses": [ "198.51.100.20", "2001:db8::20" ],
                 "DeniedNetworks": [ "192.0.2.128/25" ]
               }
             }
@@ -63,8 +65,65 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
             Assert.True(knownNetwork.Contains(IPAddress.Parse("10.0.0.0")));
             Assert.Equal(8, knownNetwork.PrefixLength);
             Assert.True(access.IsEnabled);
+            Assert.Equal(IPAddress.Parse("198.51.100.10"), Assert.Single(access.AllowedAddresses, address => address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork));
+            Assert.Equal(IPAddress.Parse("2001:db8::10"), Assert.Single(access.AllowedAddresses, address => address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6));
             Assert.Equal(IPNetwork.Parse("192.0.2.0/24"), Assert.Single(access.AllowedNetworks));
+            Assert.Equal(IPAddress.Parse("198.51.100.20"), Assert.Single(access.DeniedAddresses, address => address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork));
+            Assert.Equal(IPAddress.Parse("2001:db8::20"), Assert.Single(access.DeniedAddresses, address => address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6));
             Assert.Equal(IPNetwork.Parse("192.0.2.128/25"), Assert.Single(access.DeniedNetworks));
+        }
+
+        [Fact]
+        public void Evaluate_Should_Allow_Exact_Ipv4_Address_In_Allowlist()
+        {
+            var options = CreateEnabledOptions();
+            options.AllowedAddresses.Add(IPAddress.Parse("203.0.113.10"));
+            var service = CreateService(options);
+
+            var decision = service.Evaluate(CreateRequestInfo("203.0.113.10"));
+
+            Assert.True(decision.IsAllowed);
+            Assert.Equal(IpAccessDecisionReason.AllowedAddress, decision.Reason);
+        }
+
+        [Fact]
+        public void Evaluate_Should_Allow_Exact_Ipv6_Address_In_Allowlist()
+        {
+            var options = CreateEnabledOptions();
+            options.AllowedAddresses.Add(IPAddress.Parse("2001:db8::10"));
+            var service = CreateService(options);
+
+            var decision = service.Evaluate(CreateRequestInfo("2001:db8::10"));
+
+            Assert.True(decision.IsAllowed);
+            Assert.Equal(IpAccessDecisionReason.AllowedAddress, decision.Reason);
+        }
+
+        [Fact]
+        public void Evaluate_Should_Reject_Exact_Ipv6_Address_Even_When_Allowlisted()
+        {
+            var options = CreateEnabledOptions();
+            options.AllowedNetworks.Add(IPNetwork.Parse("2001:db8::/48"));
+            options.DeniedAddresses.Add(IPAddress.Parse("2001:db8::10"));
+            var service = CreateService(options);
+
+            var decision = service.Evaluate(CreateRequestInfo("2001:db8::10"));
+
+            Assert.False(decision.IsAllowed);
+            Assert.Equal(IpAccessDecisionReason.DeniedAddress, decision.Reason);
+        }
+
+        [Fact]
+        public void Evaluate_Should_Reject_Mapped_Ipv4_Address_When_Exact_Ipv4_Address_Is_Denied()
+        {
+            var options = CreateEnabledOptions();
+            options.DeniedAddresses.Add(IPAddress.Parse("203.0.113.10"));
+            var service = CreateService(options);
+
+            var decision = service.Evaluate(CreateRequestInfo("::ffff:203.0.113.10"));
+
+            Assert.False(decision.IsAllowed);
+            Assert.Equal(IpAccessDecisionReason.DeniedAddress, decision.Reason);
         }
 
         [Fact]
