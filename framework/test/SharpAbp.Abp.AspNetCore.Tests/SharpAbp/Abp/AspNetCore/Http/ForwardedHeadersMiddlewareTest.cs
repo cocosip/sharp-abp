@@ -167,6 +167,32 @@ public class ForwardedHeadersMiddlewareTest
     }
 
     [Fact]
+    public async Task Rfc_middleware_should_resolve_ipv6_client_address()
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddOptions<ForwardedHeadersOptions>().Configure(options =>
+        {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor;
+            options.KnownProxies.Add(IPAddress.Parse("2001:db8:100::2"));
+        });
+        var provider = services.BuildServiceProvider();
+        var app = new ApplicationBuilder(provider);
+        app.UseSharpAbpRfc7239ForwardedHeaders();
+        var context = new DefaultHttpContext { RequestServices = provider };
+        context.Connection.RemoteIpAddress = IPAddress.Parse("2001:db8:100::2");
+        context.Request.Headers["Forwarded"] = "for=\"[2001:db8::10]\"";
+
+        await app.Build()(context);
+
+        var requestInfo = new HttpRequestInfoAccessor(
+            NullLogger<HttpRequestInfoAccessor>.Instance,
+            new HttpContextAccessor { HttpContext = context }).GetRequestInfo();
+        Assert.Equal(RequestInfoResolutionStatus.Resolved, requestInfo.ResolutionStatus);
+        Assert.Equal(IPAddress.Parse("2001:db8::10"), requestInfo.ClientIpAddress);
+    }
+
+    [Fact]
     public async Task Complete_entry_point_should_process_x_forwarded_for_and_forwarded()
     {
         var services = new ServiceCollection();

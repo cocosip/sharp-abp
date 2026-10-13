@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using ForwardedHeadersOptions = Microsoft.AspNetCore.Builder.ForwardedHeadersOptions;
 using SharpAbp.Abp.AspNetCore.Http;
 using System.Net;
+using System.Collections.Generic;
 using Xunit;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
@@ -91,6 +92,19 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
         }
 
         [Fact]
+        public void Evaluate_Should_Allow_Address_In_Ipv6_Allowlist()
+        {
+            var options = CreateEnabledOptions();
+            options.AllowedNetworks.Add(IPNetwork.Parse("2001:db8::/48"));
+            var service = CreateService(options);
+
+            var decision = service.Evaluate(CreateRequestInfo("2001:db8::10"));
+
+            Assert.True(decision.IsAllowed);
+            Assert.Equal(IpAccessDecisionReason.AllowedAddress, decision.Reason);
+        }
+
+        [Fact]
         public void Evaluate_Should_Reject_Exact_Ipv6_Address_Even_When_Allowlisted()
         {
             var options = CreateEnabledOptions();
@@ -169,6 +183,33 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
 
             Assert.False(decision.IsAllowed);
             Assert.Equal(IpAccessDecisionReason.DeniedAddress, decision.Reason);
+        }
+
+        [Fact]
+        public void Evaluate_Should_Reject_Address_In_Ipv6_Denied_Network_Even_When_Allowlisted()
+        {
+            var options = CreateEnabledOptions();
+            options.AllowedNetworks.Add(IPNetwork.Parse("2001:db8::/32"));
+            options.DeniedNetworks.Add(IPNetwork.Parse("2001:db8:1::/48"));
+            var service = CreateService(options);
+
+            var decision = service.Evaluate(CreateRequestInfo("2001:db8:1::10"));
+
+            Assert.False(decision.IsAllowed);
+            Assert.Equal(IpAccessDecisionReason.DeniedAddress, decision.Reason);
+        }
+
+        [Fact]
+        public void Evaluate_Should_Use_Legacy_Matches_Override_For_Network_Rules()
+        {
+            var options = CreateEnabledOptions();
+            options.AllowedNetworks.Add(IPNetwork.Parse("203.0.113.0/24"));
+            var service = new LegacyMatchesIpAccessControlService(options);
+
+            var decision = service.Evaluate(CreateRequestInfo("203.0.113.10"));
+
+            Assert.True(decision.IsAllowed);
+            Assert.True(service.LegacyMatchesOverrideCalled);
         }
 
         [Fact]
@@ -344,6 +385,22 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
             }
 
             public HttpRequestInfo GetRequestInfo() => _requestInfo;
+        }
+
+        private sealed class LegacyMatchesIpAccessControlService : IpAccessControlService
+        {
+            public LegacyMatchesIpAccessControlService(AbpIpAccessControlOptions options)
+                : base(Microsoft.Extensions.Options.Options.Create(options), new StubHttpRequestInfoAccessor())
+            {
+            }
+
+            public bool LegacyMatchesOverrideCalled { get; private set; }
+
+            protected override bool Matches(IPAddress address, IEnumerable<IPNetwork> networks)
+            {
+                LegacyMatchesOverrideCalled = true;
+                return base.Matches(address, networks);
+            }
         }
     }
 }
