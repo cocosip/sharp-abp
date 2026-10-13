@@ -97,8 +97,21 @@ app.UseSharpAbpForwardedHeaders();
 RFC 7239 入口解析 `Forwarded` 中每一跳的 `for`、`proto`、`host`，不直接调用只读取 X 头的原生
 `ApplyForwarders`。两种标准使用同一份 `ForwardedHeadersOptions`：`XForwardedFor`、
 `XForwardedProto`、`XForwardedHost` 分别启用对应的 RFC 字段；默认不启用任何字段。
-`ForwardLimit`、`RequireHeaderSymmetry`、`AllowedHosts` 和可信代理设置同样适用。
-RFC 每一跳缺少的字段保持缺失，不会挪用其他跳的值；RFC 没有 `XForwardedPrefix` 的对应字段。
+`ForwardLimit`、`AllowedHosts` 和可信代理设置同时约束两种标准，无需重复配置。
+`RequireHeaderSymmetry` 对原生 X 头检查启用的 X 字段，对 RFC 检查启用的 `for/proto/host` 字段。
+RFC 每一跳缺少的字段保持缺失，不会挪用其他跳的值；RFC 没有 `XForwardedPrefix` 的对应字段，
+启用 X Prefix 不会要求 RFC 提供 Prefix，也不会阻断 RFC 的其他字段。
+
+| 同一份 options 的字段开关 | 原生 X 头 | RFC 7239 参数 |
+| --- | --- | --- |
+| `XForwardedFor` | `ForwardedForHeaderName` 指定的头 | `for` |
+| `XForwardedProto` | `ForwardedProtoHeaderName` 指定的头 | `proto` |
+| `XForwardedHost` | `ForwardedHostHeaderName` 指定的头 | `host` |
+| `XForwardedPrefix` | `ForwardedPrefixHeaderName` 指定的头 | 无对应参数 |
+
+`Forwarded*HeaderName` 与 `Original*HeaderName` 是原生 X 头的输入和原始值输出名称配置。
+RFC 头名固定为 `Forwarded`，参数名固定为 `for/proto/host`，不受这些名称配置影响；
+请求信息中的原始连接仍由 SharpAbp 在转发处理前捕获。
 
 两种标准都从最右侧开始处理代理链。遇到不可信代理或非空但无法解析的客户端 IP
 （包括 `unknown`、混淆标识和无效端口）时停止，保留已接受的近端跳；没有接受任何跳时保留当前连接地址和端口。

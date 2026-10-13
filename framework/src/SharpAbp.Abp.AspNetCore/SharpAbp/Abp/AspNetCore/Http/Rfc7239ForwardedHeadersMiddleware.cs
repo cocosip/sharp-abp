@@ -41,7 +41,7 @@ internal sealed class Rfc7239ForwardedHeadersMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        var requestContext = context.GetOrCreateForwardedRequestContext();
+        var requestContext = context.GetOrCreateForwardedRequestContext(_options);
         var value = context.Request.Headers["Forwarded"].ToString();
         if (string.IsNullOrWhiteSpace(value) || !TryParseForwarded(value, out var hops))
         {
@@ -121,7 +121,6 @@ internal sealed class Rfc7239ForwardedHeadersMiddleware
             if (forwardFor) counts.Add(hops.Count(hop => !string.IsNullOrEmpty(hop.ForToken)));
             if (forwardProto) counts.Add(hops.Count(hop => !string.IsNullOrEmpty(hop.Proto)));
             if (forwardHost) counts.Add(hops.Count(hop => !string.IsNullOrEmpty(hop.Host)));
-            if (_options.ForwardedHeaders.HasFlag(ForwardedHeaders.XForwardedPrefix)) counts.Add(0);
             if (counts.Distinct().Count() > 1)
             {
                 return false;
@@ -196,12 +195,6 @@ internal sealed class Rfc7239ForwardedHeadersMiddleware
                 }
             }
 
-            if (_options.RequireHeaderSymmetry
-                && _options.ForwardedHeaders.HasFlag(ForwardedHeaders.XForwardedPrefix))
-            {
-                // RFC 7239 has no equivalent of X-Forwarded-Prefix.
-                return false;
-            }
             consumed++;
         }
         return applied;

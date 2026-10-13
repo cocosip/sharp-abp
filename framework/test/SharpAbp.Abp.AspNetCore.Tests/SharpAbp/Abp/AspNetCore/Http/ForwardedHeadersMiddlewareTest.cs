@@ -18,6 +18,120 @@ namespace SharpAbp.Abp.AspNetCore.Http;
 public class ForwardedHeadersMiddlewareTest
 {
     [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task Combined_entry_should_support_both_standards_with_shared_options(bool customNames, bool prefix)
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        var configureCount = 0;
+        services.AddOptions<ForwardedHeadersOptions>().Configure(options =>
+        {
+            configureCount++;
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor |
+                                       ForwardedHeaders.XForwardedProto |
+                                       ForwardedHeaders.XForwardedHost;
+            options.RequireHeaderSymmetry = true;
+            options.ForwardLimit = 1;
+            options.KnownProxies.Add(IPAddress.Parse("10.0.0.2"));
+            options.AllowedHosts.Add("public.example.com");
+            if (customNames)
+            {
+                options.ForwardedForHeaderName = "Client-Chain";
+                options.ForwardedProtoHeaderName = "Client-Scheme";
+                options.ForwardedHostHeaderName = "Client-Host";
+                options.ForwardedPrefixHeaderName = "Client-Prefix";
+            }
+            if (prefix) options.ForwardedHeaders |= ForwardedHeaders.XForwardedPrefix;
+        });
+        using var provider = services.BuildServiceProvider();
+        var options = provider.GetRequiredService<IOptions<ForwardedHeadersOptions>>().Value;
+        var app = new ApplicationBuilder(provider);
+        app.UseSharpAbpForwardedHeaders();
+        var context = new DefaultHttpContext { RequestServices = provider };
+        context.Connection.RemoteIpAddress = IPAddress.Parse("10.0.0.2");
+        context.Connection.RemotePort = 54321;
+        context.Request.Scheme = "http";
+        context.Request.Host = new HostString("direct.example.com");
+        context.Request.Headers[options.ForwardedForHeaderName] = "203.0.113.10";
+        context.Request.Headers[options.ForwardedProtoHeaderName] = "https";
+        context.Request.Headers[options.ForwardedHostHeaderName] = "public.example.com";
+        if (prefix) context.Request.Headers[options.ForwardedPrefixHeaderName] = "/gateway";
+        context.Request.Headers["Forwarded"] = "for=203.0.113.10;proto=https;host=public.example.com";
+
+        await app.Build()(context);
+
+        var info = new HttpRequestInfoAccessor(NullLogger<HttpRequestInfoAccessor>.Instance,
+            new HttpContextAccessor { HttpContext = context }).GetRequestInfo();
+        Assert.Equal(1, configureCount);
+        Assert.Equal(RequestInfoResolutionStatus.Resolved, info.ResolutionStatus);
+        Assert.Equal(IPAddress.Parse("203.0.113.10"), info.ClientIpAddress);
+        Assert.Equal("https", info.Scheme);
+        Assert.Equal("public.example.com", info.Host);
+        Assert.Single(info.ForwardedHops);
+        Assert.Equal(prefix ? "/gateway" : "", context.Request.PathBase.Value ?? "");
+        Assert.False(context.Request.Headers.ContainsKey(options.ForwardedForHeaderName));
+    }
+
+    [Fact]
+    public async Task Combined_entry_should_recognize_custom_x_header_names_as_x_forwarded_source()
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddOptions<ForwardedHeadersOptions>().Configure(options =>
+        {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor;
+            options.ForwardedForHeaderName = "Client-Chain";
+            options.KnownProxies.Add(IPAddress.Parse("10.0.0.2"));
+        });
+        using var provider = services.BuildServiceProvider();
+        var app = new ApplicationBuilder(provider);
+        app.UseSharpAbpForwardedHeaders();
+        var context = new DefaultHttpContext { RequestServices = provider };
+        context.Connection.RemoteIpAddress = IPAddress.Parse("10.0.0.2");
+        context.Request.Headers["Client-Chain"] = "203.0.113.10";
+        var accessor = new HttpRequestInfoAccessor(NullLogger<HttpRequestInfoAccessor>.Instance,
+            new HttpContextAccessor { HttpContext = context });
+        accessor.GetRequestInfo();
+
+        await app.Build()(context);
+
+        var info = accessor.GetRequestInfo();
+        Assert.Equal(IPAddress.Parse("203.0.113.10"), info.ClientIpAddress);
+        Assert.Equal(ForwardedHeaderSource.XForwarded, info.Source);
+    }
+
+    [Fact]
+    public async Task Shared_prefix_option_should_not_require_an_rfc_prefix_parameter()
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddOptions<ForwardedHeadersOptions>().Configure(options =>
+        {
+            options.ForwardedHeaders = ForwardedHeaders.All;
+            options.RequireHeaderSymmetry = true;
+            options.KnownProxies.Add(IPAddress.Parse("10.0.0.2"));
+        });
+        using var provider = services.BuildServiceProvider();
+        var app = new ApplicationBuilder(provider);
+        app.UseSharpAbpForwardedHeaders();
+        var context = new DefaultHttpContext { RequestServices = provider };
+        context.Connection.RemoteIpAddress = IPAddress.Parse("10.0.0.2");
+        context.Request.Scheme = "http";
+        context.Request.Host = new HostString("direct.example.com");
+        context.Request.Headers["Forwarded"] = "for=203.0.113.10;proto=https;host=public.example.com";
+
+        await app.Build()(context);
+
+        Assert.Equal(IPAddress.Parse("203.0.113.10"), context.Connection.RemoteIpAddress);
+        Assert.Equal("https", context.Request.Scheme);
+        Assert.Equal("public.example.com", context.Request.Host.Host);
+        Assert.False(context.Request.PathBase.HasValue);
+    }
+
+    [Theory]
     [InlineData("10.0.0.0/24", "10.0.0.2")]
     [InlineData("2001:db8:100::/48", "2001:db8:100::2")]
     public async Task Rfc_middleware_should_trust_networks_loaded_from_configuration(string network, string proxy)
