@@ -37,8 +37,9 @@ public override void ConfigureServices(ServiceConfigurationContext context)
 }
 ```
 
-`ForwardedHeadersOptions` 使用 ASP.NET Core 原生的 `KnownProxies`、`KnownNetworks`、`ForwardLimit` 和
-`ForwardedHeaders` 配置。`KnownProxies`、`KnownNetworks` 中的地址和 CIDR 字符串由 SharpAbp 的
+`ForwardedHeadersOptions` 使用 ASP.NET Core 原生的 `KnownProxies`、`ForwardLimit` 和 `ForwardedHeaders`
+配置。可信网络在 .NET 9 使用 `KnownNetworks`，在 .NET 10 使用 `KnownIPNetworks`。
+`KnownProxies` 和可信网络中的地址与 CIDR 字符串由 SharpAbp 的
 `Configure(IConfiguration)` 扩展解析成强类型集合；模块本身不会读取配置文件。
 
 ## appsettings.json
@@ -73,6 +74,8 @@ public override void ConfigureServices(ServiceConfigurationContext context)
 
 `ForwardedHeadersOptions` 的默认值由 ASP.NET Core 决定。应用有更严格的代理拓扑要求时，可以设置可信代理/可信网络并调整转发层数。
 
+上述 JSON 用于 .NET 9；.NET 10 将 `KnownNetworks` 键改为 `KnownIPNetworks`，CIDR 数组内容不变。
+
 ## CIDR 规则
 
 - 白名单和黑名单都使用网段；单个 IPv4 地址写成 `/32`，单个 IPv6 地址写成 `/128`。
@@ -82,20 +85,25 @@ public override void ConfigureServices(ServiceConfigurationContext context)
 
 ## 使用中间件
 
-完整入口会按 native X-Forwarded middleware、RFC 7239 middleware 的顺序注册两种标准：
+完整入口先捕获原始连接，再按原生 X-Forwarded 中间件、RFC 7239 中间件的顺序处理两种标准：
 
 ```csharp
 app.UseSharpAbpForwardedHeaders();
 ```
 
-如果宿主（例如 IIS 集成或应用入口）已经调用 `UseForwardedHeaders()`，只追加 RFC 入口：
+同时处理两种标准时，应使用上面的完整入口，并让它先于任何其他 `UseForwardedHeaders()` 执行。
+两类头解析出的客户端地址不一致时，解析结果为 `ConflictingHeaders`，客户端地址和端口均不可用。
+
+只处理 RFC 7239 `Forwarded` 时使用独立入口：
 
 ```csharp
-app.UseForwardedHeaders();
 app.UseSharpAbpRfc7239ForwardedHeaders();
 ```
 
 两种入口都可以重复调用而不会重复注册 SharpAbp 的 RFC middleware；ASP.NET Core 原生 middleware 不会写入 SharpAbp 的注册标记。
+
+如果宿主已提前执行原生中间件，SharpAbp 无法还原被改写的原始连接，不能据此重新验证 RFC 代理链。
+这种部署应统一使用宿主已处理的 `X-Forwarded-*`；需要两种标准共同处理时，应调整顺序，在改写前使用完整入口。
 
 ```csharp
 app.UseIpAccessControl();

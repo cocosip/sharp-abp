@@ -133,7 +133,11 @@ internal sealed class Rfc7239ForwardedHeadersMiddleware
 
         var normalized = ForwardedRequestContextExtensions.NormalizeIp(address)!;
         return _options.KnownProxies.Any(proxy => normalized.Equals(ForwardedRequestContextExtensions.NormalizeIp(proxy)))
+#if NET10_0_OR_GREATER
+            || _options.KnownIPNetworks.Any(network => network.Contains(normalized));
+#else
             || _options.KnownNetworks.Any(network => network.Contains(normalized));
+#endif
     }
 
     private static bool TryParseForwarded(string value, out List<ForwardedHop> hops)
