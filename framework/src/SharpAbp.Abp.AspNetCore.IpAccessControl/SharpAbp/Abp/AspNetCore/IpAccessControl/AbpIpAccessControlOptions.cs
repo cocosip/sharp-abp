@@ -12,9 +12,19 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
         public bool DenyWhenClientAddressUnavailable { get; set; } = true;
 
         /// <summary>
+        /// Exact IP addresses that are allowed.
+        /// </summary>
+        public IList<IPAddress> AllowedAddresses { get; set; } = new List<IPAddress>();
+
+        /// <summary>
         /// CIDR networks that are allowed. Use /32 for one IPv4 address and /128 for one IPv6 address.
         /// </summary>
         public IList<IPNetwork> AllowedNetworks { get; set; } = new List<IPNetwork>();
+
+        /// <summary>
+        /// Exact IP addresses that are denied. Denied addresses always take precedence over allowed rules.
+        /// </summary>
+        public IList<IPAddress> DeniedAddresses { get; set; } = new List<IPAddress>();
 
         /// <summary>
         /// CIDR networks that are denied. Denied networks always take precedence over allowed networks.
@@ -53,6 +63,16 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
                 DenyWhenClientAddressUnavailable = denyWhenUnavailable.Value;
             }
 
+            var allowedAddresses = section.GetSection(nameof(AllowedAddresses)).Get<string[]>();
+            if (allowedAddresses != null)
+            {
+                AllowedAddresses.Clear();
+                foreach (var address in allowedAddresses)
+                {
+                    AllowedAddresses.Add(IPAddress.Parse(address));
+                }
+            }
+
             var allowedNetworks = section.GetSection(nameof(AllowedNetworks)).Get<string[]>();
             if (allowedNetworks != null)
             {
@@ -60,6 +80,16 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
                 foreach (var network in allowedNetworks)
                 {
                     AllowedNetworks.Add(IPNetwork.Parse(network));
+                }
+            }
+
+            var deniedAddresses = section.GetSection(nameof(DeniedAddresses)).Get<string[]>();
+            if (deniedAddresses != null)
+            {
+                DeniedAddresses.Clear();
+                foreach (var address in deniedAddresses)
+                {
+                    DeniedAddresses.Add(IPAddress.Parse(address));
                 }
             }
 

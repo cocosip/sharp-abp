@@ -3,7 +3,7 @@
 本文介绍以下两个包的配置方式：
 
 - `SharpAbp.Abp.AspNetCore`：解析 `Forwarded`、`X-Forwarded-*` 和当前请求信息。
-- `SharpAbp.Abp.AspNetCore.IpAccessControl`：按 CIDR 网段执行白名单和黑名单控制。
+- `SharpAbp.Abp.AspNetCore.IpAccessControl`：按精确 IP 地址和 CIDR 网段执行白名单和黑名单控制。
 
 ```bash
 dotnet add package SharpAbp.Abp.AspNetCore
@@ -60,9 +60,17 @@ public override void ConfigureServices(ServiceConfigurationContext context)
   "IpAccessControlOptions": {
     "IsEnabled": true,
     "DenyWhenClientAddressUnavailable": true,
+    "AllowedAddresses": [
+      "198.51.100.10",
+      "2001:db8::10"
+    ],
     "AllowedNetworks": [
       "192.0.2.0/24",
       "2001:db8:1::/48"
+    ],
+    "DeniedAddresses": [
+      "198.51.100.20",
+      "2001:db8::20"
     ],
     "DeniedNetworks": [
       "192.0.2.128/25",
@@ -76,9 +84,11 @@ public override void ConfigureServices(ServiceConfigurationContext context)
 
 上述 JSON 用于 .NET 9；.NET 10 将 `KnownNetworks` 键改为 `KnownIPNetworks`，CIDR 数组内容不变。
 
-## CIDR 规则
+## IP 地址与 CIDR 规则
 
-- 白名单和黑名单都使用网段；单个 IPv4 地址写成 `/32`，单个 IPv6 地址写成 `/128`。
+- 精确 IP 地址放在 `AllowedAddresses` 或 `DeniedAddresses`，支持 IPv4 和 IPv6。
+- 网段放在 `AllowedNetworks` 或 `DeniedNetworks`，使用 CIDR；单个 IPv4 地址也可以写成 `/32`，单个 IPv6 地址写成 `/128`。
+- 地址集合和网段集合合并判断，命中任意一项即可。
 - 黑名单优先于白名单。地址同时命中两个集合时，请求被拒绝。
 - `IsEnabled` 为 `false` 时，访问控制评估允许请求，中间件继续执行后续管道。
 - `IsEnabled` 为 `true` 且没有可用客户端地址时，`DenyWhenClientAddressUnavailable` 决定是否拒绝请求。
