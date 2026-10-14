@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Riok.Mapperly.Abstractions;
 using Volo.Abp.Identity;
 using Volo.Abp.Mapperly;
@@ -6,6 +6,7 @@ using Volo.Abp.Mapperly;
 namespace SharpAbp.Abp.Identity
 {
     [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+    [MapExtraProperties]
     public partial class IdentityClaimTypeToIdentityClaimTypeDtoMapper : MapperBase<IdentityClaimType, IdentityClaimTypeDto>
     {
 
@@ -36,6 +37,7 @@ namespace SharpAbp.Abp.Identity
     }
 
     [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+    [MapExtraProperties]
     public partial class IdentitySecurityLogToIdentitySecurityLogDtoMapper : MapperBase<IdentitySecurityLog, IdentitySecurityLogDto>
     {
         public override partial IdentitySecurityLogDto Map(IdentitySecurityLog source);
@@ -43,6 +45,7 @@ namespace SharpAbp.Abp.Identity
     }
 
     [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+    [MapExtraProperties]
     public partial class OrganizationUnitToOrganizationUnitDtoMapper : MapperBase<OrganizationUnit, OrganizationUnitDto>
     {
         public override partial OrganizationUnitDto Map(OrganizationUnit source);
@@ -112,28 +115,4 @@ namespace SharpAbp.Abp.Identity
         public override partial void Map(UpdateIdentityUserSettingsDto source, IdentityUserSettings destination);
     }
 
-    // public class IdentityApplicationModuleAutoMapperProfile : Profile
-    // {
-    //     public IdentityApplicationModuleAutoMapperProfile()
-    //     {
-    //         CreateMap<IdentityClaimType, IdentityClaimTypeDto>()
-    //             .ForMember(t => t.ValueTypeAsString, s => s.MapFrom(x => x.ValueType.ToString()));
-
-    //         CreateMap<IdentityUserClaim, IdentityUserClaimDto>();
-    //         CreateMap<IdentityRoleClaim, IdentityRoleClaimDto>();
-    //         CreateMap<IdentitySecurityLog, IdentitySecurityLogDto>();
-
-    //         CreateMap<OrganizationUnit, OrganizationUnitDto>();
-    //         CreateMap<OrganizationUnitRole, OrganizationUnitRoleDto>();
-    //         CreateMap<IdentityLockoutSettings, IdentityLockoutSettingsDto>();
-    //         CreateMap<IdentityPasswordSettings, IdentityPasswordSettingsDto>();
-    //         CreateMap<IdentitySignInSettings, IdentitySignInSettingsDto>();
-    //         CreateMap<IdentityUserSettings, IdentityUserSettingsDto>();
-
-    //         CreateMap<UpdateIdentityLockoutSettingsDto, IdentityLockoutSettings>();
-    //         CreateMap<UpdateIdentityPasswordSettingsDto, IdentityPasswordSettings>();
-    //         CreateMap<UpdateIdentitySignInSettingsDto, IdentitySignInSettings>();
-    //         CreateMap<UpdateIdentityUserSettingsDto, IdentityUserSettings>();
-    //     }
-    // }
 }

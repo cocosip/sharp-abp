@@ -33,6 +33,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\SharpAbp.Abp.Account.Application\SharpAbp.Abp.Account.Application.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.Account.Web\SharpAbp.Abp.Account.Web.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Abstractions;
 using SharpAbp.Abp.TenancyGrouping;
 using Volo.Abp.Mapperly;
 
@@ -33,7 +33,6 @@ namespace SharpAbp.Abp.TenantGroupManagement
         }
     }
 
-
     [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
     public partial class TenantGroupToTenantGroupEtoMapper : MapperBase<TenantGroup, TenantGroupEto>
     {
@@ -55,53 +54,4 @@ namespace SharpAbp.Abp.TenantGroupManagement
         }
     }
 
-    // public class AbpTenantGroupManagementDomainMappingProfile : Profile
-    // {
-    //     public AbpTenantGroupManagementDomainMappingProfile()
-    //     {
-    //         CreateMap<TenantGroup, TenantGroupConfiguration>()
-    //             .ForMember(ti => ti.ConnectionStrings, opts =>
-    //             {
-    //                 opts.MapFrom((tenantGroup, ti) =>
-    //                 {
-    //                     var connStrings = new ConnectionStrings();
-
-    //                     foreach (var connectionString in tenantGroup.ConnectionStrings)
-    //                     {
-    //                         connStrings[connectionString.Name] = connectionString.Value;
-    //                     }
-
-    //                     return connStrings;
-    //                 });
-    //             })
-    //             .ForMember(ti => ti.Tenants, opts =>
-    //             {
-    //                 opts.MapFrom((tenantGroup, ti) =>
-    //                 {
-    //                     var tenants = new List<Guid>();
-
-    //                     foreach (var tenant in tenantGroup.Tenants)
-    //                     {
-    //                         tenants.Add(tenant.TenantId);
-    //                     }
-    //                     return tenants;
-    //                 });
-    //             });
-
-    //         CreateMap<TenantGroup, TenantGroupEto>()
-    //             .ForMember(ti => ti.Tenants, opts =>
-    //             {
-    //                 opts.MapFrom((tenantGroup, ti) =>
-    //                 {
-    //                     var tenants = new List<Guid>();
-
-    //                     foreach (var tenant in tenantGroup.Tenants)
-    //                     {
-    //                         tenants.Add(tenant.TenantId);
-    //                     }
-    //                     return tenants;
-    //                 });
-    //             });
-    //     }
-    //}
 }

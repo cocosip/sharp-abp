@@ -4,6 +4,7 @@ using Volo.Abp.Mapperly;
 namespace SharpAbp.Abp.TenantGroupManagement
 {
     [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+    [MapExtraProperties]
     public partial class TenantGroupToTenantGroupDtoMapper : MapperBase<TenantGroup, TenantGroupDto>
     {
         public override partial TenantGroupDto Map(TenantGroup source);

@@ -4,7 +4,8 @@ using SharpAbp.Abp.FileStoringManagement;
 using SharpAbp.Abp.Identity;
 using SharpAbp.Abp.MapTenancyManagement;
 using SharpAbp.Abp.OpenIddict;
-using Volo.Abp.AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
+using Volo.Abp.Mapperly;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement;
@@ -31,9 +32,6 @@ public class SharpSampleApplicationModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        Configure<AbpAutoMapperOptions>(options =>
-        {
-            options.AddMaps<SharpSampleApplicationModule>();
-        });
+        context.Services.AddMapperlyObjectMapper<SharpSampleApplicationModule>();
     }
 }

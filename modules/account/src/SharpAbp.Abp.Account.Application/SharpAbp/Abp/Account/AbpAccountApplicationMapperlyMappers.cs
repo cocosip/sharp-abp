@@ -22,18 +22,4 @@ namespace SharpAbp.Abp.Account
         }
     }
 
-    // public class AbpAccountApplicationModuleAutoMapperProfile : Profile
-    // {
-    //     public AbpAccountApplicationModuleAutoMapperProfile()
-    //     {
-    //         CreateMap<IdentityUser, ProfileDto>()
-    //             .ForMember(dest => dest.HasPassword,
-    //                 op => op.MapFrom(src => src.PasswordHash != null))
-    //             .MapExtraProperties();
-
-    //         CreateMap<IdentityUser, IdentityUserDto>()
-    //             .MapExtraProperties();
-
-    //     }
-    // }
 }

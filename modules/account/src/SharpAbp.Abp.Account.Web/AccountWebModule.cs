@@ -8,7 +8,7 @@ using Volo.Abp.AspNetCore.Mvc.Localization;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared.Toolbars;
-using Volo.Abp.AutoMapper;
+using Volo.Abp.Mapperly;
 using Volo.Abp.ExceptionHandling;
 using Volo.Abp.Identity.AspNetCore;
 using Volo.Abp.Modularity;
@@ -21,7 +21,7 @@ namespace SharpAbp.Abp.Account.Web
     [DependsOn(
         typeof(AccountApplicationContractsModule),
         typeof(AbpIdentityAspNetCoreModule),
-        typeof(AbpAutoMapperModule),
+        typeof(AbpMapperlyModule),
         typeof(AbpAspNetCoreMvcUiThemeSharedModule),
         typeof(AbpExceptionHandlingModule)
         )]
@@ -71,11 +71,7 @@ namespace SharpAbp.Abp.Account.Web
 
             ConfigureProfileManagementPage();
 
-            context.Services.AddAutoMapperObjectMapper<AccountWebModule>();
-            Configure<AbpAutoMapperOptions>(options =>
-            {
-                options.AddProfile<AbpAccountWebAutoMapperProfile>();
-            });
+            context.Services.AddMapperlyObjectMapper<AccountWebModule>();
             return Task.CompletedTask;
         }
 

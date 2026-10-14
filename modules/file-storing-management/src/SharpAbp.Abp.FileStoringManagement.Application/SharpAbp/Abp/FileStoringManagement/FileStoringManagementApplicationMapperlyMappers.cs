@@ -1,4 +1,4 @@
-﻿using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Abstractions;
 using SharpAbp.Abp.FileStoring;
 using Volo.Abp.Mapperly;
 
@@ -12,14 +12,13 @@ namespace SharpAbp.Abp.FileStoringManagement
         public override partial void Map(FileProviderConfiguration source, ProviderDto destination);
     }
 
-
     [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+    [MapExtraProperties]
     public partial class FileStoringContainerToContainerDtoMapper : MapperBase<FileStoringContainer, ContainerDto>
     {
         public override partial ContainerDto Map(FileStoringContainer source);
         public override partial void Map(FileStoringContainer source, ContainerDto destination);
     }
-
 
     [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Both)]
     public partial class FileStoringContainerItemToContainerItemDtoMapper : TwoWayMapperBase<FileStoringContainerItem, ContainerItemDto>
@@ -34,21 +33,4 @@ namespace SharpAbp.Abp.FileStoringManagement
         public override partial void ReverseMap(ContainerItemDto destination, FileStoringContainerItem source);
     }
 
-
-    // public class FileStoringManagementApplicationModuleAutoMapperProfile : Profile
-    // {
-    //     public FileStoringManagementApplicationModuleAutoMapperProfile()
-    //     {
-    //         CreateMap<FileProviderConfiguration, ProviderDto>();
-
-    //         CreateMap<FileStoringContainer, ContainerDto>();
-
-
-    //         CreateMap<CreateContainerDto, FileStoringContainer>();
-    //         CreateMap<UpdateContainerDto, FileStoringContainer>();
-
-    //         CreateMap<FileStoringContainerItem, ContainerItemDto>();
-    //         CreateMap<ContainerItemDto, FileStoringContainerItem>();
-    //     }
-    // }
 }

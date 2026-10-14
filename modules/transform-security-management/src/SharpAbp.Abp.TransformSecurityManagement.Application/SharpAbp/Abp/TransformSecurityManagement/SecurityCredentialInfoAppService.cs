@@ -27,7 +27,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
     /// - ISecurityCredentialManager: For cryptographic operations and vault integration
     /// - ISecurityCredentialInfoRepository: For data persistence and querying
     /// - ABP Authorization: For permission-based access control
-    /// - AutoMapper: For entity-to-DTO mapping
+    /// - Mapperly: For entity-to-DTO mapping
     /// 
     /// All operations are designed to be thread-safe and support concurrent access patterns
     /// typical in multi-tenant web applications.

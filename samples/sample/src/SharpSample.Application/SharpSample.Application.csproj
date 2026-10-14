@@ -13,6 +13,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Volo.Abp.Mapperly" />
 		<PackageReference Include="Volo.Abp.Account.Application" />
 		<PackageReference Include="Volo.Abp.Identity.Application" />
 		<PackageReference Include="Volo.Abp.PermissionManagement.Application" />
