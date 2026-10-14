@@ -71,8 +71,8 @@ public class ForwardedHeadersMiddlewareTest
         Assert.Equal("https", info.Scheme);
         Assert.Equal("public.example.com", info.Host);
         Assert.Single(info.ForwardedHops);
-        Assert.Equal(prefix ? "/gateway" : "", context.Request.PathBase.Value ?? "");
-        Assert.False(context.Request.Headers.ContainsKey(options.ForwardedForHeaderName));
+        Assert.False(context.Request.PathBase.HasValue);
+        Assert.Equal("203.0.113.10", context.Request.Headers[options.ForwardedForHeaderName].ToString());
     }
 
     [Fact]
@@ -244,7 +244,7 @@ public class ForwardedHeadersMiddlewareTest
         app.UseSharpAbpRfc7239ForwardedHeaders();
         var context = new DefaultHttpContext { RequestServices = provider };
         context.Connection.RemoteIpAddress = IPAddress.Parse("10.0.0.2");
-        context.Request.Headers["Forwarded"] = "for=203.0.113.10;proto=https;host=rfc.example.com:8443";
+        context.Request.Headers["Forwarded"] = "for=203.0.113.10;proto=https;host=\"rfc.example.com:8443\"";
 
         await app.Build()(context);
 
@@ -278,9 +278,11 @@ public class ForwardedHeadersMiddlewareTest
         var requestInfo = new HttpRequestInfoAccessor(
             NullLogger<HttpRequestInfoAccessor>.Instance,
             new HttpContextAccessor { HttpContext = context }).GetRequestInfo();
-        Assert.Equal(RequestInfoResolutionStatus.Resolved, requestInfo.ResolutionStatus);
-        Assert.Equal(IPAddress.Parse("10.0.0.2"), requestInfo.ClientIpAddress);
-        Assert.Equal(54321, requestInfo.ClientPort);
+        Assert.Equal(RequestInfoResolutionStatus.UntrustedProxy, requestInfo.ResolutionStatus);
+        Assert.Null(requestInfo.ClientIpAddress);
+        Assert.Null(requestInfo.ClientPort);
+        Assert.Equal(IPAddress.Parse("10.0.0.2"), requestInfo.ConnectionIpAddress);
+        Assert.Equal(54321, requestInfo.ConnectionPort);
     }
 
     [Fact]
@@ -381,7 +383,7 @@ public class ForwardedHeadersMiddlewareTest
     [InlineData("Original-Client", true)]
     [InlineData("X-Original-For", false)]
     [InlineData("Original-Client", false)]
-    public async Task Combined_entry_point_should_resolve_only_agreeing_headers(string originalForHeaderName, bool conflicting)
+    public async Task Combined_entry_point_should_select_rfc_even_when_headers_disagree(string originalForHeaderName, bool conflicting)
     {
         var services = new ServiceCollection();
         services.AddLogging();
@@ -404,9 +406,8 @@ public class ForwardedHeadersMiddlewareTest
         var requestInfo = new HttpRequestInfoAccessor(
             NullLogger<HttpRequestInfoAccessor>.Instance,
             new HttpContextAccessor { HttpContext = context }).GetRequestInfo();
-        Assert.Equal(conflicting ? RequestInfoResolutionStatus.ConflictingHeaders : RequestInfoResolutionStatus.Resolved,
-            requestInfo.ResolutionStatus);
-        Assert.Equal(conflicting ? null : IPAddress.Parse("203.0.113.10"), requestInfo.ClientIpAddress);
+        Assert.Equal(RequestInfoResolutionStatus.Resolved, requestInfo.ResolutionStatus);
+        Assert.Equal(IPAddress.Parse("203.0.113.10"), requestInfo.ClientIpAddress);
         Assert.Equal(IPAddress.Parse("10.0.0.2"), requestInfo.ConnectionIpAddress);
     }
 
@@ -445,9 +446,9 @@ public class ForwardedHeadersMiddlewareTest
         var requestInfo = new HttpRequestInfoAccessor(
             NullLogger<HttpRequestInfoAccessor>.Instance,
             new HttpContextAccessor { HttpContext = context }).GetRequestInfo();
-        Assert.Equal(RequestInfoResolutionStatus.Resolved, requestInfo.ResolutionStatus);
-        Assert.Equal(IPAddress.Parse("198.51.100.20"), requestInfo.ClientIpAddress);
-        Assert.Equal(54321, requestInfo.ClientPort);
+        Assert.Equal(RequestInfoResolutionStatus.UntrustedProxy, requestInfo.ResolutionStatus);
+        Assert.Null(requestInfo.ClientIpAddress);
+        Assert.Null(requestInfo.ClientPort);
         Assert.Equal(IPAddress.Parse("198.51.100.20"), requestInfo.ConnectionIpAddress);
         Assert.Equal(54321, requestInfo.ConnectionPort);
         Assert.NotEqual("https", context.Request.Scheme);

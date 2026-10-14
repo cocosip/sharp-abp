@@ -51,7 +51,7 @@ internal static class ForwardedRequestContextExtensions
                 : hasXForwarded
                     ? ForwardedHeaderSource.XForwarded
                     : ForwardedHeaderSource.Direct,
-            ResolutionStatus = remoteIpAddress == null
+            ResolutionStatus = hasForwarded || remoteIpAddress == null
                 ? RequestInfoResolutionStatus.NoClientAddress
                 : RequestInfoResolutionStatus.Resolved
         };

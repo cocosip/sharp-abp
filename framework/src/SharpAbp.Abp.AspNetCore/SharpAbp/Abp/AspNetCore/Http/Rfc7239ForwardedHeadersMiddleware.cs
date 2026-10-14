@@ -17,9 +17,6 @@ internal sealed class Rfc7239ForwardedHeadersMiddleware
     private readonly RequestDelegate _next;
     private readonly ForwardedHeadersOptions _options;
     private readonly StringSegment[] _allowedHosts;
-#if !NET10_0_OR_GREATER
-    private readonly bool _ignoreUnknownProxiesWithoutFor;
-#endif
 
     public Rfc7239ForwardedHeadersMiddleware(
         RequestDelegate next,
@@ -29,49 +26,37 @@ internal sealed class Rfc7239ForwardedHeadersMiddleware
         _options = options.Value;
         _allowedHosts = (_options.AllowedHosts ?? [])
             .Select(host => new StringSegment(new HostString(host).ToUriComponent())).ToArray();
-#if !NET10_0_OR_GREATER
-        _ignoreUnknownProxiesWithoutFor = AppContext.TryGetSwitch(
-            "Microsoft.AspNetCore.HttpOverrides.IgnoreUnknownProxiesWithoutFor", out var enabled) && enabled;
-        var ignoreUnknown = Environment.GetEnvironmentVariable(
-            "MICROSOFT_ASPNETCORE_HTTPOVERRIDES_IGNORE_UNKNOWN_PROXIES_WITHOUT_FOR");
-        _ignoreUnknownProxiesWithoutFor |= string.Equals(ignoreUnknown, "true", StringComparison.OrdinalIgnoreCase)
-            || ignoreUnknown == "1";
-#endif
     }
 
     public async Task InvokeAsync(HttpContext context)
     {
         var requestContext = context.GetOrCreateForwardedRequestContext(_options);
+        if (!context.Request.Headers.ContainsKey("Forwarded"))
+        {
+            await _next(context);
+            return;
+        }
+
+        requestContext.Source = ForwardedHeaderSource.Forwarded;
         var value = context.Request.Headers["Forwarded"].ToString();
         if (string.IsNullOrWhiteSpace(value) || !TryParseForwarded(value, out var hops))
         {
+            requestContext.ResolutionStatus = RequestInfoResolutionStatus.InvalidHeader;
             await _next(context);
             return;
         }
 
-        var nativeClientIp = ForwardedRequestContextExtensions.NormalizeIp(context.Connection.RemoteIpAddress);
-        var nativeHeadersApplied = !Equals(
-            ForwardedRequestContextExtensions.NormalizeIp(requestContext.ConnectionIpAddress), nativeClientIp)
-            || (requestContext.ConnectionPort ?? 0) != context.Connection.RemotePort;
-        var connectionIp = nativeHeadersApplied
-            ? requestContext.ConnectionIpAddress : context.Connection.RemoteIpAddress;
-        if (!TryResolveForwarders(hops, connectionIp, requestContext.ConnectionPort ?? 0,
+        var resolved = TryResolveForwarders(hops, requestContext.ConnectionIpAddress,
             out var clientIp, out var clientPort, out var scheme, out var host,
-            out var clientIpApplied, out var consumed))
+            out var consumed, out var status);
+        requestContext.ResolutionStatus = status;
+        if (!resolved)
         {
             await _next(context);
             return;
         }
 
-        if (nativeHeadersApplied && clientIpApplied
-            && !Equals(nativeClientIp, ForwardedRequestContextExtensions.NormalizeIp(clientIp)))
-        {
-            requestContext.ResolutionStatus = RequestInfoResolutionStatus.ConflictingHeaders;
-            await _next(context);
-            return;
-        }
-
-        if (clientIpApplied)
+        if (clientIp != null)
         {
             context.Connection.RemoteIpAddress = clientIp;
             context.Connection.RemotePort = clientPort;
@@ -85,9 +70,6 @@ internal sealed class Rfc7239ForwardedHeadersMiddleware
             context.Request.Host = HostString.FromUriComponent(host);
         }
 
-        requestContext.Source = ForwardedHeaderSource.Forwarded;
-        requestContext.ResolutionStatus = context.Connection.RemoteIpAddress == null
-            ? RequestInfoResolutionStatus.NoClientAddress : RequestInfoResolutionStatus.Resolved;
         requestContext.ForwardedHops = hops.Skip(hops.Count - consumed).Select(hop =>
         {
             if (hop.Host != null && TryValidateHost(hop.Host))
@@ -101,17 +83,16 @@ internal sealed class Rfc7239ForwardedHeadersMiddleware
     }
 
     private bool TryResolveForwarders(
-        IReadOnlyList<ForwardedHop> hops, IPAddress? connectionIp, int connectionPort,
+        IReadOnlyList<ForwardedHop> hops, IPAddress? connectionIp,
         out IPAddress? clientIp, out int clientPort, out string? scheme, out string? host,
-        out bool clientIpApplied, out int consumed)
+        out int consumed, out RequestInfoResolutionStatus status)
     {
-        clientIp = connectionIp;
-        clientPort = connectionPort;
+        clientIp = null;
+        clientPort = 0;
         scheme = null;
         host = null;
-        clientIpApplied = false;
         consumed = 0;
-        var applied = false;
+        status = RequestInfoResolutionStatus.NoClientAddress;
         var forwardFor = _options.ForwardedHeaders.HasFlag(ForwardedHeaders.XForwardedFor);
         var forwardProto = _options.ForwardedHeaders.HasFlag(ForwardedHeaders.XForwardedProto);
         var forwardHost = _options.ForwardedHeaders.HasFlag(ForwardedHeaders.XForwardedHost);
@@ -123,6 +104,7 @@ internal sealed class Rfc7239ForwardedHeadersMiddleware
             if (forwardHost) counts.Add(hops.Count(hop => !string.IsNullOrEmpty(hop.Host)));
             if (counts.Distinct().Count() > 1)
             {
+                status = RequestInfoResolutionStatus.InvalidHeader;
                 return false;
             }
         }
@@ -133,48 +115,46 @@ internal sealed class Rfc7239ForwardedHeadersMiddleware
 #endif
         var limit = _options.ForwardLimit.HasValue
             ? Math.Min(hops.Count, _options.ForwardLimit.Value) : hops.Count;
+        if (limit <= 0)
+        {
+            status = RequestInfoResolutionStatus.ForwardLimitExceeded;
+            return false;
+        }
+        var proxyIp = connectionIp;
         for (var index = hops.Count - 1; index >= hops.Count - limit; index--)
         {
-            // Like the native middleware, stop at an unknown proxy and retain accepted nearer hops.
-            if (clientIp != null && checkKnownAddresses
-#if !NET10_0_OR_GREATER
-                && (!_ignoreUnknownProxiesWithoutFor || forwardFor)
-#endif
-                && !IsTrustedProxy(clientIp))
+            // Trust starts at the captured connection, then follows each accepted for address.
+            if (proxyIp == null || (checkKnownAddresses && !IsTrustedProxy(proxyIp)))
             {
+                if (consumed == 0 && proxyIp != null) status = RequestInfoResolutionStatus.UntrustedProxy;
                 break;
             }
 
             var hop = hops[index];
-            if (forwardFor)
+            if (_options.RequireHeaderSymmetry
+                && ((forwardFor && string.IsNullOrEmpty(hop.ForToken))
+                    || (forwardProto && string.IsNullOrEmpty(hop.Proto))
+                    || (forwardHost && string.IsNullOrEmpty(hop.Host))))
             {
-                if (hop.IpAddress != null)
-                {
-                    clientIp = hop.IpAddress;
-                    clientPort = hop.Port ?? 0;
-                    clientIpApplied = true;
-                    applied = true;
-                }
-                else if (!string.IsNullOrEmpty(hop.ForToken))
-                {
-                    break;
-                }
-                else if (_options.RequireHeaderSymmetry)
-                {
-                    return false;
-                }
+                status = RequestInfoResolutionStatus.InvalidHeader;
+                return false;
             }
 
+            clientIp = forwardFor ? hop.IpAddress : null;
+            clientPort = clientIp != null ? hop.Port ?? 0 : 0;
+            // Missing fields on the selected hop retain the original request values.
+            scheme = null;
+            host = null;
             if (forwardProto)
             {
                 if (!string.IsNullOrEmpty(hop.Proto)
                     && hop.Proto.All(c => char.IsAsciiLetterOrDigit(c) || c is '+' or '-' or '.'))
                 {
                     scheme = hop.Proto;
-                    applied = true;
                 }
                 else if (_options.RequireHeaderSymmetry)
                 {
+                    status = RequestInfoResolutionStatus.InvalidHeader;
                     return false;
                 }
             }
@@ -187,17 +167,24 @@ internal sealed class Rfc7239ForwardedHeadersMiddleware
                         || HostString.MatchesAny(hop.Host, _allowedHosts)))
                 {
                     host = hop.Host;
-                    applied = true;
                 }
                 else if (_options.RequireHeaderSymmetry)
                 {
+                    status = RequestInfoResolutionStatus.InvalidHeader;
                     return false;
                 }
             }
 
             consumed++;
+            status = clientIp == null ? RequestInfoResolutionStatus.NoClientAddress : RequestInfoResolutionStatus.Resolved;
+            if (hop.IpAddress == null)
+            {
+                // Missing, unknown or obfuscated for cannot authenticate the next proxy hop.
+                break;
+            }
+            proxyIp = hop.IpAddress;
         }
-        return applied;
+        return consumed > 0;
     }
 
     private bool IsTrustedProxy(IPAddress address)
@@ -229,18 +216,19 @@ internal sealed class Rfc7239ForwardedHeadersMiddleware
                     return false;
                 }
                 var name = parameter[..separator].Trim();
-                if (!names.Add(name) || !TryUnquote(parameter[(separator + 1)..].Trim(), out var parameterValue))
+                if (!IsToken(name) || !names.Add(name)
+                    || !TryUnquote(parameter[(separator + 1)..].Trim(), out var parameterValue))
                 {
                     return false;
                 }
                 if (name.Equals("for", StringComparison.OrdinalIgnoreCase))
                 {
-                    var parsed = IPEndPoint.TryParse(parameterValue, out var endpoint);
+                    if (!TryParseNode(parameterValue, out var address, out var port)) return false;
                     hop = hop with
                     {
                         ForToken = parameterValue,
-                        IpAddress = parsed ? endpoint!.Address : null,
-                        Port = parsed && endpoint!.Port > 0 ? endpoint.Port : null
+                        IpAddress = address,
+                        Port = port
                     };
                 }
                 else if (name.Equals("proto", StringComparison.OrdinalIgnoreCase))
@@ -251,13 +239,60 @@ internal sealed class Rfc7239ForwardedHeadersMiddleware
                 {
                     hop = hop with { Host = parameterValue };
                 }
+                else if (name.Equals("by", StringComparison.OrdinalIgnoreCase)
+                    && !TryParseNode(parameterValue, out _, out _))
+                {
+                    return false;
+                }
             }
             hops.Add(hop);
         }
         return hops.Count > 0;
     }
 
-    // Match the native middleware's host character and port validation before HostString conversion.
+    private static bool TryParseNode(string value, out IPAddress? address, out int? port)
+    {
+        address = null;
+        port = null;
+        var node = value;
+        if (value.StartsWith('['))
+        {
+            var closing = value.IndexOf(']');
+            if (closing < 0 || !IPAddress.TryParse(value[1..closing], out address)
+                || address.AddressFamily != System.Net.Sockets.AddressFamily.InterNetworkV6
+                || value.Contains('%')) return false;
+            node = value[..(closing + 1)];
+        }
+        else
+        {
+            var separator = value.IndexOf(':');
+            if (separator >= 0) node = value[..separator];
+            if (!node.Equals("unknown", StringComparison.OrdinalIgnoreCase) && !IsObfuscated(node)
+                && (!IPAddress.TryParse(node, out address)
+                    || address.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork
+                    || address.ToString() != node)) return false;
+        }
+        if (node.Length < value.Length)
+        {
+            if (value[node.Length] != ':') return false;
+            var portToken = value[(node.Length + 1)..];
+            if (!IsObfuscated(portToken))
+            {
+                if (portToken.Length == 0 || !portToken.All(char.IsAsciiDigit)
+                    || !int.TryParse(portToken, out var number) || number > 65535) return false;
+                port = number > 0 ? number : null;
+            }
+        }
+        return true;
+    }
+
+    private static bool IsObfuscated(string value) => value.Length > 1 && value[0] == '_'
+        && value[1..].All(c => char.IsAsciiLetterOrDigit(c) || c is '.' or '_' or '-');
+
+    private static bool IsToken(string value) => value.Length > 0
+        && value.All(c => char.IsAsciiLetterOrDigit(c) || "!#$%&'*+-.^_`|~".Contains(c));
+
+    // Validate before HostString conversion, including a usable IPv6 address and port range.
     private static bool TryValidateHost(string value)
     {
         if (string.IsNullOrEmpty(value))
@@ -268,7 +303,9 @@ internal sealed class Rfc7239ForwardedHeadersMiddleware
         if (value[0] == '[')
         {
             var closing = value.IndexOf(']');
-            if (closing < 4 || !value[1..closing].All(c => char.IsAsciiHexDigit(c) || c is ':' or '.'))
+            if (closing < 0 || !value[1..closing].All(c => char.IsAsciiHexDigit(c) || c is ':' or '.')
+                || !IPAddress.TryParse(value[1..closing], out var address)
+                || address.AddressFamily != System.Net.Sockets.AddressFamily.InterNetworkV6)
             {
                 return false;
             }
@@ -288,7 +325,8 @@ internal sealed class Rfc7239ForwardedHeadersMiddleware
         }
         return offset == value.Length
             || (value[offset] == ':' && offset + 1 < value.Length
-                && value[(offset + 1)..].All(char.IsAsciiDigit));
+                && value[(offset + 1)..].All(char.IsAsciiDigit)
+                && int.TryParse(value[(offset + 1)..], out var port) && port <= 65535);
     }
 
     private static IEnumerable<string> SplitOutsideQuotes(string value, char separator)
@@ -317,13 +355,13 @@ internal sealed class Rfc7239ForwardedHeadersMiddleware
     private static bool TryUnquote(string value, out string result)
     {
         result = value;
-        if (value.Contains('\r') || value.Contains('\n'))
+        if (value.Any(c => char.IsControl(c) && c != '\t'))
         {
             return false;
         }
         if (!value.StartsWith('"'))
         {
-            return !value.Contains('"') && !value.Contains('\\');
+            return IsToken(value);
         }
         if (value.Length < 2 || value[^1] != '"')
         {

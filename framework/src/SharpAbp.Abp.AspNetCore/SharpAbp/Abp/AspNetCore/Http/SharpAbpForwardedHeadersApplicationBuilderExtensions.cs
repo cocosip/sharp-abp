@@ -23,7 +23,9 @@ public static class SharpAbpForwardedHeadersApplicationBuilderExtensions
                 app.ApplicationServices.GetRequiredService<IOptions<ForwardedHeadersOptions>>().Value);
             await next();
         });
-        app.UseForwardedHeaders();
+        // Select one protocol before either middleware can rewrite the request.
+        app.UseWhen(context => !context.Request.Headers.ContainsKey("Forwarded"),
+            branch => branch.UseForwardedHeaders());
         if (!app.Properties.ContainsKey(RfcRegisteredKey))
         {
             app.UseMiddleware<Rfc7239ForwardedHeadersMiddleware>();

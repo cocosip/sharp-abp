@@ -17,22 +17,17 @@ namespace SharpAbp.Abp.AspNetCore.Http;
 public class ForwardedHeadersParityTest
 {
     [Theory]
-    [InlineData("203.0.113.10", false, false, 1, false)]
-    [InlineData("not-an-ip", true, false, 1, false)]
-    [InlineData("unknown", true, false, 1, false)]
-    [InlineData("_hidden", true, false, 1, false)]
-    [InlineData("[2001:db8::10]:1234", true, false, 1, false)]
-    [InlineData("203.0.113.10:65536", true, false, 1, false)]
-    [InlineData("203.0.113.10:1234", true, false, 1, false)]
-    [InlineData("203.0.113.10, 10.0.0.3", true, true, 1, false)]
-    [InlineData("203.0.113.10, 10.0.0.3", true, false, 2, false)]
-    [InlineData("203.0.113.10, 10.0.0.3", true, true, 2, false)]
-    [InlineData("not-an-ip, 10.0.0.3", true, true, 2, false)]
-    [InlineData("203.0.113.10, not-an-ip", true, true, 2, false)]
-    [InlineData("203.0.113.10", true, false, 0, false)]
-    [InlineData("203.0.113.10", false, false, 1, true)]
-    public async Task Rfc_should_match_native_trust_parsing_and_forward_limit(
-        string addresses, bool trustedPeer, bool trustedIntermediate, int limit, bool trustAll)
+    [InlineData("203.0.113.10", false, false, 1, false, RequestInfoResolutionStatus.UntrustedProxy)]
+    [InlineData("[2001:db8::10]:1234", true, false, 1, false, RequestInfoResolutionStatus.Resolved)]
+    [InlineData("203.0.113.10:1234", true, false, 1, false, RequestInfoResolutionStatus.Resolved)]
+    [InlineData("203.0.113.10, 10.0.0.3", true, true, 1, false, RequestInfoResolutionStatus.Resolved)]
+    [InlineData("203.0.113.10, 10.0.0.3", true, false, 2, false, RequestInfoResolutionStatus.Resolved)]
+    [InlineData("203.0.113.10, 10.0.0.3", true, true, 2, false, RequestInfoResolutionStatus.Resolved)]
+    [InlineData("203.0.113.10", true, false, 0, false, RequestInfoResolutionStatus.ForwardLimitExceeded)]
+    [InlineData("203.0.113.10", false, false, 1, true, RequestInfoResolutionStatus.Resolved)]
+    public async Task Rfc_should_preserve_native_trust_and_forward_limit_with_explicit_client_status(
+        string addresses, bool trustedPeer, bool trustedIntermediate, int limit, bool trustAll,
+        RequestInfoResolutionStatus status)
     {
         void Configure(ForwardedHeadersOptions options)
         {
@@ -58,7 +53,8 @@ public class ForwardedHeadersParityTest
         var native = await RunAsync(addresses, false, Configure);
         var rfc = await RunAsync(addresses, true, Configure);
 
-        AssertSameRequestInfo(native, rfc);
+        AssertSameRequestValues(native, rfc);
+        AssertClientStatus(rfc, status);
     }
 
     [Theory]
@@ -80,7 +76,10 @@ public class ForwardedHeadersParityTest
         var native = await RunAsync("203.0.113.10", false, Configure);
         var rfc = await RunAsync("203.0.113.10", true, Configure);
 
-        AssertSameRequestInfo(native, rfc);
+        AssertSameRequestValues(native, rfc);
+        AssertClientStatus(rfc, !trustedPeer ? RequestInfoResolutionStatus.UntrustedProxy
+            : fields.HasFlag(ForwardedHeaders.XForwardedFor) ? RequestInfoResolutionStatus.Resolved
+            : RequestInfoResolutionStatus.NoClientAddress);
     }
 
     [Fact]
@@ -89,22 +88,25 @@ public class ForwardedHeadersParityTest
         var native = await RunAsync("203.0.113.10", false, options => options.AllowedHosts.Add("allowed.example.com"));
         var rfc = await RunAsync("203.0.113.10", true, options => options.AllowedHosts.Add("allowed.example.com"));
 
-        AssertSameRequestInfo(native, rfc);
+        AssertSameRequestValues(native, rfc);
+        AssertClientStatus(rfc, RequestInfoResolutionStatus.Resolved);
         Assert.Equal("direct.example.com", rfc.Request.Host.Host);
     }
 
     [Fact]
-    public async Task Invalid_rfc_ip_should_preserve_a_native_forwarded_result()
+    public async Task Unknown_rfc_client_should_not_fall_back_to_x_forwarded()
     {
         var context = await RunAsync("203.0.113.10", false, extraForwarded: "for=unknown");
 
-        Assert.Equal(IPAddress.Parse("203.0.113.10"), context.Connection.RemoteIpAddress);
-        Assert.Equal(RequestInfoResolutionStatus.Resolved, GetRequestInfo(context).ResolutionStatus);
-        Assert.Equal(IPAddress.Parse("203.0.113.10"), GetRequestInfo(context).ClientIpAddress);
+        Assert.Equal(IPAddress.Parse("10.0.0.2"), context.Connection.RemoteIpAddress);
+        AssertClientStatus(context, RequestInfoResolutionStatus.NoClientAddress);
+        Assert.Equal(ForwardedHeaderSource.Forwarded, GetRequestInfo(context).Source);
+        Assert.Equal("http", context.Request.Scheme);
+        Assert.Equal("direct.example.com", context.Request.Host.Host);
     }
 
     [Fact]
-    public async Task Combined_entry_should_detect_conflict_for_a_mapped_ipv6_known_proxy()
+    public async Task Combined_entry_should_select_rfc_for_a_mapped_ipv6_known_proxy()
     {
         var context = await RunAsync("203.0.113.10", false, options =>
         {
@@ -112,8 +114,8 @@ public class ForwardedHeadersParityTest
             options.KnownProxies.Add(IPAddress.Parse("::ffff:10.0.0.2"));
         }, extraForwarded: "for=198.51.100.20", peer: "::ffff:10.0.0.2");
 
-        Assert.Equal(RequestInfoResolutionStatus.ConflictingHeaders, GetRequestInfo(context).ResolutionStatus);
-        Assert.Null(GetRequestInfo(context).ClientIpAddress);
+        Assert.Equal(RequestInfoResolutionStatus.Resolved, GetRequestInfo(context).ResolutionStatus);
+        Assert.Equal(IPAddress.Parse("198.51.100.20"), GetRequestInfo(context).ClientIpAddress);
         Assert.Equal(IPAddress.Parse("10.0.0.2"), GetRequestInfo(context).ConnectionIpAddress);
     }
 
@@ -131,19 +133,21 @@ public class ForwardedHeadersParityTest
         var native = await RunAsync("203.0.113.10", false, Configure, schemes: [scheme], hosts: [host]);
         var rfc = await RunAsync("203.0.113.10", true, Configure, schemes: [scheme], hosts: [host]);
 
-        AssertSameRequestInfo(native, rfc);
+        AssertSameRequestValues(native, rfc);
+        AssertClientStatus(rfc, symmetry ? RequestInfoResolutionStatus.InvalidHeader : RequestInfoResolutionStatus.Resolved);
     }
 
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async Task Rfc_should_match_native_when_for_is_missing(bool symmetry)
+    public async Task Missing_rfc_for_should_report_client_unavailability_and_respect_symmetry(bool symmetry)
     {
         void Configure(ForwardedHeadersOptions options) => options.RequireHeaderSymmetry = symmetry;
         var native = await RunAsync("", false, Configure);
         var rfc = await RunAsync("", true, Configure, rfcHeader: "proto=https;host=forwarded.example.com");
 
-        AssertSameRequestInfo(native, rfc);
+        AssertSameRequestValues(native, rfc);
+        AssertClientStatus(rfc, symmetry ? RequestInfoResolutionStatus.InvalidHeader : RequestInfoResolutionStatus.NoClientAddress);
     }
 
     [Fact]
@@ -155,7 +159,8 @@ public class ForwardedHeadersParityTest
         var rfc = await RunAsync("203.0.113.10, 10.0.0.3", true, Configure,
             rfcHeader: "for=203.0.113.10;proto=https, for=10.0.0.3;proto=https;host=forwarded.example.com");
 
-        AssertSameRequestInfo(native, rfc);
+        AssertSameRequestValues(native, rfc);
+        AssertClientStatus(rfc, RequestInfoResolutionStatus.InvalidHeader);
     }
 
     [Fact]
@@ -175,6 +180,21 @@ public class ForwardedHeadersParityTest
     [InlineData("for=203.0.113.10;for=198.51.100.20")]
     [InlineData("for=\"203.0.113.10\\\"")]
     [InlineData("for=\"203.0.113.10\"suffix")]
+    [InlineData("for=not-an-ip")]
+    [InlineData("for=not-an-ip, for=10.0.0.3")]
+    [InlineData("for=203.0.113.10, for=not-an-ip")]
+    [InlineData("for=\"203.0.113.10:65536\"")]
+    [InlineData("for=203.0.113.10:1234")]
+    [InlineData("for=2001:db8::10")]
+    [InlineData("for=127.1")]
+    [InlineData("for=0x7f000001")]
+    [InlineData("for=")]
+    [InlineData("for=\"\"")]
+    [InlineData("for=203.0.113.10;bad name=value")]
+    [InlineData("for=203.0.113.10;by=not-an-ip")]
+    [InlineData("for=203.0.113.10;extension=\"\u0001\"")]
+    [InlineData("for=203.0.113.10;extension=\"\\\u0001\"")]
+    [InlineData("")]
     public async Task Malformed_rfc_syntax_should_leave_the_connection_intact(string header)
     {
         var context = await RunAsync("", true, rfcHeader: header);
@@ -183,7 +203,8 @@ public class ForwardedHeadersParityTest
         Assert.Equal(54321, context.Connection.RemotePort);
         Assert.Equal("http", context.Request.Scheme);
         Assert.Equal("direct.example.com", context.Request.Host.Host);
-        Assert.Equal(RequestInfoResolutionStatus.Resolved, GetRequestInfo(context).ResolutionStatus);
+        AssertClientStatus(context, RequestInfoResolutionStatus.InvalidHeader);
+        Assert.Empty(GetRequestInfo(context).ForwardedHops);
     }
 
     private static async Task<DefaultHttpContext> RunAsync(
@@ -243,7 +264,7 @@ public class ForwardedHeadersParityTest
         return context;
     }
 
-    private static void AssertSameRequestInfo(HttpContext native, HttpContext rfc)
+    private static void AssertSameRequestValues(HttpContext native, HttpContext rfc)
     {
         Assert.Equal(native.Connection.RemoteIpAddress, rfc.Connection.RemoteIpAddress);
         Assert.Equal(native.Connection.RemotePort, rfc.Connection.RemotePort);
@@ -251,11 +272,25 @@ public class ForwardedHeadersParityTest
         Assert.Equal(native.Request.Host, rfc.Request.Host);
         var nativeInfo = GetRequestInfo(native);
         var rfcInfo = GetRequestInfo(rfc);
-        Assert.Equal(nativeInfo.ResolutionStatus, rfcInfo.ResolutionStatus);
-        Assert.Equal(nativeInfo.ClientIpAddress, rfcInfo.ClientIpAddress);
-        Assert.Equal(nativeInfo.ClientPort, rfcInfo.ClientPort);
         Assert.Equal(nativeInfo.ConnectionIpAddress, rfcInfo.ConnectionIpAddress);
         Assert.Equal(nativeInfo.ConnectionPort, rfcInfo.ConnectionPort);
+    }
+
+    private static void AssertClientStatus(HttpContext context, RequestInfoResolutionStatus status)
+    {
+        var info = GetRequestInfo(context);
+        Assert.Equal(status, info.ResolutionStatus);
+        Assert.Equal(ForwardedHeaderSource.Forwarded, info.Source);
+        if (status == RequestInfoResolutionStatus.Resolved)
+        {
+            Assert.Equal(context.Connection.RemoteIpAddress, info.ClientIpAddress);
+            Assert.Equal(context.Connection.RemotePort > 0 ? context.Connection.RemotePort : (int?)null, info.ClientPort);
+        }
+        else
+        {
+            Assert.Null(info.ClientIpAddress);
+            Assert.Null(info.ClientPort);
+        }
     }
 
     private static HttpRequestInfo GetRequestInfo(HttpContext context) => new HttpRequestInfoAccessor(
