@@ -243,6 +243,12 @@ IP access denied. Reason: ClientAddressUnavailable; ResolutionStatus: UntrustedP
 覆盖 IPv4/IPv6/端口、混合头、四类地址规则、拒绝优先、字段缺失、非法头、代理信任、多跳/层数、
 AllowedHosts、对称约束、原始连接信息、X/直接请求和拒绝日志。
 用户报告的 `.148/.149` 与 `172.16.2.0/32` 配置有独立断言，包括 `/32` 和 `/24` 范围对照。
+联合规则矩阵分别走直接请求、仅 RFC、仅 X 和两套头并存四条路径，使用 IPv4、IPv6 和
+IPv4-mapped IPv6，验证四个地址/网段集合的命中与未命中、允许规则取并集以及拒绝优先。
+混合头中 X 地址与 RFC 地址不同：X 命中白名单不能放过不在白名单中的 RFC 客户端，
+X 命中黑名单也不能拒绝已允许的 RFC 客户端；URL 和 PathBase 同时断言所选路径。
+还覆盖 X 头非法/不可信/不对称/层数为零时按原生语义使用连接地址匹配规则，
+两套头并存且 X 头非法或不对称、访问控制关闭、多跳按实际选中跳匹配规则等场景。
 
 ```powershell
 dotnet test framework/test/SharpAbp.Abp.AspNetCore.Tests/SharpAbp.Abp.AspNetCore.Tests.csproj -c Release
