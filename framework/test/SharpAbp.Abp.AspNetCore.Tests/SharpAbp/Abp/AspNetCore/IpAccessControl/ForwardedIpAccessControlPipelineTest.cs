@@ -198,6 +198,223 @@ public class ForwardedIpAccessControlPipelineTest
         Assert.Equal(54321, result.Info.ConnectionPort);
     }
 
+    public static IEnumerable<object?[]> ClientRuleCases()
+    {
+        foreach (var client in new[]
+        {
+            new[] { "172.16.0.148", "172.16.0.148", "172.16.0.0/24", "198.51.100.20", "198.51.100.0/24" },
+            new[] { "2001:db8::10", "2001:db8::10", "2001:db8::/64", "2001:db8:1::20", "2001:db8:1::/64" },
+            new[] { "::ffff:172.16.0.148", "172.16.0.148", "172.16.0.0/24", "198.51.100.20", "198.51.100.0/24" }
+        })
+        {
+            var address = client[1];
+            var network = client[2];
+            var otherAddress = client[3];
+            var otherNetwork = client[4];
+            foreach (var protocol in new[] { "Direct", "Forwarded", "XForwarded", "Mixed" })
+            foreach (var rule in new object?[][]
+            {
+                [null, null, null, null, IpAccessDecisionReason.AllowedByDefault],
+                [address, null, null, null, IpAccessDecisionReason.AllowedAddress],
+                [null, network, null, null, IpAccessDecisionReason.AllowedAddress],
+                [otherAddress, null, null, null, IpAccessDecisionReason.NotAllowlisted],
+                [null, otherNetwork, null, null, IpAccessDecisionReason.NotAllowlisted],
+                [null, null, address, null, IpAccessDecisionReason.DeniedAddress],
+                [null, null, null, network, IpAccessDecisionReason.DeniedAddress],
+                [address, null, address, null, IpAccessDecisionReason.DeniedAddress],
+                [address, null, null, network, IpAccessDecisionReason.DeniedAddress],
+                [null, network, address, null, IpAccessDecisionReason.DeniedAddress],
+                [null, network, null, network, IpAccessDecisionReason.DeniedAddress],
+                [address, otherNetwork, otherAddress, otherNetwork, IpAccessDecisionReason.AllowedAddress],
+                [otherAddress, network, otherAddress, otherNetwork, IpAccessDecisionReason.AllowedAddress],
+                [otherAddress, otherNetwork, null, null, IpAccessDecisionReason.NotAllowlisted],
+                [null, null, otherAddress, otherNetwork, IpAccessDecisionReason.AllowedByDefault]
+            })
+            {
+                yield return [protocol, client[0], address, otherAddress, rule[0], rule[1], rule[2], rule[3], rule[4]];
+            }
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(ClientRuleCases))]
+    public async Task Selected_protocol_should_apply_all_four_client_rule_collections(
+        string protocol, string wireIp, string clientIp, string otherIp,
+        string? allowedAddress, string? allowedNetwork, string? deniedAddress, string? deniedNetwork,
+        IpAccessDecisionReason reason)
+    {
+        var endpoint = new IPEndPoint(IPAddress.Parse(wireIp), 4711).ToString();
+        var hasRfc = protocol is "Forwarded" or "Mixed";
+        var hasX = protocol is "XForwarded" or "Mixed";
+        var peer = protocol == "Direct" ? wireIp : "10.0.0.2";
+        var result = await SendAsync(hasRfc ? $"for=\"{endpoint}\";proto=https;host=\"example.com:8443\"" : null,
+            access =>
+            {
+                if (allowedAddress != null) access.AllowedAddresses.Add(IPAddress.Parse(allowedAddress));
+                if (allowedNetwork != null) access.AllowedNetworks.Add(IPNetwork.Parse(allowedNetwork));
+                if (deniedAddress != null) access.DeniedAddresses.Add(IPAddress.Parse(deniedAddress));
+                if (deniedNetwork != null) access.DeniedNetworks.Add(IPNetwork.Parse(deniedNetwork));
+            }, peer: peer, xHeaders: hasX, configureRequest: request =>
+            {
+                if (!hasX) return;
+                request.Headers.Remove("X-Forwarded-For");
+                request.Headers.Add("X-Forwarded-For", protocol == "Mixed" ? otherIp : endpoint);
+            });
+
+        var allowed = reason is IpAccessDecisionReason.AllowedAddress or IpAccessDecisionReason.AllowedByDefault;
+        Assert.Equal(allowed ? HttpStatusCode.OK : HttpStatusCode.Forbidden, result.Status);
+        Assert.Equal(allowed, result.Decision.IsAllowed);
+        Assert.Equal(reason, result.Decision.Reason);
+        Assert.Equal(IPAddress.Parse(clientIp), result.Decision.ClientIpAddress);
+        Assert.Equal(IPAddress.Parse(clientIp), result.Info.ClientIpAddress);
+        Assert.Equal(protocol == "Direct" ? 54321 : 4711, result.Info.ClientPort);
+        Assert.Equal(RequestInfoResolutionStatus.Resolved, result.Info.ResolutionStatus);
+        Assert.Equal(hasRfc ? ForwardedHeaderSource.Forwarded : hasX ? ForwardedHeaderSource.XForwarded : ForwardedHeaderSource.Direct,
+            result.Info.Source);
+        Assert.Equal(IPAddress.Parse(protocol == "Direct" ? clientIp : peer), result.Info.ConnectionIpAddress);
+        Assert.Equal(54321, result.Info.ConnectionPort);
+        Assert.Equal(protocol == "XForwarded" ? "/x" : "/original", result.PathBase);
+        Assert.Equal(hasRfc ? "example.com" : hasX ? "x.example.com" : "direct.example.com", result.Info.Host);
+        Assert.Equal(protocol == "Direct" ? "http" : "https", result.Info.Scheme);
+        Assert.Equal(hasRfc ? 8443 : hasX ? 9443 : 8080, result.Info.Port);
+        Assert.Equal(allowed ? hasRfc ? "https://example.com:8443/original/download"
+            : hasX ? "https://x.example.com:9443/x/download" : "http://direct.example.com:8080/original/download" : "", result.Body);
+    }
+
+    [Theory]
+    [InlineData("198.51.100.99", "172.16.0.148", false, 1)]
+    [InlineData("10.0.0.2", "unknown", false, 1)]
+    [InlineData("10.0.0.2", "_hidden", false, 1)]
+    [InlineData("10.0.0.2", "not-an-ip", false, 1)]
+    [InlineData("10.0.0.2", "172.16.0.148", true, 1)]
+    [InlineData("10.0.0.2", "172.16.0.148", false, 0)]
+    public async Task Rejected_x_headers_should_match_connection_rules_instead_of_forged_client(
+        string peer, string xFor, bool symmetry, int limit)
+    {
+        foreach (var denyWhenUnavailable in new[] { true, false })
+        {
+            var result = await SendAsync(null, access =>
+            {
+                access.DenyWhenClientAddressUnavailable = denyWhenUnavailable;
+                access.AllowedAddresses.Add(IPAddress.Parse("172.16.0.148"));
+            }, options =>
+            {
+                options.RequireHeaderSymmetry = symmetry;
+                options.ForwardLimit = limit;
+            }, peer: peer, xHeaders: true, configureRequest: request =>
+            {
+                request.Headers.Remove("X-Forwarded-For");
+                request.Headers.Add("X-Forwarded-For", xFor);
+                if (symmetry) request.Headers.Remove("X-Forwarded-Host");
+            });
+
+            Assert.Equal(HttpStatusCode.Forbidden, result.Status);
+            Assert.Equal(IpAccessDecisionReason.NotAllowlisted, result.Decision.Reason);
+            Assert.Equal(RequestInfoResolutionStatus.Resolved, result.Info.ResolutionStatus);
+            Assert.Equal(ForwardedHeaderSource.XForwarded, result.Info.Source);
+            Assert.Equal(IPAddress.Parse(peer), result.Info.ClientIpAddress);
+            Assert.Equal(IPAddress.Parse(peer), result.Info.ConnectionIpAddress);
+            Assert.Equal(54321, result.Info.ConnectionPort);
+            Assert.Equal("http", result.Info.Scheme);
+            Assert.Equal("direct.example.com", result.Info.Host);
+            Assert.Equal("/original", result.PathBase);
+            Assert.Empty(result.Body);
+        }
+    }
+
+    [Theory]
+    [InlineData("for=172.16.0.148;proto=https;host=\"example.com:8443\"", RequestInfoResolutionStatus.Resolved, "https://example.com:8443/original/download")]
+    [InlineData("proto=https;host=\"example.com:8443\"", RequestInfoResolutionStatus.NoClientAddress, "https://example.com:8443/original/download")]
+    [InlineData("for=unknown;proto=https;host=\"example.com:8443\"", RequestInfoResolutionStatus.NoClientAddress, "https://example.com:8443/original/download")]
+    [InlineData("for=not-an-ip", RequestInfoResolutionStatus.InvalidHeader, "http://direct.example.com:8080/original/download")]
+    public async Task Disabled_access_control_should_preserve_rfc_selection_with_mixed_headers(
+        string header, RequestInfoResolutionStatus status, string url)
+    {
+        var result = await SendAsync(header, access =>
+        {
+            access.IsEnabled = false;
+            access.DeniedNetworks.Add(IPNetwork.Parse("172.16.0.0/24"));
+        }, xHeaders: true);
+
+        Assert.Equal(HttpStatusCode.OK, result.Status);
+        Assert.Equal(IpAccessDecisionReason.Disabled, result.Decision.Reason);
+        Assert.Equal(ForwardedHeaderSource.Forwarded, result.Info.Source);
+        Assert.Equal(status, result.Info.ResolutionStatus);
+        Assert.Equal(url, result.Body);
+    }
+
+    [Theory]
+    [InlineData("unknown")]
+    [InlineData("not-an-ip")]
+    [InlineData("[2001:db8::10]:65536")]
+    public async Task Valid_rfc_should_ignore_invalid_or_asymmetric_x_headers(string xFor)
+    {
+        var result = await SendAsync("for=172.16.0.148;proto=https;host=\"example.com:8443\"",
+            access => access.AllowedAddresses.Add(IPAddress.Parse("172.16.0.148")),
+            options => options.RequireHeaderSymmetry = true, xHeaders: true, configureRequest: request =>
+            {
+                request.Headers.Remove("X-Forwarded-For");
+                request.Headers.Add("X-Forwarded-For", xFor);
+                request.Headers.Remove("X-Forwarded-Host");
+            });
+
+        Assert.Equal(HttpStatusCode.OK, result.Status);
+        Assert.Equal(IpAccessDecisionReason.AllowedAddress, result.Decision.Reason);
+        Assert.Equal("172.16.0.148", result.Info.ClientIpAddress?.ToString());
+        Assert.Equal(RequestInfoResolutionStatus.Resolved, result.Info.ResolutionStatus);
+        Assert.Equal(ForwardedHeaderSource.Forwarded, result.Info.Source);
+        Assert.Equal("https://example.com:8443/original/download", result.Body);
+    }
+
+    [Theory]
+    [InlineData(false, 1, true, "10.0.0.3", IpAccessDecisionReason.DeniedAddress)]
+    [InlineData(false, 2, false, "10.0.0.3", IpAccessDecisionReason.DeniedAddress)]
+    [InlineData(false, 2, true, "172.16.0.148", IpAccessDecisionReason.AllowedAddress)]
+    [InlineData(false, null, true, "172.16.0.148", IpAccessDecisionReason.AllowedAddress)]
+    [InlineData(true, 1, true, "10.0.0.3", IpAccessDecisionReason.DeniedAddress)]
+    [InlineData(true, 2, false, "10.0.0.3", IpAccessDecisionReason.DeniedAddress)]
+    [InlineData(true, 2, true, "172.16.0.148", IpAccessDecisionReason.AllowedAddress)]
+    [InlineData(true, null, true, "172.16.0.148", IpAccessDecisionReason.AllowedAddress)]
+    public async Task Chain_access_control_should_match_only_the_hop_selected_by_trust_and_limit(
+        bool hasRfc, int? limit, bool trustIntermediate, string clientIp, IpAccessDecisionReason reason)
+    {
+        var result = await SendAsync(hasRfc
+            ? "for=172.16.0.148;proto=https;host=\"example.com:8443\", for=10.0.0.3;proto=http;host=near.example.com" : null,
+            access =>
+            {
+                access.AllowedAddresses.Add(IPAddress.Parse("172.16.0.148"));
+                access.DeniedNetworks.Add(IPNetwork.Parse("10.0.0.3/32"));
+            }, options =>
+            {
+                options.ForwardLimit = limit;
+                options.RequireHeaderSymmetry = true;
+                if (trustIntermediate) options.KnownProxies.Add(IPAddress.Parse("10.0.0.3"));
+            }, xHeaders: true, configureRequest: request =>
+            {
+                request.Headers.Remove("X-Forwarded-For");
+                request.Headers.Add("X-Forwarded-For", hasRfc ? "198.51.100.20, 10.0.0.3" : "172.16.0.148, 10.0.0.3");
+                request.Headers.Remove("X-Forwarded-Proto");
+                request.Headers.Add("X-Forwarded-Proto", "https, http");
+                request.Headers.Remove("X-Forwarded-Host");
+                request.Headers.Add("X-Forwarded-Host", "x.example.com:9443, x-near.example.com");
+                request.Headers.Remove("X-Forwarded-Prefix");
+                request.Headers.Add("X-Forwarded-Prefix", "/x, /x-near");
+            });
+
+        var allowed = reason == IpAccessDecisionReason.AllowedAddress;
+        Assert.Equal(allowed ? HttpStatusCode.OK : HttpStatusCode.Forbidden, result.Status);
+        Assert.Equal(reason, result.Decision.Reason);
+        Assert.Equal(IPAddress.Parse(clientIp), result.Info.ClientIpAddress);
+        Assert.Equal(RequestInfoResolutionStatus.Resolved, result.Info.ResolutionStatus);
+        Assert.Equal(hasRfc ? ForwardedHeaderSource.Forwarded : ForwardedHeaderSource.XForwarded, result.Info.Source);
+        Assert.Equal(allowed ? hasRfc ? "example.com" : "x.example.com"
+            : hasRfc ? "near.example.com" : "x-near.example.com", result.Info.Host);
+        Assert.Equal(IPAddress.Parse("10.0.0.2"), result.Info.ConnectionIpAddress);
+        Assert.Equal(54321, result.Info.ConnectionPort);
+        Assert.Equal(allowed ? hasRfc ? "https://example.com:8443/original/download"
+            : "https://x.example.com:9443/x/download" : "", result.Body);
+    }
+
     [Theory]
     [InlineData(0, true, null, RequestInfoResolutionStatus.ForwardLimitExceeded, "direct.example.com", "http")]
     [InlineData(1, true, "10.0.0.3", RequestInfoResolutionStatus.Resolved, "near.example.com", "http")]
@@ -398,7 +615,8 @@ public class ForwardedIpAccessControlPipelineTest
     private static async Task<(HttpStatusCode Status, string Body, HttpRequestInfo Info, IpAccessDecision Decision, string PathBase)> SendAsync(
         string? forwarded, Action<AbpIpAccessControlOptions>? configureAccess = null,
         Action<ForwardedHeadersOptions>? configureForwarding = null, string peer = "10.0.0.2",
-        bool xHeaders = false, bool registerRfcFirst = false, List<string>? logs = null)
+        bool xHeaders = false, bool registerRfcFirst = false, List<string>? logs = null,
+        Action<HttpRequestMessage>? configureRequest = null)
     {
         HttpRequestInfo info = default;
         IpAccessDecision decision = default;
@@ -464,6 +682,7 @@ public class ForwardedIpAccessControlPipelineTest
             request.Headers.Add("X-Forwarded-Host", "x.example.com:9443");
             request.Headers.Add("X-Forwarded-Prefix", "/x");
         }
+        configureRequest?.Invoke(request);
         using var response = await client.SendAsync(request);
         return (response.StatusCode, await response.Content.ReadAsStringAsync(), info, decision, pathBase);
     }
