@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using SharpAbp.Abp.AspNetCore.Http;
 using System;
 using System.Linq;
@@ -11,18 +13,37 @@ namespace SharpAbp.Abp.AspNetCore.IpAccessControl
     {
         protected AbpIpAccessControlOptions Options { get; }
         protected IHttpRequestInfoAccessor RequestInfoAccessor { get; }
+        protected ILogger<IpAccessControlService> Logger { get; }
 
         public IpAccessControlService(
             IOptions<AbpIpAccessControlOptions> options,
             IHttpRequestInfoAccessor requestInfoAccessor)
+            : this(options, requestInfoAccessor, NullLogger<IpAccessControlService>.Instance)
+        {
+        }
+
+        public IpAccessControlService(
+            IOptions<AbpIpAccessControlOptions> options,
+            IHttpRequestInfoAccessor requestInfoAccessor,
+            ILogger<IpAccessControlService> logger)
         {
             Options = options.Value;
             RequestInfoAccessor = requestInfoAccessor;
+            Logger = logger;
         }
 
         public virtual IpAccessDecision EvaluateCurrentRequest()
         {
-            return Evaluate(RequestInfoAccessor.GetRequestInfo());
+            var requestInfo = RequestInfoAccessor.GetRequestInfo();
+            var decision = Evaluate(requestInfo);
+            if (!decision.IsAllowed)
+            {
+                Logger.LogWarning("IP access denied. Reason: {Reason}; ResolutionStatus: {ResolutionStatus}; " +
+                    "Source: {Source}; ClientIpAddress: {ClientIpAddress}; ConnectionIpAddress: {ConnectionIpAddress}; " +
+                    "ConnectionPort: {ConnectionPort}.", decision.Reason, requestInfo.ResolutionStatus,
+                    requestInfo.Source, decision.ClientIpAddress, requestInfo.ConnectionIpAddress, requestInfo.ConnectionPort);
+            }
+            return decision;
         }
 
         public virtual IpAccessDecision Evaluate(HttpRequestInfo requestInfo)
