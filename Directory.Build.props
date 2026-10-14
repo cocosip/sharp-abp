@@ -5,9 +5,9 @@
 		<!--Net Core Framework-->
 		<NetCoreFx>net10.0</NetCoreFx>
 		<!--Microsoft-->
-		<MicrosoftPackageVersion>[10.0.12,)</MicrosoftPackageVersion>
+		<MicrosoftPackageVersion>[10.0.13,)</MicrosoftPackageVersion>
 		<!--EfCore-->
-		<EfCorePackageVersion>[10.0.12,)</EfCorePackageVersion>
+		<EfCorePackageVersion>[10.0.13,)</EfCorePackageVersion>
 		<!--Volo ABP packages-->
 		<VoloAbpPackageVersion>[10.7.0,)</VoloAbpPackageVersion>
 		<!--FreeSql package-->
