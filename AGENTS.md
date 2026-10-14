@@ -2,30 +2,37 @@
 
 ## Project Structure & Module Organization
 
-This repository is a .NET/ABP package collection. Shared infrastructure packages live under `framework/src`, with framework tests in `framework/test` and the main framework solution at `framework/SharpAbp.slnx`. Business modules live under `modules/<module-name>` and usually contain their own `.slnx`, `src`, and `test` trees. Runnable examples and integration samples are under `samples/`. Shared build settings are in `Directory.Build.props`, `Directory.Packages.props`, `common.props`, and `common.test.props`.
+SharpAbp is a .NET/ABP package collection. Infrastructure packages and tests live in `framework/src` and `framework/test`; the solution is `framework/SharpAbp.slnx`. Business modules use `modules/<name>/src`, `test`, and individual `.slnx` solutions. Runnable examples and web assets live under `samples`; documentation belongs in `docs` or module READMEs.
+
+Shared settings live in `Directory.Build.props`, `Directory.Packages.props`, `common.props`, and `common.test.props`. The current checkout uses .NET 10 and ABP 10.x; some infrastructure packages also target .NET Standard. Check each project's targets before using framework-specific APIs.
 
 ## Build, Test, and Development Commands
 
-- `dotnet restore framework/SharpAbp.slnx` restores the framework solution.
-- `dotnet build framework/SharpAbp.slnx -c Release` builds the shared framework packages.
-- `dotnet test framework/test/SharpAbp.Abp.FileStoring.Tests/SharpAbp.Abp.FileStoring.Tests.csproj -c Release` runs a focused test project.
-- `dotnet build modules/file-storing-management/SharpAbp.Abp.FileStoringManagement.slnx -c Release` builds one module solution.
-- `powershell -ExecutionPolicy Bypass -File scripts/windows-ci/Build-All.ps1` builds the framework and module solution list used by local Windows CI.
+Run from the repository root with the .NET 10 SDK:
 
-In the Codex app, run `dotnet build` and `dotnet test` outside the sandbox with the approved `dotnet` prefix rule.
+- `dotnet restore framework/SharpAbp.slnx` — restore framework dependencies.
+- `dotnet build framework/SharpAbp.slnx -c Release` — build infrastructure packages.
+- `dotnet build modules/account/SharpAbp.Abp.Account.slnx -c Release` — build one module.
+- `dotnet test modules/account/test/SharpAbp.Abp.Account.Application.Tests/SharpAbp.Abp.Account.Application.Tests.csproj -c Release` — run focused tests.
+- `dotnet run --project samples/sample/src/SharpSample.HttpApi.Host` — start the integration sample after configuring its external services.
+- `powershell -ExecutionPolicy Bypass -File scripts/windows-ci/Build-All.ps1` — build the framework and module CI list.
+- `git diff --check` — check whitespace errors.
+
+Keep `Build-All.ps1` aligned with `.github/workflows/ci-cd.yml`; samples require separate validation.
 
 ## Coding Style & Naming Conventions
 
-Use C# with the shared `LangVersion` from `common.props` and `common.test.props`. Follow existing ABP conventions: PascalCase for public types and members, camelCase for locals and parameters, async method names ending in `Async`, and namespaces matching the `SharpAbp.*` project path. Keep indentation consistent with nearby files. Central package versions belong in `Directory.Packages.props`; project-wide MSBuild behavior belongs in the shared props files, not individual projects unless scoped.
+Follow nearby formatting: C# typically uses four spaces. Use PascalCase for public members, camelCase for locals, `Async` suffixes, and `SharpAbp.*` namespaces. Respect shared `LangVersion` settings. Centralize NuGet versions in `Directory.Packages.props`; omit inline package versions.
+
+Use Mapperly, never AutoMapper. Follow existing `[Mapper]`, `MapperBase`, and `AddMapperlyObjectMapper<TModule>()` patterns. Use `[MapExtraProperties]` for extensible pairs and preserve ABP definition checks for nested mappings. Preserve DTO contracts and protected extension points.
 
 ## Testing Guidelines
 
-Tests are ordinary .NET test projects under `framework/test` and `modules/*/test`, commonly named `*.Tests` or `*.TestBase`. Add regression coverage beside the affected package or module, and prefer focused runs before broader solution builds. Test classes typically use names such as `SomeServiceTest` or `SomeModule_Tests`; follow the local project pattern.
+Tests use xUnit and existing ABP test bases; follow names such as `SomeServiceTest` or `SomeModule_Tests`. Add focused regression coverage beside the affected module. Mapping tests should cover both overloads, nested fields, and extension properties. Run focused tests before broader builds; report warnings and validation limits.
 
-## Commit & Pull Request Guidelines
 
-Recent history often uses emoji-prefixed Conventional Commit subjects, with scopes such as `fix(file-storing): ...` and `build(deps): ...`. Keep commits scoped, imperative, and tied to the affected package or module. Pull requests should state the problem, summarize the fix, list the exact build/test commands run, and call out configuration or package-version changes.
+## Agent Execution & Security
 
-## Security & Configuration Tips
+In Codex, run `dotnet build` and `dotnet test` outside the sandbox with `sandbox_permissions: "require_escalated"` and `prefix_rule: ["dotnet"]`. Reuse approved permissions; do not repeatedly retry sandbox hangs. Build scripts need equivalent execution access.
 
-Do not commit credentials, local endpoints, or machine-specific secrets. Keep sample configuration generic and document required environment-specific values in the relevant sample or module README.
+Never commit credentials or machine-specific endpoints; keep sample configuration generic.
