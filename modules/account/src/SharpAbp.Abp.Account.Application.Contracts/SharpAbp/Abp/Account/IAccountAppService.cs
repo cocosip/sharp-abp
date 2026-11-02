@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Volo.Abp.Account;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Identity;
@@ -24,6 +25,14 @@ namespace SharpAbp.Abp.Account
         /// <param name="input">The input containing email and optional app information for the reset link.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
         Task SendPasswordResetCodeAsync(SendPasswordResetCodeDto input);
+
+        /// <summary>
+        /// Sends a password reset email for a user selected by an administrator.
+        /// </summary>
+        /// <param name="userId">The user receiving the reset email.</param>
+        /// <param name="input">The application URL context for the reset link.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        Task SendPasswordResetEmailAsync(Guid userId, SendPasswordResetEmailDto input);
 
         /// <summary>
         /// Resets a user's password using the provided reset token.

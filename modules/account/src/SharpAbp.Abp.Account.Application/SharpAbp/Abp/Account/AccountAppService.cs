@@ -1,4 +1,6 @@
-﻿﻿﻿﻿﻿﻿﻿using Microsoft.AspNetCore.Identity;
+﻿﻿﻿﻿﻿﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using System;
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.Account.Emailing;
 using SharpAbp.Abp.Account.Localization;
@@ -103,6 +105,20 @@ namespace SharpAbp.Abp.Account
         public virtual async Task SendPasswordResetCodeAsync(SendPasswordResetCodeDto input)
         {
             var user = await GetUserByEmailAsync(input.Email);
+            var resetToken = await UserManager.GeneratePasswordResetTokenAsync(user);
+            await AccountEmailer.SendPasswordResetLinkAsync(user, resetToken, input.AppName, input.ReturnUrl, input.ReturnUrlHash);
+        }
+
+        /// <summary>
+        /// Sends a password reset email for a user selected by an administrator.
+        /// </summary>
+        /// <param name="userId">The user receiving the reset email.</param>
+        /// <param name="input">The application URL context for the reset link.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        [Authorize(IdentityPermissions.Users.Update)]
+        public virtual async Task SendPasswordResetEmailAsync(Guid userId, SendPasswordResetEmailDto input)
+        {
+            var user = await UserManager.GetByIdAsync(userId);
             var resetToken = await UserManager.GeneratePasswordResetTokenAsync(user);
             await AccountEmailer.SendPasswordResetLinkAsync(user, resetToken, input.AppName, input.ReturnUrl, input.ReturnUrlHash);
         }
