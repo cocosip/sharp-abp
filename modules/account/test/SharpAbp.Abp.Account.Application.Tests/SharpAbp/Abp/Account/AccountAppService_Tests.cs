@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using NSubstitute;
+using SharpAbp.Abp.Account.Emailing;
 using Shouldly;
 using System;
 using System.Collections.Generic;
@@ -27,6 +29,37 @@ namespace SharpAbp.Abp.Account
             _lookupNormalizer = GetRequiredService<ILookupNormalizer>();
             _userManager = GetRequiredService<IdentityUserManager>();
             _identityOptions = GetRequiredService<IOptions<IdentityOptions>>();
+        }
+
+        [Fact]
+        public async Task SendPasswordResetEmailAsync_ShouldSendResetLink()
+        {
+            await _identityOptions.SetAsync();
+
+            var emailer = GetRequiredService<IAccountEmailer>();
+            emailer.ClearReceivedCalls();
+
+            var registered = await _accountAppService.RegisterAsync(new RegisterDto
+            {
+                UserName = "reset.user",
+                EmailAddress = "reset.user@abp.io",
+                Password = "P@ssW0rd",
+                AppName = "MVC"
+            });
+
+            await _accountAppService.SendPasswordResetEmailAsync(
+                registered.Id,
+                new SendPasswordResetEmailDto
+                {
+                    AppName = "MVC"
+                });
+
+            await emailer.Received(1).SendPasswordResetLinkAsync(
+                Arg.Is<Volo.Abp.Identity.IdentityUser>(user => user.Id == registered.Id),
+                Arg.Is<string>(token => !string.IsNullOrWhiteSpace(token)),
+                "MVC",
+                null,
+                null);
         }
 
         [Fact]

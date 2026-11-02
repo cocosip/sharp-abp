@@ -60,6 +60,15 @@
       }, ajaxParams));
     };
 
+    volo.abp.account.account.sendPasswordResetEmail = function(userId, input, ajaxParams) {
+      return abp.ajax($.extend(true, {
+        url: abp.appPath + 'api/account/users/' + userId + '/send-password-reset-email',
+        type: 'POST',
+        dataType: null,
+        data: JSON.stringify(input)
+      }, ajaxParams));
+    };
+
     volo.abp.account.account.resetPassword = function(input, ajaxParams) {
       return abp.ajax($.extend(true, {
         url: abp.appPath + 'api/account/reset-password',

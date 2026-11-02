@@ -1,7 +1,12 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using NSubstitute;
+using SharpAbp.Abp.Account.Emailing;
 using Volo.Abp;
 using Volo.Abp.Authorization;
 using Volo.Abp.Autofac;
@@ -30,6 +35,10 @@ namespace SharpAbp.Abp.Account
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
+            context.Services.AddDataProtection().UseEphemeralDataProtectionProvider();
+            context.Services.AddAlwaysAllowAuthorization();
+            context.Services.Replace(ServiceDescriptor.Singleton(Substitute.For<IAccountEmailer>()));
+
             var sqliteConnection = CreateDatabaseAndGetConnection();
 
             Configure<AbpDbContextOptions>(options =>

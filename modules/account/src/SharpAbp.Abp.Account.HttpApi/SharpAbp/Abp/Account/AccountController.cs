@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Account;
@@ -31,6 +32,13 @@ namespace SharpAbp.Abp.Account
         public virtual Task SendPasswordResetCodeAsync(SendPasswordResetCodeDto input)
         {
             return AccountAppService.SendPasswordResetCodeAsync(input);
+        }
+
+        [HttpPost]
+        [Route("users/{userId}/send-password-reset-email")]
+        public virtual Task SendPasswordResetEmailAsync(Guid userId, SendPasswordResetEmailDto input)
+        {
+            return AccountAppService.SendPasswordResetEmailAsync(userId, input);
         }
 
         [HttpPost]
