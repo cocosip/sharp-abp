@@ -5,12 +5,12 @@ on:
     branches:
       - master
       - dev
-      - net10
+      - net9
   push:
     branches:
       - master
       - dev
-      - net10
+      - net9
     tags:
       - v*
 
@@ -36,6 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      id-token: write # NuGet trusted publishing (GitHub OIDC token)
 
     steps:
     - name: Checkout
@@ -55,6 +56,15 @@ jobs:
       run: |
         tag="${{ github.ref_name }}"
         version="${tag#v}"
+        declared=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' common.props | head -n 1)
+        if [ "$declared" != "$version" ]; then
+          echo "::error::Tag '$tag' must match common.props <Version> '$declared'"
+          exit 1
+        fi
+        if [ "$(git rev-parse "refs/tags/${tag}^{commit}")" != "$(git rev-parse HEAD)" ]; then
+          echo "::error::Tag '$tag' must point to the commit being built"
+          exit 1
+        fi
         echo "VERSION=$version" >> $GITHUB_OUTPUT
         echo "TAG=$tag" >> $GITHUB_OUTPUT
         echo "Release version: $version"
@@ -154,9 +164,21 @@ jobs:
         done
         echo "✓ All solutions packed successfully!"
 
+    # Trusted publishing: exchange this run's GitHub OIDC token for a one-hour
+    # nuget.org API key. Requires a nuget.org trusted publishing policy for
+    # cocosip/sharp-abp + ci-cd.yml; no long-lived NUGET_API_KEY secret is used.
+    - name: NuGet login (OIDC -> temporary API key)
+      if: startsWith(github.ref, 'refs/tags/v')
+      id: nuget_login
+      uses: NuGet/login@v1
+      with:
+        user: virtual # nuget.org profile name (not email); public, so no secret is needed
+
     - name: Publish to NuGet
       if: startsWith(github.ref, 'refs/tags/v')
       shell: bash
+      env:
+        NUGET_API_KEY: ${{ steps.nuget_login.outputs.NUGET_API_KEY }}
       run: |
         echo "Publishing NuGet packages..."
 
@@ -187,7 +209,7 @@ jobs:
         # 发布每个包
         for package in "${filtered_packages[@]}"; do
           echo "::group::Publishing: $(basename "$package")"
-          dotnet nuget push "$package" -k ${{secrets.NUGET_API_KEY}} -s https://www.nuget.org --skip-duplicate
+          dotnet nuget push "$package" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
           if [ $? -ne 0 ]; then
             echo "::error::Failed to publish: $(basename "$package")"
             exit 1
