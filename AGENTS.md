@@ -36,3 +36,24 @@ Tests use xUnit and existing ABP test bases; follow names such as `SomeServiceTe
 In Codex, run `dotnet build` and `dotnet test` outside the sandbox with `sandbox_permissions: "require_escalated"` and `prefix_rule: ["dotnet"]`. Reuse approved permissions; do not repeatedly retry sandbox hangs. Build scripts need equivalent execution access.
 
 Never commit credentials or machine-specific endpoints; keep sample configuration generic.
+
+## Branch, Version & Release Policy
+
+Three long-lived branches, each pinned to one dependency baseline:
+
+| Branch | Baseline | Role | Package upgrades |
+| --- | --- | --- | --- |
+| `master` | .NET 10 / ABP 10.x | Main line; receives merges from `dev`; releases are tagged here | through `dev` only |
+| `dev` | .NET 10 / ABP 10.x | Primary feature development | the only branch that upgrades packages |
+| `net9` | .NET 9 / ABP 9.3.x | Maintenance only: bug and security fixes for the `4.7.x` line | frozen |
+
+- Feature work happens on `dev` only and then merges into `master`.
+- A bug fixed on `net9` must also be merged into `dev` when the affected feature exists there and is expected to behave the same. The goal is identical behavior for shared features on both lines. `dev`-only fixes are not back-ported to `net9` unless they close a security issue.
+- Never upgrade packages on `net9`: keep `Directory.Build.props`, `Directory.Packages.props`, and third-party SDK versions as they are. Exceptions are limited to security advisories or hard blockers and must be stated in the commit, for example `net9: pin <package> <reason>`.
+- Adopt a new .NET or ABP major on `dev` by moving `NetCoreFx` and `VoloAbpPackageVersion` in `Directory.Build.props`. Do not open a new branch per .NET version.
+- `common.props` `<Version>` is the single version source: `4.7.x` on `net9`, `6.x` on `dev`/`master`. A release tag `v<Version>` must equal it and point at the built commit; CI fails before building otherwise.
+
+CI/CD conventions in `.github/workflows/ci-cd.yml`:
+
+- CI runs for `master`, `dev`, `net9`, and `v*` tags; other branches do not trigger it.
+- A tag push packs every solution and publishes to nuget.org through **NuGet Trusted Publishing**: `NuGet/login@v1` exchanges the GitHub OIDC token for a one-hour key, so the `id-token: write` permission is required and no long-lived `NUGET_API_KEY` secret may be added. nuget.org needs a trusted publishing policy for `cocosip/sharp-abp` + `ci-cd.yml`.
