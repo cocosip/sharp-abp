@@ -99,7 +99,7 @@
 		<PackageVersion Include="Volo.Abp.Autofac" Version="$(VoloAbpPackageVersion)" />
 		<PackageVersion Include="Volo.Abp.TestBase" Version="$(VoloAbpPackageVersion)" />
 		<PackageVersion Include="Volo.Abp.AspNetCore.TestBase" Version="$(VoloAbpPackageVersion)" />
-		<PackageVersion Include="Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite" Version="5.7.0" />
+		<PackageVersion Include="Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite" Version="5.7.1" />
 	</ItemGroup>
 
 	<ItemGroup>
