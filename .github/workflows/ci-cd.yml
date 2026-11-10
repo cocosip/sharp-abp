@@ -4,12 +4,10 @@ on:
   pull_request:
     branches:
       - master
-      - dev
       - net9
   push:
     branches:
       - master
-      - dev
       - net9
     tags:
       - v*

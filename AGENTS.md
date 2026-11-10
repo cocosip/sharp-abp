@@ -55,5 +55,5 @@ Three long-lived branches, each pinned to one dependency baseline:
 
 CI/CD conventions in `.github/workflows/ci-cd.yml`:
 
-- CI runs for `master`, `dev`, `net9`, and `v*` tags; other branches do not trigger it.
+- CI runs for `master`, `net9`, and `v*` tags; `dev` and other branches do not trigger it.
 - A tag push packs every solution and publishes to nuget.org through **NuGet Trusted Publishing**: `NuGet/login@v1` exchanges the GitHub OIDC token for a one-hour key, so the `id-token: write` permission is required and no long-lived `NUGET_API_KEY` secret may be added. nuget.org needs a trusted publishing policy for `cocosip/sharp-abp` + `ci-cd.yml`.
