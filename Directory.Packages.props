@@ -111,7 +111,7 @@
 		<PackageVersion Include="Azure.Storage.Blobs" Version="12.30.1" />
 		<PackageVersion Include="BouncyCastle.Cryptography" Version="2.7.0" />
 		<PackageVersion Include="Cocosip.KS3SDK" Version="1.0.0" />
-		<PackageVersion Include="DotCommon" Version="8.1.0" />
+		<PackageVersion Include="DotCommon" Version="8.1.1" />
 		<PackageVersion Include="FastDFS.Client" Version="1.2.0" />
 		<PackageVersion Include="FastDFS.Client.DependencyInjection" Version="1.2.0" />
 		<PackageVersion Include="Microsoft.FASTER.Core" Version="2.6.5" />
