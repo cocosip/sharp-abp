@@ -13,7 +13,7 @@
 		<!--FreeSql package-->
 		<FreeSqlPackageVersion>[3.5.311,)</FreeSqlPackageVersion>
 		<!--Masstransit package-->
-		<MassTransitPackageVersion>[9.2.3,)</MassTransitPackageVersion>
+		<MassTransitPackageVersion>[9.2.5,)</MassTransitPackageVersion>
 	</PropertyGroup>
 
 	<PropertyGroup>
