@@ -1,13 +1,8 @@
 using System;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using SharpAbp.Abp.ObjectPool;
 using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.FileStoring.Azure
@@ -16,21 +11,18 @@ namespace SharpAbp.Abp.FileStoring.Azure
     public class AzureFileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }
-        protected AbpFileStoringAbstractionsOptions Options { get; }
-        protected IPoolOrchestrator PoolOrchestrator { get; }
+        protected FileProviderClientCache<BlobServiceClient> ClientCache { get; }
         protected IAzureFileNameCalculator AzureFileNameCalculator { get; }
         protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
 
         public AzureFileProvider(
             ILogger<AzureFileProvider> logger,
-            IOptions<AbpFileStoringAbstractionsOptions> options,
-            IPoolOrchestrator poolOrchestrator,
+            FileProviderClientCache<BlobServiceClient> clientCache,
             IAzureFileNameCalculator azureFileNameCalculator,
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
             Logger = logger;
-            Options = options.Value;
-            PoolOrchestrator = poolOrchestrator;
+            ClientCache = clientCache;
             AzureFileNameCalculator = azureFileNameCalculator;
             FileNormalizeNamingService = fileNormalizeNamingService;
         }
@@ -120,31 +112,19 @@ namespace SharpAbp.Abp.FileStoring.Azure
 
         protected virtual BlobContainerClient GetBlobContainerClient(FileProviderArgs args)
         {
-            var pool = GetBlobContainerClientPool(args);
-            var blobContainerClient = pool.Get();
-            pool.Return(blobContainerClient);
-            return blobContainerClient;
-        }
-
-        protected virtual IObjectPool<BlobContainerClient> GetBlobContainerClientPool(FileProviderArgs args)
-        {
             var configuration = args.Configuration.GetAzureConfiguration();
-            var containerName = GetContainerName(args);
-            var poolName = NormalizePoolName(configuration.ConnectionString, containerName);
+            var blobServiceClient = ClientCache.GetOrAdd(
+                BuildClientKey(configuration),
+                () => new BlobServiceClient(configuration.ConnectionString));
 
-            return PoolOrchestrator.GetObjectPool<BlobContainerClient, AzureBlobContainerClientPolicy>(
-                poolName,
-                () => new AzureBlobContainerClientPolicy(configuration.ConnectionString, containerName),
-                Options.DefaultClientMaximumRetained);
+            return blobServiceClient.GetBlobContainerClient(GetContainerName(args));
         }
 
-        protected virtual string NormalizePoolName(string connectionString, string containerName)
+        protected virtual string BuildClientKey(AzureFileProviderConfiguration configuration)
         {
-            var v = $"{connectionString}-{containerName}";
-            using var sha1 = SHA1.Create();
-            var hashBuffer = sha1.ComputeHash(Encoding.UTF8.GetBytes(v));
-            var hash = hashBuffer.Aggregate("", (current, b) => current + b.ToString("X2"));
-            return $"FileStoring-{AzureFileProviderConfigurationNames.ProviderName}-{hash}";
+            return FileProviderClientKey.Build(
+                Provider,
+                ("ConnectionString", configuration.ConnectionString));
         }
 
         protected virtual async Task CreateContainerIfNotExists(FileProviderArgs args)

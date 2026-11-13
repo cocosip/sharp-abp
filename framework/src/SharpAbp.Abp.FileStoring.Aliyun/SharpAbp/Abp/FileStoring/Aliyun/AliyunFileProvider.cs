@@ -1,15 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using Aliyun.OSS;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using SharpAbp.Abp.ObjectPool;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Timing;
 
@@ -20,26 +15,23 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
     {
         protected ILogger Logger { get; }
         protected IServiceScopeFactory ServiceScopeFactory { get; }
-        protected AbpFileStoringAbstractionsOptions Options { get; }
         protected IClock Clock { get; }
-        protected IPoolOrchestrator PoolOrchestrator { get; }
+        protected FileProviderClientCache<IOss> ClientCache { get; }
         protected IAliyunFileNameCalculator AliyunFileNameCalculator { get; }
         protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
 
         public AliyunFileProvider(
             ILogger<AliyunFileProvider> logger,
             IServiceScopeFactory serviceScopeFactory,
-            IOptions<AbpFileStoringAbstractionsOptions> options,
             IClock clock,
-            IPoolOrchestrator poolOrchestrator,
+            FileProviderClientCache<IOss> clientCache,
             IAliyunFileNameCalculator aliyunFileNameCalculator,
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
             Logger = logger;
             ServiceScopeFactory = serviceScopeFactory;
-            Options = options.Value;
             Clock = clock;
-            PoolOrchestrator = poolOrchestrator;
+            ClientCache = clientCache;
             AliyunFileNameCalculator = aliyunFileNameCalculator;
             FileNormalizeNamingService = fileNormalizeNamingService;
         }
@@ -47,40 +39,33 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
         public override string Provider => AliyunFileProviderConfigurationNames.ProviderName;
 
 
-        protected virtual IObjectPool<IOss> GetOssClientPool(AliyunFileProviderConfiguration aliyunConfiguration)
-        {
-            var poolName = NormalizePoolName(aliyunConfiguration);
-            var pool = PoolOrchestrator.GetObjectPool<IOss, AliyunOssClientPolicy>(
-                poolName,
-                () => new AliyunOssClientPolicy(ServiceScopeFactory, aliyunConfiguration),
-                Options.DefaultClientMaximumRetained);
-            return pool;
-        }
-
         protected virtual OssClientLease GetOssClient(AliyunFileProviderConfiguration aliyunConfiguration)
         {
-            if (ShouldUseClientPool(aliyunConfiguration))
+            if (!ShouldCacheClient(aliyunConfiguration))
             {
-                var pool = GetOssClientPool(aliyunConfiguration);
-                return new OssClientLease(pool.Get(), pool);
+                var client = new AliyunOssClientPolicy(ServiceScopeFactory, aliyunConfiguration).Create();
+                return new OssClientLease(client, true);
             }
 
-            var client = new AliyunOssClientPolicy(ServiceScopeFactory, aliyunConfiguration).Create();
-            return new OssClientLease(client, null);
+            var cachedClient = ClientCache.GetOrAdd(
+                BuildClientKey(aliyunConfiguration),
+                () => new AliyunOssClientPolicy(ServiceScopeFactory, aliyunConfiguration).Create());
+
+            return new OssClientLease(cachedClient, false);
         }
 
-        protected virtual bool ShouldUseClientPool(AliyunFileProviderConfiguration aliyunConfiguration)
+        protected virtual bool ShouldCacheClient(AliyunFileProviderConfiguration aliyunConfiguration)
         {
             return !aliyunConfiguration.UseSecurityTokenService;
         }
 
-        protected virtual string NormalizePoolName(AliyunFileProviderConfiguration aliyunConfiguration)
+        protected virtual string BuildClientKey(AliyunFileProviderConfiguration aliyunConfiguration)
         {
-            var v = $"{aliyunConfiguration.Endpoint}-{aliyunConfiguration.AccessKeyId}-{aliyunConfiguration.AccessKeySecret}";
-            using var sha1 = SHA1.Create();
-            var hashBuffer = sha1.ComputeHash(Encoding.UTF8.GetBytes(v));
-            var hash = hashBuffer.Aggregate("", (current, b) => current + b.ToString("X2"));
-            return $"FileStoring-{AliyunFileProviderConfigurationNames.ProviderName}-{hash}";
+            return FileProviderClientKey.Build(
+                Provider,
+                ("Endpoint", aliyunConfiguration.Endpoint),
+                ("AccessKeyId", aliyunConfiguration.AccessKeyId),
+                ("AccessKeySecret", aliyunConfiguration.AccessKeySecret));
         }
 
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
@@ -180,7 +165,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
                     Logger.LogWarning("File not found in Aliyun OSS. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return null;
                 }
-                using var result = ossClient.GetObject(containerName, objectKey);
+                using var result = await GetObjectAsync(ossClient, containerName, objectKey);
 
                 return await TryCopyToMemoryStreamAsync(result.Content, args.CancellationToken);
             }
@@ -207,7 +192,7 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
                     return false;
                 }
 
-                using var result = ossClient.GetObject(containerName, objectKey);
+                using var result = await GetObjectAsync(ossClient, containerName, objectKey);
                 await TryWriteToFileAsync(result.Content, args.Path, args.CancellationToken);
                 return true;
             }
@@ -266,14 +251,28 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
         }
 
 
-        protected virtual Task<string> PutObjectAsync(
+        protected virtual async Task<string> PutObjectAsync(
             IOss ossClient,
             string containerName,
             string objectKey,
             FileProviderSaveArgs args)
         {
-            ossClient.PutObject(containerName, objectKey, args.FileStream);
-            return Task.FromResult(args.FileId);
+            var request = new PutObjectRequest(containerName, objectKey, args.FileStream);
+            await Task<PutObjectResult>.Factory.FromAsync(
+                (callback, state) => ossClient.BeginPutObject(request, callback, state),
+                ossClient.EndPutObject,
+                null);
+
+            return args.FileId;
+        }
+
+        protected virtual Task<OssObject> GetObjectAsync(IOss ossClient, string containerName, string objectKey)
+        {
+            var request = new GetObjectRequest(containerName, objectKey);
+            return Task<OssObject>.Factory.FromAsync(
+                (callback, state) => ossClient.BeginGetObject(request, callback, state),
+                ossClient.EndGetObject,
+                null);
         }
 
 
@@ -328,7 +327,10 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
                         PartNumber = i + 1
                     };
                     // Call the UploadPart interface to perform the upload function. The result contains the ETag value of this data shard.
-                    var result = ossClient.UploadPart(request);
+                    var result = await Task<UploadPartResult>.Factory.FromAsync(
+                        (callback, state) => ossClient.BeginUploadPart(request, callback, state),
+                        ossClient.EndUploadPart,
+                        null);
                     partETags.Add(result.PartETag);
 
                     Logger.LogDebug("Multipart upload progress for file '{FileId}' with UploadId '{UploadId}': {CompletedParts}/{TotalParts} completed.",
@@ -374,25 +376,19 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
 
         protected class OssClientLease
         {
-            protected IObjectPool<IOss>? Pool { get; }
-
             public IOss Client { get; }
 
-            public OssClientLease(IOss client, IObjectPool<IOss>? pool)
+            protected bool DisposeClient { get; }
+
+            public OssClientLease(IOss client, bool disposeClient)
             {
                 Client = client;
-                Pool = pool;
+                DisposeClient = disposeClient;
             }
 
             public virtual void Return()
             {
-                if (Pool != null)
-                {
-                    Pool.Return(Client);
-                    return;
-                }
-
-                if (Client is IDisposable disposable)
+                if (DisposeClient && Client is IDisposable disposable)
                 {
                     disposable.Dispose();
                 }

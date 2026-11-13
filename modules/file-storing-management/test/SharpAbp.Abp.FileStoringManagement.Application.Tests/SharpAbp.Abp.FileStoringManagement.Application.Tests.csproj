@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\..\..\..\common.test.props" />
   <PropertyGroup>
@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.FileStoring.Aliyun\SharpAbp.Abp.FileStoring.Aliyun.csproj" />
+    <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.FileStoring.Aws\SharpAbp.Abp.FileStoring.Aws.csproj" />
     <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.FileStoring.Azure\SharpAbp.Abp.FileStoring.Azure.csproj" />
     <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.FileStoring.FastDFS\SharpAbp.Abp.FileStoring.FastDFS.csproj" />
     <ProjectReference Include="..\..\..\..\framework\src\SharpAbp.Abp.FileStoring.FileSystem\SharpAbp.Abp.FileStoring.FileSystem.csproj" />

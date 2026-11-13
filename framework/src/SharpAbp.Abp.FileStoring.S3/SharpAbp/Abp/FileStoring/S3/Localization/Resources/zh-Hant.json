@@ -11,6 +11,6 @@
     "S3.VendorType": "供應商",
     "S3.SignatureVersion": "簽名版本",
     "S3.CreateBucketIfNotExists": "自動建桶",
-    "S3.MaxClient": "客戶端連接數"
+    "S3.MaxConnectionsPerServer": "每個伺服器的最大連線數"
   }
 }

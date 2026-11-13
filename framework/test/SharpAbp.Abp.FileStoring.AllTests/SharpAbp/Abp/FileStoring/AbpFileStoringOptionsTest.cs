@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using SharpAbp.Abp.FileStoring.Aliyun;
 using SharpAbp.Abp.FileStoring.Azure;
 using SharpAbp.Abp.FileStoring.FastDFS;
@@ -162,6 +162,7 @@ namespace SharpAbp.Abp.FileStoring
             Assert.Equal(0, s3Configuration.Protocol); //0-HTTPS,1-HTTP
             Assert.Equal("2.0", s3Configuration.SignatureVersion);
             Assert.False(s3Configuration.CreateBucketIfNotExists);
+            Assert.Equal(20, s3Configuration.MaxConnectionsPerServer);
         }
 
         // ─── FilePathBuilder — appsettings config ────────────────────────────────

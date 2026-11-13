@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Volo.Abp;
 
 namespace SharpAbp.Abp.FileStoring.Aws
@@ -93,6 +93,15 @@ namespace SharpAbp.Abp.FileStoring.Aws
         {
             get => _containerConfiguration.GetConfigurationOrDefault(AwsFileProviderConfigurationNames.CreateContainerIfNotExists, false);
             set => _containerConfiguration.SetConfiguration(AwsFileProviderConfigurationNames.CreateContainerIfNotExists, value);
+        }
+
+        /// <summary>
+        /// Default value: null (SDK default).
+        /// </summary>
+        public int? MaxConnectionsPerServer
+        {
+            get => _containerConfiguration.GetConfigurationOrDefault<int?>(AwsFileProviderConfigurationNames.MaxConnectionsPerServer);
+            set => _containerConfiguration.SetConfiguration(AwsFileProviderConfigurationNames.MaxConnectionsPerServer, value);
         }
 
         private readonly string _temporaryCredentialsCacheKey;

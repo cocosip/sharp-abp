@@ -1,4 +1,4 @@
-﻿using Amazon;
+using Amazon;
 using Amazon.Runtime;
 using Amazon.Runtime.CredentialManagement;
 using Amazon.S3;
@@ -33,30 +33,39 @@ namespace SharpAbp.Abp.FileStoring.Aws
             AwsFileProviderConfiguration configuration)
         {
             var region = RegionEndpoint.GetBySystemName(configuration.Region);
+            var config = new AmazonS3Config
+            {
+                RegionEndpoint = region
+            };
+
+            if (configuration.MaxConnectionsPerServer.HasValue)
+            {
+                config.MaxConnectionsPerServer = configuration.MaxConnectionsPerServer.Value;
+            }
 
             if (configuration.UseCredentials)
             {
                 var awsCredentials = GetAwsCredentials(configuration);
                 return awsCredentials == null
-                    ? new AmazonS3Client(region)
-                    : new AmazonS3Client(awsCredentials, region);
+                    ? new AmazonS3Client(config)
+                    : new AmazonS3Client(awsCredentials, config);
             }
 
             if (configuration.UseTemporaryCredentials)
             {
-                return new AmazonS3Client(await GetTemporaryCredentialsAsync(configuration), region);
+                return new AmazonS3Client(await GetTemporaryCredentialsAsync(configuration), config);
             }
 
             if (configuration.UseTemporaryFederatedCredentials)
             {
                 return new AmazonS3Client(await GetTemporaryFederatedCredentialsAsync(configuration),
-                    region);
+                    config);
             }
 
             Check.NotNullOrWhiteSpace(configuration.AccessKeyId, nameof(configuration.AccessKeyId));
             Check.NotNullOrWhiteSpace(configuration.SecretAccessKey, nameof(configuration.SecretAccessKey));
 
-            return new AmazonS3Client(configuration.AccessKeyId, configuration.SecretAccessKey, region);
+            return new AmazonS3Client(configuration.AccessKeyId, configuration.SecretAccessKey, config);
         }
 
         protected virtual AWSCredentials? GetAwsCredentials(

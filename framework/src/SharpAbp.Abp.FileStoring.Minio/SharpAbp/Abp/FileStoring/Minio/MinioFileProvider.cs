@@ -1,16 +1,11 @@
-﻿using System;
+using System;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Minio;
 using Minio.DataModel.Args;
 using Minio.Exceptions;
-using SharpAbp.Abp.ObjectPool;
 using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Timing;
@@ -21,46 +16,43 @@ namespace SharpAbp.Abp.FileStoring.Minio
     public class MinioFileProvider : FileProviderBase, ITransientDependency
     {
         protected ILogger Logger { get; }
-        protected AbpFileStoringAbstractionsOptions Options { get; }
         protected IClock Clock { get; }
-        protected IPoolOrchestrator PoolOrchestrator { get; }
+        protected FileProviderClientCache<IMinioClient> ClientCache { get; }
         protected IMinioFileNameCalculator MinioFileNameCalculator { get; }
         protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
         public MinioFileProvider(
             ILogger<MinioFileProvider> logger,
-            IOptions<AbpFileStoringAbstractionsOptions> options,
             IClock clock,
-            IPoolOrchestrator poolOrchestrator,
+            FileProviderClientCache<IMinioClient> clientCache,
             IMinioFileNameCalculator minioFileNameCalculator,
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
             Logger = logger;
-            Options = options.Value;
             Clock = clock;
-            PoolOrchestrator = poolOrchestrator;
+            ClientCache = clientCache;
             MinioFileNameCalculator = minioFileNameCalculator;
             FileNormalizeNamingService = fileNormalizeNamingService;
         }
 
         public override string Provider => MinioFileProviderConfigurationNames.ProviderName;
 
-        protected virtual IObjectPool<IMinioClient> GetMinioClientPool(MinioFileProviderConfiguration minioConfiguration)
+        protected virtual MinioClientLease GetMinioClientLease(MinioFileProviderConfiguration minioConfiguration)
         {
-            var poolName = NormalizePoolName(minioConfiguration);
-            var pool = PoolOrchestrator.GetObjectPool<IMinioClient, MinioClientPolicy>(
-                poolName,
-                () => new MinioClientPolicy(minioConfiguration),
-                Options.DefaultClientMaximumRetained);
-            return pool;
+            var client = ClientCache.GetOrAdd(
+                BuildClientKey(minioConfiguration),
+                () => new MinioClientPolicy(minioConfiguration).Create());
+
+            return new MinioClientLease(client);
         }
 
-        protected virtual string NormalizePoolName(MinioFileProviderConfiguration minioConfiguration)
+        protected virtual string BuildClientKey(MinioFileProviderConfiguration minioConfiguration)
         {
-            var v = $"{minioConfiguration.EndPoint}-{minioConfiguration.WithSSL}-{minioConfiguration.AccessKey}-{minioConfiguration.SecretKey}";
-            using var sha1 = SHA1.Create();
-            var hashBuffer = sha1.ComputeHash(Encoding.UTF8.GetBytes(v));
-            var hash = hashBuffer.Aggregate("", (current, b) => current + b.ToString("X2"));
-            return $"FileStoring-{MinioFileProviderConfigurationNames.ProviderName}-{hash}";
+            return FileProviderClientKey.Build(
+                Provider,
+                ("EndPoint", minioConfiguration.EndPoint),
+                ("WithSSL", minioConfiguration.WithSSL),
+                ("AccessKey", minioConfiguration.AccessKey),
+                ("SecretKey", minioConfiguration.SecretKey));
         }
 
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
@@ -69,8 +61,8 @@ namespace SharpAbp.Abp.FileStoring.Minio
             var containerName = GetContainerName(args);
 
             var minioConfiguration = args.Configuration.GetMinioConfiguration();
-            var pool = GetMinioClientPool(minioConfiguration);
-            var minioClient = pool.Get();
+            var lease = GetMinioClientLease(minioConfiguration);
+            var minioClient = lease.Client;
 
             try
             {
@@ -100,7 +92,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
             }
             finally
             {
-                pool.Return(minioClient);
+                lease.Return();
             }
         }
 
@@ -110,8 +102,8 @@ namespace SharpAbp.Abp.FileStoring.Minio
             var containerName = GetContainerName(args);
 
             var minioConfiguration = args.Configuration.GetMinioConfiguration();
-            var pool = GetMinioClientPool(minioConfiguration);
-            var minioClient = pool.Get();
+            var lease = GetMinioClientLease(minioConfiguration);
+            var minioClient = lease.Client;
 
             try
             {
@@ -131,7 +123,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
             }
             finally
             {
-                pool.Return(minioClient);
+                lease.Return();
             }
         }
 
@@ -141,8 +133,8 @@ namespace SharpAbp.Abp.FileStoring.Minio
             var containerName = GetContainerName(args);
 
             var minioConfiguration = args.Configuration.GetMinioConfiguration();
-            var pool = GetMinioClientPool(minioConfiguration);
-            var minioClient = pool.Get();
+            var lease = GetMinioClientLease(minioConfiguration);
+            var minioClient = lease.Client;
 
             try
             {
@@ -150,7 +142,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
             }
             finally
             {
-                pool.Return(minioClient);
+                lease.Return();
             }
         }
 
@@ -160,8 +152,8 @@ namespace SharpAbp.Abp.FileStoring.Minio
             var containerName = GetContainerName(args);
 
             var minioConfiguration = args.Configuration.GetMinioConfiguration();
-            var pool = GetMinioClientPool(minioConfiguration);
-            var minioClient = pool.Get();
+            var lease = GetMinioClientLease(minioConfiguration);
+            var minioClient = lease.Client;
 
             try
             {
@@ -194,7 +186,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
             }
             finally
             {
-                pool.Return(minioClient);
+                lease.Return();
             }
         }
 
@@ -204,8 +196,8 @@ namespace SharpAbp.Abp.FileStoring.Minio
             var containerName = GetContainerName(args);
 
             var minioConfiguration = args.Configuration.GetMinioConfiguration();
-            var pool = GetMinioClientPool(minioConfiguration);
-            var minioClient = pool.Get();
+            var lease = GetMinioClientLease(minioConfiguration);
+            var minioClient = lease.Client;
 
             try
             {
@@ -229,7 +221,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
             }
             finally
             {
-                pool.Return(minioClient);
+                lease.Return();
             }
         }
 
@@ -244,8 +236,8 @@ namespace SharpAbp.Abp.FileStoring.Minio
             var containerName = GetContainerName(args);
 
             var minioConfiguration = args.Configuration.GetMinioConfiguration();
-            var pool = GetMinioClientPool(minioConfiguration);
-            var minioClient = pool.Get();
+            var lease = GetMinioClientLease(minioConfiguration);
+            var minioClient = lease.Client;
 
             try
             {
@@ -269,7 +261,7 @@ namespace SharpAbp.Abp.FileStoring.Minio
             }
             finally
             {
-                pool.Return(minioClient);
+                lease.Return();
             }
         }
 
@@ -331,6 +323,20 @@ namespace SharpAbp.Abp.FileStoring.Minio
             return configuration.BucketName.IsNullOrWhiteSpace()
                 ? args.ContainerName
                 : FileNormalizeNamingService.NormalizeContainerName(args.Configuration, configuration.BucketName);
+        }
+
+        protected class MinioClientLease
+        {
+            public IMinioClient Client { get; }
+
+            public MinioClientLease(IMinioClient client)
+            {
+                Client = client;
+            }
+
+            public virtual void Return()
+            {
+            }
         }
     }
 

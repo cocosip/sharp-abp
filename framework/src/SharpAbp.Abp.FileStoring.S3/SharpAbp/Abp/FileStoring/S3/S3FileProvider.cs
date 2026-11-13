@@ -1,18 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using SharpAbp.Abp.ObjectPool;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Timing;
 
@@ -23,49 +18,50 @@ namespace SharpAbp.Abp.FileStoring.S3
     {
         protected ILogger Logger { get; }
         protected IServiceScopeFactory ServiceScopeFactory { get; }
-        protected AbpFileStoringAbstractionsOptions Options { get; }
         protected IClock Clock { get; }
-        protected IPoolOrchestrator PoolOrchestrator { get; }
+        protected FileProviderClientCache<IAmazonS3> ClientCache { get; }
         protected IS3FileNameCalculator FileNameCalculator { get; }
         protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
 
         public S3FileProvider(
             ILogger<S3FileProvider> logger,
             IServiceScopeFactory serviceScopeFactory,
-            IOptions<AbpFileStoringAbstractionsOptions> options,
             IClock clock,
-            IPoolOrchestrator poolOrchestrator,
+            FileProviderClientCache<IAmazonS3> clientCache,
             IS3FileNameCalculator fileNameCalculator,
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
             Logger = logger;
             ServiceScopeFactory = serviceScopeFactory;
-            Options = options.Value;
             Clock = clock;
-            PoolOrchestrator = poolOrchestrator;
+            ClientCache = clientCache;
             FileNameCalculator = fileNameCalculator;
             FileNormalizeNamingService = fileNormalizeNamingService;
         }
 
         public override string Provider => S3FileProviderConfigurationNames.ProviderName;
 
-        protected virtual IObjectPool<IAmazonS3> GetS3ClientPool(S3FileProviderConfiguration s3Configuration)
+        protected virtual IAmazonS3 GetS3Client(S3FileProviderConfiguration s3Configuration)
         {
-            var poolName = NormalizePoolName(s3Configuration);
-            var pool = PoolOrchestrator.GetObjectPool<IAmazonS3, S3ClientPolicy>(
-                poolName,
-                () => new S3ClientPolicy(ServiceScopeFactory, s3Configuration),
-                Options.DefaultClientMaximumRetained);
-            return pool;
+            return ClientCache.GetOrAdd(
+                BuildClientKey(s3Configuration),
+                () => new S3ClientPolicy(ServiceScopeFactory, s3Configuration).Create());
         }
 
-        protected virtual string NormalizePoolName(S3FileProviderConfiguration s3Configuration)
+        protected virtual S3ClientLease GetS3ClientLease(S3FileProviderConfiguration s3Configuration)
         {
-            var v = $"{s3Configuration.ServerUrl.TrimEnd('/')}-{s3Configuration.SignatureVersion}-{s3Configuration.ForcePathStyle}-{s3Configuration.AccessKeyId}-{s3Configuration.SecretAccessKey}";
-            using var sha1 = SHA1.Create();
-            var hashBuffer = sha1.ComputeHash(Encoding.UTF8.GetBytes(v));
-            var hash = hashBuffer.Aggregate("", (current, b) => current + b.ToString("X2"));
-            return $"FileStoring-{S3FileProviderConfigurationNames.ProviderName}-{hash}";
+            return new S3ClientLease(GetS3Client(s3Configuration));
+        }
+
+        protected virtual string BuildClientKey(S3FileProviderConfiguration s3Configuration)
+        {
+            return FileProviderClientKey.Build(
+                Provider,
+                ("ServerUrl", s3Configuration.ServerUrl.TrimEnd('/')),
+                ("SignatureVersion", s3Configuration.SignatureVersion),
+                ("ForcePathStyle", s3Configuration.ForcePathStyle),
+                ("AccessKeyId", s3Configuration.AccessKeyId),
+                ("SecretAccessKey", s3Configuration.SecretAccessKey));
         }
 
 
@@ -76,8 +72,8 @@ namespace SharpAbp.Abp.FileStoring.S3
             var objectKey = FileNameCalculator.Calculate(args);
 
             var s3Configuration = args.Configuration.GetS3Configuration();
-            var pool = GetS3ClientPool(s3Configuration);
-            var s3Client = pool.Get();
+            var lease = GetS3ClientLease(s3Configuration);
+            var s3Client = lease.Client;
 
             try
             {
@@ -106,7 +102,7 @@ namespace SharpAbp.Abp.FileStoring.S3
             }
             finally
             {
-                pool.Return(s3Client);
+                lease.Return();
             }
         }
 
@@ -116,8 +112,8 @@ namespace SharpAbp.Abp.FileStoring.S3
             var objectKey = FileNameCalculator.Calculate(args);
 
             var s3Configuration = args.Configuration.GetS3Configuration();
-            var pool = GetS3ClientPool(s3Configuration);
-            var s3Client = pool.Get();
+            var lease = GetS3ClientLease(s3Configuration);
+            var s3Client = lease.Client;
 
             try
             {
@@ -134,7 +130,7 @@ namespace SharpAbp.Abp.FileStoring.S3
             }
             finally
             {
-                pool.Return(s3Client);
+                lease.Return();
             }
         }
 
@@ -144,8 +140,8 @@ namespace SharpAbp.Abp.FileStoring.S3
             var objectKey = FileNameCalculator.Calculate(args);
 
             var s3Configuration = args.Configuration.GetS3Configuration();
-            var pool = GetS3ClientPool(s3Configuration);
-            var s3Client = pool.Get();
+            var lease = GetS3ClientLease(s3Configuration);
+            var s3Client = lease.Client;
 
             try
             {
@@ -154,7 +150,7 @@ namespace SharpAbp.Abp.FileStoring.S3
             }
             finally
             {
-                pool.Return(s3Client);
+                lease.Return();
             }
         }
 
@@ -164,8 +160,8 @@ namespace SharpAbp.Abp.FileStoring.S3
             var objectKey = FileNameCalculator.Calculate(args);
 
             var s3Configuration = args.Configuration.GetS3Configuration();
-            var pool = GetS3ClientPool(s3Configuration);
-            var s3Client = pool.Get();
+            var lease = GetS3ClientLease(s3Configuration);
+            var s3Client = lease.Client;
 
             try
             {
@@ -182,7 +178,7 @@ namespace SharpAbp.Abp.FileStoring.S3
             }
             finally
             {
-                pool.Return(s3Client);
+                lease.Return();
             }
         }
 
@@ -192,8 +188,8 @@ namespace SharpAbp.Abp.FileStoring.S3
             var objectKey = FileNameCalculator.Calculate(args);
 
             var s3Configuration = args.Configuration.GetS3Configuration();
-            var pool = GetS3ClientPool(s3Configuration);
-            var s3Client = pool.Get();
+            var lease = GetS3ClientLease(s3Configuration);
+            var s3Client = lease.Client;
 
             try
             {
@@ -209,7 +205,7 @@ namespace SharpAbp.Abp.FileStoring.S3
             }
             finally
             {
-                pool.Return(s3Client);
+                lease.Return();
             }
         }
 
@@ -224,8 +220,8 @@ namespace SharpAbp.Abp.FileStoring.S3
             var objectKey = FileNameCalculator.Calculate(args);
 
             var s3Configuration = args.Configuration.GetS3Configuration();
-            var pool = GetS3ClientPool(s3Configuration);
-            var s3Client = pool.Get();
+            var lease = GetS3ClientLease(s3Configuration);
+            var s3Client = lease.Client;
 
             try
             {
@@ -249,7 +245,7 @@ namespace SharpAbp.Abp.FileStoring.S3
             }
             finally
             {
-                pool.Return(s3Client);
+                lease.Return();
             }
         }
 
@@ -427,6 +423,20 @@ namespace SharpAbp.Abp.FileStoring.S3
             return configuration.BucketName.IsNullOrWhiteSpace()
                 ? args.ContainerName
                 : FileNormalizeNamingService.NormalizeContainerName(args.Configuration, configuration.BucketName);
+        }
+
+        protected class S3ClientLease
+        {
+            public IAmazonS3 Client { get; }
+
+            public S3ClientLease(IAmazonS3 client)
+            {
+                Client = client;
+            }
+
+            public virtual void Return()
+            {
+            }
         }
     }
 }

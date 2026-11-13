@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.Validation;
@@ -24,6 +24,7 @@ namespace SharpAbp.Abp.FileStoring
                 AsyncLocalFilePathContextAccessor.Instance
             );
             context.Services.AddTransient<IFilePathContextResolver, DefaultFilePathContextResolver>();
+            context.Services.AddSingleton(typeof(FileProviderClientCache<>));
 
             var configuration = context.Services.GetConfiguration();
             Configure<AbpFileStoringAbstractionsOptions>(options =>

@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon.S3;
@@ -11,8 +8,6 @@ using Amazon.S3.Model;
 using Amazon.S3.Util;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using SharpAbp.Abp.ObjectPool;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Timing;
 
@@ -25,65 +20,57 @@ namespace SharpAbp.Abp.FileStoring.Aws
 
         protected ILogger Logger { get; }
         protected IServiceScopeFactory ServiceScopeFactory { get; }
-        protected AbpFileStoringAbstractionsOptions Options { get; }
         protected IClock Clock { get; }
-        protected IPoolOrchestrator PoolOrchestrator { get; }
+        protected FileProviderClientCache<IAmazonS3> ClientCache { get; }
         protected IAwsFileNameCalculator AwsFileNameCalculator { get; }
         protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
         public AwsFileProvider(
             ILogger<AwsFileProvider> logger,
             IServiceScopeFactory serviceScopeFactory,
-            IOptions<AbpFileStoringAbstractionsOptions> options,
             IClock clock,
-            IPoolOrchestrator poolOrchestrator,
+            FileProviderClientCache<IAmazonS3> clientCache,
             IAwsFileNameCalculator awsFileNameCalculator,
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
             Logger = logger;
             ServiceScopeFactory = serviceScopeFactory;
-            Options = options.Value;
             Clock = clock;
-            PoolOrchestrator = poolOrchestrator;
+            ClientCache = clientCache;
             AwsFileNameCalculator = awsFileNameCalculator;
             FileNormalizeNamingService = fileNormalizeNamingService;
         }
 
-        protected virtual IAsyncObjectPool<IAmazonS3> GetAmazonS3Pool(AwsFileProviderConfiguration awsConfiguration)
-        {
-            var poolName = NormalizePoolName(awsConfiguration);
-            var pool = PoolOrchestrator.GetAsyncObjectPool<IAmazonS3, AmazonS3ClientPolicy>(
-                poolName,
-                () => new AmazonS3ClientPolicy(ServiceScopeFactory, awsConfiguration),
-                Options.DefaultClientMaximumRetained);
-            return pool;
-        }
-
         protected virtual async Task<AmazonS3ClientLease> GetAmazonS3ClientAsync(AwsFileProviderConfiguration awsConfiguration)
         {
-            if (ShouldUseClientPool(awsConfiguration))
+            if (!ShouldCacheClient(awsConfiguration))
             {
-                var pool = GetAmazonS3Pool(awsConfiguration);
-                return new AmazonS3ClientLease(await pool.GetAsync(), pool);
+                var client = await new AmazonS3ClientPolicy(ServiceScopeFactory, awsConfiguration).CreateAsync();
+                return new AmazonS3ClientLease(client, true);
             }
 
-            var client = await new AmazonS3ClientPolicy(ServiceScopeFactory, awsConfiguration).CreateAsync();
-            return new AmazonS3ClientLease(client, null);
+            var cachedClient = await ClientCache.GetOrAddAsync(
+                BuildClientKey(awsConfiguration),
+                () => new AmazonS3ClientPolicy(ServiceScopeFactory, awsConfiguration).CreateAsync().AsTask());
+
+            return new AmazonS3ClientLease(cachedClient, false);
         }
 
-        protected virtual bool ShouldUseClientPool(AwsFileProviderConfiguration awsConfiguration)
+        protected virtual bool ShouldCacheClient(AwsFileProviderConfiguration awsConfiguration)
         {
             return !awsConfiguration.UseTemporaryCredentials &&
                    !awsConfiguration.UseTemporaryFederatedCredentials;
         }
 
-
-        protected virtual string NormalizePoolName(AwsFileProviderConfiguration awsConfiguration)
+        protected virtual string BuildClientKey(AwsFileProviderConfiguration awsConfiguration)
         {
-            var v = $"{awsConfiguration.Region}-{awsConfiguration.UseCredentials}-{awsConfiguration.ProfileName}-{awsConfiguration.ProfilesLocation}-{awsConfiguration.AccessKeyId}-{awsConfiguration.SecretAccessKey}";
-            using var sha1 = SHA1.Create();
-            var hashBuffer = sha1.ComputeHash(Encoding.UTF8.GetBytes(v));
-            var hash = hashBuffer.Aggregate("", (current, b) => current + b.ToString("X2"));
-            return $"FileStoring-{AwsFileProviderConfigurationNames.ProviderName}-{hash}";
+            return FileProviderClientKey.Build(
+                Provider,
+                ("Region", awsConfiguration.Region),
+                ("UseCredentials", awsConfiguration.UseCredentials),
+                ("ProfileName", awsConfiguration.ProfileName),
+                ("ProfilesLocation", awsConfiguration.ProfilesLocation),
+                ("AccessKeyId", awsConfiguration.AccessKeyId),
+                ("SecretAccessKey", awsConfiguration.SecretAccessKey));
         }
 
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
@@ -462,25 +449,19 @@ namespace SharpAbp.Abp.FileStoring.Aws
 
         protected class AmazonS3ClientLease
         {
-            protected IAsyncObjectPool<IAmazonS3>? Pool { get; }
-
             public IAmazonS3 Client { get; }
 
-            public AmazonS3ClientLease(IAmazonS3 client, IAsyncObjectPool<IAmazonS3>? pool)
+            protected bool DisposeClient { get; }
+
+            public AmazonS3ClientLease(IAmazonS3 client, bool disposeClient)
             {
                 Client = client;
-                Pool = pool;
+                DisposeClient = disposeClient;
             }
 
             public virtual void Return()
             {
-                if (Pool != null)
-                {
-                    Pool.Return(Client);
-                    return;
-                }
-
-                if (Client is IDisposable disposable)
+                if (DisposeClient && Client is IDisposable disposable)
                 {
                     disposable.Dispose();
                 }

@@ -1,6 +1,5 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using SharpAbp.Abp.FileStoring.Obs.Localization;
-using SharpAbp.Abp.ObjectPool;
 using Volo.Abp.Localization;
 using Volo.Abp.Localization.ExceptionHandling;
 using Volo.Abp.Modularity;
@@ -13,8 +12,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
 {
     [DependsOn(
         typeof(AbpFileStoringModule),
-        typeof(AbpTimingModule),
-        typeof(AbpObjectPoolModule)
+        typeof(AbpTimingModule)
         )]
     public class AbpFileStoringObsModule : AbpModule
     {
