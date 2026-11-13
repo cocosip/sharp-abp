@@ -1,13 +1,12 @@
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.ObjectPool;
-using SharpAbp.Abp.ObjectPool;
 using Xunit;
 
-namespace SharpAbp.Abp.FileStoring
+namespace SharpAbp.Abp.ObjectPool
 {
-    public class FileStoringObjectPoolTest
+    public class ObjectPoolTest
     {
         [Fact]
         public async Task Object_Pool_Policy_Factory_Should_Run_Only_Once_Under_Concurrent_First_Use()
@@ -226,6 +225,239 @@ namespace SharpAbp.Abp.FileStoring
             Assert.Equal(2, attempts);
         }
 
+        [Fact]
+        public void Object_Pool_Should_Allow_Mixing_Direct_Policy_And_Factory_Overload()
+        {
+            var orchestrator = new PoolOrchestrator(new DefaultObjectPoolProvider());
+
+            var firstPool = orchestrator.GetPool<PooledObject>(
+                "mixed-policy-overload",
+                new TestPooledObjectPolicy());
+
+            var secondPool = orchestrator.GetPool<PooledObject>(
+                "mixed-policy-overload",
+                () => new AlternatePooledObjectPolicy());
+
+            Assert.Same(firstPool, secondPool);
+        }
+
+        [Fact]
+        public void Object_Pool_Should_Use_Default_Maximum_Retained_Consistently()
+        {
+            var orchestrator = new PoolOrchestrator(new DefaultObjectPoolProvider());
+
+            var firstPool = orchestrator.GetPool<PooledObject>(
+                "default-max-size",
+                new TestPooledObjectPolicy());
+
+            var secondPool = orchestrator.GetPool<PooledObject>(
+                "default-max-size",
+                new TestPooledObjectPolicy(),
+                ObjectPoolDefaults.GetDefaultMaximumRetained());
+
+            Assert.Same(firstPool, secondPool);
+        }
+
+        [Fact]
+        public void Bounded_Object_Pool_Should_Dispose_Items_Over_Maximum_Retained()
+        {
+            var pool = new BoundedObjectPool<DisposablePooledObject>(
+                new DisposablePooledObjectPolicy(),
+                1);
+
+            var first = pool.Get();
+            var second = pool.Get();
+
+            pool.Return(first);
+            pool.Return(second);
+
+            Assert.False(first.IsDisposed);
+            Assert.True(second.IsDisposed);
+        }
+
+        [Fact]
+        public void Bounded_Object_Pool_Should_Reuse_Returned_Item()
+        {
+            var pool = new BoundedObjectPool<DisposablePooledObject>(
+                new DisposablePooledObjectPolicy(),
+                1);
+
+            var first = pool.Get();
+            pool.Return(first);
+            var second = pool.Get();
+
+            Assert.Same(first, second);
+        }
+
+        [Fact]
+        public void Bounded_Object_Pool_Should_Dispose_Retained_Items_On_Dispose()
+        {
+            var pool = new BoundedObjectPool<DisposablePooledObject>(
+                new DisposablePooledObjectPolicy(),
+                4);
+
+            var item = pool.Get();
+            pool.Return(item);
+
+            pool.Dispose();
+
+            Assert.True(item.IsDisposed);
+        }
+
+        [Fact]
+        public void Bounded_Object_Pool_Should_Throw_After_Dispose()
+        {
+            var pool = new BoundedObjectPool<DisposablePooledObject>(
+                new DisposablePooledObjectPolicy(),
+                4);
+            var item = pool.Get();
+            pool.Dispose();
+
+            Assert.Throws<ObjectDisposedException>(() => pool.Get());
+
+            pool.Return(item);
+            Assert.True(item.IsDisposed);
+        }
+
+        [Fact]
+        public async Task Async_Object_Pool_Should_Reuse_Returned_Item()
+        {
+            var pool = new AsyncObjectPool<DisposablePooledObject>(
+                new DisposableAsyncObjectPoolPolicy(),
+                1);
+
+            var first = await pool.GetAsync();
+            pool.Return(first);
+            var second = await pool.GetAsync();
+
+            Assert.Same(first, second);
+        }
+
+        [Fact]
+        public async Task Async_Object_Pool_Should_Dispose_Retained_Items_On_Dispose()
+        {
+            var pool = new AsyncObjectPool<DisposablePooledObject>(
+                new DisposableAsyncObjectPoolPolicy(),
+                4);
+
+            var item = await pool.GetAsync();
+            pool.Return(item);
+
+            pool.Dispose();
+
+            Assert.True(item.IsDisposed);
+        }
+
+        [Fact]
+        public async Task Async_Object_Pool_Should_Throw_And_Dispose_Returned_Item_After_Dispose()
+        {
+            var pool = new AsyncObjectPool<DisposablePooledObject>(
+                new DisposableAsyncObjectPoolPolicy(),
+                4);
+            var item = await pool.GetAsync();
+            pool.Dispose();
+
+            Assert.Throws<ObjectDisposedException>(() => pool.GetAsync());
+
+            pool.Return(item);
+            Assert.True(item.IsDisposed);
+        }
+
+        [Fact]
+        public void Object_Pool_RemovePool_Should_Dispose_Retained_Items()
+        {
+            var orchestrator = new PoolOrchestrator(new DefaultObjectPoolProvider());
+            var pool = orchestrator.GetObjectPool<DisposablePooledObject, DisposableObjectPoolPolicy>(
+                "remove-pool",
+                () => new DisposableObjectPoolPolicy(),
+                4);
+
+            var item = pool.Get();
+            pool.Return(item);
+
+            Assert.True(orchestrator.RemovePool<DisposablePooledObject>("remove-pool"));
+            Assert.True(item.IsDisposed);
+            Assert.False(orchestrator.RemovePool<DisposablePooledObject>("remove-pool"));
+        }
+
+        [Fact]
+        public void Object_Pool_RemovePool_Non_Generic_Should_Dispose_Retained_Items()
+        {
+            var orchestrator = new PoolOrchestrator(new DefaultObjectPoolProvider());
+            var pool = orchestrator.GetObjectPool<DisposablePooledObject, DisposableObjectPoolPolicy>(
+                "remove-pool-non-generic",
+                () => new DisposableObjectPoolPolicy(),
+                4);
+
+            var item = pool.Get();
+            pool.Return(item);
+
+            Assert.True(orchestrator.RemovePool(typeof(DisposablePooledObject), "remove-pool-non-generic"));
+            Assert.True(item.IsDisposed);
+        }
+
+        [Fact]
+        public void Object_Pool_RemoveAll_Should_Dispose_All_Retained_Items()
+        {
+            var orchestrator = new PoolOrchestrator(new DefaultObjectPoolProvider());
+
+            var firstPool = orchestrator.GetObjectPool<DisposablePooledObject, DisposableObjectPoolPolicy>(
+                "remove-all-1",
+                () => new DisposableObjectPoolPolicy(),
+                4);
+            var secondPool = orchestrator.GetObjectPool<DisposablePooledObject, DisposableObjectPoolPolicy>(
+                "remove-all-2",
+                () => new DisposableObjectPoolPolicy(),
+                4);
+
+            var first = firstPool.Get();
+            var second = secondPool.Get();
+            firstPool.Return(first);
+            secondPool.Return(second);
+
+            Assert.Equal(2, orchestrator.RemoveAll());
+            Assert.True(first.IsDisposed);
+            Assert.True(second.IsDisposed);
+            Assert.Equal(0, orchestrator.RemoveAll());
+        }
+
+        [Fact]
+        public void Object_Pool_Dispose_Should_Dispose_All_Retained_Items()
+        {
+            var orchestrator = new PoolOrchestrator(new DefaultObjectPoolProvider());
+
+            var pool = orchestrator.GetObjectPool<DisposablePooledObject, DisposableObjectPoolPolicy>(
+                "dispose-all",
+                () => new DisposableObjectPoolPolicy(),
+                4);
+
+            var item = pool.Get();
+            pool.Return(item);
+
+            orchestrator.Dispose();
+
+            Assert.True(item.IsDisposed);
+            Assert.Equal(0, orchestrator.RemoveAll());
+        }
+
+        [Fact]
+        public void Object_Pool_Get_Should_Create_New_Pool_After_RemovePool()
+        {
+            var orchestrator = new PoolOrchestrator(new DefaultObjectPoolProvider());
+
+            var firstPool = orchestrator.GetPool<PooledObject>(
+                "recreate-pool",
+                new TestPooledObjectPolicy());
+
+            Assert.True(orchestrator.RemovePool<PooledObject>("recreate-pool"));
+
+            var secondPool = orchestrator.GetPool<PooledObject>(
+                "recreate-pool",
+                new TestPooledObjectPolicy());
+
+            Assert.NotSame(firstPool, secondPool);
+        }
+
         private class PooledObject
         {
         }
@@ -257,6 +489,19 @@ namespace SharpAbp.Abp.FileStoring
         {
         }
 
+        private class DisposableObjectPoolPolicy : IObjectPoolPolicy<DisposablePooledObject>
+        {
+            public DisposablePooledObject Create()
+            {
+                return new DisposablePooledObject();
+            }
+
+            public bool Return(DisposablePooledObject obj)
+            {
+                return obj != null;
+            }
+        }
+
         private class TestPooledObjectPolicy : IPooledObjectPolicy<PooledObject>
         {
             public PooledObject Create()
@@ -272,6 +517,19 @@ namespace SharpAbp.Abp.FileStoring
 
         private class AlternatePooledObjectPolicy : TestPooledObjectPolicy
         {
+        }
+
+        private class DisposablePooledObjectPolicy : IPooledObjectPolicy<DisposablePooledObject>
+        {
+            public DisposablePooledObject Create()
+            {
+                return new DisposablePooledObject();
+            }
+
+            public bool Return(DisposablePooledObject obj)
+            {
+                return obj != null;
+            }
         }
 
         private class TestAsyncObjectPoolPolicy : IAsyncObjectPoolPolicy<PooledObject>

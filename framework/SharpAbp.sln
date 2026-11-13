@@ -227,6 +227,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.AspNetCore.IpA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.AspNetCore.IpAccessControl.Tests", "test\SharpAbp.Abp.AspNetCore.IpAccessControl.Tests\SharpAbp.Abp.AspNetCore.IpAccessControl.Tests.csproj", "{B2A047C5-B90D-44E1-B772-4EB611CE7044}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAbp.Abp.ObjectPool.Tests", "test\SharpAbp.Abp.ObjectPool.Tests\SharpAbp.Abp.ObjectPool.Tests.csproj", "{FA41EF92-F58A-4968-9F5C-45B008F13DC4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1509,6 +1511,18 @@ Global
 		{B2A047C5-B90D-44E1-B772-4EB611CE7044}.Release|x64.Build.0 = Release|Any CPU
 		{B2A047C5-B90D-44E1-B772-4EB611CE7044}.Release|x86.ActiveCfg = Release|Any CPU
 		{B2A047C5-B90D-44E1-B772-4EB611CE7044}.Release|x86.Build.0 = Release|Any CPU
+		{FA41EF92-F58A-4968-9F5C-45B008F13DC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA41EF92-F58A-4968-9F5C-45B008F13DC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA41EF92-F58A-4968-9F5C-45B008F13DC4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FA41EF92-F58A-4968-9F5C-45B008F13DC4}.Debug|x64.Build.0 = Debug|Any CPU
+		{FA41EF92-F58A-4968-9F5C-45B008F13DC4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FA41EF92-F58A-4968-9F5C-45B008F13DC4}.Debug|x86.Build.0 = Debug|Any CPU
+		{FA41EF92-F58A-4968-9F5C-45B008F13DC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA41EF92-F58A-4968-9F5C-45B008F13DC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA41EF92-F58A-4968-9F5C-45B008F13DC4}.Release|x64.ActiveCfg = Release|Any CPU
+		{FA41EF92-F58A-4968-9F5C-45B008F13DC4}.Release|x64.Build.0 = Release|Any CPU
+		{FA41EF92-F58A-4968-9F5C-45B008F13DC4}.Release|x86.ActiveCfg = Release|Any CPU
+		{FA41EF92-F58A-4968-9F5C-45B008F13DC4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1620,6 +1634,7 @@ Global
 		{980F5AB9-D9B4-47F4-8614-B406A96F6FD6} = {51F9C36E-772F-4E52-A4AC-3EE8F13FDAD3}
 		{4495668C-8AAC-46BC-AC48-9CBCD4107121} = {16E4EB45-D029-4743-99CD-D125C72AE383}
 		{B2A047C5-B90D-44E1-B772-4EB611CE7044} = {51F9C36E-772F-4E52-A4AC-3EE8F13FDAD3}
+		{FA41EF92-F58A-4968-9F5C-45B008F13DC4} = {51F9C36E-772F-4E52-A4AC-3EE8F13FDAD3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {30432CEA-45F2-4F5A-B44B-790A62AB73F1}
