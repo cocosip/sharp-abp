@@ -78,7 +78,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
                 {
                     if (!await HeadBucketAsync(obsClient, containerName))
                     {
-                        obsClient.CreateBucket(new CreateBucketRequest() { BucketName = containerName });
+                        await CreateBucketAsync(obsClient, containerName);
                     }
                 }
 
@@ -277,6 +277,19 @@ namespace SharpAbp.Abp.FileStoring.Obs
             return Task<bool>.Factory.FromAsync(
                 (callback, state) => obsClient.BeginHeadBucket(request, callback, state),
                 obsClient.EndHeadBucket,
+                null);
+        }
+
+        protected virtual Task<CreateBucketResponse> CreateBucketAsync(ObsClient obsClient, string containerName)
+        {
+            var request = new CreateBucketRequest()
+            {
+                BucketName = containerName
+            };
+
+            return Task<CreateBucketResponse>.Factory.FromAsync(
+                (callback, state) => obsClient.BeginCreateBucket(request, callback, state),
+                obsClient.EndCreateBucket,
                 null);
         }
 

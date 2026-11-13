@@ -18,13 +18,17 @@ namespace SharpAbp.Abp.FileStoring
             Check.NotNullOrWhiteSpace(provider, nameof(provider));
 
             var builder = new StringBuilder();
-            builder.Append("v1|").Append(provider);
+            builder.Append("v1|").Append(provider.Length).Append(':').Append(provider);
 
             if (parts != null)
             {
                 foreach (var part in parts)
                 {
-                    builder.Append('|').Append(part.Name).Append('=').Append(Normalize(part.Value));
+                    var value = Normalize(part.Value);
+                    builder.Append('|')
+                        .Append(part.Name.Length).Append(':').Append(part.Name)
+                        .Append('=')
+                        .Append(value.Length).Append(':').Append(value);
                 }
             }
 
