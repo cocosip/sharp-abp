@@ -1,6 +1,5 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using SharpAbp.Abp.FileStoring.S3.Localization;
-using SharpAbp.Abp.ObjectPool;
 using Volo.Abp.Localization;
 using Volo.Abp.Localization.ExceptionHandling;
 using Volo.Abp.Modularity;
@@ -11,8 +10,7 @@ using Volo.Abp.VirtualFileSystem;
 namespace SharpAbp.Abp.FileStoring.S3
 {
     [DependsOn(
-        typeof(AbpFileStoringModule),
-        typeof(AbpObjectPoolModule)
+        typeof(AbpFileStoringModule)
         )]
     public class AbpFileStoringS3Module : AbpModule
     {
@@ -77,7 +75,8 @@ namespace SharpAbp.Abp.FileStoring.S3
                 .AddItem(S3FileProviderConfigurationNames.UseChunkEncoding, typeof(bool), "false")
                 .AddItem(S3FileProviderConfigurationNames.Protocol, typeof(int), "0-https,1-http")
                 .AddItem(S3FileProviderConfigurationNames.AuthenticationRegion, typeof(string), S3FileProviderConfigurationNames.DefaultRegion)
-                .AddItem(S3FileProviderConfigurationNames.CreateBucketIfNotExists, typeof(bool), "false");
+                .AddItem(S3FileProviderConfigurationNames.CreateBucketIfNotExists, typeof(bool), "false")
+                .AddItem(S3FileProviderConfigurationNames.MaxConnectionsPerServer, typeof(int), "100");
             return configuration;
         }
     }

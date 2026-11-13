@@ -1,4 +1,4 @@
-﻿namespace SharpAbp.Abp.FileStoring.S3
+namespace SharpAbp.Abp.FileStoring.S3
 {
     public static class S3FileProviderConfigurationNames
     {
@@ -17,6 +17,7 @@
         //public const string VendorType = "S3.VendorType";
         public const string AuthenticationRegion = "S3.AuthenticationRegion";
         public const string CreateBucketIfNotExists = "S3.CreateBucketIfNotExists";
+        public const string MaxConnectionsPerServer = "S3.MaxConnectionsPerServer";
 
         public const string DefaultRegion = "us-east-1";
     }

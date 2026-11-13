@@ -404,7 +404,6 @@ Configure<AbpFileStoringAbstractionsOptions>(opts =>
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
-| `DefaultClientMaximumRetained` | `int` | `Environment.ProcessorCount * 2` | Default retained client count used by provider client pools. |
 | `FilePathStrategy` | `FilePathGenerationStrategy` | `TenantBased` | Overall path generation mode. `DirectFileId` uses the raw file id except for optional prefix handling. |
 | `FilePathBuilder` | `FilePathBuilderOptions` | new instance | Shared path builder settings used by all providers. |
 | `Providers` | `FileProviderConfigurations` | new instance | Provider registration and value validator configuration. |
@@ -776,10 +775,13 @@ Configure<AbpFileStoringOptions>(options =>
             aws.Region = "us-east-1";
             aws.BucketName = "my-bucket";
             aws.CreateBucketIfNotExists = false;
+            aws.MaxConnectionsPerServer = 100;
         });
     });
 });
 ```
+
+`MaxConnectionsPerServer` is optional; when omitted the AWS SDK default is used. SDK clients are cached per credential/endpoint combination and evicted after a period of inactivity.
 
 ### MinIO Provider
 
@@ -838,6 +840,8 @@ Configure<AbpFileStoringOptions>(options =>
     });
 });
 ```
+
+`KS3.MaxConnections` is applied by the KS3 SDK through the process-wide `ServicePointManager.DefaultConnectionLimit`; when several KS3 containers use different values, the last client created wins. The KS3 SDK is synchronous only, so provider calls block on the SDK.
 
 ---
 

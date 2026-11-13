@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -11,8 +9,6 @@ using KS3;
 using KS3.Model;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using SharpAbp.Abp.ObjectPool;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Timing;
 
@@ -23,50 +19,50 @@ namespace SharpAbp.Abp.FileStoring.KS3
     {
         protected ILogger Logger { get; }
         protected IServiceScopeFactory ServiceScopeFactory { get; }
-        protected AbpFileStoringAbstractionsOptions Options { get; }
         protected IClock Clock { get; }
-        protected IPoolOrchestrator PoolOrchestrator { get; }
+        protected FileProviderClientCache<IKS3> ClientCache { get; }
         protected IKS3FileNameCalculator KS3FileNameCalculator { get; }
         protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
 
         public KS3FileProvider(
             ILogger<KS3FileProvider> logger,
             IServiceScopeFactory serviceScopeFactory,
-            IOptions<AbpFileStoringAbstractionsOptions> options,
             IClock clock,
-            IPoolOrchestrator poolOrchestrator,
+            FileProviderClientCache<IKS3> clientCache,
             IKS3FileNameCalculator ks3FileNameCalculator,
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
             Logger = logger;
             ServiceScopeFactory = serviceScopeFactory;
-            Options = options.Value;
             Clock = clock;
-            PoolOrchestrator = poolOrchestrator;
-
+            ClientCache = clientCache;
             KS3FileNameCalculator = ks3FileNameCalculator;
             FileNormalizeNamingService = fileNormalizeNamingService;
         }
 
         public override string Provider => KS3FileProviderConfigurationNames.ProviderName;
 
-        protected virtual IObjectPool<IKS3> GetKS3ClientPool(KS3FileProviderConfiguration ks3Configuration)
+        protected virtual KS3ClientLease GetKS3ClientLease(KS3FileProviderConfiguration ks3Configuration)
         {
-            var poolName = NormalizePoolName(ks3Configuration);
-            var pool = PoolOrchestrator.GetObjectPool<IKS3, KS3ClientPolicy>(
-                poolName,
-                () => new KS3ClientPolicy(ServiceScopeFactory, ks3Configuration),
-                Options.DefaultClientMaximumRetained);
-            return pool;
+            var client = ClientCache.GetOrAdd(
+                BuildClientKey(ks3Configuration),
+                () => new KS3ClientPolicy(ServiceScopeFactory, ks3Configuration).Create());
+
+            return new KS3ClientLease(client);
         }
 
-        protected virtual string NormalizePoolName(KS3FileProviderConfiguration ks3Configuration)
+        protected virtual string BuildClientKey(KS3FileProviderConfiguration ks3Configuration)
         {
-            var v = $"{ks3Configuration.Endpoint}-{ks3Configuration.Protocol}-{ks3Configuration.UserAgent}-{ks3Configuration.MaxConnections}-{ks3Configuration.Timeout}-{ks3Configuration.ReadWriteTimeout}-{ks3Configuration.AccessKey}-{ks3Configuration.SecretKey}";
-            using var sha1 = SHA1.Create();
-            var hashBuffer = sha1.ComputeHash(Encoding.UTF8.GetBytes(v));
-            var hash = hashBuffer.Aggregate("", (current, b) => current + b.ToString("X2"));
-            return $"FileStoring-{KS3FileProviderConfigurationNames.ProviderName}-{hash}";
+            return FileProviderClientKey.Build(
+                Provider,
+                ("Endpoint", ks3Configuration.Endpoint),
+                ("Protocol", ks3Configuration.Protocol),
+                ("UserAgent", ks3Configuration.UserAgent),
+                ("MaxConnections", ks3Configuration.MaxConnections),
+                ("Timeout", ks3Configuration.Timeout),
+                ("ReadWriteTimeout", ks3Configuration.ReadWriteTimeout),
+                ("AccessKey", ks3Configuration.AccessKey),
+                ("SecretKey", ks3Configuration.SecretKey));
         }
 
 
@@ -76,8 +72,8 @@ namespace SharpAbp.Abp.FileStoring.KS3
             var objectKey = KS3FileNameCalculator.Calculate(args);
 
             var ks3Configuration = args.Configuration.GetKS3Configuration();
-            var pool = GetKS3ClientPool(ks3Configuration);
-            var ks3Client = pool.Get();
+            var lease = GetKS3ClientLease(ks3Configuration);
+            var ks3Client = lease.Client;
 
             try
             {
@@ -105,7 +101,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
             }
             finally
             {
-                pool.Return(ks3Client);
+                lease.Return();
             }
         }
 
@@ -115,8 +111,8 @@ namespace SharpAbp.Abp.FileStoring.KS3
             var objectKey = KS3FileNameCalculator.Calculate(args);
 
             var ks3Configuration = args.Configuration.GetKS3Configuration();
-            var pool = GetKS3ClientPool(ks3Configuration);
-            var ks3Client = pool.Get();
+            var lease = GetKS3ClientLease(ks3Configuration);
+            var ks3Client = lease.Client;
 
             try
             {
@@ -131,7 +127,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
             }
             finally
             {
-                pool.Return(ks3Client);
+                lease.Return();
             }
         }
 
@@ -141,8 +137,8 @@ namespace SharpAbp.Abp.FileStoring.KS3
             var objectKey = KS3FileNameCalculator.Calculate(args);
 
             var ks3Configuration = args.Configuration.GetKS3Configuration();
-            var pool = GetKS3ClientPool(ks3Configuration);
-            var ks3Client = pool.Get();
+            var lease = GetKS3ClientLease(ks3Configuration);
+            var ks3Client = lease.Client;
 
             try
             {
@@ -151,7 +147,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
             }
             finally
             {
-                pool.Return(ks3Client);
+                lease.Return();
             }
         }
 
@@ -161,8 +157,8 @@ namespace SharpAbp.Abp.FileStoring.KS3
             var objectKey = KS3FileNameCalculator.Calculate(args);
 
             var ks3Configuration = args.Configuration.GetKS3Configuration();
-            var pool = GetKS3ClientPool(ks3Configuration);
-            var ks3Client = pool.Get();
+            var lease = GetKS3ClientLease(ks3Configuration);
+            var ks3Client = lease.Client;
 
             try
             {
@@ -178,7 +174,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
             }
             finally
             {
-                pool.Return(ks3Client);
+                lease.Return();
             }
         }
 
@@ -188,8 +184,8 @@ namespace SharpAbp.Abp.FileStoring.KS3
             var objectKey = KS3FileNameCalculator.Calculate(args);
 
             var ks3Configuration = args.Configuration.GetKS3Configuration();
-            var pool = GetKS3ClientPool(ks3Configuration);
-            var ks3Client = pool.Get();
+            var lease = GetKS3ClientLease(ks3Configuration);
+            var ks3Client = lease.Client;
 
             try
             {
@@ -206,7 +202,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
             }
             finally
             {
-                pool.Return(ks3Client);
+                lease.Return();
             }
         }
 
@@ -221,8 +217,8 @@ namespace SharpAbp.Abp.FileStoring.KS3
             var objectKey = KS3FileNameCalculator.Calculate(args);
 
             var ks3Configuration = args.Configuration.GetKS3Configuration();
-            var pool = GetKS3ClientPool(ks3Configuration);
-            var ks3Client = pool.Get();
+            var lease = GetKS3ClientLease(ks3Configuration);
+            var ks3Client = lease.Client;
 
             try
             {
@@ -239,7 +235,7 @@ namespace SharpAbp.Abp.FileStoring.KS3
             }
             finally
             {
-                pool.Return(ks3Client);
+                lease.Return();
             }
         }
 
@@ -406,6 +402,20 @@ namespace SharpAbp.Abp.FileStoring.KS3
             catch (Exception ex)
             {
                 Logger.LogWarning(ex, "Failed to abort multipart upload '{UploadId}'. Bucket: {BucketName}, Key: {ObjectKey}", uploadId, containerName, objectKey);
+            }
+        }
+
+        protected class KS3ClientLease
+        {
+            public IKS3 Client { get; }
+
+            public KS3ClientLease(IKS3 client)
+            {
+                Client = client;
+            }
+
+            public virtual void Return()
+            {
             }
         }
  

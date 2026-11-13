@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.FileStoring.Aliyun;
+using SharpAbp.Abp.FileStoring.Aws;
 using SharpAbp.Abp.FileStoring.Azure;
 using SharpAbp.Abp.FileStoring.FastDFS;
 using SharpAbp.Abp.FileStoring.FileSystem;
@@ -19,6 +20,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 {
     [DependsOn(
        typeof(AbpFileStoringAliyunModule),
+       typeof(AbpFileStoringAwsModule),
        typeof(AbpFileStoringAzureModule),
        typeof(AbpFileStoringFastDFSModule),
        typeof(AbpFileStoringFileSystemModule),

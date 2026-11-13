@@ -110,6 +110,7 @@
     <Project Path="test/SharpAbp.Abp.EntityFrameworkCore.Tests/SharpAbp.Abp.EntityFrameworkCore.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.FileStoring.AllTests/SharpAbp.Abp.FileStoring.AllTests.csproj" />
     <Project Path="test/SharpAbp.Abp.FileStoring.Tests/SharpAbp.Abp.FileStoring.Tests.csproj" />
+    <Project Path="test/SharpAbp.Abp.ObjectPool.Tests/SharpAbp.Abp.ObjectPool.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.FreeRedis.Tests/SharpAbp.Abp.FreeRedis.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.MassTransit.Tests/SharpAbp.Abp.MassTransit.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.OperationRateLimiting.Tests/SharpAbp.Abp.OperationRateLimiting.Tests.csproj" />

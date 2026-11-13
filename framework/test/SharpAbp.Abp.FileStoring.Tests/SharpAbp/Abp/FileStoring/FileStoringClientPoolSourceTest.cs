@@ -8,7 +8,7 @@ namespace SharpAbp.Abp.FileStoring
 {
     public class FileStoringClientPoolSourceTest
     {
-        private static readonly string[] PooledProviderNames =
+        private static readonly string[] CachedProviderNames =
         {
             "Aliyun",
             "Aws",
@@ -44,7 +44,7 @@ namespace SharpAbp.Abp.FileStoring
         [Fact]
         public void Client_Policies_Should_Not_Capture_ServiceProvider()
         {
-            foreach (var file in GetPooledProviderFiles("*ClientPolicy.cs"))
+            foreach (var file in GetProviderFiles(CachedProviderNames, "*ClientPolicy.cs"))
             {
                 var source = File.ReadAllText(file);
 
@@ -66,20 +66,22 @@ namespace SharpAbp.Abp.FileStoring
         }
 
         [Fact]
-        public void Pooled_File_Providers_Should_Use_Policy_Factory_Overload()
+        public void Cached_File_Providers_Should_Use_The_Client_Cache()
         {
-            foreach (var file in GetPooledProviderFiles("*FileProvider.cs"))
+            foreach (var file in GetProviderFiles(CachedProviderNames, "*FileProvider.cs"))
             {
                 var source = File.ReadAllText(file);
 
+                Assert.Contains("FileProviderClientCache<", source);
+                Assert.Contains("ClientCache.GetOrAdd", source);
+                Assert.DoesNotContain("IPoolOrchestrator", source);
+                Assert.DoesNotContain("PoolOrchestrator", source);
                 Assert.DoesNotContain("ActivatorUtilities.CreateInstance", source);
-                Assert.DoesNotContain("PoolOrchestrator.GetPool(poolName,", source);
-                Assert.Contains("() => new", source);
             }
         }
 
         [Fact]
-        public void File_Storing_Providers_Should_Not_Use_ServiceProvider_Based_Pool_Creation()
+        public void File_Storing_Providers_Should_Not_Use_ServiceProvider_Based_Creation()
         {
             foreach (var file in GetProviderFiles(AllProviderNames, "*FileProvider.cs"))
             {
@@ -89,79 +91,61 @@ namespace SharpAbp.Abp.FileStoring
                 Assert.DoesNotContain("CreateScope", source);
                 Assert.DoesNotContain("GetRequiredService", source);
                 Assert.DoesNotContain("ActivatorUtilities.CreateInstance", source);
-                Assert.DoesNotContain("PoolOrchestrator.GetPool(poolName,", source);
             }
         }
 
         [Fact]
-        public void File_Storing_Providers_Should_Only_Use_SharpAbp_ObjectPool_Abstractions()
-        {
-            foreach (var file in GetProviderFiles(AllProviderNames, "*.cs"))
-            {
-                var source = File.ReadAllText(file);
-
-                Assert.DoesNotContain("Microsoft.Extensions.ObjectPool", source);
-                Assert.DoesNotContain("IPooledObjectPolicy", source);
-            }
-
-            foreach (var file in GetProviderFiles(AllProviderNames, "*.csproj"))
-            {
-                var source = File.ReadAllText(file);
-
-                Assert.DoesNotContain("PackageReference Include=\"Microsoft.Extensions.ObjectPool\"", source);
-            }
-        }
-
-        [Fact]
-        public void Aws_Temporary_Credential_Clients_Should_Not_Be_Returned_To_Long_Lived_Pool()
+        public void Aws_Temporary_Credential_Clients_Should_Not_Be_Cached()
         {
             var source = File.ReadAllText(GetProviderFile("Aws", "AwsFileProvider.cs"));
 
-            Assert.Contains("ShouldUseClientPool", source);
+            Assert.Contains("ShouldCacheClient", source);
             Assert.Contains("!awsConfiguration.UseTemporaryCredentials", source);
             Assert.Contains("!awsConfiguration.UseTemporaryFederatedCredentials", source);
             Assert.Contains("new AmazonS3ClientPolicy(ServiceScopeFactory, awsConfiguration).CreateAsync()", source);
         }
 
         [Fact]
-        public void Aliyun_STS_Clients_Should_Not_Be_Returned_To_Long_Lived_Pool()
+        public void Aliyun_STS_Clients_Should_Not_Be_Cached()
         {
             var source = File.ReadAllText(GetProviderFile("Aliyun", "AliyunFileProvider.cs"));
 
-            Assert.Contains("ShouldUseClientPool", source);
+            Assert.Contains("ShouldCacheClient", source);
             Assert.Contains("!aliyunConfiguration.UseSecurityTokenService", source);
             Assert.Contains("new AliyunOssClientPolicy(ServiceScopeFactory, aliyunConfiguration).Create()", source);
         }
 
         [Fact]
-        public void Aws_Pool_Name_Should_Include_Client_Creation_Options()
+        public void Aws_Client_Key_Should_Include_Client_Creation_Options()
         {
-            var normalizePoolName = GetNormalizePoolNameSource("Aws", "AwsFileProvider.cs");
+            var buildClientKey = GetBuildClientKeySource("Aws", "AwsFileProvider.cs");
 
-            Assert.Contains("UseCredentials", normalizePoolName);
-            Assert.Contains("ProfileName", normalizePoolName);
-            Assert.Contains("ProfilesLocation", normalizePoolName);
+            Assert.Contains("UseCredentials", buildClientKey);
+            Assert.Contains("ProfileName", buildClientKey);
+            Assert.Contains("ProfilesLocation", buildClientKey);
+            Assert.Contains("MaxConnectionsPerServer", buildClientKey);
         }
 
         [Fact]
-        public void S3_Pool_Name_Should_Include_Client_Creation_Options()
+        public void S3_Client_Key_Should_Include_Client_Creation_Options()
         {
-            var normalizePoolName = GetNormalizePoolNameSource("S3", "S3FileProvider.cs");
+            var buildClientKey = GetBuildClientKeySource("S3", "S3FileProvider.cs");
 
-            Assert.Contains("AuthenticationRegion", normalizePoolName);
-            Assert.Contains("ForcePathStyle", normalizePoolName);
+            Assert.Contains("AuthenticationRegion", buildClientKey);
+            Assert.Contains("ForcePathStyle", buildClientKey);
+            Assert.Contains("MaxConnectionsPerServer", buildClientKey);
         }
 
         [Fact]
-        public void KS3_Pool_Name_Should_Include_Client_Creation_Options()
+        public void KS3_Client_Key_Should_Include_Client_Creation_Options()
         {
-            var normalizePoolName = GetNormalizePoolNameSource("KS3", "KS3FileProvider.cs");
+            var buildClientKey = GetBuildClientKeySource("KS3", "KS3FileProvider.cs");
 
-            Assert.Contains("Protocol", normalizePoolName);
-            Assert.Contains("UserAgent", normalizePoolName);
-            Assert.Contains("MaxConnections", normalizePoolName);
-            Assert.Contains("Timeout", normalizePoolName);
-            Assert.Contains("ReadWriteTimeout", normalizePoolName);
+            Assert.Contains("Protocol", buildClientKey);
+            Assert.Contains("UserAgent", buildClientKey);
+            Assert.Contains("MaxConnections", buildClientKey);
+            Assert.Contains("Timeout", buildClientKey);
+            Assert.Contains("ReadWriteTimeout", buildClientKey);
         }
 
         [Fact]
@@ -173,16 +157,11 @@ namespace SharpAbp.Abp.FileStoring
         }
 
         [Fact]
-        public void Minio_Pool_Name_Should_Include_Client_Creation_Options()
+        public void Minio_Client_Key_Should_Include_Client_Creation_Options()
         {
-            var normalizePoolName = GetNormalizePoolNameSource("Minio", "MinioFileProvider.cs");
+            var buildClientKey = GetBuildClientKeySource("Minio", "MinioFileProvider.cs");
 
-            Assert.Contains("WithSSL", normalizePoolName);
-        }
-
-        private static IEnumerable<string> GetPooledProviderFiles(string pattern)
-        {
-            return GetProviderFiles(PooledProviderNames, pattern);
+            Assert.Contains("WithSSL", buildClientKey);
         }
 
         private static string GetProviderFile(string provider, string fileName)
@@ -195,10 +174,10 @@ namespace SharpAbp.Abp.FileStoring
                 .Single();
         }
 
-        private static string GetNormalizePoolNameSource(string provider, string fileName)
+        private static string GetBuildClientKeySource(string provider, string fileName)
         {
             var source = File.ReadAllText(GetProviderFile(provider, fileName));
-            var methodStart = source.IndexOf("NormalizePoolName", StringComparison.Ordinal);
+            var methodStart = source.IndexOf("BuildClientKey", StringComparison.Ordinal);
             Assert.True(methodStart >= 0);
 
             var nextMethodStart = source.IndexOf("public override", methodStart, StringComparison.Ordinal);

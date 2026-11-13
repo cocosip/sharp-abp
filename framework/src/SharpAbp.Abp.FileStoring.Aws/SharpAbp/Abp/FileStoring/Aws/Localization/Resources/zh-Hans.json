@@ -14,6 +14,7 @@
     "Aws.Policy": "策略",
     "Aws.Region": "区域",
     "Aws.ContainerName": "容器名称",
-    "Aws.CreateContainerIfNotExists": "自动创建容器"
+    "Aws.CreateContainerIfNotExists": "自动创建容器",
+    "Aws.MaxConnectionsPerServer": "每个服务器的最大连接数"
   }
 }

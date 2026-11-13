@@ -23,7 +23,8 @@ namespace SharpAbp.Abp.FileStoring.S3
                 new(S3FileProviderConfigurationNames.UseChunkEncoding, "false"),
                 new(S3FileProviderConfigurationNames.Protocol, "0"),
                 new(S3FileProviderConfigurationNames.AuthenticationRegion, ""),
-                new(S3FileProviderConfigurationNames.CreateBucketIfNotExists, "false")
+                new(S3FileProviderConfigurationNames.CreateBucketIfNotExists, "false"),
+                new(S3FileProviderConfigurationNames.MaxConnectionsPerServer, "")
             };
 
             var result = validator.Validate(values);

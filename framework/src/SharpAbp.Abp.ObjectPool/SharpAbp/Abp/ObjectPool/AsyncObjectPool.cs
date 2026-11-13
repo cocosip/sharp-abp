@@ -1,34 +1,53 @@
-using System;
-using System.Collections.Concurrent;
-using System.Threading;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SharpAbp.Abp.ObjectPool
 {
-    public class AsyncObjectPool<T> : IAsyncObjectPool<T>
+    /// <summary>
+    /// A bounded async object pool that disposes items rejected by the policy or dropped
+    /// because the pool is full. The pool does not block or limit concurrency: when empty,
+    /// a new item is created by the policy.
+    /// </summary>
+    public class AsyncObjectPool<T> : IAsyncObjectPool<T>, IDisposable
         where T : class
     {
         protected IAsyncObjectPoolPolicy<T> Policy { get; }
 
-        protected ConcurrentQueue<T> Items { get; }
-
         protected int MaximumRetained { get; }
 
-        private int _retained;
+        private readonly object _sync = new object();
+
+        private readonly Queue<T> _items;
+
+        private bool _disposed;
 
         public AsyncObjectPool(IAsyncObjectPoolPolicy<T> policy, int maximumRetained)
         {
-            Policy = policy;
-            Items = new ConcurrentQueue<T>();
+            Policy = policy ?? throw new ArgumentNullException(nameof(policy));
+
+            if (maximumRetained < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(maximumRetained), "Maximum retained must be greater than or equal to zero.");
+            }
+
             MaximumRetained = maximumRetained;
+            _items = new Queue<T>(Math.Min(maximumRetained, 16));
         }
 
         public virtual ValueTask<T> GetAsync()
         {
-            if (Items.TryDequeue(out var item))
+            lock (_sync)
             {
-                Interlocked.Decrement(ref _retained);
-                return new ValueTask<T>(item);
+                if (_disposed)
+                {
+                    throw new ObjectDisposedException(GetType().Name);
+                }
+
+                if (_items.Count > 0)
+                {
+                    return new ValueTask<T>(_items.Dequeue());
+                }
             }
 
             return Policy.CreateAsync();
@@ -36,33 +55,48 @@ namespace SharpAbp.Abp.ObjectPool
 
         public virtual void Return(T obj)
         {
+            if (obj == null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
             if (!Policy.Return(obj))
             {
-                DisposeItem(obj);
+                PooledItemDisposer.Dispose(obj);
                 return;
             }
 
-            if (Interlocked.Increment(ref _retained) <= MaximumRetained)
+            lock (_sync)
             {
-                Items.Enqueue(obj);
-                return;
+                if (!_disposed && _items.Count < MaximumRetained)
+                {
+                    _items.Enqueue(obj);
+                    return;
+                }
             }
 
-            Interlocked.Decrement(ref _retained);
-            DisposeItem(obj);
+            PooledItemDisposer.Dispose(obj);
         }
 
-        protected virtual void DisposeItem(T obj)
+        public virtual void Dispose()
         {
-            if (obj is IAsyncDisposable asyncDisposable)
+            List<T> items;
+
+            lock (_sync)
             {
-                asyncDisposable.DisposeAsync().AsTask().GetAwaiter().GetResult();
-                return;
+                if (_disposed)
+                {
+                    return;
+                }
+
+                _disposed = true;
+                items = new List<T>(_items);
+                _items.Clear();
             }
 
-            if (obj is IDisposable disposable)
+            foreach (var item in items)
             {
-                disposable.Dispose();
+                PooledItemDisposer.Dispose(item);
             }
         }
     }

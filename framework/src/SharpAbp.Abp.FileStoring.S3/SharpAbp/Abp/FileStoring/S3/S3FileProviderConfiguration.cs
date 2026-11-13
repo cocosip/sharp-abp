@@ -1,4 +1,4 @@
-﻿using Volo.Abp;
+using Volo.Abp;
 
 namespace SharpAbp.Abp.FileStoring.S3
 {
@@ -96,6 +96,15 @@ namespace SharpAbp.Abp.FileStoring.S3
             set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.CreateBucketIfNotExists, value);
         }
 
+
+        /// <summary>
+        /// Default value: null (SDK default).
+        /// </summary>
+        public int? MaxConnectionsPerServer
+        {
+            get => _containerConfiguration.GetConfigurationOrDefault<int?>(S3FileProviderConfigurationNames.MaxConnectionsPerServer);
+            set => _containerConfiguration.SetConfiguration(S3FileProviderConfigurationNames.MaxConnectionsPerServer, value);
+        }
 
         private readonly FileContainerConfiguration _containerConfiguration;
 

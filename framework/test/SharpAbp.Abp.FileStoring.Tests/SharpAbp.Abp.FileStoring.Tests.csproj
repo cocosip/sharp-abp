@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\..\..\common.test.props" />
   <PropertyGroup>
@@ -26,7 +26,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\SharpAbp.Abp.FileStoring\SharpAbp.Abp.FileStoring.csproj" />
-    <ProjectReference Include="..\..\src\SharpAbp.Abp.ObjectPool\SharpAbp.Abp.ObjectPool.csproj" />
   </ItemGroup>
 
 </Project>

@@ -11,6 +11,6 @@
     "S3.VendorType": "Vendor",
     "S3.AuthenticationRegion": "Authentication region",
     "S3.CreateBucketIfNotExists": "Create bucket if not exist",
-    "S3.MaxClient": "Max client connection"
+    "S3.MaxConnectionsPerServer": "Max connections per server"
   }
 }

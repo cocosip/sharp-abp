@@ -1,4 +1,4 @@
-﻿﻿using System;
+using System;
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.FileStoring;
 using Volo.Abp;
@@ -56,6 +56,18 @@ namespace SharpAbp.Abp.FileStoringManagement
             foreach (var item in container.Items)
             {
                 var providerItem = fileProviderConfiguration.GetItem(item.Name);
+                if (providerItem == null)
+                {
+                    // Unknown or removed option: ignore it instead of failing the whole container.
+                    continue;
+                }
+
+                if (providerItem.ValueType != typeof(string) && string.IsNullOrWhiteSpace(item.Value))
+                {
+                    // Empty non-string values (e.g. optional int) cannot be converted.
+                    continue;
+                }
+
                 var value = TypeHelper.ConvertFromString(providerItem.ValueType, item.Value);
                 configuration.SetConfiguration(item.Name, value);
             }
@@ -96,6 +108,17 @@ namespace SharpAbp.Abp.FileStoringManagement
             foreach (var item in cacheItem.Items)
             {
                 var providerItem = fileProviderConfiguration.GetItem(item.Name);
+                if (providerItem == null)
+                {
+                    // Unknown or removed option: ignore it instead of failing the whole container.
+                    continue;
+                }
+
+                if (providerItem.ValueType != typeof(string) && string.IsNullOrWhiteSpace(item.Value))
+                {
+                    // Empty non-string values (e.g. optional int) cannot be converted.
+                    continue;
+                }
 
                 var value = TypeHelper.ConvertFromString(providerItem.ValueType, item.Value);
                 configuration.SetConfiguration(item.Name, value);

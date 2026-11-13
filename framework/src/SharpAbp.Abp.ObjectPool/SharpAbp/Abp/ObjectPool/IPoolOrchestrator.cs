@@ -113,5 +113,27 @@ namespace SharpAbp.Abp.ObjectPool
         IAsyncObjectPool<T> GetAsyncObjectPool<T, TPolicy>([NotNull] string poolName, Func<TPolicy> policyFactory, int? maxSize = null)
             where T : class
             where TPolicy : IAsyncObjectPoolPolicy<T>;
+
+        /// <summary>
+        /// Removes the pool with the specified name and disposes its retained objects.
+        /// </summary>
+        /// <typeparam name="T">The type of objects in the pool.</typeparam>
+        /// <param name="poolName">The name of the pool.</param>
+        /// <returns>True if the pool existed and was removed; otherwise false.</returns>
+        bool RemovePool<T>([NotNull] string poolName) where T : class;
+
+        /// <summary>
+        /// Removes the pool with the specified object type and name, and disposes its retained objects.
+        /// </summary>
+        /// <param name="objectType">The type of objects in the pool.</param>
+        /// <param name="poolName">The name of the pool.</param>
+        /// <returns>True if the pool existed and was removed; otherwise false.</returns>
+        bool RemovePool([NotNull] Type objectType, [NotNull] string poolName);
+
+        /// <summary>
+        /// Removes all pools and disposes their retained objects.
+        /// </summary>
+        /// <returns>The number of removed pools.</returns>
+        int RemoveAll();
     }
 }

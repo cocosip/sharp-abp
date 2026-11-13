@@ -1,4 +1,4 @@
-﻿using Amazon.S3;
+using Amazon.S3;
 using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 
@@ -18,6 +18,12 @@ namespace SharpAbp.Abp.FileStoring.S3
                 AuthenticationRegion = configuration.AuthenticationRegion,
                 ForcePathStyle = configuration.ForcePathStyle,
             };
+
+            if (configuration.MaxConnectionsPerServer.HasValue)
+            {
+                clientConfig.MaxConnectionsPerServer = configuration.MaxConnectionsPerServer.Value;
+            }
+
             return new AmazonS3Client(configuration.AccessKeyId, configuration.SecretAccessKey, clientConfig);
         }
     }

@@ -1,16 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using OBS;
 using OBS.Model;
-using SharpAbp.Abp.ObjectPool;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Timing;
 
@@ -21,27 +16,23 @@ namespace SharpAbp.Abp.FileStoring.Obs
     {
         protected ILogger Logger { get; }
         protected IServiceScopeFactory ServiceScopeFactory { get; }
-        protected AbpFileStoringAbstractionsOptions Options { get; }
         protected IClock Clock { get; }
-        protected IPoolOrchestrator PoolOrchestrator { get; }
+        protected FileProviderClientCache<ObsClient> ClientCache { get; }
         protected IObsFileNameCalculator ObsFileNameCalculator { get; }
         protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
 
         public ObsFileProvider(
             ILogger<ObsFileProvider> logger,
             IServiceScopeFactory serviceScopeFactory,
-            IOptions<AbpFileStoringAbstractionsOptions> options,
             IClock clock,
-            IPoolOrchestrator poolOrchestrator,
+            FileProviderClientCache<ObsClient> clientCache,
             IObsFileNameCalculator obsFileNameCalculator,
             IFileNormalizeNamingService fileNormalizeNamingService)
         {
             Logger = logger;
             ServiceScopeFactory = serviceScopeFactory;
-            Options = options.Value;
-
             Clock = clock;
-            PoolOrchestrator = poolOrchestrator;
+            ClientCache = clientCache;
             ObsFileNameCalculator = obsFileNameCalculator;
             FileNormalizeNamingService = fileNormalizeNamingService;
         }
@@ -49,23 +40,22 @@ namespace SharpAbp.Abp.FileStoring.Obs
         public override string Provider => ObsFileProviderConfigurationNames.ProviderName;
 
 
-        protected virtual IObjectPool<ObsClient> GetObsClientPool(ObsFileProviderConfiguration obsConfiguration)
+        protected virtual ObsClientLease GetObsClientLease(ObsFileProviderConfiguration obsConfiguration)
         {
-            var poolName = NormalizePoolName(obsConfiguration);
-            var pool = PoolOrchestrator.GetObjectPool<ObsClient, ObsClientPolicy>(
-                poolName,
-                () => new ObsClientPolicy(ServiceScopeFactory, obsConfiguration),
-                Options.DefaultClientMaximumRetained);
-            return pool;
+            var client = ClientCache.GetOrAdd(
+                BuildClientKey(obsConfiguration),
+                () => new ObsClientPolicy(ServiceScopeFactory, obsConfiguration).Create());
+
+            return new ObsClientLease(client);
         }
 
-        protected virtual string NormalizePoolName(ObsFileProviderConfiguration obsConfiguration)
+        protected virtual string BuildClientKey(ObsFileProviderConfiguration obsConfiguration)
         {
-            var v = $"{obsConfiguration.Endpoint}-{obsConfiguration.AccessKeyId}-{obsConfiguration.AccessKeySecret}";
-            using var sha1 = SHA1.Create();
-            var hashBuffer = sha1.ComputeHash(Encoding.UTF8.GetBytes(v));
-            var hash = hashBuffer.Aggregate("", (current, b) => current + b.ToString("X2"));
-            return $"FileStoring-{ObsFileProviderConfigurationNames.ProviderName}-{hash}";
+            return FileProviderClientKey.Build(
+                Provider,
+                ("Endpoint", obsConfiguration.Endpoint),
+                ("AccessKeyId", obsConfiguration.AccessKeyId),
+                ("AccessKeySecret", obsConfiguration.AccessKeySecret));
         }
 
 
@@ -75,20 +65,20 @@ namespace SharpAbp.Abp.FileStoring.Obs
             var objectKey = ObsFileNameCalculator.Calculate(args);
 
             var obsConfiguration = args.Configuration.GetObsConfiguration();
-            var pool = GetObsClientPool(obsConfiguration);
-            var obsClient = pool.Get();
+            var lease = GetObsClientLease(obsConfiguration);
+            var obsClient = lease.Client;
 
             try
             {
-                if (!args.OverrideExisting && FileExistsAsync(obsClient, containerName, objectKey))
+                if (!args.OverrideExisting && await FileExistsAsync(obsClient, containerName, objectKey))
                 {
                     throw new FileAlreadyExistsException($"Saving FILE '{args.FileId}' does already exists in the container '{containerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
                 }
                 if (obsConfiguration.CreateContainerIfNotExists)
                 {
-                    if (!obsClient.HeadBucket(new HeadBucketRequest() { BucketName = containerName }))
+                    if (!await HeadBucketAsync(obsClient, containerName))
                     {
-                        obsClient.CreateBucket(new CreateBucketRequest() { BucketName = containerName });
+                        await CreateBucketAsync(obsClient, containerName);
                     }
                 }
 
@@ -103,56 +93,53 @@ namespace SharpAbp.Abp.FileStoring.Obs
             }
             finally
             {
-                pool.Return(obsClient);
+                lease.Return();
             }
         }
 
-        public override Task<bool> DeleteAsync(FileProviderDeleteArgs args)
+        public override async Task<bool> DeleteAsync(FileProviderDeleteArgs args)
         {
             var containerName = GetContainerName(args);
             var objectKey = ObsFileNameCalculator.Calculate(args);
 
             var obsConfiguration = args.Configuration.GetObsConfiguration();
-            var pool = GetObsClientPool(obsConfiguration);
-            var obsClient = pool.Get();
+            var lease = GetObsClientLease(obsConfiguration);
+            var obsClient = lease.Client;
             try
             {
 
-                if (!FileExistsAsync(obsClient, containerName, objectKey))
+                if (!await FileExistsAsync(obsClient, containerName, objectKey))
                 {
                     Logger.LogWarning("File not found in OBS when deleting. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
-                    return Task.FromResult(false);
+                    return false;
                 }
-                obsClient.DeleteObject(new DeleteObjectRequest()
-                {
-                    BucketName = containerName,
-                    ObjectKey = objectKey
-                });
-                return Task.FromResult(true);
+
+                await DeleteObjectAsync(obsClient, containerName, objectKey);
+                return true;
             }
             finally
             {
-                pool.Return(obsClient);
+                lease.Return();
             }
         }
 
-        public override Task<bool> ExistsAsync(FileProviderExistsArgs args)
+        public override async Task<bool> ExistsAsync(FileProviderExistsArgs args)
         {
             var containerName = GetContainerName(args);
             var objectKey = ObsFileNameCalculator.Calculate(args);
 
             var obsConfiguration = args.Configuration.GetObsConfiguration();
-            var pool = GetObsClientPool(obsConfiguration);
-            var obsClient = pool.Get();
+            var lease = GetObsClientLease(obsConfiguration);
+            var obsClient = lease.Client;
 
             try
             {
 
-                return Task.FromResult(FileExistsAsync(obsClient, containerName, objectKey));
+                return await FileExistsAsync(obsClient, containerName, objectKey);
             }
             finally
             {
-                pool.Return(obsClient);
+                lease.Return();
             }
         }
 
@@ -162,23 +149,23 @@ namespace SharpAbp.Abp.FileStoring.Obs
             var objectKey = ObsFileNameCalculator.Calculate(args);
 
             var obsConfiguration = args.Configuration.GetObsConfiguration();
-            var pool = GetObsClientPool(obsConfiguration);
-            var obsClient = pool.Get();
+            var lease = GetObsClientLease(obsConfiguration);
+            var obsClient = lease.Client;
 
             try
             {
-                if (!FileExistsAsync(obsClient, containerName, objectKey))
+                if (!await FileExistsAsync(obsClient, containerName, objectKey))
                 {
                     Logger.LogWarning("File not found in OBS. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return null;
                 }
-                using var result = obsClient.GetObject(new GetObjectRequest() { BucketName = containerName, ObjectKey = objectKey });
+                using var result = await GetObjectAsync(obsClient, containerName, objectKey);
 
                 return await TryCopyToMemoryStreamAsync(result.OutputStream, args.CancellationToken);
             }
             finally
             {
-                pool.Return(obsClient);
+                lease.Return();
             }
         }
 
@@ -189,47 +176,47 @@ namespace SharpAbp.Abp.FileStoring.Obs
             var objectKey = ObsFileNameCalculator.Calculate(args);
 
             var obsConfiguration = args.Configuration.GetObsConfiguration();
-            var pool = GetObsClientPool(obsConfiguration);
-            var obsClient = pool.Get();
+            var lease = GetObsClientLease(obsConfiguration);
+            var obsClient = lease.Client;
 
             try
             {
-                if (!FileExistsAsync(obsClient, containerName, objectKey))
+                if (!await FileExistsAsync(obsClient, containerName, objectKey))
                 {
                     Logger.LogWarning("File not found in OBS. Container: {ContainerName}, ObjectKey: {ObjectKey}, FileId: {FileId}", containerName, objectKey, args.FileId);
                     return false;
                 }
 
-                using var result = obsClient.GetObject(new GetObjectRequest() { BucketName = containerName, ObjectKey = objectKey });
+                using var result = await GetObjectAsync(obsClient, containerName, objectKey);
                 await TryWriteToFileAsync(result.OutputStream, args.Path, args.CancellationToken);
                 return true;
             }
             finally
             {
-                pool.Return(obsClient);
+                lease.Return();
             }
         }
 
 
-        public override Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)
+        public override async Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)
         {
             if (!args.Configuration.HttpAccess)
             {
-                return Task.FromResult(string.Empty);
+                return string.Empty;
             }
 
             var containerName = GetContainerName(args);
             var objectKey = ObsFileNameCalculator.Calculate(args);
 
             var obsConfiguration = args.Configuration.GetObsConfiguration();
-            var pool = GetObsClientPool(obsConfiguration);
-            var obsClient = pool.Get();
+            var lease = GetObsClientLease(obsConfiguration);
+            var obsClient = lease.Client;
 
             try
             {
-                if (args.CheckFileExist && !FileExistsAsync(obsClient, containerName, objectKey))
+                if (args.CheckFileExist && !await FileExistsAsync(obsClient, containerName, objectKey))
                 {
-                    return Task.FromResult(string.Empty);
+                    return string.Empty;
                 }
 
                 var expiresSeconds = 600;
@@ -245,11 +232,11 @@ namespace SharpAbp.Abp.FileStoring.Obs
                     Expires = expiresSeconds
                 });
 
-                return Task.FromResult(temporarySignatureResponse.SignUrl);
+                return temporarySignatureResponse.SignUrl;
             }
             finally
             {
-                pool.Return(obsClient);
+                lease.Return();
             }
         }
 
@@ -261,13 +248,12 @@ namespace SharpAbp.Abp.FileStoring.Obs
                 : FileNormalizeNamingService.NormalizeContainerName(args.Configuration, configuration.BucketName);
         }
 
-        protected virtual bool FileExistsAsync(ObsClient obsClient, string containerName, string fileName)
+        protected virtual async Task<bool> FileExistsAsync(ObsClient obsClient, string containerName, string fileName)
         {
-            // Make sure Blob Container exists.
-            var headBucketRequest = new HeadBucketRequest()
+            if (!await HeadBucketAsync(obsClient, containerName))
             {
-                BucketName = containerName
-            };
+                return false;
+            }
 
             var hadObjectRequest = new HeadObjectRequest()
             {
@@ -275,23 +261,85 @@ namespace SharpAbp.Abp.FileStoring.Obs
                 ObjectKey = fileName
             };
 
-            return obsClient.HeadBucket(headBucketRequest) &&
-                   obsClient.HeadObject(hadObjectRequest);
+            return await Task<bool>.Factory.FromAsync(
+                (callback, state) => obsClient.BeginHeadObject(hadObjectRequest, callback, state),
+                obsClient.EndHeadObject,
+                null);
         }
 
-        protected virtual Task<string> PutObjectAsync(
+        protected virtual Task<bool> HeadBucketAsync(ObsClient obsClient, string containerName)
+        {
+            var request = new HeadBucketRequest()
+            {
+                BucketName = containerName
+            };
+
+            return Task<bool>.Factory.FromAsync(
+                (callback, state) => obsClient.BeginHeadBucket(request, callback, state),
+                obsClient.EndHeadBucket,
+                null);
+        }
+
+        protected virtual Task<CreateBucketResponse> CreateBucketAsync(ObsClient obsClient, string containerName)
+        {
+            var request = new CreateBucketRequest()
+            {
+                BucketName = containerName
+            };
+
+            return Task<CreateBucketResponse>.Factory.FromAsync(
+                (callback, state) => obsClient.BeginCreateBucket(request, callback, state),
+                obsClient.EndCreateBucket,
+                null);
+        }
+
+        protected virtual Task<GetObjectResponse> GetObjectAsync(ObsClient obsClient, string containerName, string objectKey)
+        {
+            var request = new GetObjectRequest()
+            {
+                BucketName = containerName,
+                ObjectKey = objectKey
+            };
+
+            return Task<GetObjectResponse>.Factory.FromAsync(
+                (callback, state) => obsClient.BeginGetObject(request, callback, state),
+                obsClient.EndGetObject,
+                null);
+        }
+
+        protected virtual Task DeleteObjectAsync(ObsClient obsClient, string containerName, string objectKey)
+        {
+            var request = new DeleteObjectRequest()
+            {
+                BucketName = containerName,
+                ObjectKey = objectKey
+            };
+
+            return Task<DeleteObjectResponse>.Factory.FromAsync(
+                (callback, state) => obsClient.BeginDeleteObject(request, callback, state),
+                obsClient.EndDeleteObject,
+                null);
+        }
+
+        protected virtual async Task<string> PutObjectAsync(
             ObsClient obsClient,
             string containerName,
             string objectKey,
             FileProviderSaveArgs args)
         {
-            obsClient.PutObject(new PutObjectRequest
+            var request = new PutObjectRequest
             {
                 BucketName = containerName,
                 ObjectKey = objectKey,
                 InputStream = args.FileStream,
-            });
-            return Task.FromResult(args.FileId);
+            };
+
+            await Task<PutObjectResponse>.Factory.FromAsync(
+                (callback, state) => obsClient.BeginPutObject(request, callback, state),
+                obsClient.EndPutObject,
+                null);
+
+            return args.FileId;
         }
 
         protected virtual async Task<string> MultiPartUploadAsync(
@@ -300,11 +348,14 @@ namespace SharpAbp.Abp.FileStoring.Obs
             string objectKey,
             FileProviderSaveArgs args)
         {
-            var initiateMultipartUploadResponse = obsClient.InitiateMultipartUpload(new InitiateMultipartUploadRequest()
-            {
-                BucketName = containerName,
-                ObjectKey = objectKey
-            });
+            var initiateMultipartUploadResponse = await Task<InitiateMultipartUploadResponse>.Factory.FromAsync(
+                (callback, state) => obsClient.BeginInitiateMultipartUpload(new InitiateMultipartUploadRequest()
+                {
+                    BucketName = containerName,
+                    ObjectKey = objectKey
+                }, callback, state),
+                obsClient.EndInitiateMultipartUpload,
+                null);
 
             var uploadId = initiateMultipartUploadResponse.UploadId;
 
@@ -354,20 +405,26 @@ namespace SharpAbp.Abp.FileStoring.Obs
                         PartNumber = i + 1
                     };
                     // Call the UploadPart interface to perform the upload function. The result contains the ETag value of this data shard.
-                    var result = obsClient.UploadPart(request);
+                    var result = await Task<UploadPartResponse>.Factory.FromAsync(
+                        (callback, state) => obsClient.BeginUploadPart(request, callback, state),
+                        obsClient.EndUploadPart,
+                        null);
                     partETags.Add(new PartETag(result.PartNumber, result.ETag));
 
                     Logger.LogDebug("Multipart upload progress for file '{FileId}' with UploadId '{UploadId}': {CompletedParts}/{TotalParts} completed.",
                         args.FileId, uploadId, partETags.Count, partCount);
                 }
 
-                var completeMultipartUploadResponse = obsClient.CompleteMultipartUpload(new CompleteMultipartUploadRequest()
-                {
-                    BucketName = containerName,
-                    ObjectKey = objectKey,
-                    UploadId = uploadId,
-                    PartETags = partETags
-                });
+                var completeMultipartUploadResponse = await Task<CompleteMultipartUploadResponse>.Factory.FromAsync(
+                    (callback, state) => obsClient.BeginCompleteMultipartUpload(new CompleteMultipartUploadRequest()
+                    {
+                        BucketName = containerName,
+                        ObjectKey = objectKey,
+                        UploadId = uploadId,
+                        PartETags = partETags
+                    }, callback, state),
+                    obsClient.EndCompleteMultipartUpload,
+                    null);
 
                 Logger.LogInformation("Multipart upload completed for file '{FileId}' with key '{ObjectKey}'. ETag: {ETag}",
                     args.FileId, completeMultipartUploadResponse.ObjectKey, completeMultipartUploadResponse.ETag);
@@ -377,12 +434,12 @@ namespace SharpAbp.Abp.FileStoring.Obs
             {
                 Logger.LogError(ex, "Multipart upload failed for file '{FileId}' with UploadId '{UploadId}'. Bucket: {BucketName}, Key: {ObjectKey}",
                     args.FileId, uploadId, containerName, objectKey);
-                AbortMultipartUploadSilently(obsClient, containerName, objectKey, uploadId);
+                await AbortMultipartUploadSilentlyAsync(obsClient, containerName, objectKey, uploadId);
                 throw;
             }
         }
 
-        protected virtual void AbortMultipartUploadSilently(
+        protected virtual async Task AbortMultipartUploadSilentlyAsync(
             ObsClient obsClient,
             string containerName,
             string objectKey,
@@ -390,16 +447,33 @@ namespace SharpAbp.Abp.FileStoring.Obs
         {
             try
             {
-                obsClient.AbortMultipartUpload(new AbortMultipartUploadRequest()
-                {
-                    BucketName = containerName,
-                    ObjectKey = objectKey,
-                    UploadId = uploadId
-                });
+                await Task<AbortMultipartUploadResponse>.Factory.FromAsync(
+                    (callback, state) => obsClient.BeginAbortMultipartUpload(new AbortMultipartUploadRequest()
+                    {
+                        BucketName = containerName,
+                        ObjectKey = objectKey,
+                        UploadId = uploadId
+                    }, callback, state),
+                    obsClient.EndAbortMultipartUpload,
+                    null);
             }
             catch (Exception ex)
             {
                 Logger.LogWarning(ex, "Failed to abort multipart upload '{UploadId}'. Bucket: {BucketName}, Key: {ObjectKey}", uploadId, containerName, objectKey);
+            }
+        }
+
+        protected class ObsClientLease
+        {
+            public ObsClient Client { get; }
+
+            public ObsClientLease(ObsClient client)
+            {
+                Client = client;
+            }
+
+            public virtual void Return()
+            {
             }
         }
 

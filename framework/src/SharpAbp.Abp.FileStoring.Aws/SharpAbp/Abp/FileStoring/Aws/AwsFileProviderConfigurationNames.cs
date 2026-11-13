@@ -1,4 +1,4 @@
-﻿namespace SharpAbp.Abp.FileStoring.Aws
+namespace SharpAbp.Abp.FileStoring.Aws
 {
     public class AwsFileProviderConfigurationNames
     {
@@ -18,5 +18,6 @@
         public const string Region = "Aws.Region";
         public const string ContainerName = "Aws.ContainerName";
         public const string CreateContainerIfNotExists = "Aws.CreateContainerIfNotExists";
+        public const string MaxConnectionsPerServer = "Aws.MaxConnectionsPerServer";
     }
 }

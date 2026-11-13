@@ -51,6 +51,13 @@ namespace SharpAbp.Abp.FileStoring.S3
             //CreateBucketIfNotExists
             ValidateHelper.ShouldBool(result, Provider, S3FileProviderConfigurationNames.CreateBucketIfNotExists, values.FindValue(S3FileProviderConfigurationNames.CreateBucketIfNotExists));
 
+            //MaxConnectionsPerServer
+            var maxConnectionsPerServer = values.FindValue(S3FileProviderConfigurationNames.MaxConnectionsPerServer);
+            if (!string.IsNullOrWhiteSpace(maxConnectionsPerServer))
+            {
+                ValidateHelper.ShouldInt(result, Provider, S3FileProviderConfigurationNames.MaxConnectionsPerServer, maxConnectionsPerServer);
+            }
+
             return result;
         }
     }

@@ -1,6 +1,5 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using SharpAbp.Abp.FileStoring.Aws.Localization;
-using SharpAbp.Abp.ObjectPool;
 using Volo.Abp.Caching;
 using Volo.Abp.Localization;
 using Volo.Abp.Localization.ExceptionHandling;
@@ -13,8 +12,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
 {
     [DependsOn(
         typeof(AbpFileStoringModule),
-        typeof(AbpCachingModule),
-        typeof(AbpObjectPoolModule)
+        typeof(AbpCachingModule)
         )]
     public class AbpFileStoringAwsModule : AbpModule
     {
@@ -82,6 +80,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
                 .AddItem(AwsFileProviderConfigurationNames.Region, typeof(string), "eu-west-1")
                 .AddItem(AwsFileProviderConfigurationNames.ContainerName, typeof(string), "container1")
                 .AddItem(AwsFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool), "false")
+                .AddItem(AwsFileProviderConfigurationNames.MaxConnectionsPerServer, typeof(int), "100")
                 .AddItem(AwsFileProviderConfigurationNames.TemporaryCredentialsCacheKey, typeof(string), "AwsCacheKey");
 
             return configuration;

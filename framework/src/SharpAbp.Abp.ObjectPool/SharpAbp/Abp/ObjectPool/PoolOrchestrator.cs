@@ -12,18 +12,24 @@ namespace SharpAbp.Abp.ObjectPool
     /// <summary>
     /// Orchestrates object pools for different types and names.
     /// </summary>
-    public class PoolOrchestrator : IPoolOrchestrator, ISingletonDependency
+    public class PoolOrchestrator : IPoolOrchestrator, ISingletonDependency, IDisposable
     {
         /// <summary>
         /// Stores pool metadata for validation.
         /// </summary>
         protected class PoolMetadata
         {
-            public Type PolicyType { get; set; }
-            public int? MaxSize { get; set; }
+            /// <summary>
+            /// The concrete policy type when it is known; null when the pool was created
+            /// through a factory overload and the type cannot be inspected.
+            /// </summary>
+            public Type? PolicyType { get; set; }
+
+            public int MaxSize { get; set; }
+
             public object Pool { get; set; }
 
-            public PoolMetadata(Type policyType, int? maxSize, object pool)
+            public PoolMetadata(Type? policyType, int maxSize, object pool)
             {
                 PolicyType = policyType;
                 MaxSize = maxSize;
@@ -94,7 +100,7 @@ namespace SharpAbp.Abp.ObjectPool
         /// <typeparam name="T">The type of objects in the pool.</typeparam>
         /// <param name="poolName">The name of the pool.</param>
         /// <param name="policy">The policy to use for creating and resetting objects.</param>
-        /// <param name="maxSize">The maximum size of the pool.</param>
+        /// <param name="maxSize">The maximum size of the pool. Defaults to <see cref="ObjectPoolDefaults.GetDefaultMaximumRetained"/>.</param>
         /// <returns>The object pool.</returns>
         /// <exception cref="InvalidOperationException">Thrown when attempting to get a pool with different parameters than previously used.</exception>
         public virtual ObjectPool<T> GetPool<T>([NotNull] string poolName, IPooledObjectPolicy<T> policy, int? maxSize = null) where T : class
@@ -102,45 +108,7 @@ namespace SharpAbp.Abp.ObjectPool
             Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
             Check.NotNull(policy, nameof(policy));
 
-            var key = new PoolKey(typeof(T), poolName);
-            var policyType = policy.GetType();
-
-            var metadata = GetOrCreateMetadata(
-                key,
-                () => new Lazy<PoolMetadata>(
-                    () =>
-                    {
-                        ObjectPool<T> pool;
-
-                        if (maxSize.HasValue)
-                        {
-                            pool = new DefaultObjectPool<T>(policy, maxSize.Value);
-                        }
-                        else
-                        {
-                            pool = Provider.Create(policy);
-                        }
-
-                        return new PoolMetadata(policyType, maxSize, pool);
-                    },
-                    LazyThreadSafetyMode.ExecutionAndPublication));
-
-            // Validate that the parameters match the existing pool configuration
-            if (metadata.PolicyType != policyType)
-            {
-                throw new InvalidOperationException(
-                    $"Pool '{poolName}' for type '{typeof(T).FullName}' already exists with policy type '{metadata.PolicyType.FullName}', " +
-                    $"but was requested with policy type '{policyType.FullName}'.");
-            }
-
-            if (metadata.MaxSize != maxSize)
-            {
-                throw new InvalidOperationException(
-                    $"Pool '{poolName}' for type '{typeof(T).FullName}' already exists with maxSize '{metadata.MaxSize}', " +
-                    $"but was requested with maxSize '{maxSize}'.");
-            }
-
-            return (ObjectPool<T>)metadata.Pool;
+            return GetPool(poolName, () => policy, policy.GetType(), maxSize);
         }
 
         /// <summary>
@@ -149,7 +117,7 @@ namespace SharpAbp.Abp.ObjectPool
         /// <typeparam name="T">The type of objects in the pool.</typeparam>
         /// <param name="poolName">The name of the pool.</param>
         /// <param name="policyFactory">The factory to create the policy only when the pool is first created.</param>
-        /// <param name="maxSize">The maximum size of the pool.</param>
+        /// <param name="maxSize">The maximum size of the pool. Defaults to <see cref="ObjectPoolDefaults.GetDefaultMaximumRetained"/>.</param>
         /// <returns>The object pool.</returns>
         /// <exception cref="InvalidOperationException">Thrown when attempting to get a pool with different parameters than previously used.</exception>
         public virtual ObjectPool<T> GetPool<T>([NotNull] string poolName, Func<IPooledObjectPolicy<T>> policyFactory, int? maxSize = null) where T : class
@@ -157,7 +125,7 @@ namespace SharpAbp.Abp.ObjectPool
             Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
             Check.NotNull(policyFactory, nameof(policyFactory));
 
-            return GetPool(poolName, policyFactory, typeof(IPooledObjectPolicy<T>), maxSize);
+            return GetPool(poolName, policyFactory, null, maxSize);
         }
 
         /// <summary>
@@ -167,7 +135,7 @@ namespace SharpAbp.Abp.ObjectPool
         /// <typeparam name="TPolicy">The type of policy used by the pool.</typeparam>
         /// <param name="poolName">The name of the pool.</param>
         /// <param name="policyFactory">The factory to create the policy only when the pool is first created.</param>
-        /// <param name="maxSize">The maximum size of the pool.</param>
+        /// <param name="maxSize">The maximum size of the pool. Defaults to <see cref="ObjectPoolDefaults.GetDefaultMaximumRetained"/>.</param>
         /// <returns>The object pool.</returns>
         /// <exception cref="InvalidOperationException">Thrown when attempting to get a pool with different parameters than previously used.</exception>
         public virtual ObjectPool<T> GetPool<T, TPolicy>([NotNull] string poolName, Func<TPolicy> policyFactory, int? maxSize = null)
@@ -177,7 +145,7 @@ namespace SharpAbp.Abp.ObjectPool
             Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
             Check.NotNull(policyFactory, nameof(policyFactory));
 
-            return GetPool<T>(poolName, () => policyFactory(), typeof(TPolicy), maxSize);
+            return GetPool(poolName, () => policyFactory(), typeof(TPolicy), maxSize);
         }
 
         /// <summary>
@@ -186,7 +154,7 @@ namespace SharpAbp.Abp.ObjectPool
         /// <typeparam name="T">The type of objects in the pool.</typeparam>
         /// <param name="poolName">The name of the pool.</param>
         /// <param name="policy">The policy to use for creating and resetting objects.</param>
-        /// <param name="maxSize">The maximum size of the pool.</param>
+        /// <param name="maxSize">The maximum size of the pool. Defaults to <see cref="ObjectPoolDefaults.GetDefaultMaximumRetained"/>.</param>
         /// <returns>The object pool.</returns>
         /// <exception cref="InvalidOperationException">Thrown when attempting to get a pool with different parameters than previously used.</exception>
         public virtual IObjectPool<T> GetObjectPool<T>([NotNull] string poolName, IObjectPoolPolicy<T> policy, int? maxSize = null) where T : class
@@ -204,7 +172,7 @@ namespace SharpAbp.Abp.ObjectPool
         /// <typeparam name="T">The type of objects in the pool.</typeparam>
         /// <param name="poolName">The name of the pool.</param>
         /// <param name="policyFactory">The factory to create the policy only when the pool is first created.</param>
-        /// <param name="maxSize">The maximum size of the pool.</param>
+        /// <param name="maxSize">The maximum size of the pool. Defaults to <see cref="ObjectPoolDefaults.GetDefaultMaximumRetained"/>.</param>
         /// <returns>The object pool.</returns>
         /// <exception cref="InvalidOperationException">Thrown when attempting to get a pool with different parameters than previously used.</exception>
         public virtual IObjectPool<T> GetObjectPool<T>([NotNull] string poolName, Func<IObjectPoolPolicy<T>> policyFactory, int? maxSize = null) where T : class
@@ -212,7 +180,7 @@ namespace SharpAbp.Abp.ObjectPool
             Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
             Check.NotNull(policyFactory, nameof(policyFactory));
 
-            return GetObjectPool<T>(poolName, policyFactory, typeof(IObjectPoolPolicy<T>), maxSize);
+            return GetObjectPool<T>(poolName, policyFactory, null, maxSize);
         }
 
         /// <summary>
@@ -222,7 +190,7 @@ namespace SharpAbp.Abp.ObjectPool
         /// <typeparam name="TPolicy">The type of policy used by the pool.</typeparam>
         /// <param name="poolName">The name of the pool.</param>
         /// <param name="policyFactory">The factory to create the policy only when the pool is first created.</param>
-        /// <param name="maxSize">The maximum size of the pool.</param>
+        /// <param name="maxSize">The maximum size of the pool. Defaults to <see cref="ObjectPoolDefaults.GetDefaultMaximumRetained"/>.</param>
         /// <returns>The object pool.</returns>
         /// <exception cref="InvalidOperationException">Thrown when attempting to get a pool with different parameters than previously used.</exception>
         public virtual IObjectPool<T> GetObjectPool<T, TPolicy>([NotNull] string poolName, Func<TPolicy> policyFactory, int? maxSize = null)
@@ -241,7 +209,7 @@ namespace SharpAbp.Abp.ObjectPool
         /// <typeparam name="T">The type of objects in the pool.</typeparam>
         /// <param name="poolName">The name of the pool.</param>
         /// <param name="policy">The policy to use for creating and resetting objects.</param>
-        /// <param name="maxSize">The maximum size of the pool.</param>
+        /// <param name="maxSize">The maximum size of the pool. Defaults to <see cref="ObjectPoolDefaults.GetDefaultMaximumRetained"/>.</param>
         /// <returns>The async object pool.</returns>
         /// <exception cref="InvalidOperationException">Thrown when attempting to get a pool with different parameters than previously used.</exception>
         public virtual IAsyncObjectPool<T> GetAsyncObjectPool<T>([NotNull] string poolName, IAsyncObjectPoolPolicy<T> policy, int? maxSize = null) where T : class
@@ -258,7 +226,7 @@ namespace SharpAbp.Abp.ObjectPool
         /// <typeparam name="T">The type of objects in the pool.</typeparam>
         /// <param name="poolName">The name of the pool.</param>
         /// <param name="policyFactory">The factory to create the policy only when the pool is first created.</param>
-        /// <param name="maxSize">The maximum size of the pool.</param>
+        /// <param name="maxSize">The maximum size of the pool. Defaults to <see cref="ObjectPoolDefaults.GetDefaultMaximumRetained"/>.</param>
         /// <returns>The async object pool.</returns>
         /// <exception cref="InvalidOperationException">Thrown when attempting to get a pool with different parameters than previously used.</exception>
         public virtual IAsyncObjectPool<T> GetAsyncObjectPool<T>([NotNull] string poolName, Func<IAsyncObjectPoolPolicy<T>> policyFactory, int? maxSize = null) where T : class
@@ -266,7 +234,7 @@ namespace SharpAbp.Abp.ObjectPool
             Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
             Check.NotNull(policyFactory, nameof(policyFactory));
 
-            return GetAsyncObjectPool<T>(poolName, policyFactory, typeof(IAsyncObjectPoolPolicy<T>), maxSize);
+            return GetAsyncObjectPool<T>(poolName, policyFactory, null, maxSize);
         }
 
         /// <summary>
@@ -276,7 +244,7 @@ namespace SharpAbp.Abp.ObjectPool
         /// <typeparam name="TPolicy">The type of policy used by the pool.</typeparam>
         /// <param name="poolName">The name of the pool.</param>
         /// <param name="policyFactory">The factory to create the policy only when the pool is first created.</param>
-        /// <param name="maxSize">The maximum size of the pool.</param>
+        /// <param name="maxSize">The maximum size of the pool. Defaults to <see cref="ObjectPoolDefaults.GetDefaultMaximumRetained"/>.</param>
         /// <returns>The async object pool.</returns>
         /// <exception cref="InvalidOperationException">Thrown when attempting to get a pool with different parameters than previously used.</exception>
         public virtual IAsyncObjectPool<T> GetAsyncObjectPool<T, TPolicy>([NotNull] string poolName, Func<TPolicy> policyFactory, int? maxSize = null)
@@ -289,12 +257,60 @@ namespace SharpAbp.Abp.ObjectPool
             return GetAsyncObjectPool<T>(poolName, () => policyFactory(), typeof(TPolicy), maxSize);
         }
 
+        /// <summary>
+        /// Removes the pool with the specified name and disposes its retained objects.
+        /// </summary>
+        public virtual bool RemovePool<T>([NotNull] string poolName) where T : class
+        {
+            Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
+
+            return RemovePoolCore(new PoolKey(typeof(T), poolName));
+        }
+
+        /// <summary>
+        /// Removes the pool with the specified object type and name, and disposes its retained objects.
+        /// </summary>
+        public virtual bool RemovePool([NotNull] Type objectType, [NotNull] string poolName)
+        {
+            Check.NotNull(objectType, nameof(objectType));
+            Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
+
+            return RemovePoolCore(new PoolKey(objectType, poolName));
+        }
+
+        /// <summary>
+        /// Removes all pools and disposes their retained objects.
+        /// </summary>
+        public virtual int RemoveAll()
+        {
+            var removed = 0;
+
+            foreach (var key in PoolMetadatas.Keys)
+            {
+                if (RemovePoolCore(key))
+                {
+                    removed++;
+                }
+            }
+
+            return removed;
+        }
+
+        /// <summary>
+        /// Removes all pools and disposes their retained objects.
+        /// </summary>
+        public virtual void Dispose()
+        {
+            RemoveAll();
+        }
+
         protected virtual ObjectPool<T> GetPool<T>(
             [NotNull] string poolName,
             Func<IPooledObjectPolicy<T>> policyFactory,
-            Type policyType,
+            Type? policyType,
             int? maxSize = null) where T : class
         {
+            var effectiveMaxSize = maxSize ?? ObjectPoolDefaults.GetDefaultMaximumRetained();
             var key = new PoolKey(typeof(T), poolName);
 
             var metadata = GetOrCreateMetadata(
@@ -304,34 +320,12 @@ namespace SharpAbp.Abp.ObjectPool
                     {
                         var policy = policyFactory();
                         Check.NotNull(policy, nameof(policyFactory));
-                        ObjectPool<T> pool;
 
-                        if (maxSize.HasValue)
-                        {
-                            pool = new DefaultObjectPool<T>(policy, maxSize.Value);
-                        }
-                        else
-                        {
-                            pool = Provider.Create(policy);
-                        }
-
-                        return new PoolMetadata(policyType, maxSize, pool);
+                        return new PoolMetadata(policyType, effectiveMaxSize, new BoundedObjectPool<T>(policy, effectiveMaxSize));
                     },
                     LazyThreadSafetyMode.ExecutionAndPublication));
 
-            if (metadata.PolicyType != policyType)
-            {
-                throw new InvalidOperationException(
-                    $"Pool '{poolName}' for type '{typeof(T).FullName}' already exists with policy type '{metadata.PolicyType.FullName}', " +
-                    $"but was requested with policy type '{policyType.FullName}'.");
-            }
-
-            if (metadata.MaxSize != maxSize)
-            {
-                throw new InvalidOperationException(
-                    $"Pool '{poolName}' for type '{typeof(T).FullName}' already exists with maxSize '{metadata.MaxSize}', " +
-                    $"but was requested with maxSize '{maxSize}'.");
-            }
+            ValidateMetadata<T>(poolName, metadata, policyType, effectiveMaxSize);
 
             return (ObjectPool<T>)metadata.Pool;
         }
@@ -339,7 +333,7 @@ namespace SharpAbp.Abp.ObjectPool
         protected virtual IObjectPool<T> GetObjectPool<T>(
             [NotNull] string poolName,
             Func<IObjectPoolPolicy<T>> policyFactory,
-            Type policyType,
+            Type? policyType,
             int? maxSize = null) where T : class
         {
             var pool = GetPool(
@@ -359,9 +353,10 @@ namespace SharpAbp.Abp.ObjectPool
         protected virtual IAsyncObjectPool<T> GetAsyncObjectPool<T>(
             [NotNull] string poolName,
             Func<IAsyncObjectPoolPolicy<T>> policyFactory,
-            Type policyType,
+            Type? policyType,
             int? maxSize = null) where T : class
         {
+            var effectiveMaxSize = maxSize ?? ObjectPoolDefaults.GetDefaultMaximumRetained();
             var key = new PoolKey(typeof(T), poolName);
 
             var metadata = GetOrCreateMetadata(
@@ -371,13 +366,23 @@ namespace SharpAbp.Abp.ObjectPool
                     {
                         var policy = policyFactory();
                         Check.NotNull(policy, nameof(policyFactory));
-                        var pool = new AsyncObjectPool<T>(policy, maxSize ?? Environment.ProcessorCount * 2);
 
-                        return new PoolMetadata(policyType, maxSize, pool);
+                        return new PoolMetadata(policyType, effectiveMaxSize, new AsyncObjectPool<T>(policy, effectiveMaxSize));
                     },
                     LazyThreadSafetyMode.ExecutionAndPublication));
 
-            if (metadata.PolicyType != policyType)
+            ValidateMetadata<T>(poolName, metadata, policyType, effectiveMaxSize);
+
+            return (IAsyncObjectPool<T>)metadata.Pool;
+        }
+
+        protected virtual void ValidateMetadata<T>(
+            [NotNull] string poolName,
+            [NotNull] PoolMetadata metadata,
+            Type? policyType,
+            int maxSize) where T : class
+        {
+            if (policyType != null && metadata.PolicyType != null && metadata.PolicyType != policyType)
             {
                 throw new InvalidOperationException(
                     $"Pool '{poolName}' for type '{typeof(T).FullName}' already exists with policy type '{metadata.PolicyType.FullName}', " +
@@ -390,8 +395,6 @@ namespace SharpAbp.Abp.ObjectPool
                     $"Pool '{poolName}' for type '{typeof(T).FullName}' already exists with maxSize '{metadata.MaxSize}', " +
                     $"but was requested with maxSize '{maxSize}'.");
             }
-
-            return (IAsyncObjectPool<T>)metadata.Pool;
         }
 
         protected virtual PoolMetadata GetOrCreateMetadata(PoolKey key, Func<Lazy<PoolMetadata>> metadataFactory)
@@ -408,6 +411,28 @@ namespace SharpAbp.Abp.ObjectPool
                 ((ICollection<KeyValuePair<PoolKey, Lazy<PoolMetadata>>>)PoolMetadatas).Remove(item);
                 throw;
             }
+        }
+
+        protected virtual bool RemovePoolCore(PoolKey key)
+        {
+            if (!PoolMetadatas.TryRemove(key, out var lazy))
+            {
+                return false;
+            }
+
+            if (lazy.IsValueCreated)
+            {
+                try
+                {
+                    (lazy.Value.Pool as IDisposable)?.Dispose();
+                }
+                catch
+                {
+                    // Pool initialization may have failed earlier; there is nothing to dispose.
+                }
+            }
+
+            return true;
         }
     }
 }

@@ -48,6 +48,13 @@ namespace SharpAbp.Abp.FileStoring.Aws
             //CreateContainerIfNotExists
             ValidateHelper.ShouldBool(result, Provider, AwsFileProviderConfigurationNames.CreateContainerIfNotExists, values.FindValue(AwsFileProviderConfigurationNames.CreateContainerIfNotExists));
 
+            //MaxConnectionsPerServer
+            var maxConnectionsPerServer = values.FindValue(AwsFileProviderConfigurationNames.MaxConnectionsPerServer);
+            if (!string.IsNullOrWhiteSpace(maxConnectionsPerServer))
+            {
+                ValidateHelper.ShouldInt(result, Provider, AwsFileProviderConfigurationNames.MaxConnectionsPerServer, maxConnectionsPerServer);
+            }
+
 
             //DurationSeconds
             //ValidateHelper.ShouldInt(result, Provider, AwsFileProviderConfigurationNames.DurationSeconds, values.FindValue[AwsFileProviderConfigurationNames.DurationSeconds]);
