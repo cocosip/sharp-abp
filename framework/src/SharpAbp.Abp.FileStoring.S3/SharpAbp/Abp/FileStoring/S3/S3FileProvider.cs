@@ -60,6 +60,7 @@ namespace SharpAbp.Abp.FileStoring.S3
                 ("ServerUrl", s3Configuration.ServerUrl.TrimEnd('/')),
                 ("SignatureVersion", s3Configuration.SignatureVersion),
                 ("ForcePathStyle", s3Configuration.ForcePathStyle),
+                ("MaxConnectionsPerServer", s3Configuration.MaxConnectionsPerServer),
                 ("AccessKeyId", s3Configuration.AccessKeyId),
                 ("SecretAccessKey", s3Configuration.SecretAccessKey));
         }

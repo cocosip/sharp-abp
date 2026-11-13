@@ -69,6 +69,7 @@ namespace SharpAbp.Abp.FileStoring.Aws
                 ("UseCredentials", awsConfiguration.UseCredentials),
                 ("ProfileName", awsConfiguration.ProfileName),
                 ("ProfilesLocation", awsConfiguration.ProfilesLocation),
+                ("MaxConnectionsPerServer", awsConfiguration.MaxConnectionsPerServer),
                 ("AccessKeyId", awsConfiguration.AccessKeyId),
                 ("SecretAccessKey", awsConfiguration.SecretAccessKey));
         }

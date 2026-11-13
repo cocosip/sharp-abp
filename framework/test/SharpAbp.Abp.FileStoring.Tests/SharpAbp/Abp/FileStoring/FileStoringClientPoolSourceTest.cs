@@ -123,6 +123,7 @@ namespace SharpAbp.Abp.FileStoring
             Assert.Contains("UseCredentials", buildClientKey);
             Assert.Contains("ProfileName", buildClientKey);
             Assert.Contains("ProfilesLocation", buildClientKey);
+            Assert.Contains("MaxConnectionsPerServer", buildClientKey);
         }
 
         [Fact]
@@ -132,6 +133,7 @@ namespace SharpAbp.Abp.FileStoring
 
             Assert.Contains("SignatureVersion", buildClientKey);
             Assert.Contains("ForcePathStyle", buildClientKey);
+            Assert.Contains("MaxConnectionsPerServer", buildClientKey);
         }
 
         [Fact]
