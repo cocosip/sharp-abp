@@ -15,6 +15,12 @@ namespace SharpAbp.Abp.Data
         Firebird,
         Dm,
         OpenGauss,
-        GaussDB
+        GaussDB,
+
+        /// <summary>
+        /// OceanBase, currently used for the Oracle-compatible mode. The MySQL-compatible mode is
+        /// accessed through the Pomelo provider and reported as <see cref="MySql"/>.
+        /// </summary>
+        OceanBase
     }
 }
