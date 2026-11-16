@@ -29,16 +29,18 @@
 
         /// <summary>
         /// Default value: 8192
-        /// Key material is long text: the length must stay above 2000 so Oracle maps the column to NCLOB
-        /// instead of NVARCHAR2(2000).
+        /// Key material is longer than the 2000 character inline limit of several databases, so the
+        /// large text column convention stores it in a LOB column where the database needs it.
         /// </summary>
         public static int MaxPublicKeyLength { get; set; } = 8192;
 
         /// <summary>
         /// Default value: 8192
-        /// Key material is long text: the length must stay above 2000 so Oracle maps the column to NCLOB
-        /// instead of NVARCHAR2(2000).
+        /// Key material is longer than the 2000 character inline limit of several databases, so the
+        /// large text column convention stores it in a LOB column where the database needs it.
         /// </summary>
         public static int MaxPrivateKeyLength { get; set; } = 8192;
     }
 }
+
+

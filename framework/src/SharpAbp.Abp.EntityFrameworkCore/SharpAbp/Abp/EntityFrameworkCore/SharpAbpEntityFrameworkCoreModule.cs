@@ -24,5 +24,20 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             Configure<SharpAbpEfCoreOptions>(configuration.GetSection("EfCoreOptions"));
             return Task.CompletedTask;
         }
+
+        public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            var configuration = context.Services.GetConfiguration();
+            Configure<AbpLargeTextColumnOptions>(configuration.GetSection("EfCoreOptions:LargeTextColumns"));
+
+            Configure<AbpDbContextOptions>(options =>
+            {
+                // Applied to every AbpDbContext model. AbpDbContext calls the configured convention
+                // action from ConfigureConventions, before OnModelCreating runs, so the convention
+                // is registered once here and the model itself is finalized per DbContext.
+                options.ConfigureDefaultConvention((dbContext, modelConfigurationBuilder) =>
+                    modelConfigurationBuilder.AddSharpAbpLargeTextColumnConvention(dbContext));
+            });
+        }
     }
 }

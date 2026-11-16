@@ -172,6 +172,18 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         }
 
         /// <summary>
+        /// Tests that OceanBase custom provider names are correctly mapped to DatabaseProvider.OceanBase.
+        /// </summary>
+        [Fact]
+        public void GetDatabaseProviderOrNullByCustomName_OceanBase_ShouldReturnOceanBase()
+        {
+            // Act & Assert
+            Assert.Equal(DatabaseProvider.OceanBase, _databaseProviderAccessor.GetDatabaseProviderOrNull("OCEANBASE"));
+            Assert.Equal(DatabaseProvider.OceanBase, _databaseProviderAccessor.GetDatabaseProviderOrNull("oceanbase"));
+            Assert.Equal(DatabaseProvider.OceanBase, _databaseProviderAccessor.GetDatabaseProviderOrNull("OceanBase"));
+        }
+
+        /// <summary>
         /// Tests that OpenGauss custom provider names are correctly mapped to DatabaseProvider.OpenGauss.
         /// </summary>
         [Fact]
@@ -329,7 +341,7 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         public void GetDatabaseProviderOrNullByEfCoreName_Dm_ShouldReturnDm()
         {
             // Act & Assert
-            Assert.Equal(DatabaseProvider.Dm, _databaseProviderAccessor.GetDatabaseProviderOrNullByEfCoreName("Dm.EntityFrameworkCore"));
+            Assert.Equal(DatabaseProvider.Dm, _databaseProviderAccessor.GetDatabaseProviderOrNullByEfCoreName("DM.Microsoft.EntityFrameworkCore"));
         }
 
         /// <summary>
@@ -349,7 +361,18 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         public void GetDatabaseProviderOrNullByEfCoreName_GaussDB_ShouldReturnGaussDB()
         {
             // Act & Assert
-            Assert.Equal(DatabaseProvider.GaussDB, _databaseProviderAccessor.GetDatabaseProviderOrNullByEfCoreName("EntityFrameworkCore.GaussDB"));
+            Assert.Equal(DatabaseProvider.GaussDB, _databaseProviderAccessor.GetDatabaseProviderOrNullByEfCoreName("DotNetCore.EntityFrameworkCore.GaussDB"));
+        }
+
+        /// <summary>
+        /// Tests that OceanBase EF Core provider names are correctly mapped to DatabaseProvider.OceanBase.
+        /// </summary>
+        [Fact]
+        public void GetDatabaseProviderOrNullByEfCoreName_OceanBase_ShouldReturnOceanBase()
+        {
+            // Act & Assert
+            Assert.Equal(DatabaseProvider.OceanBase, _databaseProviderAccessor.GetDatabaseProviderOrNullByEfCoreName("OceanBase.EntityFrameworkCore"));
+            Assert.Equal(DatabaseProvider.OceanBase, _databaseProviderAccessor.GetDatabaseProviderOrNullByEfCoreName("OceanBase.EntityFrameworkCore8"));
         }
 
         /// <summary>

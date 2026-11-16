@@ -52,6 +52,7 @@ namespace SharpAbp.Abp.EntityFrameworkCore
                 "DM" => (DatabaseProvider?)DatabaseProvider.Dm,
                 "OPENGAUSS" => (DatabaseProvider?)DatabaseProvider.OpenGauss,
                 "GAUSSDB" => (DatabaseProvider?)DatabaseProvider.GaussDB,
+                "OCEANBASE" => (DatabaseProvider?)DatabaseProvider.OceanBase,
                 _ => null,
             };
 
@@ -84,11 +85,17 @@ namespace SharpAbp.Abp.EntityFrameworkCore
                 "Microsoft.EntityFrameworkCore.InMemory" => (DatabaseProvider?)DatabaseProvider.InMemory,
                 "FirebirdSql.EntityFrameworkCore.Firebird" => (DatabaseProvider?)DatabaseProvider.Firebird,
                 "Microsoft.EntityFrameworkCore.Cosmos" => (DatabaseProvider?)DatabaseProvider.Cosmos,
-                "Dm.EntityFrameworkCore" => (DatabaseProvider?)DatabaseProvider.Dm,
+                "DM.Microsoft.EntityFrameworkCore" => (DatabaseProvider?)DatabaseProvider.Dm,
                 "OpenG.EntityFrameworkCore.OpenGauss" => (DatabaseProvider?)DatabaseProvider.OpenGauss,
-                "EntityFrameworkCore.GaussDB" => (DatabaseProvider?)DatabaseProvider.GaussDB,
+                "DotNetCore.EntityFrameworkCore.GaussDB" => (DatabaseProvider?)DatabaseProvider.GaussDB,
                 _ => null
             };
+
+            // OceanBase ships one provider assembly per EF Core major version.
+            if (result == null && providerName.StartsWith("OceanBase.EntityFrameworkCore", StringComparison.Ordinal))
+            {
+                result = DatabaseProvider.OceanBase;
+            }
 
             Logger.LogDebug("Resolved database provider '{DatabaseProvider}' for EF Core provider name '{ProviderName}'", result, providerName);
 
