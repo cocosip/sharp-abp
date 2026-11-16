@@ -85,6 +85,8 @@ namespace SharpAbp.Abp.EntityFrameworkCore
                 "Microsoft.EntityFrameworkCore.InMemory" => (DatabaseProvider?)DatabaseProvider.InMemory,
                 "FirebirdSql.EntityFrameworkCore.Firebird" => (DatabaseProvider?)DatabaseProvider.Firebird,
                 "Microsoft.EntityFrameworkCore.Cosmos" => (DatabaseProvider?)DatabaseProvider.Cosmos,
+                "DM.EntityFrameworkCore" => (DatabaseProvider?)DatabaseProvider.Dm,
+                // Previous Dameng provider package, kept for hosts that still use it.
                 "DM.Microsoft.EntityFrameworkCore" => (DatabaseProvider?)DatabaseProvider.Dm,
                 "OpenG.EntityFrameworkCore.OpenGauss" => (DatabaseProvider?)DatabaseProvider.OpenGauss,
                 "DotNetCore.EntityFrameworkCore.GaussDB" => (DatabaseProvider?)DatabaseProvider.GaussDB,

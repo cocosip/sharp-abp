@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging.Abstractions;
 using SharpAbp.Abp.Data;
@@ -9,7 +9,7 @@ namespace SharpAbp.Abp.EntityFrameworkCore
     public class LargeTextColumnConventionTests
     {
         private const string MySqlProviderName = "Pomelo.EntityFrameworkCore.MySql";
-        private const string DmProviderName = "DM.Microsoft.EntityFrameworkCore";
+        private const string DmProviderName = "DM.EntityFrameworkCore";
         private const string OracleProviderName = "Oracle.EntityFrameworkCore";
         private const string SqlServerProviderName = "Microsoft.EntityFrameworkCore.SqlServer";
         private const string OceanBaseProviderName = "OceanBase.EntityFrameworkCore";

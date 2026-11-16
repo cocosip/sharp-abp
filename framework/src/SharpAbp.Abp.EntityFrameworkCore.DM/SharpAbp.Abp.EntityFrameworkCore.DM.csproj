@@ -22,7 +22,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Sharp.EntityFrameworkCore.DM" />
+		<PackageReference Include="Sharp.DM.EntityFrameworkCore" />
 	</ItemGroup>
 
 </Project>

@@ -341,6 +341,7 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         public void GetDatabaseProviderOrNullByEfCoreName_Dm_ShouldReturnDm()
         {
             // Act & Assert
+            Assert.Equal(DatabaseProvider.Dm, _databaseProviderAccessor.GetDatabaseProviderOrNullByEfCoreName("DM.EntityFrameworkCore"));
             Assert.Equal(DatabaseProvider.Dm, _databaseProviderAccessor.GetDatabaseProviderOrNullByEfCoreName("DM.Microsoft.EntityFrameworkCore"));
         }
 

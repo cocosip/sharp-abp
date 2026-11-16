@@ -131,7 +131,7 @@
 		<PackageVersion Include="MassTransit.RabbitMQ" Version="$(MassTransitPackageVersion)" />
 		<PackageVersion Include="MassTransit.SqlTransport.PostgreSQL" Version="$(MassTransitPackageVersion)" />
 		<PackageVersion Include="MassTransit.SqlTransport.SqlServer" Version="$(MassTransitPackageVersion)" />
-		<PackageVersion Include="Sharp.EntityFrameworkCore.DM" Version="[10.0.1,)" />
+		<PackageVersion Include="Sharp.DM.EntityFrameworkCore" Version="[10.0.1,)" />
 		<PackageVersion Include="Devart.Data.Oracle.EFCore" Version="[11.2.237.10,)" />
 		<PackageVersion Include="DotNetCore.EntityFrameworkCore.GaussDB" Version="[10.0.1,)" />
 		<PackageVersion Include="DotNetCore.GaussDB" Version="[10.0.0,)" />
