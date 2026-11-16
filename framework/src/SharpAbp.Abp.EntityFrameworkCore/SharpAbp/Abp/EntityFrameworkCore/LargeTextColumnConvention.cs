@@ -5,17 +5,18 @@ using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.Data;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace SharpAbp.Abp.EntityFrameworkCore
 {
     /// <summary>
-    /// Maps bounded string and byte[] columns that are longer than the database provider can store
-    /// inline to its large object type. The convention runs when the model is finalized, so it sees
-    /// what the modules configured and applies to every AbpDbContext without a per module change.
-    /// Columns with an explicit column type (HasColumnType), keys, indexes, fixed length columns,
-    /// concurrency tokens and columns with a value converter are never changed.
+    /// Maps string and byte[] columns to the large object type of the database provider when the
+    /// configured length is above what the provider stores inline, when the table would exceed its
+    /// row size, or when the property is marked with <see cref="LargeTextColumnAttribute"/>. The
+    /// convention runs when the model is finalized, so it sees what the modules configured and
+    /// applies to every AbpDbContext without a per module change. Columns with an explicit column
+    /// type (HasColumnType), keys, indexes, fixed length columns, concurrency tokens and columns with a
+    /// value converter are never changed.
     /// </summary>
     public class LargeTextColumnConvention : IModelFinalizingConvention
     {
@@ -59,33 +60,8 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             {
                 // Evaluated before the conversions so the row size of a table is not underestimated.
                 var rowSize = providerOptions.MaxRowSizeBytes > 0 ? EstimateRowSize(entityType) : 0;
-
-                foreach (var property in GetCandidates(entityType, options.IncludeBinary))
-                {
-                    var maxLength = property.GetMaxLength();
-                    if (maxLength == null)
-                    {
-                        continue;
-                    }
-
-                    if (property.ClrType == typeof(string))
-                    {
-                        if (providerOptions.StringMaxLength is int stringMaxLength &&
-                            maxLength > stringMaxLength &&
-                            providerOptions.StringColumnType != null)
-                        {
-                            ApplyColumnType(property, providerOptions.StringColumnType);
-                        }
-                    }
-                    else if (providerOptions.BinaryMaxLength is int binaryMaxLength &&
-                             maxLength > binaryMaxLength &&
-                             providerOptions.BinaryColumnType != null)
-                    {
-                        ApplyColumnType(property, providerOptions.BinaryColumnType);
-                    }
-                }
-
-                if (providerOptions.MaxRowSizeBytes > 0 && rowSize > providerOptions.MaxRowSizeBytes)
+                var rowSizeExceeded = providerOptions.MaxRowSizeBytes > 0 && rowSize > providerOptions.MaxRowSizeBytes;
+                if (rowSizeExceeded)
                 {
                     Logger.LogInformation(
                         "Large text column convention detected a possible row size of {RowSize} bytes for {EntityType}, the limit of {ProviderName} is {MaxRowSize} bytes.",
@@ -93,74 +69,120 @@ namespace SharpAbp.Abp.EntityFrameworkCore
                         entityType.Name,
                         ProviderName,
                         providerOptions.MaxRowSizeBytes);
+                }
 
-                    foreach (var property in GetCandidates(entityType, options.IncludeBinary))
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (!ShouldConsider(entityType, property, options.IncludeBinary))
                     {
-                        if ((property.GetMaxLength() ?? 0) < providerOptions.RowSizeConversionMinLength)
-                        {
-                            continue;
-                        }
-
-                        var columnType = property.ClrType == typeof(string)
-                            ? providerOptions.StringColumnType
-                            : providerOptions.BinaryColumnType;
-
-                        if (columnType != null)
-                        {
-                            ApplyColumnType(property, columnType);
-                        }
+                        continue;
                     }
+
+                    var maxLength = property.GetMaxLength();
+                    var needsConversion =
+                        HasLargeTextColumnAttribute(property) ||
+                        IsAboveInlineLimit(property, maxLength, providerOptions) ||
+                        (rowSizeExceeded && (maxLength ?? 0) >= providerOptions.RowSizeConversionMinLength);
+
+                    if (!needsConversion)
+                    {
+                        continue;
+                    }
+
+                    if (property.IsKey() ||
+                        property.IsForeignKey() ||
+                        IsIndexed(entityType, property))
+                    {
+                        Logger.LogWarning(
+                            "Large text column convention skipped {EntityType}.{PropertyName} because it is used by a key or an index, configure its column type explicitly when the configured length is not supported.",
+                            entityType.Name,
+                            property.Name);
+                        continue;
+                    }
+
+                    var columnType = ResolveColumnType(property, providerOptions);
+                    if (columnType == null)
+                    {
+                        Logger.LogWarning(
+                            "Large text column convention skipped {EntityType}.{PropertyName} because no large text column type is configured for {ProviderName}.",
+                            entityType.Name,
+                            property.Name,
+                            ProviderName);
+                        continue;
+                    }
+
+                    ApplyColumnType(property, columnType);
                 }
             }
         }
 
         /// <summary>
-        /// Returns the bounded string and byte[] columns that take part in the conversion.
+        /// Checks whether the property can be mapped to a large object column at all.
         /// </summary>
-        protected virtual IEnumerable<IConventionProperty> GetCandidates(
+        protected virtual bool ShouldConsider(
             IConventionEntityType entityType,
+            IConventionProperty property,
             bool includeBinary)
         {
-            foreach (var property in entityType.GetProperties())
+            if (property.ClrType != typeof(string) &&
+                !(includeBinary && property.ClrType == typeof(byte[])))
             {
-                if (property.ClrType != typeof(string) &&
-                    !(includeBinary && property.ClrType == typeof(byte[])))
-                {
-                    continue;
-                }
-
-                // Only bounded columns, and never override an explicitly configured column type.
-                if (property.GetMaxLength() == null ||
-                    property.FindAnnotation(RelationalAnnotationNames.ColumnType) != null)
-                {
-                    continue;
-                }
-
-                if (property.IsFixedLength() == true ||
-                    property.GetValueConverter() != null ||
-                    property.IsConcurrencyToken)
-                {
-                    continue;
-                }
-
-                if (entityType.FindDiscriminatorProperty() == property)
-                {
-                    continue;
-                }
-
-                if (property.IsKey() ||
-                    property.IsForeignKey() ||
-                    entityType.GetIndexes().Any(index => index.Properties.Contains(property)))
-                {
-                    Logger.LogWarning(
-                        "Large text column convention skipped {EntityType}.{PropertyName} because it is used by a key or an index, configure its column type explicitly if the configured length is not supported.",
-                        entityType.Name,
-                        property.Name);
-                    continue;
-                }
-
-                yield return property;
+                return false;
             }
+
+            // An explicitly configured column type always wins.
+            if (property.FindAnnotation(RelationalAnnotationNames.ColumnType) != null)
+            {
+                return false;
+            }
+
+            if (property.IsFixedLength() == true ||
+                property.GetValueConverter() != null ||
+                property.IsConcurrencyToken)
+            {
+                return false;
+            }
+
+            return entityType.FindDiscriminatorProperty() != property;
+        }
+
+        protected virtual bool HasLargeTextColumnAttribute(IConventionProperty property)
+        {
+            return property.PropertyInfo?.IsDefined(typeof(LargeTextColumnAttribute), false) == true;
+        }
+
+        protected virtual bool IsAboveInlineLimit(
+            IConventionProperty property,
+            int? maxLength,
+            AbpLargeTextColumnProviderOptions providerOptions)
+        {
+            if (maxLength == null)
+            {
+                return false;
+            }
+
+            return property.ClrType == typeof(string)
+                ? providerOptions.StringMaxLength is int stringMaxLength && maxLength > stringMaxLength
+                : providerOptions.BinaryMaxLength is int binaryMaxLength && maxLength > binaryMaxLength;
+        }
+
+        protected virtual bool IsIndexed(IConventionEntityType entityType, IConventionProperty property)
+        {
+            return entityType.GetIndexes().Any(index => index.Properties.Contains(property));
+        }
+
+        protected virtual string? ResolveColumnType(
+            IConventionProperty property,
+            AbpLargeTextColumnProviderOptions providerOptions)
+        {
+            if (property.ClrType != typeof(string))
+            {
+                return providerOptions.BinaryColumnType;
+            }
+
+            return property.IsUnicode() == false
+                ? providerOptions.NonUnicodeStringColumnType ?? providerOptions.StringColumnType
+                : providerOptions.StringColumnType;
         }
 
         /// <summary>
@@ -216,5 +238,3 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         }
     }
 }
-
-

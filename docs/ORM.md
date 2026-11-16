@@ -399,6 +399,165 @@ Configure connection string in `appsettings.json`:
 }
 ```
 
+### Large Text Columns
+
+`SharpAbp.Abp.EntityFrameworkCore` registers a model finalizing convention that maps string and binary columns
+to the large object type of the database. A column is converted when its configured length is above what the
+provider stores inline, when the potential row size of the table is above the provider limit, or when the
+property is marked with `[LargeTextColumn]`. It runs for every `AbpDbContext` model, so modules never need
+provider specific code, and it is enabled by default.
+
+| Provider | Handled by | Result |
+| --- | --- | --- |
+| Oracle | driver | strings above 2000 characters become `NCLOB`, binary above 2000 bytes `BLOB` |
+| SQL Server | driver | strings above 4000 characters become `nvarchar(max)`/`varchar(max)` |
+| PostgreSQL | driver | `character varying` up to 10485760 characters, longer strings become `text` |
+| SQLite | driver | `TEXT`, the configured length is ignored |
+| MySQL | convention | strings above 16383 characters or a table row above 65535 bytes become `longtext` |
+| DM (DaMeng) | convention | strings above 2000 characters become `CLOB`, binary above 2000 bytes `BLOB` |
+| OceanBase | convention | Oracle mode strings above 32767 characters become `CLOB` |
+
+The convention also maps the column type of a marked property for every provider: `NCLOB`/`CLOB` and `BLOB` on
+Oracle, `nvarchar(max)`/`varchar(max)` and `varbinary(max)` on SQL Server, `text`/`bytea` on PostgreSQL,
+GaussDB and OpenGauss, `TEXT`/`BLOB` on SQLite, and the provider column type of the table above for MySQL, DM
+and OceanBase.
+
+Columns are skipped when they are part of a key, an index or a unique index, are concurrency tokens, are fixed
+length, have a value converter, or when the column type was set explicitly with `HasColumnType`. A skipped long
+column is logged as a warning, configure its type manually when it cannot stay inline.
+
+Configuration, all values are optional and the built in defaults are shown:
+
+```json
+{
+  "EfCoreOptions": {
+    "LargeTextColumns": {
+      "Enabled": true,
+      "IncludeBinary": true,
+      "Providers": {
+        "MySql": {
+          "StringMaxLength": 16383,
+          "StringColumnType": "longtext",
+          "BinaryMaxLength": 65535,
+          "BinaryColumnType": "longblob",
+          "MaxRowSizeBytes": 65535,
+          "RowSizeConversionMinLength": 2000
+        },
+        "Dm": {
+          "StringMaxLength": 2000,
+          "StringColumnType": "CLOB",
+          "BinaryMaxLength": 2000,
+          "BinaryColumnType": "BLOB"
+        },
+        "OceanBase": {
+          "StringMaxLength": 32767,
+          "StringColumnType": "CLOB",
+          "BinaryMaxLength": 2000,
+          "BinaryColumnType": "BLOB"
+        },
+        "Oracle": {
+          "StringColumnType": "NCLOB",
+          "NonUnicodeStringColumnType": "CLOB",
+          "BinaryColumnType": "BLOB"
+        },
+        "SqlServer": {
+          "StringColumnType": "nvarchar(max)",
+          "NonUnicodeStringColumnType": "varchar(max)",
+          "BinaryColumnType": "varbinary(max)"
+        },
+        "PostgreSql": {
+          "StringColumnType": "text",
+          "BinaryColumnType": "bytea"
+        },
+        "GaussDB": {
+          "StringColumnType": "text",
+          "BinaryColumnType": "bytea"
+        },
+        "OpenGauss": {
+          "StringColumnType": "text",
+          "BinaryColumnType": "bytea"
+        },
+        "Sqlite": {
+          "StringColumnType": "TEXT",
+          "BinaryColumnType": "BLOB"
+        }
+      }
+    }
+  }
+}
+```
+
+The Oracle, SQL Server, PostgreSQL, GaussDB, OpenGauss and SQLite entries have no length limits, because those
+drivers widen long columns by themselves; they only define the column type of a property marked with
+`[LargeTextColumn]`.
+
+An entry under `Providers` replaces the built in entry of that provider as a whole, so write all fields of
+that provider when you override it. Providers that are missing from the dictionary are not converted at all.
+The MySQL row size check assumes utf8mb4, lower `RowSizeConversionMinLength` when the server uses a single byte
+character set. OceanBase currently has no EF Core 9/10 provider, its entry only applies when such a provider is
+used.
+
+`ConfigureDefaultConvention` is a single slot in ABP. When another module or the application sets it, call
+`AddSharpAbpLargeTextColumnConvention` inside that action, which is also the way to skip one DbContext:
+
+```csharp
+Configure<AbpDbContextOptions>(options =>
+{
+    options.ConfigureDefaultConvention((dbContext, modelConfigurationBuilder) =>
+    {
+        if (dbContext is not ReportingDbContext)
+        {
+            modelConfigurationBuilder.AddSharpAbpLargeTextColumnConvention(dbContext);
+        }
+
+        // Other default conventions
+    });
+});
+```
+
+When a DbContext is created without ABP property injection, for example a hand written
+`IDesignTimeDbContextFactory` that calls `new YourDbContext(options)`, ABP skips its `ConfigureConventions`
+hooks and the default options are used. Add the convention to the DbContext explicitly in that case:
+
+```csharp
+protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+{
+    base.ConfigureConventions(configurationBuilder);
+    configurationBuilder.AddSharpAbpLargeTextColumnConvention(this);
+}
+```
+
+Per field control:
+
+- `[LargeTextColumn]`: mark a string or `byte[]` property when it should always be a large object column, for
+  example a key material or a JSON payload that has no natural maximum length. The convention maps it to the
+  large object type of the database, so the entity stays provider agnostic. The attribute is in
+  `SharpAbp.Abp.Data`.
+
+```csharp
+public class RSACreds : Entity<Guid>
+{
+    [LargeTextColumn]
+    public string PublicKey { get; set; }
+
+    [LargeTextColumn]
+    public string PrivateKey { get; set; }
+}
+```
+
+- Long text field with a length: give the property a length above the inline limit, for example
+  `HasMaxLength(4000)`. It is one change that is correct for every provider, because the driver or the
+  convention picks the right type, and it keeps DTO validation and migrations consistent.
+- Provider specific type of one field: set `HasColumnType` explicitly in the provider project, for example
+  `builder.Entity<MyEntity>().Property(x => x.Payload).HasColumnType("NCLOB")` in the Oracle project, or guard it
+  with `builder.GetSharpAbpDatabaseProvider() == DatabaseProvider.Oracle` in a shared DbContext. An explicit
+  column type always wins, the convention never changes it.
+- Oracle cannot alter an existing `VARCHAR2`/`NVARCHAR2` column to `CLOB`/`NCLOB` (`ORA-22858`). Migrate an
+  existing database with a hand written migration: add the new LOB column, copy the data, drop the old column
+  and rename the new one.
+- A marked property that is part of a key or an index is skipped with a warning, because most databases cannot
+  index a LOB column. Configure the column type of such a property manually when the database supports it.
+
 ### Usage Example
 
 #### Define DbContext
