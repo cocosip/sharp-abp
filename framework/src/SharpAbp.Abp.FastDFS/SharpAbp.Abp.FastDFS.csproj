@@ -4,7 +4,10 @@
 	<Import Project="..\..\..\configureawait.props" />
 
 	<PropertyGroup>
-		<TargetFrameworks>$(ProjectFrameworks)</TargetFrameworks>
+		<!-- $(ProjectFrameworks) drops $(NetCoreFx) because it is defined before NetCoreFx in Directory.Build.props.
+		     FastDFS.Client 1.3.0's netstandard2.0 asset depends on Microsoft.Extensions 10.x, its net9.0 asset uses 9.x,
+		     so the $(NetCoreFx) asset is required to keep net9 consumers off the .NET 10 libraries. -->
+		<TargetFrameworks>netstandard2.0;netstandard2.1;$(NetCoreFx)</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>Nullable</WarningsAsErrors>
 		<AssemblyName>SharpAbp.Abp.FastDFS</AssemblyName>

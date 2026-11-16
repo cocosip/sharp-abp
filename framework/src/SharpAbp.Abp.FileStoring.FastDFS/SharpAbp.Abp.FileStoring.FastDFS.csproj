@@ -4,7 +4,9 @@
 	<Import Project="..\..\..\configureawait.props" />
 
 	<PropertyGroup>
-		<TargetFrameworks>$(ProjectFrameworks)</TargetFrameworks>
+		<!-- Kept in sync with SharpAbp.Abp.FastDFS: both need the $(NetCoreFx) asset so net9 consumers do not
+		     end up with the Microsoft.Extensions 10.x references of the netstandard assets. -->
+		<TargetFrameworks>netstandard2.0;netstandard2.1;$(NetCoreFx)</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>Nullable</WarningsAsErrors>
 		<AssemblyName>SharpAbp.Abp.FileStoring.FastDFS</AssemblyName>
