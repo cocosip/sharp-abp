@@ -2,7 +2,6 @@
 using System;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities;
-using Volo.Abp.TenantManagement;
 
 namespace SharpAbp.Abp.TenantGroupManagement
 {
@@ -47,7 +46,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
         public TenantGroupConnectionString(Guid tenantGroupId, [NotNull] string name, [NotNull] string value)
         {
             TenantGroupId = tenantGroupId;
-            Name = Check.NotNullOrWhiteSpace(name, nameof(name), TenantConnectionStringConsts.MaxNameLength);
+            Name = Check.NotNullOrWhiteSpace(name, nameof(name), TenantGroupConnectionStringConsts.MaxNameLength);
             SetValue(value);
         }
 
@@ -58,7 +57,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
         /// <exception cref="ArgumentException">Thrown when value is null, empty, or exceeds maximum length.</exception>
         public virtual void SetValue([NotNull] string value)
         {
-            Value = Check.NotNullOrWhiteSpace(value, nameof(value), TenantConnectionStringConsts.MaxValueLength);
+            Value = Check.NotNullOrWhiteSpace(value, nameof(value), TenantGroupConnectionStringConsts.MaxValueLength);
         }
 
         /// <summary>

@@ -8,7 +8,7 @@
         public static int MaxNameLength { get; set; } = 128;
 
         /// <summary>
-        /// Default value: 512
+        /// Default value: 256
         /// </summary>
         public static int MaxHttpServerLength { get; set; } = 256;
     }

@@ -47,6 +47,7 @@ namespace SharpAbp.Abp.FileStoring.Database
 
                 b.Property(p => p.ContainerId).IsRequired(); //TODO: Foreign key!
                 b.Property(p => p.Name).IsRequired().HasMaxLength(DatabaseFileConsts.MaxNameLength);
+                // The max length must stay above 2000 so Oracle maps the column to BLOB instead of RAW(2000).
                 b.Property(p => p.Content).HasMaxLength(DatabaseFileConsts.MaxContentLength);
 
                 b.HasOne<DatabaseFileContainer>().WithMany().HasForeignKey(p => p.ContainerId);

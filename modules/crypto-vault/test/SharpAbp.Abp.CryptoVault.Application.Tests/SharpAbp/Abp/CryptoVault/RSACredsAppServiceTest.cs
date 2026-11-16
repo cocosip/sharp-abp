@@ -1,5 +1,6 @@
 ﻿using SharpAbp.Abp.Crypto.RSA;
 using System.Threading.Tasks;
+using Volo.Abp.Validation;
 using Xunit;
 
 namespace SharpAbp.Abp.CryptoVault
@@ -72,6 +73,19 @@ namespace SharpAbp.Abp.CryptoVault
             Assert.NotEqual(rsaCreds.PrivateKey, createDto.PrivateKey);
             Assert.Equal(decryptKey.PublicKey, createDto.PublicKey);
             Assert.Equal(decryptKey.PrivateKey, createDto.PrivateKey);
+        }
+
+        [Fact]
+        public async Task PublicKey_Above_MaxLength_Is_Rejected()
+        {
+            var keyPair = _rsaEncryptionService.GenerateRSAKeyPair(1024);
+
+            await Assert.ThrowsAsync<AbpValidationException>(() => _rsaCredsAppService.CreateAsync(new CreateRSACredsDto()
+            {
+                Size = 1024,
+                PublicKey = new string('a', RSACredsConsts.MaxPublicKeyLength + 1),
+                PrivateKey = keyPair.Private.ExportPrivateKey()
+            }));
         }
 
     }
