@@ -9,7 +9,7 @@
         public static int MaxTokenLength { get; set; } = 64;
 
         /// <summary>
-        /// Default value: 32
+        /// Default value: 64
         /// </summary>
         public static int MaxBizTypeLength { get; set; } = 64;
 

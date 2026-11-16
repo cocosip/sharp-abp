@@ -1,5 +1,6 @@
-﻿﻿using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.CryptoVault
 {
@@ -35,6 +36,7 @@ namespace SharpAbp.Abp.CryptoVault
         /// The format should be compatible with the RSA algorithm implementation.
         /// </remarks>
         [Required(ErrorMessage = "The RSA public key is required and cannot be null or empty.")]
+        [DynamicStringLength(typeof(RSACredsConsts), nameof(RSACredsConsts.MaxPublicKeyLength))]
         public string PublicKey { get; set; }
 
         /// <summary>
@@ -50,6 +52,7 @@ namespace SharpAbp.Abp.CryptoVault
         /// The format should be compatible with the RSA algorithm implementation.
         /// </remarks>
         [Required(ErrorMessage = "The RSA private key is required and cannot be null or empty.")]
+        [DynamicStringLength(typeof(RSACredsConsts), nameof(RSACredsConsts.MaxPrivateKeyLength))]
         public string PrivateKey { get; set; }
 
         /// <summary>

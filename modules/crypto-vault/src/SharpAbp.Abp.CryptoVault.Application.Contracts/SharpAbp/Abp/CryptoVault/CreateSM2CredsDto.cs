@@ -1,4 +1,4 @@
-﻿﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.CryptoVault
@@ -35,6 +35,7 @@ namespace SharpAbp.Abp.CryptoVault
         /// The format should be compatible with the SM2 algorithm implementation.
         /// </remarks>
         [Required(ErrorMessage = "The SM2 public key is required and cannot be null or empty.")]
+        [DynamicStringLength(typeof(SM2CredsConsts), nameof(SM2CredsConsts.MaxPublicKeyLength))]
         public string PublicKey { get; set; }
 
         /// <summary>
@@ -50,6 +51,7 @@ namespace SharpAbp.Abp.CryptoVault
         /// The format should be compatible with the SM2 algorithm implementation.
         /// </remarks>
         [Required(ErrorMessage = "The SM2 private key is required and cannot be null or empty.")]
+        [DynamicStringLength(typeof(SM2CredsConsts), nameof(SM2CredsConsts.MaxPrivateKeyLength))]
         public string PrivateKey { get; set; }
     }
 }

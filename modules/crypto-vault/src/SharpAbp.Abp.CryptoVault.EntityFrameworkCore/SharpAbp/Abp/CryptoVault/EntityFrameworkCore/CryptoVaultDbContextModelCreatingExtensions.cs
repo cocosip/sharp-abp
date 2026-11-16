@@ -32,6 +32,8 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
 
                 b.Property(p => p.Size).IsRequired();
 
+                // Key material is stored as a LOB: the configured length is intentionally above 2000 so
+                // Oracle (ODP.NET) maps these columns to NCLOB instead of a truncated NVARCHAR2(2000).
                 b.Property(p => p.PublicKey).IsRequired().HasMaxLength(RSACredsConsts.MaxPublicKeyLength);
 
                 b.Property(p => p.PrivateKey).IsRequired().HasMaxLength(RSACredsConsts.MaxPrivateKeyLength);

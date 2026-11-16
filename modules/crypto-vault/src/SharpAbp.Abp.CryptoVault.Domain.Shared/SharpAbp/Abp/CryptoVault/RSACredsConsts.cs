@@ -24,11 +24,15 @@
 
         /// <summary>
         /// Default value: 8192
+        /// Key material is long text: the length must stay above 2000 so Oracle maps the column to NCLOB
+        /// instead of NVARCHAR2(2000), which cannot hold an encrypted 3072/4096 bit key.
         /// </summary>
         public static int MaxPublicKeyLength { get; set; } = 8192;
 
         /// <summary>
         /// Default value: 8192
+        /// Key material is long text: the length must stay above 2000 so Oracle maps the column to NCLOB
+        /// instead of NVARCHAR2(2000), which cannot hold an encrypted 3072/4096 bit key.
         /// </summary>
         public static int MaxPrivateKeyLength { get; set; } = 8192;
 

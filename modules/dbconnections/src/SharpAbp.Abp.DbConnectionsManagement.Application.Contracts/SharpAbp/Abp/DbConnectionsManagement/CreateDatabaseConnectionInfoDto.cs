@@ -24,7 +24,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         /// </summary>
         /// <value>A string representing the database provider name, must not be null or empty.</value>
         [Required]
-        [DynamicStringLength(typeof(DatabaseConnectionInfoConsts), nameof(DatabaseConnectionInfoConsts.MaxConnectionStringLength))]
+        [DynamicStringLength(typeof(DatabaseConnectionInfoConsts), nameof(DatabaseConnectionInfoConsts.MaxDatabaseProviderLength))]
         public string DatabaseProvider { get; set; }
 
         /// <summary>

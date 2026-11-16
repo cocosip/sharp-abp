@@ -34,7 +34,7 @@ namespace SharpAbp.Abp.FileStoring.Database
         {
             Check.NotNull(content, nameof(content));
 
-            if (content.Length >= DatabaseFileConsts.MaxContentLength)
+            if (content.Length > DatabaseFileConsts.MaxContentLength)
             {
                 throw new AbpException($"File content size cannot be more than {DatabaseFileConsts.MaxContentLength} Bytes.");
             }

@@ -13,8 +13,9 @@
         public static int MaxDatabaseProviderLength { get; set; } = 32;
 
         /// <summary>
-        /// Default value: 256.
+        /// Default value: 1024.
+        /// Kept at or below 2000 so Oracle maps the column to NVARCHAR2(n) instead of a LOB.
         /// </summary>
-        public static int MaxConnectionStringLength { get; set; } = 256;
+        public static int MaxConnectionStringLength { get; set; } = 1024;
     }
 }
