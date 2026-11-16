@@ -11,6 +11,7 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         private const string MySqlProviderName = "Pomelo.EntityFrameworkCore.MySql";
         private const string DmProviderName = "DM.Microsoft.EntityFrameworkCore";
         private const string OracleProviderName = "Oracle.EntityFrameworkCore";
+        private const string SqlServerProviderName = "Microsoft.EntityFrameworkCore.SqlServer";
         private const string OceanBaseProviderName = "OceanBase.EntityFrameworkCore";
 
         [Fact]
@@ -113,6 +114,86 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             Assert.Null(GetConfiguredColumnType(dbContext, nameof(TestEntity.Binary)));
         }
 
+        [Fact]
+        public void Convention_Can_Be_Registered_Without_Abp_Service_Provider()
+        {
+            // A DbContext created without ABP property injection (for example by a hand written
+            // IDesignTimeDbContextFactory) registers the convention from ConfigureConventions.
+            using var dbContext = new DesignTimeDbContext();
+
+            var property = dbContext.Model
+                .FindEntityType(typeof(TestEntity))
+                .FindProperty(nameof(TestEntity.Long8192));
+
+            // SQLite is not configured in the default options, so nothing is converted, but the
+            // model has to build with the default options.
+            Assert.Null(property.FindAnnotation(RelationalAnnotationNames.ColumnType)?.Value);
+        }
+
+        private sealed class DesignTimeDbContext : DbContext
+        {
+            protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+            {
+                optionsBuilder.UseSqlite("Data Source=:memory:");
+            }
+
+            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            {
+                modelBuilder.Entity<TestEntity>(builder =>
+                {
+                    builder.HasKey(x => x.Id);
+                    builder.Property(x => x.Long8192).HasMaxLength(8192);
+                });
+            }
+
+            protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+            {
+                configurationBuilder.AddSharpAbpLargeTextColumnConvention(this);
+            }
+        }
+
+        [Fact]
+        public void Attribute_Maps_Unbounded_Column_To_Oracle_Lob()
+        {
+            using var dbContext = CreateDbContext<OracleAttributeTag>(OracleProviderName, new AbpLargeTextColumnOptions());
+
+            Assert.Equal("NCLOB", GetConfiguredColumnType(dbContext, nameof(TestEntity.Marked)));
+            Assert.Equal("CLOB", GetConfiguredColumnType(dbContext, nameof(TestEntity.MarkedAnsi)));
+            Assert.Equal("BLOB", GetConfiguredColumnType(dbContext, nameof(TestEntity.MarkedBinary)));
+            // Indexed columns and explicit column types are never changed.
+            Assert.Null(GetConfiguredColumnType(dbContext, nameof(TestEntity.MarkedIndexed)));
+            Assert.Equal("varchar(8192)", GetConfiguredColumnType(dbContext, nameof(TestEntity.MarkedExplicit)));
+        }
+
+        [Fact]
+        public void Attribute_Maps_Unbounded_Column_To_SqlServer_Lob()
+        {
+            using var dbContext = CreateDbContext<SqlServerAttributeTag>(SqlServerProviderName, new AbpLargeTextColumnOptions());
+
+            Assert.Equal("nvarchar(max)", GetConfiguredColumnType(dbContext, nameof(TestEntity.Marked)));
+            Assert.Equal("varchar(max)", GetConfiguredColumnType(dbContext, nameof(TestEntity.MarkedAnsi)));
+            Assert.Equal("varbinary(max)", GetConfiguredColumnType(dbContext, nameof(TestEntity.MarkedBinary)));
+        }
+
+        [Fact]
+        public void Attribute_Maps_Unbounded_Column_To_Dm_Lob()
+        {
+            using var dbContext = CreateDbContext<DmAttributeTag>(DmProviderName, new AbpLargeTextColumnOptions());
+
+            Assert.Equal("CLOB", GetConfiguredColumnType(dbContext, nameof(TestEntity.Marked)));
+            Assert.Equal("BLOB", GetConfiguredColumnType(dbContext, nameof(TestEntity.MarkedBinary)));
+        }
+
+        [Fact]
+        public void Attribute_Is_Ignored_For_A_Provider_Without_Column_Types()
+        {
+            using var dbContext = CreateDbContext<InMemoryAttributeTag>(
+                "Microsoft.EntityFrameworkCore.InMemory",
+                new AbpLargeTextColumnOptions());
+
+            Assert.Null(GetConfiguredColumnType(dbContext, nameof(TestEntity.Marked)));
+        }
+
         private static string GetConfiguredColumnType(DbContext dbContext, string propertyName)
         {
             var property = dbContext.Model
@@ -163,6 +244,22 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         private sealed class OverrideTag
         {
         }
+
+        private sealed class OracleAttributeTag
+        {
+        }
+
+        private sealed class SqlServerAttributeTag
+        {
+        }
+
+        private sealed class DmAttributeTag
+        {
+        }
+
+        private sealed class InMemoryAttributeTag
+        {
+        }
     }
 
     public class TestEntity
@@ -184,6 +281,21 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         public string Concurrency { get; set; }
 
         public byte[] Binary { get; set; }
+
+        [LargeTextColumn]
+        public string Marked { get; set; }
+
+        [LargeTextColumn]
+        public string MarkedAnsi { get; set; }
+
+        [LargeTextColumn]
+        public byte[] MarkedBinary { get; set; }
+
+        [LargeTextColumn]
+        public string MarkedIndexed { get; set; }
+
+        [LargeTextColumn]
+        public string MarkedExplicit { get; set; }
     }
 
     public class ConventionDbContext<TTag> : DbContext
@@ -217,6 +329,12 @@ namespace SharpAbp.Abp.EntityFrameworkCore
                 builder.HasIndex(x => x.Indexed);
                 builder.Property(x => x.Concurrency).HasMaxLength(8192).IsConcurrencyToken();
                 builder.Property(x => x.Binary).HasMaxLength(3000);
+                builder.Property(x => x.Marked);
+                builder.Property(x => x.MarkedAnsi).IsUnicode(false);
+                builder.Property(x => x.MarkedBinary);
+                builder.Property(x => x.MarkedIndexed);
+                builder.HasIndex(x => x.MarkedIndexed);
+                builder.Property(x => x.MarkedExplicit).HasMaxLength(8192).HasColumnType("varchar(8192)");
             });
         }
 

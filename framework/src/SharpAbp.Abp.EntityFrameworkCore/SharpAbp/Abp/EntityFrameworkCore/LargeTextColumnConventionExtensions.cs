@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
@@ -14,8 +15,11 @@ namespace SharpAbp.Abp.EntityFrameworkCore
 
         /// <summary>
         /// Registers <see cref="LargeTextColumnConvention"/> for the given DbContext. It is called
-        /// automatically for every AbpDbContext by <see cref="SharpAbpEntityFrameworkCoreModule"/>;
-        /// call it manually when the host overrides AbpDbContextOptions.ConfigureDefaultConvention.
+        /// automatically for every AbpDbContext by <see cref="SharpAbpEntityFrameworkCoreModule"/>.
+        /// Call it manually when the host overrides AbpDbContextOptions.ConfigureDefaultConvention, or
+        /// from ConfigureConventions when the DbContext is created without ABP property injection
+        /// (for example a hand written IDesignTimeDbContextFactory), in which case the default options
+        /// are used.
         /// </summary>
         public static ModelConfigurationBuilder AddSharpAbpLargeTextColumnConvention(
             this ModelConfigurationBuilder configurationBuilder,
@@ -30,14 +34,26 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             // AbpDbContext exposes its services through LazyServiceProvider, while the convention
             // factory below only gets the EF Core service provider, which cannot resolve them.
             var lazyServiceProvider = GetLazyServiceProvider(dbContext);
-            if (lazyServiceProvider == null)
-            {
-                return configurationBuilder;
-            }
 
-            var options = lazyServiceProvider.LazyGetRequiredService<IOptions<AbpLargeTextColumnOptions>>();
-            var databaseProviderAccessor = lazyServiceProvider.LazyGetRequiredService<IEfCoreDatabaseProviderAccessor>();
-            var logger = lazyServiceProvider.LazyGetRequiredService<ILogger<LargeTextColumnConvention>>();
+            IOptions<AbpLargeTextColumnOptions> options;
+            IEfCoreDatabaseProviderAccessor databaseProviderAccessor;
+            ILogger<LargeTextColumnConvention> logger;
+
+            if (lazyServiceProvider != null)
+            {
+                options = lazyServiceProvider.LazyGetRequiredService<IOptions<AbpLargeTextColumnOptions>>();
+                databaseProviderAccessor = lazyServiceProvider.LazyGetRequiredService<IEfCoreDatabaseProviderAccessor>();
+                logger = lazyServiceProvider.LazyGetRequiredService<ILogger<LargeTextColumnConvention>>();
+            }
+            else
+            {
+                // DbContext without ABP property injection (design time factories, manual creation).
+                // The convention is registered from ConfigureConventions by the DbContext itself.
+                options = Microsoft.Extensions.Options.Options.Create(new AbpLargeTextColumnOptions());
+                databaseProviderAccessor = new EfCoreDatabaseProviderAccessor(
+                    NullLogger<EfCoreDatabaseProviderAccessor>.Instance);
+                logger = NullLogger<LargeTextColumnConvention>.Instance;
+            }
 
             configurationBuilder.Conventions.Add(_ => new LargeTextColumnConvention(
                 providerName,
