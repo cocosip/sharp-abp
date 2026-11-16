@@ -31,28 +31,37 @@ namespace SharpAbp.Abp.ConcurrencyLimiting
             }
 
             // Test-only control of native idle timestamps; the real native timer owns cleanup.
+            // System.Threading.RateLimiting 10.0.15 wraps the limiter in a LimiterEntry that carries the
+            // last access timestamp, earlier versions store the lazily created limiter directly.
             var flags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
             var nativeType = limiter.GetType();
-            var partitions = (Dictionary<ConcurrencyLimitingPartitionKey, Lazy<RateLimiter>>)nativeType.GetField("_limiters", flags)!.GetValue(limiter)!;
-            lock (partitions)
+            var partitions = (System.Collections.IDictionary)nativeType.GetField("_limiters", flags)!.GetValue(limiter)!;
+            var idleTimestamp = Stopwatch.GetTimestamp() - 20 * Stopwatch.Frequency;
+            lock (partitions.SyncRoot)
             {
                 Assert.Equal(101, partitions.Count);
-                foreach (var entry in partitions.Values)
+                foreach (System.Collections.DictionaryEntry partition in partitions)
                 {
-                    if (entry.Value.IdleDuration.HasValue)
+                    var entry = partition.Value!.GetType().GetProperty("Value", flags)!.GetValue(partition.Value)!;
+                    // Access timestamp is only used for the no-op limiter, the idle duration of a concrete
+                    // limiter comes from its own _idleSince field.
+                    entry.GetType().GetField("LastAccessTimestamp", flags)?.SetValue(entry, idleTimestamp);
+                    var rateLimiter = entry.GetType().GetProperty("Limiter", flags)?.GetValue(entry) as RateLimiter
+                        ?? entry as RateLimiter;
+                    if (rateLimiter?.IdleDuration.HasValue == true)
                     {
-                        entry.Value.GetType().GetField("_idleSince", flags)!.SetValue(entry.Value, Stopwatch.GetTimestamp() - 20 * Stopwatch.Frequency);
+                        rateLimiter.GetType().GetField("_idleSince", flags)!.SetValue(rateLimiter, idleTimestamp);
                     }
                 }
             }
             var deadline = Stopwatch.StartNew();
             while (true)
             {
-                lock (partitions)
+                lock (partitions.SyncRoot)
                 {
                     if (partitions.Count == 1)
                     {
-                        Assert.True(partitions.ContainsKey(activeKey));
+                        Assert.True(partitions.Contains(activeKey));
                         break;
                     }
                 }
