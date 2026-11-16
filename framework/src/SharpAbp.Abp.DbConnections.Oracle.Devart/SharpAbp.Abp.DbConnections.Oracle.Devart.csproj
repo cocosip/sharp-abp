@@ -20,7 +20,9 @@
 	<ItemGroup>
 		<PackageReference Include="Devart.Data.Oracle.EFCore" />
 		<PackageReference Include="Volo.Abp.EntityFrameworkCore.Oracle.Devart" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+		<!-- Devart.Data.Oracle.EFCore requires Microsoft.EntityFrameworkCore.Relational >= 10.0.14,
+		     while the shared EfCorePackageVersion follows the ABP 10.7.1 baseline (10.0.11). -->
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" VersionOverride="10.0.14" />
 	</ItemGroup>
 
 	<ItemGroup>
