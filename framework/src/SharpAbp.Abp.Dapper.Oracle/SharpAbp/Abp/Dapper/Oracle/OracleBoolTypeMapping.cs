@@ -9,16 +9,11 @@ namespace SharpAbp.Abp.Dapper.Oracle
     {
         public override bool CanSetValue(IDbDataParameter parameter) => parameter is OracleParameter;
 
-        public override bool CanParse(object? value) => false;
+        public override bool CanParse(object? value) => value is decimal or byte or sbyte or short or int or long;
 
         public override void SetValue(IDbDataParameter parameter, bool value)
         {
             parameter.Value = value ? (byte)1 : (byte)0;
-        }
-
-        public override void SetNullValue(IDbDataParameter parameter)
-        {
-            parameter.Value = (byte)0;
         }
 
         public override bool Parse(object value)

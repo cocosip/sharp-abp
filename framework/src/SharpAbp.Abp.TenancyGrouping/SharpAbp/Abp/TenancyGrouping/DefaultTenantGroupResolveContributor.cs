@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -27,7 +27,8 @@ namespace SharpAbp.Abp.TenancyGrouping
             {
                 context.ServiceProvider
                     .GetRequiredService<ILogger<DefaultTenantGroupResolveContributor>>()
-                    .LogWarning(e.ToString());
+                    .LogError(e, "Failed to resolve tenant group for the current tenant.");
+                throw;
             }
 
         }

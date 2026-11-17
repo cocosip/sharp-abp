@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -98,55 +98,5 @@ namespace SharpAbp.Abp.TenancyGrouping
 
             return await tenantGroupStore.FindAsync(groupId);
         }
-
-
-        //protected IServiceProvider ServiceProvider { get; }
-        //public TenantGroupConnectionStringResolver(
-        //    IOptionsMonitor<AbpDbConnectionOptions> options,
-        //    ICurrentTenant currentTenant,
-        //    IServiceProvider serviceProvider) : base(options, currentTenant, serviceProvider)
-        //{
-        //    ServiceProvider = serviceProvider;
-        //}
-
-
-        //protected override async Task<TenantConfiguration?> FindTenantConfigurationAsync(Guid tenantId)
-        //{
-        //    using var serviceScope = ServiceProvider.CreateScope();
-        //    var currentTenantGroup = serviceScope.ServiceProvider.GetService<ICurrentTenantGroup>();
-        //    if (currentTenantGroup != null && currentTenantGroup.IsAvailable)
-        //    {
-
-        //    }
-
-
-        //    var tenantStore = serviceScope
-        //        .ServiceProvider
-        //        .GetRequiredService<ITenantStore>();
-
-        //    var tenant = await tenantStore.FindAsync(tenantId);
-
-        //    var tenantGroupStore = serviceScope.ServiceProvider.GetRequiredService<ITenantGroupStore>();
-        //    var tenantGroup = await tenantGroupStore.FindByTenantIdAsync(tenantId);
-        //    if (tenantGroup != null && tenantGroup.IsActive)
-        //    {
-        //        if (tenantGroup.ConnectionStrings != null)
-        //        {
-        //            var defaultConnectionString = tenant?.ConnectionStrings?.Default;
-
-        //            if (tenant != null)
-        //            {
-        //                tenant.ConnectionStrings = tenantGroup.ConnectionStrings;
-        //                if (tenant.ConnectionStrings.Default.IsNullOrWhiteSpace())
-        //                {
-        //                    tenant.ConnectionStrings.Default = defaultConnectionString;
-        //                }
-        //            }
-        //        }
-        //    }
-
-        //    return tenant;
-        //}
-
     }
 }

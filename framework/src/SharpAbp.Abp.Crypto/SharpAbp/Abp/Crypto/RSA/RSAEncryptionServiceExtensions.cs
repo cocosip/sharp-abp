@@ -19,7 +19,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="encoding">The encoding to use for the plain text. Defaults to UTF8.</param>
         /// <param name="padding">The padding scheme to use (e.g., "PKCS1Padding", "OAEPPadding").</param>
         /// <returns>The encrypted data as a Base64 string.</returns>
-        public static string Encrypt(this IRSAEncryptionService rsaEncryptionService, AsymmetricKeyParameter publicKeyParam, string plainText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
+        public static string Encrypt(this IRSAEncryptionService rsaEncryptionService, AsymmetricKeyParameter publicKeyParam, string plainText, Encoding? encoding = null, string padding = RSAPaddingNames.PKCS1Padding)
         {
             encoding ??= Encoding.UTF8;
             var cipherText = rsaEncryptionService.Encrypt(publicKeyParam, encoding.GetBytes(plainText), padding);
@@ -35,7 +35,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="encoding">The encoding to use for the plain text. Defaults to UTF8.</param>
         /// <param name="padding">The padding scheme to use (e.g., "PKCS1Padding", "OAEPPadding").</param>
         /// <returns>The encrypted data as a Base64 string.</returns>
-        public static string EncryptFromPem(this IRSAEncryptionService rsaEncryptionService, string publicKeyPem, string plainText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
+        public static string EncryptFromPem(this IRSAEncryptionService rsaEncryptionService, string publicKeyPem, string plainText, Encoding? encoding = null, string padding = RSAPaddingNames.PKCS1Padding)
         {
             var publicKeyParam = rsaEncryptionService.ImportPublicKeyPem(publicKeyPem);
             return rsaEncryptionService.Encrypt(publicKeyParam, plainText, encoding, padding);
@@ -50,7 +50,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="encoding">The encoding to use for the decrypted text. Defaults to UTF8.</param>
         /// <param name="padding">The padding scheme used during encryption (e.g., "PKCS1Padding", "OAEPPadding").</param>
         /// <returns>The decrypted data as a string.</returns>
-        public static string Decrypt(this IRSAEncryptionService rsaEncryptionService, AsymmetricKeyParameter privateKeyParam, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
+        public static string Decrypt(this IRSAEncryptionService rsaEncryptionService, AsymmetricKeyParameter privateKeyParam, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.PKCS1Padding)
         {
             encoding ??= Encoding.UTF8;
             var cipherBytes = Base64.Decode(cipherText);
@@ -67,7 +67,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="encoding">The encoding to use for the decrypted text. Defaults to UTF8.</param>
         /// <param name="padding">The padding scheme used during encryption (e.g., "PKCS1Padding", "OAEPPadding").</param>
         /// <returns>The decrypted data as a string.</returns>
-        public static string DecryptFromPem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
+        public static string DecryptFromPem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.PKCS1Padding)
         {
             var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPem(privateKeyPem);
             return rsaEncryptionService.Decrypt(privateKeyParam, cipherText, encoding, padding);
@@ -82,7 +82,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="encoding">The encoding to use for the decrypted text. Defaults to UTF8.</param>
         /// <param name="padding">The padding scheme used during encryption (e.g., "PKCS1Padding", "OAEPPadding").</param>
         /// <returns>The decrypted data as a string.</returns>
-        public static string DecryptFromPkcs8Pem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
+        public static string DecryptFromPkcs8Pem(this IRSAEncryptionService rsaEncryptionService, string privateKeyPem, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.PKCS1Padding)
         {
             var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPkcs8Pem(privateKeyPem);
             return rsaEncryptionService.Decrypt(privateKeyParam, cipherText, encoding, padding);
@@ -178,7 +178,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="encoding">The encoding to use for the plain text. Defaults to UTF8.</param>
         /// <param name="padding">The padding scheme to use (e.g., "PKCS1Padding", "OAEPPadding").</param>
         /// <returns>The encrypted data as a Base64 string.</returns>
-        public static string EncryptFromBase64(this IRSAEncryptionService rsaEncryptionService, string publicKeyBase64, string plainText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
+        public static string EncryptFromBase64(this IRSAEncryptionService rsaEncryptionService, string publicKeyBase64, string plainText, Encoding? encoding = null, string padding = RSAPaddingNames.PKCS1Padding)
         {
             var publicKeyParam = rsaEncryptionService.ImportPublicKey(publicKeyBase64);
             return rsaEncryptionService.Encrypt(publicKeyParam, plainText, encoding, padding);
@@ -193,7 +193,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="encoding">The encoding to use for the decrypted text. Defaults to UTF8.</param>
         /// <param name="padding">The padding scheme used during encryption (e.g., "PKCS1Padding", "OAEPPadding").</param>
         /// <returns>The decrypted data as a string.</returns>
-        public static string DecryptFromBase64(this IRSAEncryptionService rsaEncryptionService, string privateKeyBase64, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
+        public static string DecryptFromBase64(this IRSAEncryptionService rsaEncryptionService, string privateKeyBase64, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.PKCS1Padding)
         {
             var privateKeyParam = rsaEncryptionService.ImportPrivateKey(privateKeyBase64);
             return rsaEncryptionService.Decrypt(privateKeyParam, cipherText, encoding, padding);
@@ -208,7 +208,7 @@ namespace SharpAbp.Abp.Crypto.RSA
         /// <param name="encoding">The encoding to use for the decrypted text. Defaults to UTF8.</param>
         /// <param name="padding">The padding scheme used during encryption (e.g., "PKCS1Padding", "OAEPPadding").</param>
         /// <returns>The decrypted data as a string.</returns>
-        public static string DecryptFromPkcs8Base64(this IRSAEncryptionService rsaEncryptionService, string privateKeyBase64, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.None)
+        public static string DecryptFromPkcs8Base64(this IRSAEncryptionService rsaEncryptionService, string privateKeyBase64, string cipherText, Encoding? encoding = null, string padding = RSAPaddingNames.PKCS1Padding)
         {
             var privateKeyParam = rsaEncryptionService.ImportPrivateKeyPkcs8(privateKeyBase64);
             return rsaEncryptionService.Decrypt(privateKeyParam, cipherText, encoding, padding);

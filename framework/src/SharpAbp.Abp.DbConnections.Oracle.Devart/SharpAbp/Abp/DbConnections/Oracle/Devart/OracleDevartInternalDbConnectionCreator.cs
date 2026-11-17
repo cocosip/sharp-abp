@@ -1,9 +1,9 @@
-﻿using Devart.Data.Oracle;
+using Devart.Data.Oracle;
 using SharpAbp.Abp.Data;
 using System.Data;
 using Volo.Abp.DependencyInjection;
 
-namespace SharpAbp.Abp.DbConnections.Oracle.Drvart
+namespace SharpAbp.Abp.DbConnections.Oracle.Devart
 {
     [ExposeKeyedService<IInternalDbConnectionCreator>(DatabaseProvider.Oracle)]
     public class OracleDevartInternalDbConnectionCreator : IInternalDbConnectionCreator, ITransientDependency

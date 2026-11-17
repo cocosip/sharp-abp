@@ -129,15 +129,16 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         public virtual async Task<DatabaseConnectionInfoDto> CreateAsync(CreateDatabaseConnectionInfoDto input)
         {
             var databaseConnectionInfo = await ConnectionInfoManager.CreateAsync(input.Name, input.DatabaseProvider, input.ConnectionString);
+            var created = await ConnectionInfoRepository.InsertAsync(databaseConnectionInfo);
+
             await DistributedEventBus.PublishAsync(new DatabaseConnectionCreatedEto()
             {
-                Id = databaseConnectionInfo.Id,
-                Name = input.Name,
-                DatabaseProvider = databaseConnectionInfo.DatabaseProvider,
-                ConnectionString = input.ConnectionString,
+                Id = created.Id,
+                Name = created.Name,
+                DatabaseProvider = created.DatabaseProvider,
+                ConnectionString = created.ConnectionString,
             });
 
-            var created = await ConnectionInfoRepository.InsertAsync(databaseConnectionInfo);
             return ObjectMapper.Map<DatabaseConnectionInfo, DatabaseConnectionInfoDto>(created);
         }
 

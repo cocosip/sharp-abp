@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Domain.Entities;
 using Volo.Abp.OpenIddict.Scopes;
 
 namespace SharpAbp.Abp.OpenIddict
@@ -63,6 +64,10 @@ namespace SharpAbp.Abp.OpenIddict
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
             var scope = await OpenIddictScopeRepository.FindByNameAsync(name);
+            if (scope == null)
+            {
+                throw new EntityNotFoundException(typeof(OpenIddictScope), name);
+            }
             return await ToScopeDtoAsync(scope.ToModel());
         }
 
@@ -146,6 +151,10 @@ namespace SharpAbp.Abp.OpenIddict
         public virtual async Task<OpenIddictScopeDto> UpdateAsync(Guid id, UpdateOpenIddictScopeDto input)
         {
             var model = await OpenIddictScopeStore.FindByIdAsync(id.ToString("D"), CancellationToken.None);
+            if (model == null)
+            {
+                throw new EntityNotFoundException(typeof(OpenIddictScope), id);
+            }
             model.ExtraProperties.Clear();
             foreach (var extraProperty in input.ExtraProperties)
             {

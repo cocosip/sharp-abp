@@ -36,7 +36,7 @@ namespace SharpAbp.Abp.FileStoring.Azure
             ValidateHelper.NotNullOrWhiteSpace(result, Provider, AzureFileProviderConfigurationNames.ContainerName, values.FindValue(AzureFileProviderConfigurationNames.ContainerName));
 
             //CreateContainerIfNotExists
-            ValidateHelper.NotNullOrWhiteSpace(result, Provider, AzureFileProviderConfigurationNames.CreateContainerIfNotExists, values.FindValue(AzureFileProviderConfigurationNames.CreateContainerIfNotExists));
+            ValidateHelper.ShouldBool(result, Provider, AzureFileProviderConfigurationNames.CreateContainerIfNotExists, values.FindValue(AzureFileProviderConfigurationNames.CreateContainerIfNotExists));
 
             return result;
         }

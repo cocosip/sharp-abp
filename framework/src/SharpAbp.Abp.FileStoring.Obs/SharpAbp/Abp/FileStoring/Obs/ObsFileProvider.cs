@@ -220,7 +220,7 @@ namespace SharpAbp.Abp.FileStoring.Obs
                 }
 
                 var expiresSeconds = 600;
-                if (args.Expires.HasValue)
+                if (args.Expires.HasValue && args.Expires > Clock.Now)
                 {
                     expiresSeconds = (int)(args.Expires.Value - Clock.Now).TotalSeconds;
                 }

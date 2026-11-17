@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +24,7 @@ namespace SharpAbp.Abp.EventBus.MassTransit.RabbitMQ
         {
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
 
-            if (abpMassTransitOptions.Provider!.Equals(MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(abpMassTransitOptions.Provider, MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
                 var abpMassTransitEventBusOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitEventBusOptions>();
 
@@ -61,7 +61,7 @@ namespace SharpAbp.Abp.EventBus.MassTransit.RabbitMQ
                         }),
                         MessageConfigure = new Action<string, IRabbitMqBusFactoryConfigurator>((exchangeName, c) =>
                         {
-                            c.Message<MassTransitEventBusConsumer>(e =>
+                            c.Message<AbpMassTransitEventData>(e =>
                             {
                                 e.SetEntityName(exchangeName);
                             });

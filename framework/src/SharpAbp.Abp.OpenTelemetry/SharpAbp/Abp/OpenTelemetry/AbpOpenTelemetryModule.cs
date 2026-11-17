@@ -56,35 +56,6 @@ namespace SharpAbp.Abp.OpenTelemetry
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            var openTelemetryOptions = context.Services.ExecutePreConfiguredActions<AbpOpenTelemetryOptions>();
-
-            if (openTelemetryOptions.Tracing.IsEnabled &&
-                TryResolveExporter(openTelemetryOptions.Tracing.ExporterName, openTelemetryOptions.TracingExporters, out var tracingExporter))
-            {
-                PreConfigure<AbpOpenTelemetryOptions>(options =>
-                {
-                    options.Tracing.ExporterConfigure = tracingExporter;
-                });
-            }
-
-            if (openTelemetryOptions.Metrics.IsEnabled &&
-                TryResolveExporter(openTelemetryOptions.Metrics.ExporterName, openTelemetryOptions.MetricsExporters, out var metricsExporter))
-            {
-                PreConfigure<AbpOpenTelemetryOptions>(options =>
-                {
-                    options.Metrics.ExporterConfigure = metricsExporter;
-                });
-            }
-
-            if (openTelemetryOptions.Logging.IsEnabled &&
-                TryResolveExporter(openTelemetryOptions.Logging.ExporterName, openTelemetryOptions.LoggingExporters, out var loggingExporter))
-            {
-                PreConfigure<AbpOpenTelemetryOptions>(options =>
-                {
-                    options.Logging.ExporterConfigure = loggingExporter;
-                });
-            }
-
             return Task.CompletedTask;
         }
 
@@ -95,6 +66,36 @@ namespace SharpAbp.Abp.OpenTelemetry
 
         public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
         {
+            // Exporter modules depend on this module, so their ConfigureServices has already run here.
+            var exporterOptions = context.Services.ExecutePreConfiguredActions<AbpOpenTelemetryOptions>();
+
+            if (exporterOptions.Tracing.IsEnabled &&
+                TryResolveExporter(exporterOptions.Tracing.ExporterName, exporterOptions.TracingExporters, out var tracingExporter))
+            {
+                PreConfigure<AbpOpenTelemetryOptions>(options =>
+                {
+                    options.Tracing.ExporterConfigure = tracingExporter;
+                });
+            }
+
+            if (exporterOptions.Metrics.IsEnabled &&
+                TryResolveExporter(exporterOptions.Metrics.ExporterName, exporterOptions.MetricsExporters, out var metricsExporter))
+            {
+                PreConfigure<AbpOpenTelemetryOptions>(options =>
+                {
+                    options.Metrics.ExporterConfigure = metricsExporter;
+                });
+            }
+
+            if (exporterOptions.Logging.IsEnabled &&
+                TryResolveExporter(exporterOptions.Logging.ExporterName, exporterOptions.LoggingExporters, out var loggingExporter))
+            {
+                PreConfigure<AbpOpenTelemetryOptions>(options =>
+                {
+                    options.Logging.ExporterConfigure = loggingExporter;
+                });
+            }
+
             var resourcePreConfigureActions = context.Services.GetPreConfigureActions<AbpOpenTelemetryResourceOptions>();
             Configure<AbpOpenTelemetryResourceOptions>(options =>
             {

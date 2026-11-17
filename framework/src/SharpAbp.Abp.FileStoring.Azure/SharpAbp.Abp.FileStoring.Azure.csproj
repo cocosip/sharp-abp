@@ -24,6 +24,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Azure.Storage.Blobs" />
+		<PackageReference Include="Volo.Abp.Timing" />
 	</ItemGroup>
 
 	<ItemGroup>

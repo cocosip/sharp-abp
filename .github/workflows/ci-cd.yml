@@ -13,21 +13,7 @@ on:
       - v*
 
 env:
-  # 定义所有需要构建/测试/打包的解决方案路径
-  SOLUTION_PATHS: |
-    framework
-    modules/file-storing-database
-    modules/file-storing-management
-    modules/map-tenancy-management
-    modules/tenant-group-management
-    modules/dbconnections
-    modules/Identity
-    modules/openiddict
-    modules/audit-logging
-    modules/account
-    modules/minid
-    modules/crypto-vault
-    modules/transform-security-management
+  DOTNET_NOLOGO: true
 
 jobs:
   build-and-test:
@@ -70,61 +56,29 @@ jobs:
     - name: Build All Solutions
       shell: bash
       run: |
-        solutions=(
-          "framework"
-          "modules/file-storing-database"
-          "modules/file-storing-management"
-          "modules/map-tenancy-management"
-          "modules/tenant-group-management"
-          "modules/dbconnections"
-          "modules/Identity"
-          "modules/openiddict"
-          "modules/audit-logging"
-          "modules/account"
-          "modules/minid"
-          "modules/crypto-vault"
-          "modules/transform-security-management"
-        )
-
-        for solution in "${solutions[@]}"; do
+        while IFS= read -r solution; do
+          [ -z "$solution" ] && continue
           echo "::group::Building solution: $solution"
-          dotnet build "$solution" -c Release
-          if [ $? -ne 0 ]; then
+          if ! dotnet build "$solution" -c Release; then
             echo "::error::Build failed for solution: $solution"
             exit 1
           fi
           echo "::endgroup::"
-        done
+        done < solutions.txt
         echo "✓ All solutions built successfully!"
 
     - name: Test All Solutions
       shell: bash
       run: |
-        solutions=(
-          "framework"
-          "modules/file-storing-database"
-          "modules/file-storing-management"
-          "modules/map-tenancy-management"
-          "modules/tenant-group-management"
-          "modules/dbconnections"
-          "modules/Identity"
-          "modules/openiddict"
-          "modules/audit-logging"
-          "modules/account"
-          "modules/minid"
-          "modules/crypto-vault"
-          "modules/transform-security-management"
-        )
-
-        for solution in "${solutions[@]}"; do
+        while IFS= read -r solution; do
+          [ -z "$solution" ] && continue
           echo "::group::Testing solution: $solution"
-          dotnet test "$solution" --no-build -c Release
-          if [ $? -ne 0 ]; then
+          if ! dotnet test "$solution" --no-build -c Release; then
             echo "::error::Test failed for solution: $solution"
             exit 1
           fi
           echo "::endgroup::"
-        done
+        done < solutions.txt
         echo "✓ All tests passed successfully!"
 
     # 以下步骤仅在 tag 推送时执行
@@ -135,31 +89,15 @@ jobs:
         # 创建输出目录
         mkdir -p dest
 
-        solutions=(
-          "framework"
-          "modules/file-storing-database"
-          "modules/file-storing-management"
-          "modules/map-tenancy-management"
-          "modules/tenant-group-management"
-          "modules/dbconnections"
-          "modules/Identity"
-          "modules/openiddict"
-          "modules/audit-logging"
-          "modules/account"
-          "modules/minid"
-          "modules/crypto-vault"
-          "modules/transform-security-management"
-        )
-
-        for solution in "${solutions[@]}"; do
+        while IFS= read -r solution; do
+          [ -z "$solution" ] && continue
           echo "::group::Packing solution: $solution"
-          dotnet pack "$solution" -c Release --include-symbols --no-build -o dest
-          if [ $? -ne 0 ]; then
+          if ! dotnet pack "$solution" -c Release --include-symbols --no-build -o dest; then
             echo "::error::Pack failed for solution: $solution"
             exit 1
           fi
           echo "::endgroup::"
-        done
+        done < solutions.txt
         echo "✓ All solutions packed successfully!"
 
     # Trusted publishing: exchange this run's GitHub OIDC token for a one-hour

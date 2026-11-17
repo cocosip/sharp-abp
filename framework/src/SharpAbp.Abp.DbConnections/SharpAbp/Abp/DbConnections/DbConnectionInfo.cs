@@ -1,4 +1,4 @@
-﻿using SharpAbp.Abp.Data;
+using SharpAbp.Abp.Data;
 using System;
 
 namespace SharpAbp.Abp.DbConnections
@@ -72,8 +72,10 @@ namespace SharpAbp.Abp.DbConnections
         /// <returns>A hash code for the current DbConnectionInfo</returns>
         public override int GetHashCode()
         {
-            return StringComparer.InvariantCulture.GetHashCode(ConnectionString)
-                | DatabaseProvider.GetHashCode();
+            unchecked
+            {
+                return ((int)DatabaseProvider * 397) ^ (ConnectionString?.GetHashCode() ?? 0);
+            }
         }
     }
 }

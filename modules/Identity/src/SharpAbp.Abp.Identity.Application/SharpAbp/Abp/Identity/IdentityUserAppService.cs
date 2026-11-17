@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Data;
 using Volo.Abp.Identity;
 using Volo.Abp.ObjectExtending;
 
@@ -238,8 +239,7 @@ namespace SharpAbp.Abp.Identity
 
             var user = await UserManager.GetByIdAsync(id);
 
-            //4.2.2之后版本
-            //user.SetConcurrencyStampIfNotNull(input.ConcurrencyStamp);
+            user.SetConcurrencyStampIfNotNull(input.ConcurrencyStamp);
 
             (await UserManager.SetUserNameAsync(user, input.UserName)).CheckErrors();
 
@@ -425,7 +425,7 @@ namespace SharpAbp.Abp.Identity
 
         protected virtual async Task UpdateUserOrganizationUnits(IdentityUser user, params Guid[] organizationUnitIds)
         {
-            if (organizationUnitIds != null && organizationUnitIds.Any())
+            if (organizationUnitIds != null)
             {
                 await UserManager.SetOrganizationUnitsAsync(user, organizationUnitIds);
             }

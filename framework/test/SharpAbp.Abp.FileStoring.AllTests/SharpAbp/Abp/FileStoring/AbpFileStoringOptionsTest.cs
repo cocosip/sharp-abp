@@ -20,14 +20,12 @@ namespace SharpAbp.Abp.FileStoring
         private readonly IFileContainerConfigurationProvider _configurationProvider;
         private readonly AbpFileStoringOptions _options;
         private readonly AbpFileStoringAbstractionsOptions _abstractionsOptions;
-        private readonly IFileContainerFactory _fileContainerFactory;
         public AbpFileStoringOptionsTest()
         {
             _currentTenant = GetRequiredService<ICurrentTenant>();
             _configurationProvider = GetRequiredService<IFileContainerConfigurationProvider>();
             _options = GetRequiredService<IOptions<AbpFileStoringOptions>>().Value;
             _abstractionsOptions = GetRequiredService<IOptions<AbpFileStoringAbstractionsOptions>>().Value;
-            _fileContainerFactory = GetRequiredService<IFileContainerFactory>();
         }
 
 
@@ -82,9 +80,9 @@ namespace SharpAbp.Abp.FileStoring
             var fastDFSConfiguration = configuration.GetFastDFSConfiguration();
 
             Assert.Equal("default", fastDFSConfiguration.ClusterName);
-            Assert.Equal("http://192.168.0.100", fastDFSConfiguration.HttpServer);
+            Assert.Equal("http://127.0.0.1", fastDFSConfiguration.HttpServer);
             Assert.Equal("group1", fastDFSConfiguration.GroupName);
-            Assert.Equal("192.168.0.101:22122,192.168.0.102:22122", fastDFSConfiguration.Trackers);
+            Assert.Equal("127.0.0.1:22122", fastDFSConfiguration.Trackers);
             Assert.True(fastDFSConfiguration.AntiStealCheckToken);
             Assert.Equal("123456", fastDFSConfiguration.SecretKey);
             Assert.Equal("utf-8", fastDFSConfiguration.Charset);
@@ -112,7 +110,7 @@ namespace SharpAbp.Abp.FileStoring
 
             Assert.Equal("/usr/local/file_system", fileSystemConfiguration.BasePath);
             Assert.True(fileSystemConfiguration.AppendContainerNameToBasePath);
-            Assert.Equal("http://192.168.0.100", fileSystemConfiguration.HttpServer);
+            Assert.Equal("http://127.0.0.1", fileSystemConfiguration.HttpServer);
         }
 
         [Fact]
@@ -131,12 +129,6 @@ namespace SharpAbp.Abp.FileStoring
             Assert.Equal("SecretKey", minioConfiguration.SecretKey);
             Assert.False(minioConfiguration.WithSSL);
             Assert.True(minioConfiguration.CreateBucketIfNotExists);
-
-            //using (_currentTenant.Change(Guid.Parse("3a044922-eeea-f5b0-b21d-581b400d73c0")))
-            //{
-            //    var container = _fileContainerFactory.Create("minio-test");
-            //    var url = await container.GetAccessUrlAsync("Hidos/3a044922-eeea-f5b0-b21d-581b400d73c0/Default/1.2.156.112618.86.101.3706474.22062178130944.4151728/1.3.12.2.1107.5.3.63.20350.2.202206210956460246-CR/1.3.12.2.1107.5.3.63.20350.11.202206210956460246-1-1.dcm");
-            //}
         }
 
 
@@ -154,7 +146,7 @@ namespace SharpAbp.Abp.FileStoring
             var s3Configuration = configuration.GetS3Configuration();
 
             Assert.Equal("s3-bucket", s3Configuration.BucketName);
-            Assert.Equal("http://192.168.0.100", s3Configuration.ServerUrl);
+            Assert.Equal("http://127.0.0.1", s3Configuration.ServerUrl);
             Assert.Equal("AccessKeyId", s3Configuration.AccessKeyId);
             Assert.Equal("SecretAccessKey", s3Configuration.SecretAccessKey);
             Assert.False(s3Configuration.ForcePathStyle);

@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,12 +51,12 @@ namespace SharpAbp.Abp.MapTenancy
         public MapTenancyConfiguration GetConfigurationByMapCode([NotNull] string mapCode)
         {
             Check.NotNullOrWhiteSpace(mapCode, nameof(mapCode));
-            return _mappers.Where(x => x.Value.MapCode == mapCode).FirstOrDefault().Value ;
+            return _mappers.Values.FirstOrDefault(x => x.MapCode == mapCode);
         }
 
         public MapTenancyConfiguration GetConfigurationByTenantId(Guid tenantId)
         {
-            return _mappers.Where(x => x.Value.TenantId == tenantId).FirstOrDefault().Value;
+            return _mappers.Values.FirstOrDefault(x => x.TenantId == tenantId);
         }
 
     }

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
@@ -26,16 +26,24 @@ namespace SharpAbp.Abp.CryptoVault
 
         public async Task SeedAsync(DataSeedContext context)
         {
-            var rsaCount = await _rsaCredsRepository.GetCountAsync();
-            if (rsaCount < _options.RSACount)
+            if (context.TenantId.HasValue)
             {
-                var rsaCredsList = _keyService.GenerateRSACreds(_options.RSAKeySize, _options.RSACount);
+                return;
+            }
+
+            var rsaCount = await _rsaCredsRepository.GetCountAsync();
+            var rsaToGenerate = _options.RSACount - rsaCount;
+            if (rsaToGenerate > 0)
+            {
+                var rsaCredsList = _keyService.GenerateRSACreds(_options.RSAKeySize, rsaToGenerate);
                 await _rsaCredsRepository.InsertManyAsync(rsaCredsList);
             }
+
             var sm2Count = await _sm2CredsRepository.GetCountAsync();
-            if (sm2Count < _options.SM2Count)
+            var sm2ToGenerate = _options.SM2Count - sm2Count;
+            if (sm2ToGenerate > 0)
             {
-                var sm2CredsList = _keyService.GenerateSM2Creds(_options.SM2Curve, _options.SM2Count);
+                var sm2CredsList = _keyService.GenerateSM2Creds(_options.SM2Curve, sm2ToGenerate);
                 await _sm2CredsRepository.InsertManyAsync(sm2CredsList);
             }
         }

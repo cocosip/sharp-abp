@@ -45,9 +45,12 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
                 ? FileMode.Create
                 : FileMode.CreateNew;
 
+            var fileCreatedByThisSave = false;
+
             async Task SaveFileAsync()
             {
                 using var fileStream = File.Open(filePath, fileMode, FileAccess.Write);
+                fileCreatedByThisSave = true;
                 await sourceStream.CopyToAsync(
                     fileStream,
                     args.CancellationToken
@@ -65,7 +68,11 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
                         (_, _, _, _) =>
                         {
                             sourceStream.Position = initialPosition;
-                            FileHelper.DeleteIfExists(filePath);
+                            if (fileCreatedByThisSave)
+                            {
+                                FileHelper.DeleteIfExists(filePath);
+                                fileCreatedByThisSave = false;
+                            }
                             return Task.CompletedTask;
                         })
                     .ExecuteAsync(async () =>

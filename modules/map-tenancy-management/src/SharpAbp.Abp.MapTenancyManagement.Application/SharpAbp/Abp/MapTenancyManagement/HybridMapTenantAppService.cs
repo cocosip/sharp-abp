@@ -280,11 +280,11 @@ namespace SharpAbp.Abp.MapTenancyManagement
             var tenant = await TenantRepository.GetAsync(mapTenant.TenantId);
             await TenantManager.ChangeNameAsync(tenant, input.Name);
 
-            //tenant.SetConcurrencyStampIfNotNull(input.ConcurrencyStamp);
+            tenant.SetConcurrencyStampIfNotNull(input.ConcurrencyStamp);
             input.MapExtraPropertiesTo(tenant);
             await TenantRepository.UpdateAsync(tenant);
 
-            await MapTenantManager.UpdateAsync(id, tenant.Id, tenant.Name, input.Code, input.MapCode);
+            mapTenant = await MapTenantManager.UpdateAsync(id, tenant.Id, tenant.Name, input.Code, input.MapCode);
 
             var hybridMapTenant = ObjectMapper.Map<MapTenant, HybridMapTenantDto>(mapTenant);
 
@@ -307,15 +307,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         public virtual async Task DeleteAsync(Guid id)
         {
             var mapTenant = await MapTenantRepository.GetAsync(id);
-            if (mapTenant == null)
-            {
-                return;
-            }
             var tenant = await TenantRepository.GetAsync(mapTenant.TenantId);
-            if (tenant == null)
-            {
-                return;
-            }
             await TenantRepository.HardDeleteAsync(tenant);
             await MapTenantRepository.DeleteAsync(mapTenant);
         }

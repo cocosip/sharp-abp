@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<Import Project="..\..\common.props" />
 
@@ -12,10 +12,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="appsettings.secrets.json">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		  <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-		</Content>
 		<Content Include="appsettings.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -42,12 +38,6 @@
 		<PackageReference Include="Serilog.Sinks.Async" />
 		<PackageReference Include="Serilog.Sinks.Console" />
 		<PackageReference Include="Serilog.Sinks.File" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Reference Include="SharpAbp.Abp.MassTransit.PostgreSql">
-			<HintPath>..\..\..\..\framework\src\SharpAbp.Abp.MassTransit.PostgreSql\bin\Debug\netstandard2.1\SharpAbp.Abp.MassTransit.PostgreSql.dll</HintPath>
-		</Reference>
 	</ItemGroup>
 
 </Project>

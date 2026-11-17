@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 
 namespace SharpAbp.Abp.Faster
@@ -37,7 +37,11 @@ namespace SharpAbp.Abp.Faster
                 .GetSection("FasterOptions:Configurations")
                 .Get<Dictionary<string, AbpFasterConfiguration>>();
 
-            RootPath = configuration["FasterOptions:RootPath"];
+            var rootPath = configuration["FasterOptions:RootPath"];
+            if (!string.IsNullOrWhiteSpace(rootPath))
+            {
+                RootPath = rootPath;
+            }
 
             if (fasterConfigurations != null)
             {

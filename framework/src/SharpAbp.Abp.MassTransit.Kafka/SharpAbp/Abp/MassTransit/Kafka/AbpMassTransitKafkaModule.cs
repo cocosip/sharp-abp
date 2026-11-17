@@ -1,4 +1,4 @@
-﻿using MassTransit;
+using MassTransit;
 using MassTransit.KafkaIntegration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -23,7 +23,7 @@ namespace SharpAbp.Abp.MassTransit.Kafka
             var configuration = context.Services.GetConfiguration();
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
 
-            if (abpMassTransitOptions.Provider!.Equals(MassTransitKafkaConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(abpMassTransitOptions.Provider, MassTransitKafkaConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
                 PreConfigure<AbpMassTransitOptions>(options =>
                 {
@@ -93,7 +93,7 @@ namespace SharpAbp.Abp.MassTransit.Kafka
         public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
         {
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
-            if (abpMassTransitOptions.Provider!.Equals(MassTransitKafkaConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(abpMassTransitOptions.Provider, MassTransitKafkaConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
                 var kafkaPreConfiguredOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitKafkaOptions>();
                 Configure<AbpMassTransitKafkaOptions>(options => options.CopyFrom(kafkaPreConfiguredOptions));

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.MassTransit;
 using System;
@@ -108,7 +108,7 @@ namespace SharpAbp.Abp.EventBus.MassTransit
         public virtual async Task ProcessEventAsync(AbpMassTransitEventData message)
         {
             var eventName = message.EventName;
-            var eventType = EventTypes.GetOrDefault(eventName);
+            var eventType = GetEventTypeByEventName(eventName);
             if (eventType == null)
             {
                 return;
@@ -139,7 +139,7 @@ namespace SharpAbp.Abp.EventBus.MassTransit
         /// <exception cref="Exception">Throws aggregated exceptions if any handlers fail during processing.</exception>
         public override async Task ProcessFromInboxAsync(IncomingEventInfo incomingEvent, InboxConfig inboxConfig)
         {
-            var eventType = EventTypes.GetOrDefault(incomingEvent.EventName);
+            var eventType = GetEventTypeByEventName(incomingEvent.EventName);
             if (eventType == null)
             {
                 return;
@@ -202,7 +202,7 @@ namespace SharpAbp.Abp.EventBus.MassTransit
                     });
                 }
 
-                await PublishToMassTransitAsync(outgoingEvent.EventName, Serializer.Deserialize(outgoingEvent.EventData, GetEventType(outgoingEvent.EventName)), outgoingEvent.GetCorrelationId(), outgoingEvent.Id);
+                await PublishToMassTransitAsync(outgoingEvent.EventName, outgoingEvent.EventData, outgoingEvent.GetCorrelationId(), outgoingEvent.Id);
             }
         }
 
@@ -598,6 +598,26 @@ namespace SharpAbp.Abp.EventBus.MassTransit
                 eventName,
                 (messageId ?? GuidGenerator.Create()).ToString("N"),
                 Serializer.SerializeToString(eventData),
+                correlationId);
+
+            await MassTransitPublisher.PublishAsync(data, cancellationToken);
+        }
+
+        /// <summary>
+        /// Publishes an already serialized event to MassTransit, preserving the original payload bytes.
+        /// </summary>
+        /// <param name="eventName">The name of the event to publish.</param>
+        /// <param name="eventData">The UTF-8 JSON payload of the event.</param>
+        /// <param name="correlationId">The correlation ID for request tracking.</param>
+        /// <param name="messageId">The optional message ID. If not provided, a new GUID will be generated.</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        protected virtual async Task PublishToMassTransitAsync(string eventName, byte[] eventData, string? correlationId, Guid? messageId = null, CancellationToken cancellationToken = default)
+        {
+            var data = new AbpMassTransitEventData(
+                eventName,
+                (messageId ?? GuidGenerator.Create()).ToString("N"),
+                System.Text.Encoding.UTF8.GetString(eventData),
                 correlationId);
 
             await MassTransitPublisher.PublishAsync(data, cancellationToken);

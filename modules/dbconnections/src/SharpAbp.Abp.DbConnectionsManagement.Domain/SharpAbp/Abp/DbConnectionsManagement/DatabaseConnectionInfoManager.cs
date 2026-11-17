@@ -72,6 +72,15 @@ namespace SharpAbp.Abp.DbConnectionsManagement
             string connectionString,
             CancellationToken cancellationToken = default)
         {
+            if (databaseConnectionInfo.Name != name)
+            {
+                var duplicate = await ConnectionInfoRepository.FindExpectedByNameAsync(name, databaseConnectionInfo.Id, cancellationToken: cancellationToken);
+                if (duplicate != null)
+                {
+                    throw new UserFriendlyException(Localizer["DbConnectionsManagement.DuplicateName", name]);
+                }
+            }
+
             databaseConnectionInfo.Update(name, databaseProvider, connectionString);
             return await ConnectionInfoRepository.UpdateAsync(databaseConnectionInfo, cancellationToken: cancellationToken);
         }
@@ -89,10 +98,10 @@ namespace SharpAbp.Abp.DbConnectionsManagement
             string name,
             CancellationToken cancellationToken = default)
         {
-            var queryDatabaseConnectionInfo = await ConnectionInfoRepository.FindExpectedByNameAsync(databaseConnectionInfo.Name, databaseConnectionInfo.Id, cancellationToken: cancellationToken);
+            var queryDatabaseConnectionInfo = await ConnectionInfoRepository.FindExpectedByNameAsync(name, databaseConnectionInfo.Id, cancellationToken: cancellationToken);
             if (queryDatabaseConnectionInfo != null)
             {
-                throw new UserFriendlyException(Localizer["DbConnectionsManagement.DuplicateName", databaseConnectionInfo.Name]);
+                throw new UserFriendlyException(Localizer["DbConnectionsManagement.DuplicateName", name]);
             }
 
             databaseConnectionInfo.ChangeName(name);

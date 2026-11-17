@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.MassTransit;
 using System.Threading.Tasks;
 using Volo.Abp;
@@ -26,32 +26,8 @@ namespace SharpAbp.Abp.EventBus.MassTransit
                 options.Topic = "Abp.MassTransit.EventBus";
             });
 
-            Configure<AbpMassTransitEventBusOptions>(options =>
-            {
-                options.Topic = "Abp.MassTransit.EventBus";
-            });
-
             return Task.CompletedTask;
         }
-
-        public override void PostConfigureServices(ServiceConfigurationContext context)
-        {
-            AsyncHelper.RunSync(() => PostConfigureServicesAsync(context));
-        }
-
-        public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
-        {
-            var actions = context.Services.GetPreConfigureActions<AbpMassTransitEventBusOptions>();
-            var options = new AbpMassTransitEventBusOptions();
-
-            foreach (var action in actions)
-            {
-                action(options);
-            }
-
-            return Task.CompletedTask;
-        }
-
 
         public override void OnApplicationInitialization(ApplicationInitializationContext context)
         {

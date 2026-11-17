@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -74,9 +74,8 @@ namespace SharpAbp.Abp.Swashbuckle.Versioning
         {
             var apiExplorerConfigures = context.Services.GetPreConfigureActions<ApiExplorerOptions>();
 
-            context.Services.AddApiVersioning(options => { })
-                .AddApiExplorer(options =>
-                {
+            context.Services.AddApiVersioning().AddApiExplorer(options =>
+            {
                     options.GroupNameFormat = "'v'VVV";
                     options.SubstituteApiVersionInUrl = true;
                     if (apiExplorerConfigures != null)

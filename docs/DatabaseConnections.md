@@ -29,34 +29,33 @@ Configure in `appsettings.json`:
 
 ```json
 {
-  "DbConnections": {
-    "Databases": [
-      {
-        "Name": "Default",
-        "DatabaseType": "SqlServer",
+  "DbConnectionsOptions": {
+    "DbConnections": {
+      "Default": {
+        "DatabaseProvider": "SqlServer",
         "ConnectionString": "Server=localhost;Database=MyDb;User Id=sa;Password=****;"
       },
-      {
-        "Name": "ReportingDb",
-        "DatabaseType": "MySQL",
+      "ReportingDb": {
+        "DatabaseProvider": "MySql",
         "ConnectionString": "Server=localhost;Database=ReportDb;Uid=root;Pwd=****;"
       },
-      {
-        "Name": "AnalyticsDb",
-        "DatabaseType": "PostgreSql",
+      "AnalyticsDb": {
+        "DatabaseProvider": "PostgreSql",
         "ConnectionString": "Host=localhost;Database=AnalyticsDb;Username=postgres;Password=****;"
       },
-      {
-        "Name": "LegacyDb",
-        "DatabaseType": "DM",
+      "LegacyDb": {
+        "DatabaseProvider": "Dm",
         "ConnectionString": "Server=localhost;Port=5236;User Id=SYSDBA;PWD=SYSDBA;Database=LegacyDb;"
       }
-    ]
+    },
+    "DatabaseProviders": [ "SqlServer", "MySql", "PostgreSql", "Dm" ]
   }
 }
 ```
 
-Add the module dependency:
+Every provider used by a connection must also be listed in `DatabaseProviders`, otherwise connection creation throws.
+
+Add the module dependency and bind the configuration section:
 
 ```csharp
 [DependsOn(
@@ -74,26 +73,24 @@ public class YourModule : AbpModule
 
         Configure<AbpDbConnectionsOptions>(options =>
         {
-            options.Databases.AddIfNotContains(
-                new DatabaseConfiguration
-                {
-                    DatabaseName = "Default",
-                    DatabaseType = DatabaseType.SqlServer,
-                    ConnectionString = configuration.GetConnectionString("Default")
-                }
-            );
-
-            options.Databases.AddIfNotContains(
-                new DatabaseConfiguration
-                {
-                    DatabaseName = "ReportingDb",
-                    DatabaseType = DatabaseType.MySQL,
-                    ConnectionString = configuration.GetConnectionString("ReportingDb")
-                }
-            );
+            options.Configure(configuration);
         });
     }
 }
+```
+
+Connections can also be configured in code instead of `appsettings.json`:
+
+```csharp
+Configure<AbpDbConnectionsOptions>(options =>
+{
+    options.DatabaseProviders.Add(DatabaseProvider.SqlServer);
+    options.DbConnections.Configure("Default", c =>
+    {
+        c.DatabaseProvider = DatabaseProvider.SqlServer;
+        c.ConnectionString = configuration.GetConnectionString("Default");
+    });
+});
 ```
 
 ### Usage Example
@@ -111,21 +108,21 @@ public class DatabaseService : ITransientDependency
     }
 
     // Get connection to default database
-    public async Task<DbConnection> GetDefaultConnectionAsync()
+    public async Task<IDbConnection> GetDefaultConnectionAsync()
     {
-        return await _dbConnectionFactory.CreateAsync("Default");
+        return await _dbConnectionFactory.GetDbConnectionAsync("Default");
     }
 
     // Get connection to specific database
-    public async Task<DbConnection> GetReportingConnectionAsync()
+    public async Task<IDbConnection> GetReportingConnectionAsync()
     {
-        return await _dbConnectionFactory.CreateAsync("ReportingDb");
+        return await _dbConnectionFactory.GetDbConnectionAsync("ReportingDb");
     }
 
     // Execute query on specific database
     public async Task<List<T>> QueryAsync<T>(string databaseName, string sql, object parameters = null)
     {
-        using (var connection = await _dbConnectionFactory.CreateAsync(databaseName))
+        using (var connection = await _dbConnectionFactory.GetDbConnectionAsync(databaseName))
         {
             await connection.OpenAsync();
             return (await connection.QueryAsync<T>(sql, parameters)).ToList();
@@ -135,7 +132,7 @@ public class DatabaseService : ITransientDependency
     // Execute command on specific database
     public async Task<int> ExecuteAsync(string databaseName, string sql, object parameters = null)
     {
-        using (var connection = await _dbConnectionFactory.CreateAsync(databaseName))
+        using (var connection = await _dbConnectionFactory.GetDbConnectionAsync(databaseName))
         {
             await connection.OpenAsync();
             return await connection.ExecuteAsync(sql, parameters);
@@ -161,7 +158,7 @@ public class CrossDatabaseReportService : ApplicationService
         var report = new ReportData();
 
         // Query from main database
-        using (var mainConn = await _connectionFactory.CreateAsync("Default"))
+        using (var mainConn = await _connectionFactory.GetDbConnectionAsync("Default"))
         {
             await mainConn.OpenAsync();
             var orders = await mainConn.QueryAsync<Order>(
@@ -172,7 +169,7 @@ public class CrossDatabaseReportService : ApplicationService
         }
 
         // Query from reporting database
-        using (var reportConn = await _connectionFactory.CreateAsync("ReportingDb"))
+        using (var reportConn = await _connectionFactory.GetDbConnectionAsync("ReportingDb"))
         {
             await reportConn.OpenAsync();
             var statistics = await reportConn.QueryFirstOrDefaultAsync<Statistics>(
@@ -183,7 +180,7 @@ public class CrossDatabaseReportService : ApplicationService
         }
 
         // Query from analytics database
-        using (var analyticsConn = await _connectionFactory.CreateAsync("AnalyticsDb"))
+        using (var analyticsConn = await _connectionFactory.GetDbConnectionAsync("AnalyticsDb"))
         {
             await analyticsConn.OpenAsync();
             var metrics = await analyticsConn.QueryAsync<Metric>(
@@ -198,48 +195,30 @@ public class CrossDatabaseReportService : ApplicationService
 }
 ```
 
-#### Dynamic Database Connection
+#### Tenant-aware Connection Selection
 
 ```csharp
 public class TenantDatabaseService : ApplicationService
 {
     private readonly IDbConnectionFactory _connectionFactory;
-    private readonly IDbConnectionManager _connectionManager;
     private readonly ICurrentTenant _currentTenant;
 
     public TenantDatabaseService(
         IDbConnectionFactory connectionFactory,
-        IDbConnectionManager connectionManager,
         ICurrentTenant currentTenant)
     {
         _connectionFactory = connectionFactory;
-        _connectionManager = connectionManager;
         _currentTenant = currentTenant;
     }
 
-    // Register tenant database dynamically
-    public async Task RegisterTenantDatabaseAsync(Guid tenantId, string connectionString)
+    // Connections are registered at startup; select one by tenant convention.
+    public Task<IDbConnection> GetCurrentTenantConnectionAsync()
     {
-        var databaseName = $"Tenant_{tenantId}";
+        var connectionName = _currentTenant.Id == null
+            ? "Default"
+            : $"Tenant_{_currentTenant.Id}";
 
-        await _connectionManager.AddOrUpdateAsync(new DatabaseConfiguration
-        {
-            DatabaseName = databaseName,
-            DatabaseType = DatabaseType.SqlServer,
-            ConnectionString = connectionString
-        });
-    }
-
-    // Get current tenant's database connection
-    public async Task<DbConnection> GetCurrentTenantConnectionAsync()
-    {
-        if (_currentTenant.Id == null)
-        {
-            return await _connectionFactory.CreateAsync("Default");
-        }
-
-        var databaseName = $"Tenant_{_currentTenant.Id}";
-        return await _connectionFactory.CreateAsync(databaseName);
+        return _connectionFactory.GetDbConnectionAsync(connectionName);
     }
 
     // Query from current tenant's database
@@ -261,67 +240,21 @@ public class TenantDatabaseService : ApplicationService
 public class DatabaseHealthCheckService : ITransientDependency
 {
     private readonly IDbConnectionFactory _connectionFactory;
-    private readonly IDbConnectionManager _connectionManager;
 
-    public DatabaseHealthCheckService(
-        IDbConnectionFactory connectionFactory,
-        IDbConnectionManager connectionManager)
+    public DatabaseHealthCheckService(IDbConnectionFactory connectionFactory)
     {
         _connectionFactory = connectionFactory;
-        _connectionManager = connectionManager;
-    }
-
-    public async Task<Dictionary<string, bool>> CheckAllDatabasesAsync()
-    {
-        var results = new Dictionary<string, bool>();
-        var databases = await _connectionManager.GetAllAsync();
-
-        foreach (var db in databases)
-        {
-            try
-            {
-                using (var connection = await _connectionFactory.CreateAsync(db.DatabaseName))
-                {
-                    await connection.OpenAsync();
-                    results[db.DatabaseName] = connection.State == ConnectionState.Open;
-                }
-            }
-            catch
-            {
-                results[db.DatabaseName] = false;
-            }
-        }
-
-        return results;
     }
 
     public async Task<bool> TestConnectionAsync(string databaseName)
     {
         try
         {
-            using (var connection = await _connectionFactory.CreateAsync(databaseName))
+            using (var connection = await _connectionFactory.GetDbConnectionAsync(databaseName))
             {
                 await connection.OpenAsync();
                 return connection.State == ConnectionState.Open;
             }
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-    public async Task<bool> TestConnectionStringAsync(
-        DatabaseType databaseType,
-        string connectionString)
-    {
-        try
-        {
-            var connection = _connectionFactory.Create(databaseType, connectionString);
-            await connection.OpenAsync();
-            var isOpen = connection.State == ConnectionState.Open;
-            await connection.CloseAsync();
-            return isOpen;
         }
         catch
         {
@@ -337,16 +270,16 @@ public class DatabaseHealthCheckService : ITransientDependency
 
 ### Supported Database Types
 
-| Database | DatabaseType Enum | Package |
-|----------|------------------|---------|
-| SQL Server | `DatabaseType.SqlServer` | `SharpAbp.Abp.DbConnections.SqlServer` |
-| MySQL | `DatabaseType.MySQL` | `SharpAbp.Abp.DbConnections.MySQL` |
-| PostgreSQL | `DatabaseType.PostgreSql` | `SharpAbp.Abp.DbConnections.PostgreSql` |
-| Oracle | `DatabaseType.Oracle` | `SharpAbp.Abp.DbConnections.Oracle` |
-| Oracle (Devart) | `DatabaseType.Oracle` | `SharpAbp.Abp.DbConnections.Oracle.Devart` |
-| SQLite | `DatabaseType.Sqlite` | `SharpAbp.Abp.DbConnections.Sqlite` |
-| DM (DaMeng) | `DatabaseType.DM` | `SharpAbp.Abp.DbConnections.DM` |
-| GaussDB | `DatabaseType.GaussDB` | `SharpAbp.Abp.DbConnections.GaussDB` |
+| Database | DatabaseProvider Enum | Package |
+|----------|----------------------|---------|
+| SQL Server | `DatabaseProvider.SqlServer` | `SharpAbp.Abp.DbConnections.SqlServer` |
+| MySQL | `DatabaseProvider.MySql` | `SharpAbp.Abp.DbConnections.MySQL` |
+| PostgreSQL | `DatabaseProvider.PostgreSql` | `SharpAbp.Abp.DbConnections.PostgreSql` |
+| Oracle | `DatabaseProvider.Oracle` | `SharpAbp.Abp.DbConnections.Oracle` |
+| Oracle (Devart) | `DatabaseProvider.Oracle` | `SharpAbp.Abp.DbConnections.Oracle.Devart` |
+| SQLite | `DatabaseProvider.Sqlite` | `SharpAbp.Abp.DbConnections.Sqlite` |
+| DM (DaMeng) | `DatabaseProvider.Dm` | `SharpAbp.Abp.DbConnections.DM` |
+| GaussDB | `DatabaseProvider.GaussDB` | `SharpAbp.Abp.DbConnections.GaussDB` |
 
 ### Connection String Examples
 
@@ -394,7 +327,7 @@ Host=localhost;Port=5432;Database=MyDb;Username=gaussdb;Password=****;
 Always use `using` statements to ensure connections are properly disposed:
 
 ```csharp
-using (var connection = await _connectionFactory.CreateAsync("Default"))
+using (var connection = await _connectionFactory.GetDbConnectionAsync("Default"))
 {
     await connection.OpenAsync();
     // Use connection
@@ -409,8 +342,8 @@ For multi-statement operations, use transactions:
 ```csharp
 public async Task TransferDataAsync(string sourceDatabaseName, string targetDatabaseName)
 {
-    using (var sourceConn = await _connectionFactory.CreateAsync(sourceDatabaseName))
-    using (var targetConn = await _connectionFactory.CreateAsync(targetDatabaseName))
+    using (var sourceConn = await _connectionFactory.GetDbConnectionAsync(sourceDatabaseName))
+    using (var targetConn = await _connectionFactory.GetDbConnectionAsync(targetDatabaseName))
     {
         await sourceConn.OpenAsync();
         await targetConn.OpenAsync();
@@ -467,7 +400,7 @@ public async Task<List<T>> SafeQueryAsync<T>(string databaseName, string sql, ob
 {
     try
     {
-        using (var connection = await _connectionFactory.CreateAsync(databaseName))
+        using (var connection = await _connectionFactory.GetDbConnectionAsync(databaseName))
         {
             await connection.OpenAsync();
             return (await connection.QueryAsync<T>(sql, parameters)).ToList();

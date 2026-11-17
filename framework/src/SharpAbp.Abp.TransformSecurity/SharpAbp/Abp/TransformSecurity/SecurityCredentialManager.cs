@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using SharpAbp.Abp.Crypto.RSA;
 using SharpAbp.Abp.Crypto.SM2;
 using System;
@@ -126,8 +126,12 @@ namespace SharpAbp.Abp.TransformSecurity
                 credential.SetSM2Curve(SM2Options.Curve);
                 credential.SetSM2Mode(SM2Options.Mode);
             }
+            else
+            {
+                throw new AbpException($"The encryption algorithm '{Options.EncryptionAlgo}' is not supported. Supported algorithms are 'RSA' and 'SM2'.");
+            }
 
-            await SecurityCredentialStore.SetAsync(credential);
+            await SecurityCredentialStore.SetAsync(credential, cancellationToken);
             return credential;
         }
 

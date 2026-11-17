@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Volo.Abp.Application.Dtos;
 
 namespace SharpAbp.Abp.CryptoVault
@@ -21,6 +21,11 @@ namespace SharpAbp.Abp.CryptoVault
         /// the credentials in business operations and user interfaces.
         /// </remarks>
         public string Identifier { get; set; }
+
+        /// <summary>
+        /// Gets or sets the source type of the credentials (generated or imported).
+        /// </summary>
+        public int SourceType { get; set; }
 
         /// <summary>
         /// Gets or sets the elliptic curve name used for the SM2 key pair.

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Authorization.Permissions;
+using Volo.Abp.Domain.Entities;
 using Volo.Abp.OpenIddict.Applications;
 using Volo.Abp.PermissionManagement;
 
@@ -105,6 +106,10 @@ namespace SharpAbp.Abp.OpenIddict
         {
             Check.NotNullOrWhiteSpace(clientId, nameof(clientId));
             var application = await OpenIdApplicationRepository.FindByClientIdAsync(clientId);
+            if (application == null)
+            {
+                throw new EntityNotFoundException(typeof(OpenIddictApplication), clientId);
+            }
             return await ToApplicationDtoAsync(application.ToModel());
         }
 
@@ -202,15 +207,19 @@ namespace SharpAbp.Abp.OpenIddict
 
 
             var model = (await ApplicationManager.FindByIdAsync(id.ToString("D"))).As<OpenIddictApplicationModel>();
+            if (model == null)
+            {
+                throw new EntityNotFoundException(typeof(OpenIddictApplication), id);
+            }
             var buildModel = await BuildModel(input);
             if (buildModel.ClientSecret.IsNullOrWhiteSpace())
             {
                 buildModel.ClientSecret = model.ClientSecret;
             }
 
+            await PermissionManager.DeleteAsync(ClientPermissionValueProvider.ProviderName, model.ClientId);
             if (input.Permissions.Any())
             {
-                await PermissionManager.DeleteAsync(ClientPermissionValueProvider.ProviderName, model.ClientId);
                 await PermissionDataSeeder.SeedAsync(
                     ClientPermissionValueProvider.ProviderName,
                     input.ClientId,
@@ -443,25 +452,6 @@ namespace SharpAbp.Abp.OpenIddict
             }
 
             return dto;
-        }
-
-        /// <summary>
-        /// Gets all available grant types
-        /// </summary>
-        /// <returns>A list of all available grant types</returns>
-        protected virtual List<string> GetAllGrantTypes()
-        {
-            var grantTypes = new List<string>()
-            {
-                OpenIddictConstants.GrantTypes.AuthorizationCode,
-                OpenIddictConstants.GrantTypes.ClientCredentials,
-                OpenIddictConstants.GrantTypes.DeviceCode,
-                OpenIddictConstants.GrantTypes.Implicit,
-                OpenIddictConstants.GrantTypes.Password,
-                OpenIddictConstants.GrantTypes.RefreshToken
-            };
-
-            return grantTypes;
         }
 
         /// <summary>

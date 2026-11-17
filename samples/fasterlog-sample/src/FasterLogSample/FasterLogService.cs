@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using SharpAbp.Abp.Faster;
 using System;
 using System.Linq;
@@ -93,7 +93,7 @@ public class FasterLogService : ISingletonDependency
                         var max = list.Max(x => x.Data.Id);
                         Logger.LogDebug("Read data min: {min}, max:{max}", min, max);
 
-                        var p = list.GetPosition();
+                        var p = list.GetPositions();
                         //提交
 
                         await FasterLogger.CommitAsync(p, CancellationTokenProvider.Token);

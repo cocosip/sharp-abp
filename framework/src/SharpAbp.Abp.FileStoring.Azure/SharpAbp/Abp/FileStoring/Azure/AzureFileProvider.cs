@@ -2,8 +2,10 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
+using Azure.Storage.Sas;
 using Microsoft.Extensions.Logging;
 using Volo.Abp.DependencyInjection;
+using Volo.Abp.Timing;
 
 namespace SharpAbp.Abp.FileStoring.Azure
 {
@@ -14,17 +16,20 @@ namespace SharpAbp.Abp.FileStoring.Azure
         protected FileProviderClientCache<BlobServiceClient> ClientCache { get; }
         protected IAzureFileNameCalculator AzureFileNameCalculator { get; }
         protected IFileNormalizeNamingService FileNormalizeNamingService { get; }
+        protected IClock Clock { get; }
 
         public AzureFileProvider(
             ILogger<AzureFileProvider> logger,
             FileProviderClientCache<BlobServiceClient> clientCache,
             IAzureFileNameCalculator azureFileNameCalculator,
-            IFileNormalizeNamingService fileNormalizeNamingService)
+            IFileNormalizeNamingService fileNormalizeNamingService,
+            IClock clock)
         {
             Logger = logger;
             ClientCache = clientCache;
             AzureFileNameCalculator = azureFileNameCalculator;
             FileNormalizeNamingService = fileNormalizeNamingService;
+            Clock = clock;
         }
 
         public override string Provider => AzureFileProviderConfigurationNames.ProviderName;
@@ -99,9 +104,40 @@ namespace SharpAbp.Abp.FileStoring.Azure
             return !download.IsError;
         }
 
-        public override Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)
+        public override async Task<string> GetAccessUrlAsync(FileProviderAccessArgs args)
         {
-            return Task.FromResult(string.Empty);
+            if (!args.Configuration.HttpAccess)
+            {
+                return string.Empty;
+            }
+
+            var fileName = AzureFileNameCalculator.Calculate(args);
+            var blobClient = GetBlobClient(args, fileName);
+
+            if (args.CheckFileExist && !(await blobClient.ExistsAsync(args.CancellationToken)).Value)
+            {
+                return string.Empty;
+            }
+
+            if (!args.Expires.HasValue)
+            {
+                return blobClient.Uri.AbsoluteUri;
+            }
+
+            var expiresOn = args.Expires.Value > Clock.Now
+                ? args.Expires.Value
+                : Clock.Now.AddMinutes(10);
+
+            var sasBuilder = new BlobSasBuilder
+            {
+                BlobContainerName = GetContainerName(args),
+                BlobName = fileName,
+                Resource = "b",
+                ExpiresOn = expiresOn
+            };
+            sasBuilder.SetPermissions(BlobSasPermissions.Read);
+
+            return blobClient.GenerateSasUri(sasBuilder).AbsoluteUri;
         }
 
         protected virtual BlobClient GetBlobClient(FileProviderArgs args, string fileName)

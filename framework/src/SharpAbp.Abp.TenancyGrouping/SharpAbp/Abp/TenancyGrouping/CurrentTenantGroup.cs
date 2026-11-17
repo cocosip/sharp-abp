@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Volo.Abp;
 using Volo.Abp.DependencyInjection;
@@ -28,9 +28,6 @@ namespace SharpAbp.Abp.TenancyGrouping
         private IDisposable SetCurrent(Guid? groupId, string? name = null, List<Guid>? tenants = null)
         {
             var parentScope = _currentTenantGroupAccessor.Current;
-
-            var basicTenantGroupInfo = new BasicTenantGroupInfo(groupId, name);
-
 
             _currentTenantGroupAccessor.Current = new BasicTenantGroupInfo(groupId, name, tenants);
 

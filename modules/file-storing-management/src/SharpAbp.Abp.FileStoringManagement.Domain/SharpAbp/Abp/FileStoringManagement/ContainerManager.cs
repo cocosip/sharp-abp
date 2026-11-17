@@ -1,5 +1,6 @@
-﻿﻿﻿﻿﻿﻿using System;
+﻿﻿﻿﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -152,15 +153,27 @@ namespace SharpAbp.Abp.FileStoringManagement
                 multiPartUploadShardingSize,
                 httpAccess);
 
-            if (values.Count > 0)
+            // Values are submitted as the full provider configuration, so reconcile instead of
+            // only appending: removed keys must disappear (e.g. when the provider changes).
+            var newValueNames = values.Select(x => x.Name).ToHashSet();
+            foreach (var item in container.Items.Where(x => !newValueNames.Contains(x.Name)).ToList())
             {
-                container.ItemClear();
-                foreach (var value in values)
+                container.RemoveItem(item.Name);
+            }
+
+            foreach (var value in values)
+            {
+                var existingItem = container.Items.FirstOrDefault(x => x.Name == value.Name);
+                if (existingItem == null)
                 {
                     container.AddItem(
                        GuidGenerator.Create(),
                        value.Name,
                        value.Value);
+                }
+                else
+                {
+                    existingItem.Value = value.Value;
                 }
             }
             return container;

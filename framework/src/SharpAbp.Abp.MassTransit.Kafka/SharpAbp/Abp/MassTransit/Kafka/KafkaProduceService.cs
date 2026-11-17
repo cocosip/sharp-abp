@@ -1,10 +1,12 @@
-﻿using MassTransit;
+using MassTransit;
 using MassTransit.KafkaIntegration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.MassTransit.Kafka
@@ -89,10 +91,29 @@ namespace SharpAbp.Abp.MassTransit.Kafka
             var producerType = typeof(ITopicProducer<,>).MakeGenericType(typeof(string), actualType);
             var topicProducer = scope.ServiceProvider.GetRequiredService(producerType);
 
-            // Call Produce method using reflection
-            var produceMethod = producerType.GetMethod("Produce");
+            // Call the (key, value, cancellationToken) overload explicitly; GetMethod("Produce") is ambiguous.
+            var produceMethod = producerType.GetMethods()
+                .FirstOrDefault(m =>
+                {
+                    if (m.Name != "Produce")
+                    {
+                        return false;
+                    }
+
+                    var parameters = m.GetParameters();
+                    return parameters.Length == 3 &&
+                           parameters[0].ParameterType == typeof(string) &&
+                           parameters[1].ParameterType == actualType &&
+                           parameters[2].ParameterType == typeof(CancellationToken);
+                });
+
+            if (produceMethod == null)
+            {
+                throw new AbpException($"Could not find a compatible Produce method on '{producerType.FullName}'.");
+            }
+
             var key = NewId.Next().ToString("D").ToUpperInvariant();
-            var task = (Task)produceMethod!.Invoke(topicProducer, new[] { key, message, cancellationToken })!;
+            var task = (Task)produceMethod.Invoke(topicProducer, new[] { key, message, cancellationToken })!;
             await task;
         }
 

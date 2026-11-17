@@ -1,5 +1,6 @@
 using SharpAbp.Abp.Data;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Xunit;
 
 namespace SharpAbp.Abp.DbConnections
@@ -23,12 +24,9 @@ namespace SharpAbp.Abp.DbConnections
         }
 
         [Fact]
-        public async Task ResolveAsync_Should_Fallback_To_Default_Configuration_When_Name_Is_Unknown()
+        public async Task ResolveAsync_Should_Throw_When_Name_Is_Unknown()
         {
-            var result = await _resolver.ResolveAsync("missing");
-
-            Assert.Equal(DatabaseProvider.InMemory, result.DatabaseProvider);
-            Assert.Equal(string.Empty, result.ConnectionString);
+            await Assert.ThrowsAsync<AbpException>(() => _resolver.ResolveAsync("missing"));
         }
     }
 }

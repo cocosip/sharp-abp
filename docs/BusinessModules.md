@@ -20,8 +20,8 @@ dotnet add package SharpAbp.Abp.Account.Web
 
 ```csharp
 [DependsOn(
-    typeof(AbpAccountApplicationModule),
-    typeof(AbpAccountHttpApiModule)
+    typeof(AccountApplicationModule),
+    typeof(AccountHttpApiModule)
 )]
 public class YourModule : AbpModule
 {
@@ -53,8 +53,8 @@ dotnet add package SharpAbp.Abp.Identity.HttpApi.Client
 
 ```csharp
 [DependsOn(
-    typeof(AbpIdentityApplicationModule),
-    typeof(AbpIdentityHttpApiModule)
+    typeof(IdentityApplicationModule),
+    typeof(IdentityHttpApiModule)
 )]
 public class YourModule : AbpModule
 {
@@ -89,19 +89,13 @@ public class UserManagementService : ApplicationService
 
 ---
 
-## IdentityServer & OpenIddict
+## OpenIddict
 
-OAuth2/OIDC authentication server modules.
+OpenIddict OAuth2/OIDC authentication server module.
 
 ### Installation
 
 ```bash
-# IdentityServer4
-dotnet add package SharpAbp.Abp.IdentityServer.Domain
-dotnet add package SharpAbp.Abp.IdentityServer.Application
-dotnet add package SharpAbp.Abp.IdentityServer.HttpApi
-
-# OpenIddict (modern alternative)
 dotnet add package SharpAbp.Abp.OpenIddict.Domain
 dotnet add package SharpAbp.Abp.OpenIddict.Application
 dotnet add package SharpAbp.Abp.OpenIddict.HttpApi
@@ -260,8 +254,8 @@ Database file storage provider for storing files directly in the database.
 ### Installation
 
 ```bash
-dotnet add package SharpAbp.Abp.FileStoringDatabase.Domain
-dotnet add package SharpAbp.Abp.FileStoringDatabase.EntityFrameworkCore  # or MongoDB
+dotnet add package SharpAbp.Abp.FileStoring.Database.Domain
+dotnet add package SharpAbp.Abp.FileStoring.Database.EntityFrameworkCore  # or MongoDB
 ```
 
 ### Configuration
@@ -416,10 +410,10 @@ Crypto vault and secret management module for centralized key and secret storage
 ### Installation
 
 ```bash
-dotnet add package SharpAbp.CryptoVault.Domain
-dotnet add package SharpAbp.CryptoVault.Application
-dotnet add package SharpAbp.CryptoVault.HttpApi
-dotnet add package SharpAbp.CryptoVault.EntityFrameworkCore
+dotnet add package SharpAbp.Abp.CryptoVault.Domain
+dotnet add package SharpAbp.Abp.CryptoVault.Application
+dotnet add package SharpAbp.Abp.CryptoVault.HttpApi
+dotnet add package SharpAbp.Abp.CryptoVault.EntityFrameworkCore
 ```
 
 ### Usage Example
@@ -461,10 +455,10 @@ Data transform security management module for encryption configuration and manag
 ### Installation
 
 ```bash
-dotnet add package SharpAbp.TransformSecurityManagement.Domain
-dotnet add package SharpAbp.TransformSecurityManagement.Application
-dotnet add package SharpAbp.TransformSecurityManagement.HttpApi
-dotnet add package SharpAbp.TransformSecurityManagement.EntityFrameworkCore
+dotnet add package SharpAbp.Abp.TransformSecurityManagement.Domain
+dotnet add package SharpAbp.Abp.TransformSecurityManagement.Application
+dotnet add package SharpAbp.Abp.TransformSecurityManagement.HttpApi
+dotnet add package SharpAbp.Abp.TransformSecurityManagement.EntityFrameworkCore
 ```
 
 ### Usage Example

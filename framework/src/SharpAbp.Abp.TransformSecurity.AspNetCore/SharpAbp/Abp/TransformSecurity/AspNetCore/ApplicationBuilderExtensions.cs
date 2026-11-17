@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace SharpAbp.Abp.TransformSecurity.AspNetCore
 {
@@ -11,6 +12,8 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
         /// <returns></returns>
         public static IApplicationBuilder UseAbpTransformSecurity(this IApplicationBuilder builder)
         {
+            // Enables the "SecurityKey" rate limiting policy used by the security key endpoint.
+            builder.UseRateLimiter();
             return builder.UseMiddleware<AbpTransformSecurityMiddleware>();
         }
 

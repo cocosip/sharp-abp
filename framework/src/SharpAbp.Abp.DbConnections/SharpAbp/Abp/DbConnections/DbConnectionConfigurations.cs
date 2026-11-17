@@ -1,4 +1,4 @@
-﻿﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using SharpAbp.Abp.Data;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace SharpAbp.Abp.DbConnections
         /// <summary>
         /// Gets the default database connection configuration
         /// </summary>
-        private DbConnectionConfiguration Default => GetConfiguration<DefaultDbConnection>();
+        private DbConnectionConfiguration Default => GetConfiguration<DefaultDbConnection>()!;
 
         private readonly Dictionary<string, DbConnectionConfiguration> _connections;
 
@@ -99,7 +99,7 @@ namespace SharpAbp.Abp.DbConnections
         /// <typeparam name="TDbConnection">The type of the database connection</typeparam>
         /// <returns>The database connection configuration, or null if not found</returns>
         [CanBeNull]
-        public DbConnectionConfiguration GetConfiguration<TDbConnection>()
+        public DbConnectionConfiguration? GetConfiguration<TDbConnection>()
         {
             return GetConfiguration(DbConnectionNameAttribute.GetDbConnectionName<TDbConnection>());
         }
@@ -110,11 +110,10 @@ namespace SharpAbp.Abp.DbConnections
         /// <param name="dbConnectionName">The name of the database connection to retrieve</param>
         /// <returns>The database connection configuration, or null if not found</returns>
         [CanBeNull]
-        public DbConnectionConfiguration GetConfiguration([NotNull] string dbConnectionName)
+        public DbConnectionConfiguration? GetConfiguration([NotNull] string dbConnectionName)
         {
             Check.NotNullOrWhiteSpace(dbConnectionName, nameof(dbConnectionName));
-            return _connections.GetOrDefault(dbConnectionName) ??
-                   Default;
+            return _connections.GetOrDefault(dbConnectionName);
         }
     }
 }

@@ -79,7 +79,7 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             {
                 "Microsoft.EntityFrameworkCore.SqlServer" => (DatabaseProvider?)DatabaseProvider.SqlServer,
                 "Npgsql.EntityFrameworkCore.PostgreSQL" => (DatabaseProvider?)DatabaseProvider.PostgreSql,
-                "Pomelo.EntityFrameworkCore.MySql" or "MySql.Data.EntityFrameworkCore" => (DatabaseProvider?)DatabaseProvider.MySql,
+                "MySql.EntityFrameworkCore" or "Pomelo.EntityFrameworkCore.MySql" or "MySql.Data.EntityFrameworkCore" => (DatabaseProvider?)DatabaseProvider.MySql,
                 "Oracle.EntityFrameworkCore" or "Devart.Data.Oracle.Entity.EFCore" => (DatabaseProvider?)DatabaseProvider.Oracle,
                 "Microsoft.EntityFrameworkCore.Sqlite" => (DatabaseProvider?)DatabaseProvider.Sqlite,
                 "Microsoft.EntityFrameworkCore.InMemory" => (DatabaseProvider?)DatabaseProvider.InMemory,

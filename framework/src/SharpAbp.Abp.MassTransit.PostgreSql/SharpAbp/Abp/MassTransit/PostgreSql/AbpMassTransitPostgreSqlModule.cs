@@ -1,4 +1,4 @@
-﻿using MassTransit;
+using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using System;
@@ -24,7 +24,7 @@ namespace SharpAbp.Abp.MassTransit.PostgreSql
             var configuration = context.Services.GetConfiguration();
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
 
-            if (abpMassTransitOptions.Provider!.Equals(MassTransitPostgreSqlConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(abpMassTransitOptions.Provider, MassTransitPostgreSqlConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
                 PreConfigure<AbpMassTransitPostgreSqlOptions>(options => options.PreConfigure(configuration));
 
@@ -54,7 +54,7 @@ namespace SharpAbp.Abp.MassTransit.PostgreSql
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
             if (abpMassTransitOptions != null)
             {
-                if (abpMassTransitOptions.Provider!.Equals(MassTransitPostgreSqlConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(abpMassTransitOptions.Provider, MassTransitPostgreSqlConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
                 {
                     var postgreSqlPreConfiguredOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitPostgreSqlOptions>();
                     Configure<AbpMassTransitPostgreSqlOptions>(options => options.CopyFrom(postgreSqlPreConfiguredOptions));
@@ -124,7 +124,7 @@ namespace SharpAbp.Abp.MassTransit.PostgreSql
                             foreach (var producer in postgreSqlOptions.Producers ?? [])
                             {
                                 var configure = producer.Configure ?? postgreSqlOptions.DefaultPublishTopologyConfigurator;
-                                cfg.AddPublishMessageTypes(producer.MessageTypes, producer.Configure);
+                                cfg.AddPublishMessageTypes(producer.MessageTypes, configure);
                             }
 
                             //PostgreSql postConfigure

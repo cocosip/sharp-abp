@@ -45,7 +45,7 @@ namespace SharpAbp.Abp.DbConnections
             var options = new AbpDbConnectionsOptions();
             options.Configure(configuration);
 
-            Assert.Equal(DatabaseProvider.InMemory, options.DbConnections.GetConfiguration("missing").DatabaseProvider);
+            Assert.Null(options.DbConnections.GetConfiguration("missing"));
             Assert.Empty(options.DatabaseProviders);
         }
     }

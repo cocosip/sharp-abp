@@ -55,8 +55,7 @@ namespace SharpAbp.Abp.EntityFrameworkCore.ConnectionStrings
                 }
                 catch (ArgumentException ex)
                 {
-                    Logger.LogError(ex, "Invalid GaussDB connection string format detected during validation. Connection String: {ConnectionString}", 
-                        connectionString);
+                    Logger.LogError(ex, "Invalid GaussDB connection string format detected during validation. Message: {Message}", ex.Message);
                     return result;
                 }
 

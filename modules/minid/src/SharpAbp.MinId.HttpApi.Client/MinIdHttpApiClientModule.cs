@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using Volo.Abp.Http.Client;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
-using Volo.Abp.VirtualFileSystem;
 
 namespace SharpAbp.MinId
 {
@@ -19,15 +18,10 @@ namespace SharpAbp.MinId
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            context.Services.AddStaticHttpClientProxies(
+            context.Services.AddHttpClientProxies(
                 typeof(MinIdApplicationContractsModule).Assembly,
                 MinIdRemoteServiceConsts.RemoteServiceName
             );
-
-            Configure<AbpVirtualFileSystemOptions>(options =>
-            {
-                options.FileSets.AddEmbedded<MinIdHttpApiClientModule>();
-            });
             return Task.CompletedTask;
         }
 
