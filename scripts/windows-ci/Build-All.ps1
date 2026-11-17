@@ -8,19 +8,9 @@ Set-StrictMode -Version Latest
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $solutionPaths = @(
-    'framework'
-    'modules/file-storing-database'
-    'modules/file-storing-management'
-    'modules/map-tenancy-management'
-    'modules/tenant-group-management'
-    'modules/dbconnections'
-    'modules/Identity'
-    'modules/openiddict'
-    'modules/audit-logging'
-    'modules/account'
-    'modules/minid'
-    'modules/crypto-vault'
-    'modules/transform-security-management'
+    Get-Content (Join-Path $repoRoot 'solutions.txt') |
+        ForEach-Object { $_.Trim() } |
+        Where-Object { $_ }
 )
 
 Push-Location $repoRoot
