@@ -1,4 +1,4 @@
-﻿﻿using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -28,6 +28,15 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// the container if found, or null if no container with the specified name exists.
         /// </returns>
         Task<FileStoringContainer> FindByNameAsync([NotNull] string name, bool includeDetails = true, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Finds a host-owned container that is explicitly shared with tenants by its name.
+        /// </summary>
+        /// <param name="name">The unique name of the container to find.</param>
+        /// <param name="includeDetails">Whether to include related configuration items in the result.</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+        /// <returns>The shared host container, or null when no matching container exists.</returns>
+        Task<FileStoringContainer> FindHostMultiTenantByNameAsync([NotNull] string name, bool includeDetails = true, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Finds a file storing container by name with optional exclusion of a specific container ID.

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Volo.Abp;
 using Volo.Abp.Caching;
+using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.MultiTenancy;
 
@@ -42,6 +43,11 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// Used to convert container entities to cache-friendly formats.
         /// </summary>
         protected IFileContainerConfigurationConverter ConfigurationConverter { get; }
+
+        /// <summary>
+        /// Gets the data filter used to bypass the tenant filter when looking up shared host containers.
+        /// </summary>
+        protected IDataFilter DataFilter { get; }
         
         /// <summary>
         /// Initializes a new instance of the <see cref="FileStoringContainerCacheManager"/> class.
@@ -50,16 +56,19 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// <param name="containerCache">The distributed cache for container cache items.</param>
         /// <param name="containerRepository">The repository for container data access.</param>
         /// <param name="configurationConverter">The configuration converter for data transformation.</param>
+        /// <param name="dataFilter">The data filter used for host container lookups.</param>
         public FileStoringContainerCacheManager(
             ICurrentTenant currentTenant,
             IDistributedCache<FileStoringContainerCacheItem> containerCache,
             IFileStoringContainerRepository containerRepository,
-            IFileContainerConfigurationConverter configurationConverter)
+            IFileContainerConfigurationConverter configurationConverter,
+            IDataFilter dataFilter)
         {
             CurrentTenant = currentTenant;
             ContainerCache = containerCache;
             ContainerRepository = containerRepository;
             ConfigurationConverter = configurationConverter;
+            DataFilter = dataFilter;
         }
 
         /// <summary>
@@ -86,6 +95,19 @@ namespace SharpAbp.Abp.FileStoringManagement
                 async () =>
                 {
                     var container = await ContainerRepository.FindByNameAsync(name, true, cancellationToken);
+                    if (container == null && CurrentTenant.Id.HasValue)
+                    {
+                        // Fall back to a host container explicitly shared with tenants.
+                        using (CurrentTenant.Change(null))
+                        using (DataFilter.Disable<IMultiTenant>())
+                        {
+                            container = await ContainerRepository.FindHostMultiTenantByNameAsync(
+                                name,
+                                includeDetails: true,
+                                cancellationToken: cancellationToken);
+                        }
+                    }
+
                     return container?.AsCacheItem();
                 },
                 token: cancellationToken);

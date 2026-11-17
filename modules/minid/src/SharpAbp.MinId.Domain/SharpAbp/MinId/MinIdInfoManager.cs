@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿using Microsoft.Extensions.Logging;
+﻿﻿﻿﻿﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,7 +37,7 @@ namespace SharpAbp.MinId
         /// <param name="minIdInfo">The MinId information entity to create. Cannot be null.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A task containing the created MinId information entity.</returns>
-        /// <exception cref="AbpException">Thrown when a MinId configuration with the same business type already exists.</exception>
+        /// <exception cref="UserFriendlyException">Thrown when a MinId configuration with the same business type already exists.</exception>
         /// <exception cref="ArgumentNullException">Thrown when minIdInfo is null.</exception>
         public virtual async Task<MinIdInfo> CreateAsync(MinIdInfo minIdInfo, CancellationToken cancellationToken = default)
         {
@@ -53,7 +53,7 @@ namespace SharpAbp.MinId
             {
                 var errorMessage = $"Cannot create MinId configuration: Business type '{minIdInfo.BizType}' already exists in the system. Each business type must be unique.";
                 Logger.LogWarning("Failed to create MinId configuration due to duplicate business type: {BizType}", minIdInfo.BizType);
-                throw new AbpException(errorMessage);
+                throw new UserFriendlyException(errorMessage);
             }
 
             var result = await MinIdInfoRepository.InsertAsync(minIdInfo, cancellationToken: cancellationToken);
@@ -75,18 +75,12 @@ namespace SharpAbp.MinId
         /// <param name="remainder">The remainder value for modulo operations.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A task containing the updated MinId information entity.</returns>
-        /// <exception cref="AbpException">Thrown when the specified ID is not found or when the business type conflicts with existing records.</exception>
+        /// <exception cref="UserFriendlyException">Thrown when the business type conflicts with existing records.</exception>
         public virtual async Task<MinIdInfo> UpdateAsync(Guid id, string bizType, long maxId, int step, int delta, int remainder, CancellationToken cancellationToken = default)
         {
             Logger.LogDebug("Attempting to update MinId configuration with ID {Id} to business type '{BizType}'", id, bizType);
 
             var minIdInfo = await MinIdInfoRepository.GetAsync(id, cancellationToken: cancellationToken);
-            if (minIdInfo == null)
-            {
-                var errorMessage = $"Cannot update MinId configuration: No configuration found with ID '{id}'. Please verify the ID is correct.";
-                Logger.LogWarning("Failed to update MinId configuration: ID {Id} not found", id);
-                throw new AbpException(errorMessage);
-            }
 
             // Check for business type conflicts only if the business type is changing
             if (minIdInfo.BizType != bizType)
@@ -96,7 +90,7 @@ namespace SharpAbp.MinId
                 {
                     var errorMessage = $"Cannot update MinId configuration: Business type '{bizType}' already exists in another configuration (ID: {queryMinIdInfo.Id}). Each business type must be unique.";
                     Logger.LogWarning("Failed to update MinId configuration due to duplicate business type: {BizType} (existing ID: {ExistingId})", bizType, queryMinIdInfo.Id);
-                    throw new AbpException(errorMessage);
+                    throw new UserFriendlyException(errorMessage);
                 }
             }
 

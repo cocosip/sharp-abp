@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿using JetBrains.Annotations;
+﻿﻿﻿﻿﻿﻿﻿using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -53,6 +53,27 @@ namespace SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore
             return await (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
                 .FirstOrDefaultAsync(x => x.Name == name, GetCancellationToken(cancellationToken));
+        }
+
+        /// <summary>
+        /// Finds a host-owned container that is explicitly shared with tenants by its name.
+        /// Callers are responsible for switching to the host tenant scope and disabling the tenant filter.
+        /// </summary>
+        /// <param name="name">The unique name of the container to find.</param>
+        /// <param name="includeDetails">Whether to include related configuration items in the result.</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+        /// <returns>The shared host container, or null when no matching container exists.</returns>
+        public virtual async Task<FileStoringContainer> FindHostMultiTenantByNameAsync(
+            [NotNull] string name,
+            bool includeDetails = true,
+            CancellationToken cancellationToken = default)
+        {
+            Check.NotNullOrWhiteSpace(name, nameof(name));
+            return await (await GetDbSetAsync())
+                .IncludeDetails(includeDetails)
+                .FirstOrDefaultAsync(
+                    x => x.Name == name && x.TenantId == null && x.IsMultiTenant,
+                    GetCancellationToken(cancellationToken));
         }
 
         /// <summary>
