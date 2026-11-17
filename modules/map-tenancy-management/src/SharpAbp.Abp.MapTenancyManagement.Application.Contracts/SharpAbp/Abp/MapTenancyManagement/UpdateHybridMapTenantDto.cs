@@ -25,5 +25,10 @@ namespace SharpAbp.Abp.MapTenancyManagement
         [Required]
         [DynamicStringLength(typeof(MapTenantConsts), nameof(MapTenantConsts.MaxMapCodeLength))]
         public string MapCode { get; set; }
+
+        /// <summary>
+        /// Gets or sets the concurrency stamp used for optimistic concurrency checks
+        /// </summary>
+        public string ConcurrencyStamp { get; set; }
     }
 }

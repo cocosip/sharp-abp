@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -174,18 +174,15 @@ namespace SharpAbp.Abp.FileStoringManagement
         public virtual async Task DeleteAsync(Guid id)
         {
             var container = await ContainerRepository.GetAsync(id);
-            if (container == null)
-            {
-                return;
-            }
+
+            await ContainerRepository.DeleteAsync(id);
+
             await DistributedEventBus.PublishAsync(new FileStoringContainerDeletedEto()
             {
                 Id = container.Id,
                 TenantId = container.TenantId,
                 Name = container.Name,
             });
-
-            await ContainerRepository.DeleteAsync(id);
         }
     }
 }
