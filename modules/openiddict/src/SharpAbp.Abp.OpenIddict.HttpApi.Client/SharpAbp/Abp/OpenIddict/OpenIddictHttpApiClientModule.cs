@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using Volo.Abp.Http.Client;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
-using Volo.Abp.VirtualFileSystem;
 
 namespace SharpAbp.Abp.OpenIddict
 {
@@ -20,15 +19,10 @@ namespace SharpAbp.Abp.OpenIddict
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            context.Services.AddStaticHttpClientProxies(
+            context.Services.AddHttpClientProxies(
                 typeof(OpenIddictApplicationContractsModule).Assembly,
                 OpenIddictRemoteServiceConsts.RemoteServiceName
             );
-
-            Configure<AbpVirtualFileSystemOptions>(options =>
-            {
-                options.FileSets.AddEmbedded<OpenIddictHttpApiClientModule>();
-            });
             return Task.CompletedTask;
         }
 
