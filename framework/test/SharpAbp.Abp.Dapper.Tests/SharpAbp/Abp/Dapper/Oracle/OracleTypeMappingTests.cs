@@ -64,16 +64,24 @@ namespace SharpAbp.Abp.Dapper
         }
 
         [Theory]
-        [InlineData((byte)1)]
-        [InlineData((short)1)]
-        [InlineData(1)]
-        [InlineData(1L)]
-        [InlineData("1")]
-        public void Bool_Mapping_Should_Not_Claim_Provider_Agnostic_Parse_Values(object value)
+        [InlineData((byte)1, true)]
+        [InlineData((short)1, true)]
+        [InlineData(1, true)]
+        [InlineData(1L, true)]
+        [InlineData("1", false)]
+        public void Bool_Mapping_Should_Claim_Only_Numeric_Parse_Values(object value, bool expected)
         {
             var mapping = new OracleBoolTypeMapping();
 
-            Assert.False(mapping.CanParse(value));
+            Assert.Equal(expected, mapping.CanParse(value));
+        }
+
+        [Fact]
+        public void Bool_Mapping_Should_Claim_Oracle_Number_Parse_Values()
+        {
+            var mapping = new OracleBoolTypeMapping();
+
+            Assert.True(mapping.CanParse(1m));
         }
 
         [Fact]
@@ -90,14 +98,14 @@ namespace SharpAbp.Abp.Dapper
         }
 
         [Fact]
-        public void Nullable_Bool_Mapping_Should_Write_Null_As_Zero()
+        public void Nullable_Bool_Mapping_Should_Persist_Null_As_DBNull()
         {
             IDapperTypeMapping mapping = new OracleBoolTypeMapping();
             var parameter = new OracleParameter();
 
             mapping.SetValue(parameter, null);
 
-            Assert.Equal((byte)0, parameter.Value);
+            Assert.Equal(DBNull.Value, parameter.Value);
         }
     }
 }
