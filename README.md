@@ -2,23 +2,23 @@
 
 > Enterprise extension modules for ABP vNext
 
-An enterprise-grade extension module collection based on ABP vNext framework, consisting of 77 core framework packages and 13 business modules, providing complete enterprise application solutions including multi-database support, distributed file storage, message queuing, authentication, multi-tenancy isolation, and more.
+An enterprise-grade extension module collection based on ABP vNext framework, consisting of 84 core framework packages and 12 business modules, providing complete enterprise application solutions including multi-database support, distributed file storage, message queuing, authentication, multi-tenancy isolation, and more.
 
 ## Project Structure
 
-- **Framework**: 77 core framework packages providing infrastructure support
-- **Modules**: 13 business modules providing complete enterprise-grade functionality
+- **Framework**: 84 core framework packages providing infrastructure support
+- **Modules**: 12 business modules providing complete enterprise-grade functionality
 - **Samples**: Sample projects demonstrating module usage
 
 ## Key Features
 
 - **Multi-Database Support**: MySQL, PostgreSQL, SQL Server, Oracle, SQLite, DM (DaMeng), GaussDB
 - **Multi-ORM Support**: Entity Framework Core, FreeSql, Dapper
-- **File Storage**: Support for 11 storage providers including Aliyun OSS, Azure, AWS, MinIO, KS3, Huawei OBS, FastDFS, S3
+- **File Storage**: Support for 10 storage providers including Aliyun OSS, Azure, AWS, MinIO, KS3, Huawei OBS, FastDFS, S3 and Database
 - **Message Queue**: RabbitMQ, Kafka, ActiveMQ (via MassTransit)
-- **Authentication**: IdentityServer4, OpenIddict OAuth2/OIDC support
+- **Authentication**: OpenIddict OAuth2/OIDC support
 - **Multi-Tenancy**: Map-based tenancy isolation, tenant grouping isolation
-- **Observability**: OpenTelemetry, Zipkin, Prometheus integration
+- **Observability**: OpenTelemetry, Prometheus integration
 - **Data Security**: SM2/AES encryption, secret management, transform security
 
 ## Framework Modules
@@ -35,7 +35,6 @@ An enterprise-grade extension module collection based on ABP vNext framework, co
 | **ConcurrencyLimiting** | Process-local execution concurrency limits and queues | [docs](/docs/ConcurrencyLimiting.md) |
 | **OperationRateLimiting** | Fixed-window operation quotas with replaceable storage | [docs](/docs/OperationRateLimiting.md) |
 | **AspNetCore** | AspNetCore integration extensions | [docs](/docs/Core.md#aspnetcore) |
-| **Swashbuckle** | Swagger/Swashbuckle API documentation support | [docs](/docs/Core.md#swashbuckle) |
 | **Swashbuckle.Versioning** | API versioning management | [docs](/docs/Core.md#swashbuckleversioning) |
 
 ### ORM Frameworks
@@ -51,7 +50,6 @@ An enterprise-grade extension module collection based on ABP vNext framework, co
 | Name | Description | Documentation |
 | ---- | ----------- | ------------- |
 | **FileStoring** | Unified file storage abstraction and core implementation | [docs](/docs/FileStorage.md#filestoring) |
-| **AutoS3** | AWSSDK.S3 adapter (supports KS3) | [docs](/docs/FileStorage.md#autos3) |
 | **FastDFS** | FastDFS distributed file system adapter | [docs](/docs/FileStorage.md#fastdfs) |
 
 ### Database Connections
@@ -83,7 +81,7 @@ An enterprise-grade extension module collection based on ABP vNext framework, co
 
 | Name | Description | Documentation |
 | ---- | ----------- | ------------- |
-| **OpenTelemetry** | OpenTelemetry observability platform (supports Zipkin/Prometheus/OTLP) | [docs](/docs/Observability.md) |
+| **OpenTelemetry** | OpenTelemetry observability platform (supports OTLP/Prometheus) | [docs](/docs/Observability.md) |
 
 ## Business Modules
 
@@ -91,8 +89,7 @@ An enterprise-grade extension module collection based on ABP vNext framework, co
 | ---- | ----------- | ------------- |
 | **Account** | Account management (registration, login, verification) | [docs](/docs/BusinessModules.md#account) |
 | **Identity** | Identity management (users, roles, permissions, organizations) | [docs](/docs/BusinessModules.md#identity) |
-| **IdentityServer** | IdentityServer4 OAuth2/OIDC integration | [docs](/docs/BusinessModules.md#identityserver--openiddict) |
-| **OpenIddict** | OpenIddict OAuth2/OIDC implementation | [docs](/docs/BusinessModules.md#identityserver--openiddict) |
+| **OpenIddict** | OpenIddict OAuth2/OIDC implementation | [docs](/docs/BusinessModules.md#openiddict) |
 | **AuditLogging** | Audit logging (operation audit, compliance tracking) | [docs](/docs/BusinessModules.md#auditlogging) |
 | **MinId** | Distributed ID generation service | [docs](/docs/BusinessModules.md#minid) |
 | **FileStoringManagement** | File storage management (upload, download, configuration) | [docs](/docs/BusinessModules.md#filestoringmanagement) |
@@ -113,12 +110,9 @@ An enterprise-grade extension module collection based on ABP vNext framework, co
 | `SharpAbp.Abp.FreeSql` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FreeSql.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FreeSql) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FreeSql.svg)|
 | `SharpAbp.Abp.FreeRedis` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FreeRedis.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FreeRedis) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FreeRedis.svg)|
 | `SharpAbp.Abp.AspNetCore` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.AspNetCore.svg)](https://www.nuget.org/packages/SharpAbp.Abp.AspNetCore) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.AspNetCore.svg)|
-| `SharpAbp.Abp.Swashbuckle` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Swashbuckle.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Swashbuckle) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Swashbuckle.svg)|
 | `SharpAbp.Abp.Swashbuckle.Versioning` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Swashbuckle.Versioning.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Swashbuckle.Versioning) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Swashbuckle.Versioning.svg)|
 | **FastDFS** | - | - |
 | `SharpAbp.Abp.FastDFS` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FastDFS.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FastDFS) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FastDFS.svg)|
-| `SharpAbp.Abp.FastDFS.DotNetty` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FastDFS.DotNetty.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FastDFS.DotNetty) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FastDFS.DotNetty.svg)|
-| `SharpAbp.Abp.FastDFS.SuperSocket` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.FastDFS.SuperSocket.svg)](https://www.nuget.org/packages/SharpAbp.Abp.FastDFS.SuperSocket) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.FastDFS.SuperSocket.svg)|
 | **MassTransit** | - | - |
 | `SharpAbp.Abp.MassTransit` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.MassTransit.svg)](https://www.nuget.org/packages/SharpAbp.Abp.MassTransit) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.MassTransit.svg)|
 | `SharpAbp.Abp.MassTransit.Kafka` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.MassTransit.Kafka.svg)](https://www.nuget.org/packages/SharpAbp.Abp.MassTransit.Kafka) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.MassTransit.Kafka.svg)|
@@ -141,7 +135,6 @@ An enterprise-grade extension module collection based on ABP vNext framework, co
 | `SharpAbp.MinId.Domain.Shared` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.MinId.Domain.Shared.svg)](https://www.nuget.org/packages/SharpAbp.MinId.Domain.Shared) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.MinId.Domain.Shared.svg)|
 | `SharpAbp.MinId.Domain` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.MinId.Domain.svg)](https://www.nuget.org/packages/SharpAbp.MinId.Domain) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.MinId.Domain.svg)|
 | `SharpAbp.MinId.EntityFrameworkCore` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.MinId.EntityFrameworkCore.svg)](https://www.nuget.org/packages/SharpAbp.MinId.EntityFrameworkCore) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.MinId.EntityFrameworkCore.svg)|
-| `SharpAbp.MinId.MongoDB` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.MinId.MongoDB.svg)](https://www.nuget.org/packages/SharpAbp.MinId.MongoDB) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.MinId.MongoDB.svg)|
 | `SharpAbp.MinId.Application.Contracts` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.MinId.Application.Contracts.svg)](https://www.nuget.org/packages/SharpAbp.MinId.Application.Contracts) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.MinId.Application.Contracts.svg)|
 | `SharpAbp.MinId.Application` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.MinId.Application.svg)](https://www.nuget.org/packages/SharpAbp.MinId.Application) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.MinId.Application.svg)|
 | `SharpAbp.MinId.HttpApi` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.MinId.HttpApi.svg)](https://www.nuget.org/packages/SharpAbp.MinId.HttpApi) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.MinId.HttpApi.svg)|
@@ -201,14 +194,6 @@ An enterprise-grade extension module collection based on ABP vNext framework, co
 | `SharpAbp.Abp.Identity.Application` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Identity.Application.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Identity.Application) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Identity.Application.svg)|
 | `SharpAbp.Abp.Identity.HttpApi` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Identity.HttpApi.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Identity.HttpApi) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Identity.HttpApi.svg)|
 | `SharpAbp.Abp.Identity.HttpApi.Client` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Identity.HttpApi.Client.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Identity.HttpApi.Client) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Identity.HttpApi.Client.svg)|
-| **IdentityServer** | - | - |
-| `SharpAbp.Abp.IdentityServer.Domain.Shared` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.IdentityServer.Domain.Shared.svg)](https://www.nuget.org/packages/SharpAbp.Abp.IdentityServer.Domain.Shared) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.IdentityServer.Domain.Shared.svg)|
-| `SharpAbp.Abp.IdentityServer.Domain` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.IdentityServer.Domain.svg)](https://www.nuget.org/packages/SharpAbp.Abp.IdentityServer.Domain) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.IdentityServer.Domain.svg)|
-| `SharpAbp.Abp.IdentityServer.Application.Contracts` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.IdentityServer.Application.Contracts.svg)](https://www.nuget.org/packages/SharpAbp.Abp.IdentityServer.Application.Contracts) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.IdentityServer.Application.Contracts.svg)|
-| `SharpAbp.Abp.IdentityServer.Application` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.IdentityServer.Application.svg)](https://www.nuget.org/packages/SharpAbp.Abp.IdentityServer.Application) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.IdentityServer.Application.svg)|
-| `SharpAbp.Abp.IdentityServer.HttpApi` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.IdentityServer.HttpApi.svg)](https://www.nuget.org/packages/SharpAbp.Abp.IdentityServer.HttpApi) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.IdentityServer.HttpApi.svg)|
-| `SharpAbp.Abp.IdentityServer.HttpApi.Client` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.IdentityServer.HttpApi.Client.svg)](https://www.nuget.org/packages/SharpAbp.Abp.IdentityServer.HttpApi.Client) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.IdentityServer.HttpApi.Client.svg)|
-| `SharpAbp.Abp.IdentityServer.Extensions` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.IdentityServer.Extensions.svg)](https://www.nuget.org/packages/SharpAbp.Abp.IdentityServer.Extensions) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.IdentityServer.Extensions.svg)|
 | **OpenIddict** | - | - |
 | `SharpAbp.Abp.OpenIddict.Domain.Shared` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.OpenIddict.Domain.Shared.svg)](https://www.nuget.org/packages/SharpAbp.Abp.OpenIddict.Domain.Shared) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.OpenIddict.Domain.Shared.svg)|
 | `SharpAbp.Abp.OpenIddict.Domain` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.OpenIddict.Domain.svg)](https://www.nuget.org/packages/SharpAbp.Abp.OpenIddict.Domain) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.OpenIddict.Domain.svg)|
@@ -229,4 +214,3 @@ An enterprise-grade extension module collection based on ABP vNext framework, co
 | `SharpAbp.Abp.Account.HttpApi` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Account.HttpApi.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Account.HttpApi) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Account.HttpApi.svg)|
 | `SharpAbp.Abp.Account.HttpApi.Client` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Account.HttpApi.Client.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Account.HttpApi.Client) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Account.HttpApi.Client.svg)|
 | `SharpAbp.Abp.Account.Web` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Account.Web.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Account.Web) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Account.Web.svg)|
-| `SharpAbp.Abp.Account.Web.IdentityServer` | [![NuGet](https://img.shields.io/nuget/v/SharpAbp.Abp.Account.Web.IdentityServer.svg)](https://www.nuget.org/packages/SharpAbp.Abp.Account.Web.IdentityServer) |![NuGet](https://img.shields.io/nuget/dt/SharpAbp.Abp.Account.Web.IdentityServer.svg)|

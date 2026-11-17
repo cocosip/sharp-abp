@@ -45,7 +45,7 @@ Add the module dependency:
 ```csharp
 [DependsOn(
     typeof(AbpMassTransitModule),
-    typeof(AbpMassTransitRabbitMQModule)
+    typeof(AbpMassTransitRabbitMqModule)
 )]
 public class YourModule : AbpModule
 {
@@ -150,7 +150,7 @@ Add the module dependency:
 ```csharp
 [DependsOn(
     typeof(AbpMassTransitModule),
-    typeof(AbpMassTransitActiveMQModule)
+    typeof(AbpMassTransitActiveMqModule)
 )]
 public class YourModule : AbpModule
 {

@@ -352,54 +352,6 @@ public class ProductAppService : ApplicationService, IProductAppService
 
 ---
 
-## Swashbuckle
-
-Swagger/Swashbuckle API documentation support.
-
-### Installation
-
-```bash
-dotnet add package SharpAbp.Abp.Swashbuckle
-```
-
-### Configuration
-
-Configure in your Web module:
-
-```csharp
-[DependsOn(typeof(AbpSwashbuckleModule))]
-public class YourWebModule : AbpModule
-{
-    public override void ConfigureServices(ServiceConfigurationContext context)
-    {
-        context.Services.AddAbpSwaggerGen(options =>
-        {
-            options.SwaggerDoc("v1", new OpenApiInfo
-            {
-                Title = "Your API",
-                Version = "v1"
-            });
-
-            options.DocInclusionPredicate((docName, description) => true);
-            options.CustomSchemaIds(type => type.FullName);
-        });
-    }
-
-    public override void OnApplicationInitialization(ApplicationInitializationContext context)
-    {
-        var app = context.GetApplicationBuilder();
-
-        app.UseSwagger();
-        app.UseSwaggerUI(options =>
-        {
-            options.SwaggerEndpoint("/swagger/v1/swagger.json", "Your API v1");
-        });
-    }
-}
-```
-
----
-
 ## Swashbuckle.Versioning
 
 API versioning management for Swagger documentation.
