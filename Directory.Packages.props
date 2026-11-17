@@ -58,9 +58,6 @@
 		<PackageVersion Include="Volo.Abp.PermissionManagement.Domain.OpenIddict" Version="$(VoloAbpPackageVersion)" />
 		<PackageVersion Include="Volo.Abp.PermissionManagement.HttpApi" Version="$(VoloAbpPackageVersion)" />
 		<PackageVersion Include="Volo.Abp.PermissionManagement.HttpApi.Client" Version="$(VoloAbpPackageVersion)" />
-		<PackageVersion Include="Volo.Abp.IdentityServer.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
-		<PackageVersion Include="Volo.Abp.IdentityServer.Domain" Version="$(VoloAbpPackageVersion)" />
-		<PackageVersion Include="Volo.Abp.IdentityServer.EntityFrameworkCore" Version="$(VoloAbpPackageVersion)" />
 		<PackageVersion Include="Volo.Abp.Identity.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
 		<PackageVersion Include="Volo.Abp.OpenIddict.Domain.Shared" Version="$(VoloAbpPackageVersion)" />
 		<PackageVersion Include="Volo.Abp.OpenIddict.Domain" Version="$(VoloAbpPackageVersion)" />
@@ -134,7 +131,6 @@
 		<PackageVersion Include="Sharp.DM.EntityFrameworkCore" Version="[10.0.1,)" />
 		<PackageVersion Include="Devart.Data.Oracle.EFCore" Version="[11.2.237.10,)" />
 		<PackageVersion Include="DotNetCore.EntityFrameworkCore.GaussDB" Version="[10.0.1,)" />
-		<PackageVersion Include="DotNetCore.GaussDB" Version="[10.0.0,)" />
 		<PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.2.1" />
 		<PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(EfCorePackageVersion)" />
 		<PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfCorePackageVersion)" />
@@ -146,11 +142,9 @@
 		<PackageVersion Include="Microsoft.Extensions.FileProviders.Embedded" Version="$(MicrosoftPackageVersion)" />
 		<PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftPackageVersion)" />
 		<PackageVersion Include="Microsoft.Extensions.ObjectPool" Version="$(MicrosoftPackageVersion)" />
-		<PackageVersion Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.0.1" />
 		<PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
 		<PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.403" />
 		<PackageVersion Include="Minio" Version="7.0.0" />
-		<PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
 		<PackageVersion Include="NSubstitute" Version="5.3.0" />
 		<PackageVersion Include="OpenTelemetry" Version="1.20.1" />
 		<PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.20.1" />
@@ -171,7 +165,6 @@
 		<PackageVersion Include="StackExchange.Redis" Version="3.4.31" />
 		<PackageVersion Include="DistributedLock.Redis" Version="1.1.1" />
 		<PackageVersion Include="System.ComponentModel.Annotations" Version="5.0.0" />
-		<PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
 		<PackageVersion Include="System.Threading.Channels" Version="$(MicrosoftPackageVersion)" />
 		<PackageVersion Include="System.Threading.RateLimiting" Version="$(MicrosoftPackageVersion)" />
 		<PackageVersion Include="Moq" Version="4.21.0" />
