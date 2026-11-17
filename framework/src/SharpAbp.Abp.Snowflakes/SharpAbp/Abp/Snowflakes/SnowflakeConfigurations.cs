@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using Volo.Abp;
@@ -107,18 +107,17 @@ namespace SharpAbp.Abp.Snowflakes
 
         /// <summary>
         /// Gets the Snowflake configuration for the specified name.
-        /// If the named configuration is not found, the default configuration is returned.
         /// </summary>
         /// <param name="name">The name of the Snowflake configuration.</param>
-        /// <returns>The <see cref="SnowflakeConfiguration"/> for the given name, or the default configuration if not found.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="name"/> is null or whitespace.</exception>
+        /// <returns>The <see cref="SnowflakeConfiguration"/> for the given name.</returns>
+        /// <exception cref="AbpException">Thrown when no configuration is registered for the given name.</exception>
         [NotNull]
         public SnowflakeConfiguration GetConfiguration([NotNull] string name)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
 
             return _snowflakes.GetOrDefault(name) ??
-                   Default;
+                   throw new AbpException($"No snowflake configuration found for '{name}'. Configure it before resolving the snowflake instance.");
         }
     }
 }

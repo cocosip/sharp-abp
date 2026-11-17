@@ -6,18 +6,19 @@ namespace SharpAbp.Abp.DbConnections
     public class DbConnectionConfigurationsTest
     {
         [Fact]
-        public void Should_Have_Default_Configuration()
+        public void Should_Return_Null_For_Unconfigured_Connection()
         {
             var configurations = new DbConnectionConfigurations();
 
-            var configuration = configurations.GetConfiguration("missing");
+            Assert.Null(configurations.GetConfiguration("missing"));
 
-            Assert.Equal(DatabaseProvider.InMemory, configuration.DatabaseProvider);
-            Assert.Equal(string.Empty, configuration.ConnectionString);
+            var defaultConfiguration = configurations.GetConfiguration<DefaultDbConnection>();
+            Assert.Equal(DatabaseProvider.InMemory, defaultConfiguration.DatabaseProvider);
+            Assert.Equal(string.Empty, defaultConfiguration.ConnectionString);
         }
 
         [Fact]
-        public void ConfigureDefault_Should_Update_Default_And_Fallback_Configuration()
+        public void ConfigureDefault_Should_Not_Change_Unknown_Connection_Lookup()
         {
             var configurations = new DbConnectionConfigurations();
 
@@ -28,12 +29,10 @@ namespace SharpAbp.Abp.DbConnections
             });
 
             var defaultConfiguration = configurations.GetConfiguration<DefaultDbConnection>();
-            var fallbackConfiguration = configurations.GetConfiguration("unknown");
 
             Assert.Equal(DatabaseProvider.SqlServer, defaultConfiguration.DatabaseProvider);
             Assert.Equal("Server=.;Database=demo;", defaultConfiguration.ConnectionString);
-            Assert.Equal(defaultConfiguration.DatabaseProvider, fallbackConfiguration.DatabaseProvider);
-            Assert.Equal(defaultConfiguration.ConnectionString, fallbackConfiguration.ConnectionString);
+            Assert.Null(configurations.GetConfiguration("unknown"));
         }
 
         [Fact]

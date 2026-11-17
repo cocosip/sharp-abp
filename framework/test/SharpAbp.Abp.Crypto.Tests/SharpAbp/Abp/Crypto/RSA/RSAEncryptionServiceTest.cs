@@ -1,4 +1,4 @@
-﻿using Org.BouncyCastle.Tls;
+using Org.BouncyCastle.Tls;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -207,7 +207,7 @@ YIJ480WXdUSxebxnoemJs+HYNM7m0vugOhdb8iTwijKYSRxyPLc=
 
             var cipherText = @"YA5e9rEEgfV3cXT2bKwd88Ee7FwhFb7Q1AlPeHsjH2Ss9oXxP3Z2/az/Tb4dFPFfgRjNfg/Ye2w9i16MmFUD5LMhGcgRXcGCOWT8rWjq0uYi+vXH9hEAm4GfIAXgfnPtmfLtrffURd8yaEOYLu7AuaYu9THFFtC+YD55k8auixPLuCMxA9S/tIGF/CMcQSHV/MCAvNqLDTMkuHvzRgyRbKdRJlzl+mnZpWOF9cK/VPgc9kQnI+ZAgne/NKrm5bCQbe0qfrJ5+oYit6r0dTWQL/s99Z5HJKrrqDbqKXMxu3VbdWOsiux+XgVXjEMerQHWJU4hkajb623FSP3P+agjaw==";
 
-            var s = _rsaEncryptionService.DecryptFromPem(priv, cipherText);
+            var s = _rsaEncryptionService.DecryptFromPem(priv, cipherText, padding: RSAPaddingNames.None);
 
         }
     }

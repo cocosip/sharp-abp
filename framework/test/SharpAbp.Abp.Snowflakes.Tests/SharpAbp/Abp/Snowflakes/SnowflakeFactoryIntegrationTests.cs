@@ -46,8 +46,8 @@ namespace SharpAbp.Abp.Snowflakes
         [Fact]
         public void Should_Return_Different_Instances_For_Different_Names()
         {
-            var instance1 = _snowflakeFactory.Get("instance_a");
-            var instance2 = _snowflakeFactory.Get("instance_b");
+            var instance1 = _snowflakeFactory.Get("test_instance");
+            var instance2 = _snowflakeFactory.Get("shared_instance");
 
             Assert.NotSame(instance1, instance2);
         }

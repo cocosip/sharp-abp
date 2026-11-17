@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
@@ -36,11 +36,6 @@ namespace SharpAbp.Abp.ObjectPool
                 Pool = pool;
             }
         }
-
-        /// <summary>
-        /// Gets the object pool provider.
-        /// </summary>
-        protected ObjectPoolProvider Provider { get; }
 
         /// <summary>
         /// Represents a composite key for pool identification.
@@ -87,11 +82,17 @@ namespace SharpAbp.Abp.ObjectPool
         /// <summary>
         /// Initializes a new instance of the <see cref="PoolOrchestrator"/> class.
         /// </summary>
-        /// <param name="provider">The object pool provider.</param>
-        public PoolOrchestrator(ObjectPoolProvider provider)
+        public PoolOrchestrator()
         {
-            Provider = provider;
             PoolMetadatas = new ConcurrentDictionary<PoolKey, Lazy<PoolMetadata>>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PoolOrchestrator"/> class.
+        /// </summary>
+        /// <param name="provider">Kept for backward compatibility; pools are created by this orchestrator.</param>
+        public PoolOrchestrator(ObjectPoolProvider provider) : this()
+        {
         }
 
         /// <summary>

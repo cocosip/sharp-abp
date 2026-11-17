@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using Volo.Abp;
@@ -79,7 +79,7 @@ namespace SharpAbp.Abp.FreeRedis
             Check.NotNullOrWhiteSpace(name, nameof(name));
 
             return _clients.GetOrDefault(name) ??
-                   Default;
+                   throw new AbpException($"No FreeRedis configuration found for client '{name}'. Configure it before resolving the client.");
         }
 
     }

@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -64,15 +65,24 @@ namespace SharpAbp.Abp.DbConnections
             }
 
             using var scope = ServiceProvider.CreateScope();
-            var creators = scope.ServiceProvider.GetServices<IDbConnectionCreator>();
-            if (creators != null)
+
+            // Creators explicitly listed in the options take precedence over conventionally registered ones.
+            var handledCreatorTypes = new HashSet<Type>();
+            foreach (var creatorType in Options.Creators)
             {
-                foreach (var creator in creators)
+                var creator = (IDbConnectionCreator)ActivatorUtilities.CreateInstance(scope.ServiceProvider, creatorType);
+                handledCreatorTypes.Add(creatorType);
+                if (creator.IsMatch(dbConnectionName, dbConnectionInfo))
                 {
-                    if (creator.IsMatch(dbConnectionName, dbConnectionInfo))
-                    {
-                        return await creator.CreateAsync(dbConnectionName, dbConnectionInfo);
-                    }
+                    return await creator.CreateAsync(dbConnectionName, dbConnectionInfo);
+                }
+            }
+
+            foreach (var creator in scope.ServiceProvider.GetServices<IDbConnectionCreator>())
+            {
+                if (handledCreatorTypes.Add(creator.GetType()) && creator.IsMatch(dbConnectionName, dbConnectionInfo))
+                {
+                    return await creator.CreateAsync(dbConnectionName, dbConnectionInfo);
                 }
             }
 
