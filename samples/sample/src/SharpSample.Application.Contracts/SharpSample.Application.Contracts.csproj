@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<Import Project="..\..\common.props" />
 
@@ -26,7 +26,7 @@
 		<ProjectReference Include="..\..\..\..\modules\audit-logging\src\SharpAbp.Abp.AuditLogging.Application.Contracts\SharpAbp.Abp.AuditLogging.Application.Contracts.csproj" />
 		<ProjectReference Include="..\..\..\..\modules\dbconnections\src\SharpAbp.Abp.DbConnectionsManagement.Application.Contracts\SharpAbp.Abp.DbConnectionsManagement.Application.Contracts.csproj" />
 		<ProjectReference Include="..\..\..\..\modules\file-storing-management\src\SharpAbp.Abp.FileStoringManagement.Application.Contracts\SharpAbp.Abp.FileStoringManagement.Application.Contracts.csproj" />
-		<ProjectReference Include="..\..\..\..\modules\identity\src\SharpAbp.Abp.Identity.Application.Contracts\SharpAbp.Abp.Identity.Application.Contracts.csproj" />
+		<ProjectReference Include="..\..\..\..\modules\Identity\src\SharpAbp.Abp.Identity.Application.Contracts\SharpAbp.Abp.Identity.Application.Contracts.csproj" />
 		<ProjectReference Include="..\..\..\..\modules\openiddict\src\SharpAbp.Abp.OpenIddict.Application.Contracts\SharpAbp.Abp.OpenIddict.Application.Contracts.csproj" />
 		<ProjectReference Include="..\..\..\..\modules\map-tenancy-management\src\SharpAbp.Abp.MapTenancyManagement.Application.Contracts\SharpAbp.Abp.MapTenancyManagement.Application.Contracts.csproj" />
 		<ProjectReference Include="..\..\..\..\modules\minid\src\SharpAbp.MinId.Application.Contracts\SharpAbp.MinId.Application.Contracts.csproj" />
