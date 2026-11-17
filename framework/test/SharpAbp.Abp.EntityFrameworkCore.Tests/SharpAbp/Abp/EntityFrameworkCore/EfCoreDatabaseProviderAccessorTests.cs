@@ -279,6 +279,7 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         public void GetDatabaseProviderOrNullByEfCoreName_MySql_ShouldReturnMySql()
         {
             // Act & Assert
+            Assert.Equal(DatabaseProvider.MySql, _databaseProviderAccessor.GetDatabaseProviderOrNullByEfCoreName("MySql.EntityFrameworkCore"));
             Assert.Equal(DatabaseProvider.MySql, _databaseProviderAccessor.GetDatabaseProviderOrNullByEfCoreName("Pomelo.EntityFrameworkCore.MySql"));
             Assert.Equal(DatabaseProvider.MySql, _databaseProviderAccessor.GetDatabaseProviderOrNullByEfCoreName("MySql.Data.EntityFrameworkCore"));
         }

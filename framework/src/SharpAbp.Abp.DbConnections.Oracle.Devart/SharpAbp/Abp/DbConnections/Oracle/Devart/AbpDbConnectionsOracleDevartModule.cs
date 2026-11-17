@@ -1,9 +1,9 @@
-﻿using SharpAbp.Abp.Data;
+using SharpAbp.Abp.Data;
 using System.Threading.Tasks;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
 
-namespace SharpAbp.Abp.DbConnections.Oracle.Drvart
+namespace SharpAbp.Abp.DbConnections.Oracle.Devart
 {
     [DependsOn(
         typeof(AbpDbConnectionsModule)
