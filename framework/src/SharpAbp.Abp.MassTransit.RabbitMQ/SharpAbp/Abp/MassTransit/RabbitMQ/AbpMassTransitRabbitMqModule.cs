@@ -1,4 +1,4 @@
-﻿using MassTransit;
+using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -23,7 +23,7 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
             var configuration = context.Services.GetConfiguration();
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
 
-            if (abpMassTransitOptions.Provider!.Equals(MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(abpMassTransitOptions.Provider, MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
                 PreConfigure<AbpMassTransitRabbitMqOptions>(options => options.PreConfigure(configuration));
 
@@ -65,7 +65,7 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
             if (abpMassTransitOptions != null)
             {
-                if (abpMassTransitOptions.Provider!.Equals(MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(abpMassTransitOptions.Provider, MassTransitRabbitMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
                 {
                     var rabbitMqPreConfiguredOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitRabbitMqOptions>();
                     Configure<AbpMassTransitRabbitMqOptions>(options => options.CopyFrom(rabbitMqPreConfiguredOptions));

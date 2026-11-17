@@ -1,4 +1,4 @@
-﻿using MassTransit;
+using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
@@ -21,7 +21,7 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
         {
             var configuration = context.Services.GetConfiguration();
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
-            if (abpMassTransitOptions.Provider!.Equals(MassTransitActiveMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(abpMassTransitOptions.Provider, MassTransitActiveMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
                 PreConfigure<AbpMassTransitActiveMqOptions>(options => options.PreConfigure(configuration));
 
@@ -56,109 +56,6 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
         }
 
 
-        public override void ConfigureServices(ServiceConfigurationContext context)
-        {
-            AsyncHelper.RunSync(() => ConfigureServicesAsync(context));
-        }
-
-        public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
-        {
-            var configuration = context.Services.GetConfiguration();
-            var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
-            if (abpMassTransitOptions.Provider!.Equals(MassTransitActiveMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
-            {
-                var massTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
-                var activeMqOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitActiveMqOptions>();
-
-                context.Services.AddMassTransit(x =>
-                {
-                    //Masstransit preConfigure
-                    foreach (var preConfigure in massTransitOptions.PreConfigures)
-                    {
-                        preConfigure(x);
-                    }
-
-                    //Consumer
-                    foreach (var consumer in activeMqOptions.Consumers)
-                    {
-                        consumer.Configure?.Invoke(x);
-                    }
-
-                    //Get message configures
-                    var messageConfigues = activeMqOptions.GetMessageConfigures();
-
-                    x.UsingActiveMq((ctx, cfg) =>
-                    {
-                        //ActiveMq preConfigure
-                        foreach (var preConfigure in activeMqOptions.ActiveMqPreConfigures)
-                        {
-                            preConfigure(ctx, cfg);
-                        }
-
-                        cfg.Host(activeMqOptions.Host, activeMqOptions.Port, h =>
-                        {
-                            h.Username(activeMqOptions.Username);
-                            h.Password(activeMqOptions.Password);
-
-                            if (activeMqOptions.UseSSL)
-                            {
-                                h.UseSsl();
-                            }
-
-                        });
-
-                        //ActiveMq configure
-                        foreach (var configure in activeMqOptions.ActiveMqConfigures)
-                        {
-                            configure(ctx, cfg);
-                        }
-
-                        //Message configure
-                        foreach (var messageConfigue in messageConfigues)
-                        {
-                            var queueName = activeMqOptions.DefaultQueueNameFormatFunc?.Invoke(massTransitOptions.Prefix, messageConfigue.Item1);
-                            messageConfigue.Item2?.Invoke(queueName!, cfg);
-                        }
-
-                        //Producer
-                        foreach (var producer in activeMqOptions.Producers)
-                        {
-                            var queueName = activeMqOptions.DefaultQueueNameFormatFunc?.Invoke(massTransitOptions.Prefix, producer.QueueName!);
-                            producer.MapConfigure?.Invoke(new Uri($"activemq://{activeMqOptions.Host}/{queueName}"));
-
-                            var publishTopologyConfigure = producer.PublishTopologyConfigure ?? activeMqOptions.DefaultPublishTopologyConfigure;
-                            producer.PublishConfigure?.Invoke(publishTopologyConfigure!, ctx, cfg);
-                        }
-
-                        //Consumer
-                        foreach (var consumer in activeMqOptions.Consumers)
-                        {
-                            var queueName = activeMqOptions.DefaultQueueNameFormatFunc?.Invoke(massTransitOptions.Prefix, consumer.QueueName!);
-                            consumer.MapConfigure?.Invoke(new Uri($"activemq://{activeMqOptions.Host}/{queueName}"));
-
-                            var receiveEndpointConfigure = consumer.ReceiveEndpointConfigure ?? activeMqOptions.DefaultReceiveEndpointConfigure;
-                            consumer.ReceiveEndpoint?.Invoke(queueName!, receiveEndpointConfigure!, ctx, cfg);
-                        }
-
-                        if (activeMqOptions.DefaultEnableArtemisCompatibility)
-                        {
-                            cfg.EnableArtemisCompatibility();
-                        }
-
-                        //RabbitMq postConfigure
-                        foreach (var postConfigure in activeMqOptions.ActiveMqPostConfigures)
-                        {
-                            postConfigure(ctx, cfg);
-                        }
-
-                    });
-                });
-            }
-
-            return Task.CompletedTask;
-        }
-
-
         public override void PostConfigureServices(ServiceConfigurationContext context)
         {
             AsyncHelper.RunSync(() => PostConfigureServicesAsync(context));
@@ -167,7 +64,7 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
         public override Task PostConfigureServicesAsync(ServiceConfigurationContext context)
         {
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
-            if (abpMassTransitOptions.Provider!.Equals(MassTransitActiveMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(abpMassTransitOptions.Provider, MassTransitActiveMqConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
                 var activeMqPreConfiguredOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitActiveMqOptions>();
                 Configure<AbpMassTransitActiveMqOptions>(options => options.CopyFrom(activeMqPreConfiguredOptions));

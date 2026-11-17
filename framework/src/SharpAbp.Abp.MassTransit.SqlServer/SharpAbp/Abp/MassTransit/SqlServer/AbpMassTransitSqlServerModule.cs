@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using MassTransit;
 using Microsoft.Data.SqlClient;
@@ -23,7 +23,7 @@ namespace SharpAbp.Abp.MassTransit.SqlServer
             var configuration = context.Services.GetConfiguration();
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
 
-            if (abpMassTransitOptions.Provider!.Equals(MassTransitSqlServerConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(abpMassTransitOptions.Provider, MassTransitSqlServerConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
             {
                 PreConfigure<AbpMassTransitSqlServerOptions>(options => options.PreConfigure(configuration));
 
@@ -53,7 +53,7 @@ namespace SharpAbp.Abp.MassTransit.SqlServer
             var abpMassTransitOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitOptions>();
             if (abpMassTransitOptions != null)
             {
-                if (abpMassTransitOptions.Provider!.Equals(MassTransitSqlServerConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(abpMassTransitOptions.Provider, MassTransitSqlServerConsts.ProviderName, StringComparison.OrdinalIgnoreCase))
                 {
                     var sqlServerPreConfiguredOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitSqlServerOptions>();
                     Configure<AbpMassTransitSqlServerOptions>(options => options.CopyFrom(sqlServerPreConfiguredOptions));
@@ -66,8 +66,8 @@ namespace SharpAbp.Abp.MassTransit.SqlServer
                         options.Database = sqlServerOptions.SqlTransportOptions?.Database ?? "masstransit";
                         options.Schema = sqlServerOptions.SqlTransportOptions?.Schema ?? "transport";
                         options.Role = sqlServerOptions.SqlTransportOptions?.Role ?? "transport";
-                        options.Username = sqlServerOptions.SqlTransportOptions?.Username ?? "postgres";
-                        options.Password = sqlServerOptions.SqlTransportOptions?.Password ?? "postgres";
+                        options.Username = sqlServerOptions.SqlTransportOptions?.Username ?? builder.UserID;
+                        options.Password = sqlServerOptions.SqlTransportOptions?.Password ?? builder.Password;
                         options.AdminUsername = sqlServerOptions.SqlTransportOptions?.AdminUsername ?? builder.UserID;
                         options.AdminPassword = sqlServerOptions.SqlTransportOptions?.AdminPassword ?? builder.Password;
 
@@ -123,7 +123,7 @@ namespace SharpAbp.Abp.MassTransit.SqlServer
                             foreach (var producer in sqlServerOptions.Producers ?? [])
                             {
                                 var configure = producer.Configure ?? sqlServerOptions.DefaultPublishTopologyConfigurator;
-                                cfg.AddPublishMessageTypes(producer.MessageTypes, producer.Configure);
+                                cfg.AddPublishMessageTypes(producer.MessageTypes, configure);
                             }
 
                             //PostgreSql postConfigure
