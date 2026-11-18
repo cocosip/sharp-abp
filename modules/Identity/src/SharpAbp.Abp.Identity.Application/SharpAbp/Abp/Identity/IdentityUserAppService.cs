@@ -341,7 +341,7 @@ namespace SharpAbp.Abp.Identity
         {
             var user = await UserRepository.GetAsync(id);
             await UserManager.SetLockoutEnabledAsync(user, true);
-            await UserManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now.AddSeconds(seconds));
+            await UserManager.SetLockoutEndDateAsync(user, Clock.Now.AddSeconds(seconds));
         }
 
         /// <summary>
@@ -353,6 +353,7 @@ namespace SharpAbp.Abp.Identity
         public virtual async Task UnLockAsync(Guid id)
         {
             var user = await UserRepository.GetAsync(id);
+            await UserManager.SetLockoutEndDateAsync(user, null);
             await UserManager.SetLockoutEnabledAsync(user, false);
         }
 

@@ -1,5 +1,10 @@
-﻿using SharpAbp.Abp.FileStoring.Fakes;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using SharpAbp.Abp.FileStoring.Fakes;
 using SharpAbp.Abp.FileStoring.TestObjects;
+using System.Collections.Generic;
+using Volo.Abp;
+using Volo.Abp.Modularity;
 using Xunit;
 
 namespace SharpAbp.Abp.FileStoring
@@ -36,6 +41,36 @@ namespace SharpAbp.Abp.FileStoring
             var config = _configurationProvider.Get<TestContainer3>();
             Assert.Equal(nameof(FakeFileProvider1), config.Provider);
             Assert.Equal("TestValueDefault", config.GetConfigurationOrNull("TestConfigDefault"));
+        }
+
+        [Fact]
+        public void Should_Keep_Container_Defaults_When_Json_Entry_Omits_Values()
+        {
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["FileStoringOptions:test:Provider"] = nameof(FakeFileProvider1)
+                })
+                .Build();
+
+            var services = new ServiceCollection();
+            services.PreConfigure<AbpFileStoringAbstractionsOptions>(opts =>
+            {
+                opts.Providers.TryAdd(new FileProviderConfiguration(
+                    nameof(FakeFileProvider1),
+                    typeof(AbpFileStoringOptions)));
+            });
+
+            var options = new AbpFileStoringOptions();
+            options.Configure(configuration, new ServiceConfigurationContext(services));
+
+            var container = options.Containers.GetConfiguration("test");
+            Assert.Equal(nameof(FakeFileProvider1), container.Provider);
+            Assert.True(container.IsMultiTenant);
+            Assert.False(container.EnableAutoMultiPartUpload);
+            Assert.Equal(1024 * 1024 * 100, container.MultiPartUploadMinFileSize);
+            Assert.Equal(1024 * 1024 * 5, container.MultiPartUploadShardingSize);
+            Assert.True(container.HttpAccess);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -116,7 +115,7 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
                                 {
                                     try
                                     {
-                                        var encryptedPassword = WebUtility.UrlDecode(value) ?? string.Empty;
+                                        var encryptedPassword = value ?? string.Empty;
                                         _logger.LogDebug("Decrypting password for token authentication");
 
                                         // Decrypt the encrypted password to plain text

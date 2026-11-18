@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Volo.Abp.Validation;
 
@@ -36,7 +36,7 @@ namespace SharpAbp.MinId
         /// <summary>
         /// The delta value used in ID generation.
         /// Defines the increment between consecutive IDs within a segment.
-        /// Must be greater than or equal to zero.
+        /// Must be greater than zero.
         /// </summary>
         [Required]
         public int Delta { get; set; }
@@ -66,9 +66,9 @@ namespace SharpAbp.MinId
                 yield return new ValidationResult($"Invalid Step value '{Step}'. The Step must be greater than 0.");
             }
 
-            if (Delta < 0)
+            if (Delta <= 0)
             {
-                yield return new ValidationResult($"Invalid Delta value '{Delta}'. The Delta must be greater than or equal to 0.");
+                yield return new ValidationResult($"Invalid Delta value '{Delta}'. The Delta must be greater than 0.");
             }
 
             if (Remainder < 0 || Remainder >= Step)

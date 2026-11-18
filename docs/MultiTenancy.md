@@ -4,7 +4,8 @@ Sharp-ABP provides advanced multi-tenancy features including map-based tenancy i
 
 ## MapTenancy
 
-Map-based tenancy isolation that allows domain-to-tenant binding for seamless tenant resolution.
+Map-based tenancy resolves the current tenant from a request value: a tenant `Code` or an external `MapCode`.
+`AbpAspNetCoreMapTenancyModule` registers query-string, form, route, header and cookie resolvers, so no middleware call is required.
 
 ### Installation
 
@@ -12,36 +13,55 @@ Map-based tenancy isolation that allows domain-to-tenant binding for seamless te
 # Core MapTenancy
 dotnet add package SharpAbp.Abp.MapTenancy
 
-# AspNetCore integration
+# AspNetCore integration (tenant resolvers)
 dotnet add package SharpAbp.Abp.AspNetCore.MapTenancy
 ```
 
 ### Configuration
 
-Configure in `appsettings.json`:
+Map codes are configured under `MapTenancyOptions`, keyed by code:
 
 ```json
 {
-  "MapTenancy": {
-    "TenantMappings": [
-      {
-        "Domain": "tenant1.myapp.com",
-        "TenantId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-      },
-      {
-        "Domain": "tenant2.myapp.com",
-        "TenantId": "8b3c9d45-6e2a-4f8b-9c5d-1a2b3c4d5e6f"
-      },
-      {
-        "Domain": "app.customdomain.com",
-        "TenantId": "7a4e8f23-9b1c-4d5e-a6f7-3b2c1d0e9f8a"
-      }
-    ]
+  "MapTenancyOptions": {
+    "tenant1": {
+      "TenantId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "TenantName": "Tenant 1",
+      "Code": "tenant1",
+      "MapCode": "t1"
+    },
+    "tenant2": {
+      "TenantId": "8b3c9d45-6e2a-4f8b-9c5d-1a2b3c4d5e6f",
+      "TenantName": "Tenant 2",
+      "Code": "tenant2",
+      "MapCode": "t2"
+    }
   }
 }
 ```
 
-Add the module dependency:
+Bind the section (the core module does not bind it automatically):
+
+```csharp
+Configure<AbpMapTenancyOptions>(options => options.Configure(configuration));
+```
+
+The same mappings can be configured in code:
+
+```csharp
+Configure<AbpMapTenancyOptions>(options =>
+{
+    options.Mappers.Configure("tenant1", mapper =>
+    {
+        mapper.TenantId = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa6");
+        mapper.TenantName = "Tenant 1";
+        mapper.Code = "tenant1";
+        mapper.MapCode = "t1";
+    });
+});
+```
+
+Add the module dependencies:
 
 ```csharp
 [DependsOn(
@@ -50,37 +70,20 @@ Add the module dependency:
 )]
 public class YourModule : AbpModule
 {
-    public override void ConfigureServices(ServiceConfigurationContext context)
-    {
-        var configuration = context.Services.GetConfiguration();
-
-        Configure<AbpMapTenancyOptions>(options =>
-        {
-            options.TenantMappings.Add(new TenantMapping
-            {
-                Domain = "tenant1.myapp.com",
-                TenantId = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa6")
-            });
-
-            options.TenantMappings.Add(new TenantMapping
-            {
-                Domain = "tenant2.myapp.com",
-                TenantId = Guid.Parse("8b3c9d45-6e2a-4f8b-9c5d-1a2b3c4d5e6f")
-            });
-        });
-    }
-
-    public override void OnApplicationInitialization(ApplicationInitializationContext context)
-    {
-        var app = context.GetApplicationBuilder();
-
-        // Add MapTenancy middleware (before MVC)
-        app.UseMapTenancy();
-        app.UseRouting();
-        app.UseConfiguredEndpoints();
-    }
 }
 ```
+
+The resolvers read the request value from the key configured by `AbpAspNetCoreMapTenancyOptions.MapTenantKey`
+(default `__tenant`):
+
+```csharp
+Configure<AbpAspNetCoreMapTenancyOptions>(options =>
+{
+    options.MapTenantKey = "__tenant";
+});
+```
+
+A request such as `?__tenant=t1` resolves the tenant through its `MapCode`; `?__tenant=tenant1` resolves it through its `Code`.
 
 ### Usage Example
 
@@ -90,9 +93,7 @@ public class TenantAwareService : ITransientDependency
     private readonly ICurrentTenant _currentTenant;
     private readonly ITenantStore _tenantStore;
 
-    public TenantAwareService(
-        ICurrentTenant _currentTenant,
-        ITenantStore tenantStore)
+    public TenantAwareService(ICurrentTenant currentTenant, ITenantStore tenantStore)
     {
         _currentTenant = currentTenant;
         _tenantStore = tenantStore;
@@ -109,67 +110,43 @@ public class TenantAwareService : ITransientDependency
         return tenant?.Name ?? "Unknown";
     }
 
-    public Guid? GetCurrentTenantId()
+    public IDisposable ChangeTenant(Guid tenantId)
     {
-        return _currentTenant.Id;
-    }
-
-    // Switch tenant context
-    public async Task<List<Product>> GetTenantProductsAsync(Guid tenantId)
-    {
-        using (_currentTenant.Change(tenantId))
-        {
-            // Operations here will be in the context of the specified tenant
-            return await _productRepository.GetListAsync();
-        }
+        return _currentTenant.Change(tenantId);
     }
 }
 ```
 
 #### Dynamic Tenant Mapping Management
 
+Use `IMapTenantAppService` from `SharpAbp.Abp.MapTenancyManagement.*` to create, update and delete mappings at runtime:
+
 ```csharp
-public class TenantMappingService : ApplicationService
+public class MapTenantService : ApplicationService
 {
-    private readonly ITenantMappingStore _mappingStore;
+    private readonly IMapTenantAppService _mapTenantAppService;
 
-    public TenantMappingService(ITenantMappingStore mappingStore)
+    public MapTenantService(IMapTenantAppService mapTenantAppService)
     {
-        _mappingStore = mappingStore;
+        _mapTenantAppService = mapTenantAppService;
     }
 
-    // Add new domain mapping
-    public async Task AddDomainMappingAsync(string domain, Guid tenantId)
+    public Task<MapTenantDto> CreateAsync(Guid tenantId, string tenantName, string code, string mapCode)
     {
-        await _mappingStore.AddOrUpdateAsync(new TenantMapping
-        {
-            Domain = domain,
-            TenantId = tenantId
-        });
-    }
-
-    // Remove domain mapping
-    public async Task RemoveDomainMappingAsync(string domain)
-    {
-        await _mappingStore.RemoveAsync(domain);
-    }
-
-    // Get tenant by domain
-    public async Task<Guid?> GetTenantIdByDomainAsync(string domain)
-    {
-        var mapping = await _mappingStore.FindByDomainAsync(domain);
-        return mapping?.TenantId;
-    }
-
-    // List all mappings for a tenant
-    public async Task<List<string>> GetTenantDomainsAsync(Guid tenantId)
-    {
-        var mappings = await _mappingStore.GetListByTenantIdAsync(tenantId);
-        return mappings.Select(m => m.Domain).ToList();
+        return _mapTenantAppService.CreateAsync(new CreateMapTenantDto(tenantId, tenantName, code, mapCode));
     }
 }
 ```
 
+For cached lookups without going through the application service, inject `IMapTenantStore`:
+
+```csharp
+var mapping = await _mapTenantStore.GetByCodeAsync("tenant1");
+using (_currentTenant.Change(mapping.TenantId))
+{
+    // Work in the mapped tenant context.
+}
+```
 #### Tenant Code Provider
 
 `IMapTenantCodeProvider` resolves a tenant id to the mapping code used by consumers that need a stable tenant code instead of a tenant GUID or tenant name.
@@ -209,21 +186,25 @@ When `SharpAbp.Abp.MapTenancyManagement.Domain` is installed, `DatabaseMapTenant
 
 ## TenancyGrouping
 
-Tenant grouping isolation allows you to organize tenants into groups and apply group-level configurations and isolation.
+Tenant grouping groups tenants so group-level settings (for example connection strings) can be resolved alongside the
+current tenant. `SharpAbp.Abp.TenantGroupManagement.*` adds persistent CRUD management on top of the framework module.
 
 ### Installation
 
 ```bash
-# Core TenancyGrouping
+# Framework grouping
 dotnet add package SharpAbp.Abp.TenancyGrouping
 
 # AspNetCore integration
 dotnet add package SharpAbp.Abp.AspNetCore.TenancyGrouping
+
+# Persistent tenant group management (optional)
+dotnet add package SharpAbp.Abp.TenantGroupManagement.Application
 ```
 
 ### Configuration
 
-Add the module dependency:
+Add the module dependencies:
 
 ```csharp
 [DependsOn(
@@ -236,127 +217,92 @@ public class YourModule : AbpModule
     {
         Configure<AbpTenancyGroupingOptions>(options =>
         {
-            // Configure grouping options
-            options.EnableGroupIsolation = true;
-            options.DefaultGroupName = "Default";
+            options.IsEnabled = true;
         });
     }
 }
 ```
 
+Without the management module, groups can be supplied from configuration through
+`AbpDefaultTenantGroupStoreOptions.Groups`. Additional resolvers are added to
+`AbpTenantGroupResolveOptions.TenantResolvers`.
+
 ### Usage Example
 
-#### Define Tenant Groups
+#### Manage Tenant Groups
 
 ```csharp
-public class TenantGroup : AggregateRoot<Guid>
+public class TenantGroupService : ApplicationService
 {
-    public string Name { get; set; }
-    public string DisplayName { get; set; }
-    public string Description { get; set; }
-    public Dictionary<string, object> Properties { get; set; }
-    public bool IsActive { get; set; }
-}
-```
+    private readonly ITenantGroupAppService _tenantGroupAppService;
 
-#### Tenant Group Management
-
-```csharp
-public class TenantGroupAppService : ApplicationService
-{
-    private readonly IRepository<TenantGroup, Guid> _groupRepository;
-    private readonly ITenantGroupManager _tenantGroupManager;
-
-    public TenantGroupAppService(
-        IRepository<TenantGroup, Guid> groupRepository,
-        ITenantGroupManager tenantGroupManager)
+    public TenantGroupService(ITenantGroupAppService tenantGroupAppService)
     {
-        _groupRepository = groupRepository;
-        _tenantGroupManager = tenantGroupManager;
+        _tenantGroupAppService = tenantGroupAppService;
     }
 
-    // Create tenant group
-    public async Task<TenantGroupDto> CreateAsync(CreateTenantGroupDto input)
+    public Task<TenantGroupDto> CreateAsync(string name)
     {
-        var group = new TenantGroup
+        return _tenantGroupAppService.CreateAsync(new CreateTenantGroupDto
         {
-            Name = input.Name,
-            DisplayName = input.DisplayName,
-            Description = input.Description,
+            Name = name,
             IsActive = true
-        };
-
-        await _groupRepository.InsertAsync(group);
-        return ObjectMapper.Map<TenantGroup, TenantGroupDto>(group);
+        });
     }
 
-    // Assign tenant to group
-    public async Task AssignTenantToGroupAsync(Guid tenantId, Guid groupId)
+    public Task<TenantGroupDto> AddTenantAsync(Guid groupId, Guid tenantId)
     {
-        await _tenantGroupManager.AssignTenantToGroupAsync(tenantId, groupId);
+        return _tenantGroupAppService.AddTenantAsync(groupId, new AddTenantDto
+        {
+            TenantId = tenantId
+        });
     }
 
-    // Get tenants in group
-    public async Task<List<TenantDto>> GetTenantsInGroupAsync(Guid groupId)
+    public Task<PagedResultDto<TenantGroupDto>> GetListAsync(TenantGroupPagedRequestDto input)
     {
-        var tenants = await _tenantGroupManager.GetTenantsInGroupAsync(groupId);
-        return ObjectMapper.Map<List<Tenant>, List<TenantDto>>(tenants);
-    }
-
-    // Get tenant's group
-    public async Task<TenantGroupDto> GetTenantGroupAsync(Guid tenantId)
-    {
-        var group = await _tenantGroupManager.GetTenantGroupAsync(tenantId);
-        return ObjectMapper.Map<TenantGroup, TenantGroupDto>(group);
+        return _tenantGroupAppService.GetPagedListAsync(input);
     }
 }
 ```
 
-#### Group-Level Data Isolation
+`ITenantGroupAppService` also exposes `UpdateAsync`, `DeleteAsync`, `RemoveTenantAsync`,
+`GetDefaultConnectionStringAsync`, `UpdateDefaultConnectionStringAsync` and
+`DeleteDefaultConnectionStringAsync`.
+
+#### Current Tenant Group
 
 ```csharp
-public class GroupAwareProductService : ApplicationService
+public class GroupAwareService : ITransientDependency
 {
-    private readonly IRepository<Product, Guid> _productRepository;
     private readonly ICurrentTenantGroup _currentTenantGroup;
+    private readonly IRepository<Product, Guid> _productRepository;
 
-    public GroupAwareProductService(
-        IRepository<Product, Guid> productRepository,
-        ICurrentTenantGroup currentTenantGroup)
+    public GroupAwareService(
+        ICurrentTenantGroup currentTenantGroup,
+        IRepository<Product, Guid> productRepository)
     {
-        _productRepository = productRepository;
         _currentTenantGroup = currentTenantGroup;
+        _productRepository = productRepository;
     }
 
-    // Get products visible to current tenant's group
-    public async Task<List<ProductDto>> GetGroupProductsAsync()
+    public async Task<List<Product>> GetGroupProductsAsync()
     {
-        var groupId = _currentTenantGroup.Id;
-
-        var queryable = await _productRepository.GetQueryableAsync();
-        var products = await AsyncExecuter.ToListAsync(
-            queryable.Where(p => p.TenantGroupId == groupId)
-        );
-
-        return ObjectMapper.Map<List<Product>, List<ProductDto>>(products);
-    }
-
-    // Share product across group
-    public async Task ShareProductWithGroupAsync(Guid productId, Guid targetGroupId)
-    {
-        var product = await _productRepository.GetAsync(productId);
-
-        // Create shared product reference
-        var sharedProduct = new SharedProduct
+        if (!_currentTenantGroup.IsAvailable || _currentTenantGroup.Id == null)
         {
-            OriginalProductId = productId,
-            TargetGroupId = targetGroupId
-        };
+            return [];
+        }
 
-        // Save shared reference
+        return await _productRepository.GetListAsync();
+    }
+
+    public IDisposable ChangeGroup(Guid groupId)
+    {
+        return _currentTenantGroup.Change(groupId);
     }
 }
 ```
+
+`ICurrentTenantGroup` exposes `IsAvailable`, `Id`, `Name`, `Tenants` and `Change(id, name, tenants)`.
 
 ---
 

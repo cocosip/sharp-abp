@@ -1,9 +1,11 @@
-﻿﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
+using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Uow;
 
@@ -68,13 +70,11 @@ namespace SharpAbp.MinId
             string bizType,
             CancellationToken cancellationToken = default)
         {
-            var retry = Options.ConflictRetryCount;
+            var retry = Math.Max(1, Options.ConflictRetryCount);
             var timeout = Options.TransactionTimeout;
 
-            for (var i = 0; i < retry; i++)
+            for (var attempt = 1; attempt <= retry; attempt++)
             {
-                SegmentId segmentId = null;
-
                 using var unitOfWork = UnitOfWorkManager.Begin(true, true, IsolationLevel.ReadCommitted, timeout);
 
                 try
@@ -90,31 +90,47 @@ namespace SharpAbp.MinId
 
                     minIdInfo.UpdateMaxId(newMaxId);
                     await MinIdInfoRepository.UpdateAsync(minIdInfo, cancellationToken: cancellationToken);
-                    segmentId = ConvertToSegmentId(minIdInfo);
+                    await unitOfWork.CompleteAsync(cancellationToken);
+
+                    return ConvertToSegmentId(minIdInfo);
+                }
+                catch (AbpDbConcurrencyException ex)
+                {
+                    await RollbackAsync(unitOfWork, cancellationToken);
+
+                    if (attempt == retry)
+                    {
+                        throw new AbpException($"Failed to allocate segment for business type '{bizType}' after {retry} attempts due to concurrent access conflicts.", ex);
+                    }
+
+                    Logger.LogWarning(ex, "Concurrent segment allocation conflict for business type '{BizType}', retrying ({Attempt}/{Retry}).",
+                        bizType, attempt, retry);
+
+                    await Task.Delay(TimeSpan.FromMilliseconds(20 * attempt), cancellationToken);
                 }
                 catch
                 {
-                    try
-                    {
-                        await unitOfWork.RollbackAsync(cancellationToken);
-                    }
-                    catch
-                    {
-                        /* Transaction rollback failed - this is logged internally by ABP */
-                    }
-
+                    await RollbackAsync(unitOfWork, cancellationToken);
                     throw;
-                }
-
-                await unitOfWork.CompleteAsync(cancellationToken);
-
-                if (segmentId != null)
-                {
-                    return segmentId;
                 }
             }
 
             throw new AbpException($"Failed to allocate segment for business type '{bizType}' after {retry} retry attempts due to concurrent access conflicts. Please try again later.");
+        }
+
+        /// <summary>
+        /// Rolls back the current unit of work while preserving the original exception.
+        /// </summary>
+        protected virtual async Task RollbackAsync(IUnitOfWork unitOfWork, CancellationToken cancellationToken)
+        {
+            try
+            {
+                await unitOfWork.RollbackAsync(cancellationToken);
+            }
+            catch
+            {
+                /* Transaction rollback failed - this is logged internally by ABP */
+            }
         }
 
         /// <summary>

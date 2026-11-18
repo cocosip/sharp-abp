@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -158,7 +158,7 @@ namespace SharpAbp.Abp.FileStoring.Database
                 return false;
             }
 
-            using (var fs = new FileStream(args.Path, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            using (var fs = new FileStream(args.Path, FileMode.Create, FileAccess.ReadWrite))
             {
                 await fs.WriteAsync(file.Content, 0, file.Content.Length);
             }

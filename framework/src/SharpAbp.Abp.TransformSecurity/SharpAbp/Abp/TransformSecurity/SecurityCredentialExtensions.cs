@@ -1,7 +1,8 @@
-﻿using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Engines;
 using SharpAbp.Abp.Crypto.RSA;
 using SharpAbp.Abp.Crypto.SM2;
 using System;
+using Volo.Abp;
 using Volo.Abp.Data;
 
 namespace SharpAbp.Abp.TransformSecurity
@@ -116,6 +117,17 @@ namespace SharpAbp.Abp.TransformSecurity
         }
 
         /// <summary>
+        /// Gets the RSA padding scheme from the security credential, falling back to the supplied value when unset.
+        /// </summary>
+        /// <param name="key">The security credential.</param>
+        /// <param name="fallback">The value to use when the credential has no stored padding.</param>
+        /// <returns>The stored RSA padding scheme or the fallback.</returns>
+        public static string? GetRSAPadding(this SecurityCredential key, string? fallback)
+        {
+            return key.GetProperty(PropertyKeys.RsaPadding, fallback);
+        }
+
+        /// <summary>
         /// Sets the RSA padding scheme for the security credential.
         /// </summary>
         /// <param name="key">The security credential.</param>
@@ -137,6 +149,17 @@ namespace SharpAbp.Abp.TransformSecurity
         }
 
         /// <summary>
+        /// Gets the SM2 curve from the security credential, falling back to the supplied value when unset.
+        /// </summary>
+        /// <param name="key">The security credential.</param>
+        /// <param name="fallback">The value to use when the credential has no stored curve.</param>
+        /// <returns>The stored SM2 curve or the fallback.</returns>
+        public static string? GetSM2Curve(this SecurityCredential key, string? fallback)
+        {
+            return key.GetProperty(PropertyKeys.Sm2Curve, fallback);
+        }
+
+        /// <summary>
         /// Sets the SM2 curve for the security credential.
         /// </summary>
         /// <param name="key">The security credential.</param>
@@ -154,7 +177,24 @@ namespace SharpAbp.Abp.TransformSecurity
         /// <returns>The SM2 engine mode, defaults to C1C2C3 if not specified.</returns>
         public static SM2Engine.Mode GetSM2Mode(this SecurityCredential key)
         {
-            return (SM2Engine.Mode)Enum.Parse(typeof(SM2Engine.Mode), key.GetProperty(PropertyKeys.Sm2Mode, SM2Engine.Mode.C1C2C3.ToString()));
+            return key.GetSM2Mode(SM2Engine.Mode.C1C2C3);
+        }
+
+        /// <summary>
+        /// Gets the SM2 engine mode from the security credential, falling back to the supplied value when unset.
+        /// </summary>
+        /// <param name="key">The security credential.</param>
+        /// <param name="fallback">The value to use when the credential has no stored mode.</param>
+        /// <returns>The stored SM2 engine mode or the fallback.</returns>
+        public static SM2Engine.Mode GetSM2Mode(this SecurityCredential key, SM2Engine.Mode fallback)
+        {
+            var value = key.GetProperty(PropertyKeys.Sm2Mode, fallback.ToString());
+            if (!Enum.TryParse<SM2Engine.Mode>(value, out var mode))
+            {
+                throw new AbpException($"Invalid SM2 mode '{value}' on security credential '{key.Identifier}'.");
+            }
+
+            return mode;
         }
 
         /// <summary>

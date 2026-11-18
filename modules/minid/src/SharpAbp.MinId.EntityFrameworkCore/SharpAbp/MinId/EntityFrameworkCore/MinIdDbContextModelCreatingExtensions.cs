@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using Volo.Abp;
 using Volo.Abp.EntityFrameworkCore.Modeling;
@@ -37,6 +37,8 @@ namespace SharpAbp.MinId.EntityFrameworkCore
                 b.Property(p => p.Delta).IsRequired();
 
                 b.Property(p => p.Remainder).IsRequired();
+
+                b.Property(p => p.ConcurrencyStamp).IsConcurrencyToken().HasMaxLength(40);
 
                 b.HasIndex(x => x.BizType).IsUnique();
 

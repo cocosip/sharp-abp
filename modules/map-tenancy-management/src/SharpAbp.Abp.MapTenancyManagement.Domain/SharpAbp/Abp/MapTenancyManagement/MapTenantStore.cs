@@ -1,4 +1,4 @@
-﻿﻿﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
@@ -10,6 +10,7 @@ using Volo.Abp.DistributedLocking;
 using Volo.Abp.Guids;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.Threading;
+using Volo.Abp.Timing;
 
 namespace SharpAbp.Abp.MapTenancyManagement
 {
@@ -27,6 +28,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         protected IMapTenancyStoreInMemoryCache StoreCache { get; }
         protected IDistributedCache DistributedCache { get; }
         protected IAbpDistributedLock DistributedLock { get; }
+        protected IClock Clock { get; }
 
         /// <summary>
         /// Initializes a new instance of the MapTenantStore class
@@ -39,6 +41,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <param name="storeCache">In-memory cache for storing map tenancy data</param>
         /// <param name="distributedCache">Distributed cache for cross-instance synchronization</param>
         /// <param name="distributedLock">Distributed locking mechanism for cache coordination</param>
+        /// <param name="clock">Clock used for the cache staleness window</param>
         public MapTenantStore(
             IOptions<AbpDistributedCacheOptions> cacheOptions,
             IOptions<MapTenancyStoreOptions> storeOptions,
@@ -47,7 +50,8 @@ namespace SharpAbp.Abp.MapTenancyManagement
             IMapTenantRepository mapTenantRepository,
             IMapTenancyStoreInMemoryCache storeCache,
             IDistributedCache distributedCache,
-            IAbpDistributedLock distributedLock)
+            IAbpDistributedLock distributedLock,
+            IClock clock)
         {
             CacheOptions = cacheOptions.Value;
             StoreOptions = storeOptions.Value;
@@ -58,6 +62,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
             StoreCache = storeCache;
             DistributedCache = distributedCache;
             DistributedLock = distributedLock;
+            Clock = clock;
         }
 
         /// <summary>
@@ -142,7 +147,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         protected virtual async Task EnsureCacheIsUptoDateAsync()
         {
             if (StoreCache.LastCheckTime.HasValue &&
-                DateTime.Now.Subtract(StoreCache.LastCheckTime.Value).TotalSeconds < 30)
+                Clock.Now.Subtract(StoreCache.LastCheckTime.Value).TotalSeconds < 30)
             {
                 return;
             }
@@ -151,14 +156,14 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
             if (stampInDistributedCache == StoreCache.CacheStamp)
             {
-                StoreCache.LastCheckTime = DateTime.Now;
+                StoreCache.LastCheckTime = Clock.Now;
                 return;
             }
 
             await UpdateInMemoryStoreCache();
 
             StoreCache.CacheStamp = stampInDistributedCache;
-            StoreCache.LastCheckTime = DateTime.Now;
+            StoreCache.LastCheckTime = Clock.Now;
         }
 
         /// <summary>

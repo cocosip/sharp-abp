@@ -1,9 +1,10 @@
-﻿using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using SharpAbp.Abp.MapTenancyManagement.Localization;
 using System;
 using System.Threading.Tasks;
 using Volo.Abp;
+using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.TenantManagement;
 
@@ -155,26 +156,22 @@ namespace SharpAbp.Abp.MapTenancyManagement
         {
             Logger.LogDebug("Validating tenant ID: {TenantId} with expected ID: {ExpectedId}", tenantId, expectedId);
             
-            try
+            var tenant = await TenantRepository.GetAsync(tenantId, false);
+            if (tenant == null)
             {
-                var tenant = await TenantRepository.GetAsync(tenantId, false);
-                var existingMapTenant = await MapTenantRepository.FindExpectedTenantIdAsync(tenantId, expectedId);
-                
-                if (existingMapTenant != null)
-                {
-                    Logger.LogWarning("Tenant ID {TenantId} is already mapped to another map tenant with ID: {ExistingId}", 
-                        tenantId, existingMapTenant.Id);
-                    throw new UserFriendlyException(Localizer["MapTenancyManagement.DuplicateTenantId", tenantId]);
-                }
-                
-                Logger.LogDebug("Successfully validated tenant ID: {TenantId}", tenantId);
-                return tenant;
+                throw new EntityNotFoundException(typeof(Tenant), tenantId);
             }
-            catch (Exception ex) when (!(ex is UserFriendlyException))
+
+            var existingMapTenant = await MapTenantRepository.FindExpectedTenantIdAsync(tenantId, expectedId);
+            if (existingMapTenant != null)
             {
-                Logger.LogError(ex, "Error occurred while validating tenant ID: {TenantId}", tenantId);
-                throw new UserFriendlyException($"Failed to validate tenant with ID: {tenantId}");
+                Logger.LogWarning("Tenant ID {TenantId} is already mapped to another map tenant with ID: {ExistingId}",
+                    tenantId, existingMapTenant.Id);
+                throw new UserFriendlyException(Localizer["MapTenancyManagement.DuplicateTenantId", tenantId]);
             }
+
+            Logger.LogDebug("Successfully validated tenant ID: {TenantId}", tenantId);
+            return tenant;
         }
 
         /// <summary>
@@ -190,25 +187,16 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
             Logger.LogDebug("Validating tenant ID: {TenantId} with expected ID: {ExpectedId}", tenant.Id, expectedId);
 
-            try
+            var existingMapTenant = await MapTenantRepository.FindExpectedTenantIdAsync(tenant.Id, expectedId);
+            if (existingMapTenant != null)
             {
-                var existingMapTenant = await MapTenantRepository.FindExpectedTenantIdAsync(tenant.Id, expectedId);
-
-                if (existingMapTenant != null)
-                {
-                    Logger.LogWarning("Tenant ID {TenantId} is already mapped to another map tenant with ID: {ExistingId}",
-                        tenant.Id, existingMapTenant.Id);
-                    throw new UserFriendlyException(Localizer["MapTenancyManagement.DuplicateTenantId", tenant.Id]);
-                }
-
-                Logger.LogDebug("Successfully validated tenant ID: {TenantId}", tenant.Id);
-                return tenant;
+                Logger.LogWarning("Tenant ID {TenantId} is already mapped to another map tenant with ID: {ExistingId}",
+                    tenant.Id, existingMapTenant.Id);
+                throw new UserFriendlyException(Localizer["MapTenancyManagement.DuplicateTenantId", tenant.Id]);
             }
-            catch (Exception ex) when (!(ex is UserFriendlyException))
-            {
-                Logger.LogError(ex, "Error occurred while validating tenant ID: {TenantId}", tenant.Id);
-                throw new UserFriendlyException($"Failed to validate tenant with ID: {tenant.Id}");
-            }
+
+            Logger.LogDebug("Successfully validated tenant ID: {TenantId}", tenant.Id);
+            return tenant;
         }
 
         /// <summary>
@@ -223,24 +211,15 @@ namespace SharpAbp.Abp.MapTenancyManagement
             
             Logger.LogDebug("Validating code: {Code} with expected ID: {ExpectedId}", code, expectedId);
             
-            try
+            var existingMapTenant = await MapTenantRepository.FindExpectedCodeAsync(code, expectedId);
+            if (existingMapTenant != null)
             {
-                var existingMapTenant = await MapTenantRepository.FindExpectedCodeAsync(code, expectedId);
-                
-                if (existingMapTenant != null)
-                {
-                    Logger.LogWarning("Code '{Code}' is already in use by map tenant with ID: {ExistingId}", 
-                        code, existingMapTenant.Id);
-                    throw new UserFriendlyException(Localizer["MapTenancyManagement.DuplicateCode", code]);
-                }
-                
-                Logger.LogDebug("Successfully validated code: {Code}", code);
+                Logger.LogWarning("Code '{Code}' is already in use by map tenant with ID: {ExistingId}",
+                    code, existingMapTenant.Id);
+                throw new UserFriendlyException(Localizer["MapTenancyManagement.DuplicateCode", code]);
             }
-            catch (Exception ex) when (!(ex is UserFriendlyException))
-            {
-                Logger.LogError(ex, "Error occurred while validating code: {Code}", code);
-                throw new UserFriendlyException($"Failed to validate code: {code}");
-            }
+
+            Logger.LogDebug("Successfully validated code: {Code}", code);
         }
 
         /// <summary>
@@ -255,24 +234,15 @@ namespace SharpAbp.Abp.MapTenancyManagement
             
             Logger.LogDebug("Validating map code: {MapCode} with expected ID: {ExpectedId}", mapCode, expectedId);
             
-            try
+            var existingMapTenant = await MapTenantRepository.FindExpectedMapCodeAsync(mapCode, expectedId);
+            if (existingMapTenant != null)
             {
-                var existingMapTenant = await MapTenantRepository.FindExpectedMapCodeAsync(mapCode, expectedId);
-                
-                if (existingMapTenant != null)
-                {
-                    Logger.LogWarning("Map code '{MapCode}' is already in use by map tenant with ID: {ExistingId}", 
-                        mapCode, existingMapTenant.Id);
-                    throw new UserFriendlyException(Localizer["MapTenancyManagement.DuplicateMapCode", mapCode]);
-                }
-                
-                Logger.LogDebug("Successfully validated map code: {MapCode}", mapCode);
+                Logger.LogWarning("Map code '{MapCode}' is already in use by map tenant with ID: {ExistingId}",
+                    mapCode, existingMapTenant.Id);
+                throw new UserFriendlyException(Localizer["MapTenancyManagement.DuplicateMapCode", mapCode]);
             }
-            catch (Exception ex) when (!(ex is UserFriendlyException))
-            {
-                Logger.LogError(ex, "Error occurred while validating map code: {MapCode}", mapCode);
-                throw new UserFriendlyException($"Failed to validate map code: {mapCode}");
-            }
+
+            Logger.LogDebug("Successfully validated map code: {MapCode}", mapCode);
         }
 
     }

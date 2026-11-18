@@ -4,7 +4,7 @@ Core modules provide essential functionality and utilities for ABP vNext applica
 
 ## DotCommon
 
-DotCommon ABP adapter that provides Snowflake ID generation and other utilities.
+DotCommon ABP adapter for the DotCommon performance counters (`IPerformanceService`).
 
 ### Installation
 
@@ -20,37 +20,42 @@ Add the module dependency to your module class:
 [DependsOn(typeof(AbpDotCommonModule))]
 public class YourModule : AbpModule
 {
-    public override void ConfigureServices(ServiceConfigurationContext context)
-    {
-        // Module is automatically configured
-    }
 }
 ```
+
+The module registers a default performance configuration named `default`. Add or customize configurations with
+`Configure<AbpPerformanceOptions>`.
 
 ### Usage Example
 
 ```csharp
 public class YourService
 {
-    private readonly ISnowflakeIdGenerator _snowflakeIdGenerator;
+    private readonly IPerformanceService _performanceService;
 
-    public YourService(ISnowflakeIdGenerator snowflakeIdGenerator)
+    public YourService(IPerformanceServiceFactory performanceServiceFactory)
     {
-        _snowflakeIdGenerator = snowflakeIdGenerator;
+        _performanceService = performanceServiceFactory.GetOrCreate("YourService");
     }
 
-    public long GenerateId()
+    public void DoWork()
     {
-        return _snowflakeIdGenerator.NextId();
+        var start = DateTime.UtcNow;
+
+        // ... work ...
+
+        _performanceService.IncrementKeyCount("DoWork", (DateTime.UtcNow - start).TotalMilliseconds);
     }
 }
 ```
+
+`GetKeyPerformanceInfo(key)` returns the current `PerformanceInfo` snapshot for a key.
 
 ---
 
 ## Snowflakes
 
-Distributed unique ID generator for generating globally unique IDs.
+Distributed unique ID generator based on the Snowflake algorithm.
 
 ### Installation
 
@@ -60,18 +65,24 @@ dotnet add package SharpAbp.Abp.Snowflakes
 
 ### Configuration
 
-Configure in your `appsettings.json`:
+Configure named Snowflake instances in `appsettings.json`:
 
 ```json
 {
-  "Snowflakes": {
-    "WorkerId": 1,
-    "DataCenterId": 1
+  "SnowflakeOptions": {
+    "default": {
+      "WorkerId": 1,
+      "DatacenterId": 1
+    },
+    "order": {
+      "WorkerId": 2,
+      "DatacenterId": 1
+    }
   }
 }
 ```
 
-Add the module dependency:
+Add the module dependency and bind the section:
 
 ```csharp
 [DependsOn(typeof(AbpSnowflakesModule))]
@@ -81,35 +92,33 @@ public class YourModule : AbpModule
     {
         var configuration = context.Services.GetConfiguration();
 
-        Configure<SnowflakesOptions>(options =>
-        {
-            options.WorkerId = configuration.GetValue<int>("Snowflakes:WorkerId");
-            options.DataCenterId = configuration.GetValue<int>("Snowflakes:DataCenterId");
-        });
+        Configure<AbpSnowflakesOptions>(options => options.Configure(configuration));
     }
 }
 ```
+
+`WorkerId`, `DatacenterId`, `Twepoch`, `WorkerIdBits`, `DatacenterIdBits` and `SequenceBits` can be set per instance.
 
 ### Usage Example
 
 ```csharp
 public class YourService
 {
-    private readonly ISnowflakeIdGenerator _idGenerator;
+    private readonly ISnowflakeFactory _snowflakeFactory;
 
-    public YourService(ISnowflakeIdGenerator idGenerator)
+    public YourService(ISnowflakeFactory snowflakeFactory)
     {
-        _idGenerator = idGenerator;
+        _snowflakeFactory = snowflakeFactory;
     }
 
     public long CreateUniqueId()
     {
-        return _idGenerator.NextId();
+        return _snowflakeFactory.GetDefault().NextId();
     }
 
-    public string CreateUniqueStringId()
+    public long CreateOrderId()
     {
-        return _idGenerator.NextId().ToString();
+        return _snowflakeFactory.Get("order").NextId();
     }
 }
 ```
@@ -118,7 +127,7 @@ public class YourService
 
 ## Crypto
 
-Encryption and decryption module with SM2/AES support for data security.
+Cryptography primitives built on BouncyCastle: RSA, SM2, SM3 and SM4.
 
 ### Installation
 
@@ -127,20 +136,6 @@ dotnet add package SharpAbp.Abp.Crypto
 ```
 
 ### Configuration
-
-Configure encryption settings in `appsettings.json`:
-
-```json
-{
-  "Crypto": {
-    "DefaultAlgorithm": "AES",
-    "AES": {
-      "Key": "your-32-character-secret-key-here",
-      "IV": "your-16-char-iv"
-    }
-  }
-}
-```
 
 Add the module dependency:
 
@@ -151,35 +146,65 @@ public class YourModule : AbpModule
 }
 ```
 
+The module registers `IRSAEncryptionService`, `ISm2EncryptionService`, `ISm3EncryptionService` and
+`ISm4EncryptionService`. SM2 and SM4 defaults are configured with the options classes:
+
+```csharp
+Configure<AbpSm2EncryptionOptions>(options =>
+{
+    options.DefaultCurve = Sm2EncryptionNames.CurveSm2p256v1;
+});
+
+Configure<AbpSm4EncryptionOptions>(options =>
+{
+    options.DefaultIv = Encoding.UTF8.GetBytes("SharpAbpDefault!"); // 16 bytes for CBC
+    options.DefaultMode = Sm4EncryptionNames.ModeCBC;
+    options.DefaultPadding = Sm4EncryptionNames.PKCS7Padding;
+});
+```
+
+The SM4 default mode is `ECB` with `NoPadding`; switch to `CBC` and provide a 16-byte IV when you need CBC.
+
 ### Usage Example
 
 ```csharp
 public class YourService
 {
-    private readonly ICryptoService _cryptoService;
+    private readonly ISm4EncryptionService _sm4EncryptionService;
+    private readonly IRSAEncryptionService _rsaEncryptionService;
 
-    public YourService(ICryptoService cryptoService)
+    public YourService(
+        ISm4EncryptionService sm4EncryptionService,
+        IRSAEncryptionService rsaEncryptionService)
     {
-        _cryptoService = cryptoService;
+        _sm4EncryptionService = sm4EncryptionService;
+        _rsaEncryptionService = rsaEncryptionService;
     }
 
-    public string EncryptData(string plainText)
+    public string EncryptSm4(string plainText, string keyHex, string ivHex)
     {
-        return _cryptoService.Encrypt(plainText);
+        return _sm4EncryptionService.Encrypt(plainText, keyHex, ivHex);
     }
 
-    public string DecryptData(string cipherText)
+    public string EncryptRsa(string plainText, string publicKeyBase64)
     {
-        return _cryptoService.Decrypt(cipherText);
+        return _rsaEncryptionService.EncryptFromBase64(
+            publicKeyBase64,
+            plainText,
+            Encoding.UTF8,
+            RSAPaddingNames.PKCS1Padding);
     }
 }
 ```
+
+For SM2, use `ISm2EncryptionService.Encrypt(publicKeyHex, plainText, Encoding.UTF8, curve, mode)` and the matching
+`Decrypt` overload; for hashing use `ISm3EncryptionService.GetHash(plainText)`.
 
 ---
 
 ## FreeRedis
 
-FreeRedis cache library ABP adapter for Redis integration.
+FreeRedis client management with named clients and ABP-style configuration.
 
 ### Installation
 
@@ -189,17 +214,20 @@ dotnet add package SharpAbp.Abp.FreeRedis
 
 ### Configuration
 
-Configure Redis connection in `appsettings.json`:
+Configure named clients under `FreeRedisOptions` in `appsettings.json`:
 
 ```json
 {
-  "Redis": {
-    "Configuration": "127.0.0.1:6379,defaultDatabase=0,poolsize=50"
+  "FreeRedisOptions": {
+    "default": {
+      "Mode": "Standalone",
+      "ConnectionString": "127.0.0.1:6379,defaultDatabase=0,poolsize=50"
+    }
   }
 }
 ```
 
-Add the module dependency:
+Add the module dependency and bind the section:
 
 ```csharp
 [DependsOn(typeof(AbpFreeRedisModule))]
@@ -208,12 +236,8 @@ public class YourModule : AbpModule
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         var configuration = context.Services.GetConfiguration();
-        var redis = configuration["Redis:Configuration"];
 
-        Configure<FreeRedisOptions>(options =>
-        {
-            options.Configuration = redis;
-        });
+        Configure<AbpFreeRedisOptions>(options => options.Configure(configuration));
     }
 }
 ```
@@ -223,32 +247,21 @@ public class YourModule : AbpModule
 ```csharp
 public class YourService
 {
-    private readonly IDistributedCache<MyCacheItem> _cache;
+    private readonly RedisClient _redisClient;
 
-    public YourService(IDistributedCache<MyCacheItem> cache)
+    public YourService(IRedisClientFactory redisClientFactory)
     {
-        _cache = cache;
+        _redisClient = redisClientFactory.Get(); // or Get("custom")
     }
 
-    public async Task<MyCacheItem> GetOrCreateAsync(string key)
+    public void SetValue(string key, string value)
     {
-        return await _cache.GetOrAddAsync(
-            key,
-            async () => await CreateItemAsync(),
-            () => new DistributedCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
-            }
-        );
-    }
-
-    private async Task<MyCacheItem> CreateItemAsync()
-    {
-        // Create and return item
-        return new MyCacheItem();
+        _redisClient.Set(key, value);
     }
 }
 ```
+
+Use `[RedisClientName("custom")]` on a marker class and `redisClientFactory.Get<CustomClient>()` to select a named client.
 
 ---
 
@@ -267,7 +280,7 @@ dotnet add package SharpAbp.Abp.Validation
 Add the module dependency:
 
 ```csharp
-[DependsOn(typeof(AbpValidationModule))]
+[DependsOn(typeof(SharpAbpValidationModule))]
 public class YourModule : AbpModule
 {
 }
@@ -320,7 +333,7 @@ Add the module dependency:
 
 ```csharp
 [DependsOn(
-    typeof(AbpAspNetCoreModule),
+    typeof(SharpAbpAspNetCoreModule),
     typeof(AbpAspNetCoreMvcModule)
 )]
 public class YourWebModule : AbpModule

@@ -33,10 +33,9 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         /// The providers are obtained from the application configuration settings.
         /// </summary>
         /// <returns>A task that represents the asynchronous operation. The task result contains a list of database provider names.</returns>
-        public virtual async Task<List<string>> GetAllAsync()
+        public virtual Task<List<string>> GetAllAsync()
         {
-            var databaseProviders = Options.DatabaseProviders.Select(x => x.ToString()).ToList();
-            return await Task.FromResult(databaseProviders);
+            return Task.FromResult(Options.DatabaseProviders.Select(x => x.ToString()).ToList());
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -80,11 +80,13 @@ namespace SharpAbp.MinId
         /// Get next segmentId
         /// </summary>
         /// <param name="bizType"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("next-segmentId")]
-        public async Task<SegmentIdDto> GetNextSegmentIdAsync(string bizType)
+        public async Task<SegmentIdDto> GetNextSegmentIdAsync(string bizType, string token)
         {
+            await _minIdTokenValidator.ValidateTokenAsync(bizType, token);
             return await _segmentIdAppService.GetNextSegmentIdAsync(bizType);
         }
     }

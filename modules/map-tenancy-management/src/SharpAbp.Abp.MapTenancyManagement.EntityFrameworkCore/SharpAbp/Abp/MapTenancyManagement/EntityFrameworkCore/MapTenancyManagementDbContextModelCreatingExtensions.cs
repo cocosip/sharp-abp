@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using Volo.Abp;
 using Volo.Abp.EntityFrameworkCore.Modeling;
@@ -36,6 +36,8 @@ namespace SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
                 b.HasIndex(p => new { p.Code }).IsUnique();
 
                 b.HasIndex(p => new { p.MapCode }).IsUnique();
+
+                b.HasIndex(p => new { p.TenantId }).IsUnique();
 
                 b.ApplyObjectExtensionMappings();
             });

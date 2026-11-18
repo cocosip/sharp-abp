@@ -4,15 +4,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
+using Volo.Abp.Timing;
 
 namespace SharpAbp.Abp.TransformSecurity
 {
     public class SecurityCredentialStore : ISecurityCredentialStore, ITransientDependency
     {
         protected IDistributedCache<SecurityCredential> Cache { get; }
-        public SecurityCredentialStore(IDistributedCache<SecurityCredential> cache)
+
+        protected IClock Clock { get; }
+
+        public SecurityCredentialStore(
+            IDistributedCache<SecurityCredential> cache,
+            IClock clock)
         {
             Cache = cache;
+            Clock = clock;
         }
 
         public virtual async Task<SecurityCredential?> GetAsync(string identifier, CancellationToken cancellationToken = default)
@@ -22,7 +29,6 @@ namespace SharpAbp.Abp.TransformSecurity
 
         public virtual async Task SetAsync(SecurityCredential credential, CancellationToken cancellationToken = default)
         {
-            await Cache.RemoveAsync(credential.Identifier!, token: cancellationToken);
             await Cache.SetAsync(
                 credential.Identifier!,
                 credential,
@@ -32,9 +38,17 @@ namespace SharpAbp.Abp.TransformSecurity
 
         protected virtual DistributedCacheEntryOptions? CreateCacheOptions(SecurityCredential credential)
         {
-            if (!credential.Expires.HasValue || credential.Expires.Value <= DateTime.UtcNow)
+            if (!credential.Expires.HasValue)
             {
                 return null;
+            }
+
+            if (credential.IsExpires(Clock.Now))
+            {
+                return new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpiration = new DateTimeOffset(Clock.Now)
+                };
             }
 
             return new DistributedCacheEntryOptions

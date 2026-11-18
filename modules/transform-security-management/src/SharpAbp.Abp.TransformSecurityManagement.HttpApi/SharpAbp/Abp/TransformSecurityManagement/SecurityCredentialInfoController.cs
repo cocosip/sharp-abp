@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,7 +8,7 @@ using Volo.Abp.Application.Dtos;
 namespace SharpAbp.Abp.TransformSecurityManagement
 {
     [RemoteService(Name = AbpTransformSecurityManagementRemoteServiceConsts.RemoteServiceName)]
-    [Area("cryptoVault")]
+    [Area("transform-security-management")]
     [Route("api/transform-security-management/security-credentialInfos")]
     public class SecurityCredentialInfoController : TransformSecurityManagementController, ISecurityCredentialInfoAppService
     {

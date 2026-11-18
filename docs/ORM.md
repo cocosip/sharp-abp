@@ -4,199 +4,62 @@ Sharp-ABP provides integration with multiple ORM frameworks, giving you flexibil
 
 ## FreeSql
 
-FreeSql ORM framework integration with support for multiple database providers.
+`SharpAbp.Abp.FreeSql` exposes the current EF Core `DbConnection` and `DbTransaction`, so FreeSql commands can
+participate in the same ABP unit of work as EF Core.
 
 ### Installation
 
-Install the core package and your database provider:
-
 ```bash
-# Core FreeSql package
 dotnet add package SharpAbp.Abp.FreeSql
-
-# Database-specific packages
-dotnet add package SharpAbp.Abp.FreeSql.MySQL
-dotnet add package SharpAbp.Abp.FreeSql.PostgreSql
-dotnet add package SharpAbp.Abp.FreeSql.SqlServer
-dotnet add package SharpAbp.Abp.FreeSql.Oracle
-dotnet add package SharpAbp.Abp.FreeSql.Sqlite
-dotnet add package SharpAbp.Abp.FreeSql.DM        # DaMeng Database
 ```
 
 ### Configuration
 
-Configure in `appsettings.json`:
-
-```json
-{
-  "ConnectionStrings": {
-    "Default": "Server=localhost;Database=MyDb;User Id=sa;Password=****;"
-  },
-  "FreeSql": {
-    "DataType": "SqlServer",
-    "ConnectionString": "Server=localhost;Database=MyDb;User Id=sa;Password=****;",
-    "AutoSyncStructure": false,
-    "LazyLoading": false
-  }
-}
-```
-
-Add the module dependency:
+Add the module dependency next to your EF Core module:
 
 ```csharp
 [DependsOn(
     typeof(AbpFreeSqlModule),
-    typeof(AbpFreeSqlSqlServerModule)  // Or your database provider
+    typeof(AbpEntityFrameworkCoreModule)
 )]
 public class YourModule : AbpModule
 {
-    public override void ConfigureServices(ServiceConfigurationContext context)
-    {
-        var configuration = context.Services.GetConfiguration();
-
-        Configure<AbpFreeSqlOptions>(options =>
-        {
-            options.PreConfigure = freeSql =>
-            {
-                freeSql.GlobalFilter
-                    .Apply<ISoftDelete>("SoftDelete", a => a.IsDeleted == false);
-            };
-
-            options.ConfigureFreeSql = (sp, freeSql) =>
-            {
-                // Additional configuration
-                freeSql.Aop.CurdBefore += (s, e) =>
-                {
-                    // Log SQL
-                    Console.WriteLine($"SQL: {e.Sql}");
-                };
-            };
-        });
-    }
 }
 ```
 
 ### Usage Example
 
-#### Basic CRUD Operations
-
 ```csharp
-public class ProductRepository : ITransientDependency
+using Dapper;
+
+public class ReportingRepository : ITransientDependency
 {
-    private readonly IFreeSql _freeSql;
+    private readonly IFreeSqlRepository _freeSqlRepository;
 
-    public ProductRepository(IFreeSql freeSql)
+    public ReportingRepository(IFreeSqlRepository freeSqlRepository)
     {
-        _freeSql = freeSql;
+        _freeSqlRepository = freeSqlRepository;
     }
 
-    // Query
-    public async Task<List<Product>> GetAllProductsAsync()
+    public async Task<long> CountAsync()
     {
-        return await _freeSql.Select<Product>()
-            .Where(x => x.IsActive)
-            .OrderBy(x => x.Name)
-            .ToListAsync();
-    }
+        var connection = await _freeSqlRepository.GetDbConnectionAsync();
+        var transaction = await _freeSqlRepository.GetDbTransactionAsync();
 
-    // Query with pagination
-    public async Task<PagedResult<Product>> GetPagedAsync(int page, int pageSize)
-    {
-        var query = _freeSql.Select<Product>()
-            .Where(x => x.IsActive);
-
-        var total = await query.CountAsync();
-        var items = await query
-            .Page(page, pageSize)
-            .ToListAsync();
-
-        return new PagedResult<Product>
-        {
-            Items = items,
-            Total = total
-        };
-    }
-
-    // Insert
-    public async Task<Product> CreateAsync(Product product)
-    {
-        await _freeSql.Insert(product).ExecuteAffrowsAsync();
-        return product;
-    }
-
-    // Update
-    public async Task<Product> UpdateAsync(Product product)
-    {
-        await _freeSql.Update<Product>()
-            .SetSource(product)
-            .ExecuteAffrowsAsync();
-        return product;
-    }
-
-    // Delete
-    public async Task DeleteAsync(Guid id)
-    {
-        await _freeSql.Delete<Product>()
-            .Where(x => x.Id == id)
-            .ExecuteAffrowsAsync();
+        // Use the connection/transaction with FreeSql so the query joins the active UOW.
+        return await connection.ExecuteScalarAsync<long>("SELECT COUNT(*) FROM Orders");
     }
 }
 ```
 
-#### Advanced Queries
-
-```csharp
-public class AdvancedQueryExample
-{
-    private readonly IFreeSql _freeSql;
-
-    public AdvancedQueryExample(IFreeSql freeSql)
-    {
-        _freeSql = freeSql;
-    }
-
-    // Join query
-    public async Task<List<OrderWithCustomer>> GetOrdersWithCustomersAsync()
-    {
-        return await _freeSql.Select<Order, Customer>()
-            .LeftJoin((o, c) => o.CustomerId == c.Id)
-            .ToListAsync((o, c) => new OrderWithCustomer
-            {
-                OrderId = o.Id,
-                OrderNumber = o.OrderNumber,
-                CustomerName = c.Name
-            });
-    }
-
-    // Aggregate query
-    public async Task<decimal> GetTotalSalesAsync()
-    {
-        return await _freeSql.Select<Order>()
-            .Where(x => x.Status == OrderStatus.Completed)
-            .SumAsync(x => x.TotalAmount);
-    }
-
-    // Group by
-    public async Task<List<CategorySales>> GetSalesByCategoryAsync()
-    {
-        return await _freeSql.Select<Product, OrderItem>()
-            .InnerJoin((p, oi) => p.Id == oi.ProductId)
-            .GroupBy((p, oi) => p.CategoryId)
-            .ToListAsync(g => new CategorySales
-            {
-                CategoryId = g.Key,
-                TotalQuantity = g.Sum((p, oi) => oi.Quantity),
-                TotalAmount = g.Sum((p, oi) => oi.Amount)
-            });
-    }
-}
-```
+`IFreeSqlRepository` is resolved per EF Core DbContext (`FreeSqlRepository<TDbContext>`); register it for your
+context if you inject the generic form directly.
 
 ---
 
 ## Dapper
 
-Dapper micro-ORM framework integration for lightweight data access.
+Dapper micro-ORM integration with ABP connection strings and SharpAbp type mappings.
 
 ### Installation
 
@@ -209,15 +72,15 @@ dotnet add package SharpAbp.Abp.Dapper
 Add the module dependency:
 
 ```csharp
-[DependsOn(typeof(AbpDapperModule))]
+[DependsOn(typeof(SharpAbpDapperModule))]
 public class YourModule : AbpModule
 {
-    public override void ConfigureServices(ServiceConfigurationContext context)
-    {
-        // Dapper is ready to use with ABP's connection strings
-    }
 }
 ```
+
+`SharpAbpDapperModule` depends on `AbpDapperModule` and registers the type mappings for extra properties and GUIDs.
+Install a provider package such as `SharpAbp.Abp.Dapper.MySQL` or `SharpAbp.Abp.Dapper.PostgreSql` when its
+type mappings are needed.
 
 ### Usage Example
 

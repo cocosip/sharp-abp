@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SharpAbp.Abp.MapTenancy;
@@ -52,7 +52,7 @@ namespace SharpAbp.Abp.AspNetCore.MapTenancy
         {
             context
                 .ServiceProvider
-                .GetRequiredService<ILogger<HeaderTenantResolveContributor>>()
+                .GetRequiredService<ILogger<MapHeaderTenantResolveContributor>>()
                 .LogWarning(text);
         }
     }

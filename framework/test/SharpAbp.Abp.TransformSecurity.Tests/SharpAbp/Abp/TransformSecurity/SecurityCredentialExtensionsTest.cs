@@ -285,5 +285,28 @@ namespace SharpAbp.Abp.TransformSecurity
             Assert.Equal(keySize, credential.GetRSAKeySize());
             Assert.Equal(padding, credential.GetRSAPadding());
         }
+
+        [Fact]
+        public void GetRSAAndSM2Metadata_Should_Use_Fallback_When_Not_Set()
+        {
+            var credential = new SecurityCredential();
+
+            Assert.Equal(RSAPaddingNames.PKCS1Padding, credential.GetRSAPadding(RSAPaddingNames.PKCS1Padding));
+            Assert.Equal(Sm2EncryptionNames.CurveSm2p256v1, credential.GetSM2Curve(Sm2EncryptionNames.CurveSm2p256v1));
+            Assert.Equal(SM2Engine.Mode.C1C2C3, credential.GetSM2Mode(SM2Engine.Mode.C1C2C3));
+        }
+
+        [Fact]
+        public void GetRSAAndSM2Metadata_Should_Prefer_Credential_Value()
+        {
+            var credential = new SecurityCredential()
+                .SetRSAPadding(RSAPaddingNames.OAEPPadding)
+                .SetSM2Curve(Sm2EncryptionNames.CurveSm2p256v1)
+                .SetSM2Mode(SM2Engine.Mode.C1C3C2);
+
+            Assert.Equal(RSAPaddingNames.OAEPPadding, credential.GetRSAPadding(RSAPaddingNames.PKCS1Padding));
+            Assert.Equal(Sm2EncryptionNames.CurveSm2p256v1, credential.GetSM2Curve("other"));
+            Assert.Equal(SM2Engine.Mode.C1C3C2, credential.GetSM2Mode(SM2Engine.Mode.C1C2C3));
+        }
     }
 }

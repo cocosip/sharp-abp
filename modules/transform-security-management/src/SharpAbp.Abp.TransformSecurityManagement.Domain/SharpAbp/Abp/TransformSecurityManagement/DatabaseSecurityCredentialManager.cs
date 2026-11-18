@@ -127,11 +127,12 @@ namespace SharpAbp.Abp.TransformSecurityManagement
             if (Options.EncryptionAlgo.Equals("RSA", StringComparison.OrdinalIgnoreCase))
             {
                 credential.KeyType = "RSA";
-                var rsaCreds = await RSACredsRepository.GetRandomAsync(size: credential.GetRSAKeySize(), cancellationToken: cancellationToken) ?? throw new AbpException("Failed to retrieve RSA credentials. Please ensure RSA credentials are properly configured and available.");
+                credential.SetRSAKeySize(RSAOptions.KeySize);
+                credential.SetRSAPadding(RSAOptions.Padding);
+
+                var rsaCreds = await RSACredsRepository.GetRandomAsync(size: RSAOptions.KeySize, cancellationToken: cancellationToken) ?? throw new AbpException("Failed to retrieve RSA credentials. Please ensure RSA credentials are properly configured and available.");
 
                 credential.SetReferenceId(rsaCreds.Id.ToString("N"));
-                credential.SetSM2Curve(SM2Options.Curve);
-                credential.SetSM2Mode(SM2Options.Mode);
                 credential.PublicKey = KeyService.DecryptKey(rsaCreds.PublicKey, rsaCreds.PassPhrase, rsaCreds.Salt);
                 credential.PrivateKey = KeyService.DecryptKey(rsaCreds.PrivateKey, rsaCreds.PassPhrase, rsaCreds.Salt);
 
@@ -139,11 +140,12 @@ namespace SharpAbp.Abp.TransformSecurityManagement
             else if (Options.EncryptionAlgo.Equals("SM2", StringComparison.OrdinalIgnoreCase))
             {
                 credential.KeyType = "SM2";
-                var sm2Creds = await SM2CredsRepository.GetRandomAsync(curve: credential.GetSM2Curve(), cancellationToken: cancellationToken) ?? throw new AbpException("Failed to retrieve SM2 credentials. Please ensure SM2 credentials are properly configured and available.");
+                credential.SetSM2Curve(SM2Options.Curve);
+                credential.SetSM2Mode(SM2Options.Mode);
+
+                var sm2Creds = await SM2CredsRepository.GetRandomAsync(curve: SM2Options.Curve, cancellationToken: cancellationToken) ?? throw new AbpException("Failed to retrieve SM2 credentials. Please ensure SM2 credentials are properly configured and available.");
 
                 credential.SetReferenceId(sm2Creds.Id.ToString("N"));
-                credential.SetRSAKeySize(RSAOptions.KeySize);
-                credential.SetRSAPadding(RSAOptions.Padding);
                 credential.PublicKey = KeyService.DecryptKey(sm2Creds.PublicKey, sm2Creds.PassPhrase, sm2Creds.Salt);
                 credential.PrivateKey = KeyService.DecryptKey(sm2Creds.PrivateKey, sm2Creds.PassPhrase, sm2Creds.Salt);
             }

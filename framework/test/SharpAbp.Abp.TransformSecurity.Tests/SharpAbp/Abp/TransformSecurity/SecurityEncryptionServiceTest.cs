@@ -169,6 +169,24 @@ namespace SharpAbp.Abp.TransformSecurity
         }
 
         [Fact]
+        public async Task EncryptDecrypt_Should_Use_Credential_RsaPadding()
+        {
+            // Arrange
+            var credential = await _securityCredentialManager.GenerateAsync("Login");
+            credential.SetRSAPadding(RSAPaddingNames.OAEPPadding);
+            await _securityCredentialStore.SetAsync(credential);
+
+            var plainText = "Credential padding test";
+
+            // Act
+            var cipherText = await _securityEncryptionService.EncryptAsync(plainText, credential.Identifier!);
+            var decryptedText = await _securityEncryptionService.DecryptAsync(cipherText, credential.Identifier!);
+
+            // Assert
+            Assert.Equal(plainText, decryptedText);
+        }
+
+        [Fact]
         public async Task EncryptAsync_Should_Produce_Different_Results_For_Same_Input()
         {
             // Arrange

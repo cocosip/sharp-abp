@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -73,7 +73,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
         /// <exception cref="AbpException">Thrown when a tenant with the same ID already exists in the group.</exception>
         public virtual void AddTenant(TenantGroupTenant tenant)
         {
-            if (Tenants.Any(x => x.TenantId == tenant.Id))
+            if (Tenants.Any(x => x.TenantId == tenant.TenantId))
             {
                 throw new AbpException($"TenantGroup duplicate tenantId: {tenant.TenantId}");
             }

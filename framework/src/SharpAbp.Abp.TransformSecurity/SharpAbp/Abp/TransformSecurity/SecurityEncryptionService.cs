@@ -125,11 +125,20 @@ namespace SharpAbp.Abp.TransformSecurity
             var credential = await GetValidCredentialAsync(identifier, cancellationToken);
             if (credential.IsRSA())
             {
-                return RSAEncryptionService.EncryptFromBase64(credential.PublicKey!, plainText, Encoding.UTF8, RSAOptions.Padding);
+                return RSAEncryptionService.EncryptFromBase64(
+                    credential.PublicKey!,
+                    plainText,
+                    Encoding.UTF8,
+                    credential.GetRSAPadding(RSAOptions.Padding)!);
             }
             else if (credential.IsSM2())
             {
-                return Sm2EncryptionService.Encrypt(credential.PublicKey!, plainText, Encoding.UTF8, SM2Options.Curve, SM2Options.Mode);
+                return Sm2EncryptionService.Encrypt(
+                    credential.PublicKey!,
+                    plainText,
+                    Encoding.UTF8,
+                    credential.GetSM2Curve(SM2Options.Curve)!,
+                    credential.GetSM2Mode(SM2Options.Mode));
             }
             else
             {
@@ -151,11 +160,20 @@ namespace SharpAbp.Abp.TransformSecurity
 
             if (credential.IsRSA())
             {
-                return RSAEncryptionService.DecryptFromBase64(credential.PrivateKey!, cipherText, Encoding.UTF8, RSAOptions.Padding);
+                return RSAEncryptionService.DecryptFromBase64(
+                    credential.PrivateKey!,
+                    cipherText,
+                    Encoding.UTF8,
+                    credential.GetRSAPadding(RSAOptions.Padding)!);
             }
             else if (credential.IsSM2())
             {
-                return Sm2EncryptionService.Decrypt(credential.PrivateKey!, cipherText, Encoding.UTF8, SM2Options.Curve, SM2Options.Mode);
+                return Sm2EncryptionService.Decrypt(
+                    credential.PrivateKey!,
+                    cipherText,
+                    Encoding.UTF8,
+                    credential.GetSM2Curve(SM2Options.Curve)!,
+                    credential.GetSM2Mode(SM2Options.Mode));
             }
             else
             {

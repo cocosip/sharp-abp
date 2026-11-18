@@ -44,16 +44,18 @@ namespace SharpAbp.Abp.ObjectPool
         {
             public Type ObjectType { get; }
             public string PoolName { get; }
+            public bool IsAsync { get; }
 
-            public PoolKey(Type objectType, string poolName)
+            public PoolKey(Type objectType, string poolName, bool isAsync = false)
             {
                 ObjectType = objectType;
                 PoolName = poolName;
+                IsAsync = isAsync;
             }
 
             public bool Equals(PoolKey other)
             {
-                return ObjectType == other.ObjectType && PoolName == other.PoolName;
+                return ObjectType == other.ObjectType && PoolName == other.PoolName && IsAsync == other.IsAsync;
             }
 
             public override bool Equals(object? obj)
@@ -66,10 +68,10 @@ namespace SharpAbp.Abp.ObjectPool
 #if NETSTANDARD2_0
                 unchecked
                 {
-                    return ((ObjectType?.GetHashCode() ?? 0) * 397) ^ (PoolName?.GetHashCode() ?? 0);
+                    return (((ObjectType?.GetHashCode() ?? 0) * 397) ^ (PoolName?.GetHashCode() ?? 0)) * 397 ^ IsAsync.GetHashCode();
                 }
 #else
-                return HashCode.Combine(ObjectType, PoolName);
+                return HashCode.Combine(ObjectType, PoolName, IsAsync);
 #endif
             }
         }
@@ -265,7 +267,13 @@ namespace SharpAbp.Abp.ObjectPool
         {
             Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
 
-            return RemovePoolCore(new PoolKey(typeof(T), poolName));
+            var removed = RemovePoolCore(new PoolKey(typeof(T), poolName));
+            if (RemovePoolCore(new PoolKey(typeof(T), poolName, true)))
+            {
+                removed = true;
+            }
+
+            return removed;
         }
 
         /// <summary>
@@ -276,7 +284,13 @@ namespace SharpAbp.Abp.ObjectPool
             Check.NotNull(objectType, nameof(objectType));
             Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
 
-            return RemovePoolCore(new PoolKey(objectType, poolName));
+            var removed = RemovePoolCore(new PoolKey(objectType, poolName));
+            if (RemovePoolCore(new PoolKey(objectType, poolName, true)))
+            {
+                removed = true;
+            }
+
+            return removed;
         }
 
         /// <summary>
@@ -358,7 +372,7 @@ namespace SharpAbp.Abp.ObjectPool
             int? maxSize = null) where T : class
         {
             var effectiveMaxSize = maxSize ?? ObjectPoolDefaults.GetDefaultMaximumRetained();
-            var key = new PoolKey(typeof(T), poolName);
+            var key = new PoolKey(typeof(T), poolName, true);
 
             var metadata = GetOrCreateMetadata(
                 key,

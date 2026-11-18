@@ -1,4 +1,4 @@
-﻿using SharpAbp.Abp.FileStoring.FileSystem.Localization;
+using SharpAbp.Abp.FileStoring.FileSystem.Localization;
 using System.Threading.Tasks;
 using Volo.Abp.Localization;
 using Volo.Abp.Localization.ExceptionHandling;
@@ -52,7 +52,7 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
 
             Configure<AbpExceptionLocalizationOptions>(options =>
             {
-                options.MapCodeNamespace("FileStoringFastDFS", typeof(FileStoringFileSystemResource));
+                options.MapCodeNamespace("FileStoringFileSystem", typeof(FileStoringFileSystemResource));
             });
 
             return Task.CompletedTask;

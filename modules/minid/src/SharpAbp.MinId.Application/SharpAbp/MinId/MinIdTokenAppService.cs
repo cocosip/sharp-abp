@@ -1,8 +1,9 @@
-﻿﻿﻿﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Caching;
 
 namespace SharpAbp.MinId
 {
@@ -11,13 +12,16 @@ namespace SharpAbp.MinId
     {
         protected IMinIdTokenManager MinIdTokenManager { get; }
         protected IMinIdTokenRepository MinIdTokenRepository { get; }
+        protected IDistributedCache<MinIdTokenCacheItem> TokenCache { get; }
 
         public MinIdTokenAppService(
             IMinIdTokenManager minIdTokenManager,
-            IMinIdTokenRepository minIdTokenRepository)
+            IMinIdTokenRepository minIdTokenRepository,
+            IDistributedCache<MinIdTokenCacheItem> tokenCache)
         {
             MinIdTokenManager = minIdTokenManager;
             MinIdTokenRepository = minIdTokenRepository;
+            TokenCache = tokenCache;
         }
 
         /// <summary>
@@ -82,6 +86,7 @@ namespace SharpAbp.MinId
                 input.Remark);
 
             await MinIdTokenManager.CreateAsync(minIdToken);
+            await TokenCache.RemoveAsync(GetCacheKey(minIdToken));
             return ObjectMapper.Map<MinIdToken, MinIdTokenDto>(minIdToken);
         }
 
@@ -94,7 +99,12 @@ namespace SharpAbp.MinId
         [Authorize(MinIdPermissions.MinIdTokens.Update)]
         public virtual async Task<MinIdTokenDto> UpdateAsync(Guid id, UpdateMinIdTokenDto input)
         {
+            var existingToken = await MinIdTokenRepository.GetAsync(id);
+            var oldCacheKey = GetCacheKey(existingToken);
+
             var minIdToken = await MinIdTokenManager.UpdateAsync(id, input.BizType, input.Token, input.Remark);
+            await TokenCache.RemoveAsync(oldCacheKey);
+            await TokenCache.RemoveAsync(GetCacheKey(minIdToken));
             return ObjectMapper.Map<MinIdToken, MinIdTokenDto>(minIdToken);
         }
 
@@ -106,7 +116,14 @@ namespace SharpAbp.MinId
         [Authorize(MinIdPermissions.MinIdTokens.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {
-            await MinIdTokenRepository.DeleteAsync(id);
+            var minIdToken = await MinIdTokenRepository.GetAsync(id);
+            await MinIdTokenRepository.DeleteAsync(minIdToken);
+            await TokenCache.RemoveAsync(GetCacheKey(minIdToken));
+        }
+
+        protected static string GetCacheKey(MinIdToken minIdToken)
+        {
+            return $"{minIdToken.BizType}-{minIdToken.Token}";
         }
 
     }

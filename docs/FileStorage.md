@@ -34,38 +34,40 @@ Configure in `appsettings.json`:
 
 ```json
 {
-  "FileStoring": {
-    "Containers": {
-      "default": {
-        "Provider": "FileSystem",
-        "FileSystem": {
-          "BasePath": "C:\\Files"
-        }
-      },
-      "profile-pictures": {
-        "Provider": "Aliyun",
-        "Aliyun": {
-          "AccessKeyId": "your-access-key",
-          "AccessKeySecret": "your-secret-key",
-          "Endpoint": "oss-cn-hangzhou.aliyuncs.com",
-          "BucketName": "my-bucket",
-          "CreateBucketIfNotExists": true
-        }
-      },
-      "documents": {
-        "Provider": "Aws",
-        "Aws": {
-          "AccessKeyId": "your-access-key",
-          "SecretAccessKey": "your-secret-key",
-          "Region": "us-east-1",
-          "BucketName": "my-documents",
-          "CreateBucketIfNotExists": false
-        }
+  "FileStoringOptions": {
+    "default": {
+      "Provider": "FileSystem",
+      "Properties": {
+        "BasePath": "C:\\Files"
+      }
+    },
+    "profile-pictures": {
+      "Provider": "Aliyun",
+      "Properties": {
+        "AccessKeyId": "your-access-key",
+        "AccessKeySecret": "your-secret-key",
+        "Endpoint": "oss-cn-hangzhou.aliyuncs.com",
+        "BucketName": "my-bucket",
+        "CreateBucketIfNotExists": "true"
+      }
+    },
+    "documents": {
+      "Provider": "Aws",
+      "Properties": {
+        "AccessKeyId": "your-access-key",
+        "SecretAccessKey": "your-secret-key",
+        "Region": "us-east-1",
+        "BucketName": "my-documents",
+        "CreateBucketIfNotExists": "false"
       }
     }
   }
 }
 ```
+
+The keys under `Properties` must match the provider configuration item names; values are strings and are
+converted to the declared item type. To load these entries, call
+`Configure<AbpFileStoringOptions>(options => options.Configure(configuration, context))`.
 
 Add the module dependency:
 
@@ -95,10 +97,10 @@ public class YourModule : AbpModule
             {
                 container.UseAliyun(aliyun =>
                 {
-                    aliyun.AccessKeyId = configuration["FileStoring:Aliyun:AccessKeyId"];
-                    aliyun.AccessKeySecret = configuration["FileStoring:Aliyun:AccessKeySecret"];
-                    aliyun.Endpoint = configuration["FileStoring:Aliyun:Endpoint"];
-                    aliyun.BucketName = configuration["FileStoring:Aliyun:BucketName"];
+                    aliyun.AccessKeyId = configuration["FileStoringOptions:profile-pictures:Properties:AccessKeyId"];
+                    aliyun.AccessKeySecret = configuration["FileStoringOptions:profile-pictures:Properties:AccessKeySecret"];
+                    aliyun.Endpoint = configuration["FileStoringOptions:profile-pictures:Properties:Endpoint"];
+                    aliyun.BucketName = configuration["FileStoringOptions:profile-pictures:Properties:BucketName"];
                     aliyun.CreateBucketIfNotExists = true;
                 });
             });

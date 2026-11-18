@@ -30,7 +30,7 @@ public class YourModule : AbpModule
 
 ### Usage
 
-The Account module provides pre-built APIs for common account operations.
+The Account module provides pre-built APIs for common account operations through `IAccountAppService` and `IProfileAppService`.
 
 ---
 
@@ -75,13 +75,12 @@ public class UserManagementService : ApplicationService
 
     public async Task<IdentityUserDto> CreateUserAsync(string userName, string email, string password)
     {
-        return await _userAppService.CreateAsync(new IdentityUserCreateDto
+        return await _userAppService.CreateAsync(new NewIdentityUserCreateDto
         {
             UserName = userName,
             Email = email,
             Password = password,
-            IsActive = true,
-            RoleNames = new[] { "User" }
+            IsActive = true
         });
     }
 }
@@ -100,6 +99,8 @@ dotnet add package SharpAbp.Abp.OpenIddict.Domain
 dotnet add package SharpAbp.Abp.OpenIddict.Application
 dotnet add package SharpAbp.Abp.OpenIddict.HttpApi
 ```
+
+The module exposes `IOpenIddictApplicationAppService` and `IOpenIddictScopeAppService` for managing clients and scopes.
 
 ---
 
@@ -120,16 +121,23 @@ dotnet add package SharpAbp.Abp.AuditLogging.HttpApi
 ```csharp
 public class AuditLogService : ApplicationService
 {
-    private readonly IAuditLogRepository _auditLogRepository;
+    private readonly IAuditLogAppService _auditLogAppService;
+
+    public AuditLogService(IAuditLogAppService auditLogAppService)
+    {
+        _auditLogAppService = auditLogAppService;
+    }
 
     public async Task<List<AuditLogDto>> GetAuditLogsAsync(DateTime startDate, DateTime endDate)
     {
-        var logs = await _auditLogRepository.GetListAsync(
-            startTime: startDate,
-            endTime: endDate
-        );
+        var result = await _auditLogAppService.GetPagedListAsync(new AuditLogPagedRequestDto
+        {
+            StartTime = startDate,
+            EndTime = endDate,
+            MaxResultCount = 100
+        });
 
-        return ObjectMapper.Map<List<AuditLog>, List<AuditLogDto>>(logs);
+        return result.Items;
     }
 }
 ```
@@ -138,7 +146,7 @@ public class AuditLogService : ApplicationService
 
 ## MinId
 
-Distributed ID generation service for generating globally unique IDs.
+Distributed ID generation service based on segment IDs.
 
 ### Installation
 
@@ -147,7 +155,7 @@ dotnet add package SharpAbp.MinId.Domain
 dotnet add package SharpAbp.MinId.Domain.Shared
 dotnet add package SharpAbp.MinId.Application
 dotnet add package SharpAbp.MinId.HttpApi
-dotnet add package SharpAbp.MinId.EntityFrameworkCore  # or MongoDB
+dotnet add package SharpAbp.MinId.EntityFrameworkCore
 ```
 
 ### Configuration
@@ -168,32 +176,38 @@ public class YourModule : AbpModule
 ```csharp
 public class IdGenerationService : ApplicationService
 {
-    private readonly IMinIdAppService _minIdService;
+    private readonly IMinIdGeneratorAppService _idGeneratorAppService;
 
-    public IdGenerationService(IMinIdAppService minIdService)
+    public IdGenerationService(IMinIdGeneratorAppService idGeneratorAppService)
     {
-        _minIdService = minIdService;
+        _idGeneratorAppService = idGeneratorAppService;
     }
 
-    public async Task<long> GenerateIdAsync(string name)
+    public async Task<long> GenerateIdAsync(string bizType)
     {
-        return await _minIdService.NextIdAsync(name);
+        return await _idGeneratorAppService.NextIdAsync(bizType);
     }
 
-    public async Task<List<long>> GenerateBatchIdsAsync(string name, int count)
+    public async Task<List<long>> GenerateBatchIdsAsync(string bizType, int batchSize)
     {
-        return await _minIdService.NextIdsAsync(name, count);
+        return await _idGeneratorAppService.NextIdAsync(bizType, batchSize);
     }
 }
 ```
+
+Business types and segment allocations are managed through `IMinIdInfoAppService` and `IMinIdTokenAppService`.
+
+> **Upgrading existing databases:** `MinIdInfo` now has a `ConcurrencyStamp` column used for optimistic concurrency. Add a non-null `ConcurrencyStamp` string column (max length 40) with an empty-string default, then regenerate the consumer application's EF Core migration or apply the equivalent SQL before deploying this version.
+>
+> **Breaking API change:** the `next-segmentId` endpoint now requires the `token` query parameter and validates it against the configured MinId token. Update existing clients before deploying.
 
 ---
 
 ## FileStoringManagement
 
-File storage management module for centralized file upload, download, and configuration.
-The domain package replaces `IFileContainerConfigurationProvider` with `DatabaseFileContainerConfigurationProvider`, so runtime file containers can be loaded from the database.
-Global path layout can still be configured separately with `FileStoringOptions:FilePathBuilder` in appsettings.
+File storage management module for database-backed container configuration. The domain package replaces `IFileContainerConfigurationProvider` with `DatabaseFileContainerConfigurationProvider`, so runtime file containers are loaded from the database and cache instead of `AbpFileStoringOptions.Containers`.
+
+Actual file upload, download, and deletion use the `IFileContainer` service from `SharpAbp.Abp.FileStoring`; this module manages the container definitions and their provider settings.
 
 ### Installation
 
@@ -220,30 +234,51 @@ public class YourModule : AbpModule
 ### Usage Example
 
 ```csharp
-public class FileManagementService : ApplicationService
+public class ContainerManagementService : ApplicationService
 {
-    private readonly IFileStoringManagementAppService _fileManagementService;
+    private readonly IContainerAppService _containerAppService;
+    private readonly IFileProviderAppService _fileProviderAppService;
 
-    public async Task<FileInfoDto> UploadFileAsync(IFormFile file, string containerName)
+    public ContainerManagementService(
+        IContainerAppService containerAppService,
+        IFileProviderAppService fileProviderAppService)
     {
-        using (var stream = file.OpenReadStream())
-        {
-            return await _fileManagementService.CreateAsync(new CreateFileInfoDto
-            {
-                ContainerName = containerName,
-                FileName = file.FileName,
-                FileSize = file.Length,
-                FileStream = stream
-            });
-        }
+        _containerAppService = containerAppService;
+        _fileProviderAppService = fileProviderAppService;
     }
 
-    public async Task<Stream> DownloadFileAsync(Guid fileId)
+    public async Task<ContainerDto> CreateFileSystemContainerAsync(
+        string name,
+        string title,
+        string basePath)
     {
-        return await _fileManagementService.GetFileStreamAsync(fileId);
+        return await _containerAppService.CreateAsync(new CreateOrUpdateContainerDto
+        {
+            Name = name,
+            Title = title,
+            Provider = "FileSystem",
+            IsMultiTenant = false,
+            EnableAutoMultiPartUpload = false,
+            MultiPartUploadMinFileSize = 0,
+            MultiPartUploadShardingSize = 0,
+            HttpAccess = false,
+            Items = new List<CreateOrUpdateContainerItemDto>
+            {
+                new CreateOrUpdateContainerItemDto(null, "FileSystem.BasePath", basePath),
+                new CreateOrUpdateContainerItemDto(null, "FileSystem.AppendContainerNameToBasePath", "false")
+            }
+        });
+    }
+
+    public async Task<List<string>> GetProvidersAsync()
+    {
+        var providers = await _fileProviderAppService.GetProvidersAsync();
+        return providers.Select(x => x.Provider).ToList();
     }
 }
 ```
+
+Use `IContainerAppService.GetAllAsync`/`GetPagedListAsync` to list containers, and `IFileProviderAppService.GetOptionsAsync(provider)` to discover the configuration item names a provider accepts.
 
 ---
 
@@ -261,6 +296,9 @@ dotnet add package SharpAbp.Abp.FileStoring.Database.EntityFrameworkCore  # or M
 ### Configuration
 
 ```csharp
+using SharpAbp.Abp.FileStoring;
+using SharpAbp.Abp.FileStoring.Database;
+
 Configure<AbpFileStoringOptions>(options =>
 {
     options.Containers.ConfigureDefault(container =>
@@ -274,7 +312,7 @@ Configure<AbpFileStoringOptions>(options =>
 
 ## DbConnectionsManagement
 
-Database connection configuration management module.
+Database connection configuration management module. Connection information created here is consumed by the `SharpAbp.Abp.DbConnections` module.
 
 ### Installation
 
@@ -290,30 +328,38 @@ dotnet add package SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore
 ```csharp
 public class ConnectionManagementService : ApplicationService
 {
-    private readonly IDbConnectionsManagementAppService _connectionService;
+    private readonly IDatabaseConnectionInfoAppService _connectionInfoAppService;
+    private readonly IDatabaseProviderAppService _databaseProviderAppService;
 
-    public async Task<DatabaseConnectionDto> CreateConnectionAsync(
+    public ConnectionManagementService(
+        IDatabaseConnectionInfoAppService connectionInfoAppService,
+        IDatabaseProviderAppService databaseProviderAppService)
+    {
+        _connectionInfoAppService = connectionInfoAppService;
+        _databaseProviderAppService = databaseProviderAppService;
+    }
+
+    public async Task<DatabaseConnectionInfoDto> CreateConnectionAsync(
         string name,
-        DatabaseType databaseType,
+        string databaseProvider,
         string connectionString)
     {
-        return await _connectionService.CreateAsync(new CreateDatabaseConnectionDto
+        return await _connectionInfoAppService.CreateAsync(new CreateDatabaseConnectionInfoDto
         {
-            DatabaseName = name,
-            DatabaseType = databaseType,
-            ConnectionString = connectionString,
-            IsActive = true
+            Name = name,
+            DatabaseProvider = databaseProvider,
+            ConnectionString = connectionString
         });
     }
 
-    public async Task<List<DatabaseConnectionDto>> GetAllConnectionsAsync()
+    public async Task<List<DatabaseConnectionInfoDto>> GetAllConnectionsAsync()
     {
-        return await _connectionService.GetListAsync();
+        return await _connectionInfoAppService.GetListAsync();
     }
 
-    public async Task<bool> TestConnectionAsync(Guid connectionId)
+    public async Task<List<string>> GetSupportedProvidersAsync()
     {
-        return await _connectionService.TestConnectionAsync(connectionId);
+        return await _databaseProviderAppService.GetAllAsync();
     }
 }
 ```
@@ -338,27 +384,42 @@ dotnet add package SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore
 ### Usage Example
 
 ```csharp
-public class TenantMappingAppService : ApplicationService
+public class TenantMappingService : ApplicationService
 {
-    private readonly IMapTenancyManagementAppService _mappingService;
+    private readonly IMapTenantAppService _mapTenantAppService;
 
-    public async Task<TenantMappingDto> CreateMappingAsync(string domain, Guid tenantId)
+    public TenantMappingService(IMapTenantAppService mapTenantAppService)
     {
-        return await _mappingService.CreateAsync(new CreateTenantMappingDto
+        _mapTenantAppService = mapTenantAppService;
+    }
+
+    public async Task<MapTenantDto> CreateMappingAsync(
+        Guid tenantId,
+        string tenantName,
+        string code,
+        string mapCode)
+    {
+        return await _mapTenantAppService.CreateAsync(new CreateMapTenantDto
         {
-            Domain = domain,
-            TenantId = tenantId
+            TenantId = tenantId,
+            TenantName = tenantName,
+            Code = code,
+            MapCode = mapCode
         });
     }
 
-    public async Task<List<TenantMappingDto>> GetTenantMappingsAsync(Guid tenantId)
+    public async Task<MapTenantDto> FindByTenantIdAsync(Guid tenantId)
     {
-        return await _mappingService.GetByTenantIdAsync(tenantId);
+        return await _mapTenantAppService.FindByTenantIdAsync(tenantId);
     }
 }
 ```
 
+Hybrid tenant creation is available through `IHybridMapTenantAppService`.
+
 ---
+
+> **Upgrading existing databases:** `MapTenant.TenantId` now has a unique index. Before applying the migration, find duplicate `TenantId` rows and merge or delete them; otherwise index creation fails.
 
 ## TenantGroupManagement
 
@@ -376,36 +437,43 @@ dotnet add package SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
 ### Usage Example
 
 ```csharp
-public class TenantGroupAppService : ApplicationService
+public class TenantGroupAdminService : ApplicationService
 {
-    private readonly ITenantGroupManagementAppService _groupService;
+    private readonly ITenantGroupAppService _tenantGroupAppService;
 
-    public async Task<TenantGroupDto> CreateGroupAsync(string name, string displayName)
+    public TenantGroupAdminService(ITenantGroupAppService tenantGroupAppService)
     {
-        return await _groupService.CreateAsync(new CreateTenantGroupDto
+        _tenantGroupAppService = tenantGroupAppService;
+    }
+
+    public async Task<TenantGroupDto> CreateGroupAsync(string name)
+    {
+        return await _tenantGroupAppService.CreateAsync(new CreateTenantGroupDto
         {
             Name = name,
-            DisplayName = displayName,
             IsActive = true
         });
     }
 
-    public async Task AssignTenantToGroupAsync(Guid tenantId, Guid groupId)
+    public async Task<TenantGroupDto> AddTenantAsync(Guid groupId, Guid tenantId)
     {
-        await _groupService.AssignTenantAsync(new AssignTenantToGroupDto
+        return await _tenantGroupAppService.AddTenantAsync(groupId, new AddTenantDto
         {
-            TenantId = tenantId,
-            GroupId = groupId
+            TenantId = tenantId
         });
     }
 }
 ```
 
+Use `RemoveTenantAsync`, `GetDefaultConnectionStringAsync`, and `UpdateDefaultConnectionStringAsync` for the remaining group operations.
+
+> **Upgrading existing databases:** the unique index now uses `TenantGroup.NormalizedName` instead of `Name`. Backfill `NormalizedName` and remove duplicate normalized names before applying the migration.
+
 ---
 
 ## CryptoVault
 
-Crypto vault and secret management module for centralized key and secret storage.
+Crypto vault module for centralized RSA and SM2 key storage. Key material is encrypted at rest, and decrypted keys are only returned through the explicitly authorized `GetDecryptKey` operation.
 
 ### Installation
 
@@ -419,38 +487,56 @@ dotnet add package SharpAbp.Abp.CryptoVault.EntityFrameworkCore
 ### Usage Example
 
 ```csharp
-public class SecretManagementService : ApplicationService
+public class RsaKeyService : ApplicationService
 {
-    private readonly ICryptoVaultAppService _vaultService;
+    private readonly IRSACredsAppService _rsaCredsAppService;
 
-    public async Task<SecretDto> StoreSecretAsync(string key, string value)
+    public RsaKeyService(IRSACredsAppService rsaCredsAppService)
     {
-        return await _vaultService.CreateSecretAsync(new CreateSecretDto
+        _rsaCredsAppService = rsaCredsAppService;
+    }
+
+    public async Task<RSACredsDto> ImportKeyPairAsync(
+        int size,
+        string publicKey,
+        string privateKey)
+    {
+        return await _rsaCredsAppService.CreateAsync(new CreateRSACredsDto
         {
-            Key = key,
-            Value = value,
-            IsEncrypted = true
+            Size = size,
+            PublicKey = publicKey,
+            PrivateKey = privateKey
         });
     }
 
-    public async Task<string> GetSecretAsync(string key)
+    public async Task GenerateKeyPairsAsync(int size, int count)
     {
-        var secret = await _vaultService.GetSecretByKeyAsync(key);
-        return secret.Value;
+        await _rsaCredsAppService.GenerateAsync(new GenerateRSACredsDto
+        {
+            Size = size,
+            Count = count
+        });
     }
 
-    public async Task RotateSecretAsync(string key, string newValue)
+    public async Task<RSACredsDto> FindAsync(string identifier)
     {
-        await _vaultService.RotateSecretAsync(key, newValue);
+        return await _rsaCredsAppService.FindByIdentifierAsync(identifier);
+    }
+
+    public async Task<RSACredsKeyDto> GetDecryptKeyAsync(Guid id)
+    {
+        return await _rsaCredsAppService.GetDecryptKey(id);
     }
 }
 ```
+
+SM2 keys use `ISM2CredsAppService` with `CreateSM2CredsDto`, `GenerateSM2CredsDto`, `SM2CredsDto`, and `SM2CredsKeyDto`.
 
 ---
 
 ## TransformSecurityManagement
 
-Data transform security management module for encryption configuration and management.
+Data transform security management module. It creates and stores the credential metadata used by `SharpAbp.Abp.TransformSecurity`; the corresponding RSA or SM2 key material is stored in CryptoVault.
 
 ### Installation
 
@@ -464,86 +550,87 @@ dotnet add package SharpAbp.Abp.TransformSecurityManagement.EntityFrameworkCore
 ### Usage Example
 
 ```csharp
-public class SecurityConfigService : ApplicationService
+public class SecurityCredentialAdminService : ApplicationService
 {
-    private readonly ITransformSecurityManagementAppService _securityService;
+    private readonly ISecurityCredentialInfoAppService _securityCredentialInfoAppService;
 
-    public async Task<EncryptionConfigDto> CreateEncryptionConfigAsync(
-        string name,
-        TransformAlgorithm algorithm)
+    public SecurityCredentialAdminService(
+        ISecurityCredentialInfoAppService securityCredentialInfoAppService)
     {
-        return await _securityService.CreateConfigAsync(new CreateEncryptionConfigDto
-        {
-            Name = name,
-            Algorithm = algorithm,
-            IsActive = true
-        });
+        _securityCredentialInfoAppService = securityCredentialInfoAppService;
     }
 
-    public async Task<List<EncryptionConfigDto>> GetAllConfigsAsync()
+    public async Task<SecurityCredentialInfoDto> CreateAsync(string bizType)
     {
-        return await _securityService.GetConfigListAsync();
+        return await _securityCredentialInfoAppService.CreateAsync(
+            new CreateSecurityCredentialInfoDto
+            {
+                BizType = bizType
+            });
+    }
+
+    public async Task<List<SecurityCredentialInfoDto>> GetByBizTypeAsync(string bizType)
+    {
+        return await _securityCredentialInfoAppService.GetListAsync(bizType: bizType);
     }
 }
 ```
+
+See [Security.md](Security.md) for the runtime encryption API that consumes these credentials.
 
 ---
 
 ## Integration Example
 
-Here's an example of how these modules work together:
+Here's an example of how these modules work together. It assumes `SharpAbp.Abp.FileStoring` is configured with a default file container and the DbConnectionsManagement module is installed:
 
 ```csharp
 public class EnterpriseApplicationService : ApplicationService
 {
-    private readonly ICurrentTenant _currentTenant;
-    private readonly IMinIdAppService _minIdService;
-    private readonly IFileStoringManagementAppService _fileService;
-    private readonly IDbConnectionsManagementAppService _connectionService;
-    private readonly IAuditLogRepository _auditLogRepository;
+    private readonly IMinIdGeneratorAppService _idGeneratorAppService;
+    private readonly IFileContainer _fileContainer;
+    private readonly IDatabaseConnectionInfoAppService _connectionInfoAppService;
+
+    public EnterpriseApplicationService(
+        IMinIdGeneratorAppService idGeneratorAppService,
+        IFileContainer fileContainer,
+        IDatabaseConnectionInfoAppService connectionInfoAppService)
+    {
+        _idGeneratorAppService = idGeneratorAppService;
+        _fileContainer = fileContainer;
+        _connectionInfoAppService = connectionInfoAppService;
+    }
 
     public async Task<OrderDto> CreateOrderWithFilesAsync(CreateOrderDto input)
     {
-        // Generate unique ID
-        var orderId = await _minIdService.NextIdAsync("Order");
+        // Generate a unique order ID
+        var orderId = await _idGeneratorAppService.NextIdAsync("Order");
 
-        // Upload files to tenant-specific storage
-        var fileIds = new List<Guid>();
+        // Store files in the default file container
+        var fileIds = new List<string>();
         foreach (var file in input.Files)
         {
-            var fileInfo = await _fileService.CreateAsync(new CreateFileInfoDto
-            {
-                ContainerName = $"tenant-{_currentTenant.Id}",
-                FileName = file.FileName,
-                FileStream = file.Stream
-            });
-            fileIds.Add(fileInfo.Id);
+            var fileId = $"{orderId}/{file.FileName}";
+            await _fileContainer.SaveAsync(
+                fileId,
+                file.Stream,
+                Path.GetExtension(file.FileName));
+            fileIds.Add(fileId);
         }
 
-        // Store in tenant-specific database
-        using (var connection = await GetTenantConnectionAsync())
+        // Resolve the tenant-specific connection information
+        var connectionInfo = await _connectionInfoAppService.FindByNameAsync(
+            $"tenant-{CurrentTenant.Id}");
+
+        // Open the connection with IDbConnectionFactory from SharpAbp.Abp.DbConnections
+        // and persist the order in the tenant database.
+        // Audit logging of the application service is handled by ABP.
+
+        return new OrderDto
         {
-            // Create order
-            await connection.ExecuteAsync(
-                "INSERT INTO Orders (Id, CustomerId, ...) VALUES (...)",
-                new { Id = orderId, ... }
-            );
-        }
-
-        // Audit log is automatically created
-        // Multi-tenancy is automatically handled
-
-        return new OrderDto { Id = orderId, FileIds = fileIds };
-    }
-
-    private async Task<DbConnection> GetTenantConnectionAsync()
-    {
-        var connections = await _connectionService.GetListAsync();
-        var tenantConnection = connections.FirstOrDefault(
-            c => c.TenantId == _currentTenant.Id
-        );
-
-        return await CreateConnectionAsync(tenantConnection.ConnectionString);
+            Id = orderId,
+            FileIds = fileIds
+        };
     }
 }
 ```

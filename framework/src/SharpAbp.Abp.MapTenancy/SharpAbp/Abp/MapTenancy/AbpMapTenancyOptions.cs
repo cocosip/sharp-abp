@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 
 namespace SharpAbp.Abp.MapTenancy
@@ -25,6 +25,7 @@ namespace SharpAbp.Abp.MapTenancy
                     Mappers.Configure(mapTenancyKv.Key, c =>
                     {
                         c.TenantId = mapTenancyKv.Value.TenantId;
+                        c.TenantName = mapTenancyKv.Value.TenantName;
                         c.Code = mapTenancyKv.Value.Code;
                         c.MapCode = mapTenancyKv.Value.MapCode;
                     });

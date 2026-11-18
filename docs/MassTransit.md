@@ -22,14 +22,17 @@ dotnet add package SharpAbp.Abp.EventBus.MassTransit.ActiveMQ
 
 ## Configuration
 
-### RabbitMQ
+All transports read `MassTransitOptions`. Set `Provider` to the transport name (`RabbitMQ`, `Kafka` or `ActiveMQ`)
+and put transport-specific values in the matching `*Options` section.
 
-Configure in `appsettings.json`:
+### RabbitMQ
 
 ```json
 {
-  "MassTransit": {
-    "RabbitMQ": {
+  "MassTransitOptions": {
+    "Provider": "RabbitMQ",
+    "Prefix": "SharpAbp",
+    "RabbitMqOptions": {
       "Host": "localhost",
       "Port": 5672,
       "VirtualHost": "/",
@@ -40,7 +43,7 @@ Configure in `appsettings.json`:
 }
 ```
 
-Add the module dependency:
+Add the module dependency; the transport module registers MassTransit and configures the host from the options:
 
 ```csharp
 [DependsOn(
@@ -49,51 +52,27 @@ Add the module dependency:
 )]
 public class YourModule : AbpModule
 {
-    public override void ConfigureServices(ServiceConfigurationContext context)
-    {
-        var configuration = context.Services.GetConfiguration();
-
-        Configure<AbpMassTransitOptions>(options =>
-        {
-            options.ConfigureMassTransit = (ctx, cfg) =>
-            {
-                cfg.UsingRabbitMq((context, configurator) =>
-                {
-                    configurator.Host(
-                        configuration["MassTransit:RabbitMQ:Host"],
-                        configuration.GetValue<ushort>("MassTransit:RabbitMQ:Port"),
-                        configuration["MassTransit:RabbitMQ:VirtualHost"],
-                        h =>
-                        {
-                            h.Username(configuration["MassTransit:RabbitMQ:Username"]);
-                            h.Password(configuration["MassTransit:RabbitMQ:Password"]);
-                        });
-
-                    configurator.ConfigureEndpoints(context);
-                });
-            };
-        });
-    }
 }
 ```
 
-### Kafka
+For advanced scenarios, use `AbpMassTransitRabbitMqOptions.RabbitMqPreConfigures`,
+`RabbitMqConfigures`, `RabbitMqPostConfigures`, `Producers` and `Consumers` instead of configuring the bus directly.
 
-Configure in `appsettings.json`:
+### Kafka
 
 ```json
 {
-  "MassTransit": {
-    "Kafka": {
-      "Servers": "localhost:9092",
-      "GroupId": "my-consumer-group",
-      "TopicPrefix": "my-app"
+  "MassTransitOptions": {
+    "Provider": "Kafka",
+    "Prefix": "SharpAbp",
+    "KafkaOptions": {
+      "Server": "localhost:9092",
+      "DefaultGroupId": "my-consumer-group",
+      "AutoCreateTopic": true
     }
   }
 }
 ```
-
-Add the module dependency:
 
 ```csharp
 [DependsOn(
@@ -102,40 +81,17 @@ Add the module dependency:
 )]
 public class YourModule : AbpModule
 {
-    public override void ConfigureServices(ServiceConfigurationContext context)
-    {
-        var configuration = context.Services.GetConfiguration();
-
-        Configure<AbpMassTransitOptions>(options =>
-        {
-            options.ConfigureMassTransit = (ctx, cfg) =>
-            {
-                cfg.UsingInMemory((context, configurator) =>
-                {
-                    configurator.ConfigureEndpoints(context);
-                });
-
-                cfg.AddRider(rider =>
-                {
-                    rider.UsingKafka((context, configurator) =>
-                    {
-                        configurator.Host(configuration["MassTransit:Kafka:Servers"]);
-                    });
-                });
-            };
-        });
-    }
 }
 ```
 
 ### ActiveMQ
 
-Configure in `appsettings.json`:
-
 ```json
 {
-  "MassTransit": {
-    "ActiveMQ": {
+  "MassTransitOptions": {
+    "Provider": "ActiveMQ",
+    "Prefix": "SharpAbp",
+    "ActiveMqOptions": {
       "Host": "localhost",
       "Port": 61616,
       "Username": "admin",
@@ -145,8 +101,6 @@ Configure in `appsettings.json`:
 }
 ```
 
-Add the module dependency:
-
 ```csharp
 [DependsOn(
     typeof(AbpMassTransitModule),
@@ -154,33 +108,8 @@ Add the module dependency:
 )]
 public class YourModule : AbpModule
 {
-    public override void ConfigureServices(ServiceConfigurationContext context)
-    {
-        var configuration = context.Services.GetConfiguration();
-
-        Configure<AbpMassTransitOptions>(options =>
-        {
-            options.ConfigureMassTransit = (ctx, cfg) =>
-            {
-                cfg.UsingActiveMq((context, configurator) =>
-                {
-                    configurator.Host(
-                        configuration["MassTransit:ActiveMQ:Host"],
-                        configuration.GetValue<ushort>("MassTransit:ActiveMQ:Port"),
-                        h =>
-                        {
-                            h.Username(configuration["MassTransit:ActiveMQ:Username"]);
-                            h.Password(configuration["MassTransit:ActiveMQ:Password"]);
-                        });
-
-                    configurator.ConfigureEndpoints(context);
-                });
-            };
-        });
-    }
 }
 ```
-
 ## Usage Examples
 
 ### Publishing Messages
@@ -248,19 +177,15 @@ public class OrderCreatedConsumer : IConsumer<OrderCreatedEvent>
 Register the consumer in your module:
 
 ```csharp
-Configure<AbpMassTransitOptions>(options =>
+Configure<AbpMassTransitRabbitMqOptions>(options =>
 {
-    options.ConfigureMassTransit = (ctx, cfg) =>
+    options.Consumers.Add(new RabbitMqConsumerConfiguration
     {
-        // Add consumer
-        cfg.AddConsumer<OrderCreatedConsumer>();
-
-        cfg.UsingRabbitMq((context, configurator) =>
-        {
-            configurator.Host(...);
-            configurator.ConfigureEndpoints(context);
-        });
-    };
+        Configure = cfg => cfg.AddConsumer<OrderCreatedConsumer>(),
+        // Optional explicit exchange/queue names; defaults are derived from the message type.
+        ExchangeName = "OrderCreatedEvent",
+        QueueName = "order-created"
+    });
 });
 ```
 
@@ -478,19 +403,19 @@ public class OrderCreatedEvent
 Implement retry policies:
 
 ```csharp
-Configure<AbpMassTransitOptions>(options =>
+Configure<AbpMassTransitRabbitMqOptions>(options =>
 {
-    options.ConfigureMassTransit = (ctx, cfg) =>
+    options.Consumers.Add(new RabbitMqConsumerConfiguration
     {
-        cfg.AddConsumer<OrderCreatedConsumer>(consumerConfigurator =>
+        Configure = cfg => cfg.AddConsumer<OrderCreatedConsumer>(consumerConfigurator =>
         {
             consumerConfigurator.UseMessageRetry(r => r.Intervals(
                 TimeSpan.FromSeconds(1),
                 TimeSpan.FromSeconds(5),
                 TimeSpan.FromSeconds(10)
             ));
-        });
-    };
+        })
+    });
 });
 ```
 
@@ -531,6 +456,10 @@ public class OrderCreatedConsumer : IConsumer<OrderCreatedEvent>
 Use MassTransit's built-in metrics and health checks:
 
 ```csharp
+var rabbitMq = configuration
+    .GetSection("MassTransitOptions:RabbitMqOptions")
+    .Get<AbpMassTransitRabbitMqOptions>()!;
+
 services.AddHealthChecks()
-    .AddRabbitMQ(configuration["MassTransit:RabbitMQ:ConnectionString"]);
+    .AddRabbitMQ($"amqp://{rabbitMq.Username}:{rabbitMq.Password}@{rabbitMq.Host}:{rabbitMq.Port}{rabbitMq.VirtualHost}");
 ```

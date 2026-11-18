@@ -81,7 +81,7 @@ exporter 配置放在：
 
 `SourceNames` 表示当前应用中会使用哪些 `ActivitySource`。
 
-它应该与业务代码中的 `new ActivitySource/"...")` 一致。
+它应该与业务代码中的 `new ActivitySource("...")` 一致。
 
 例如：
 
@@ -93,7 +93,7 @@ exporter 配置放在：
 
 `MeterNames` 表示当前应用中会使用哪些 `Meter`。
 
-它应该与业务代码中的 `new Meter/"...")` 一致。
+它应该与业务代码中的 `new Meter("...")` 一致。
 
 例如：
 
@@ -336,15 +336,15 @@ exporter 配置放在：
 如果你希望在模块中通过代码而不是仅通过配置文件来控制 OpenTelemetry，可以使用：
 
 ```csharp
-public override void PreConfigureServices/ServiceConfigurationContext context)
+public override void PreConfigureServices(ServiceConfigurationContext context)
 {
-    PreConfigure<AbpOpenTelemetryOptions>/options =>
+    PreConfigure<AbpOpenTelemetryOptions>(options =>
     {
         options.Resource.ServiceName = "OrderService";
         options.Resource.ServiceVersion = "1.0.0";
 
-        options.EnableTracing/"SharpAbp.Ordering.Application", "SharpAbp.Ordering.Domain");
-        options.EnableMetrics/"SharpAbp.Ordering", "SharpAbp.Inventory");
+        options.EnableTracing("SharpAbp.Ordering.Application", "SharpAbp.Ordering.Domain");
+        options.EnableMetrics("SharpAbp.Ordering", "SharpAbp.Inventory");
 
         options.Tracing.ExporterName = OpenTelemetryExporterNames.Otlp;
         options.Metrics.ExporterName = OpenTelemetryExporterNames.PrometheusAspNetCore;
@@ -356,20 +356,20 @@ public override void PreConfigureServices/ServiceConfigurationContext context)
 也可以逐个追加：
 
 ```csharp
-public override void PreConfigureServices/ServiceConfigurationContext context)
+public override void PreConfigureServices(ServiceConfigurationContext context)
 {
-    PreConfigure<AbpOpenTelemetryOptions>/options =>
+    PreConfigure<AbpOpenTelemetryOptions>(options =>
     {
         options.Resource.ServiceName = "OrderService";
 
-        options.EnableTracing/);
-        options.EnableMetrics/);
+        options.EnableTracing();
+        options.EnableMetrics();
 
-        options.AddSource/"SharpAbp.Ordering.Application");
-        options.AddSource/"SharpAbp.Ordering.Domain");
+        options.AddSource("SharpAbp.Ordering.Application");
+        options.AddSource("SharpAbp.Ordering.Domain");
 
-        options.AddMeter/"SharpAbp.Ordering");
-        options.AddMeter/"SharpAbp.Inventory");
+        options.AddMeter("SharpAbp.Ordering");
+        options.AddMeter("SharpAbp.Inventory");
     });
 }
 ```
@@ -414,27 +414,27 @@ using System.Diagnostics;
 
 public class OrderAppService : ApplicationService
 {
-    private static readonly ActivitySource ActivitySource = new/"SharpAbp.Ordering.Application");
+    private static readonly ActivitySource ActivitySource = new("SharpAbp.Ordering.Application");
 
-    public async Task<OrderDto> CreateAsync/CreateOrderInput input)
+    public async Task<OrderDto> CreateAsync(CreateOrderInput input)
     {
-        using var activity = ActivitySource.StartActivity/"Order.Create");
+        using var activity = ActivitySource.StartActivity("Order.Create");
 
-        activity?.SetTag/"order.customer_id", input.CustomerId);
-        activity?.SetTag/"order.item_count", input.Items.Count);
-        activity?.SetTag/"order.currency", input.Currency);
+        activity?.SetTag("order.customer_id", input.CustomerId);
+        activity?.SetTag("order.item_count", input.Items.Count);
+        activity?.SetTag("order.currency", input.Currency);
 
         try
         {
-            var order = await CreateOrderInternalAsync/input);
-            activity?.SetTag/"order.id", order.Id);
-            activity?.SetStatus/ActivityStatusCode.Ok);
-            return ObjectMapper.Map<Order, OrderDto>/order);
+            var order = await CreateOrderInternalAsync(input);
+            activity?.SetTag("order.id", order.Id);
+            activity?.SetStatus(ActivityStatusCode.Ok);
+            return ObjectMapper.Map<Order, OrderDto>(order);
         }
-        catch /Exception ex)
+        catch (Exception ex)
         {
-            activity?.SetStatus/ActivityStatusCode.Error, ex.Message);
-            activity?.RecordException/ex);
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+            activity?.RecordException(ex);
             throw;
         }
     }
@@ -446,21 +446,21 @@ public class OrderAppService : ApplicationService
 如果一个接口内部有几个重要步骤，可以拆成多个 span：
 
 ```csharp
-using var activity = ActivitySource.StartActivity/"Order.Create");
+using var activity = ActivitySource.StartActivity("Order.Create");
 
-using /var validateActivity = ActivitySource.StartActivity/"Order.Validate"))
+using (var validateActivity = ActivitySource.StartActivity("Order.Validate"))
 {
-    await ValidateAsync/input);
+    await ValidateAsync(input);
 }
 
-using /var pricingActivity = ActivitySource.StartActivity/"Order.CalculatePrice"))
+using (var pricingActivity = ActivitySource.StartActivity("Order.CalculatePrice"))
 {
-    await CalculatePriceAsync/input);
+    await CalculatePriceAsync(input);
 }
 
-using /var persistActivity = ActivitySource.StartActivity/"Order.Persist"))
+using (var persistActivity = ActivitySource.StartActivity("Order.Persist"))
 {
-    await SaveAsync/input);
+    await SaveAsync(input);
 }
 ```
 
@@ -491,31 +491,31 @@ using System.Diagnostics.Metrics;
 
 public static class OrderingMetrics
 {
-    public static readonly Meter Meter = new/"SharpAbp.Ordering");
+    public static readonly Meter Meter = new("SharpAbp.Ordering");
 
     public static readonly Counter<long> OrderCreatedCounter =
-        Meter.CreateCounter<long>/"orders.created");
+        Meter.CreateCounter<long>("orders.created");
 
     public static readonly Counter<long> OrderFailedCounter =
-        Meter.CreateCounter<long>/"orders.failed");
+        Meter.CreateCounter<long>("orders.failed");
 
     public static readonly Histogram<double> OrderAmountHistogram =
-        Meter.CreateHistogram<double>/"orders.amount");
+        Meter.CreateHistogram<double>("orders.amount");
 
     public static readonly Histogram<double> OrderDurationHistogram =
-        Meter.CreateHistogram<double>/"orders.duration.ms");
+        Meter.CreateHistogram<double>("orders.duration.ms");
 }
 ```
 
 记录方式示例：
 
 ```csharp
-OrderingMetrics.OrderCreatedCounter.Add/1,
-    new KeyValuePair<string, object?>/"payment_method", input.PaymentMethod),
-    new KeyValuePair<string, object?>/"currency", input.Currency));
+OrderingMetrics.OrderCreatedCounter.Add(1,
+    new KeyValuePair<string, object?>("payment_method", input.PaymentMethod),
+    new KeyValuePair<string, object?>("currency", input.Currency));
 
-OrderingMetrics.OrderAmountHistogram.Record/input.TotalAmount,
-    new KeyValuePair<string, object?>/"currency", input.Currency));
+OrderingMetrics.OrderAmountHistogram.Record(input.TotalAmount,
+    new KeyValuePair<string, object?>("currency", input.Currency));
 ```
 
 ### 11.2 metrics 里建议记录什么
@@ -569,28 +569,28 @@ OrderingMetrics.OrderAmountHistogram.Record/input.TotalAmount,
 ### 13.1 注册自定义 source / meter
 
 ```csharp
-PreConfigure<AbpOpenTelemetryOptions>/options =>
+PreConfigure<AbpOpenTelemetryOptions>(options =>
 {
-    options.EnableTracing/"SharpAbp.Ordering.Application");
-    options.EnableMetrics/"SharpAbp.Ordering");
+    options.EnableTracing("SharpAbp.Ordering.Application");
+    options.EnableMetrics("SharpAbp.Ordering");
 });
 ```
 
 ### 13.2 添加 instrumentation
 
 ```csharp
-PreConfigure<AbpOpenTelemetryOptions>/options =>
+PreConfigure<AbpOpenTelemetryOptions>(options =>
 {
-    options.AddTracingInstrumentation/builder =>
+    options.AddTracingInstrumentation(builder =>
     {
-        builder.AddAspNetCoreInstrumentation/);
-        builder.AddHttpClientInstrumentation/);
+        builder.AddAspNetCoreInstrumentation();
+        builder.AddHttpClientInstrumentation();
     });
 
-    options.AddMetricsInstrumentation/builder =>
+    options.AddMetricsInstrumentation(builder =>
     {
-        builder.AddAspNetCoreInstrumentation/);
-        builder.AddHttpClientInstrumentation/);
+        builder.AddAspNetCoreInstrumentation();
+        builder.AddHttpClientInstrumentation();
     });
 });
 ```

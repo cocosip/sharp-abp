@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp;
 using Volo.Abp.EntityFrameworkCore.Modeling;
@@ -30,7 +30,7 @@ namespace SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore
 
                 b.Property(t => t.NormalizedName).IsRequired().HasMaxLength(TenantGroupConsts.MaxNormalizedNameLength);
 
-                b.HasIndex(p => new { p.Name }).IsUnique();
+                b.HasIndex(p => new { p.NormalizedName }).IsUnique();
 
                 b.HasMany(p => p.ConnectionStrings).WithOne().HasForeignKey(uc => uc.TenantGroupId).IsRequired();
 

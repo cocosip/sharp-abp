@@ -35,7 +35,7 @@ namespace SharpAbp.MinId
                     {
                         return new DistributedCacheEntryOptions()
                         {
-                            AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(600)
+                            AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(600)
                         };
                     }
                     return null;

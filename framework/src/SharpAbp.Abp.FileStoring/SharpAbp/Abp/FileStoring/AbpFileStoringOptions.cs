@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp;
@@ -28,7 +28,7 @@ namespace SharpAbp.Abp.FileStoring
                     filePathBuilderEntry.ApplyTo(opts));
             }
 
-            var entries = section.Get<Dictionary<string, FileContainerConfigurationEntry>>();
+            var entries = section.Get<Dictionary<string, FileContainerConfigurationBindingEntry>>();
 
             var abstractionsOptions = context.Services.ExecutePreConfiguredActions<AbpFileStoringAbstractionsOptions>();
 
@@ -53,11 +53,33 @@ namespace SharpAbp.Abp.FileStoring
                     Containers.Configure(entryKv.Key, c =>
                     {
                         c.Provider = fileProviderConfiguration.Provider;
-                        c.IsMultiTenant = entry.IsMultiTenant;
-                        c.EnableAutoMultiPartUpload = entry.EnableAutoMultiPartUpload;
-                        c.MultiPartUploadMinFileSize = entry.MultiPartUploadMinFileSize;
-                        c.MultiPartUploadShardingSize = entry.MultiPartUploadShardingSize;
-                        c.HttpAccess = entry.HttpAccess;
+
+                        // Only override values that were actually present in configuration so
+                        // JSON entries inherit container/code defaults instead of resetting them.
+                        if (entry.IsMultiTenant.HasValue)
+                        {
+                            c.IsMultiTenant = entry.IsMultiTenant.Value;
+                        }
+
+                        if (entry.EnableAutoMultiPartUpload.HasValue)
+                        {
+                            c.EnableAutoMultiPartUpload = entry.EnableAutoMultiPartUpload.Value;
+                        }
+
+                        if (entry.MultiPartUploadMinFileSize.HasValue)
+                        {
+                            c.MultiPartUploadMinFileSize = entry.MultiPartUploadMinFileSize.Value;
+                        }
+
+                        if (entry.MultiPartUploadShardingSize.HasValue)
+                        {
+                            c.MultiPartUploadShardingSize = entry.MultiPartUploadShardingSize.Value;
+                        }
+
+                        if (entry.HttpAccess.HasValue)
+                        {
+                            c.HttpAccess = entry.HttpAccess.Value;
+                        }
 
                         foreach (var defaultNamingNormalizer in fileProviderConfiguration.DefaultNamingNormalizers)
                         {
@@ -67,7 +89,7 @@ namespace SharpAbp.Abp.FileStoring
                         var itemPairs = fileProviderConfiguration.GetItems();
                         foreach (var key in itemPairs.Keys)
                         {
-                            if (entry.Properties.ContainsKey(key) && itemPairs[key] != null)
+                            if (entry.Properties != null && entry.Properties.ContainsKey(key) && itemPairs[key] != null)
                             {
                                 var o = TypeHelper.ConvertFromString(itemPairs[key].ValueType!, entry.Properties[key]);
                                 c.SetConfiguration(key, o);
@@ -79,5 +101,18 @@ namespace SharpAbp.Abp.FileStoring
             return this;
         }
 
+        /// <summary>
+        /// Binding model that keeps track of which values were actually present in configuration.
+        /// </summary>
+        internal sealed class FileContainerConfigurationBindingEntry
+        {
+            public string? Provider { get; set; }
+            public bool? IsMultiTenant { get; set; }
+            public bool? EnableAutoMultiPartUpload { get; set; }
+            public int? MultiPartUploadMinFileSize { get; set; }
+            public int? MultiPartUploadShardingSize { get; set; }
+            public bool? HttpAccess { get; set; }
+            public Dictionary<string, string> Properties { get; set; } = [];
+        }
     }
 }

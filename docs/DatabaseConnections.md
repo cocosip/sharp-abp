@@ -63,7 +63,7 @@ Add the module dependency and bind the configuration section:
     typeof(AbpDbConnectionsSqlServerModule),
     typeof(AbpDbConnectionsMySQLModule),
     typeof(AbpDbConnectionsPostgreSqlModule),
-    typeof(AbpDbConnectionsDMModule)
+    typeof(AbpDbConnectionsDmModule)
 )]
 public class YourModule : AbpModule
 {

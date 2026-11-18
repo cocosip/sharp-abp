@@ -104,7 +104,7 @@ namespace SharpAbp.Abp.AuditLogging
         /// <summary>
         /// Gets or sets additional comments for the audit log
         /// </summary>
-        public string Comments { get; protected set; }
+        public string Comments { get; set; }
 
         /// <summary>
         /// Gets or sets the HTTP status code returned by the request

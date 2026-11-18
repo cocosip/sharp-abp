@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Volo.Abp.ObjectExtending;
 
 namespace SharpAbp.Abp.TransformSecurity
@@ -52,6 +52,16 @@ namespace SharpAbp.Abp.TransformSecurity
         public bool IsExpires(DateTime dateTime)
         {
             return Expires.HasValue && Expires.Value <= dateTime;
+        }
+
+        /// <summary>
+        /// Determines whether this credential has expired at the specified date and time.
+        /// </summary>
+        /// <param name="dateTime">The date and time to check against; only its UTC value is used.</param>
+        /// <returns>True if the credential has expired; otherwise, false</returns>
+        public bool IsExpires(DateTimeOffset dateTime)
+        {
+            return IsExpires(dateTime.UtcDateTime);
         }
     }
 }

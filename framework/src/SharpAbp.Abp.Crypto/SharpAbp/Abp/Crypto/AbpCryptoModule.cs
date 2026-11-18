@@ -1,4 +1,4 @@
-﻿using SharpAbp.Abp.Crypto.SM2;
+using SharpAbp.Abp.Crypto.SM2;
 using SharpAbp.Abp.Crypto.SM4;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,7 +23,7 @@ namespace SharpAbp.Abp.Crypto
 
             Configure<AbpSm4EncryptionOptions>(options =>
             {
-                options.DefaultIv = Encoding.UTF8.GetBytes("SharpAbp123");
+                options.DefaultIv = Encoding.UTF8.GetBytes("SharpAbpDefault!");
                 options.DefaultMode = Sm4EncryptionNames.ModeECB;
                 options.DefaultPadding = Sm4EncryptionNames.NoPadding;
             });

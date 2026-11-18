@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.ObjectPool;
@@ -60,6 +60,22 @@ namespace SharpAbp.Abp.ObjectPool
             await Task.WhenAll(tasks);
 
             Assert.Equal(1, policyFactoryCallCount);
+        }
+
+        [Fact]
+        public async Task Sync_And_Async_Pools_With_Same_Name_Should_Be_Independent()
+        {
+            var orchestrator = new PoolOrchestrator(new DefaultObjectPoolProvider());
+
+            var syncPool = orchestrator.GetObjectPool<PooledObject, TestObjectPoolPolicy>(
+                "shared-name",
+                () => new TestObjectPoolPolicy());
+            var asyncPool = orchestrator.GetAsyncObjectPool<PooledObject, TestAsyncObjectPoolPolicy>(
+                "shared-name",
+                () => new TestAsyncObjectPoolPolicy());
+
+            Assert.NotNull(syncPool.Get());
+            Assert.NotNull(await asyncPool.GetAsync());
         }
 
         [Fact]
