@@ -22,7 +22,8 @@ namespace SharpAbp.Abp.Dapper
             Assert.Equal(DbType.Binary, parameter.DbType);
             Assert.Equal(16, parameter.Size);
             Assert.Equal(value.ToByteArray(), parameter.Value);
-            Assert.Equal(value, mapping.Parse(value.ToByteArray()));
+            Assert.False(mapping.CanParse(value.ToByteArray()));
+            Assert.Equal(value, new BinaryGuidTypeMapping().Parse(value.ToByteArray()));
         }
 
         [Fact]

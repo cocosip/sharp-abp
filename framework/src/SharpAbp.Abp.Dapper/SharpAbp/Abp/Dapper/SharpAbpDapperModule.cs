@@ -23,6 +23,11 @@ namespace SharpAbp.Abp.Dapper
             PreConfigure<SharpAbpDapperOptions>(options =>
             {
                 options.TypeMappings.Add(new ExtraPropertyDictionaryTypeMapping());
+
+                // Dapper passes no connection context while parsing, so GUID value shapes are claimed
+                // once here and shared by every provider instead of by each provider mapping.
+                options.TypeMappings.Add(new BinaryGuidTypeMapping());
+                options.TypeMappings.Add(new StringGuidTypeMapping());
             });
 
             return Task.CompletedTask;

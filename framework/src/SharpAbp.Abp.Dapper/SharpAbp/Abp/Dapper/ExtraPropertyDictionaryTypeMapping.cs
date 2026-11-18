@@ -6,6 +6,11 @@ using Volo.Abp.Data;
 
 namespace SharpAbp.Abp.Dapper
 {
+    /// <summary>
+    /// Maps <see cref="ExtraPropertyDictionary"/> to a JSON string. This is the only mapping for that type and it
+    /// claims every parameter and every value, so adding another mapping for the same type would make every write
+    /// and read ambiguous.
+    /// </summary>
     public class ExtraPropertyDictionaryTypeMapping : DapperTypeMapping<ExtraPropertyDictionary>
     {
         public override bool CanSetValue(IDbDataParameter parameter) => true;

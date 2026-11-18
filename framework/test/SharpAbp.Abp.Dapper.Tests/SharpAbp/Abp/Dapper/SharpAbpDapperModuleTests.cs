@@ -3,10 +3,12 @@ using System.Data;
 using Dapper;
 using Npgsql;
 using NpgsqlTypes;
+using OceanBaseConnector;
 using Oracle.ManagedDataAccess.Client;
 using SharpAbp.Abp.Dapper.DM;
 using SharpAbp.Abp.Dapper.GaussDB;
 using SharpAbp.Abp.Dapper.MySQL;
+using SharpAbp.Abp.Dapper.OceanBase;
 using SharpAbp.Abp.Dapper.Oracle;
 using SharpAbp.Abp.Dapper.PostgreSql;
 using SharpAbp.Abp.Dapper.Sqlite;
@@ -49,6 +51,42 @@ namespace SharpAbp.Abp.Dapper
             Assert.Equal(guid, postgreSqlParameter.Value);
             Assert.Equal(guid, handler.Parse(typeof(Guid), guid));
 
+            var oceanBaseOracleParameter = OceanBaseTestParameters.Create(OceanBaseCompatibilityMode.Oracle);
+            handler.SetValue(oceanBaseOracleParameter, guid);
+            Assert.Equal(DbType.Binary, oceanBaseOracleParameter.DbType);
+            Assert.Equal(16, oceanBaseOracleParameter.Size);
+            Assert.Equal(guid.ToByteArray(), oceanBaseOracleParameter.Value);
+
+            var oceanBaseMySqlParameter = OceanBaseTestParameters.Create(OceanBaseCompatibilityMode.MySql);
+            handler.SetValue(oceanBaseMySqlParameter, guid);
+            Assert.Equal(DbType.String, oceanBaseMySqlParameter.DbType);
+            Assert.Equal(36, oceanBaseMySqlParameter.Size);
+            Assert.Equal(guid.ToString("D"), oceanBaseMySqlParameter.Value);
+
+            Assert.Equal(guid, handler.Parse(typeof(Guid), guid.ToString("D")));
+
+            var decimalHandler = GetRequiredTypeHandler(typeof(decimal));
+            Assert.Same(GetRequiredTypeHandler(typeof(decimal?)), decimalHandler);
+            Assert.Equal(1234.5678m, decimalHandler.Parse(typeof(decimal), new OceanBaseDecimal(1234.5678m)));
+            Assert.Equal(1234.5678m, decimalHandler.Parse(typeof(decimal), 1234.5678m));
+
+            var dateTimeHandler = GetRequiredTypeHandler(typeof(DateTime));
+            Assert.Same(GetRequiredTypeHandler(typeof(DateTime?)), dateTimeHandler);
+            var timestamp = new OceanBaseTimestamp(new DateTime(2024, 1, 2, 3, 4, 5));
+            Assert.Equal(new DateTime(2024, 1, 2, 3, 4, 5), dateTimeHandler.Parse(typeof(DateTime), timestamp));
+            Assert.Equal(
+                new DateTime(2024, 1, 2, 3, 4, 5),
+                dateTimeHandler.Parse(typeof(DateTime), new OceanBaseTimestampLocalTimeZone(timestamp, "+08:00")));
+            Assert.Null(dateTimeHandler.Parse(typeof(DateTime?), DBNull.Value));
+
+            var dateTimeOffsetHandler = GetRequiredTypeHandler(typeof(DateTimeOffset));
+            var dateTimeOffset = new DateTimeOffset(2024, 1, 2, 3, 4, 5, TimeSpan.FromHours(8));
+            Assert.Equal(
+                dateTimeOffset,
+                dateTimeOffsetHandler.Parse(
+                    typeof(DateTimeOffset),
+                    new OceanBaseTimestampWithTimeZone(dateTimeOffset)));
+
             var nullableGuidHandler = GetRequiredTypeHandler(typeof(Guid?));
             Assert.Same(handler, nullableGuidHandler);
             var nullablePostgreSqlParameter = new NpgsqlParameter();
@@ -79,6 +117,16 @@ namespace SharpAbp.Abp.Dapper
             Assert.Equal(true, defaultBoolParameter.Value);
             Assert.Equal(DbType.Boolean, defaultBoolParameter.DbType);
 
+            // OceanBase has no bool mapping: the driver binds DbType.Boolean as 1/0 in both tenant modes,
+            // so the Dapper default path must leave the value untouched.
+            foreach (var mode in new[] { OceanBaseCompatibilityMode.Oracle, OceanBaseCompatibilityMode.MySql })
+            {
+                var oceanBaseBoolParameter = OceanBaseTestParameters.Create(mode);
+                boolHandler.SetValue(oceanBaseBoolParameter, true);
+                Assert.Equal(true, oceanBaseBoolParameter.Value);
+                Assert.Equal(DbType.Boolean, oceanBaseBoolParameter.DbType);
+            }
+
             var extraPropertiesHandler = GetRequiredTypeHandler(typeof(ExtraPropertyDictionary));
             var extraProperties = Assert.IsType<ExtraPropertyDictionary>(
                 extraPropertiesHandler.Parse(typeof(ExtraPropertyDictionary), DBNull.Value));
@@ -96,6 +144,7 @@ namespace SharpAbp.Abp.Dapper
 
     [DependsOn(
         typeof(SharpAbpDapperOracleModule),
+        typeof(SharpAbpDapperOceanBaseModule),
         typeof(SharpAbpDapperPostgreSqlModule),
         typeof(SharpAbpDapperMySQLModule),
         typeof(SharpAbpDapperSqlServerModule),

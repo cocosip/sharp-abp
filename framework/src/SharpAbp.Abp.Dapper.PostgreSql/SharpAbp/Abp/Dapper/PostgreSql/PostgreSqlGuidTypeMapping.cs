@@ -5,11 +5,15 @@ using NpgsqlTypes;
 
 namespace SharpAbp.Abp.Dapper.PostgreSql
 {
+    /// <summary>
+    /// Writes a <see cref="Guid"/> as a PostgreSQL <c>uuid</c>, mapping <see cref="Guid.Empty"/> to <c>NULL</c>.
+    /// Reading needs no mapping: Npgsql returns a <see cref="Guid"/>, which Dapper converts by itself.
+    /// </summary>
     public sealed class PostgreSqlGuidTypeMapping : DapperTypeMapping<Guid>
     {
         public override bool CanSetValue(IDbDataParameter parameter) => parameter is NpgsqlParameter;
 
-        public override bool CanParse(object? value) => value is Guid;
+        public override bool CanParse(object? value) => false;
 
         public override void SetValue(IDbDataParameter parameter, Guid value)
         {
@@ -25,6 +29,11 @@ namespace SharpAbp.Abp.Dapper.PostgreSql
             npgsqlParameter.Value = DBNull.Value;
         }
 
-        public override Guid Parse(object value) => (Guid)value;
+        public override Guid Parse(object value)
+        {
+            throw new NotSupportedException(
+                $"'{nameof(PostgreSqlGuidTypeMapping)}' only writes parameters; Dapper reads " +
+                $"'{nameof(Guid)}' values without a mapping.");
+        }
     }
 }

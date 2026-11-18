@@ -24,7 +24,7 @@ namespace SharpAbp.Abp.Dapper
         {
             var guid = Guid.Parse("adf8fad4-4a9f-4e76-8bd9-60dbffdf4a2d");
             var options = new SharpAbpDapperOptions();
-            options.TypeMappings.Add(new BinaryGuidTypeMapping());
+            options.TypeMappings.Add(new TestBinaryGuidTypeMapping());
 
             DapperTypeHandlerRegistrar.Register(options);
             var handler = GetRequiredTypeHandler(typeof(Guid));
@@ -47,7 +47,7 @@ namespace SharpAbp.Abp.Dapper
         public void Register_Should_Use_One_Handler_For_Value_And_Nullable_Types()
         {
             var options = new SharpAbpDapperOptions();
-            options.TypeMappings.Add(new BinaryGuidTypeMapping());
+            options.TypeMappings.Add(new TestBinaryGuidTypeMapping());
 
             DapperTypeHandlerRegistrar.Register(options);
 
@@ -61,7 +61,7 @@ namespace SharpAbp.Abp.Dapper
         {
             SqlMapper.AddTypeHandler(new TestValueTypeHandler());
             var options = new SharpAbpDapperOptions();
-            options.TypeMappings.Add(new BinaryGuidTypeMapping());
+            options.TypeMappings.Add(new TestBinaryGuidTypeMapping());
 
             DapperTypeHandlerRegistrar.Register(options);
 
@@ -74,7 +74,7 @@ namespace SharpAbp.Abp.Dapper
             var expected = Guid.Parse("c6a97184-0bd6-4570-9107-fcd9319480ad");
             SqlMapper.AddTypeHandler(new ExistingGuidTypeHandler(expected));
             var options = new SharpAbpDapperOptions();
-            options.TypeMappings.Add(new BinaryGuidTypeMapping());
+            options.TypeMappings.Add(new TestBinaryGuidTypeMapping());
 
             DapperTypeHandlerRegistrar.Register(options);
             var handler = GetRequiredTypeHandler(typeof(Guid));
@@ -163,7 +163,7 @@ namespace SharpAbp.Abp.Dapper
             SqlMapper.AddTypeMap(typeof(bool), DbType.Boolean);
         }
 
-        private sealed class BinaryGuidTypeMapping : DapperTypeMapping<Guid>
+        private sealed class TestBinaryGuidTypeMapping : DapperTypeMapping<Guid>
         {
             public override bool CanSetValue(IDbDataParameter parameter) => parameter is BinaryDbParameter;
 

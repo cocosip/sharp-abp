@@ -49,14 +49,15 @@ namespace SharpAbp.Abp.Dapper
         }
 
         [Fact]
-        public void Guid_Mapping_Should_Preserve_PostgreSql_Guid_Values()
+        public void Guid_Mapping_Should_Leave_Reading_To_Dapper()
         {
             var mapping = new PostgreSqlGuidTypeMapping();
             var value = Guid.Parse("4fa2852a-1d57-4884-8029-d54e09daa823");
 
-            Assert.True(mapping.CanParse(value));
+            Assert.False(mapping.CanParse(value));
             Assert.False(mapping.CanParse(value.ToByteArray()));
-            Assert.Equal(value, mapping.Parse(value));
+            Assert.False(mapping.CanParse(value.ToString("D")));
+            Assert.Throws<NotSupportedException>(() => mapping.Parse(value));
         }
     }
 }

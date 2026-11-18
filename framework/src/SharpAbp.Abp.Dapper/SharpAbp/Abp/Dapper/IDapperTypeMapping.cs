@@ -12,6 +12,8 @@ namespace SharpAbp.Abp.Dapper
 
         /// <summary>
         /// Returns true only when the concrete parameter belongs to the provider handled by this mapping.
+        /// Dapper resolves the mapping at execution time for every parameter, so write predicates for the same
+        /// target type must also be mutually exclusive.
         /// </summary>
         bool CanSetValue(IDbDataParameter parameter);
 
