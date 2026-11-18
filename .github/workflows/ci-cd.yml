@@ -61,24 +61,10 @@ jobs:
     - name: Build All Solutions
       shell: bash
       run: |
-        first_solution=$(grep -m1 -v '^[[:space:]]*$' solutions.txt | tr -d '\r')
-        if [ "$first_solution" != "framework" ]; then
-          echo "::error::solutions.txt must list framework first so module builds can reuse its outputs"
-          exit 1
-        fi
-
-        first=true
         while IFS= read -r solution; do
           [ -z "$solution" ] && continue
           echo "::group::Building solution: $solution"
-          if [ "$first" = true ]; then
-            # Build the framework once; later solutions reuse its outputs.
-            build_args=()
-            first=false
-          else
-            build_args=(-p:BuildProjectReferences=false)
-          fi
-          if ! dotnet build "$solution" -c Release "${build_args[@]}"; then
+          if ! dotnet build "$solution" -c Release; then
             echo "::error::Build failed for solution: $solution"
             exit 1
           fi
