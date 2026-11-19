@@ -52,6 +52,8 @@ Three long-lived branches, each pinned to one dependency baseline:
 - Never upgrade packages on `net9`: keep `Directory.Build.props`, `Directory.Packages.props`, and third-party SDK versions as they are. Exceptions are limited to security advisories or hard blockers and must be stated in the commit, for example `net9: pin <package> <reason>`.
 - Adopt a new .NET or ABP major on `dev` by moving `NetCoreFx` and `VoloAbpPackageVersion` in `Directory.Build.props`. Do not open a new branch per .NET version.
 - `common.props` `<Version>` is the single version source: `4.7.x` on `net9`, `6.x` on `dev`/`master`. A release tag `v<Version>` must equal it and point at the built commit; CI fails before building otherwise.
+- Versions track the dependency baseline rather than strict API-compatibility SemVer: `4.7.x` is the .NET 9 / ABP 9.3.x line and `6.x` is the .NET 10 / ABP 10.x line. A major version changes only when the .NET/ABP baseline moves; API changes inside a line ship in that line's next minor or patch release.
+- `BREAKING CHANGE:` footers inside a baseline line are migration notes for the next `6.x` release; they do not require a major version. Document the migration in the commit body and release it with the line's next version.
 
 CI/CD conventions in `.github/workflows/ci-cd.yml`:
 
