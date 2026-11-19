@@ -18,8 +18,8 @@ namespace SharpAbp.Abp.Data
         GaussDB,
 
         /// <summary>
-        /// OceanBase, currently used for the Oracle-compatible mode. The MySQL-compatible mode is
-        /// accessed through the Pomelo provider and reported as <see cref="MySql"/>.
+        /// OceanBase. A tenant runs in an Oracle- or MySQL-compatible mode; Oracle mode is the default
+        /// when the mode is not known. The MySQL-compatible mode through Pomelo is reported as <see cref="MySql"/>.
         /// </summary>
         OceanBase
     }

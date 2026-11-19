@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\..\..\common.props" />
+	<Import Project="..\..\..\configureawait.props" />
+
+	<PropertyGroup>
+		<TargetFramework>$(NetCoreFx)</TargetFramework>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>Nullable</WarningsAsErrors>
+		<AssemblyName>SharpAbp.Abp.Data.SqlBuilder.OceanBase</AssemblyName>
+		<PackageId>SharpAbp.Abp.Data.SqlBuilder.OceanBase</PackageId>
+		<AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<Description>SharpAbp Data SqlBuilder OceanBase Module</Description>
+		<RootNamespace />
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="OceanBaseConnector" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SharpAbp.Abp.Data.SqlBuilder\SharpAbp.Abp.Data.SqlBuilder.csproj" />
+	</ItemGroup>
+
+</Project>

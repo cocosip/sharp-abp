@@ -32,6 +32,7 @@
     <Project Path="src/SharpAbp.Abp.Dapper.SqlServer/SharpAbp.Abp.Dapper.SqlServer.csproj" />
     <Project Path="src/SharpAbp.Abp.Dapper/SharpAbp.Abp.Dapper.csproj" />
     <Project Path="src/SharpAbp.Abp.Data.SqlBuilder.DM/SharpAbp.Abp.Data.SqlBuilder.DM.csproj" />
+    <Project Path="src/SharpAbp.Abp.Data.SqlBuilder.OceanBase/SharpAbp.Abp.Data.SqlBuilder.OceanBase.csproj" />
     <Project Path="src/SharpAbp.Abp.Data.SqlBuilder/SharpAbp.Abp.Data.SqlBuilder.csproj" />
     <Project Path="src/SharpAbp.Abp.Data/SharpAbp.Abp.Data.csproj" />
     <Project Path="src/SharpAbp.Abp.DbConnections.DM/SharpAbp.Abp.DbConnections.DM.csproj" />
