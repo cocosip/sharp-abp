@@ -2,6 +2,7 @@
 using SharpAbp.Abp.Identity;
 using System.Threading.Tasks;
 using Volo.Abp.Emailing;
+using Volo.Abp.Mapperly;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
 using Volo.Abp.UI.Navigation;
@@ -14,7 +15,8 @@ namespace SharpAbp.Abp.Account
         typeof(AccountApplicationContractsModule),
         typeof(IdentityApplicationModule),
         typeof(AbpUiNavigationModule),
-        typeof(AbpEmailingModule)
+        typeof(AbpEmailingModule),
+        typeof(AbpMapperlyModule)
     )]
     public class AccountApplicationModule : AbpModule
     {

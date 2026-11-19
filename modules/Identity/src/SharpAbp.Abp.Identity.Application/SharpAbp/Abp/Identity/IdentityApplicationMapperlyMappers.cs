@@ -1,4 +1,3 @@
-using System.Runtime.Serialization;
 using Riok.Mapperly.Abstractions;
 using Volo.Abp.Identity;
 using Volo.Abp.Mapperly;
@@ -109,7 +108,7 @@ namespace SharpAbp.Abp.Identity
     }
 
     [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
-    public partial class UpdateIdentityUserSignInSettingsDtoToIdentitySignInSettingsMapper : MapperBase<UpdateIdentityUserSettingsDto, IdentityUserSettings>
+    public partial class UpdateIdentityUserSettingsDtoToIdentityUserSettingsMapper : MapperBase<UpdateIdentityUserSettingsDto, IdentityUserSettings>
     {
         public override partial IdentityUserSettings Map(UpdateIdentityUserSettingsDto source);
         public override partial void Map(UpdateIdentityUserSettingsDto source, IdentityUserSettings destination);

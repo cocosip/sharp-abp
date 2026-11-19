@@ -28,9 +28,9 @@ namespace SharpAbp.Abp.FileStoringManagement
 
         public override partial void Map(FileStoringContainerItem source, ContainerItemDto destination);
 
-        public override partial FileStoringContainerItem ReverseMap(ContainerItemDto destination);
+        public override partial FileStoringContainerItem ReverseMap(ContainerItemDto source);
 
-        public override partial void ReverseMap(ContainerItemDto destination, FileStoringContainerItem source);
+        public override partial void ReverseMap(ContainerItemDto source, FileStoringContainerItem destination);
     }
 
 }

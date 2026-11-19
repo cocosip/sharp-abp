@@ -37,10 +37,10 @@ namespace SharpAbp.Abp.TenantGroupManagement
     public partial class TenantGroupToTenantGroupEtoMapper : MapperBase<TenantGroup, TenantGroupEto>
     {
 
-        [MapperIgnoreTarget(nameof(TenantGroupConfiguration.Tenants))]
+        [MapperIgnoreTarget(nameof(TenantGroupEto.Tenants))]
         public override partial TenantGroupEto Map(TenantGroup source);
 
-        [MapperIgnoreTarget(nameof(TenantGroupConfiguration.Tenants))]
+        [MapperIgnoreTarget(nameof(TenantGroupEto.Tenants))]
         public override partial void Map(TenantGroup source, TenantGroupEto destination);
 
         public override void AfterMap(TenantGroup source, TenantGroupEto destination)

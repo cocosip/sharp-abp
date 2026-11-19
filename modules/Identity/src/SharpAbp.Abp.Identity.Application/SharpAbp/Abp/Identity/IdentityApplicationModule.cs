@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Volo.Abp.Application;
 using Volo.Abp.Identity;
+using Volo.Abp.Mapperly;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
 
@@ -11,7 +12,8 @@ namespace SharpAbp.Abp.Identity
         typeof(AbpDddApplicationModule),
         typeof(AbpIdentityApplicationModule),
         typeof(IdentityApplicationContractsModule),
-        typeof(IdentityDomainModule)
+        typeof(IdentityDomainModule),
+        typeof(AbpMapperlyModule)
         )]
     public class IdentityApplicationModule : AbpModule
     {

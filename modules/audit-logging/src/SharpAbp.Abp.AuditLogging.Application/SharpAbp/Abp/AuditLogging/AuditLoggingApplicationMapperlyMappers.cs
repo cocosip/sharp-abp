@@ -7,8 +7,7 @@ using Volo.Abp.ObjectMapping;
 namespace SharpAbp.Abp.AuditLogging
 {
 
-    [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target,
-        IncludedMembers = MemberVisibility.Public | MemberVisibility.Protected)]
+    [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
     [MapExtraProperties]
     public partial class AuditLogToAuditLogDtoMapper : MapperBase<AuditLog, AuditLogDto>
     {
