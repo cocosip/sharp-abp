@@ -47,7 +47,7 @@ namespace SharpAbp.Abp.FileStoring
         public void Should_Keep_Container_Defaults_When_Json_Entry_Omits_Values()
         {
             var configuration = new ConfigurationBuilder()
-                .AddInMemoryCollection(new Dictionary<string, string?>
+                .AddInMemoryCollection(new Dictionary<string, string>
                 {
                     ["FileStoringOptions:test:Provider"] = nameof(FakeFileProvider1)
                 })

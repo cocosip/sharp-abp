@@ -89,8 +89,8 @@ public class FasterLogService : ISingletonDependency
                     {
                         var list = await FasterLogger.ReadAsync(50, CancellationTokenProvider.Token);
 
-                        var min = list.Min(x => x.Data.Id);
-                        var max = list.Max(x => x.Data.Id);
+                        var min = list.Min(x => x.Data!.Id);
+                        var max = list.Max(x => x.Data!.Id);
                         Logger.LogDebug("Read data min: {min}, max:{max}", min, max);
 
                         var p = list.GetPositions();
@@ -120,15 +120,15 @@ public class FasterLogService : ISingletonDependency
     public class TenantData
     {
         public long Id { get; set; }
-        public string TenantId { get; set; }
+        public string TenantId { get; set; } = null!;
 
-        public string StudyInstanceUID { get; set; }
+        public string StudyInstanceUID { get; set; } = null!;
 
-        public string SeriesInstanceUID { get; set; }
-        public string SOPInstanceUIDP { get; set; }
+        public string SeriesInstanceUID { get; set; } = null!;
+        public string SOPInstanceUIDP { get; set; } = null!;
         public long FileSize { get; set; }
 
-        public string FileId { get; set; }
+        public string FileId { get; set; } = null!;
         public DateTime CreationTime { get; set; }
     }
 }

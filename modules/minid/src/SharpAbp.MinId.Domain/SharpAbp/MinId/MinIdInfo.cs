@@ -9,13 +9,8 @@ namespace SharpAbp.MinId
     /// This aggregate root manages the ID allocation parameters including maximum ID, step size,
     /// delta modulo, and remainder for distributed unique ID generation.
     /// </summary>
-    public class MinIdInfo : AuditedAggregateRoot<Guid>, IHasConcurrencyStamp
+    public class MinIdInfo : AuditedAggregateRoot<Guid>
     {
-        /// <summary>
-        /// Gets or sets the concurrency stamp used to detect conflicting segment allocations.
-        /// </summary>
-        public virtual string ConcurrencyStamp { get; set; } = Guid.NewGuid().ToString("N");
-
         /// <summary>
         /// Gets or sets the business type identifier that this MinId configuration serves.
         /// This is used to differentiate between different ID generation contexts.

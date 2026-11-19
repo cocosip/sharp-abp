@@ -47,7 +47,7 @@ public class FasterLogSampleModule : AbpModule
 
     public override Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
     {
-        var s = context.ServiceProvider.GetService<FasterLogService>();
+        var s = context.ServiceProvider.GetRequiredService<FasterLogService>();
         s.Start();
         return Task.CompletedTask;
     }

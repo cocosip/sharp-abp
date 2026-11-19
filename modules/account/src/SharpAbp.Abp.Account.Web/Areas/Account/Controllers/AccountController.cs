@@ -20,6 +20,7 @@ namespace SharpAbp.Abp.Account.Web.Areas.Account.Controllers
 {
 
     [RemoteService(Name = AccountRemoteServiceConsts.RemoteServiceName)]
+    [ApiController]
     [Controller]
     [Area("account")]
     [Route("api/account")]

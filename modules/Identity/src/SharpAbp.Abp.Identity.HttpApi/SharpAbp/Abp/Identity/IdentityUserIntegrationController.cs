@@ -12,6 +12,7 @@ using Volo.Abp.AspNetCore.Mvc;
 namespace SharpAbp.Abp.Identity
 {
     [RemoteService(Name = IdentityRemoteServiceConsts.RemoteServiceName)]
+    [ApiController]
     [Area(IdentityRemoteServiceConsts.ModuleName)]
     [ControllerName("UserIntegration")]
     [Route("integration-api/identity/users")]
@@ -47,7 +48,7 @@ namespace SharpAbp.Abp.Identity
 
         [HttpGet]
         [Route("search")]
-        public Task<ListResultDto<UserData>> SearchAsync(UserLookupSearchInputDto input)
+        public Task<ListResultDto<UserData>> SearchAsync([FromQuery] UserLookupSearchInputDto input)
         {
             return UserIntegrationService.SearchAsync(input);
         }
@@ -61,14 +62,14 @@ namespace SharpAbp.Abp.Identity
 
         [HttpGet]
         [Route("count")]
-        public Task<long> GetCountAsync(UserLookupCountInputDto input)
+        public Task<long> GetCountAsync([FromQuery] UserLookupCountInputDto input)
         {
             return UserIntegrationService.GetCountAsync(input);
         }
 
         [HttpGet]
         [Route("search/roles")]
-        public virtual Task<ListResultDto<RoleData>> SearchRoleAsync(RoleLookupSearchInputDto input)
+        public virtual Task<ListResultDto<RoleData>> SearchRoleAsync([FromQuery] RoleLookupSearchInputDto input)
         {
             return UserIntegrationService.SearchRoleAsync(input);
         }
@@ -82,7 +83,7 @@ namespace SharpAbp.Abp.Identity
 
         [HttpGet]
         [Route("count/roles")]
-        public virtual Task<long> GetRoleCountAsync(RoleLookupCountInputDto input)
+        public virtual Task<long> GetRoleCountAsync([FromQuery] RoleLookupCountInputDto input)
         {
             return UserIntegrationService.GetRoleCountAsync(input);
         }
