@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Volo.Abp.Auditing;
 using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.CryptoVault
@@ -52,6 +53,7 @@ namespace SharpAbp.Abp.CryptoVault
         /// </remarks>
         [Required(ErrorMessage = "The SM2 private key is required and cannot be null or empty.")]
         [DynamicStringLength(typeof(SM2CredsConsts), nameof(SM2CredsConsts.MaxPrivateKeyLength))]
+        [DisableAuditing]
         public string PrivateKey { get; set; }
     }
 }

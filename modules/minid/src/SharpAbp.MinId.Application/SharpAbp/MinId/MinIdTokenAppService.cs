@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Auditing;
 using Volo.Abp.Caching;
+using Volo.Abp;
 
 namespace SharpAbp.MinId
 {
@@ -43,10 +45,17 @@ namespace SharpAbp.MinId
         /// <param name="token">The token value.</param>
         /// <returns>The MinId token data transfer object.</returns>
         [Authorize(MinIdPermissions.MinIdTokens.Default)]
-        public virtual async Task<MinIdTokenDto> FindByTokenAsync(string bizType, string token)
+        [RemoteService(false)]
+        public virtual async Task<MinIdTokenDto> FindByTokenAsync(string bizType, [DisableAuditing] string token)
         {
             var minIdToken = await MinIdTokenRepository.FindByTokenAsync(bizType, token);
             return ObjectMapper.Map<MinIdToken, MinIdTokenDto>(minIdToken);
+        }
+
+        [Authorize(MinIdPermissions.MinIdTokens.Default)]
+        public virtual Task<MinIdTokenDto> FindAsync(FindMinIdTokenDto input)
+        {
+            return FindByTokenAsync(input.BizType, input.Token);
         }
 
         /// <summary>
@@ -86,7 +95,7 @@ namespace SharpAbp.MinId
                 input.Remark);
 
             await MinIdTokenManager.CreateAsync(minIdToken);
-            await TokenCache.RemoveAsync(GetCacheKey(minIdToken));
+            await TokenCache.RemoveAsync(GetCacheKey(minIdToken), considerUow: true);
             return ObjectMapper.Map<MinIdToken, MinIdTokenDto>(minIdToken);
         }
 
@@ -103,8 +112,8 @@ namespace SharpAbp.MinId
             var oldCacheKey = GetCacheKey(existingToken);
 
             var minIdToken = await MinIdTokenManager.UpdateAsync(id, input.BizType, input.Token, input.Remark);
-            await TokenCache.RemoveAsync(oldCacheKey);
-            await TokenCache.RemoveAsync(GetCacheKey(minIdToken));
+            await TokenCache.RemoveAsync(oldCacheKey, considerUow: true);
+            await TokenCache.RemoveAsync(GetCacheKey(minIdToken), considerUow: true);
             return ObjectMapper.Map<MinIdToken, MinIdTokenDto>(minIdToken);
         }
 
@@ -118,7 +127,7 @@ namespace SharpAbp.MinId
         {
             var minIdToken = await MinIdTokenRepository.GetAsync(id);
             await MinIdTokenRepository.DeleteAsync(minIdToken);
-            await TokenCache.RemoveAsync(GetCacheKey(minIdToken));
+            await TokenCache.RemoveAsync(GetCacheKey(minIdToken), considerUow: true);
         }
 
         protected static string GetCacheKey(MinIdToken minIdToken)

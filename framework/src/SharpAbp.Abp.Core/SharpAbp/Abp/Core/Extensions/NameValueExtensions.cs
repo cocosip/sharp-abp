@@ -15,7 +15,7 @@ namespace SharpAbp.Abp.Core.Extensions
         /// <param name="values">The collection of NameValue items to search</param>
         /// <param name="name">The name to search for</param>
         /// <returns>The first matching NameValue item, or null if not found</returns>
-        public static NameValue FindOrDefault(this IList<NameValue> values, string name)
+        public static NameValue? FindOrDefault(this IList<NameValue> values, string name)
         {
             return values.FirstOrDefault(x => x.Name == name);
         }

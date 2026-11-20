@@ -48,13 +48,13 @@ namespace SharpAbp.Abp.MapTenancy
                    Default;
         }
 
-        public MapTenancyConfiguration GetConfigurationByMapCode([NotNull] string mapCode)
+        public MapTenancyConfiguration? GetConfigurationByMapCode([NotNull] string mapCode)
         {
             Check.NotNullOrWhiteSpace(mapCode, nameof(mapCode));
             return _mappers.Values.FirstOrDefault(x => x.MapCode == mapCode);
         }
 
-        public MapTenancyConfiguration GetConfigurationByTenantId(Guid tenantId)
+        public MapTenancyConfiguration? GetConfigurationByTenantId(Guid tenantId)
         {
             return _mappers.Values.FirstOrDefault(x => x.TenantId == tenantId);
         }

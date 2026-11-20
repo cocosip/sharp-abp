@@ -1,5 +1,6 @@
 ﻿﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Volo.Abp.Auditing;
 using Volo.Abp.Validation;
 
 namespace SharpAbp.MinId
@@ -27,6 +28,7 @@ namespace SharpAbp.MinId
         /// </summary>
         [Required]
         [DynamicStringLength(typeof(MinIdTokenConsts), nameof(MinIdTokenConsts.MaxTokenLength))]
+        [DisableAuditing]
         public string Token { get; set; }
 
         /// <summary>
@@ -52,7 +54,7 @@ namespace SharpAbp.MinId
 
             if (!MinIdUtil.IsToken(Token))
             {
-                yield return new ValidationResult($"Invalid Token '{Token}'. Must be 3-40 characters, containing only alphanumeric characters.");
+                yield return new ValidationResult("Invalid Token. Must be 3-40 characters, containing only alphanumeric characters.");
             }
 
             yield break;

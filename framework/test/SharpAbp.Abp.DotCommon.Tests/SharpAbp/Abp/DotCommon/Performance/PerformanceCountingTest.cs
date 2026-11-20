@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Collections.Generic;
@@ -85,7 +86,8 @@ public class PerformanceCountingTest
         using var services = new ServiceCollection().AddSingleton<ThrowingHandler>().BuildServiceProvider();
         var configuration = new PerformanceConfiguration { AutoLogging = true };
         configuration.PerformanceInfoHandlers.Add(typeof(ThrowingHandler));
-        var count = new CountInfo(NullLogger<CountInfo>.Instance, services, "api", "read", configuration, 1, 2);
+        var logger = new ExceptionLogger();
+        var count = new CountInfo(logger, services, "api", "read", configuration, 1, 2);
 
         count.Calculate();
         count.IncrementTotalCount(4);
@@ -94,6 +96,8 @@ public class PerformanceCountingTest
         Assert.Equal(2, count.TotalCount);
         Assert.Equal(4, count.RT);
         Assert.Equal(3, count.AverageRT);
+        Assert.Equal(2, logger.Errors.Count);
+        Assert.All(logger.Errors, error => Assert.IsType<InvalidOperationException>(error));
     }
 
     public sealed class RecordingHandler : IPerformanceInfoHandlerService
@@ -110,6 +114,21 @@ public class PerformanceCountingTest
     public sealed class ThrowingHandler : IPerformanceInfoHandlerService
     {
         public void Handle(string name, string key, PerformanceInfo info) => throw new InvalidOperationException("Sink unavailable");
+    }
+
+    private sealed class ExceptionLogger : ILogger<CountInfo>
+    {
+        public List<Exception> Errors { get; } = [];
+        public IDisposable BeginScope<TState>(TState state) where TState : notnull => null;
+        public bool IsEnabled(LogLevel logLevel) => true;
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception,
+            Func<TState, Exception, string> formatter)
+        {
+            if (logLevel == LogLevel.Error)
+            {
+                Errors.Add(exception);
+            }
+        }
     }
 }
 

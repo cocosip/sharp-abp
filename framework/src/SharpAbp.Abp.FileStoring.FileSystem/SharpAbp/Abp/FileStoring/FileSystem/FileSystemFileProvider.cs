@@ -33,30 +33,76 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
 
             Logger.LogDebug("Saving file to file system. File: {FilePath}", filePath);
 
+            var alreadyExistsMessage = $"Saving File '{args.FileId}' already exists in the container '{args.ContainerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.";
             if (!args.OverrideExisting && await ExistsAsync(filePath))
             {
-                throw new FileAlreadyExistsException(
-                    $"Saving File '{args.FileId}' already exists in the container '{args.ContainerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
+                throw new FileAlreadyExistsException(alreadyExistsMessage);
             }
 
-            DirectoryHelper.CreateIfNotExists(Path.GetDirectoryName(filePath));
-
-            var fileMode = args.OverrideExisting
-                ? FileMode.Create
-                : FileMode.CreateNew;
-
-            var fileCreatedByThisSave = false;
+            var directoryPath = Path.GetDirectoryName(filePath);
+            if (string.IsNullOrEmpty(directoryPath))
+            {
+                throw new ArgumentException("The file path must have a parent directory.", nameof(args));
+            }
+            DirectoryHelper.CreateIfNotExists(directoryPath);
 
             async Task SaveFileAsync()
             {
-                using var fileStream = File.Open(filePath, fileMode, FileAccess.Write);
-                fileCreatedByThisSave = true;
-                await sourceStream.CopyToAsync(
-                    fileStream,
-                    args.CancellationToken
-                );
+                var stagingPath = Path.Combine(directoryPath, $".sharpabp-{Guid.NewGuid():N}.tmp");
+                var stagingCreated = false;
+                try
+                {
+                    if (sourceStream.CanSeek)
+                    {
+                        sourceStream.Position = initialPosition;
+                    }
+                    using (var fileStream = File.Open(stagingPath, FileMode.CreateNew, FileAccess.Write))
+                    {
+                        stagingCreated = true;
+                        await sourceStream.CopyToAsync(fileStream, args.CancellationToken);
+                        await fileStream.FlushAsync(args.CancellationToken);
+                    }
 
-                await fileStream.FlushAsync(args.CancellationToken);
+                    args.CancellationToken.ThrowIfCancellationRequested();
+                    if (args.OverrideExisting && File.Exists(filePath))
+                    {
+                        File.Replace(stagingPath, filePath, null);
+                    }
+                    else
+                    {
+                        try
+                        {
+                            File.Move(stagingPath, filePath);
+                        }
+                        catch (IOException) when (File.Exists(filePath))
+                        {
+                            if (!args.OverrideExisting)
+                            {
+                                throw new FileAlreadyExistsException(alreadyExistsMessage);
+                            }
+                            File.Replace(stagingPath, filePath, null);
+                        }
+                    }
+                }
+                catch (IOException ex)
+                {
+                    Logger.LogError(ex, "Failed to save file '{FileId}' to file system. Path: {FilePath}", args.FileId, filePath);
+                    throw;
+                }
+                finally
+                {
+                    if (stagingCreated)
+                    {
+                        try
+                        {
+                            File.Delete(stagingPath);
+                        }
+                        catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+                        {
+                            Logger.LogWarning(ex, "Failed to remove staging file. Path: {StagingPath}", stagingPath);
+                        }
+                    }
+                }
             }
 
             if (sourceStream.CanSeek)
@@ -64,42 +110,12 @@ namespace SharpAbp.Abp.FileStoring.FileSystem
                 await Policy.Handle<IOException>()
                     .WaitAndRetryAsync(
                         2,
-                        retryCount => TimeSpan.FromSeconds(retryCount),
-                        (_, _, _, _) =>
-                        {
-                            sourceStream.Position = initialPosition;
-                            if (fileCreatedByThisSave)
-                            {
-                                FileHelper.DeleteIfExists(filePath);
-                                fileCreatedByThisSave = false;
-                            }
-                            return Task.CompletedTask;
-                        })
-                    .ExecuteAsync(async () =>
-                    {
-                        try
-                        {
-                            sourceStream.Position = initialPosition;
-                            await SaveFileAsync();
-                        }
-                        catch (IOException ex)
-                        {
-                            Logger.LogError(ex, "Failed to save file '{FileId}' to file system. Path: {FilePath}", args.FileId, filePath);
-                            throw;
-                        }
-                    });
+                        retryCount => TimeSpan.FromSeconds(retryCount))
+                    .ExecuteAsync(_ => SaveFileAsync(), args.CancellationToken);
             }
             else
             {
-                try
-                {
-                    await SaveFileAsync();
-                }
-                catch (IOException ex)
-                {
-                    Logger.LogError(ex, "Failed to save file '{FileId}' to file system. Path: {FilePath}", args.FileId, filePath);
-                    throw;
-                }
+                await SaveFileAsync();
             }
 
             Logger.LogInformation("Successfully saved file '{FileId}' to file system. Path: {FilePath}", args.FileId, filePath);

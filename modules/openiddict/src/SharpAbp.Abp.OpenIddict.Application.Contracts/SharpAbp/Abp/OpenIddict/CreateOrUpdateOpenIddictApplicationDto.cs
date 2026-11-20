@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using Volo.Abp.Auditing;
 using Volo.Abp.ObjectExtending;
 using Volo.Abp.OpenIddict.Applications;
 using Volo.Abp.Validation;
@@ -40,6 +41,7 @@ namespace SharpAbp.Abp.OpenIddict
         /// Note: depending on the application manager used to create this instance,
         /// this property may be hashed or encrypted for security reasons.
         /// </summary>
+        [DisableAuditing]
         public string ClientSecret { get; set; }
 
         /// <summary>

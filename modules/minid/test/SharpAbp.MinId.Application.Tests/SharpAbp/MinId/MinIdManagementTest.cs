@@ -50,6 +50,7 @@ public class MinIdManagementTest : MinIdApplicationTestBase
 
         Assert.Equal(created.Id, (await service.GetAsync(created.Id)).Id);
         Assert.Equal(created.Id, (await service.FindByTokenAsync("orders", "token123")).Id);
+        Assert.Equal(created.Id, (await service.FindAsync(new FindMinIdTokenDto { BizType = "orders", Token = "token123" })).Id);
         var page = await service.GetPagedListAsync(new MinIdTokenPagedRequestDto { BizType = "orders", Token = "token123" });
         Assert.Equal(1, page.TotalCount);
         Assert.Equal(created.Id, Assert.Single(page.Items).Id);
@@ -59,6 +60,6 @@ public class MinIdManagementTest : MinIdApplicationTestBase
         await service.DeleteAsync(created.Id);
 
         Assert.False(await validator.ValidateAsync("orders", "token123"));
-        await Assert.ThrowsAsync<AbpException>(() => validator.ValidateTokenAsync("orders", "token123"));
+        await Assert.ThrowsAnyAsync<AbpException>(() => validator.ValidateTokenAsync("orders", "token123"));
     }
 }

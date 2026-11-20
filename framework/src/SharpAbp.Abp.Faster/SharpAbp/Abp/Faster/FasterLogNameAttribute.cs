@@ -32,7 +32,7 @@ namespace SharpAbp.Abp.Faster
 
             if (nameAttribute == null)
             {
-                return type.FullName;
+                return type.FullName ?? throw new ArgumentException("The type must have a full name or an explicit Faster log name.", nameof(type));
             }
 
             return nameAttribute.GetName(type);

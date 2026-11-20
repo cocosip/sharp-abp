@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Volo.Abp.TenantManagement;
+using Volo.Abp.Auditing;
 using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.MapTenancyManagement
@@ -25,6 +26,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <value>The administrator's password; required field with maximum length of 128 characters</value>
         [MaxLength(128)]
         [Required]
+        [DisableAuditing]
         public virtual string AdminPassword { get; set; }
 
         /// <summary>

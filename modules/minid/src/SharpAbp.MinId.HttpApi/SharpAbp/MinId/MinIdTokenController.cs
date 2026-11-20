@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Auditing;
 
 namespace SharpAbp.MinId
 {
@@ -10,6 +11,7 @@ namespace SharpAbp.MinId
     /// REST controller for managing MinId tokens.
     /// </summary>
     [RemoteService(Name = MinIdRemoteServiceConsts.RemoteServiceName)]
+    [ApiController]
     [Area("minid")]
     [Route("api/minid/minid-token")]
     public class MinIdTokenController : MinIdController, IMinIdTokenAppService
@@ -43,11 +45,16 @@ namespace SharpAbp.MinId
         /// <param name="bizType">The business type of the token.</param>
         /// <param name="token">The token value.</param>
         /// <returns>The MinId token data transfer object.</returns>
-        [HttpGet]
-        [Route("find-by-token/{bizType}/{token}")]
-        public async Task<MinIdTokenDto> FindByTokenAsync(string bizType, string token)
+        [NonAction]
+        public async Task<MinIdTokenDto> FindByTokenAsync(string bizType, [DisableAuditing] string token)
         {
             return await _minIdTokenAppService.FindByTokenAsync(bizType, token);
+        }
+
+        [HttpPost("find-by-token")]
+        public Task<MinIdTokenDto> FindAsync([FromBody] FindMinIdTokenDto input)
+        {
+            return _minIdTokenAppService.FindAsync(input);
         }
 
         /// <summary>
@@ -55,8 +62,8 @@ namespace SharpAbp.MinId
         /// </summary>
         /// <param name="input">The paged request input containing filter and pagination parameters.</param>
         /// <returns>A paged result containing MinId token data transfer objects.</returns>
-        [HttpGet]
-        public async Task<PagedResultDto<MinIdTokenDto>> GetPagedListAsync(MinIdTokenPagedRequestDto input)
+        [HttpPost("search")]
+        public async Task<PagedResultDto<MinIdTokenDto>> GetPagedListAsync([FromBody] MinIdTokenPagedRequestDto input)
         {
             return await _minIdTokenAppService.GetPagedListAsync(input);
         }

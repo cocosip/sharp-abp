@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Auditing;
+using Volo.Abp;
 
 namespace SharpAbp.MinId
 {
@@ -20,7 +22,13 @@ namespace SharpAbp.MinId
         /// <param name="bizType">The business type of the token.</param>
         /// <param name="token">The token value.</param>
         /// <returns>The MinId token data transfer object.</returns>
-        Task<MinIdTokenDto> FindByTokenAsync(string bizType, string token);
+        [RemoteService(false)]
+        Task<MinIdTokenDto> FindByTokenAsync(string bizType, [DisableAuditing] string token);
+
+        /// <summary>
+        /// Finds a token using a request body rather than URL credentials.
+        /// </summary>
+        Task<MinIdTokenDto> FindAsync(FindMinIdTokenDto input);
 
         /// <summary>
         /// Get a paged list of MinId tokens based on the provided filter.

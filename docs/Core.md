@@ -263,6 +263,26 @@ public class YourService
 
 Use `[RedisClientName("custom")]` on a marker class and `redisClientFactory.Get<CustomClient>()` to select a named client.
 
+The factory owns one shared client per name. Callers must not dispose clients returned by `Get` or `GetAll`.
+Concurrent first requests share the same initialization, and a failed initialization can be retried.
+Disposing `DefaultRedisClientFactory` permanently rejects new requests, waits for active initialization,
+and disposes all initialized clients. Cleanup attempts every client and reports failures through an `AggregateException`.
+Disposal invoked from an active configuration or initialization callback throws `InvalidOperationException`
+before changing factory state. Configure callbacks must finish before requesting shutdown.
+
+### Object pool lifetime
+
+`PoolOrchestrator.RemovePool` and `RemoveAll` wait for active pool initialization and dispose retained items;
+the orchestrator remains reusable after either operation. `Dispose` permanently rejects new pool requests.
+Callers must return borrowed items even when a pool has been removed or disposed so that those items can be released.
+Pending asynchronous item creation releases its result if the pool shuts down before creation finishes.
+Cleanup attempts every retained item and pool before reporting an `AggregateException`, including async-only
+disposable items through the existing disposal path. Repeated disposal does not dispose resources again.
+Lifecycle changes (`RemovePool`, `RemoveAll`, or `Dispose`) from an active policy initialization callback
+throw `InvalidOperationException` before changing the registry or shutdown state. Cleanup callbacks run
+outside registry locks and may access the reusable orchestrator. Background work started during
+initialization may request lifecycle changes after initialization finishes.
+
 ---
 
 ## Validation

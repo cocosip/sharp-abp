@@ -111,8 +111,7 @@ namespace SharpAbp.Abp.DotCommon.Performance
         /// <returns></returns>
         public virtual PerformanceInfo? GetKeyPerformanceInfo(string key)
         {
-            CountInfo countInfo;
-            if (_countInfoDict.TryGetValue(key, out countInfo))
+            if (_countInfoDict.TryGetValue(key, out var countInfo))
             {
                 return countInfo.GetCurrentPerformanceInfo();
             }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Guids;
+using Volo.Abp.ObjectExtending;
 
 namespace SharpAbp.Abp.TransformSecurityManagement
 {
@@ -75,13 +76,13 @@ namespace SharpAbp.Abp.TransformSecurityManagement
         /// <param name="identifier">The unique identifier of the security credential to retrieve.</param>
         /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
         /// <returns>The security credential with decrypted cryptographic keys and metadata.</returns>
-        /// <exception cref="AbpException">Thrown when the credential with the specified identifier is not found or when an unsupported key type is encountered.</exception>
+        /// <exception cref="AbpException">Thrown when an unsupported key type is encountered.</exception>
         public virtual async Task<SecurityCredential> GetAsync(string identifier, CancellationToken cancellationToken = default)
         {
             var securityCredentialInfo = await SecurityCredentialInfoRepository.FindByIdentifierAsync(identifier, cancellationToken: cancellationToken);
             if (securityCredentialInfo == null)
             {
-                throw new AbpException($"Security credential info with identifier '{identifier}' could not be found.");
+                return null;
             }
 
             var securityCredential = new SecurityCredential()
@@ -93,6 +94,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
                 CreationTime = securityCredentialInfo.CreationTime,
             };
 
+            securityCredentialInfo.MapExtraPropertiesTo(securityCredential, MappingPropertyDefinitionChecks.None);
             securityCredential.SetReferenceId(securityCredentialInfo.CredsId.ToString("N"));
 
             if (securityCredential.KeyType.Equals("RSA", StringComparison.OrdinalIgnoreCase))
@@ -140,6 +142,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
                 credential.Expires,
                 "");
 
+            credential.MapExtraPropertiesTo(securityCredentialInfo, MappingPropertyDefinitionChecks.None);
             await SecurityCredentialInfoRepository.InsertAsync(securityCredentialInfo, cancellationToken: cancellationToken);
         }
     }

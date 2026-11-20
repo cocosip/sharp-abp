@@ -485,6 +485,8 @@ namespace SharpAbp.Abp.Faster
                                                 gapSize,
                                                 TypeHelper.GetFullNameHandlingNullableAndGenerics(typeof(T)),
                                                 gapDuration.TotalSeconds,
+                                                gapStart,
+                                                gapEnd,
                                                 currentEnd,
                                                 range.Start);
 
@@ -991,7 +993,7 @@ namespace SharpAbp.Abp.Faster
                     "Export fromAddress {From} is below BeginAddress {Begin} for '{TypeName}'. " +
                     "Data in [{From}, {Begin}) has been truncated and cannot be exported. " +
                     "Adjusting fromAddress to BeginAddress.",
-                    fromAddress, Log.BeginAddress, typeName);
+                    fromAddress, Log.BeginAddress, typeName, fromAddress, Log.BeginAddress);
                 fromAddress = Log.BeginAddress;
             }
 

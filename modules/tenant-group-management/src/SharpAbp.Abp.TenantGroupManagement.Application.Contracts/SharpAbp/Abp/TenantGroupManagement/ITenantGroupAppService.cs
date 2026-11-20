@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Auditing;
 using Volo.Abp.TenantManagement;
 
 namespace SharpAbp.Abp.TenantGroupManagement
@@ -99,7 +100,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
         /// <param name="id">The identifier of the tenant group.</param>
         /// <param name="defaultConnectionString">The new default connection string value.</param>
         /// <returns>A task representing the asynchronous update operation.</returns>
-        Task UpdateDefaultConnectionStringAsync(Guid id, string defaultConnectionString);
+        Task UpdateDefaultConnectionStringAsync(Guid id, [DisableAuditing] string defaultConnectionString);
         
         /// <summary>
         /// Deletes the default connection string for the specified tenant group.

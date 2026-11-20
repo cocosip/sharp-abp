@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Auditing;
 using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.DbConnectionsManagement
@@ -35,6 +36,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         /// </summary>
         /// <value>A string containing the database connection configuration, can be null for default settings.</value>
         [DynamicStringLength(typeof(DatabaseConnectionInfoConsts), nameof(DatabaseConnectionInfoConsts.MaxConnectionStringLength))]
+        [DisableAuditing]
         public string ConnectionString { get; set; }
     }
 }

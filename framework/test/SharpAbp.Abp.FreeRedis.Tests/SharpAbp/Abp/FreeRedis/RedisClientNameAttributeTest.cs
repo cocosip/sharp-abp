@@ -6,6 +6,14 @@ namespace SharpAbp.Abp.FreeRedis
     public class RedisClientNameAttributeTest
     {
         [Fact]
+        public void Unnamed_Type_Requires_An_Explicit_Name()
+        {
+            Assert.Throws<System.ArgumentException>(() => RedisClientNameAttribute.GetClientName(typeof(Generic<>).GetGenericArguments()[0]));
+        }
+
+        private class Generic<T> { }
+
+        [Fact]
         public void Should_Get_Specified_Name()
         {
             var name = RedisClientNameAttribute

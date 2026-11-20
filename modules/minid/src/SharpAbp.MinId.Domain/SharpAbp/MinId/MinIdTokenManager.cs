@@ -59,8 +59,7 @@ namespace SharpAbp.MinId
                 throw new ArgumentNullException(nameof(minIdToken), "MinId token cannot be null when creating a new token.");
             }
 
-            Logger.LogDebug("Attempting to create MinId token for business type '{BizType}' with token '{Token}'", 
-                minIdToken.BizType, minIdToken.Token);
+            Logger.LogDebug("Attempting to create MinId token for business type '{BizType}'", minIdToken.BizType);
 
             // Validate that the business type exists in the system
             var minIdInfo = await MinIdInfoRepository.FindByBizTypeAsync(minIdToken.BizType, cancellationToken);
@@ -75,15 +74,14 @@ namespace SharpAbp.MinId
             var queryMinIdToken = await MinIdTokenRepository.FindExpectedByTokenAsync(minIdToken.BizType, minIdToken.Token, null, cancellationToken);
             if (queryMinIdToken != null)
             {
-                var errorMessage = $"Cannot create MinId token: Token '{minIdToken.Token}' already exists for business type '{minIdToken.BizType}'. Each token must be unique within its business type context.";
-                Logger.LogWarning("Failed to create MinId token due to duplicate token: {Token} for business type {BizType}", 
-                    minIdToken.Token, minIdToken.BizType);
+                var errorMessage = $"Cannot create MinId token: A token already exists for business type '{minIdToken.BizType}'. Each token must be unique within its business type context.";
+                Logger.LogWarning("Failed to create MinId token due to duplicate token for business type {BizType}", minIdToken.BizType);
                 throw new AbpException(errorMessage);
             }
 
             var result = await MinIdTokenRepository.InsertAsync(minIdToken, cancellationToken: cancellationToken);
-            Logger.LogInformation("Successfully created MinId token '{Token}' for business type '{BizType}' with ID {Id}", 
-                minIdToken.Token, minIdToken.BizType, result.Id);
+            Logger.LogInformation("Successfully created MinId token for business type '{BizType}' with ID {Id}",
+                minIdToken.BizType, result.Id);
             
             return result;
         }
@@ -107,8 +105,8 @@ namespace SharpAbp.MinId
         /// </exception>
         public virtual async Task<MinIdToken> UpdateAsync(Guid id, string bizType, string token, string remark, CancellationToken cancellationToken = default)
         {
-            Logger.LogDebug("Attempting to update MinId token with ID {Id} to business type '{BizType}' and token '{Token}'", 
-                id, bizType, token);
+            Logger.LogDebug("Attempting to update MinId token with ID {Id} to business type '{BizType}'",
+                id, bizType);
 
             var minIdToken = await MinIdTokenRepository.GetAsync(id, cancellationToken: cancellationToken);
             if (minIdToken == null)
@@ -119,7 +117,6 @@ namespace SharpAbp.MinId
             }
 
             var oldBizType = minIdToken.BizType;
-            var oldToken = minIdToken.Token;
 
             // Check if business type is changing and validate the new business type exists
             if (minIdToken.BizType != bizType)
@@ -140,17 +137,17 @@ namespace SharpAbp.MinId
             var queryMinIdToken = await MinIdTokenRepository.FindExpectedByTokenAsync(bizType, token, id, cancellationToken);
             if (queryMinIdToken != null)
             {
-                var errorMessage = $"Cannot update MinId token: Token '{token}' already exists for business type '{bizType}' in another record (ID: {queryMinIdToken.Id}). Each token must be unique within its business type context.";
-                Logger.LogWarning("Failed to update MinId token due to duplicate token: {Token} for business type {BizType} (existing ID: {ExistingId})", 
-                    token, bizType, queryMinIdToken.Id);
+                var errorMessage = $"Cannot update MinId token: A token already exists for business type '{bizType}' in another record (ID: {queryMinIdToken.Id}). Each token must be unique within its business type context.";
+                Logger.LogWarning("Failed to update MinId token due to duplicate token for business type {BizType} (existing ID: {ExistingId})",
+                    bizType, queryMinIdToken.Id);
                 throw new AbpException(errorMessage);
             }
 
             minIdToken.Update(bizType, token, remark);
 
             var result = await MinIdTokenRepository.UpdateAsync(minIdToken, cancellationToken: cancellationToken);
-            Logger.LogInformation("Successfully updated MinId token {Id}: business type changed from '{OldBizType}' to '{NewBizType}', token changed from '{OldToken}' to '{NewToken}', remark: '{Remark}'", 
-                id, oldBizType, bizType, oldToken, token, remark);
+            Logger.LogInformation("Successfully updated MinId token {Id}: business type changed from '{OldBizType}' to '{NewBizType}'",
+                id, oldBizType, bizType);
             
             return result;
         }

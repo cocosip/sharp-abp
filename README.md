@@ -2,12 +2,12 @@
 
 > Enterprise extension modules for ABP vNext
 
-An enterprise-grade extension module collection based on ABP vNext framework, consisting of 85 core framework packages and 12 business modules, providing complete enterprise application solutions including multi-database support, distributed file storage, message queuing, authentication, multi-tenancy isolation, and more.
+An enterprise-grade extension module collection based on ABP vNext framework, consisting of 75 core framework packages and 11 business modules, providing complete enterprise application solutions including multi-database support, distributed file storage, message queuing, authentication, multi-tenancy isolation, and more.
 
 ## Project Structure
 
-- **Framework**: 85 core framework packages providing infrastructure support
-- **Modules**: 12 business modules providing complete enterprise-grade functionality
+- **Framework**: 75 core framework packages providing infrastructure support
+- **Modules**: 11 business modules providing complete enterprise-grade functionality
 
 See [Testing and coverage](docs/Testing.md) for ABP test conventions and the repository coverage check.
 
@@ -15,7 +15,7 @@ See [Testing and coverage](docs/Testing.md) for ABP test conventions and the rep
 
 - **Multi-Database Support**: MySQL, PostgreSQL, SQL Server, Oracle, SQLite, DM (DaMeng), GaussDB
 - **Multi-ORM Support**: Entity Framework Core, FreeSql, Dapper
-- **File Storage**: Support for 10 storage providers including FileSystem, Aliyun OSS, Azure, AWS, MinIO, KS3, Huawei OBS, FastDFS, S3 and Database
+- **File Storage**: Support for 9 storage providers including FileSystem, Aliyun OSS, Azure, AWS, MinIO, KS3, Huawei OBS, FastDFS and S3
 - **Message Queue**: RabbitMQ, Kafka, ActiveMQ (via MassTransit)
 - **Authentication**: OpenIddict OAuth2/OIDC support
 - **Multi-Tenancy**: Map-based tenancy isolation, tenant grouping isolation
@@ -61,7 +61,6 @@ See [Testing and coverage](docs/Testing.md) for ABP test conventions and the rep
 | **Obs** | Huawei OBS storage provider | [docs](/docs/FileStorage.md) |
 | **S3** | S3-compatible storage provider | [docs](/docs/FileStorage.md) |
 | **FastDFS** | FastDFS distributed file system adapter | [docs](/docs/FileStorage.md) |
-| **Database** | Database-backed file storage provider | [docs](/docs/FileStorage.md) |
 | **MapTenancy** | Tenant code integration for file paths | [docs](/docs/FileStorage.md) |
 
 ### Database Connections

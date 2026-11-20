@@ -1,9 +1,9 @@
 <Project>
 	<PropertyGroup>
-		<!--Project Frameworks-->
-		<ProjectFrameworks>netstandard2.0;netstandard2.1;$(NetCoreFx)</ProjectFrameworks>
 		<!--Net Core Framework-->
 		<NetCoreFx>net10.0</NetCoreFx>
+		<!--Project Frameworks-->
+		<ProjectFrameworks>netstandard2.0;netstandard2.1;$(NetCoreFx)</ProjectFrameworks>
 		<!-- Keep references outside a module solution in the requested build configuration. -->
 		<ShouldUnsetParentConfigurationAndPlatform>false</ShouldUnsetParentConfigurationAndPlatform>
 		<!--Microsoft-->

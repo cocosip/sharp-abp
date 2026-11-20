@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Auditing;
 using Volo.Abp.TenantManagement;
 
 namespace SharpAbp.Abp.TenantGroupManagement
@@ -98,7 +99,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
 
         [HttpPut]
         [Route("{id}/default-connection-string")]
-        public async Task UpdateDefaultConnectionStringAsync(Guid id, string defaultConnectionString)
+        public async Task UpdateDefaultConnectionStringAsync(Guid id, [FromBody, DisableAuditing] string defaultConnectionString)
         {
             await _tenantGroupAppService.UpdateDefaultConnectionStringAsync(id, defaultConnectionString);
         }

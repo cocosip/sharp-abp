@@ -37,7 +37,7 @@ namespace SharpAbp.Abp.Core.Extensions
         /// <returns></returns>
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue defaultValue)
         {
-            if (dictionary.TryGetValue(key, out TValue value))
+            if (dictionary.TryGetValue(key, out var value))
             {
                 return value;
             }
@@ -54,7 +54,7 @@ namespace SharpAbp.Abp.Core.Extensions
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <returns></returns>
-        public static bool TryRemove<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, out TValue value)
+        public static bool TryRemove<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, out TValue? value)
         {
             if (dictionary.TryGetValue(key, out value))
             {
@@ -71,6 +71,7 @@ namespace SharpAbp.Abp.Core.Extensions
         /// <typeparam name="TValue"></typeparam>
         /// <returns></returns>
         public static IDictionary<TKey, TValue> AsDictionary<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> keyValuePairs)
+            where TKey : notnull
         {
             var dictionary = new Dictionary<TKey, TValue>();
             foreach (var keyValuePair in keyValuePairs)
@@ -98,6 +99,7 @@ namespace SharpAbp.Abp.Core.Extensions
             this IDictionary<TKey, TValue> dictionary,
             Func<TKey, DKey> keySelector,
             Func<TValue, DValue> valueSelector)
+            where DKey : notnull
         {
             var destination = new Dictionary<DKey, DValue>();
             foreach (var keyValuPair in dictionary)
@@ -119,6 +121,7 @@ namespace SharpAbp.Abp.Core.Extensions
         public static IDictionary<TKey, DValue> ToDictionary<TKey, TValue, DValue>(
             this IDictionary<TKey, TValue> dictionary,
             Func<TValue, DValue> valueSelector)
+            where TKey : notnull
         {
             var destination = new Dictionary<TKey, DValue>();
             foreach (var keyValuePair in dictionary)

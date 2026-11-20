@@ -220,14 +220,17 @@ namespace SharpAbp.Abp.EventBus.MassTransit
         {
             var handlerFactories = GetOrCreateHandlerFactories(eventType);
 
-            if (factory.IsInFactories(handlerFactories))
+            lock (handlerFactories)
             {
-                return NullDisposable.Instance;
+                if (factory.IsInFactories(handlerFactories))
+                {
+                    return NullDisposable.Instance;
+                }
+
+                handlerFactories.Add(factory);
+
+                return new EventHandlerFactoryUnregistrar(this, eventType, factory);
             }
-
-            handlerFactories.Add(factory);
-
-            return new EventHandlerFactoryUnregistrar(this, eventType, factory);
         }
 
         /// <summary>
@@ -243,14 +246,17 @@ namespace SharpAbp.Abp.EventBus.MassTransit
 
             var handlerFactories = GetOrCreateDynamicHandlerFactories(eventName);
 
-            if (factory.IsInFactories(handlerFactories))
+            lock (handlerFactories)
             {
-                return NullDisposable.Instance;
+                if (factory.IsInFactories(handlerFactories))
+                {
+                    return NullDisposable.Instance;
+                }
+
+                handlerFactories.Add(factory);
+
+                return new DynamicEventHandlerFactoryUnregistrar(this, eventName, factory);
             }
-
-            handlerFactories.Add(factory);
-
-            return new DynamicEventHandlerFactoryUnregistrar(this, eventName, factory);
         }
 
         /// <summary>
@@ -388,7 +394,7 @@ namespace SharpAbp.Abp.EventBus.MassTransit
                      HandlerFactories.Where(hf => ShouldTriggerEventForHandler(eventType, hf.Key)))
             {
                 handlerFactoryList.Add(
-                    new EventTypeWithEventHandlerFactories(handlerFactory.Key, handlerFactory.Value));
+                    new EventTypeWithEventHandlerFactories(handlerFactory.Key, handlerFactory.Value.Locking(factories => factories.ToList())));
             }
 
             return [.. handlerFactoryList];
@@ -403,8 +409,14 @@ namespace SharpAbp.Abp.EventBus.MassTransit
         {
             Check.NotNullOrWhiteSpace(eventName, nameof(eventName));
 
-            return DynamicHandlerFactories.TryGetValue(eventName, out var handlerFactories) && handlerFactories.Any()
-                ? [new EventTypeWithEventHandlerFactories(typeof(DynamicEventData), handlerFactories)]
+            if (!DynamicHandlerFactories.TryGetValue(eventName, out var handlerFactories))
+            {
+                return [];
+            }
+
+            var snapshot = handlerFactories.Locking(factories => factories.ToList());
+            return snapshot.Count > 0
+                ? [new EventTypeWithEventHandlerFactories(typeof(DynamicEventData), snapshot)]
                 : [];
         }
 
@@ -454,7 +466,7 @@ namespace SharpAbp.Abp.EventBus.MassTransit
             {
                 AddToUnitOfWork(
                     UnitOfWorkManager.Current,
-                    new UnitOfWorkEventRecord(typeof(DynamicEventData), dynamicEventData, EventOrderGenerator.GetNext()));
+                    new UnitOfWorkEventRecord(typeof(DynamicEventData), dynamicEventData, EventOrderGenerator.GetNext(), useOutbox));
                 return;
             }
 

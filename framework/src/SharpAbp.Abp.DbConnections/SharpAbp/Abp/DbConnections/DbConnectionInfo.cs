@@ -42,7 +42,7 @@ namespace SharpAbp.Abp.DbConnections
         /// </summary>
         /// <param name="other">The DbConnectionInfo to compare with the current DbConnectionInfo</param>
         /// <returns>true if the specified DbConnectionInfo is equal to the current DbConnectionInfo; otherwise, false</returns>
-        public bool Equals(DbConnectionInfo other)
+        public bool Equals(DbConnectionInfo? other)
         {
             if (other is null)
             {
@@ -56,7 +56,7 @@ namespace SharpAbp.Abp.DbConnections
         /// </summary>
         /// <param name="obj">The object to compare with the current DbConnectionInfo</param>
         /// <returns>true if the specified object is equal to the current DbConnectionInfo; otherwise, false</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is null)
             {

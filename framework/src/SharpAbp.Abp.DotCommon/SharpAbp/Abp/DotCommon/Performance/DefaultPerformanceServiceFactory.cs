@@ -35,7 +35,7 @@ namespace SharpAbp.Abp.DotCommon.Performance
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
 
-            if (!_performanceServiceDict.TryGetValue(name, out IPerformanceService performanceService))
+            if (!_performanceServiceDict.TryGetValue(name, out var performanceService))
             {
                 lock (_sync)
                 {

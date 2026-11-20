@@ -5,6 +5,14 @@ namespace SharpAbp.Abp.Faster
     public class FasterLogNameAttributeTests
     {
         [Fact]
+        public void Unnamed_Type_Requires_An_Explicit_Name()
+        {
+            Assert.Throws<System.ArgumentException>(() => FasterLogNameAttribute.GetLogName(typeof(Generic<>).GetGenericArguments()[0]));
+        }
+
+        private class Generic<T> { }
+
+        [Fact]
         public void GetLogName_WithAttribute_ReturnsAttributeName()
         {
             var name = FasterLogNameAttribute.GetLogName<FasterTestEntry>();

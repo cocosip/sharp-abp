@@ -7,7 +7,8 @@ namespace SharpAbp.Abp.FreeRedis
     public interface IRedisClientFactory
     {
         /// <summary>
-        /// Get csredis client by name
+        /// Gets a shared Redis client by name. The factory owns its lifetime;
+        /// callers must not dispose it or use it after the factory shuts down.
         /// </summary>
         /// <param name="name">name</param>
         /// <returns></returns>
@@ -16,7 +17,7 @@ namespace SharpAbp.Abp.FreeRedis
 
 
         /// <summary>
-        /// Get all csredis client
+        /// Gets all initialized shared clients. The factory owns their lifetime.
         /// </summary>
         /// <returns></returns>
         List<RedisClient> GetAll();

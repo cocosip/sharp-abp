@@ -76,6 +76,38 @@ namespace SharpAbp.Abp.Snowflakes
             Assert.Throws<ArgumentException>(() => new Snowflake(0, -1));
         }
 
+        [Theory]
+        [InlineData(-1, 5, 12)]
+        [InlineData(5, -1, 12)]
+        [InlineData(5, 5, -1)]
+        [InlineData(64, 5, 12)]
+        [InlineData(5, 64, 12)]
+        [InlineData(5, 5, 64)]
+        [InlineData(21, 21, 21)]
+        [InlineData(int.MaxValue, int.MaxValue, int.MaxValue)]
+        public void Should_Reject_Bit_Allocations_Without_A_Timestamp(int workerBits, int datacenterBits, int sequenceBits)
+        {
+            Assert.ThrowsAny<ArgumentException>(() => new Snowflake(0, workerBits, datacenterBits, sequenceBits, 0, 0));
+        }
+
+        [Fact]
+        public void Should_Reject_Timestamps_Before_The_Epoch()
+        {
+            var snowflake = new TestableSnowflake(0, 0, epoch: 1001);
+            snowflake.SetCurrentTime(1000);
+            Assert.Throws<InvalidOperationException>(() => snowflake.NextId());
+        }
+
+        [Fact]
+        public void Should_Reject_Exhausted_Timestamp_Bits()
+        {
+            var snowflake = new TestableSnowflake(0, 0, sequenceBits: 52);
+            snowflake.SetCurrentTime(1);
+            Assert.Equal(1L << 62, snowflake.NextId());
+            snowflake.SetCurrentTime(4);
+            Assert.Throws<InvalidOperationException>(() => snowflake.NextId());
+        }
+
         [Fact]
         public void SnowflakeFactory_GetDefault_ShouldReturnDefaultInstance()
         {
@@ -104,7 +136,8 @@ namespace SharpAbp.Abp.Snowflakes
         {
             private long _currentTime;
 
-            public TestableSnowflake(long workerId, long datacenterId) : base(workerId, datacenterId)
+            public TestableSnowflake(long workerId, long datacenterId, long epoch = 0, int sequenceBits = 12)
+                : base(epoch, 5, 5, sequenceBits, workerId, datacenterId)
             {
                 _currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             }

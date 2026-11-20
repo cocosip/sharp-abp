@@ -46,6 +46,20 @@ public class DefaultSegmentIdServiceTest
     }
 
     [Fact]
+    public async Task Allocation_Overflow_Preserves_Maximum_And_Rolls_Back_Without_Writing()
+    {
+        var info = new MinIdInfo(Guid.NewGuid(), "orders", long.MaxValue - 5, 10, 1, 0);
+        _repository.FindByBizTypeAsync("orders", Arg.Any<CancellationToken>()).Returns(info);
+
+        await Assert.ThrowsAsync<OverflowException>(() => Create(new MinIdOptions()).GetNextSegmentIdAsync("orders"));
+
+        Assert.Equal(long.MaxValue - 5, info.MaxId);
+        await _repository.DidNotReceive().UpdateAsync(Arg.Any<MinIdInfo>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+        await _unitOfWork.Received(1).RollbackAsync(Arg.Any<CancellationToken>());
+        await _unitOfWork.DidNotReceive().CompleteAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task Missing_Configuration_Rolls_Back_Without_Committing()
     {
         var service = Create(new MinIdOptions());

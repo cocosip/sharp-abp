@@ -1,5 +1,7 @@
 ﻿﻿using Volo.Abp.Application.Dtos;
 
+using Volo.Abp.Auditing;
+
 namespace SharpAbp.MinId
 {
     /// <summary>
@@ -18,6 +20,7 @@ namespace SharpAbp.MinId
         /// Gets or sets the token value for filtering MinId tokens.
         /// Used to search for specific token values in the system.
         /// </summary>
+        [DisableAuditing]
         public string Token { get; set; }
     }
 }

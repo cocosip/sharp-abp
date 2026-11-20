@@ -94,10 +94,19 @@ namespace SharpAbp.Abp.ObjectPool
                 _items.Clear();
             }
 
+            var errors = new List<Exception>();
             foreach (var item in items)
             {
-                PooledItemDisposer.Dispose(item);
+                try
+                {
+                    PooledItemDisposer.Dispose(item);
+                }
+                catch (Exception error)
+                {
+                    errors.Add(error);
+                }
             }
+            if (errors.Count > 0) throw new AggregateException(errors);
         }
     }
 }

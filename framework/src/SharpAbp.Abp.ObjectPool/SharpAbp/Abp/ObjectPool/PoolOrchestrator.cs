@@ -14,6 +14,16 @@ namespace SharpAbp.Abp.ObjectPool
     /// </summary>
     public class PoolOrchestrator : IPoolOrchestrator, ISingletonDependency, IDisposable
     {
+        private readonly object _lifecycle = new object();
+        private readonly HashSet<Lazy<PoolMetadata>> _initializing = new HashSet<Lazy<PoolMetadata>>();
+        private readonly AsyncLocal<InitializationScope?> _initialization = new AsyncLocal<InitializationScope?>();
+        private bool _disposed;
+
+        private sealed class InitializationScope(InitializationScope? parent)
+        {
+            public InitializationScope? Parent { get; } = parent;
+            public int Active = 1;
+        }
         /// <summary>
         /// Stores pool metadata for validation.
         /// </summary>
@@ -267,13 +277,7 @@ namespace SharpAbp.Abp.ObjectPool
         {
             Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
 
-            var removed = RemovePoolCore(new PoolKey(typeof(T), poolName));
-            if (RemovePoolCore(new PoolKey(typeof(T), poolName, true)))
-            {
-                removed = true;
-            }
-
-            return removed;
+            return RemovePools(new[] { new PoolKey(typeof(T), poolName), new PoolKey(typeof(T), poolName, true) }) > 0;
         }
 
         /// <summary>
@@ -284,13 +288,7 @@ namespace SharpAbp.Abp.ObjectPool
             Check.NotNull(objectType, nameof(objectType));
             Check.NotNullOrWhiteSpace(poolName, nameof(poolName));
 
-            var removed = RemovePoolCore(new PoolKey(objectType, poolName));
-            if (RemovePoolCore(new PoolKey(objectType, poolName, true)))
-            {
-                removed = true;
-            }
-
-            return removed;
+            return RemovePools(new[] { new PoolKey(objectType, poolName), new PoolKey(objectType, poolName, true) }) > 0;
         }
 
         /// <summary>
@@ -298,24 +296,21 @@ namespace SharpAbp.Abp.ObjectPool
         /// </summary>
         public virtual int RemoveAll()
         {
-            var removed = 0;
-
-            foreach (var key in PoolMetadatas.Keys)
-            {
-                if (RemovePoolCore(key))
-                {
-                    removed++;
-                }
-            }
-
-            return removed;
+            RejectInitializationMutation();
+            return RemovePools(PoolMetadatas.Keys);
         }
 
         /// <summary>
-        /// Removes all pools and disposes their retained objects.
+        /// Permanently shuts down this orchestrator and disposes all retained pools.
         /// </summary>
         public virtual void Dispose()
         {
+            lock (_lifecycle)
+            {
+                if (_disposed) return;
+                RejectInitializationMutation();
+                _disposed = true;
+            }
             RemoveAll();
         }
 
@@ -414,8 +409,17 @@ namespace SharpAbp.Abp.ObjectPool
 
         protected virtual PoolMetadata GetOrCreateMetadata(PoolKey key, Func<Lazy<PoolMetadata>> metadataFactory)
         {
-            var lazy = PoolMetadatas.GetOrAdd(key, _ => metadataFactory());
-
+            var candidate = metadataFactory();
+            Lazy<PoolMetadata> lazy;
+            lock (_lifecycle)
+            {
+                ThrowIfDisposed();
+                lazy = PoolMetadatas.GetOrAdd(key, candidate);
+                _initializing.Add(lazy);
+            }
+            var previous = _initialization.Value;
+            var scope = new InitializationScope(previous);
+            _initialization.Value = scope;
             try
             {
                 return lazy.Value;
@@ -426,28 +430,61 @@ namespace SharpAbp.Abp.ObjectPool
                 ((ICollection<KeyValuePair<PoolKey, Lazy<PoolMetadata>>>)PoolMetadatas).Remove(item);
                 throw;
             }
+            finally
+            {
+                Volatile.Write(ref scope.Active, 0);
+                _initialization.Value = previous;
+                lock (_lifecycle) _initializing.Remove(lazy);
+            }
         }
 
         protected virtual bool RemovePoolCore(PoolKey key)
         {
-            if (!PoolMetadatas.TryRemove(key, out var lazy))
+            RejectInitializationMutation();
+            Lazy<PoolMetadata> lazy;
+            bool started;
+            lock (_lifecycle)
             {
-                return false;
+                if (!PoolMetadatas.TryRemove(key, out lazy!)) return false;
+                started = lazy.IsValueCreated || _initializing.Contains(lazy);
             }
+            if (started) (lazy.Value.Pool as IDisposable)?.Dispose();
+            return true;
+        }
 
-            if (lazy.IsValueCreated)
+        private int RemovePools(IEnumerable<PoolKey> keys)
+        {
+            RejectInitializationMutation();
+            var removed = 0;
+            var errors = new List<Exception>();
+            foreach (var key in keys)
             {
                 try
                 {
-                    (lazy.Value.Pool as IDisposable)?.Dispose();
+                    if (RemovePoolCore(key)) removed++;
                 }
-                catch
+                catch (Exception error)
                 {
-                    // Pool initialization may have failed earlier; there is nothing to dispose.
+                    errors.Add(error);
                 }
             }
 
-            return true;
+            if (errors.Count > 0) throw new AggregateException(errors);
+            return removed;
+        }
+
+        private void ThrowIfDisposed()
+        {
+            if (_disposed) throw new ObjectDisposedException(GetType().Name);
+        }
+
+        private void RejectInitializationMutation()
+        {
+            for (var scope = _initialization.Value; scope != null; scope = scope.Parent)
+            {
+                if (Volatile.Read(ref scope.Active) != 0)
+                    throw new InvalidOperationException("Pool lifecycle changes cannot run inside this orchestrator's initialization callback.");
+            }
         }
     }
 }

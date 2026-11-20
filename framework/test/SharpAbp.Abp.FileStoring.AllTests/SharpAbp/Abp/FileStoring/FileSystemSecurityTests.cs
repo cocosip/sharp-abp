@@ -185,13 +185,14 @@ namespace SharpAbp.Abp.FileStoring
                 var provider = new FileSystemFileProvider(NullLogger<FileSystemFileProvider>.Instance, currentTenant.Object, calculator);
                 var content = Encoding.UTF8.GetBytes("retry-safe-content");
                 await using var stream = new RetryableReadStream(content);
+                stream.Position = 6;
                 var args = new FileProviderSaveArgs("docs", configuration, "files/retry.txt", stream, ".txt");
 
                 await provider.SaveAsync(args);
 
                 var savedFilePath = calculator.Calculate(args);
                 Assert.True(File.Exists(savedFilePath));
-                Assert.Equal("retry-safe-content", await File.ReadAllTextAsync(savedFilePath));
+                Assert.Equal("safe-content", await File.ReadAllTextAsync(savedFilePath));
             }
             finally
             {

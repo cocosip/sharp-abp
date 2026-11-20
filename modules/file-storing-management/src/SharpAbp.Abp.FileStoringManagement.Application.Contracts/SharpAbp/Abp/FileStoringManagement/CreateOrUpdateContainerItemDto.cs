@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Volo.Abp.Auditing;
 using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.FileStoringManagement
@@ -28,6 +29,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         /// This field is optional and must not exceed the maximum length defined in FileStoringContainerItemConsts.
         /// </summary>
         [DynamicStringLength(typeof(FileStoringContainerItemConsts), nameof(FileStoringContainerItemConsts.MaxValueLength))]
+        [DisableAuditing]
         public string Value { get; set; }
 
         /// <summary>

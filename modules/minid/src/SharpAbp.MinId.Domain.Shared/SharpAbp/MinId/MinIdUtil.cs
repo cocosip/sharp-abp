@@ -5,6 +5,16 @@ namespace SharpAbp.MinId
 {
     public static class MinIdUtil
     {
+        public const int MaxBatchSize = 1000;
+
+        public static void CheckBatchSize(int batchSize)
+        {
+            if (batchSize < 1 || batchSize > MaxBatchSize)
+            {
+                throw new ArgumentOutOfRangeException(nameof(batchSize), $"Batch size must be between 1 and {MaxBatchSize}.");
+            }
+        }
+
         public static bool IsToken(string input)
         {
             if (!input.IsNullOrWhiteSpace())

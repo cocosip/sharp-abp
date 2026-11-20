@@ -91,6 +91,12 @@ namespace SharpAbp.Abp.Snowflakes
             long workerId,
             long datacenterId)
         {
+            if (workerIdBits < 0 || datacenterIdBits < 0 || sequenceBits < 0 ||
+                (long)workerIdBits + datacenterIdBits + sequenceBits >= 63)
+            {
+                throw new ArgumentException("Bit allocations must be nonnegative and leave at least one timestamp bit.");
+            }
+
             _epoch = epoch;
             _workerIdBits = workerIdBits;
             _datacenterIdBits = datacenterIdBits;
@@ -151,10 +157,16 @@ namespace SharpAbp.Abp.Snowflakes
                     _sequence = 0L;
                 }
 
+                var elapsed = unchecked((ulong)timestamp - (ulong)_epoch);
+                if (timestamp < _epoch || elapsed > (ulong)(long.MaxValue >> _timestampLeftShift))
+                {
+                    throw new InvalidOperationException("The timestamp is outside the configured Snowflake range.");
+                }
+
                 _lastTimestamp = timestamp;
 
                 // Combine parts to form the 64-bit ID.
-                return ((timestamp - _epoch) << _timestampLeftShift) |
+                return ((long)elapsed << _timestampLeftShift) |
                        (_datacenterId << _datacenterIdShift) |
                        (_workerId << _workerIdShift) |
                        _sequence;

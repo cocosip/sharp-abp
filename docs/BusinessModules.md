@@ -32,6 +32,12 @@ public class YourModule : AbpModule
 
 The Account module provides pre-built APIs for common account operations through `IAccountAppService` and `IProfileAppService`.
 
+External sign-in identifies existing users by the stored provider and subject. An email claim alone never links an external identity to an existing account: the user must sign in through an existing login method and explicitly link the provider through the host application's authenticated account management flow. Applications that relied on automatic email linking must migrate to that flow; this module does not add a linking endpoint.
+
+Automatic account creation from an external login also respects `SharpAbp.Account.IsSelfRegistrationEnabled`; disabling registration does not prevent an already linked external identity from signing in.
+
+Login and registration use the normal Identity sign-in checks, including configured email/account confirmation, lockout and two-factor authentication. A newly registered account and its external login link remain registered when confirmation or another sign-in check denies authentication; no application cookie is issued. Confirmation and recovery flows remain the host application's responsibility. Override `TwoFactorLoginResultAsync` on the login and registration page models to continue an application-specific two-factor flow; the default returns to login without authenticating. Existing registration hooks keep their signatures; overrides that perform sign-in must set `RegistrationSignInResult` to the checked result rather than call `SignInAsync` directly.
+
 ---
 
 ## Identity
@@ -199,7 +205,47 @@ Business types and segment allocations are managed through `IMinIdInfoAppService
 
 > **Upgrading existing databases:** `MinIdInfo` now has a `ConcurrencyStamp` column used for optimistic concurrency. Add a non-null `ConcurrencyStamp` string column (max length 40) with an empty-string default, then regenerate the consumer application's EF Core migration or apply the equivalent SQL before deploying this version.
 >
-> **Breaking API change:** the `next-segmentId` endpoint now requires the `token` query parameter and validates it against the configured MinId token. Update existing clients before deploying.
+### Credential transport and limits
+
+**Breaking HTTP migration:** all five ID endpoints under `/api/minid/id` read their MinId
+credential from `Authorization: Bearer <minid-token>`. Query-string `token` credentials are
+rejected, including when a valid header is also present. These are opaque MinId credentials,
+not OpenIddict access tokens; hosts with a global JWT-only policy must configure the ID
+routes' authentication/authorization policy accordingly rather than send credentials in URLs.
+
+```http
+GET /api/minid/id/batch-nextId?bizType=orders&batchSize=100 HTTP/1.1
+Authorization: Bearer <minid-token>
+```
+
+The application service and domain generator both reject batch sizes outside **1–1,000**
+before allocating IDs. HTTP validation returns a bad request for an unsupported count.
+Existing in-process method signatures remain available, but invalid counts are no longer
+silently raised to one.
+
+Administrative token lookup now uses `POST /api/minid/minid-token/find-by-token` with
+`{"bizType":"orders","token":"<minid-token>"}` as its JSON body. Use
+`IMinIdTokenAppService.FindAsync(FindMinIdTokenDto)` from updated remote .NET clients;
+custom implementations of that interface must add this method. `FindByTokenAsync` remains
+available locally but is no longer a remote action. Its old token-bearing GET route was
+removed. Token listing/filtering now uses `POST /api/minid/minid-token/search` with a
+`MinIdTokenPagedRequestDto` JSON body instead of GET query parameters. Administrative
+requests retain their normal user authorization header separately from the body credential.
+
+Tokens are checked against persisted state for every validation; positive cache entries
+are ignored, including late entries written after revocation. Route these checks to the
+authoritative primary database, and do not reuse a long-lived snapshot transaction for
+authentication. Previously authorized in-flight requests may finish. Existing legacy cache
+invalidations still run after successful transaction completion for older cache consumers;
+all application instances must be upgraded to remove their former cached acceptance window.
+
+The `MinIdResponse` envelope is retained. Invalid credentials and invalid batch requests
+receive stable messages; unexpected failures contain a reference ID without backend details.
+Server diagnostics retain the reference, exception type and stack without copying arbitrary
+exception messages that may contain credentials. Cancellation is propagated rather than
+converted into a server-failure envelope. Production hosts must keep ABP detailed exception
+responses disabled and redact Authorization headers, request bodies and any legacy URL
+credentials in reverse-proxy/APM/access logs.
 
 ---
 

@@ -17,6 +17,6 @@ namespace SharpAbp.Abp.MapTenancy
         /// </summary>
         /// <param name="mapCode"></param>
         /// <returns></returns>
-        Task<MapTenancyConfiguration> GetByMapCodeAsync([NotNull] string mapCode);
+        Task<MapTenancyConfiguration?> GetByMapCodeAsync([NotNull] string mapCode);
     }
 }

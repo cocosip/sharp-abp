@@ -25,15 +25,29 @@ namespace SharpAbp.Abp.FreeRedis
                 cli = new RedisClient(configuration.ConnectionString);
             }
 
-            if (configuration.CliConfigures != null)
+            try
             {
-                foreach (var c in configuration.CliConfigures)
+                if (configuration.CliConfigures != null)
                 {
-                    c(cli);
+                    foreach (var c in configuration.CliConfigures)
+                    {
+                        c(cli);
+                    }
                 }
+                return cli;
             }
-
-            return cli;
+            catch (System.Exception configurationError)
+            {
+                try
+                {
+                    cli.Dispose();
+                }
+                catch (System.Exception cleanupError)
+                {
+                    throw new System.AggregateException(configurationError, cleanupError);
+                }
+                throw;
+            }
         }
     }
 }

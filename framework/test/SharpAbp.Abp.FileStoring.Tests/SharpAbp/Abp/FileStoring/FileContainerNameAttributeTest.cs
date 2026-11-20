@@ -34,5 +34,13 @@ namespace SharpAbp.Abp.FileStoring
             Assert.Equal(expected, name);
         }
 
+        [Fact]
+        public void Unnamed_Generic_Parameters_Cannot_Identify_A_Container()
+        {
+            var type = typeof(System.Action<>).GetGenericArguments()[0];
+
+            Assert.Throws<System.ArgumentException>(() => FileContainerNameAttribute.GetContainerName(type));
+        }
+
     }
 }

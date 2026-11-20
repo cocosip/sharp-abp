@@ -75,8 +75,7 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
 
             if (IsExternalLoginOnly)
             {
-                //return await ExternalLogin(vm.ExternalLoginScheme, returnUrl);
-                throw new NotImplementedException();
+                return await OnPostExternalLogin(ExternalLoginScheme);
             }
 
             return Page();
@@ -148,7 +147,8 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
         /// </summary>
         protected virtual Task<IActionResult> TwoFactorLoginResultAsync()
         {
-            throw new NotImplementedException();
+            Alerts.Warning(L["LoginIsNotAllowed"]);
+            return Task.FromResult<IActionResult>(RedirectToPage("./Login", new { ReturnUrl, ReturnUrlHash }));
         }
 
         protected virtual async Task<List<ExternalProviderModel>> GetExternalProviders()
@@ -200,69 +200,66 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
                 loginInfo.LoginProvider,
                 loginInfo.ProviderKey,
                 isPersistent: false,
-                bypassTwoFactor: true
+                bypassTwoFactor: false
             );
-
-            if (!result.Succeeded)
-            {
-                await IdentitySecurityLogManager.SaveAsync(new IdentitySecurityLogContext()
-                {
-                    Identity = IdentitySecurityLogIdentityConsts.IdentityExternal,
-                    Action = "Login" + result
-                });
-            }
-
-            if (result.IsLockedOut)
-            {
-                Logger.LogWarning($"External login callback error: user is locked out!");
-                throw new UserFriendlyException("Cannot proceed because user is locked out!");
-            }
-
-            if (result.IsNotAllowed)
-            {
-                Logger.LogWarning($"External login callback error: user is not allowed!");
-                throw new UserFriendlyException("Cannot proceed because user is not allowed!");
-            }
-
-            if (result.Succeeded)
-            {
-                return await RedirectSafelyAsync(returnUrl, returnUrlHash);
-            }
-
-            //TODO: Handle other cases for result!
-
-            var email = loginInfo.Principal.FindFirstValue(AbpClaimTypes.Email);
-            if (email.IsNullOrWhiteSpace())
-            {
-                return RedirectToPage("./Register", new
-                {
-                    IsExternalLogin = true,
-                    ExternalLoginAuthSchema = loginInfo.LoginProvider,
-                    ReturnUrl = returnUrl
-                });
-            }
-
-            var user = await UserManager.FindByEmailAsync(email);
-            if (user == null)
-            {
-                user = await CreateExternalUserAsync(loginInfo);
-            }
-            else
-            {
-                if (await UserManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey) == null)
-                {
-                    CheckIdentityErrors(await UserManager.AddLoginAsync(user, loginInfo));
-                }
-            }
-
-            await SignInManager.SignInAsync(user, false);
 
             await IdentitySecurityLogManager.SaveAsync(new IdentitySecurityLogContext()
             {
                 Identity = IdentitySecurityLogIdentityConsts.IdentityExternal,
-                Action = result.ToIdentitySecurityLogAction(),
-                UserName = user.Name
+                Action = result.ToIdentitySecurityLogAction()
             });
+
+            if (!result.Succeeded && !result.RequiresTwoFactor && !result.IsLockedOut && !result.IsNotAllowed)
+            {
+                if (await UserManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey) != null)
+                {
+                    throw new UserFriendlyException("External login failed. Sign in with an existing login method.");
+                }
+
+                var email = loginInfo.Principal.FindFirstValue(AbpClaimTypes.Email);
+                if (email.IsNullOrWhiteSpace())
+                {
+                    return RedirectToPage("./Register", new
+                    {
+                        IsExternalLogin = true,
+                        ExternalLoginAuthSchema = loginInfo.LoginProvider,
+                        ReturnUrl = returnUrl,
+                        ReturnUrlHash = returnUrlHash
+                    });
+                }
+
+                if (await UserManager.FindByEmailAsync(email) != null)
+                {
+                    throw new UserFriendlyException("Sign in with your existing login method, then explicitly link this external provider to your account.");
+                }
+
+                if (!await SettingProvider.IsTrueAsync(AccountSettingNames.IsSelfRegistrationEnabled))
+                {
+                    throw new UserFriendlyException(L["SelfRegistrationDisabledMessage"]);
+                }
+
+                await CreateExternalUserAsync(loginInfo);
+                result = await SignInManager.ExternalLoginSignInAsync(
+                    loginInfo.LoginProvider, loginInfo.ProviderKey, isPersistent: false, bypassTwoFactor: false);
+                await IdentitySecurityLogManager.SaveAsync(new IdentitySecurityLogContext()
+                {
+                    Identity = IdentitySecurityLogIdentityConsts.IdentityExternal,
+                    Action = result.ToIdentitySecurityLogAction()
+                });
+            }
+
+            if (result.RequiresTwoFactor)
+            {
+                ReturnUrl = returnUrl;
+                ReturnUrlHash = returnUrlHash;
+                return await TwoFactorLoginResultAsync();
+            }
+
+            if (!result.Succeeded)
+            {
+                Alerts.Warning(L[result.IsLockedOut ? "UserLockedOutMessage" : "LoginIsNotAllowed"]);
+                return RedirectToPage("./Login", new { ReturnUrl = returnUrl, ReturnUrlHash = returnUrlHash });
+            }
 
             return await RedirectSafelyAsync(returnUrl, returnUrlHash);
         }

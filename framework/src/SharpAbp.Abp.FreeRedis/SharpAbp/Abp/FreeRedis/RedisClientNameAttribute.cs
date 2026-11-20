@@ -33,7 +33,7 @@ namespace SharpAbp.Abp.FreeRedis
 
             if (nameAttribute == null)
             {
-                return type.FullName;
+                return type.FullName ?? throw new ArgumentException("The type must have a full name or an explicit Redis client name.", nameof(type));
             }
 
             return nameAttribute.GetName(type);

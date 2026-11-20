@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Auditing;
 
 namespace SharpAbp.Abp.MapTenancyManagement
 {
@@ -89,7 +90,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <param name="id">The unique identifier of the hybrid map tenant</param>
         /// <param name="defaultConnectionString">The new default connection string to set</param>
         /// <returns>A task representing the asynchronous update operation</returns>
-        Task UpdateDefaultConnectionStringAsync(Guid id, string defaultConnectionString);
+        Task UpdateDefaultConnectionStringAsync(Guid id, [DisableAuditing] string defaultConnectionString);
 
         /// <summary>
         /// Removes the default connection string configuration for the specified tenant

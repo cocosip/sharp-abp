@@ -11,6 +11,7 @@ namespace SharpAbp.MinId
     {
         private readonly object _sync = new();
         private long _currentId;
+        private volatile bool _isExhausted;
 
         /// <summary>
         /// Gets or sets the current ID position within this segment.
@@ -54,7 +55,7 @@ namespace SharpAbp.MinId
         /// <returns>True if the current ID is within the valid range; otherwise, false.</returns>
         public bool IsUseful()
         {
-            return CurrentId <= MaxId;
+            return !_isExhausted && CurrentId <= MaxId;
         }
 
         /// <summary>
@@ -87,6 +88,13 @@ namespace SharpAbp.MinId
                 // Align the current ID to match the delta/remainder constraint
                 for (int i = 0; i <= Delta; i++)
                 {
+                    if (_currentId == long.MaxValue)
+                    {
+                        _isExhausted = true;
+                        _isSetup = true;
+                        return;
+                    }
+
                     id = Interlocked.Increment(ref _currentId);
                     if (id % Delta == Remainder)
                     {
@@ -113,11 +121,21 @@ namespace SharpAbp.MinId
         {
             Setup();
 
-            var id = Interlocked.Add(ref _currentId, Delta);
-
-            if (id > MaxId)
+            long id;
+            while (true)
             {
-                return new(ResultCodeConsts.Over, id);
+                var currentId = Interlocked.Read(ref _currentId);
+                if (_isExhausted || currentId > long.MaxValue - Delta || currentId + Delta > MaxId)
+                {
+                    _isExhausted = true;
+                    return new(ResultCodeConsts.Over, currentId);
+                }
+
+                id = currentId + Delta;
+                if (Interlocked.CompareExchange(ref _currentId, id, currentId) == currentId)
+                {
+                    break;
+                }
             }
             if (id >= LoadingId)
             {

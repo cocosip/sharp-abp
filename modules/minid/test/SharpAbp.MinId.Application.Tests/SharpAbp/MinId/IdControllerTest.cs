@@ -20,10 +20,10 @@ public class IdControllerTest : MinIdApplicationTestBase
         // HTTP GET actions run without a transaction; segment allocation owns its own unit of work.
         using var request = GetRequiredService<IUnitOfWorkManager>().Begin(isTransactional: false);
 
-        var first = await controller.SimpleNextIdAsync("default", "controllertoken");
-        var second = await controller.NextIdAsync("default", "controllertoken");
-        var simpleBatch = await controller.SimpleBatchNextIdAsync("default", "controllertoken", 3);
-        var batch = await controller.BatchNextIdAsync("default", "controllertoken", 3);
+        var first = await controller.SimpleNextIdAsync("default", "Bearer controllertoken");
+        var second = await controller.NextIdAsync("default", "Bearer controllertoken");
+        var simpleBatch = await controller.SimpleBatchNextIdAsync("default", "Bearer controllertoken", 3);
+        var batch = await controller.BatchNextIdAsync("default", "Bearer controllertoken", 3);
 
         Assert.True(second.Success);
         Assert.NotEqual(first, second.Data);
@@ -31,7 +31,7 @@ public class IdControllerTest : MinIdApplicationTestBase
         Assert.True(batch.Success);
         Assert.Equal(3, batch.Data.Count);
         Assert.Equal(8, simpleBatch.Concat(batch.Data).Append(first).Append(second.Data).Distinct().Count());
-        var segment = await controller.GetNextSegmentIdAsync("default", "controllertoken");
+        var segment = await controller.GetNextSegmentIdAsync("default", "Bearer controllertoken");
         Assert.True(segment.MaxId >= segment.CurrentId);
         Assert.Equal(1, segment.Delta);
     }
@@ -42,8 +42,8 @@ public class IdControllerTest : MinIdApplicationTestBase
         var controller = new IdController(GetRequiredService<IMinIdTokenValidator>(),
             GetRequiredService<IMinIdGeneratorAppService>(), GetRequiredService<ISegmentIdAppService>());
 
-        var single = await controller.NextIdAsync("default", "missing");
-        var batch = await controller.BatchNextIdAsync("default", "missing", 3);
+        var single = await controller.NextIdAsync("default", "Bearer missing");
+        var batch = await controller.BatchNextIdAsync("default", "Bearer missing", 3);
 
         Assert.False(single.Success);
         Assert.Equal(0, single.Data);
@@ -51,8 +51,8 @@ public class IdControllerTest : MinIdApplicationTestBase
         Assert.False(batch.Success);
         Assert.Null(batch.Data);
         Assert.Contains("Invalid token", batch.Message);
-        await Assert.ThrowsAsync<AbpException>(() => controller.SimpleNextIdAsync("default", "missing"));
-        await Assert.ThrowsAsync<AbpException>(() => controller.SimpleBatchNextIdAsync("default", "missing", 3));
-        await Assert.ThrowsAsync<AbpException>(() => controller.GetNextSegmentIdAsync("default", "missing"));
+        await Assert.ThrowsAnyAsync<AbpException>(() => controller.SimpleNextIdAsync("default", "Bearer missing"));
+        await Assert.ThrowsAnyAsync<AbpException>(() => controller.SimpleBatchNextIdAsync("default", "Bearer missing", 3));
+        await Assert.ThrowsAnyAsync<AbpException>(() => controller.GetNextSegmentIdAsync("default", "Bearer missing"));
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
@@ -23,6 +24,7 @@ namespace SharpAbp.Abp.FileStoring
             public TClient Client { get; }
 
             private long _lastUsedTicks;
+            private int _released;
 
             public Entry(TClient client)
             {
@@ -35,6 +37,11 @@ namespace SharpAbp.Abp.FileStoring
             public void Touch()
             {
                 Interlocked.Exchange(ref _lastUsedTicks, DateTime.UtcNow.Ticks);
+            }
+
+            public bool TryRelease()
+            {
+                return Interlocked.Exchange(ref _released, 1) == 0;
             }
         }
 
@@ -110,8 +117,15 @@ namespace SharpAbp.Abp.FileStoring
             }
             catch
             {
-                _syncEntries.TryRemove(key, out _);
+                ((ICollection<KeyValuePair<string, Lazy<Entry>>>)_syncEntries).Remove(new(key, lazy));
                 throw;
+            }
+
+            if (Volatile.Read(ref _disposed) == 1)
+            {
+                ((ICollection<KeyValuePair<string, Lazy<Entry>>>)_syncEntries).Remove(new(key, lazy));
+                DisposeEntry(entry);
+                ThrowIfDisposed();
             }
 
             entry.Touch();
@@ -139,8 +153,15 @@ namespace SharpAbp.Abp.FileStoring
             }
             catch
             {
-                _asyncEntries.TryRemove(key, out _);
+                ((ICollection<KeyValuePair<string, Lazy<Task<Entry>>>>)_asyncEntries).Remove(new(key, lazy));
                 throw;
+            }
+
+            if (Volatile.Read(ref _disposed) == 1)
+            {
+                ((ICollection<KeyValuePair<string, Lazy<Task<Entry>>>>)_asyncEntries).Remove(new(key, lazy));
+                DisposeEntry(entry);
+                ThrowIfDisposed();
             }
 
             entry.Touch();
@@ -154,11 +175,12 @@ namespace SharpAbp.Abp.FileStoring
                 return;
             }
 
+            var errors = new List<Exception>();
             foreach (var pair in _syncEntries)
             {
                 if (_syncEntries.TryRemove(pair.Key, out var lazy) && lazy.IsValueCreated)
                 {
-                    DisposeClient(lazy.Value.Client);
+                    CollectDisposeError(() => DisposeEntry(lazy.Value), errors);
                 }
             }
 
@@ -168,14 +190,16 @@ namespace SharpAbp.Abp.FileStoring
                     lazy.IsValueCreated &&
                     lazy.Value.Status == TaskStatus.RanToCompletion)
                 {
-                    DisposeClient(lazy.Value.Result.Client);
+                    CollectDisposeError(() => DisposeEntry(lazy.Value.Result), errors);
                 }
             }
 
             while (_retiredClients.TryDequeue(out var retired))
             {
-                DisposeClient(retired.Client);
+                CollectDisposeError(() => DisposeClient(retired.Client), errors);
             }
+
+            if (errors.Count > 0) { throw new AggregateException(errors); }
         }
 
         protected virtual void SweepIfNeeded()
@@ -204,9 +228,10 @@ namespace SharpAbp.Abp.FileStoring
             {
                 if (pair.Value.IsValueCreated && now - pair.Value.Value.LastUsedTicks >= _idleTimeout.Ticks)
                 {
-                    if (_syncEntries.TryRemove(pair.Key, out var lazy) && lazy.IsValueCreated)
+                    if (((ICollection<KeyValuePair<string, Lazy<Entry>>>)_syncEntries).Remove(pair) &&
+                        pair.Value.Value.TryRelease())
                     {
-                        Retire(lazy.Value.Client, now);
+                        Retire(pair.Value.Value.Client, now);
                     }
                 }
             }
@@ -221,7 +246,8 @@ namespace SharpAbp.Abp.FileStoring
                 var entry = pair.Value.Value.Result;
                 if (now - entry.LastUsedTicks >= _idleTimeout.Ticks)
                 {
-                    if (_asyncEntries.TryRemove(pair.Key, out _))
+                    if (((ICollection<KeyValuePair<string, Lazy<Task<Entry>>>>)_asyncEntries).Remove(pair) &&
+                        entry.TryRelease())
                     {
                         Retire(entry.Client, now);
                     }
@@ -235,17 +261,30 @@ namespace SharpAbp.Abp.FileStoring
         protected virtual void Retire(TClient client, long now)
         {
             _retiredClients.Enqueue(new RetiredClient(client, now + _gracePeriod.Ticks));
+            if (Volatile.Read(ref _disposed) == 1)
+            {
+                DisposeDueRetiredClients(long.MaxValue);
+            }
         }
 
         protected virtual void DisposeDueRetiredClients(long now)
         {
+            var errors = new List<Exception>();
             while (_retiredClients.TryPeek(out var retired) && retired.DisposeAtTicks <= now)
             {
                 if (_retiredClients.TryDequeue(out retired))
                 {
-                    DisposeClient(retired.Client);
+                    CollectDisposeError(() => DisposeClient(retired.Client), errors);
                 }
             }
+
+            if (errors.Count > 0) { throw new AggregateException(errors); }
+        }
+
+        private static void CollectDisposeError(Action cleanup, List<Exception> errors)
+        {
+            try { cleanup(); }
+            catch (Exception exception) { errors.Add(exception); }
         }
 
         protected virtual void DisposeClient(TClient client)
@@ -253,6 +292,14 @@ namespace SharpAbp.Abp.FileStoring
             if (client is IDisposable disposable)
             {
                 disposable.Dispose();
+            }
+        }
+
+        private void DisposeEntry(Entry entry)
+        {
+            if (entry.TryRelease())
+            {
+                DisposeClient(entry.Client);
             }
         }
 

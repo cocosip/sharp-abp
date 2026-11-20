@@ -269,6 +269,31 @@ public class TenantGroupService : ApplicationService
 `GetDefaultConnectionStringAsync`, `UpdateDefaultConnectionStringAsync` and
 `DeleteDefaultConnectionStringAsync`.
 
+#### Connection String HTTP Migration
+
+The following updates accept the connection string only as a JSON string in the request body:
+
+| Method | Route |
+|--------|-------|
+| `PUT` | `/api/tenant-group/tenant-groups/{id}/default-connection-string` |
+| `PUT` | `/api/map-tenancy/hybrid-map-tenants/{id}/default-connection-string` |
+
+For example:
+
+```http
+PUT /api/tenant-group/tenant-groups/3fa85f64-5717-4562-b3fc-2c963f66afa6/default-connection-string
+Content-Type: application/json
+
+"Server=db.example;Database=tenant_database;User Id=tenant_user;Password=replace-me"
+```
+
+This is an HTTP contract change: remove the `defaultConnectionString` query parameter and
+send the JSON string body, including its surrounding quotes. A JSON object wrapper is not
+used. Query-only requests no longer bind the connection string and fail body validation;
+when both are present, the body is used. Update HTTP callers and regenerate proxies as needed.
+The application-service and controller C# method signatures remain `string` parameters, and
+connection strings remain excluded from audit parameters through `[DisableAuditing]`.
+
 #### Current Tenant Group
 
 ```csharp

@@ -107,7 +107,7 @@ namespace SharpAbp.Abp.DotCommon.Performance
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("PerformanceInfo handler execution has exception.", ex);
+                    _logger.LogError(ex, "PerformanceInfo handler execution has exception.");
                 }
             }
         }

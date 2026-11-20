@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using SharpAbp.Abp.Account.Localization;
@@ -26,6 +27,16 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
         {
             LocalizationResourceType = typeof(AccountResource);
             ObjectMapperContext = typeof(AccountWebModule);
+        }
+
+        protected override Task<string> GetRedirectUrlAsync(string returnUrl, string returnUrlHash = null)
+        {
+            if (!string.IsNullOrWhiteSpace(returnUrlHash) && !returnUrlHash.StartsWith("#", StringComparison.Ordinal))
+            {
+                returnUrlHash = "#" + returnUrlHash;
+            }
+
+            return base.GetRedirectUrlAsync(returnUrl, returnUrlHash);
         }
 
         protected virtual void CheckCurrentTenant(Guid? tenantId)

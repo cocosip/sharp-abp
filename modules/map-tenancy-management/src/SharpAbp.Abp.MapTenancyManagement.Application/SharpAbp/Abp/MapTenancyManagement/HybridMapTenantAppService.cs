@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Auditing;
 using Volo.Abp.Data;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
@@ -345,7 +346,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         /// <exception cref="EntityNotFoundException">Thrown when the hybrid map tenant with the specified ID is not found.</exception>
         /// <exception cref="ArgumentException">Thrown when the connection string format is invalid.</exception>
         [Authorize(TenantManagementPermissions.Tenants.ManageConnectionStrings)]
-        public virtual async Task UpdateDefaultConnectionStringAsync(Guid id, string defaultConnectionString)
+        public virtual async Task UpdateDefaultConnectionStringAsync(Guid id, [DisableAuditing] string defaultConnectionString)
         {
             var mapTenant = await MapTenantRepository.GetAsync(id);
             var tenant = await TenantRepository.GetAsync(mapTenant.TenantId);

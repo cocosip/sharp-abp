@@ -1,6 +1,7 @@
 using SharpAbp.Abp.Crypto.RSA;
 using SharpAbp.Abp.CryptoVault;
 using SharpAbp.Abp.TransformSecurity;
+using Org.BouncyCastle.Crypto.Engines;
 using System;
 using System.Threading.Tasks;
 using Xunit;
@@ -44,6 +45,10 @@ namespace SharpAbp.Abp.TransformSecurityManagement
                 CreationTime = new DateTime(2026, 4, 15, 0, 0, 0, DateTimeKind.Utc),
                 Expires = new DateTime(2026, 5, 15, 0, 0, 0, DateTimeKind.Utc)
             }.SetReferenceId(rsaCreds.Id.ToString("N"));
+            credential.SetRSAKeySize(3072);
+            credential.SetRSAPadding(RSAPaddingNames.OAEPSHA256Padding);
+            credential.SetSM2Curve("secp256r1");
+            credential.SetSM2Mode(SM2Engine.Mode.C1C3C2);
 
             await _securityCredentialStore.SetAsync(credential);
 
@@ -65,6 +70,19 @@ namespace SharpAbp.Abp.TransformSecurityManagement
             Assert.Equal(publicKey, result.PublicKey);
             Assert.Equal(privateKey, result.PrivateKey);
             Assert.Equal(rsaCreds.Id.ToString("N"), result.GetReferenceId());
+            Assert.Equal(3072, result.GetRSAKeySize());
+            Assert.Equal(RSAPaddingNames.OAEPSHA256Padding, result.GetRSAPadding());
+            Assert.Equal("secp256r1", result.GetSM2Curve());
+            Assert.Equal(SM2Engine.Mode.C1C3C2, result.GetSM2Mode());
+        }
+
+        [Fact]
+        public async Task GetAsync_Should_Return_Null_For_Unknown_Identifier()
+        {
+            Assert.Null(await _securityCredentialStore.GetAsync("unknown-credential"));
+            var encryptionService = GetRequiredService<ISecurityEncryptionService>();
+            var result = await encryptionService.ValidateAsync("unknown-credential");
+            Assert.Equal(SecurityCredentialResultType.NotFound, result.Result);
         }
     }
 }

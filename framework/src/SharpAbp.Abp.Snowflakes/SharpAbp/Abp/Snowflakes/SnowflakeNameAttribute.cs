@@ -62,7 +62,7 @@ namespace SharpAbp.Abp.Snowflakes
 
             if (nameAttribute == null)
             {
-                return type.FullName;
+                return type.FullName ?? throw new ArgumentException("The type must have a full name or an explicit Snowflake name.", nameof(type));
             }
 
             return nameAttribute.GetName(type);

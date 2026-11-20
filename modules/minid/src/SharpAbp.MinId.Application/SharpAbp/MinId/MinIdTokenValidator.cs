@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
+using Volo.Abp.Authorization;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.ObjectMapping;
@@ -10,7 +11,7 @@ namespace SharpAbp.MinId
 {
     /// <summary>
     /// Implementation of IMinIdTokenValidator that validates MinId authentication tokens.
-    /// Uses distributed caching to improve performance of token validation operations.
+    /// Checks persisted tokens on every request so revocation cannot be undone by stale cache entries.
     /// </summary>
     public class MinIdTokenValidator : IMinIdTokenValidator, ITransientDependency
     {
@@ -36,7 +37,7 @@ namespace SharpAbp.MinId
 
         /// <summary>
         /// Asynchronously validates whether a token is valid for a given business type.
-        /// Uses a distributed cache to improve performance of repeated validation requests.
+        /// Reads persisted token state without trusting positive cache entries.
         /// </summary>
         /// <param name="bizType">The business type identifier associated with the token. Cannot be null, empty, or whitespace.</param>
         /// <param name="token">The authentication token to validate. Cannot be null, empty, or whitespace.</param>
@@ -47,50 +48,25 @@ namespace SharpAbp.MinId
             Check.NotNullOrWhiteSpace(bizType, nameof(bizType));
             Check.NotNullOrWhiteSpace(token, nameof(token));
 
-            var key = $"{bizType}-{token}";
-
-            var minIdTokenCacheItem = await TokenCache.GetOrAddAsync(key, async () =>
-            {
-                var minIdToken = await MinIdTokenRepository.FindByTokenAsync(bizType, token, cancellationToken);
-                return ObjectMapper.Map<MinIdToken, MinIdTokenCacheItem>(minIdToken);
-            }, token: cancellationToken);
-
-            if (minIdTokenCacheItem != null)
-            {
-                return minIdTokenCacheItem.Token == token;
-            }
-
-            return false;
+            var minIdToken = await MinIdTokenRepository.FindByTokenAsync(bizType, token, cancellationToken);
+            return minIdToken != null && minIdToken.BizType == bizType && minIdToken.Token == token;
         }
 
         /// <summary>
         /// Asynchronously validates a token for a given business type and throws an exception if invalid.
-        /// Uses a distributed cache to improve performance of repeated validation requests.
+        /// Reads persisted token state without trusting positive cache entries.
         /// </summary>
         /// <param name="bizType">The business type identifier associated with the token. Cannot be null, empty, or whitespace.</param>
         /// <param name="token">The authentication token to validate. Cannot be null, empty, or whitespace.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <exception cref="Volo.Abp.AbpException">Thrown when the token is invalid for the specified business type.
-        /// The exception message includes details about the invalid token and business type.</exception>
+        /// The exception message identifies the business type without exposing the token.</exception>
         public virtual async Task ValidateTokenAsync([NotNull] string bizType, [NotNull] string token, CancellationToken cancellationToken = default)
         {
-            Check.NotNullOrWhiteSpace(bizType, nameof(bizType));
-            Check.NotNullOrWhiteSpace(token, nameof(token));
-
-            var key = $"{bizType}-{token}";
-
-            var minIdTokenCacheItem = await TokenCache.GetOrAddAsync(key, async () =>
+            if (!await ValidateAsync(bizType, token, cancellationToken))
             {
-                var minIdToken = await MinIdTokenRepository.FindByTokenAsync(bizType, token, cancellationToken);
-                return ObjectMapper.Map<MinIdToken, MinIdTokenCacheItem>(minIdToken);
-            }, token: cancellationToken);
-
-            if (minIdTokenCacheItem != null)
-            {
-                return;
+                throw new AbpAuthorizationException($"Invalid token for business type '{bizType}'.");
             }
-
-            throw new AbpException($"Invalid token '{token}' for business type '{bizType}'.");
         }
     }
 }

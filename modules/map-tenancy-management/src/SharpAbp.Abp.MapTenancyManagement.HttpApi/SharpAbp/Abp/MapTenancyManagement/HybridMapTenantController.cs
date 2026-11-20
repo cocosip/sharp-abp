@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Auditing;
 
 namespace SharpAbp.Abp.MapTenancyManagement
 {
@@ -81,7 +82,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
         [HttpPut]
         [Route("{id}/default-connection-string")]
-        public async Task UpdateDefaultConnectionStringAsync(Guid id, string defaultConnectionString)
+        public async Task UpdateDefaultConnectionStringAsync(Guid id, [FromBody, DisableAuditing] string defaultConnectionString)
         {
             await _hybridMapTenantAppService.UpdateDefaultConnectionStringAsync(id, defaultConnectionString);
         }

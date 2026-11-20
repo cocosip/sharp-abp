@@ -33,7 +33,7 @@ namespace SharpAbp.Abp.FileStoring
 
             if (nameAttribute == null)
             {
-                return type.FullName;
+                return type.FullName ?? throw new ArgumentException("The container type must have a full name.", nameof(type));
             }
 
             return nameAttribute.GetName(type);

@@ -61,6 +61,15 @@ public class YourModule : AbpModule
 
 ### Basic Usage
 
+The factory owns the shared loggers returned by `GetOrCreate<T>(name)`. Consumers must not dispose them.
+Disposing the factory permanently rejects new requests, waits for active initialization, and attempts
+to dispose every initialized logger before reporting cleanup failures through an `AggregateException`.
+Repeated disposal does not dispose loggers again.
+Failed initialization releases the partially created logger before allowing the same name to be retried.
+Calling factory disposal from an active initialization callback throws `InvalidOperationException`
+before changing shutdown state. Background tasks started during initialization may request shutdown
+after initialization finishes. Initialization and cleanup run outside registry locks.
+
 ```csharp
 public class MyService
 {

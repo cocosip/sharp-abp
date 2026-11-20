@@ -58,10 +58,10 @@ namespace SharpAbp.Abp.FileStoring
         /// </summary>
         /// <param name="name">The name of the configuration item</param>
         /// <returns>The configuration item if found, otherwise null</returns>
-        public FileProviderConfigurationItem GetItem([NotNull] string name)
+        public FileProviderConfigurationItem? GetItem([NotNull] string name)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            _items.TryGetValue(name, out FileProviderConfigurationItem item);
+            _items.TryGetValue(name, out var item);
             return item;
         }
 

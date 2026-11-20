@@ -50,7 +50,19 @@ namespace SharpAbp.Abp.ObjectPool
                 }
             }
 
-            return Policy.CreateAsync();
+            return CreateAsync();
+        }
+
+        private async ValueTask<T> CreateAsync()
+        {
+            var item = await Policy.CreateAsync().ConfigureAwait(false);
+            lock (_sync)
+            {
+                if (!_disposed) return item;
+            }
+
+            PooledItemDisposer.Dispose(item);
+            throw new ObjectDisposedException(GetType().Name);
         }
 
         public virtual void Return(T obj)
@@ -94,10 +106,19 @@ namespace SharpAbp.Abp.ObjectPool
                 _items.Clear();
             }
 
+            var errors = new List<Exception>();
             foreach (var item in items)
             {
-                PooledItemDisposer.Dispose(item);
+                try
+                {
+                    PooledItemDisposer.Dispose(item);
+                }
+                catch (Exception error)
+                {
+                    errors.Add(error);
+                }
             }
+            if (errors.Count > 0) throw new AggregateException(errors);
         }
     }
 }

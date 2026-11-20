@@ -3,6 +3,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using Volo.Abp;
 using Volo.Abp.DependencyInjection;
 
@@ -13,6 +16,16 @@ namespace SharpAbp.Abp.Faster
     /// </summary>
     public class DefaultFasterLoggerFactory : IFasterLoggerFactory, ISingletonDependency, IDisposable
     {
+        private readonly object _lifecycle = new object();
+        private readonly HashSet<Lazy<IFasterLogger>> _initializing = new HashSet<Lazy<IFasterLogger>>();
+        private readonly AsyncLocal<InitializationScope?> _initialization = new AsyncLocal<InitializationScope?>();
+        private bool _disposed;
+
+        private sealed class InitializationScope(InitializationScope? parent)
+        {
+            public InitializationScope? Parent { get; } = parent;
+            public int Active = 1;
+        }
         /// <summary>
         /// Gets the concurrent dictionary that stores created logger instances with lazy initialization
         /// </summary>
@@ -58,9 +71,17 @@ namespace SharpAbp.Abp.Faster
         /// <returns>The Faster logger instance</returns>
         public virtual IFasterLogger<T> GetOrCreate<T>(string name) where T : class
         {
-            // Use Lazy<T> to ensure thread-safe lazy initialization
             var cacheKey = new LoggerCacheKey(typeof(T), name);
-            var lazyLogger = Loggers.GetOrAdd(cacheKey, key => new Lazy<IFasterLogger>(() => CreateLogger<T>(key.Name)));
+            Lazy<IFasterLogger> lazyLogger;
+            lock (_lifecycle)
+            {
+                ThrowIfDisposed();
+                lazyLogger = Loggers.GetOrAdd(cacheKey, key => new Lazy<IFasterLogger>(() => CreateLogger<T>(key.Name)));
+                _initializing.Add(lazyLogger);
+            }
+            var previous = _initialization.Value;
+            var scope = new InitializationScope(previous);
+            _initialization.Value = scope;
             try
             {
                 Check.NotNull(lazyLogger.Value, nameof(IFasterLogger<T>));
@@ -68,9 +89,15 @@ namespace SharpAbp.Abp.Faster
             }
             catch
             {
-                // Remove failed lazy instances so transient initialization problems can recover.
-                Loggers.TryRemove(cacheKey, out _);
+                // Remove only the failed entry so a concurrent replacement can survive.
+                ((ICollection<KeyValuePair<LoggerCacheKey, Lazy<IFasterLogger>>>)Loggers).Remove(new(cacheKey, lazyLogger));
                 throw;
+            }
+            finally
+            {
+                Volatile.Write(ref scope.Active, 0);
+                _initialization.Value = previous;
+                lock (_lifecycle) _initializing.Remove(lazyLogger);
             }
         }
 
@@ -87,8 +114,23 @@ namespace SharpAbp.Abp.Faster
                 ServiceProvider,
                 name,
                 configuration);
-            fasterLogger.Initialize();
-            return fasterLogger;
+            try
+            {
+                fasterLogger.Initialize();
+                return fasterLogger;
+            }
+            catch (Exception initializationError)
+            {
+                try
+                {
+                    fasterLogger.Dispose();
+                }
+                catch (Exception cleanupError)
+                {
+                    throw new AggregateException(initializationError, cleanupError);
+                }
+                throw;
+            }
         }
 
         /// <summary>
@@ -96,26 +138,44 @@ namespace SharpAbp.Abp.Faster
         /// </summary>
         public void Dispose()
         {
-            Logger.LogInformation("Disposing FasterLoggerFactory and all cached loggers...");
-
-            foreach (var kvp in Loggers)
+            List<Lazy<IFasterLogger>> loggers;
+            lock (_lifecycle)
             {
-                if (kvp.Value.IsValueCreated)
+                if (_disposed) return;
+                RejectInitializationDisposal();
+                _disposed = true;
+                loggers = Loggers.Values.Where(lazy => lazy.IsValueCreated || _initializing.Contains(lazy)).ToList();
+                Loggers.Clear();
+            }
+
+            var errors = new List<Exception>();
+            foreach (var lazy in loggers)
+            {
+                try
                 {
-                    try
-                    {
-                        kvp.Value.Value?.Dispose();
-                        Logger.LogDebug("Disposed logger: {LoggerName}", kvp.Key.Name);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.LogError(ex, "Error disposing logger '{LoggerName}': {Message}", kvp.Key.Name, ex.Message);
-                    }
+                    lazy.Value?.Dispose();
+                }
+                catch (Exception error)
+                {
+                    errors.Add(error);
                 }
             }
 
-            Loggers.Clear();
-            Logger.LogInformation("FasterLoggerFactory disposed successfully.");
+            if (errors.Count > 0) throw new AggregateException(errors);
+        }
+
+        private void ThrowIfDisposed()
+        {
+            if (_disposed) throw new ObjectDisposedException(GetType().Name);
+        }
+
+        private void RejectInitializationDisposal()
+        {
+            for (var scope = _initialization.Value; scope != null; scope = scope.Parent)
+            {
+                if (Volatile.Read(ref scope.Active) != 0)
+                    throw new InvalidOperationException("Factory disposal cannot run inside this factory's initialization callback.");
+            }
         }
 
         protected readonly struct LoggerCacheKey : IEquatable<LoggerCacheKey>

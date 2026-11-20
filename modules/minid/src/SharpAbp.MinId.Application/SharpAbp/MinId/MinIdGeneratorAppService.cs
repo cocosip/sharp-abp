@@ -36,14 +36,14 @@ namespace SharpAbp.MinId
 
         /// <summary>
         /// Generates a batch of unique IDs for the specified business type.
-        /// Ensures the batch size is at least 1 before generating IDs.
+        /// Rejects batch sizes outside the supported range before allocating IDs.
         /// </summary>
         /// <param name="bizType">The business type identifier for which to generate IDs.</param>
-        /// <param name="batchSize">The number of IDs to generate in the batch. Will be adjusted to a minimum of 1 if less than 1.</param>
+        /// <param name="batchSize">The number of IDs to generate, between 1 and 1000.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains a list of generated unique IDs.</returns>
         public virtual async Task<List<long>> NextIdAsync(string bizType, int batchSize)
         {
-            batchSize = batchSize < 1 ? 1 : batchSize;
+            MinIdUtil.CheckBatchSize(batchSize);
             var minIdGenerator = await MinIdGeneratorFactory.GetAsync(bizType);
             return await minIdGenerator.NextIdAsync(batchSize);
         }

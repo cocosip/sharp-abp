@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using SharpAbp.Abp.TenancyGrouping;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Auditing;
 using Volo.Abp.Data;
 using Volo.Abp.EventBus.Distributed;
 using Volo.Abp.EventBus.Local;
@@ -248,7 +249,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
         /// <param name="defaultConnectionString">The new default connection string value.</param>
         /// <returns>A task representing the asynchronous update operation.</returns>
         [Authorize(TenantGroupManagementPermissions.TenantGroups.ManageTenants)]
-        public virtual async Task UpdateDefaultConnectionStringAsync(Guid id, string defaultConnectionString)
+        public virtual async Task UpdateDefaultConnectionStringAsync(Guid id, [DisableAuditing] string defaultConnectionString)
         {
             var tenantGroup = await TenantGroupRepository.GetAsync(id);
             if (tenantGroup.FindDefaultConnectionString() != defaultConnectionString)

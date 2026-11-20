@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Volo.Abp.Auditing;
 using Volo.Abp.Validation;
 
 namespace SharpAbp.Abp.CryptoVault
@@ -53,6 +54,7 @@ namespace SharpAbp.Abp.CryptoVault
         /// </remarks>
         [Required(ErrorMessage = "The RSA private key is required and cannot be null or empty.")]
         [DynamicStringLength(typeof(RSACredsConsts), nameof(RSACredsConsts.MaxPrivateKeyLength))]
+        [DisableAuditing]
         public string PrivateKey { get; set; }
 
         /// <summary>

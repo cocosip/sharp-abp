@@ -726,6 +726,31 @@ Configure<AbpFileStoringOptions>(options =>
 });
 ```
 
+Saves first copy into an unpredictable sibling file named `.sharpabp-<random>.tmp` on the
+destination filesystem. After the copy is flushed and closed, a same-filesystem `File.Move`
+publishes a new file, or `File.Replace` replaces an existing file when overwrite is enabled.
+The provider never deletes the destination to make replacement succeed. Failed reads, failed
+copies, or cancellation before publication preserve the existing file and leave a new file
+unpublished. Concurrent creates with overwrite disabled have one winner; other writers receive
+`FileAlreadyExistsException`. Seekable inputs retry from their original position; consumed
+non-seekable inputs are not retried. Cancellation is checked immediately before publication;
+the synchronous publication itself cannot be cancelled.
+
+Only the final file id/path is returned or used to generate an access URL. Staging files are
+removed after failures and cancellation; a cleanup failure is logged. Because staging files
+share the destination directory, keep storage writable only by trusted identities. If that
+directory is served by a static HTTP server, explicitly deny `.sharpabp-*.tmp` paths and disable
+directory browsing; unpredictable names alone do not make staged bytes private. Prefer serving
+files through application endpoints when the server cannot enforce that restriction.
+
+`File.Replace` retains destination metadata supported by the operating system/filesystem;
+Windows creation-time preservation is covered by a regression test. Other ACLs, permissions,
+extended attributes, Linux behavior, and network/virtual filesystems need deployment-specific
+verification. Unsupported replacement fails without a delete-and-recreate fallback. Atomic
+publication is not a crash-durability guarantee: the implementation does not force filesystem
+directory metadata to stable storage, and abrupt termination can leave staging files behind.
+Power-loss recovery and non-local filesystem semantics have not been validated.
+
 ### Aliyun OSS Provider
 
 ```csharp

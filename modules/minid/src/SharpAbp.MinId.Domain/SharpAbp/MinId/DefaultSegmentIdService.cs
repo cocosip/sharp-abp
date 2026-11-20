@@ -83,7 +83,7 @@ namespace SharpAbp.MinId
                         ?? throw new AbpException($"Business type '{bizType}' is not registered in the MinId system. Please ensure the business type is properly configured.");
 
                     // Calculate new maximum ID by adding step to current maximum
-                    var newMaxId = minIdInfo.MaxId + minIdInfo.Step;
+                    var newMaxId = checked(minIdInfo.MaxId + minIdInfo.Step);
 
                     Logger.LogDebug("Segment allocation for business type '{BizType}': Old maxId: {OldMaxId}, New maxId: {NewMaxId}, Step: {Step}",
                         bizType, minIdInfo.MaxId, newMaxId, minIdInfo.Step);

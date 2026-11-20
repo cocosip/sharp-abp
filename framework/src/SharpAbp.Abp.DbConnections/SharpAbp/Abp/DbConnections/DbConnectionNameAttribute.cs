@@ -56,7 +56,7 @@ namespace SharpAbp.Abp.DbConnections
             var nameAttribute = type.GetCustomAttribute<DbConnectionNameAttribute>();
             if (nameAttribute == null)
             {
-                return type.FullName;
+                return type.FullName ?? throw new ArgumentException("The database connection type must have a full name.", nameof(type));
             }
             return nameAttribute.GetName(type);
         }

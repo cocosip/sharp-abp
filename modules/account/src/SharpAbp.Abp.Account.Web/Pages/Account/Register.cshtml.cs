@@ -14,6 +14,7 @@ using Volo.Abp.Identity;
 using Volo.Abp.Settings;
 using Volo.Abp.Validation;
 using IdentityUser = Volo.Abp.Identity.IdentityUser;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace SharpAbp.Abp.Account.Web.Pages.Account
 {
@@ -34,6 +35,8 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
 
         [BindProperty(SupportsGet = true)]
         public string ExternalLoginAuthSchema { get; set; }
+
+        protected SignInResult RegistrationSignInResult { get; set; } = SignInResult.Failed;
 
         public RegisterModel(IAccountAppService accountAppService)
         {
@@ -79,6 +82,7 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
             try
             {
                 await CheckSelfRegistrationAsync();
+                RegistrationSignInResult = SignInResult.Failed;
 
                 if (IsExternalLogin)
                 {
@@ -96,7 +100,18 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
                     await RegisterLocalUserAsync();
                 }
 
-                return Redirect(ReturnUrl ?? "~/"); //TODO: How to ensure safety? IdentityServer requires it however it should be checked somehow!
+                if (RegistrationSignInResult.RequiresTwoFactor)
+                {
+                    return await TwoFactorLoginResultAsync();
+                }
+
+                if (!RegistrationSignInResult.Succeeded)
+                {
+                    Alerts.Warning(L[RegistrationSignInResult.IsLockedOut ? "UserLockedOutMessage" : "LoginIsNotAllowed"]);
+                    return RedirectToPage("./Login", new { ReturnUrl, ReturnUrlHash });
+                }
+
+                return await RedirectSafelyAsync(ReturnUrl, ReturnUrlHash);
             }
             catch (BusinessException e)
             {
@@ -120,7 +135,8 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
             );
 
             var user = await UserManager.GetByIdAsync(userDto.Id);
-            await SignInManager.SignInAsync(user, isPersistent: true);
+            await IdentityOptions.SetAsync();
+            RegistrationSignInResult = await SignInManager.PasswordSignInAsync(user, Input.Password, isPersistent: true, lockoutOnFailure: true);
         }
 
         protected virtual async Task RegisterExternalUserAsync(ExternalLoginInfo externalLoginInfo, string emailAddress)
@@ -146,7 +162,17 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
                 ))).CheckErrors();
             }
 
-            await SignInManager.SignInAsync(user, isPersistent: true);
+            RegistrationSignInResult = await SignInManager.ExternalLoginSignInAsync(
+                externalLoginInfo.LoginProvider, externalLoginInfo.ProviderKey, isPersistent: true, bypassTwoFactor: false);
+        }
+
+        /// <summary>
+        /// Override this method to continue registration with your application's 2FA flow.
+        /// </summary>
+        protected virtual Task<IActionResult> TwoFactorLoginResultAsync()
+        {
+            Alerts.Warning(L["LoginIsNotAllowed"]);
+            return Task.FromResult<IActionResult>(RedirectToPage("./Login", new { ReturnUrl, ReturnUrlHash }));
         }
 
         protected virtual async Task CheckSelfRegistrationAsync()

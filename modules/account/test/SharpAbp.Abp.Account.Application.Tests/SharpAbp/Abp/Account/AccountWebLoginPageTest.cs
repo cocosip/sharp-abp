@@ -50,12 +50,15 @@ public class AccountWebLoginPageTest : AccountWebTest
     }
 
     [Fact]
-    public async Task Single_External_Provider_Identifies_The_Unimplemented_Automatic_Challenge()
+    public async Task Single_External_Provider_Is_Challenged_When_Local_Login_Is_Disabled()
     {
         Settings.GetOrNullAsync(AccountSettingNames.EnableLocalLogin).Returns("false");
         Schemes.GetAllSchemesAsync().Returns(new[] { new AuthenticationScheme("External", "External", typeof(CookieAuthenticationHandler)) });
+        SignIn.ConfigureExternalAuthenticationProperties("External", Arg.Any<string>(), null).Returns(new AuthenticationProperties());
         var page = LoginPage();
-        await Assert.ThrowsAsync<NotImplementedException>(() => page.OnGetAsync());
+        var challenge = Assert.IsType<ChallengeResult>(await page.OnGetAsync());
+        Assert.Equal("External", Assert.Single(challenge.AuthenticationSchemes));
+        Assert.Equal("External", challenge.Properties.Items["scheme"]);
         Assert.True(page.IsExternalLoginOnly);
         Assert.Equal("External", page.ExternalLoginScheme);
     }
@@ -82,7 +85,8 @@ public class AccountWebLoginPageTest : AccountWebTest
         var page = LoginPage();
         if (outcome == "two-factor")
         {
-            await Assert.ThrowsAsync<NotImplementedException>(() => page.OnPostAsync("login"));
+            Assert.Equal("./Login", Assert.IsType<RedirectToPageResult>(await page.OnPostAsync("login")).PageName);
+            Assert.Single(Alerts);
             return;
         }
         var response = await page.OnPostAsync("login");
@@ -155,7 +159,7 @@ public class AccountWebLoginPageTest : AccountWebTest
     public async Task External_Callback_Handles_Provider_Result_And_Missing_Email(string outcome)
     {
         SignIn.GetExternalLoginInfoAsync(null).Returns(ExternalInfo());
-        SignIn.ExternalLoginSignInAsync("Provider", "external-key", false, true).Returns(outcome switch
+        SignIn.ExternalLoginSignInAsync("Provider", "external-key", false, false).Returns(outcome switch
         {
             "success" => SignInResult.Success,
             "locked" => SignInResult.LockedOut,
@@ -165,7 +169,8 @@ public class AccountWebLoginPageTest : AccountWebTest
         var page = LoginPage();
         if (outcome is "locked" or "not-allowed")
         {
-            await Assert.ThrowsAsync<UserFriendlyException>(() => page.OnGetExternalLoginCallbackAsync("/profile", "#external"));
+            Assert.Equal("./Login", Assert.IsType<RedirectToPageResult>(await page.OnGetExternalLoginCallbackAsync("/profile", "#external")).PageName);
+            Assert.Single(Alerts);
             return;
         }
         var result = await page.OnGetExternalLoginCallbackAsync("/profile", "#external");
@@ -179,36 +184,81 @@ public class AccountWebLoginPageTest : AccountWebTest
             Assert.Equal("./Register", register.PageName);
             Assert.Equal(true, register.RouteValues["IsExternalLogin"]);
             Assert.Equal("Provider", register.RouteValues["ExternalLoginAuthSchema"]);
+            Assert.Equal("/profile", register.RouteValues["ReturnUrl"]);
+            Assert.Equal("#external", register.RouteValues["ReturnUrlHash"]);
         }
     }
 
     [Theory]
-    [InlineData(false, false)]
-    [InlineData(true, false)]
-    [InlineData(true, true)]
-    public async Task External_Callback_Creates_Or_Links_A_User_Before_Signing_In(bool existingUser, bool existingLogin)
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task External_Callback_Rejects_Email_Only_Linking_Without_Changing_The_Local_Account(bool linked)
     {
         using var unitOfWork = GetRequiredService<IUnitOfWorkManager>().Begin(requiresNew: true, isTransactional: false);
         var info = ExternalInfo("external@example.com");
-        if (existingUser)
+        var user = await CreateUserAsync(email: "external@example.com");
+        if (linked)
         {
-            var user = await CreateUserAsync(email: "external@example.com");
-            if (existingLogin)
-            {
-                (await Users.AddLoginAsync(user, info)).CheckErrors();
-                await unitOfWork.SaveChangesAsync();
-            }
+            (await Users.AddLoginAsync(user, info)).CheckErrors();
         }
         SignIn.GetExternalLoginInfoAsync(null).Returns(info);
-        SignIn.ExternalLoginSignInAsync("Provider", "external-key", false, true).Returns(SignInResult.Failed);
+        SignIn.ExternalLoginSignInAsync("Provider", "external-key", false, false).Returns(SignInResult.Failed);
 
-        var result = Assert.IsType<RedirectResult>(await LoginPage().OnGetExternalLoginCallbackAsync("/profile", "#external"));
+        var exception = await Assert.ThrowsAsync<UserFriendlyException>(() => LoginPage().OnGetExternalLoginCallbackAsync());
+
+        Assert.Contains("existing login", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(linked ? user.Id : (Guid?)null, (await Users.FindByLoginAsync("Provider", "external-key"))?.Id);
+        Assert.Equal(user.Id, (await Users.FindByEmailAsync("external@example.com")).Id);
+        Assert.True(await Users.CheckPasswordAsync(user, "P@ssW0rd"));
+        await SignIn.DidNotReceiveWithAnyArgs().SignInAsync(default, false, default);
+    }
+
+    [Theory]
+    [InlineData("success")]
+    [InlineData("not-allowed")]
+    [InlineData("locked")]
+    public async Task New_External_Users_Must_Pass_Normal_SignIn_Checks(string outcome)
+    {
+        using var unitOfWork = GetRequiredService<IUnitOfWorkManager>().Begin(requiresNew: true, isTransactional: false);
+        SignIn.GetExternalLoginInfoAsync(null).Returns(ExternalInfo("external@example.com"));
+        SignIn.ExternalLoginSignInAsync("Provider", "external-key", false, false).Returns(SignInResult.Failed, outcome switch
+        {
+            "not-allowed" => SignInResult.NotAllowed,
+            "locked" => SignInResult.LockedOut,
+            _ => SignInResult.Success
+        });
+
+        var result = await LoginPage().OnGetExternalLoginCallbackAsync("/profile", "#external");
 
         var linked = await Users.FindByLoginAsync("Provider", "external-key");
         Assert.NotNull(linked);
         Assert.Equal("external@example.com", linked.Email);
-        Assert.Equal("/profile#external", result.Url);
-        await SignIn.Received(1).SignInAsync(Arg.Is<Volo.Abp.Identity.IdentityUser>(user => user.Id == linked.Id), false, null);
+        if (outcome == "success")
+        {
+            Assert.Equal("/profile#external", Assert.IsType<RedirectResult>(result).Url);
+        }
+        else
+        {
+            Assert.Equal("./Login", Assert.IsType<RedirectToPageResult>(result).PageName);
+            Assert.Single(Alerts);
+        }
+        await unitOfWork.CompleteAsync();
+        await SignIn.DidNotReceiveWithAnyArgs().SignInAsync(default, false, default);
+    }
+
+    [Fact]
+    public async Task Linked_External_Login_Requires_TwoFactor_Without_Falling_Back_To_Email()
+    {
+        using var unitOfWork = GetRequiredService<IUnitOfWorkManager>().Begin(requiresNew: true, isTransactional: false);
+        SignIn.GetExternalLoginInfoAsync(null).Returns(ExternalInfo("external@example.com"));
+        SignIn.ExternalLoginSignInAsync("Provider", "external-key", false, false).Returns(SignInResult.TwoFactorRequired);
+        var page = Page(new TwoFactorLoginModel(Schemes, Options.Create(new AbpAccountOptions()),
+            GetRequiredService<IOptions<IdentityOptions>>()));
+
+        Assert.Equal("two-factor", Assert.IsType<ContentResult>(await page.OnGetExternalLoginCallbackAsync("/profile", "#external")).Content);
+        Assert.Equal("/profile", page.ReturnUrl);
+        Assert.Equal("#external", page.ReturnUrlHash);
+        await SignIn.DidNotReceiveWithAnyArgs().SignInAsync(default, false, default);
     }
 
     [Fact]
@@ -217,8 +267,14 @@ public class AccountWebLoginPageTest : AccountWebTest
         using var unitOfWork = GetRequiredService<IUnitOfWorkManager>().Begin(requiresNew: true, isTransactional: false);
         await CreateUserAsync("external@example.com", "other@example.com");
         SignIn.GetExternalLoginInfoAsync(null).Returns(ExternalInfo("external@example.com"));
-        SignIn.ExternalLoginSignInAsync("Provider", "external-key", false, true).Returns(SignInResult.Failed);
+        SignIn.ExternalLoginSignInAsync("Provider", "external-key", false, false).Returns(SignInResult.Failed);
         var exception = await Assert.ThrowsAsync<UserFriendlyException>(() => LoginPage().OnGetExternalLoginCallbackAsync());
         Assert.Contains("DuplicateUserName", exception.Message);
+    }
+
+    private sealed class TwoFactorLoginModel(IAuthenticationSchemeProvider schemes, IOptions<AbpAccountOptions> accountOptions,
+        IOptions<IdentityOptions> identityOptions) : LoginModel(schemes, accountOptions, identityOptions)
+    {
+        protected override Task<IActionResult> TwoFactorLoginResultAsync() => Task.FromResult<IActionResult>(Content("two-factor"));
     }
 }

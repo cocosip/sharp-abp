@@ -22,6 +22,13 @@ namespace SharpAbp.Abp.DbConnections
         }
 
         [Fact]
+        public void Unnamed_Generic_Parameter_Cannot_Be_A_Connection_Name()
+        {
+            var type = typeof(System.Collections.Generic.List<>).GetGenericArguments()[0];
+            Assert.Throws<ArgumentException>(() => DbConnectionNameAttribute.GetDbConnectionName(type));
+        }
+
+        [Fact]
         public void Constructor_Should_Validate_Name()
         {
             Assert.Throws<ArgumentException>(() => new DbConnectionNameAttribute(string.Empty));

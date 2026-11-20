@@ -64,6 +64,11 @@ namespace SharpAbp.MinId
 
                 try
                 {
+                    if (_current != null && _current.IsUseful())
+                    {
+                        return;
+                    }
+
                     if (_next == null)
                     {
                         var segmentId = await QuerySegmentIdAsync();
@@ -158,11 +163,12 @@ namespace SharpAbp.MinId
         /// This method efficiently generates multiple IDs by calling NextIdAsync sequentially
         /// for the specified number of times.
         /// </summary>
-        /// <param name="batchSize">The number of unique identifiers to generate. Must be positive.</param>
+        /// <param name="batchSize">The number of unique identifiers to generate, between 1 and 1000.</param>
         /// <returns>A task containing a list of unique identifiers.</returns>
         public virtual async Task<List<long>> NextIdAsync(int batchSize)
         {
-            var ids = new List<long>();
+            MinIdUtil.CheckBatchSize(batchSize);
+            var ids = new List<long>(batchSize);
             for (var i = 0; i < batchSize; i++)
             {
                 var id = await NextIdAsync();
@@ -185,9 +191,13 @@ namespace SharpAbp.MinId
                 var segmentId = await SegmentIdService.GetNextSegmentIdAsync(BizType);
                 return segmentId;
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
-                throw new AbpException($"Failed to acquire new segment for business type '{BizType}'. Error details: {ex.Message}", ex);
+                throw new AbpException($"Failed to acquire new segment for business type '{BizType}'.", ex);
             }
         }
 

@@ -52,6 +52,57 @@ namespace SharpAbp.Abp.EventBus.MassTransit
             Assert.Empty(eventBus.GetDynamicHandlerFactoriesForTest("test.dynamic"));
         }
 
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void Subscribe_Should_Synchronize_Duplicate_Check_With_Unsubscription(bool dynamic)
+        {
+            var eventBus = CreateEventBus();
+            var factory = new Mock<IEventHandlerFactory>();
+            factory.Setup(x => x.IsInFactories(It.IsAny<System.Collections.Generic.List<IEventHandlerFactory>>()))
+                .Returns((System.Collections.Generic.List<IEventHandlerFactory> factories) =>
+                {
+                    Assert.True(Monitor.IsEntered(factories));
+                    return factories.Contains(factory.Object);
+                });
+
+            using var first = dynamic
+                ? eventBus.Subscribe("test.dynamic", factory.Object)
+                : eventBus.Subscribe(typeof(DynamicEventData), factory.Object);
+            using var duplicate = dynamic
+                ? eventBus.Subscribe("test.dynamic", factory.Object)
+                : eventBus.Subscribe(typeof(DynamicEventData), factory.Object);
+
+            var groups = dynamic
+                ? eventBus.GetDynamicHandlerFactoriesForTest("test.dynamic")
+                : eventBus.GetHandlerFactoriesForTest(typeof(DynamicEventData));
+            Assert.Same(factory.Object, Assert.Single(Assert.Single(groups).EventHandlerFactories));
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void Handler_Factory_Snapshots_Should_Survive_Subscription_Changes(bool dynamic)
+        {
+            var eventBus = CreateEventBus();
+            var original = new SingleInstanceHandlerFactory(new TestDynamicEventHandler());
+            var replacement = new SingleInstanceHandlerFactory(new TestDynamicEventHandler());
+            using var subscription = dynamic
+                ? eventBus.Subscribe("test.dynamic", original)
+                : eventBus.Subscribe(typeof(DynamicEventData), original);
+            var groups = dynamic
+                ? eventBus.GetDynamicHandlerFactoriesForTest("test.dynamic")
+                : eventBus.GetHandlerFactoriesForTest(typeof(DynamicEventData));
+            var snapshot = Assert.Single(groups).EventHandlerFactories;
+
+            subscription.Dispose();
+            using var next = dynamic
+                ? eventBus.Subscribe("test.dynamic", replacement)
+                : eventBus.Subscribe(typeof(DynamicEventData), replacement);
+
+            Assert.Same(original, Assert.Single(snapshot));
+        }
+
         [Fact]
         public async Task PublishAsync_Should_Publish_Dynamic_Event_By_Event_Name()
         {
@@ -71,7 +122,27 @@ namespace SharpAbp.Abp.EventBus.MassTransit
                 Times.Once);
         }
 
-        private static TestMassTransitDistributedEventBus CreateEventBus(IMassTransitPublisher publisher = null)
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task PublishAsync_Should_Preserve_Outbox_Choice_When_Deferring_Dynamic_Events(bool useOutbox)
+        {
+            UnitOfWorkEventRecord recorded = null;
+            var unitOfWork = new Mock<IUnitOfWork>();
+            unitOfWork.Setup(x => x.AddOrReplaceDistributedEvent(
+                    It.IsAny<UnitOfWorkEventRecord>(), It.IsAny<Predicate<UnitOfWorkEventRecord>>()))
+                .Callback<UnitOfWorkEventRecord, Predicate<UnitOfWorkEventRecord>>((record, _) => recorded = record);
+            var manager = Mock.Of<IUnitOfWorkManager>(x => x.Current == unitOfWork.Object);
+            var eventBus = CreateEventBus(unitOfWorkManager: manager);
+
+            await eventBus.PublishAsync("test.dynamic", new { Value = 42 }, true, useOutbox);
+
+            Assert.NotNull(recorded);
+            Assert.Equal(useOutbox, recorded.UseOutbox);
+            Assert.Equal("test.dynamic", Assert.IsType<DynamicEventData>(recorded.EventData).EventName);
+        }
+
+        private static TestMassTransitDistributedEventBus CreateEventBus(IMassTransitPublisher publisher = null, IUnitOfWorkManager unitOfWorkManager = null)
         {
             var services = new ServiceCollection();
             services.AddLogging();
@@ -80,7 +151,7 @@ namespace SharpAbp.Abp.EventBus.MassTransit
             return new TestMassTransitDistributedEventBus(
                 services.BuildServiceProvider().GetRequiredService<IServiceScopeFactory>(),
                 Mock.Of<ICurrentTenant>(),
-                Mock.Of<IUnitOfWorkManager>(),
+                unitOfWorkManager ?? Mock.Of<IUnitOfWorkManager>(),
                 Options.Create(new AbpDistributedEventBusOptions()),
                 new SimpleGuidGenerator(),
                 Mock.Of<IClock>(),
@@ -123,6 +194,11 @@ namespace SharpAbp.Abp.EventBus.MassTransit
             public System.Collections.Generic.IEnumerable<EventTypeWithEventHandlerFactories> GetDynamicHandlerFactoriesForTest(string eventName)
             {
                 return GetDynamicHandlerFactories(eventName);
+            }
+
+            public System.Collections.Generic.IEnumerable<EventTypeWithEventHandlerFactories> GetHandlerFactoriesForTest(Type eventType)
+            {
+                return GetHandlerFactories(eventType);
             }
 
             public Type GetEventTypeByEventNameForTest(string eventName)

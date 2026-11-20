@@ -212,7 +212,8 @@ namespace SharpAbp.Abp.OpenIddict
                 throw new EntityNotFoundException(typeof(OpenIddictApplication), id);
             }
             var buildModel = await BuildModel(input);
-            if (buildModel.ClientSecret.IsNullOrWhiteSpace())
+            if (buildModel.ClientSecret.IsNullOrWhiteSpace() &&
+                !string.Equals(input.ClientType, OpenIddictConstants.ClientTypes.Public, StringComparison.OrdinalIgnoreCase))
             {
                 buildModel.ClientSecret = model.ClientSecret;
             }
@@ -248,7 +249,13 @@ namespace SharpAbp.Abp.OpenIddict
         [Authorize(OpenIddictPermissions.Applications.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {
-            await OpenIdApplicationRepository.DeleteAsync(id);
+            var application = await ApplicationManager.FindByIdAsync(id.ToString("D"));
+            if (application == null)
+            {
+                throw new EntityNotFoundException(typeof(OpenIddictApplication), id);
+            }
+
+            await ApplicationManager.DeleteAsync(application);
         }
 
         /// <summary>

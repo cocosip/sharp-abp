@@ -34,7 +34,7 @@ namespace SharpAbp.MinId
         /// Generates a batch of unique identifiers with the specified size.
         /// This method efficiently generates multiple IDs in sequence.
         /// </summary>
-        /// <param name="batchSize">The number of unique identifiers to generate.</param>
+        /// <param name="batchSize">The number of unique identifiers to generate, between 1 and 1000.</param>
         /// <returns>A task containing a list of unique identifiers.</returns>
         Task<List<long>> NextIdAsync(int batchSize);
     }
