@@ -282,34 +282,6 @@ Use `IContainerAppService.GetAllAsync`/`GetPagedListAsync` to list containers, a
 
 ---
 
-## FileStoringDatabase
-
-Database file storage provider for storing files directly in the database.
-
-### Installation
-
-```bash
-dotnet add package SharpAbp.Abp.FileStoring.Database.Domain
-dotnet add package SharpAbp.Abp.FileStoring.Database.EntityFrameworkCore  # or MongoDB
-```
-
-### Configuration
-
-```csharp
-using SharpAbp.Abp.FileStoring;
-using SharpAbp.Abp.FileStoring.Database;
-
-Configure<AbpFileStoringOptions>(options =>
-{
-    options.Containers.ConfigureDefault(container =>
-    {
-        container.UseDatabase();
-    });
-});
-```
-
----
-
 ## DbConnectionsManagement
 
 Database connection configuration management module. Connection information created here is consumed by the `SharpAbp.Abp.DbConnections` module.

@@ -13,12 +13,13 @@
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
 		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-		<Description>SharpAbp Binary Module</Description>
+		<Description>SharpAbp Binary Module (protobuf-net serializer)</Description>
 		<RootNamespace />
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\SharpAbp.Abp.Binary.Protobuf\SharpAbp.Abp.Binary.Protobuf.csproj" />
+		<PackageReference Include="protobuf-net" />
+		<PackageReference Include="Volo.Abp" />
 	</ItemGroup>
 
 </Project>

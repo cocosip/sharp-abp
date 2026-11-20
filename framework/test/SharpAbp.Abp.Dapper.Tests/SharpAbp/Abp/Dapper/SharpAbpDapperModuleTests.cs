@@ -5,14 +5,9 @@ using Npgsql;
 using NpgsqlTypes;
 using OceanBaseConnector;
 using Oracle.ManagedDataAccess.Client;
-using SharpAbp.Abp.Dapper.DM;
-using SharpAbp.Abp.Dapper.GaussDB;
-using SharpAbp.Abp.Dapper.MySQL;
 using SharpAbp.Abp.Dapper.OceanBase;
 using SharpAbp.Abp.Dapper.Oracle;
 using SharpAbp.Abp.Dapper.PostgreSql;
-using SharpAbp.Abp.Dapper.Sqlite;
-using SharpAbp.Abp.Dapper.SqlServer;
 using Volo.Abp;
 using Volo.Abp.Autofac;
 using Volo.Abp.Modularity;
@@ -146,11 +141,6 @@ namespace SharpAbp.Abp.Dapper
         typeof(SharpAbpDapperOracleModule),
         typeof(SharpAbpDapperOceanBaseModule),
         typeof(SharpAbpDapperPostgreSqlModule),
-        typeof(SharpAbpDapperMySQLModule),
-        typeof(SharpAbpDapperSqlServerModule),
-        typeof(SharpAbpDapperSqliteModule),
-        typeof(SharpAbpDapperDmModule),
-        typeof(SharpAbpDapperGaussDBModule),
         typeof(AbpTestBaseModule),
         typeof(AbpAutofacModule))]
     public sealed class SharpAbpDapperTestModule : AbpModule

@@ -13,6 +13,10 @@ participate in the same ABP unit of work as EF Core.
 dotnet add package SharpAbp.Abp.FreeSql
 ```
 
+Add the official FreeSql provider package for the database you use (for example `FreeSql.Provider.SqlServer`) next to
+it: `SharpAbp.Abp.FreeSql` only exposes the EF Core connection and transaction, so no SharpAbp provider package or
+provider module is needed.
+
 ### Configuration
 
 Add the module dependency next to your EF Core module:
@@ -78,9 +82,10 @@ public class YourModule : AbpModule
 }
 ```
 
-`SharpAbpDapperModule` depends on `AbpDapperModule` and registers the type mappings for extra properties and GUIDs.
-Install a provider package such as `SharpAbp.Abp.Dapper.MySQL` or `SharpAbp.Abp.Dapper.PostgreSql` when its
-type mappings are needed.
+`SharpAbpDapperModule` depends on `AbpDapperModule` and registers the type mappings for extra properties, binary GUIDs
+and textual GUIDs. Writing falls back to Dapper's default handling, so most databases need nothing else; reference the
+ADO.NET driver yourself. Add `SharpAbp.Abp.Dapper.Oracle`, `SharpAbp.Abp.Dapper.PostgreSql` or
+`SharpAbp.Abp.Dapper.OceanBase` only when that provider needs its custom mapping.
 
 ### Usage Example
 
