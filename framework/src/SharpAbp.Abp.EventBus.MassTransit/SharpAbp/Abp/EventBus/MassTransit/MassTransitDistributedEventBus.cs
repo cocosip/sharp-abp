@@ -115,7 +115,9 @@ namespace SharpAbp.Abp.EventBus.MassTransit
             }
 
             var messageId = message.MessageId;
-            var eventData = Serializer.Deserialize(message.JsonData, eventType);
+            var eventData = eventType == typeof(DynamicEventData)
+                ? new DynamicEventData(eventName, Serializer.Deserialize(message.JsonData, typeof(object)))
+                : Serializer.Deserialize(message.JsonData, eventType);
             var correlationId = message.CorrelationId;
 
             if (await AddToInboxAsync(messageId, eventName, eventType, eventData, correlationId))
@@ -145,7 +147,9 @@ namespace SharpAbp.Abp.EventBus.MassTransit
                 return;
             }
 
-            var eventData = Serializer.Deserialize(incomingEvent.EventData, eventType);
+            var eventData = eventType == typeof(DynamicEventData)
+                ? CreateDynamicEventData(incomingEvent, Serializer.Deserialize(incomingEvent.EventData, typeof(object)))
+                : Serializer.Deserialize(incomingEvent.EventData, eventType);
             var exceptions = new List<Exception>();
             using (CorrelationIdProvider.Change(incomingEvent.GetCorrelationId()))
             {

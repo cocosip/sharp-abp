@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SharpAbp.Abp.DbConnectionsManagement
@@ -8,7 +8,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         private readonly IDatabaseProviderAppService _databaseProviderAppService;
         public DatabaseProviderAppServiceTest()
         {
-            _databaseProviderAppService = GetRequiredService<IDatabaseProviderAppService>();
+            _databaseProviderAppService = new DatabaseProviderController(GetRequiredService<IDatabaseProviderAppService>());
         }
 
         [Fact]

@@ -2,6 +2,12 @@
 
 MassTransit message bus integration providing support for RabbitMQ, Kafka, and ActiveMQ.
 
+Local tests cover ABP registration, transport configuration, in-memory message delivery,
+unit-of-work publication and inbox/outbox payload handling. Broker acceptance remains a
+separate check. Dynamic inbox replay restores tenant metadata stored in `IncomingEventInfo`.
+The current `AbpMassTransitEventData` broker envelope carries no tenant metadata; tenant
+routing for dynamic broker delivery requires host configuration.
+
 ## Installation
 
 ```bash

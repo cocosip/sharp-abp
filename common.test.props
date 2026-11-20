@@ -7,4 +7,7 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" PrivateAssets="all" />
+  </ItemGroup>
 </Project>

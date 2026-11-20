@@ -15,10 +15,6 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="coverlet.collector">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
 
 		<PackageReference Include="Volo.Abp.Autofac" />
 		<PackageReference Include="Volo.Abp.TestBase" />
@@ -30,6 +26,7 @@
 		<ProjectReference Include="..\..\src\SharpAbp.Abp.MassTransit.Kafka\SharpAbp.Abp.MassTransit.Kafka.csproj" />
 		<ProjectReference Include="..\..\src\SharpAbp.Abp.MassTransit.RabbitMQ\SharpAbp.Abp.MassTransit.RabbitMQ.csproj" />
 		<ProjectReference Include="..\..\src\SharpAbp.Abp.MassTransit.PostgreSql\SharpAbp.Abp.MassTransit.PostgreSql.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.MassTransit.SqlServer\SharpAbp.Abp.MassTransit.SqlServer.csproj" />
 		<ProjectReference Include="..\..\src\SharpAbp.Abp.EventBus.MassTransit\SharpAbp.Abp.EventBus.MassTransit.csproj" />
 	</ItemGroup>
 

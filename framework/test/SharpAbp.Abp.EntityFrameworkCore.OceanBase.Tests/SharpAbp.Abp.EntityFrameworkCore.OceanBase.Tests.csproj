@@ -7,10 +7,13 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.NET.Test.Sdk" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
 		<PackageReference Include="xunit" />
 		<PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
 		<PackageReference Include="Volo.Abp.Autofac" />
 		<PackageReference Include="Volo.Abp.TestBase" />
 		<ProjectReference Include="..\..\src\SharpAbp.Abp.EntityFrameworkCore.OceanBase\SharpAbp.Abp.EntityFrameworkCore.OceanBase.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.EntityFrameworkCore.DM\SharpAbp.Abp.EntityFrameworkCore.DM.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.EntityFrameworkCore.GaussDB\SharpAbp.Abp.EntityFrameworkCore.GaussDB.csproj" />
 	</ItemGroup>
 </Project>

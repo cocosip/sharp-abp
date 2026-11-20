@@ -163,29 +163,10 @@ namespace SharpAbp.Abp.MassTransit.Kafka
             object message,
             CancellationToken cancellationToken = default)
         {
-            var messageType = message.GetType();
-            using var scope = ServiceScopeFactory.CreateScope();
-            var producerProvider = scope.ServiceProvider.GetRequiredService<ITopicProducerProvider>();
-
-            // Parse URI to get topic name
-            var uri = new Uri(uriString);
-            var topicName = string.IsNullOrEmpty(uri.AbsolutePath) || uri.AbsolutePath == "/"
-                ? uri.Host
-                : uri.AbsolutePath.TrimStart('/');
-
-            if (string.IsNullOrWhiteSpace(topicName))
-            {
-                throw new ArgumentException($"Unable to extract topic name from URI: {uriString}", nameof(uriString));
-            }
-
-            // Get producer using reflection (ITopicProducer<T>)
-            var getProducerMethod = typeof(ITopicProducerProvider).GetMethod("GetProducer")!.MakeGenericMethod(messageType);
-            var producer = getProducerMethod.Invoke(producerProvider, new object[] { new Uri($"topic:{topicName}") })!;
-
-            // Call Produce method (only takes message, not key)
-            var produceMethod = producer.GetType().GetMethod("Produce", new[] { messageType, typeof(CancellationToken) });
-            var task = (Task)produceMethod!.Invoke(producer, new[] { message, cancellationToken })!;
-            await task;
+            var sendMethod = typeof(KafkaProduceService).GetMethods()
+                .Single(method => method.Name == nameof(SendAsync) && method.IsGenericMethodDefinition)
+                .MakeGenericMethod(message.GetType());
+            await (Task)sendMethod.Invoke(this, new object[] { uriString, message, cancellationToken })!;
         }
     }
 }

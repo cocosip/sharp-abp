@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -9,7 +9,7 @@ namespace SharpAbp.Abp.AuditLogging
        private readonly IAuditLogAppService _auditLogAppService;
        public AuditLogAppServiceTest()
        {
-           _auditLogAppService = GetRequiredService<IAuditLogAppService>();
+           _auditLogAppService = new AuditLogController(GetRequiredService<IAuditLogAppService>());
        }
 
 

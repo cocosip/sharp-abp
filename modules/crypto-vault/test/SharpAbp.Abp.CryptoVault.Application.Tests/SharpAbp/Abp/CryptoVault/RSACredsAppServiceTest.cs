@@ -1,4 +1,4 @@
-﻿using SharpAbp.Abp.Crypto.RSA;
+using SharpAbp.Abp.Crypto.RSA;
 using System.Threading.Tasks;
 using Volo.Abp.Validation;
 using Xunit;
@@ -11,7 +11,7 @@ namespace SharpAbp.Abp.CryptoVault
         private readonly IRSAEncryptionService _rsaEncryptionService;
         public RSACredsAppServiceTest()
         {
-            _rsaCredsAppService = GetRequiredService<IRSACredsAppService>();
+            _rsaCredsAppService = new RSACredsController(GetRequiredService<IRSACredsAppService>());
             _rsaEncryptionService = GetRequiredService<IRSAEncryptionService>();
         }
 

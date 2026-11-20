@@ -149,7 +149,7 @@ namespace SharpAbp.MinId
                 MaxId = minIdInfo.MaxId,
                 Remainder = minIdInfo.Remainder < 0 ? 0 : minIdInfo.Remainder,
                 Delta = minIdInfo.Delta,
-                LoadingId = minIdInfo.MaxId - minIdInfo.Step + minIdInfo.Step * (loadingPercent / 100)
+                LoadingId = minIdInfo.MaxId - minIdInfo.Step + (long)minIdInfo.Step * loadingPercent / 100
             };
 
             return segmentId;

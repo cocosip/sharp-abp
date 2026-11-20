@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <Format>json,cobertura</Format>
+          <Include>[SharpAbp.*]*</Include>
+          <Exclude>[*.Tests]*,[*.AllTests]*,[*.TestBase]*</Exclude>
+          <IncludeTestAssembly>false</IncludeTestAssembly>
+          <SkipAutoProps>false</SkipAutoProps>
+          <UseSourceLink>false</UseSourceLink>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

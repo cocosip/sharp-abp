@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using SharpAbp.Abp.DbConnections.OceanBase;
 using OceanBaseConnector;
 using SharpAbp.Abp.Data;
 using Volo.Abp;
@@ -50,6 +51,15 @@ namespace SharpAbp.Abp.DbConnections
         {
             await Assert.ThrowsAsync<ArgumentException>(() => GetRequiredService<IDbConnectionCreateService>().CreateAsync(
                 new DbConnectionInfo(DatabaseProvider.OceanBase, "Port=not-a-number")));
+        }
+
+        [Fact]
+        public void Creator_Rejects_Missing_Connection_Info_And_Settings()
+        {
+            var creator = new OceanBaseInternalDbConnectionCreator();
+            Assert.Throws<ArgumentNullException>(() => creator.Create(null));
+            Assert.Throws<ArgumentException>(() => creator.Create(new DbConnectionInfo(DatabaseProvider.OceanBase, null)));
+            Assert.Throws<ArgumentException>(() => creator.Create(new DbConnectionInfo(DatabaseProvider.OceanBase, " ")));
         }
     }
 }

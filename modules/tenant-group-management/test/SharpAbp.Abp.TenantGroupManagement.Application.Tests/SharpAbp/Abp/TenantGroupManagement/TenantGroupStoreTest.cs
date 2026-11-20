@@ -5,6 +5,7 @@ using Volo.Abp.Data;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.TenantManagement;
 using Xunit;
+using Microsoft.Extensions.Options;
 
 namespace SharpAbp.Abp.TenantGroupManagement
 {
@@ -40,7 +41,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
                 Assert.Null(c1);
 
                 var connection = await _connectionStringResolver.ResolveAsync();
-                Assert.Equal("123", connection);
+                Assert.Equal(GetRequiredService<IOptions<AbpDbConnectionOptions>>().Value.ConnectionStrings.Default, connection);
             }
 
 

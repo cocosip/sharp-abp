@@ -15,10 +15,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.collector" >
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
 
     <PackageReference Include="Volo.Abp.Autofac"  />
     <PackageReference Include="Volo.Abp.TestBase" />
@@ -37,4 +33,16 @@
     <ProjectReference Include="..\..\src\SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore\SharpAbp.Abp.FileStoringManagement.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.FileStoringManagement.HttpApi\SharpAbp.Abp.FileStoringManagement.HttpApi.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.EntityFrameworkCore.Sqlite" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.FileStoringManagement.HttpApi.Client\SharpAbp.Abp.FileStoringManagement.HttpApi.Client.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.FileStoringManagement.MongoDB\SharpAbp.Abp.FileStoringManagement.MongoDB.csproj" />
+  </ItemGroup>
 </Project>

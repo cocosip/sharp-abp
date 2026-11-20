@@ -14,7 +14,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 
         public FileProviderAppServiceTest()
         {
-            _fileProviderAppService = GetRequiredService<IFileProviderAppService>();
+            _fileProviderAppService = new FileProviderController(GetRequiredService<IFileProviderAppService>());
         }
 
         [Fact]

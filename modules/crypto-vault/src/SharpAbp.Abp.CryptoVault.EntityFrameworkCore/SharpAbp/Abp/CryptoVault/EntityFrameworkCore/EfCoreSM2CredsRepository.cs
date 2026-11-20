@@ -1,8 +1,9 @@
-﻿﻿﻿using JetBrains.Annotations;
+﻿﻿using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Linq.Dynamic.Core;
 using System.Threading;
 using System.Threading.Tasks;
@@ -77,8 +78,8 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
         }
 
         /// <summary>
-        /// Retrieves a random SM2 credential using database-level randomization for optimal performance and fair distribution.
-        /// Implements true randomness through SQL NEWID() function for equal probability selection across all matching credentials.
+        /// Retrieves a random SM2 credential using a randomly selected position in the filtered result.
+        /// Uses a count and an ordered offset query for portable selection across relational providers.
         /// Supports filtering by source type for domain-specific randomization and curve type for cryptographic compatibility.
         /// Ideal for load balancing scenarios, automatic key rotation, and fair distribution across available SM2 credentials
         /// with specific cryptographic parameters and Chinese national standard compliance.
@@ -94,12 +95,22 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
             bool includeDetails = true, 
             CancellationToken cancellationToken = default)
         {
-            return await (await GetDbSetAsync())
+            var query = (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
                 .WhereIf(sourceType.HasValue, item => item.SourceType == sourceType.Value)
-                .WhereIf(!curve.IsNullOrWhiteSpace(), item => item.Curve == curve)
-                .OrderBy(x => Guid.NewGuid())
-                .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
+                .WhereIf(!curve.IsNullOrWhiteSpace(), item => item.Curve == curve);
+            var token = GetCancellationToken(cancellationToken);
+            var count = await query.CountAsync(token);
+            if (count == 0)
+            {
+                return null;
+            }
+
+            // Provider random SQL functions have different per-row semantics; select a random position instead.
+            var selected = await query.OrderBy(x => x.Id)
+                .Skip(RandomNumberGenerator.GetInt32(count))
+                .FirstOrDefaultAsync(token);
+            return selected ?? await query.OrderBy(x => x.Id).FirstOrDefaultAsync(token);
         }
 
         /// <summary>

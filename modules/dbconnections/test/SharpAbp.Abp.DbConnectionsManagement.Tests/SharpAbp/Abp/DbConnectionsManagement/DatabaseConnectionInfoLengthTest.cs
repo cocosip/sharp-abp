@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
@@ -13,7 +13,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
 
         public DatabaseConnectionInfoLengthTest()
         {
-            _databaseConnectionInfoAppService = GetRequiredService<IDatabaseConnectionInfoAppService>();
+            _databaseConnectionInfoAppService = new DatabaseConnectionInfoController(GetRequiredService<IDatabaseConnectionInfoAppService>());
         }
 
         [Fact]

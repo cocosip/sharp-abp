@@ -1,4 +1,4 @@
-﻿using OpenIddict.Abstractions;
+using OpenIddict.Abstractions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,7 +13,7 @@ namespace SharpAbp.Abp.OpenIddict
         private readonly IAbpApplicationManager _applicationManager;
         public OpenIddictApplicationAppServiceTest()
         {
-            _openIddictApplicationAppService = GetRequiredService<IOpenIddictApplicationAppService>();
+            _openIddictApplicationAppService = new OpenIddictApplicationController(GetRequiredService<IOpenIddictApplicationAppService>());
             _applicationManager = GetRequiredService<IAbpApplicationManager>();
         }
 

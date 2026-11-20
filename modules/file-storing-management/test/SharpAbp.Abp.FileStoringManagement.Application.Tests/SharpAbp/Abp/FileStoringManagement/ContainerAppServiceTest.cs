@@ -1,4 +1,4 @@
-﻿using SharpAbp.Abp.FileStoring;
+using SharpAbp.Abp.FileStoring;
 using SharpAbp.Abp.FileStoring.FileSystem;
 using SharpAbp.Abp.FileStoring.Minio;
 using System;
@@ -21,7 +21,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         {
             _currentTenant = GetRequiredService<ICurrentTenant>();
             _dataFilter = GetRequiredService<IDataFilter<IMultiTenant>>();
-            _containerAppService = GetRequiredService<IContainerAppService>();
+            _containerAppService = new ContainerController(GetRequiredService<IContainerAppService>());
             _fileContainerFactory = GetRequiredService<IFileContainerFactory>();
         }
 

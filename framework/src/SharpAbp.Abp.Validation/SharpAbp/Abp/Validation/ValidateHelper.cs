@@ -81,7 +81,7 @@ namespace SharpAbp.Abp.Validation
         {
             if (!value.IsNullOrWhiteSpace())
             {
-                return Regex.IsMatch(value, @"^[+-]?[0-9]+$");
+                return Regex.IsMatch(value, @"\A[+-]?[0-9]+\z");
             }
             return false;
         }

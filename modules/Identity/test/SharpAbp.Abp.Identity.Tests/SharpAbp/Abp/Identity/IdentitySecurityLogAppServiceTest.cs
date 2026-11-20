@@ -15,7 +15,7 @@ namespace SharpAbp.Abp.Identity
         public IdentitySecurityLogAppServiceTest()
         {
             _securityLogStore = GetRequiredService<ISecurityLogStore>();
-            _identitySecurityLogAppService = GetRequiredService<IIdentitySecurityLogAppService>();
+            _identitySecurityLogAppService = new IdentitySecurityLogController(GetRequiredService<IIdentitySecurityLogAppService>());
             _identitySecurityLogManager = GetRequiredService<IdentitySecurityLogManager>();
         }
 
@@ -68,6 +68,8 @@ namespace SharpAbp.Abp.Identity
 
 
             var first = pagedSecurityLog.Items.FirstOrDefault();
+
+            Assert.Equal(first.Id, (await _identitySecurityLogAppService.GetAsync(first.Id)).Id);
 
             await _identitySecurityLogAppService.DeleteAsync(first.Id);
 

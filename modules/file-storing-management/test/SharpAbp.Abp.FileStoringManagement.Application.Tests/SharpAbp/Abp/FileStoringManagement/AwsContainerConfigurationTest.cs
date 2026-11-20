@@ -13,7 +13,7 @@ namespace SharpAbp.Abp.FileStoringManagement
 
         public AwsContainerConfigurationTest()
         {
-            _containerAppService = GetRequiredService<IContainerAppService>();
+            _containerAppService = new ContainerController(GetRequiredService<IContainerAppService>());
             _fileContainerFactory = GetRequiredService<IFileContainerFactory>();
         }
 

@@ -15,17 +15,17 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="coverlet.collector" >
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
 
 		<PackageReference Include="Volo.Abp.Autofac" />
 		<PackageReference Include="Volo.Abp.TestBase" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+		<!-- Match the existing Oracle.Devart adapter's minimum relational patch. -->
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" VersionOverride="$(DevartEfCoreRelationalPackageVersion)" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.DbConnections.DM\SharpAbp.Abp.DbConnections.DM.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.DbConnections.GaussDB\SharpAbp.Abp.DbConnections.GaussDB.csproj" />
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.DbConnections.Oracle.Devart\SharpAbp.Abp.DbConnections.Oracle.Devart.csproj" />
 		<ProjectReference Include="..\..\src\SharpAbp.Abp.DbConnections.OceanBase\SharpAbp.Abp.DbConnections.OceanBase.csproj" />
 		<ProjectReference Include="..\..\src\SharpAbp.Abp.DbConnections.MySQL\SharpAbp.Abp.DbConnections.MySQL.csproj" />
 		<ProjectReference Include="..\..\src\SharpAbp.Abp.DbConnections.Oracle\SharpAbp.Abp.DbConnections.Oracle.csproj" />

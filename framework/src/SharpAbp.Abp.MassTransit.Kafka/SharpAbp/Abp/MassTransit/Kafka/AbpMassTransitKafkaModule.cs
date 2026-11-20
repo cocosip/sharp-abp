@@ -35,25 +35,23 @@ namespace SharpAbp.Abp.MassTransit.Kafka
 
                 PreConfigure<AbpMassTransitKafkaOptions>(options => options.PreConfigure(configuration));
 
-                var kafkaOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitKafkaOptions>();
-
                 PreConfigure<AbpMassTransitKafkaOptions>(options =>
                 {
                     options.DefaultTopicFormatFunc = KafkaUtil.TopicFormat;
 
                     options.DefaultReceiveEndpointConfigure = new Action<IKafkaTopicReceiveEndpointConfigurator>(c =>
                     {
-                        c.ConcurrentMessageLimit = kafkaOptions.DefaultConcurrentMessageLimit;
-                        c.MessageLimit = kafkaOptions.DefaultMessageLimit;
-                        c.PrefetchCount = kafkaOptions.DefaultPrefetchCount;
-                        c.MaxPollInterval = kafkaOptions.DefaultMaxPollInterval;
-                        c.SessionTimeout = kafkaOptions.DefaultSessionTimeout;
-                        c.CheckpointInterval = kafkaOptions.DefaultCheckpointInterval;
-                        c.CheckpointMessageCount = kafkaOptions.DefaultCheckpointMessageCount;
-                        c.EnableAutoOffsetStore = kafkaOptions.DefaultEnableAutoOffsetStore;
-                        c.ConcurrentConsumerLimit = kafkaOptions.DefaultConcurrentConsumerLimit;
-                        c.AutoOffsetReset = kafkaOptions.DefaultAutoOffsetReset;
-                        c.HeartbeatInterval = kafkaOptions.DefaultHeartbeatInterval;
+                        c.ConcurrentMessageLimit = options.DefaultConcurrentMessageLimit;
+                        c.MessageLimit = options.DefaultMessageLimit;
+                        c.PrefetchCount = options.DefaultPrefetchCount;
+                        c.MaxPollInterval = options.DefaultMaxPollInterval;
+                        c.SessionTimeout = options.DefaultSessionTimeout;
+                        c.CheckpointInterval = options.DefaultCheckpointInterval;
+                        c.CheckpointMessageCount = options.DefaultCheckpointMessageCount;
+                        c.EnableAutoOffsetStore = options.DefaultEnableAutoOffsetStore;
+                        c.ConcurrentConsumerLimit = options.DefaultConcurrentConsumerLimit;
+                        c.AutoOffsetReset = options.DefaultAutoOffsetReset;
+                        c.HeartbeatInterval = options.DefaultHeartbeatInterval;
 
                         if (options.AutoCreateTopic)
                         {

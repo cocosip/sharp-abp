@@ -105,10 +105,12 @@
     <Project Path="test/SharpAbp.Abp.FileStoring.Tests/SharpAbp.Abp.FileStoring.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.ObjectPool.Tests/SharpAbp.Abp.ObjectPool.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.FreeRedis.Tests/SharpAbp.Abp.FreeRedis.Tests.csproj" />
+    <Project Path="test/SharpAbp.Abp.IdentityModel.Tests/SharpAbp.Abp.IdentityModel.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.MassTransit.Tests/SharpAbp.Abp.MassTransit.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.OpenTelemetry.Tests/SharpAbp.Abp.OpenTelemetry.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.OperationRateLimiting.Tests/SharpAbp.Abp.OperationRateLimiting.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.Snowflakes.Tests/SharpAbp.Abp.Snowflakes.Tests.csproj" />
+    <Project Path="test/SharpAbp.Abp.Swashbuckle.Versioning.Tests/SharpAbp.Abp.Swashbuckle.Versioning.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.TransformSecurity.AspNetCore.Tests/SharpAbp.Abp.TransformSecurity.AspNetCore.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.TransformSecurity.SM2.Tests/SharpAbp.Abp.TransformSecurity.SM2.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.TransformSecurity.Tests/SharpAbp.Abp.TransformSecurity.Tests.csproj" />

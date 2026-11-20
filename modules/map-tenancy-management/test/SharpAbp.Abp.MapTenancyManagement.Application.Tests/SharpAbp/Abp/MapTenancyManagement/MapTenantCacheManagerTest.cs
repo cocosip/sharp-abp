@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -10,7 +10,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         private readonly IMapTenantStore _mapTenantStore;
         public MapTenantCacheManagerTest()
         {
-            _hybridMapTenantAppService = GetRequiredService<IHybridMapTenantAppService>();
+            _hybridMapTenantAppService = new HybridMapTenantController(GetRequiredService<IHybridMapTenantAppService>());
             _mapTenantStore = GetRequiredService<IMapTenantStore>();
         }
 

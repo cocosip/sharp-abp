@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.DataProtection;
+using Volo.Abp.Data;
+using System;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -33,6 +35,13 @@ namespace SharpAbp.Abp.Account
     )]
     public class AccountApplicationTestModule : AbpModule
     {
+        private SqliteConnection _connection;
+
+        public override void OnApplicationShutdown(ApplicationShutdownContext context)
+        {
+            _connection.Dispose();
+        }
+
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             context.Services.AddDataProtection().UseEphemeralDataProtectionProvider();
@@ -40,18 +49,24 @@ namespace SharpAbp.Abp.Account
             context.Services.Replace(ServiceDescriptor.Singleton(Substitute.For<IAccountEmailer>()));
 
             var sqliteConnection = CreateDatabaseAndGetConnection();
+            _connection = sqliteConnection;
+
+            Configure<AbpDbConnectionOptions>(options =>
+            {
+                options.ConnectionStrings.Default = _connection.ConnectionString;
+            });
 
             Configure<AbpDbContextOptions>(options =>
             {
                 options.Configure(abpDbContextConfigurationContext =>
                 {
-                    abpDbContextConfigurationContext.DbContextOptions.UseSqlite(sqliteConnection);
+                    abpDbContextConfigurationContext.UseSqlite();
                 });
             });
         }
         private static SqliteConnection CreateDatabaseAndGetConnection()
         {
-            var connection = new SqliteConnection("Data Source=:memory:");
+            var connection = new SqliteConnection($"Data Source={Guid.NewGuid():N};Mode=Memory;Cache=Shared");
             connection.Open();
 
             new SettingManagementDbContext(

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using SharpAbp.Abp.Account.Emailing;
@@ -24,7 +24,7 @@ namespace SharpAbp.Abp.Account
 
         public AccountAppService_Tests()
         {
-            _accountAppService = GetRequiredService<IAccountAppService>();
+            _accountAppService = new AccountController(GetRequiredService<IAccountAppService>());
             _identityUserRepository = GetRequiredService<IIdentityUserRepository>();
             _lookupNormalizer = GetRequiredService<ILookupNormalizer>();
             _userManager = GetRequiredService<IdentityUserManager>();

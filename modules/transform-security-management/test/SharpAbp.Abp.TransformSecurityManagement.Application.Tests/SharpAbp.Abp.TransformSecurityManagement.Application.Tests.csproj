@@ -15,10 +15,6 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="coverlet.collector">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
 
 		<PackageReference Include="Volo.Abp.Autofac" />
 		<PackageReference Include="Volo.Abp.TestBase" />
@@ -31,4 +27,16 @@
 		<ProjectReference Include="..\..\..\crypto-vault\src\SharpAbp.Abp.CryptoVault.EntityFrameworkCore\SharpAbp.Abp.CryptoVault.EntityFrameworkCore.csproj" />
 	</ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.TransformSecurityManagement.HttpApi\SharpAbp.Abp.TransformSecurityManagement.HttpApi.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.EntityFrameworkCore.Sqlite" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.TransformSecurityManagement.HttpApi.Client\SharpAbp.Abp.TransformSecurityManagement.HttpApi.Client.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.TransformSecurityManagement.MongoDB\SharpAbp.Abp.TransformSecurityManagement.MongoDB.csproj" />
+  </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -10,7 +10,7 @@ namespace SharpAbp.Abp.OpenIddict
         private readonly IOpenIddictScopeAppService _openIddictScopeAppService;
         public OpenIddictScopeAppServiceTest()
         {
-            _openIddictScopeAppService = GetRequiredService<IOpenIddictScopeAppService>();
+            _openIddictScopeAppService = new OpenIddictScopeController(GetRequiredService<IOpenIddictScopeAppService>());
         }
 
         [Fact]

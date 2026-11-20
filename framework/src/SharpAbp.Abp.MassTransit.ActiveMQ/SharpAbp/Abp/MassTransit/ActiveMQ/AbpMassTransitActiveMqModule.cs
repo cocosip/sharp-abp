@@ -25,25 +25,23 @@ namespace SharpAbp.Abp.MassTransit.ActiveMQ
             {
                 PreConfigure<AbpMassTransitActiveMqOptions>(options => options.PreConfigure(configuration));
 
-                var activeMqOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitActiveMqOptions>();
-
                 PreConfigure<AbpMassTransitActiveMqOptions>(options =>
                 {
                     options.DefaultQueueNameFormatFunc = ActiveMqUtil.QueueNameFormat;
 
                     options.DefaultPublishTopologyConfigure = new Action<IActiveMqMessagePublishTopologyConfigurator>(c =>
                     {
-                        c.AutoDelete = activeMqOptions.DefaultAutoDelete;
-                        c.Durable = activeMqOptions.DefaultDurable;
-                        c.Exclude = activeMqOptions.DefaultExclude;
+                        c.AutoDelete = options.DefaultAutoDelete;
+                        c.Durable = options.DefaultDurable;
+                        c.Exclude = options.DefaultExclude;
                     });
 
                     options.DefaultReceiveEndpointConfigure = new Action<string, IActiveMqReceiveEndpointConfigurator>((queueName, c) =>
                     {
-                        c.ConcurrentMessageLimit = activeMqOptions.DefaultConcurrentMessageLimit;
-                        c.PrefetchCount = activeMqOptions.DefaultPrefetchCount;
-                        c.AutoDelete = activeMqOptions.DefaultAutoDelete;
-                        c.Durable = activeMqOptions.DefaultDurable;
+                        c.ConcurrentMessageLimit = options.DefaultConcurrentMessageLimit;
+                        c.PrefetchCount = options.DefaultPrefetchCount;
+                        c.AutoDelete = options.DefaultAutoDelete;
+                        c.Durable = options.DefaultDurable;
                     });
 
                     options.ActiveMqPostConfigures.Add(new Action<IBusRegistrationContext, IActiveMqBusFactoryConfigurator>((ctx, cfg) =>

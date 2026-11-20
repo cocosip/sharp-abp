@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SharpAbp.Abp.Identity
@@ -8,7 +8,7 @@ namespace SharpAbp.Abp.Identity
         private readonly IIdentitySettingsAppService _identitySettingsAppService;
         public IdentitySettingsAppServiceTest()
         {
-            _identitySettingsAppService = GetRequiredService<IIdentitySettingsAppService>();
+            _identitySettingsAppService = new IdentitySettingsController(GetRequiredService<IIdentitySettingsAppService>());
         }
 
         [Fact]

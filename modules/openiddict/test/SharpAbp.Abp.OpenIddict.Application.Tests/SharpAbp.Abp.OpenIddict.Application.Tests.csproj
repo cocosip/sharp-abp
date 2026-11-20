@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\..\..\common.test.props" />
 
 	<PropertyGroup>
 		<TargetFramework>$(NetCoreFx)</TargetFramework>
@@ -14,10 +15,6 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="coverlet.collector" >
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
 
 		<PackageReference Include="Volo.Abp.Autofac" />
 		<PackageReference Include="Volo.Abp.TestBase" />
@@ -29,4 +26,13 @@
 	  <ProjectReference Include="..\..\src\SharpAbp.Abp.OpenIddict.Application\SharpAbp.Abp.OpenIddict.Application.csproj" />
 	</ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.OpenIddict.HttpApi\SharpAbp.Abp.OpenIddict.HttpApi.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.EntityFrameworkCore.Sqlite" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.OpenIddict.HttpApi.Client\SharpAbp.Abp.OpenIddict.HttpApi.Client.csproj" />
+  </ItemGroup>
 </Project>

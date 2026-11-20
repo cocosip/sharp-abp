@@ -48,6 +48,7 @@ namespace SharpAbp.Abp.MassTransit.PostgreSql
                 ConnectionString = massTransitPostgreSqlOptions.ConnectionString;
                 Create = massTransitPostgreSqlOptions.Create;
                 Delete = massTransitPostgreSqlOptions.Delete;
+                AutoStart = massTransitPostgreSqlOptions.AutoStart;
                 AutoDeleteOnIdle = massTransitPostgreSqlOptions.AutoDeleteOnIdle;
 
                 ConcurrentMessageLimit = massTransitPostgreSqlOptions.ConcurrentMessageLimit;

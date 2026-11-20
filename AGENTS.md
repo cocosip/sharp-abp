@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-SharpAbp is a .NET/ABP package collection. Infrastructure packages and tests live in `framework/src` and `framework/test`; the solution is `framework/SharpAbp.slnx`. Business modules use `modules/<name>/src`, `test`, and individual `.slnx` solutions. Runnable examples and web assets live under `samples`; documentation belongs in `docs` or module READMEs.
+SharpAbp is a .NET/ABP package collection. Infrastructure packages and tests live in `framework/src` and `framework/test`; the solution is `framework/SharpAbp.slnx`. Business modules use `modules/<name>/src`, `test`, and individual `.slnx` solutions. Documentation belongs in `docs` or module READMEs.
 
 Shared settings live in `Directory.Build.props`, `Directory.Packages.props`, `common.props`, and `common.test.props`. The current checkout uses .NET 10 and ABP 10.x; some infrastructure packages also target .NET Standard. Check each project's targets before using framework-specific APIs.
 
@@ -14,11 +14,10 @@ Run from the repository root with the .NET 10 SDK:
 - `dotnet build framework/SharpAbp.slnx -c Release` — build infrastructure packages.
 - `dotnet build modules/account/SharpAbp.Abp.Account.slnx -c Release` — build one module.
 - `dotnet test modules/account/test/SharpAbp.Abp.Account.Application.Tests/SharpAbp.Abp.Account.Application.Tests.csproj -c Release` — run focused tests.
-- `dotnet run --project samples/sample/src/SharpSample.HttpApi.Host` — start the integration sample after configuring its external services.
 - `powershell -ExecutionPolicy Bypass -File scripts/windows-ci/Build-All.ps1` — build the framework and module CI list.
 - `git diff --check` — check whitespace errors.
 
-Keep `Build-All.ps1` aligned with `.github/workflows/ci-cd.yml`; samples require separate validation.
+Keep `Build-All.ps1` aligned with `.github/workflows/ci-cd.yml`.
 
 ## Coding Style & Naming Conventions
 
@@ -35,7 +34,7 @@ Tests use xUnit and existing ABP test bases; follow names such as `SomeServiceTe
 
 In Codex, run `dotnet build` and `dotnet test` outside the sandbox with `sandbox_permissions: "require_escalated"` and `prefix_rule: ["dotnet"]`. Reuse approved permissions; do not repeatedly retry sandbox hangs. Build scripts need equivalent execution access.
 
-Never commit credentials or machine-specific endpoints; keep sample configuration generic.
+Never commit credentials or machine-specific endpoints; keep example configuration generic.
 
 ## Branch, Version & Release Policy
 

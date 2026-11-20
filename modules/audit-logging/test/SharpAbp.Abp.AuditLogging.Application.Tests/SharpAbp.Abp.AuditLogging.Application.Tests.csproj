@@ -15,10 +15,6 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="coverlet.collector" >
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
 
 		<PackageReference Include="Volo.Abp.Autofac"  />
 		<PackageReference Include="Volo.Abp.TestBase"  />
@@ -29,4 +25,13 @@
 	  <ProjectReference Include="..\..\src\SharpAbp.Abp.AuditLogging.Application\SharpAbp.Abp.AuditLogging.Application.csproj" />
 	</ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.AuditLogging.HttpApi\SharpAbp.Abp.AuditLogging.HttpApi.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.EntityFrameworkCore.Sqlite" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.AuditLogging.HttpApi.Client\SharpAbp.Abp.AuditLogging.HttpApi.Client.csproj" />
+  </ItemGroup>
 </Project>

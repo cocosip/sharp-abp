@@ -1,4 +1,4 @@
-﻿using SharpAbp.Abp.MapTenancy;
+using SharpAbp.Abp.MapTenancy;
 using System;
 using System.Threading.Tasks;
 using Volo.Abp;
@@ -18,7 +18,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         {
             _tenantNormalizer = GetRequiredService<ITenantNormalizer>();
             _tenantRepository = GetRequiredService<ITenantRepository>();
-            _mapTenantAppService = GetRequiredService<IMapTenantAppService>();
+            _mapTenantAppService = new MapTenantController(GetRequiredService<IMapTenantAppService>());
             _mapTenancyConfigurationProvider = GetRequiredService<IMapTenancyConfigurationProvider>();
         }
 

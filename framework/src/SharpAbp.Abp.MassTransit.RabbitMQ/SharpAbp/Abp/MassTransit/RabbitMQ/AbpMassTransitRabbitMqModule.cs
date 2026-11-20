@@ -27,8 +27,6 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
             {
                 PreConfigure<AbpMassTransitRabbitMqOptions>(options => options.PreConfigure(configuration));
 
-                var rabbitMqOptions = context.Services.ExecutePreConfiguredActions<AbpMassTransitRabbitMqOptions>();
-
                 PreConfigure<AbpMassTransitRabbitMqOptions>(options =>
                 {
                     options.DefaultExchangeNameFormatFunc = RabbitMqUtil.ExchangeNameFormat;
@@ -36,18 +34,18 @@ namespace SharpAbp.Abp.MassTransit.RabbitMQ
 
                     options.DefaultPublishTopologyConfigure = new Action<IRabbitMqMessagePublishTopologyConfigurator>(c =>
                     {
-                        c.AutoDelete = rabbitMqOptions.DefaultAutoDelete;
-                        c.Durable = rabbitMqOptions.DefaultDurable;
-                        c.ExchangeType = rabbitMqOptions.DefaultExchangeType;
+                        c.AutoDelete = options.DefaultAutoDelete;
+                        c.Durable = options.DefaultDurable;
+                        c.ExchangeType = options.DefaultExchangeType;
                     });
 
                     options.DefaultReceiveEndpointConfigure = new Action<string, string, IRabbitMqReceiveEndpointConfigurator>((exchangeName, queueName, c) =>
                     {
-                        c.ConcurrentMessageLimit = rabbitMqOptions.DefaultConcurrentMessageLimit;
-                        c.PrefetchCount = rabbitMqOptions.DefaultPrefetchCount;
-                        c.AutoDelete = rabbitMqOptions.DefaultAutoDelete;
-                        c.Durable = rabbitMqOptions.DefaultDurable;
-                        c.ExchangeType = rabbitMqOptions.DefaultExchangeType;
+                        c.ConcurrentMessageLimit = options.DefaultConcurrentMessageLimit;
+                        c.PrefetchCount = options.DefaultPrefetchCount;
+                        c.AutoDelete = options.DefaultAutoDelete;
+                        c.Durable = options.DefaultDurable;
+                        c.ExchangeType = options.DefaultExchangeType;
                     });
                 });
             }

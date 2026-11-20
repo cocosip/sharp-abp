@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
 using Xunit;
 
@@ -9,7 +9,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
         private readonly IHybridMapTenantAppService _hybridMapTenantAppService;
         public HybridMapTenantAppServiceTest()
         {
-            _hybridMapTenantAppService = GetRequiredService<IHybridMapTenantAppService>();
+            _hybridMapTenantAppService = new HybridMapTenantController(GetRequiredService<IHybridMapTenantAppService>());
         }
 
         [Fact]

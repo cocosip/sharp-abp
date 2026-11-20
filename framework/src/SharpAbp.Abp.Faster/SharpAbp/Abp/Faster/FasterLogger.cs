@@ -26,6 +26,7 @@ namespace SharpAbp.Abp.Faster
         private readonly SemaphoreSlim _initializeSemaphore = new SemaphoreSlim(1, 1);
         private readonly CancellationTokenSource _disposeCts = new CancellationTokenSource();
         private CancellationTokenSource? _linkedCts;
+        private IDevice? _logDevice;
         private long _truncateBeforeAddress = -1L;
         private bool _initialized = false;
         private bool _disposed = false;
@@ -205,6 +206,7 @@ namespace SharpAbp.Abp.Faster
                     Configuration.RecoverDevice,
                     Configuration.UseIoCompletionPort,
                     Configuration.DisableFileBuffering);
+                _logDevice = device;
 
                 var settings = new FasterLogSettings()
                 {
@@ -1202,6 +1204,7 @@ namespace SharpAbp.Abp.Faster
             // Dispose resources
             Log?.Dispose();
             Iter?.Dispose();
+            _logDevice?.Dispose();
             _commitSemaphore?.Dispose();
             _initializeSemaphore?.Dispose();
             _linkedCts?.Dispose();

@@ -1,4 +1,4 @@
-﻿using SharpAbp.Abp.Crypto.SM2;
+using SharpAbp.Abp.Crypto.SM2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +14,7 @@ namespace SharpAbp.Abp.CryptoVault
         private readonly ISm2EncryptionService _sm2EncryptionService;
         public SM2CredsAppServiceTest()
         {
-            _sm2CredsAppService = GetRequiredService<ISM2CredsAppService>();
+            _sm2CredsAppService = new SM2CredsController(GetRequiredService<ISM2CredsAppService>());
             _sm2EncryptionService = GetRequiredService<ISm2EncryptionService>();
         }
 

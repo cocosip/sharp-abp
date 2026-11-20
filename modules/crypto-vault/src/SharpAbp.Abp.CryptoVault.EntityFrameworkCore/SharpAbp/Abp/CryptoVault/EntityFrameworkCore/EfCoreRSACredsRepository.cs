@@ -1,8 +1,9 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
@@ -73,8 +74,8 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
         }
 
         /// <summary>
-        /// Retrieves a random RSA credential using database-level randomization for optimal performance.
-        /// Implements true randomness through SQL NEWID() function for fair distribution across credentials.
+        /// Retrieves a random RSA credential using a randomly selected position in the filtered result.
+        /// Uses a count and an ordered offset query for portable selection across relational providers.
         /// Supports filtering by source type and key size for targeted random selection scenarios.
         /// </summary>
         /// <param name="sourceType">Optional filter by source type of the credential for domain-specific randomization.</param>
@@ -88,12 +89,22 @@ namespace SharpAbp.Abp.CryptoVault.EntityFrameworkCore
             bool includeDetails = true, 
             CancellationToken cancellationToken = default)
         {
-            return await (await GetDbSetAsync())
+            var query = (await GetDbSetAsync())
                 .IncludeDetails(includeDetails)
                 .WhereIf(sourceType.HasValue, item => item.SourceType == sourceType.Value)
-                .WhereIf(size.HasValue, item => item.Size == size.Value)
-                .OrderBy(x => Guid.NewGuid())
-                .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
+                .WhereIf(size.HasValue, item => item.Size == size.Value);
+            var token = GetCancellationToken(cancellationToken);
+            var count = await query.CountAsync(token);
+            if (count == 0)
+            {
+                return null;
+            }
+
+            // Provider random SQL functions have different per-row semantics; select a random position instead.
+            var selected = await query.OrderBy(x => x.Id)
+                .Skip(RandomNumberGenerator.GetInt32(count))
+                .FirstOrDefaultAsync(token);
+            return selected ?? await query.OrderBy(x => x.Id).FirstOrDefaultAsync(token);
         }
 
         /// <summary>

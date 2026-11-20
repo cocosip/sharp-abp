@@ -2,6 +2,7 @@
 	<PropertyGroup>
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 		<CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+		<DevartEfCoreRelationalPackageVersion>10.0.14</DevartEfCoreRelationalPackageVersion>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageVersion Include="Volo.Abp" Version="$(VoloAbpPackageVersion)" />

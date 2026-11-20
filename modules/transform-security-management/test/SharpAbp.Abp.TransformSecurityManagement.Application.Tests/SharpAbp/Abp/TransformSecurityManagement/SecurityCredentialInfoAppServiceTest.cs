@@ -14,7 +14,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
 
         public SecurityCredentialInfoAppServiceTest()
         {
-            _securityCredentialInfoAppService = GetRequiredService<ISecurityCredentialInfoAppService>();
+            _securityCredentialInfoAppService = new SecurityCredentialInfoController(GetRequiredService<ISecurityCredentialInfoAppService>());
             _securityCredentialInfoRepository = GetRequiredService<ISecurityCredentialInfoRepository>();
             _rsaCredsAppService = GetRequiredService<IRSACredsAppService>();
         }

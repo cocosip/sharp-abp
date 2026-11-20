@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<Import Project="..\..\..\..\common.test.props" />
 	<PropertyGroup>
@@ -15,10 +15,6 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="coverlet.collector">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
 
 		<PackageReference Include="Volo.Abp.Autofac" />
 		<PackageReference Include="Volo.Abp.TestBase" />
@@ -29,4 +25,16 @@
 		<ProjectReference Include="..\..\src\SharpAbp.Abp.CryptoVault.EntityFrameworkCore\SharpAbp.Abp.CryptoVault.EntityFrameworkCore.csproj" />
 	</ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.CryptoVault.HttpApi\SharpAbp.Abp.CryptoVault.HttpApi.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.EntityFrameworkCore.Sqlite" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.CryptoVault.HttpApi.Client\SharpAbp.Abp.CryptoVault.HttpApi.Client.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.CryptoVault.MongoDB\SharpAbp.Abp.CryptoVault.MongoDB.csproj" />
+  </ItemGroup>
 </Project>

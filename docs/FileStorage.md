@@ -833,17 +833,19 @@ Configure<AbpFileStoringOptions>(options =>
     {
         container.UseKS3(ks3 =>
         {
-            ks3.AccessKeyId = "your-access-key";
-            ks3.AccessKeySecret = "your-secret-key";
-            ks3.Endpoint = "ks3-cn-beijing.ksyuncs.com";
+            ks3.AccessKey = "your-access-key";
+            ks3.SecretKey = "your-secret-key";
+            ks3.Endpoint = "ks3-cn-beijing.ksyun.com";
             ks3.BucketName = "my-bucket";
-            ks3.CreateBucketIfNotExists = true;
+            ks3.CreateContainerIfNotExists = true;
         });
     });
 });
 ```
 
 `KS3.MaxConnections` is applied by the KS3 SDK through the process-wide `ServicePointManager.DefaultConnectionLimit`; when several KS3 containers use different values, the last client created wins. The KS3 SDK is synchronous only, so provider calls block on the SDK.
+
+The bundled `Cocosip.KS3SDK` 1.0.0 URL signer hardcodes HTTP and `ks3-cn-beijing.ksyun.com`, ignoring the configured endpoint and protocol. Custom endpoints and HTTPS signed access URLs are not supported by that signer. Offline signing tests cover its default endpoint; custom endpoint signing needs an SDK fix and real KS3 validation.
 
 ---
 

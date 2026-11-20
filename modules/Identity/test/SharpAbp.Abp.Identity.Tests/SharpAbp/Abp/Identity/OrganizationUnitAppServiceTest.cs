@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Identity;
 using Xunit;
@@ -10,7 +10,7 @@ namespace SharpAbp.Abp.Identity
         private readonly IOrganizationUnitAppService _organizationUnitAppService;
         public OrganizationUnitAppServiceTest()
         {
-            _organizationUnitAppService = GetRequiredService<IOrganizationUnitAppService>();
+            _organizationUnitAppService = new OrganizationUnitController(GetRequiredService<IOrganizationUnitAppService>());
         }
 
         [Fact]

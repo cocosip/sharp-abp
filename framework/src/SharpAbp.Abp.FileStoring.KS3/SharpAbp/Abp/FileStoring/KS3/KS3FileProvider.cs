@@ -169,8 +169,8 @@ namespace SharpAbp.Abp.FileStoring.KS3
                     return null;
                 }
                 var result = ks3Client.GetObject(containerName, objectKey);
-
-                return await TryCopyToMemoryStreamAsync(result.ObjectContent, args.CancellationToken);
+                using var content = result.ObjectContent;
+                return await TryCopyToMemoryStreamAsync(content, args.CancellationToken);
             }
             finally
             {
@@ -197,7 +197,8 @@ namespace SharpAbp.Abp.FileStoring.KS3
                 }
 
                 var result = ks3Client.GetObject(containerName, objectKey);
-                await TryWriteToFileAsync(result.ObjectContent, args.Path, args.CancellationToken);
+                using var content = result.ObjectContent;
+                await TryWriteToFileAsync(content, args.Path, args.CancellationToken);
                 return true;
             }
             finally
@@ -265,7 +266,11 @@ namespace SharpAbp.Abp.FileStoring.KS3
             {
                 try
                 {
-                    var headObject = ks3.HeadObject(containerName, fileName);
+                    var headObject = ks3.HeadObject(new HeadObjectRequest
+                    {
+                        BucketName = containerName,
+                        ObjectKey = fileName
+                    });
                     return true;
                 }
                 catch (Exception ex)

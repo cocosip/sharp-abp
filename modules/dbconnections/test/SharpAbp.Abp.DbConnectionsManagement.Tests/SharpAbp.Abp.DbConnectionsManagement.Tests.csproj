@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<Import Project="..\..\..\..\common.test.props" />
 	<PropertyGroup>
@@ -12,10 +12,6 @@
 		<PackageReference Include="Microsoft.NET.Test.Sdk"/>
 		<PackageReference Include="xunit" />
 		<PackageReference Include="xunit.runner.visualstudio">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="coverlet.collector">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
@@ -35,4 +31,16 @@
 		<ProjectReference Include="..\..\src\SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore\SharpAbp.Abp.DbConnectionsManagement.EntityFrameworkCore.csproj" />
 	</ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.DbConnectionsManagement.HttpApi\SharpAbp.Abp.DbConnectionsManagement.HttpApi.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.EntityFrameworkCore.Sqlite" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.DbConnectionsManagement.HttpApi.Client\SharpAbp.Abp.DbConnectionsManagement.HttpApi.Client.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.DbConnectionsManagement.MongoDB\SharpAbp.Abp.DbConnectionsManagement.MongoDB.csproj" />
+  </ItemGroup>
 </Project>

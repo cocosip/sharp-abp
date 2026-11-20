@@ -3,6 +3,7 @@ using System.Data;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging;
@@ -50,13 +51,18 @@ public class OceanBaseConfigurationTests
         Assert.Equal(mode.ToString(), native.ExpectedMode.ToString());
     }
 
-    [Fact]
-    public void Existing_Connection_Takes_Precedence_And_Remains_Caller_Owned()
+    [Theory]
+    [InlineData(EfMode.MySql)]
+    [InlineData(EfMode.Oracle)]
+    public void Existing_Connection_Takes_Precedence_And_Remains_Caller_Owned(EfMode mode)
     {
         using var services = new ServiceCollection().AddLogging().BuildServiceProvider();
         using var connection = new OceanBaseConnection(ConnectionString);
         var context = new AbpDbContextConfigurationContext("unused", services, "Default", connection);
-        context.UseOceanBase(EfMode.MySql);
+        context.UseOceanBase(mode);
+
+        Assert.Equal(QuerySplittingBehavior.SplitQuery,
+            RelationalOptionsExtension.Extract(context.DbContextOptions.Options).QuerySplittingBehavior);
 
         using (var dbContext = new DbContext(context.DbContextOptions.Options))
         {
@@ -74,6 +80,18 @@ public class OceanBaseConfigurationTests
         var options = new AbpDbContextOptions();
         Assert.Throws<ArgumentOutOfRangeException>(() => options.UseOceanBase((EfMode)123));
         Assert.Throws<ArgumentOutOfRangeException>(() => options.UseOceanBase<OracleTestDbContext>((EfMode)123));
+        using var services = new ServiceCollection().AddLogging().BuildServiceProvider();
+        var context = new AbpDbContextConfigurationContext(ConnectionString, services, "Default", null);
+        Assert.Throws<ArgumentOutOfRangeException>(() => context.UseOceanBase((EfMode)123));
+    }
+
+    [Fact]
+    public void Configuration_Rejects_Null_Options_And_Context()
+    {
+        Assert.Throws<ArgumentNullException>(() => ((AbpDbContextOptions)null).UseOceanBase(EfMode.MySql));
+        Assert.Throws<ArgumentNullException>(() => ((AbpDbContextOptions)null).UseOceanBase<OracleTestDbContext>(EfMode.Oracle));
+        Assert.Throws<ArgumentNullException>(() => ((AbpDbContextConfigurationContext)null).UseOceanBase(EfMode.MySql));
+        Assert.Throws<ArgumentNullException>(() => new OceanBaseConnectionStringChecker(null));
     }
 
     [Fact]
@@ -136,7 +154,33 @@ public class OceanBaseModuleTests : AbpIntegratedTest<OceanBaseFoundationTestMod
         AssertColumns(mysql, "LONGTEXT", "LONGTEXT", "LONGBLOB", "VARCHAR(120)");
         AssertColumns(oracle, "NCLOB", "CLOB", "BLOB", "VARCHAR2(120 CHAR)");
         AssertColumns(mysql, "LONGTEXT", "LONGTEXT", "LONGBLOB", "VARCHAR(120)");
+        Assert.Equal(QuerySplittingBehavior.SplitQuery, RelationalOptionsExtension.Extract(mysql.GetService<IDbContextOptions>()).QuerySplittingBehavior);
+        Assert.Equal(QuerySplittingBehavior.SingleQuery, RelationalOptionsExtension.Extract(oracle.GetService<IDbContextOptions>()).QuerySplittingBehavior);
         await unitOfWork.CompleteAsync();
+    }
+
+    [Fact]
+    public async Task OceanBase_Module_Leaves_Other_Providers_Unchanged()
+    {
+        using var unitOfWork = GetRequiredService<IUnitOfWorkManager>().Begin(requiresNew: true, isTransactional: false);
+        var context = await GetRequiredService<IDbContextProvider<InMemoryTestDbContext>>().GetDbContextAsync();
+
+        Assert.True(context.Database.IsInMemory());
+        Assert.Null(context.Model.FindEntityType(typeof(LargeValue)).FindProperty(nameof(LargeValue.Text))
+            .FindAnnotation(RelationalAnnotationNames.ColumnType));
+        await unitOfWork.CompleteAsync();
+    }
+
+    [Fact]
+    public async Task Raw_Provider_Configuration_Reports_The_Missing_Abp_Mode()
+    {
+        using var unitOfWork = GetRequiredService<IUnitOfWorkManager>().Begin(requiresNew: true, isTransactional: false);
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            var context = await GetRequiredService<IDbContextProvider<RawOceanBaseTestDbContext>>().GetDbContextAsync();
+            _ = context.Model;
+        });
+        Assert.Contains("AbpDbContextOptions.UseOceanBase", exception.Message);
     }
 
     private static void AssertColumns(DbContext context, string textType, string ansiType, string binaryType, string explicitType)
@@ -156,12 +200,18 @@ public class OceanBaseFoundationTestModule : AbpModule
     {
         context.Services.AddAbpDbContext<MySqlTestDbContext>();
         context.Services.AddAbpDbContext<OracleTestDbContext>();
+        context.Services.AddAbpDbContext<InMemoryTestDbContext>();
+        context.Services.AddAbpDbContext<RawOceanBaseTestDbContext>();
         Configure<AbpDbConnectionOptions>(options => options.ConnectionStrings.Default =
             "Server=localhost;Port=2881;User ID=app;Database=appdb");
         Configure<AbpDbContextOptions>(options =>
         {
             options.UseOceanBase(EfMode.MySql);
-            options.UseOceanBase<OracleTestDbContext>(EfMode.Oracle);
+            options.UseOceanBase<OracleTestDbContext>(EfMode.Oracle,
+                builder => builder.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery));
+            options.Configure<InMemoryTestDbContext>(configuration => configuration.DbContextOptions.UseInMemoryDatabase("OceanBaseModuleIsolation"));
+            options.Configure<RawOceanBaseTestDbContext>(configuration => configuration.DbContextOptions.UseOceanBase(
+                "Server=localhost;User ID=app;Database=appdb", EfMode.MySql));
         });
     }
 }
@@ -195,6 +245,23 @@ public class OracleTestDbContext(DbContextOptions<OracleTestDbContext> options) 
         builder.Entity<LargeValue>().Property(x => x.Explicit).HasColumnType("VARCHAR2(120 CHAR)");
     }
 }
+
+public class InMemoryTestDbContext(DbContextOptions<InMemoryTestDbContext> options) : AbpDbContext<InMemoryTestDbContext>(options)
+{
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+        builder.Entity<LargeValue>();
+    }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder builder)
+    {
+        base.ConfigureConventions(builder);
+        Assert.Same(builder, builder.AddSharpAbpOceanBaseLargeTextColumnConvention(this, EfMode.MySql));
+    }
+}
+
+public class RawOceanBaseTestDbContext(DbContextOptions<RawOceanBaseTestDbContext> options) : AbpDbContext<RawOceanBaseTestDbContext>(options);
 
 public class LargeValue
 {

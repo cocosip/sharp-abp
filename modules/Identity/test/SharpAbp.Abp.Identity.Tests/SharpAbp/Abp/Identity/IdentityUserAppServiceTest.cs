@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SharpAbp.Abp.Identity
@@ -9,7 +9,7 @@ namespace SharpAbp.Abp.Identity
         private readonly Volo.Abp.Identity.IIdentityUserAppService _voloIdentityUserAppService;
         public IdentityUserAppServiceTest()
         {
-            _identityUserAppService = GetRequiredService<IIdentityUserAppService>();
+            _identityUserAppService = new IdentityUserController(GetRequiredService<IIdentityUserAppService>());
             _voloIdentityUserAppService = GetRequiredService<Volo.Abp.Identity.IIdentityUserAppService>();
         }
 

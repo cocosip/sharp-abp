@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.TenantManagement;
 using Xunit;
@@ -12,7 +12,7 @@ namespace SharpAbp.Abp.TenantGroupManagement
         public TenantGroupAppServiceTest()
         {
             _tenantAppService = GetRequiredService<ITenantAppService>();
-            _tenantGroupAppService = GetRequiredService<ITenantGroupAppService>();
+            _tenantGroupAppService = new TenantGroupController(GetRequiredService<ITenantGroupAppService>());
         }
 
         [Fact]

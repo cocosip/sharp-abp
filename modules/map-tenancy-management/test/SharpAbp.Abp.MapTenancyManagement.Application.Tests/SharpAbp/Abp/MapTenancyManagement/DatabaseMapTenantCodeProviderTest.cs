@@ -15,7 +15,7 @@ namespace SharpAbp.Abp.MapTenancyManagement
 
         public DatabaseMapTenantCodeProviderTest()
         {
-            _mapTenantAppService = GetRequiredService<IMapTenantAppService>();
+            _mapTenantAppService = new MapTenantController(GetRequiredService<IMapTenantAppService>());
             _mapTenantCodeProvider = GetRequiredService<IMapTenantCodeProvider>();
             _tenantNormalizer = GetRequiredService<ITenantNormalizer>();
             _tenantRepository = GetRequiredService<ITenantRepository>();

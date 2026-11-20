@@ -1,4 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Volo.Abp.Data;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
+using Volo.Abp.EntityFrameworkCore.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using Volo.Abp;
@@ -13,6 +18,7 @@ using Volo.Abp.Uow;
 namespace SharpAbp.Abp.AuditLogging
 {
     [DependsOn(
+        typeof(AbpEntityFrameworkCoreSqliteModule),
         typeof(AuditLoggingApplicationModule),
         typeof(AbpAuditLoggingEntityFrameworkCoreModule),
         typeof(AbpTestBaseModule),
@@ -20,25 +26,36 @@ namespace SharpAbp.Abp.AuditLogging
         )]
     public class AuditLoggingApplicationTestModule : AbpModule
     {
+        private SqliteConnection _connection;
+
+        public override void OnApplicationShutdown(ApplicationShutdownContext context)
+        {
+            _connection.Dispose();
+        }
+
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             context.Services.AddAlwaysAllowAuthorization();
-            context.Services.AddEntityFrameworkInMemoryDatabase();
 
-            var databaseName = Guid.NewGuid().ToString();
+
+            _connection = new SqliteConnection($"Data Source={Guid.NewGuid():N};Mode=Memory;Cache=Shared");
+            _connection.Open();
+            using (var dbContext = new AbpAuditLoggingDbContext(new DbContextOptionsBuilder<AbpAuditLoggingDbContext>().UseSqlite(_connection).Options))
+            {
+                dbContext.GetService<IRelationalDatabaseCreator>().CreateTables();
+            }
+
+            Configure<AbpDbConnectionOptions>(options =>
+            {
+                options.ConnectionStrings.Default = _connection.ConnectionString;
+            });
 
             Configure<AbpDbContextOptions>(options =>
             {
                 options.Configure(abpDbContextConfigurationContext =>
                 {
-                    abpDbContextConfigurationContext.DbContextOptions.UseInMemoryDatabase(databaseName);
+                    abpDbContextConfigurationContext.UseSqlite();
                 });
-            });
-
-
-            Configure<AbpUnitOfWorkDefaultOptions>(options =>
-            {
-                options.TransactionBehavior = UnitOfWorkTransactionBehavior.Disabled; //EF in-memory database does not support transactions
             });
 
 

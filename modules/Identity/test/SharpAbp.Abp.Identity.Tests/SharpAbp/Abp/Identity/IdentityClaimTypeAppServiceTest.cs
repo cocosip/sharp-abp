@@ -35,6 +35,10 @@ namespace SharpAbp.Abp.Identity
             var claimTypeId1 = await _identityClaimTypeAppService.CreateAsync(claimType1);
             var claimTypeId2 = await _identityClaimTypeAppService.CreateAsync(claimType2);
 
+            Assert.True(await _identityClaimTypeAppService.AnyAsync("profile"));
+            Assert.False(await _identityClaimTypeAppService.AnyAsync("profile", claimTypeId1));
+            Assert.False(await _identityClaimTypeAppService.AnyAsync("missing"));
+
             var queryClaimType1 = await _identityClaimTypeAppService.GetAsync(claimTypeId1);
             Assert.Equal("profile", queryClaimType1.Name);
             Assert.False(queryClaimType1.Required);

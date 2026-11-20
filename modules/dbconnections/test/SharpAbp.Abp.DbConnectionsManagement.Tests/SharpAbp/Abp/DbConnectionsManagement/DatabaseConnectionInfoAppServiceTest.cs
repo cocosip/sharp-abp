@@ -1,4 +1,4 @@
-﻿using SharpAbp.Abp.Data;
+using SharpAbp.Abp.Data;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -10,7 +10,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         private readonly IDatabaseConnectionCacheManager _databaseConnectionInfoCacheManager;
         public DatabaseConnectionInfoAppServiceTest()
         {
-            _databaseConnectionInfoAppService = GetRequiredService<IDatabaseConnectionInfoAppService>();
+            _databaseConnectionInfoAppService = new DatabaseConnectionInfoController(GetRequiredService<IDatabaseConnectionInfoAppService>());
             _databaseConnectionInfoCacheManager = GetRequiredService<IDatabaseConnectionCacheManager>();
         }
 

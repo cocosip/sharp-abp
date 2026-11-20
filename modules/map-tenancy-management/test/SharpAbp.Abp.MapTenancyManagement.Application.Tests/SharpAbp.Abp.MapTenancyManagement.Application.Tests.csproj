@@ -15,10 +15,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.collector" >
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
 
     <PackageReference Include="Volo.Abp.Autofac" />
     <PackageReference Include="Volo.Abp.TestBase"  />
@@ -30,4 +26,16 @@
     <ProjectReference Include="..\..\src\SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore\SharpAbp.Abp.MapTenancyManagement.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.MapTenancyManagement.HttpApi\SharpAbp.Abp.MapTenancyManagement.HttpApi.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.EntityFrameworkCore.Sqlite" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.MapTenancyManagement.HttpApi.Client\SharpAbp.Abp.MapTenancyManagement.HttpApi.Client.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SharpAbp.Abp.MapTenancyManagement.MongoDB\SharpAbp.Abp.MapTenancyManagement.MongoDB.csproj" />
+  </ItemGroup>
 </Project>

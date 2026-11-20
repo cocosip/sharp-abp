@@ -10,7 +10,7 @@ namespace SharpAbp.MinId
 
         public MinIdTokenAppServiceTest()
         {
-            _tokenAppService = GetRequiredService<IMinIdTokenAppService>();
+            _tokenAppService = new MinIdTokenController(GetRequiredService<IMinIdTokenAppService>());
             _tokenValidator = GetRequiredService<IMinIdTokenValidator>();
         }
 

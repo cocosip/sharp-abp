@@ -15,9 +15,5 @@ namespace SharpAbp.MinId
    
 
 
-        public override void Dispose()
-        {
-
-        }
     }
 }

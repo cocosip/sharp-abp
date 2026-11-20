@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../../common.test.props" />
+  <PropertyGroup>
+    <TargetFramework>$(NetCoreFx)</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
+    <PackageReference Include="Moq" />
+    <PackageReference Include="Volo.Abp.Autofac" />
+    <PackageReference Include="Volo.Abp.AspNetCore.TestBase" />
+    <ProjectReference Include="../../src/SharpAbp.Abp.Swashbuckle.Versioning/SharpAbp.Abp.Swashbuckle.Versioning.csproj" />
+  </ItemGroup>
+</Project>

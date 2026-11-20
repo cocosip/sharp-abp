@@ -8,7 +8,8 @@ An enterprise-grade extension module collection based on ABP vNext framework, co
 
 - **Framework**: 85 core framework packages providing infrastructure support
 - **Modules**: 12 business modules providing complete enterprise-grade functionality
-- **Samples**: Sample projects demonstrating module usage
+
+See [Testing and coverage](docs/Testing.md) for ABP test conventions and the repository coverage check.
 
 ## Key Features
 

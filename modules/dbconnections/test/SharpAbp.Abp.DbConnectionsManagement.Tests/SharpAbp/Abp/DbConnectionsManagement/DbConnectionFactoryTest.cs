@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using SharpAbp.Abp.Data;
 using SharpAbp.Abp.DbConnections;
 using System;
@@ -16,7 +16,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         private readonly ICurrentTenant _currentTenant;
         public DbConnectionFactoryTest()
         {
-            _databaseConnectionInfoAppService = GetRequiredService<IDatabaseConnectionInfoAppService>();
+            _databaseConnectionInfoAppService = new DatabaseConnectionInfoController(GetRequiredService<IDatabaseConnectionInfoAppService>());
             _dbConnectionFactory = GetRequiredService<IDbConnectionFactory>();
             _currentTenant = GetRequiredService<ICurrentTenant>();
         }
