@@ -26,6 +26,16 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         public bool IncludeBinary { get; set; } = true;
 
         /// <summary>
+        /// MySQL-compatible OceanBase settings. The provider widens ordinary long columns itself.
+        /// Oracle-compatible settings remain under Providers:OceanBase.
+        /// </summary>
+        public AbpLargeTextColumnProviderOptions OceanBaseMySql { get; set; } = new()
+        {
+            StringColumnType = "LONGTEXT",
+            BinaryColumnType = "LONGBLOB"
+        };
+
+        /// <summary>
         /// Settings per database provider. A provider missing from this dictionary is not converted.
         /// An entry replaces the built in one as a whole, so write all fields of that provider.
         /// </summary>
@@ -53,11 +63,9 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             },
             [DatabaseProvider.OceanBase] = new()
             {
-                // OceanBase Oracle-compatible mode limits NVARCHAR2 to 32767 and VARCHAR2 in SQL to
-                // 4000 bytes, so columns above the NVARCHAR2 limit have to be a CLOB.
-                StringMaxLength = 32767,
-                StringColumnType = "CLOB",
-                BinaryMaxLength = 2000,
+                // The provider widens ordinary long columns; preserve national character semantics.
+                StringColumnType = "NCLOB",
+                NonUnicodeStringColumnType = "CLOB",
                 BinaryColumnType = "BLOB"
             },
             // The providers below widen long columns by themselves, the entries only define which

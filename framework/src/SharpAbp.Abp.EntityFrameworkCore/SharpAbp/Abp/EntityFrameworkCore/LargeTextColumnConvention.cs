@@ -28,16 +28,29 @@ namespace SharpAbp.Abp.EntityFrameworkCore
 
         protected virtual ILogger<LargeTextColumnConvention> Logger { get; }
 
+        protected virtual OceanBaseDatabaseMode? OceanBaseMode { get; }
+
         public LargeTextColumnConvention(
             string? providerName,
             IOptions<AbpLargeTextColumnOptions> options,
             IEfCoreDatabaseProviderAccessor databaseProviderAccessor,
             ILogger<LargeTextColumnConvention> logger)
+            : this(providerName, options, databaseProviderAccessor, logger, null)
+        {
+        }
+
+        public LargeTextColumnConvention(
+            string? providerName,
+            IOptions<AbpLargeTextColumnOptions> options,
+            IEfCoreDatabaseProviderAccessor databaseProviderAccessor,
+            ILogger<LargeTextColumnConvention> logger,
+            OceanBaseDatabaseMode? oceanBaseMode)
         {
             ProviderName = providerName;
             Options = options;
             DatabaseProviderAccessor = databaseProviderAccessor;
             Logger = logger;
+            OceanBaseMode = oceanBaseMode;
         }
 
         public virtual void ProcessModelFinalizing(
@@ -54,6 +67,11 @@ namespace SharpAbp.Abp.EntityFrameworkCore
             if (databaseProvider == null || !options.Providers.TryGetValue(databaseProvider.Value, out var providerOptions))
             {
                 return;
+            }
+
+            if (databaseProvider == DatabaseProvider.OceanBase && OceanBaseMode == OceanBaseDatabaseMode.MySql)
+            {
+                providerOptions = options.OceanBaseMySql;
             }
 
             foreach (var entityType in modelBuilder.Metadata.GetEntityTypes())

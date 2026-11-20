@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<Import Project="..\..\..\common.test.props" />
 	<PropertyGroup>
@@ -26,6 +26,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\src\SharpAbp.Abp.DbConnections.OceanBase\SharpAbp.Abp.DbConnections.OceanBase.csproj" />
 		<ProjectReference Include="..\..\src\SharpAbp.Abp.DbConnections.MySQL\SharpAbp.Abp.DbConnections.MySQL.csproj" />
 		<ProjectReference Include="..\..\src\SharpAbp.Abp.DbConnections.Oracle\SharpAbp.Abp.DbConnections.Oracle.csproj" />
 		<ProjectReference Include="..\..\src\SharpAbp.Abp.DbConnections.PostgreSql\SharpAbp.Abp.DbConnections.PostgreSql.csproj" />

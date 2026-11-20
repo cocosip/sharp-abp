@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\common.props" />
+	<Import Project="..\..\..\configureawait.props" />
+	<PropertyGroup>
+		<TargetFramework>$(NetCoreFx)</TargetFramework>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>Nullable</WarningsAsErrors>
+		<Description>SharpAbp EntityFrameworkCore OceanBase Module</Description>
+		<RootNamespace />
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\SharpAbp.Abp.EntityFrameworkCore\SharpAbp.Abp.EntityFrameworkCore.csproj" />
+		<PackageReference Include="Sharp.OceanBase.EntityFrameworkCore" />
+	</ItemGroup>
+</Project>

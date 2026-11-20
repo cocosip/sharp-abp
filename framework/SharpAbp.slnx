@@ -33,6 +33,7 @@
     <Project Path="src/SharpAbp.Abp.DbConnections.MySQL/SharpAbp.Abp.DbConnections.MySQL.csproj" />
     <Project Path="src/SharpAbp.Abp.DbConnections.Oracle.Devart/SharpAbp.Abp.DbConnections.Oracle.Devart.csproj" />
     <Project Path="src/SharpAbp.Abp.DbConnections.Oracle/SharpAbp.Abp.DbConnections.Oracle.csproj" />
+    <Project Path="src/SharpAbp.Abp.DbConnections.OceanBase/SharpAbp.Abp.DbConnections.OceanBase.csproj" />
     <Project Path="src/SharpAbp.Abp.DbConnections.PostgreSql/SharpAbp.Abp.DbConnections.PostgreSql.csproj" />
     <Project Path="src/SharpAbp.Abp.DbConnections.Sqlite/SharpAbp.Abp.DbConnections.Sqlite.csproj" />
     <Project Path="src/SharpAbp.Abp.DbConnections.SqlServer/SharpAbp.Abp.DbConnections.SqlServer.csproj" />
@@ -40,6 +41,7 @@
     <Project Path="src/SharpAbp.Abp.DotCommon/SharpAbp.Abp.DotCommon.csproj" />
     <Project Path="src/SharpAbp.Abp.EntityFrameworkCore.DM/SharpAbp.Abp.EntityFrameworkCore.DM.csproj" />
     <Project Path="src/SharpAbp.Abp.EntityFrameworkCore.GaussDB/SharpAbp.Abp.EntityFrameworkCore.GaussDB.csproj" />
+    <Project Path="src/SharpAbp.Abp.EntityFrameworkCore.OceanBase/SharpAbp.Abp.EntityFrameworkCore.OceanBase.csproj" />
     <Project Path="src/SharpAbp.Abp.EntityFrameworkCore/SharpAbp.Abp.EntityFrameworkCore.csproj" />
     <Project Path="src/SharpAbp.Abp.EventBus.MassTransit.ActiveMQ/SharpAbp.Abp.EventBus.MassTransit.ActiveMQ.csproj" />
     <Project Path="src/SharpAbp.Abp.EventBus.MassTransit.Kafka/SharpAbp.Abp.EventBus.MassTransit.Kafka.csproj" />
@@ -97,6 +99,7 @@
     <Project Path="test/SharpAbp.Abp.DbConnections.Tests/SharpAbp.Abp.DbConnections.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.DotCommon.Tests/SharpAbp.Abp.DotCommon.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.EntityFrameworkCore.Tests/SharpAbp.Abp.EntityFrameworkCore.Tests.csproj" />
+    <Project Path="test/SharpAbp.Abp.EntityFrameworkCore.OceanBase.Tests/SharpAbp.Abp.EntityFrameworkCore.OceanBase.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.Faster.Tests/SharpAbp.Abp.Faster.Tests.csproj" />
     <Project Path="test/SharpAbp.Abp.FileStoring.AllTests/SharpAbp.Abp.FileStoring.AllTests.csproj" />
     <Project Path="test/SharpAbp.Abp.FileStoring.Tests/SharpAbp.Abp.FileStoring.Tests.csproj" />

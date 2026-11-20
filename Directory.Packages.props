@@ -130,6 +130,7 @@
 		<PackageVersion Include="MassTransit.SqlTransport.PostgreSQL" Version="$(MassTransitPackageVersion)" />
 		<PackageVersion Include="MassTransit.SqlTransport.SqlServer" Version="$(MassTransitPackageVersion)" />
 		<PackageVersion Include="Sharp.DM.EntityFrameworkCore" Version="[10.0.1,)" />
+		<PackageVersion Include="Sharp.OceanBase.EntityFrameworkCore" Version="[10.0.0,11.0.0)" />
 		<PackageVersion Include="Devart.Data.Oracle.EFCore" Version="[11.2.237.10,)" />
 		<PackageVersion Include="DotNetCore.EntityFrameworkCore.GaussDB" Version="[10.0.1,)" />
 		<PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.2.1" />
@@ -147,7 +148,7 @@
 		<PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.404" />
 		<PackageVersion Include="Minio" Version="7.0.0" />
 		<PackageVersion Include="NSubstitute" Version="6.2.0" />
-		<PackageVersion Include="OceanBaseConnector" Version="[0.3.1,)" />
+		<PackageVersion Include="OceanBaseConnector" Version="[0.4.0,)" />
 		<PackageVersion Include="OpenTelemetry" Version="1.20.1" />
 		<PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.20.1" />
 		<PackageVersion Include="OpenTelemetry.Exporter.Console" Version="1.20.1" />

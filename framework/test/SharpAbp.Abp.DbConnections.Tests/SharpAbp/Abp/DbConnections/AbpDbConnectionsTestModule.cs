@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SharpAbp.Abp.DbConnections.MySQL;
 using SharpAbp.Abp.DbConnections.Oracle;
+using SharpAbp.Abp.DbConnections.OceanBase;
 using SharpAbp.Abp.DbConnections.PostgreSql;
 using SharpAbp.Abp.DbConnections.Sqlite;
 using SharpAbp.Abp.DbConnections.SqlServer;
@@ -17,6 +18,7 @@ namespace SharpAbp.Abp.DbConnections
         typeof(AbpDbConnectionsPostgreSqlModule),
         typeof(AbpDbConnectionsSqlServerModule),
         typeof(AbpDbConnectionsOracleModule),
+        typeof(AbpDbConnectionsOceanBaseModule),
         typeof(AbpDbConnectionsSqliteModule),
         typeof(AbpTestBaseModule),
         typeof(AbpAutofacModule)

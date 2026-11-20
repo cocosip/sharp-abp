@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
 using System.Reflection;
+using SharpAbp.Abp.Data;
 using Volo.Abp.DependencyInjection;
 
 namespace SharpAbp.Abp.EntityFrameworkCore
@@ -24,6 +25,14 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         public static ModelConfigurationBuilder AddSharpAbpLargeTextColumnConvention(
             this ModelConfigurationBuilder configurationBuilder,
             DbContext dbContext)
+        {
+            return configurationBuilder.AddSharpAbpLargeTextColumnConvention(dbContext, null);
+        }
+
+        public static ModelConfigurationBuilder AddSharpAbpLargeTextColumnConvention(
+            this ModelConfigurationBuilder configurationBuilder,
+            DbContext dbContext,
+            OceanBaseDatabaseMode? oceanBaseMode)
         {
             var providerName = dbContext.Database.ProviderName;
             if (string.IsNullOrWhiteSpace(providerName))
@@ -59,7 +68,8 @@ namespace SharpAbp.Abp.EntityFrameworkCore
                 providerName,
                 options,
                 databaseProviderAccessor,
-                logger));
+                logger,
+                oceanBaseMode));
 
             return configurationBuilder;
         }

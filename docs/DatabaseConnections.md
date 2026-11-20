@@ -4,7 +4,7 @@ Multi-database connection management module supporting dynamic database connecti
 
 ## DbConnections
 
-Core module for managing multiple database connections with support for MySQL, PostgreSQL, SQL Server, Oracle, SQLite, DM (DaMeng), and GaussDB.
+Core module for managing multiple database connections with support for MySQL, PostgreSQL, SQL Server, Oracle, SQLite, DM (DaMeng), GaussDB and OceanBase.
 
 ### Installation
 
@@ -21,7 +21,33 @@ dotnet add package SharpAbp.Abp.DbConnections.Oracle.Devart  # Devart Oracle dri
 dotnet add package SharpAbp.Abp.DbConnections.Sqlite
 dotnet add package SharpAbp.Abp.DbConnections.DM             # DaMeng
 dotnet add package SharpAbp.Abp.DbConnections.GaussDB        # GaussDB
+dotnet add package SharpAbp.Abp.DbConnections.OceanBase     # OceanBase
 ```
+
+### OceanBase
+
+Add `AbpDbConnectionsOceanBaseModule` from `SharpAbp.Abp.DbConnections.OceanBase` to your module dependencies.
+It registers the OceanBase creator and adds `DatabaseProvider.OceanBase` to the supported providers. This package
+uses OceanBaseConnector directly and does not require the OceanBase EF Core adapter.
+
+```json
+{
+  "DbConnectionsOptions": {
+    "DbConnections": {
+      "OceanBaseReporting": {
+        "DatabaseProvider": "OceanBase",
+        "ConnectionString": "Server=localhost;Port=2881;User ID=app;Password=****;Database=reports;ExpectedMode=MySql"
+      }
+    }
+  }
+}
+```
+
+Bind the configuration using the same `AbpDbConnectionsOptions.Configure` call below, then use
+`IDbConnectionFactory.GetDbConnectionAsync("OceanBaseReporting")`. The returned `OceanBaseConnection` is closed;
+the caller opens and disposes it. The Connector detects the tenant mode when opening. `ExpectedMode=MySql` or
+`ExpectedMode=Oracle` can constrain the expected mode through the connection string. No DTO or connection factory
+interface changes are required. EF Core configuration still selects its compatibility mode explicitly.
 
 ### Configuration
 

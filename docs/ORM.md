@@ -184,7 +184,7 @@ public class OrderRepository : DapperRepository<YourDbContext>
 
 ## EntityFrameworkCore
 
-Entity Framework Core integration with support for DM (DaMeng) and GaussDB.
+Entity Framework Core integration with support for DM (DaMeng), GaussDB and OceanBase.
 
 ### Installation
 
@@ -195,6 +195,7 @@ dotnet add package SharpAbp.Abp.EntityFrameworkCore
 # Database-specific packages
 dotnet add package SharpAbp.Abp.EntityFrameworkCore.DM       # DaMeng
 dotnet add package SharpAbp.Abp.EntityFrameworkCore.GaussDB  # GaussDB
+dotnet add package SharpAbp.Abp.EntityFrameworkCore.OceanBase # OceanBase
 ```
 
 ### Configuration
@@ -267,6 +268,75 @@ Configure connection string in `appsettings.json`:
 }
 ```
 
+#### For OceanBase
+
+`SharpAbp.Abp.EntityFrameworkCore.OceanBase` uses `Sharp.OceanBase.EntityFrameworkCore` 10.x and
+OceanBaseConnector 0.4.0 or later. Select the tenant compatibility mode explicitly:
+
+```csharp
+using OceanBase.EntityFrameworkCore;
+using SharpAbp.Abp.EntityFrameworkCore;
+using SharpAbp.Abp.EntityFrameworkCore.OceanBase;
+using Volo.Abp.EntityFrameworkCore;
+
+[DependsOn(typeof(AbpEntityFrameworkCoreOceanBaseModule))]
+public class YourEntityFrameworkCoreModule : AbpModule
+{
+    public override void ConfigureServices(ServiceConfigurationContext context)
+    {
+        context.Services.AddAbpDbContext<YourDbContext>();
+        Configure<AbpDbContextOptions>(options =>
+        {
+            options.UseOceanBase(OceanBaseCompatibilityMode.MySql);
+            // Or configure a particular context for an Oracle-compatible tenant:
+            options.UseOceanBase<OracleDbContext>(OceanBaseCompatibilityMode.Oracle,
+                provider => provider.MigrationsAssembly("YourApp.Migrations.Oracle"));
+        });
+    }
+}
+```
+
+Configure each context's connection string with ABP's standard connection string configuration. The generic
+configuration takes precedence for that context. The adapter reuses `ExistingConnection` when ABP supplies one,
+keeps it caller-owned, and forwards the provider callback. Split queries are the default; the callback can select
+`QuerySplittingBehavior.SingleQuery`. Compatibility mode and large-text settings are selected per context.
+
+Use the ABP `UseOceanBase` entry points above when this module is loaded; the provider does not expose its
+configured mode as a public API. For a manually constructed design-time context, select the same mode in both
+the provider configuration and its convention:
+
+```csharp
+// In IDesignTimeDbContextFactory:
+var options = new DbContextOptionsBuilder<YourDbContext>()
+    .UseOceanBase(connectionString, OceanBaseCompatibilityMode.MySql)
+    .Options;
+
+// In YourDbContext (for the same MySQL configuration):
+protected override void ConfigureConventions(ModelConfigurationBuilder builder)
+{
+    base.ConfigureConventions(builder);
+    builder.AddSharpAbpOceanBaseLargeTextColumnConvention(this, OceanBaseCompatibilityMode.MySql);
+}
+```
+
+The standalone convention uses default options when ABP services are absent. Applications that replace ABP's
+default convention callback must register the OceanBase convention themselves with the matching mode.
+`ModelBuilder.UseOceanBase()` and `IsUsingOceanBase()` provide SharpAbp model markers; they do not select a tenant
+mode or alias OceanBase to ABP's built-in Oracle/MySQL provider enum.
+
+The module registers `OceanBaseConnectionStringChecker` as the application's `IConnectionStringChecker`, like
+the DM adapter. It checks a connection without creating databases or users and logs only the failure type.
+As with the other provider-specific checkers, it is an application-wide service: choose the appropriate checker
+explicitly when loading several provider modules. A MySQL connection with no selected database is reported as
+connected but without an existing target database; an Oracle login has its user schema.
+
+Schema management remains opt-in through the provider's `EnableOceanBaseSchemaManagement` API on the underlying
+EF options builder. The adapter does not enable database/user creation or deletion, automatic retries, global
+filter database functions, or change the application's clock and GUID generation policies. Oracle generated-value
+writes require the Connector setting `Use Oracle Prepare Execute=true`. Unzoned `DateTime` values require
+`DateTimeKind.Unspecified`, and MySQL temporal precision is at most six fractional digits. Business-module and
+live-database compatibility require separate acceptance.
+
 ### Large Text Columns
 
 `SharpAbp.Abp.EntityFrameworkCore` registers a model finalizing convention that maps string and binary columns
@@ -283,7 +353,7 @@ provider specific code, and it is enabled by default.
 | SQLite | driver | `TEXT`, the configured length is ignored |
 | MySQL | convention | strings above 16383 characters or a table row above 65535 bytes become `longtext` |
 | DM (DaMeng) | convention | strings above 2000 characters become `CLOB`, binary above 2000 bytes `BLOB` |
-| OceanBase | convention | Oracle mode strings above 32767 characters become `CLOB` |
+| OceanBase | provider + convention | provider widens ordinary columns; marked properties use Oracle `NCLOB`/`CLOB`/`BLOB` or MySQL `LONGTEXT`/`LONGBLOB` |
 
 The convention also maps the column type of a marked property for every provider: `NCLOB`/`CLOB` and `BLOB` on
 Oracle, `nvarchar(max)`/`varchar(max)` and `varbinary(max)` on SQL Server, `text`/`bytea` on PostgreSQL,
@@ -318,9 +388,8 @@ Configuration, all values are optional and the built in defaults are shown:
           "BinaryColumnType": "BLOB"
         },
         "OceanBase": {
-          "StringMaxLength": 32767,
-          "StringColumnType": "CLOB",
-          "BinaryMaxLength": 2000,
+          "StringColumnType": "NCLOB",
+          "NonUnicodeStringColumnType": "CLOB",
           "BinaryColumnType": "BLOB"
         },
         "Oracle": {
@@ -362,10 +431,18 @@ drivers widen long columns by themselves; they only define the column type of a 
 An entry under `Providers` replaces the built in entry of that provider as a whole, so write all fields of
 that provider when you override it. Providers that are missing from the dictionary are not converted at all.
 The MySQL row size check assumes utf8mb4, lower `RowSizeConversionMinLength` when the server uses a single byte
-character set. OceanBase currently has no EF Core 9/10 provider, its entry only applies when such a provider is
-used.
+character set. OceanBase's provider widens ordinary long columns itself. `Providers:OceanBase` configures
+Oracle-compatible marked columns; `EfCoreOptions:LargeTextColumns:OceanBaseMySql` configures MySQL-compatible
+marked columns (defaults: `StringColumnType=LONGTEXT`, `BinaryColumnType=LONGBLOB`). Removing `Providers:OceanBase`
+disables conversion for both OceanBase modes. Explicit column types, keys, indexes and converters retain their
+existing protections. The old 32767-character/CLOB fallback is no longer applied. Review migration diffs before
+upgrading existing models: Unicode Oracle fields now retain national character semantics through `NCLOB`.
+The provider records NCLOB creation as unsupported on its tested OceanBase 4.4.2.2 target. Use a supported server
+profile or deliberately configure suitable CLOB storage after checking the application's character semantics;
+the adapter does not silently replace NCLOB with CLOB.
 
-`ConfigureDefaultConvention` is a single slot in ABP. When another module or the application sets it, call
+`ConfigureDefaultConvention` appends callbacks in ABP 10.7. When an application replaces them with
+`overrideExisting: true`, call
 `AddSharpAbpLargeTextColumnConvention` inside that action, which is also the way to skip one DbContext:
 
 ```csharp
@@ -379,7 +456,7 @@ Configure<AbpDbContextOptions>(options =>
         }
 
         // Other default conventions
-    });
+    }, overrideExisting: true);
 });
 ```
 

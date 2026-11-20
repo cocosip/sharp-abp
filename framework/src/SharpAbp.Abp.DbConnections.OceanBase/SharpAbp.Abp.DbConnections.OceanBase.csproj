@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\common.props" />
+	<Import Project="..\..\..\configureawait.props" />
+	<PropertyGroup>
+		<TargetFramework>$(NetCoreFx)</TargetFramework>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>Nullable</WarningsAsErrors>
+		<Description>SharpAbp DbConnections OceanBase Module</Description>
+		<RootNamespace />
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\SharpAbp.Abp.DbConnections\SharpAbp.Abp.DbConnections.csproj" />
+		<PackageReference Include="OceanBaseConnector" />
+	</ItemGroup>
+</Project>

@@ -58,14 +58,16 @@ namespace SharpAbp.Abp.EntityFrameworkCore
         }
 
         [Fact]
-        public void OceanBase_Maps_Columns_Above_The_Nvarchar2_Limit_To_Clob()
+        public void OceanBase_Leaves_Length_Mapping_To_Provider_And_Preserves_National_Lob_Type()
         {
             using var dbContext = CreateDbContext<OceanBaseTag>(OceanBaseProviderName, new AbpLargeTextColumnOptions());
 
-            Assert.Equal("CLOB", GetConfiguredColumnType(dbContext, nameof(TestEntity.Huge)));
-            Assert.Equal("BLOB", GetConfiguredColumnType(dbContext, nameof(TestEntity.Binary)));
-            // 8192 characters still fit into NVARCHAR2 on OceanBase.
+            Assert.Null(GetConfiguredColumnType(dbContext, nameof(TestEntity.Huge)));
+            Assert.Null(GetConfiguredColumnType(dbContext, nameof(TestEntity.Binary)));
             Assert.Null(GetConfiguredColumnType(dbContext, nameof(TestEntity.Long8192)));
+            Assert.Equal("NCLOB", GetConfiguredColumnType(dbContext, nameof(TestEntity.Marked)));
+            Assert.Equal("CLOB", GetConfiguredColumnType(dbContext, nameof(TestEntity.MarkedAnsi)));
+            Assert.Equal("BLOB", GetConfiguredColumnType(dbContext, nameof(TestEntity.MarkedBinary)));
         }
 
         [Fact]
