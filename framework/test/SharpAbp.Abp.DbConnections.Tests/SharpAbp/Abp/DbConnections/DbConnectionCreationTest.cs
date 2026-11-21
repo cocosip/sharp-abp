@@ -105,6 +105,63 @@ namespace SharpAbp.Abp.DbConnections
         }
 
         [Fact]
+        public async Task Explicit_Creators_Are_Disposed_After_Each_Attempt()
+        {
+            var options = new AbpDbConnectionsOptions();
+            options.DatabaseProviders.Add(DatabaseProvider.Sqlite);
+            options.Creators.Add<UnmatchedCreator>();
+            options.Creators.Add<AsyncCreator>();
+            var lifetime = new CreatorLifetime();
+            var creator = new Mock<IDbConnectionCreator>();
+            using var services = new ServiceCollection()
+                .AddSingleton(lifetime)
+                .AddSingleton(creator.Object)
+                .BuildServiceProvider();
+            var info = new DbConnectionInfo(DatabaseProvider.Sqlite, "Data Source=:memory:");
+            var resolver = new Mock<IDbConnectionInfoResolver>();
+            resolver.Setup(value => value.ResolveAsync("reporting")).ReturnsAsync(info);
+            var service = new DbConnectionCreateService(Options.Create(options), services, resolver.Object);
+            var connection = new Mock<IDbConnection>();
+            var error = new InvalidOperationException("Creation failed.");
+            creator.SetupSequence(value => value.CreateAsync("reporting", info))
+                .ThrowsAsync(error)
+                .ReturnsAsync(connection.Object);
+
+            Assert.Same(error, await Assert.ThrowsAsync<InvalidOperationException>(() => service.CreateAsync("reporting")));
+            Assert.Equal(1, lifetime.Disposed);
+            Assert.Equal(1, lifetime.DisposedAsync);
+
+            Assert.Same(connection.Object, await service.CreateAsync("reporting"));
+            Assert.Equal(2, lifetime.Disposed);
+            Assert.Equal(2, lifetime.DisposedAsync);
+            connection.Verify(value => value.Dispose(), Times.Never);
+        }
+
+        [Fact]
+        public async Task Creation_Disposes_Connection_If_Creator_Cleanup_Fails()
+        {
+            var options = new AbpDbConnectionsOptions();
+            options.DatabaseProviders.Add(DatabaseProvider.Sqlite);
+            options.Creators.Add<AsyncCreator>();
+            var error = new InvalidOperationException("Creator cleanup failed.");
+            var lifetime = new CreatorLifetime { CleanupError = error };
+            var creator = new Mock<IDbConnectionCreator>();
+            using var services = new ServiceCollection()
+                .AddSingleton(lifetime)
+                .AddSingleton(creator.Object)
+                .BuildServiceProvider();
+            var info = new DbConnectionInfo(DatabaseProvider.Sqlite, "Data Source=:memory:");
+            var resolver = new Mock<IDbConnectionInfoResolver>();
+            resolver.Setup(value => value.ResolveAsync("reporting")).ReturnsAsync(info);
+            var service = new DbConnectionCreateService(Options.Create(options), services, resolver.Object);
+            var connection = new Mock<IDbConnection>();
+            creator.Setup(value => value.CreateAsync("reporting", info)).ReturnsAsync(connection.Object);
+
+            Assert.Same(error, await Assert.ThrowsAsync<InvalidOperationException>(() => service.CreateAsync("reporting")));
+            connection.Verify(value => value.Dispose(), Times.Once);
+        }
+
+        [Fact]
         public async Task Creation_Reports_Missing_Info_And_Requires_A_Keyed_Creator_For_Named_Connections()
         {
             var options = new AbpDbConnectionsOptions();
@@ -136,6 +193,35 @@ namespace SharpAbp.Abp.DbConnections
         {
             public bool IsMatch(string name, DbConnectionInfo info) => creator.Object.IsMatch(name, info);
             public Task<IDbConnection> CreateAsync(string name, DbConnectionInfo info) => creator.Object.CreateAsync(name, info);
+        }
+
+        private sealed class CreatorLifetime
+        {
+            public int Disposed { get; set; }
+            public int DisposedAsync { get; set; }
+            public Exception CleanupError { get; init; }
+        }
+
+        private sealed class UnmatchedCreator(CreatorLifetime lifetime) : IDbConnectionCreator, IDisposable
+        {
+            public bool IsMatch(string dbConnectionName, DbConnectionInfo dbConnectionInfo) => false;
+            public Task<IDbConnection> CreateAsync(string dbConnectionName, DbConnectionInfo dbConnectionInfo)
+                => throw new InvalidOperationException("An unmatched creator cannot create a connection.");
+            public void Dispose() => lifetime.Disposed++;
+        }
+
+        private sealed class AsyncCreator(CreatorLifetime lifetime, IDbConnectionCreator creator)
+            : IDbConnectionCreator, IAsyncDisposable
+        {
+            public bool IsMatch(string dbConnectionName, DbConnectionInfo dbConnectionInfo) => true;
+            public Task<IDbConnection> CreateAsync(string dbConnectionName, DbConnectionInfo dbConnectionInfo)
+                => creator.CreateAsync(dbConnectionName, dbConnectionInfo);
+
+            public ValueTask DisposeAsync()
+            {
+                lifetime.DisposedAsync++;
+                return lifetime.CleanupError == null ? ValueTask.CompletedTask : ValueTask.FromException(lifetime.CleanupError);
+            }
         }
     }
 }

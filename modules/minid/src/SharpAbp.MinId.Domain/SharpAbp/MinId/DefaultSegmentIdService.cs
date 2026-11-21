@@ -82,6 +82,11 @@ namespace SharpAbp.MinId
                     var minIdInfo = await MinIdInfoRepository.FindByBizTypeAsync(bizType, cancellationToken)
                         ?? throw new AbpException($"Business type '{bizType}' is not registered in the MinId system. Please ensure the business type is properly configured.");
 
+                    if (minIdInfo.Step <= 0 || minIdInfo.Delta <= 0 || minIdInfo.Remainder < 0 || minIdInfo.Remainder >= minIdInfo.Delta)
+                    {
+                        throw new AbpException($"Business type '{bizType}' has an invalid MinId step, delta or remainder.");
+                    }
+
                     // Calculate new maximum ID by adding step to current maximum
                     var newMaxId = checked(minIdInfo.MaxId + minIdInfo.Step);
 
@@ -143,13 +148,20 @@ namespace SharpAbp.MinId
         protected virtual SegmentId ConvertToSegmentId(MinIdInfo minIdInfo)
         {
             var loadingPercent = Options.LoadingPercent;
+            var loadingId = minIdInfo.MaxId - minIdInfo.Step + (long)minIdInfo.Step * loadingPercent / 100;
+            if (minIdInfo.Step > 0 && minIdInfo.MaxId > long.MaxValue - minIdInfo.Step)
+            {
+                // Keep serving the reserved IDs when another full segment would overflow.
+                loadingId = long.MaxValue;
+            }
+
             var segmentId = new SegmentId()
             {
                 CurrentId = minIdInfo.MaxId - minIdInfo.Step,
                 MaxId = minIdInfo.MaxId,
-                Remainder = minIdInfo.Remainder < 0 ? 0 : minIdInfo.Remainder,
+                Remainder = minIdInfo.Remainder,
                 Delta = minIdInfo.Delta,
-                LoadingId = minIdInfo.MaxId - minIdInfo.Step + (long)minIdInfo.Step * loadingPercent / 100
+                LoadingId = loadingId
             };
 
             return segmentId;

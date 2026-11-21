@@ -1,6 +1,8 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Localization;
+using SharpAbp.Abp.Data;
 using SharpAbp.Abp.DbConnectionsManagement.Localization;
 using Volo.Abp;
 using Volo.Abp.Domain.Services;
@@ -47,6 +49,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         /// <exception cref="UserFriendlyException">Thrown when a database connection with the same name already exists</exception>
         public virtual async Task<DatabaseConnectionInfo> CreateAsync(string name, string databaseProvider, string connectionString, CancellationToken cancellationToken = default)
         {
+            databaseProvider = NormalizeProviderName(databaseProvider);
             var databaseConnectionInfo = await ConnectionInfoRepository.FindExpectedByNameAsync(name, cancellationToken: cancellationToken);
             if (databaseConnectionInfo != null)
             {
@@ -72,6 +75,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
             string connectionString,
             CancellationToken cancellationToken = default)
         {
+            databaseProvider = NormalizeProviderName(databaseProvider);
             if (databaseConnectionInfo.Name != name)
             {
                 var duplicate = await ConnectionInfoRepository.FindExpectedByNameAsync(name, databaseConnectionInfo.Id, cancellationToken: cancellationToken);
@@ -106,6 +110,18 @@ namespace SharpAbp.Abp.DbConnectionsManagement
 
             databaseConnectionInfo.ChangeName(name);
             return await ConnectionInfoRepository.UpdateAsync(databaseConnectionInfo, cancellationToken: cancellationToken);
+        }
+
+        private static string NormalizeProviderName(string name)
+        {
+            var trimmed = name?.Trim();
+            if (Enum.TryParse<DatabaseProvider>(trimmed, ignoreCase: true, out var provider)
+                && string.Equals(trimmed, Enum.GetName(provider), StringComparison.OrdinalIgnoreCase))
+            {
+                return provider.ToString();
+            }
+
+            throw new UserFriendlyException("Select a recognized database provider name.");
         }
     }
 }

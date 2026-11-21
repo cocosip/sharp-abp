@@ -4,9 +4,11 @@ using SharpAbp.Abp.FileStoring.Minio;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Volo.Abp.Caching;
 using Volo.Abp.Data;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.MultiTenancy;
+using Volo.Abp.Uow;
 using Xunit;
 
 namespace SharpAbp.Abp.FileStoringManagement
@@ -25,6 +27,100 @@ namespace SharpAbp.Abp.FileStoringManagement
             _fileContainerFactory = GetRequiredService<IFileContainerFactory>();
         }
 
+
+        [Fact]
+        public async Task Uncommitted_Container_Is_Never_Published_To_The_Distributed_Cache()
+        {
+            var cacheManager = GetRequiredService<IFileStoringContainerCacheManager>();
+            var cache = GetRequiredService<IDistributedCache<FileStoringContainerCacheItem>>();
+            var repository = GetRequiredService<IFileStoringContainerRepository>();
+            var key = FileStoringContainerCacheItem.CalculateCacheKey(null, "uncommitted");
+            var container = new FileStoringContainer(Guid.NewGuid(), null, true, "FileSystem",
+                "uncommitted", "Uncommitted", false, 0, 0, false);
+
+            using (GetRequiredService<IUnitOfWorkManager>().Begin(requiresNew: true, isTransactional: true))
+            {
+                await repository.InsertAsync(container, autoSave: true);
+                Assert.Equal(container.Id, (await cacheManager.GetAsync("uncommitted")).Id);
+                Assert.Null(await cache.GetAsync(key));
+            }
+
+            Assert.Null(await cacheManager.GetAsync("uncommitted"));
+        }
+
+        [Fact]
+        public async Task Deferred_Container_Invalidation_Uses_The_Event_Tenant()
+        {
+            var tenantId = Guid.NewGuid();
+            var cacheManager = GetRequiredService<IFileStoringContainerCacheManager>();
+            var cache = GetRequiredService<IDistributedCache<FileStoringContainerCacheItem>>();
+            var key = FileStoringContainerCacheItem.CalculateCacheKey(tenantId, "shared");
+            using (_currentTenant.Change(tenantId))
+            {
+                await cache.SetAsync(key, new FileStoringContainerCacheItem { Name = "shared", TenantId = tenantId });
+            }
+
+            using (_currentTenant.Change(Guid.NewGuid()))
+            using (var uow = GetRequiredService<IUnitOfWorkManager>().Begin(requiresNew: true))
+            {
+                await new FileStoringHandler(_currentTenant, cacheManager).HandleEventAsync(
+                    new FileStoringContainerUpdatedEto { TenantId = tenantId, OldName = "shared", Name = "renamed" });
+                await uow.CompleteAsync();
+            }
+
+            using (_currentTenant.Change(tenantId))
+            {
+                Assert.Null(await cache.GetAsync(key));
+            }
+        }
+
+        [Fact]
+        public async Task Host_Fallback_Reflects_Updates_And_Tenant_Overrides()
+        {
+            var cache = GetRequiredService<IFileStoringContainerCacheManager>();
+            var tenantId = Guid.NewGuid();
+            var host = await _containerAppService.CreateAsync(FileSystemContainer("shared", "Host"));
+
+            using (_currentTenant.Change(tenantId))
+            {
+                Assert.Equal(host.Id, (await cache.GetAsync("shared")).Id);
+            }
+
+            await _containerAppService.UpdateAsync(host.Id, FileSystemContainer("shared", "Updated host"));
+            using (_currentTenant.Change(tenantId))
+            {
+                Assert.Equal("Updated host", (await cache.GetAsync("shared")).Title);
+                var tenant = await _containerAppService.CreateAsync(FileSystemContainer("shared", "Tenant"));
+                Assert.Equal(tenant.Id, (await cache.GetAsync("shared")).Id);
+
+                await _containerAppService.UpdateAsync(tenant.Id, FileSystemContainer("renamed", "Renamed tenant"));
+                Assert.Equal(host.Id, (await cache.GetAsync("shared")).Id);
+                Assert.Equal(tenant.Id, (await cache.GetAsync("renamed")).Id);
+            }
+
+            await _containerAppService.DeleteAsync(host.Id);
+            using (_currentTenant.Change(tenantId))
+            {
+                Assert.Null(await cache.GetAsync("shared"));
+            }
+        }
+
+        private static CreateOrUpdateContainerDto FileSystemContainer(string name, string title)
+        {
+            return new CreateOrUpdateContainerDto
+            {
+                Provider = FileSystemFileProviderConfigurationNames.ProviderName,
+                Name = name,
+                Title = title,
+                IsMultiTenant = true,
+                Items =
+                [
+                    new CreateOrUpdateContainerItemDto(FileSystemFileProviderConfigurationNames.BasePath, "storage"),
+                    new CreateOrUpdateContainerItemDto(FileSystemFileProviderConfigurationNames.AppendContainerNameToBasePath, "true"),
+                    new CreateOrUpdateContainerItemDto(FileSystemFileProviderConfigurationNames.HttpServer, "")
+                ]
+            };
+        }
 
         [Fact]
         public async Task CreateAsync_UpdateAsync_Test()

@@ -340,8 +340,8 @@ namespace SharpAbp.Abp.Identity
         public virtual async Task LockAsync(Guid id, int seconds)
         {
             var user = await UserRepository.GetAsync(id);
-            await UserManager.SetLockoutEnabledAsync(user, true);
-            await UserManager.SetLockoutEndDateAsync(user, Clock.Now.AddSeconds(seconds));
+            (await UserManager.SetLockoutEnabledAsync(user, true)).CheckErrors();
+            (await UserManager.SetLockoutEndDateAsync(user, Clock.Now.AddSeconds(seconds))).CheckErrors();
         }
 
         /// <summary>
@@ -353,8 +353,8 @@ namespace SharpAbp.Abp.Identity
         public virtual async Task UnLockAsync(Guid id)
         {
             var user = await UserRepository.GetAsync(id);
-            await UserManager.SetLockoutEndDateAsync(user, null);
-            await UserManager.SetLockoutEnabledAsync(user, false);
+            (await UserManager.SetLockoutEndDateAsync(user, null)).CheckErrors();
+            (await UserManager.SetLockoutEnabledAsync(user, false)).CheckErrors();
         }
 
         /// <summary>
@@ -396,7 +396,7 @@ namespace SharpAbp.Abp.Identity
         public virtual async Task SetTwoFactorAsync(Guid id, bool enabled)
         {
             var user = await UserRepository.GetAsync(id);
-            await UserManager.SetTwoFactorEnabledAsync(user, enabled);
+            (await UserManager.SetTwoFactorEnabledAsync(user, enabled)).CheckErrors();
         }
 
 

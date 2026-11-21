@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Volo.Abp.Validation;
@@ -47,7 +48,8 @@ namespace SharpAbp.MinId
         /// <summary>
         /// Gets or sets the remainder value used with delta for modulo operations.
         /// This helps distribute IDs across different instances in a cluster environment.
-        /// Must be between 0 and Step-1.
+        /// Generated IDs satisfy ID % Delta == Remainder.
+        /// Must be nonnegative and smaller than both Delta and Step.
         /// </summary>
         [Required]
         public int Remainder { get; set; }
@@ -74,9 +76,10 @@ namespace SharpAbp.MinId
                 yield return new ValidationResult($"Delta must be greater than 0. Current value: {Delta}.");
             }
 
-            if (Remainder < 0 || Remainder >= Step)
+            var remainderLimit = Math.Min(Delta, Step);
+            if (Remainder < 0 || (remainderLimit > 0 && Remainder >= remainderLimit))
             {
-                yield return new ValidationResult($"Remainder must be between 0 and Step-1 ({Step - 1}). Current value: {Remainder}.");
+                yield return new ValidationResult($"Invalid Remainder value '{Remainder}'. The Remainder must be nonnegative and smaller than both Delta ({Delta}) and Step ({Step}).");
             }
 
             yield break;

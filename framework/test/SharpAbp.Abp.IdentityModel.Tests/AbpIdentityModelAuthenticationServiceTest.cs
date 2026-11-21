@@ -20,7 +20,9 @@ public class AbpIdentityModelAuthenticationServiceTest
 {
     [Theory]
     [InlineData("client_credentials", false)]
+    [InlineData("client_credentials", true)]
     [InlineData("password", false)]
+    [InlineData("password", true)]
     [InlineData("external_credentials", false)]
     [InlineData("external_credentials", true)]
     public async Task Should_Select_Grant_And_Preserve_Custom_Request_Configuration(string grantType, bool customize)
@@ -62,6 +64,22 @@ public class AbpIdentityModelAuthenticationServiceTest
     }
 
     [Fact]
+    public async Task Should_Use_Upstream_Device_Grant_And_Its_Protected_Hook()
+    {
+        using var handler = new TokenHandler();
+        var factory = new Mock<IHttpClientFactory>();
+        factory.Setup(x => x.CreateClient(IdentityModelAuthenticationService.HttpClientName))
+            .Returns(() => new HttpClient(handler, disposeHandler: false));
+        var service = new TestAuthenticationService(factory.Object, new IdentityModelHttpRequestMessageOptions());
+        var configuration = new IdentityClientConfiguration("https://identity.example", "api", "app",
+            "secret", "urn:ietf:params:oauth:grant-type:device_code");
+
+        await service.RequestTokenAsync(configuration);
+
+        Assert.Same(configuration, service.DeviceConfiguration);
+    }
+
+    [Fact]
     public async Task Should_Reject_Unsupported_Grant_Without_Sending_Token_Request()
     {
         using var handler = new TokenHandler();
@@ -81,10 +99,18 @@ public class AbpIdentityModelAuthenticationServiceTest
             Mock.Of<ICurrentTenant>(), Options.Create(options), Mock.Of<IDistributedCache<IdentityModelTokenCacheItem>>(),
             Mock.Of<IDistributedCache<IdentityModelDiscoveryDocumentCacheItem>>(), Mock.Of<IAbpHostEnvironment>())
     {
+        public IdentityClientConfiguration DeviceConfiguration { get; private set; }
+
         public Task<TokenResponse> RequestTokenAsync(IdentityClientConfiguration configuration) => GetTokenResponse(configuration);
 
         protected override Task<IdentityModelDiscoveryDocumentCacheItem> GetDiscoveryResponse(IdentityClientConfiguration configuration)
             => Task.FromResult(new IdentityModelDiscoveryDocumentCacheItem("https://identity.example/token", "https://identity.example/device"));
+
+        protected override Task<TokenResponse> RequestDeviceAuthorizationAsync(HttpClient httpClient, IdentityClientConfiguration configuration)
+        {
+            DeviceConfiguration = configuration;
+            return Task.FromResult<TokenResponse>(null);
+        }
     }
 
     private sealed class TokenHandler : HttpMessageHandler

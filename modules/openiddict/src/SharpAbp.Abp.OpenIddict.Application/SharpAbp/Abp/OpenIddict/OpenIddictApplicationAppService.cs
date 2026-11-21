@@ -13,6 +13,7 @@ using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.Domain.Entities;
+using Volo.Abp.ObjectExtending;
 using Volo.Abp.OpenIddict.Applications;
 using Volo.Abp.PermissionManagement;
 
@@ -175,15 +176,11 @@ namespace SharpAbp.Abp.OpenIddict
                     input.Permissions,
                     null);
             }
-            var descriptor = new AbpApplicationDescriptor()
-            {
-                LogoUri = input.LogoUri,
-                ClientUri = input.ClientUri
-            };
-
-            await ApplicationManager.PopulateAsync(descriptor, model);
-            var created = await ApplicationManager.CreateAsync(descriptor);
-            return await ToApplicationDtoAsync(created.As<OpenIddictApplicationModel>());
+            model.Id = GuidGenerator.Create();
+            var secret = model.ClientSecret;
+            model.ClientSecret = null;
+            await ApplicationManager.CreateAsync(model, secret);
+            return await ToApplicationDtoAsync(model);
         }
 
         /// <summary>
@@ -212,6 +209,9 @@ namespace SharpAbp.Abp.OpenIddict
                 throw new EntityNotFoundException(typeof(OpenIddictApplication), id);
             }
             var buildModel = await BuildModel(input);
+            var properties = await ApplicationManager.GetPropertiesAsync(model);
+            var incomingProperties = await ApplicationManager.GetPropertiesAsync(buildModel);
+            await OpenIdApplicationStore.SetPropertiesAsync(buildModel, properties.SetItems(incomingProperties), CancellationToken.None);
             if (buildModel.ClientSecret.IsNullOrWhiteSpace() &&
                 !string.Equals(input.ClientType, OpenIddictConstants.ClientTypes.Public, StringComparison.OrdinalIgnoreCase))
             {
@@ -235,6 +235,10 @@ namespace SharpAbp.Abp.OpenIddict
             };
 
             await ApplicationManager.PopulateAsync(descriptor, buildModel);
+            foreach (var property in buildModel.ExtraProperties)
+            {
+                model.ExtraProperties[property.Key] = property.Value;
+            }
             await ApplicationManager.UpdateAsync(model, descriptor);
 
             var updated = (await ApplicationManager.FindByIdAsync(id.ToString("D"))).As<OpenIddictApplicationModel>();
@@ -275,6 +279,11 @@ namespace SharpAbp.Abp.OpenIddict
                 ClientUri = input.ClientUri,
                 LogoUri = input.LogoUri,
             };
+
+            ExtensibleObjectMapper.MapExtraPropertiesTo<CreateOrUpdateOpenIddictApplicationDto, OpenIddictApplication>(
+                input.ExtraProperties, model.ExtraProperties, MappingPropertyDefinitionChecks.Both);
+            await OpenIdApplicationStore.SetPropertiesAsync(
+                model, input.Properties?.ToImmutableDictionary() ?? ImmutableDictionary<string, JsonElement>.Empty, CancellationToken.None);
 
             var displayNames = new Dictionary<CultureInfo, string>(input.DisplayNames.Select(x => new KeyValuePair<CultureInfo, string>(new CultureInfo(x.Key), x.Value)));
             await OpenIdApplicationStore.SetDisplayNamesAsync(model, displayNames.ToImmutableDictionary(), CancellationToken.None);
@@ -423,10 +432,8 @@ namespace SharpAbp.Abp.OpenIddict
                 LogoUri = model.LogoUri,
             };
 
-            foreach (var extraProperty in model.ExtraProperties)
-            {
-                dto.ExtraProperties.Add(extraProperty.Key, extraProperty.Value);
-            }
+            ExtensibleObjectMapper.MapExtraPropertiesTo<OpenIddictApplication, OpenIddictApplicationDto>(
+                model.ExtraProperties, dto.ExtraProperties, MappingPropertyDefinitionChecks.Both);
 
             dto.Properties = new Dictionary<string, JsonElement>(await ApplicationManager.GetPropertiesAsync(model));
 

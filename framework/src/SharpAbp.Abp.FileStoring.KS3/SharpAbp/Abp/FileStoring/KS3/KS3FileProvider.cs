@@ -68,6 +68,11 @@ namespace SharpAbp.Abp.FileStoring.KS3
 
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
+            if (!args.OverrideExisting)
+            {
+                throw new NotSupportedException("KS3 does not support conditional object creation through this SDK. Use an explicit overwrite only when replacement is acceptable.");
+            }
+
             var containerName = GetContainerName(args);
             var objectKey = KS3FileNameCalculator.Calculate(args);
 
@@ -78,10 +83,6 @@ namespace SharpAbp.Abp.FileStoring.KS3
             try
             {
 
-                if (!args.OverrideExisting && FileExists(ks3Client, containerName, objectKey))
-                {
-                    throw new FileAlreadyExistsException($"Saving FILE '{args.FileId}' does already exists in the container '{containerName}'! Set {nameof(args.OverrideExisting)} if it should be overwritten.");
-                }
                 if (ks3Configuration.CreateContainerIfNotExists)
                 {
                     if (!BucketExist(ks3Client, containerName))

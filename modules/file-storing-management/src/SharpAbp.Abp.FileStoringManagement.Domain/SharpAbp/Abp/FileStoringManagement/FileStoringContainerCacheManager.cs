@@ -89,29 +89,34 @@ namespace SharpAbp.Abp.FileStoringManagement
             CancellationToken cancellationToken = default)
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
-            var cacheKey = CalculateCacheKey(CurrentTenant.Id, name);
-            var cacheItem = await ContainerCache.GetOrAddAsync(
-                cacheKey,
+            var tenantId = CurrentTenant.Id;
+            var cacheItem = await GetCurrentTenantContainerAsync(name, cancellationToken);
+            if (cacheItem != null || !tenantId.HasValue)
+            {
+                return cacheItem;
+            }
+
+            using (CurrentTenant.Change(null))
+            {
+                cacheItem = await GetCurrentTenantContainerAsync(name, cancellationToken);
+                return cacheItem?.IsMultiTenant == true ? cacheItem : null;
+            }
+        }
+
+        private Task<FileStoringContainerCacheItem> GetCurrentTenantContainerAsync(string name, CancellationToken cancellationToken)
+        {
+            return ContainerCache.GetOrAddAsync(
+                CalculateCacheKey(CurrentTenant.Id, name),
                 async () =>
                 {
-                    var container = await ContainerRepository.FindByNameAsync(name, true, cancellationToken);
-                    if (container == null && CurrentTenant.Id.HasValue)
+                    using (DataFilter.Enable<IMultiTenant>())
                     {
-                        // Fall back to a host container explicitly shared with tenants.
-                        using (CurrentTenant.Change(null))
-                        using (DataFilter.Disable<IMultiTenant>())
-                        {
-                            container = await ContainerRepository.FindHostMultiTenantByNameAsync(
-                                name,
-                                includeDetails: true,
-                                cancellationToken: cancellationToken);
-                        }
+                        var container = await ContainerRepository.FindByNameAsync(name, true, cancellationToken);
+                        return container?.AsCacheItem();
                     }
-
-                    return container?.AsCacheItem();
                 },
+                considerUow: true,
                 token: cancellationToken);
-            return cacheItem;
         }
 
 
@@ -131,7 +136,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         {
             Check.NotNullOrWhiteSpace(name, nameof(name));
             var cacheKey = CalculateCacheKey(CurrentTenant.Id, name);
-            await ContainerCache.RemoveAsync(cacheKey, token: cancellationToken);
+            await ContainerCache.RemoveAsync(cacheKey, considerUow: true, token: cancellationToken);
         }
 
         /// <summary>
@@ -149,7 +154,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         {
             Check.NotNull(names, nameof(names));
             var cacheKeys = names.Where(x => !x.IsNullOrWhiteSpace()).Select(x => CalculateCacheKey(CurrentTenant.Id, x)).ToList();
-            await ContainerCache.RemoveManyAsync(cacheKeys, token: cancellationToken);
+            await ContainerCache.RemoveManyAsync(cacheKeys, considerUow: true, token: cancellationToken);
         }
 
 

@@ -84,8 +84,11 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
 
             try
             {
-                await client.DownloadFileAsync(fileId, args.Path);
-                return true;
+                return await TryWriteToFileAsync(args.Path, async (output, token) =>
+                {
+                    await client.DownloadAsync(fileId, output, token);
+                    return true;
+                }, args.CancellationToken);
             }
             catch (FastDFSException ex)
             {
@@ -131,14 +134,19 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
             var fileId = FileNameCalculator.Calculate(args);
             var client = ClientFactory.GetClient(configuration.ClusterName);
 
-            if (configuration.AntiStealCheckToken)
+            if (args.CheckFileExist && !await client.FileExistsAsync(fileId, args.CancellationToken))
             {
-                return await client.GetFileUrlWithTokenAsync(fileId, configuration.DefaultTokenExpireSeconds);
+                return string.Empty;
             }
-            else
+
+            if (args.Expires.HasValue)
             {
-                return await client.GetFileUrlAsync(fileId);
+                throw new NotSupportedException("FastDFS access URLs cannot enforce an explicit expiration because the server controls the token lifetime.");
             }
+
+            return configuration.AntiStealCheckToken
+                ? await client.GetFileUrlWithTokenAsync(fileId, configuration.DefaultTokenExpireSeconds, cancellationToken: args.CancellationToken)
+                : await client.GetFileUrlAsync(fileId, cancellationToken: args.CancellationToken);
         }
 
         private string GetGroupName(FastDFSFileProviderConfiguration configuration, FileProviderArgs args)

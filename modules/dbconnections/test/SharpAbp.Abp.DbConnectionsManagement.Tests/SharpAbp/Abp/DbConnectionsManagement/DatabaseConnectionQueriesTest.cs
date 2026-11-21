@@ -7,6 +7,28 @@ namespace SharpAbp.Abp.DbConnectionsManagement;
 
 public class DatabaseConnectionQueriesTest : DbConnectionsManagementTestBase
 {
+    [Theory]
+    [InlineData("unknown")]
+    [InlineData("0")]
+    [InlineData("MySql, PostgreSql")]
+    public async Task Create_And_Update_Reject_Invalid_Provider_Names(string provider)
+    {
+        var service = GetRequiredService<IDatabaseConnectionInfoAppService>();
+        await Assert.ThrowsAsync<UserFriendlyException>(() => service.CreateAsync(new CreateDatabaseConnectionInfoDto
+        {
+            Name = "invalid", DatabaseProvider = provider, ConnectionString = "example-value"
+        }));
+        var item = await service.CreateAsync(new CreateDatabaseConnectionInfoDto
+        {
+            Name = "valid", DatabaseProvider = "mysql", ConnectionString = "example-value"
+        });
+        Assert.Equal("MySql", (await service.GetAsync(item.Id)).DatabaseProvider);
+        await Assert.ThrowsAsync<UserFriendlyException>(() => service.UpdateAsync(item.Id, new UpdateDatabaseConnectionInfoDto
+        {
+            Name = "valid", DatabaseProvider = provider, ConnectionString = "example-value"
+        }));
+    }
+
     [Fact]
     public async Task Queries_Filter_By_Name_And_Provider_And_Delete_Removes_Entry()
     {

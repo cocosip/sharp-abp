@@ -1,8 +1,11 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
 using Volo.Abp.Identity;
 using Volo.Abp.Validation;
 using Xunit;
+using IdentityUser = Volo.Abp.Identity.IdentityUser;
 
 namespace SharpAbp.Abp.Identity;
 
@@ -59,6 +62,34 @@ public class IdentityUserSecurityTest : IdentityApplicationTestBase
         Assert.Equal(2, claims.Count);
         Assert.Equal("finance", Assert.Single(claims, x => x.ClaimType == "department").ClaimValue);
         Assert.Equal("new", Assert.Single(claims, x => x.ClaimType == "location").ClaimValue);
+    }
+
+    [Fact]
+    public async Task TwoFactor_Change_Reports_User_Validation_Failure()
+    {
+        var user = await _service.CreateAsync(new NewIdentityUserCreateDto
+        {
+            UserName = "validation-user", Password = "1q2w3E*", Email = "validation@example.com"
+        });
+        var manager = GetRequiredService<IdentityUserManager>();
+        manager.UserValidators.Add(new RejectUserUpdate());
+        var service = new IdentityUserAppService(
+            manager,
+            GetRequiredService<IIdentityUserRepository>(),
+            GetRequiredService<IIdentityRoleRepository>(),
+            GetRequiredService<IOrganizationUnitRepository>(),
+            GetRequiredService<IIdentityClaimTypeRepository>(),
+            GetRequiredService<IOptions<IdentityOptions>>());
+
+        await Assert.ThrowsAsync<AbpIdentityResultException>(() => service.SetTwoFactorAsync(user.Id, true));
+    }
+
+    private sealed class RejectUserUpdate : IUserValidator<IdentityUser>
+    {
+        public Task<IdentityResult> ValidateAsync(UserManager<IdentityUser> manager, IdentityUser user)
+        {
+            return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = "ValidationRejected" }));
+        }
     }
 
     [Fact]

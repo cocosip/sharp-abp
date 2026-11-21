@@ -46,6 +46,7 @@ public class AwsFileProviderTest : AbpFileStoringAllTestBase
         Assert.Equal("file", result);
         Assert.Equal("bucket", sent.BucketName);
         Assert.Equal("file", sent.Key);
+        Assert.Equal("*", sent.IfNoneMatch);
         Assert.Same(input, sent.InputStream);
         Assert.True(input.CanRead);
         Assert.Equal(1, disposed);
@@ -105,8 +106,22 @@ public class AwsFileProviderTest : AbpFileStoringAllTestBase
         Assert.Equal(new byte[] { 5, 6, 7 }, parts[1]);
         Assert.Equal(new byte[] { 8 }, parts[2]);
         Assert.Equal("upload", completion.UploadId);
+        Assert.Null(completion.IfNoneMatch);
         Assert.Equal(new int?[] { 1, 2, 3 }, completion.PartETags.Select(x => x.PartNumber));
         Assert.Equal(new[] { "etag-1", "etag-2", "etag-3" }, completion.PartETags.Select(x => x.ETag));
+    }
+
+    [Fact]
+    public async Task Save_Rejects_When_Another_Writer_Creates_Object_First()
+    {
+        var client = new Mock<IAmazonS3>(MockBehavior.Strict);
+        client.Setup(x => x.PutObjectAsync(It.IsAny<PutObjectRequest>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new AmazonS3Exception("Precondition failed") { StatusCode = HttpStatusCode.PreconditionFailed });
+        client.Setup(x => x.Dispose());
+        using var input = new MemoryStream([1]);
+
+        await Assert.ThrowsAsync<FileAlreadyExistsException>(() => new TestAwsProvider(ServiceProvider, client.Object, false)
+            .SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", input, "bin")));
     }
 
     [Fact]
@@ -134,6 +149,40 @@ public class AwsFileProviderTest : AbpFileStoringAllTestBase
         Assert.Equal("upload", aborted.UploadId);
         Assert.Equal("bucket", aborted.BucketName);
         Assert.Equal("file", aborted.Key);
+    }
+
+    [Fact]
+    public async Task Cancelled_Multipart_Should_Abort_With_An_Independent_Token()
+    {
+        _configuration.EnableAutoMultiPartUpload = true;
+        _configuration.MultiPartUploadMinFileSize = 1;
+        _configuration.MultiPartUploadShardingSize = 2;
+        using var input = new MemoryStream([1, 2, 3]);
+        using var cancellation = new CancellationTokenSource();
+        var client = new Mock<IAmazonS3>(MockBehavior.Strict);
+        client.Setup(x => x.Dispose());
+        client.Setup(x => x.InitiateMultipartUploadAsync(It.IsAny<InitiateMultipartUploadRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new InitiateMultipartUploadResponse { UploadId = "upload" });
+        client.Setup(x => x.UploadPartAsync(It.IsAny<UploadPartRequest>(), cancellation.Token))
+            .Returns(() =>
+            {
+                cancellation.Cancel();
+                return Task.FromCanceled<UploadPartResponse>(cancellation.Token);
+            });
+        var aborted = false;
+        client.Setup(x => x.AbortMultipartUploadAsync(It.IsAny<AbortMultipartUploadRequest>(), It.IsAny<CancellationToken>()))
+            .Returns((AbortMultipartUploadRequest request, CancellationToken cleanupToken) =>
+            {
+                cleanupToken.ThrowIfCancellationRequested();
+                aborted = request.UploadId == "upload";
+                return Task.FromResult(new AbortMultipartUploadResponse());
+            });
+
+        var error = await Assert.ThrowsAnyAsync<OperationCanceledException>(() => new TestAwsProvider(ServiceProvider, client.Object, false)
+            .SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", input, "bin", cancellationToken: cancellation.Token)));
+
+        Assert.Equal(cancellation.Token, error.CancellationToken);
+        Assert.True(aborted);
     }
 
     [Theory]

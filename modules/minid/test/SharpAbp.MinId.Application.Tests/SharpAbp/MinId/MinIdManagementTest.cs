@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Volo.Abp;
+using Volo.Abp.Data;
 using Volo.Abp.Domain.Entities;
 using Xunit;
 
@@ -7,6 +8,36 @@ namespace SharpAbp.MinId;
 
 public class MinIdManagementTest : MinIdApplicationTestBase
 {
+    [Fact]
+    public async Task Seeding_Does_Not_Recreate_A_Retired_Default()
+    {
+        var service = GetRequiredService<IMinIdInfoAppService>();
+        var existing = await service.FindByBizTypeAsync("default");
+
+        await service.DeleteAsync(existing.Id);
+        await GetRequiredService<IDataSeeder>().SeedAsync();
+
+        Assert.Empty(await service.GetListAsync());
+    }
+
+    [Fact]
+    public async Task Configuration_Cannot_Lower_The_Watermark_Or_Reuse_A_Retired_Name()
+    {
+        var service = GetRequiredService<IMinIdInfoAppService>();
+        var input = new CreateMinIdInfoDto { BizType = "billing", MaxId = 100, Step = 10, Delta = 1 };
+        var created = await service.CreateAsync(input);
+        await Assert.ThrowsAsync<UserFriendlyException>(() => service.UpdateAsync(created.Id,
+            new UpdateMinIdInfoDto { BizType = input.BizType, MaxId = 99, Step = 10, Delta = 1 }));
+        await Assert.ThrowsAsync<UserFriendlyException>(() => service.UpdateAsync(created.Id,
+            new UpdateMinIdInfoDto { BizType = "renamed", MaxId = 100, Step = 10, Delta = 1 }));
+        Assert.Equal(100, (await service.GetAsync(created.Id)).MaxId);
+
+        await service.DeleteAsync(created.Id);
+
+        Assert.Empty(await service.GetListAsync(bizType: input.BizType));
+        await Assert.ThrowsAsync<UserFriendlyException>(() => service.CreateAsync(input));
+    }
+
     [Fact]
     public async Task Configuration_Crud_Filters_And_Rejects_Duplicate_Business_Type()
     {
@@ -25,15 +56,15 @@ public class MinIdManagementTest : MinIdApplicationTestBase
 
         var updated = await service.UpdateAsync(created.Id, new UpdateMinIdInfoDto
         {
-            BizType = "invoices", MaxId = 200, Step = 20, Delta = 2, Remainder = 1
+            BizType = "orders", MaxId = 200, Step = 20, Delta = 2, Remainder = 1
         });
-        Assert.Equal("invoices", updated.BizType);
+        Assert.Equal("orders", updated.BizType);
         Assert.Equal(200, updated.MaxId);
         Assert.Equal(20, updated.Step);
         Assert.Equal(2, updated.Delta);
         Assert.Equal(1, updated.Remainder);
-        Assert.Empty(await service.GetListAsync(bizType: "orders"));
         await service.DeleteAsync(created.Id);
+        Assert.Empty(await service.GetListAsync(bizType: "orders"));
         await Assert.ThrowsAnyAsync<EntityNotFoundException>(() => service.GetAsync(created.Id));
     }
 

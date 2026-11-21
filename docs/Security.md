@@ -4,6 +4,13 @@
 
 The module is credential-based. It does not provide attribute-based encryption, field-level encryption interceptors, or swappable encryption strategies.
 
+## IdentityModel grants
+
+`SharpAbp.Abp.IdentityModel` handles the custom `external_credentials` grant.
+Standard grant dispatch follows the installed ABP version, including device
+authorization in ABP 10.7.1. Custom subclasses can keep overriding the protected
+token-request hooks for client credentials, password, and external credentials.
+
 ## TransformSecurity
 
 ### Installation

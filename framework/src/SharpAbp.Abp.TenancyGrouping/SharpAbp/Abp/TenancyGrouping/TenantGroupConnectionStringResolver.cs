@@ -46,10 +46,10 @@ namespace SharpAbp.Abp.TenancyGrouping
                         if (connectionStringName == null ||
                             connectionStringName == ConnectionStrings.DefaultConnectionStringName)
                         {
-                            //Return tenant's default or global default
+                            // A group without a default shares ABP's tenant and host fallback.
                             return !tenantGroupDefaultConnectionString.IsNullOrWhiteSpace()
                                 ? tenantGroupDefaultConnectionString!
-                                : Options.ConnectionStrings.Default!;
+                                : await base.ResolveAsync(connectionStringName);
                         }
 
                         //Requesting specific connection string...

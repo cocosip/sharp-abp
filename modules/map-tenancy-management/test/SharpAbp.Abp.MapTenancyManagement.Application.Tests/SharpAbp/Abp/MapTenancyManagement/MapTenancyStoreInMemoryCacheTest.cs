@@ -16,13 +16,27 @@ public class MapTenancyStoreInMemoryCacheTest
 
         var cached = cache.GetByTenantIdOrNull(first.TenantId);
         Assert.Equal("first", cached.TenantName);
-        Assert.Same(cached, cache.GetByCodeOrNull("code-one"));
-        Assert.Same(cached, cache.GetByMapCodeOrNull("map-one"));
+        var byCode = cache.GetByCodeOrNull("code-one");
+        var byMapCode = cache.GetByMapCodeOrNull("map-one");
+        Assert.NotSame(cached, byCode);
+        Assert.NotSame(cached, byMapCode);
+        Assert.Equal(cached.TenantId, byCode.TenantId);
+        Assert.Equal(cached.TenantId, byMapCode.TenantId);
+        var snapshot = cache.GetAll();
+        Assert.NotSame(cached, Assert.Single(snapshot));
         first.Code = "changed";
-        Assert.Equal("code-one", cached.Code);
+        cached.Code = "changed";
+        byCode.MapCode = "changed";
+        byMapCode.TenantId = Guid.NewGuid();
+        snapshot[0].TenantName = "changed";
+        Assert.Equal("code-one", cache.GetByTenantIdOrNull(first.TenantId).Code);
+        Assert.Equal("map-one", cache.GetByCodeOrNull("code-one").MapCode);
+        Assert.Equal(first.TenantId, cache.GetByMapCodeOrNull("map-one").TenantId);
+        Assert.Equal("first", Assert.Single(cache.GetAll()).TenantName);
 
         await cache.FillAsync([second]);
 
+        Assert.Equal(first.TenantId, Assert.Single(snapshot).TenantId);
         Assert.Null(cache.GetByTenantIdOrNull(first.TenantId));
         Assert.Null(cache.GetByCodeOrNull("code-one"));
         Assert.Null(cache.GetByMapCodeOrNull("map-one"));

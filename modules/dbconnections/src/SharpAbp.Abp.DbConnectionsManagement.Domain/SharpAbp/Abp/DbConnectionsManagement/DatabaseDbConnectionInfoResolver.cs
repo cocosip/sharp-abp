@@ -62,7 +62,12 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         /// <returns>The converted database connection information</returns>
         private DbConnectionInfo ConvertToDbConnection(DatabaseConnectionCacheItem cacheItem)
         {
-            var databaseProvider = (DatabaseProvider)Enum.Parse(typeof(DatabaseProvider), cacheItem.DatabaseProvider);
+            if (!Enum.TryParse<DatabaseProvider>(cacheItem.DatabaseProvider, ignoreCase: true, out var databaseProvider)
+                || !Enum.IsDefined(databaseProvider) || cacheItem.DatabaseProvider.Contains(','))
+            {
+                throw new AbpException("The stored database provider is invalid. Update it to a recognized provider name.");
+            }
+
             return new DbConnectionInfo(databaseProvider, cacheItem.ConnectionString);
         }
     }

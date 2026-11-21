@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Domain.Entities;
+using Volo.Abp.EventBus.Local;
 
 namespace SharpAbp.Abp.CryptoVault
 {
@@ -199,6 +201,7 @@ namespace SharpAbp.Abp.CryptoVault
         [Authorize(CryptoVaultPermissions.RSACreds.Create)]
         public virtual async Task<RSACredsDto> CreateAsync(CreateRSACredsDto input)
         {
+            ValidateImportedKey(input);
             var rsaCreds = new RSACreds(GuidGenerator.Create())
             {
                 Identifier = KeyService.GenerateIdentifier(),
@@ -232,7 +235,44 @@ namespace SharpAbp.Abp.CryptoVault
         [Authorize(CryptoVaultPermissions.RSACreds.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {
+            await LazyServiceProvider.LazyGetRequiredService<ILocalEventBus>()
+                .PublishAsync(new CryptoVaultKeyDeletingEvent(id), onUnitOfWorkComplete: false);
             await RSACredsRepository.DeleteAsync(id);
+        }
+
+        private static void ValidateImportedKey(CreateRSACredsDto input)
+        {
+            const string message = "Import an RSA key pair in base64 DER format matching the specified key size.";
+            byte[] privateKey = null;
+            try
+            {
+                var publicKey = Convert.FromBase64String(input.PublicKey);
+                privateKey = Convert.FromBase64String(input.PrivateKey);
+                using var rsaPublic = RSA.Create();
+                using var rsaPrivate = RSA.Create();
+                rsaPublic.ImportSubjectPublicKeyInfo(publicKey, out var publicBytesRead);
+                rsaPrivate.ImportRSAPrivateKey(privateKey, out var privateBytesRead);
+                var publicParameters = rsaPublic.ExportParameters(false);
+                var privatePublicParameters = rsaPrivate.ExportParameters(false);
+                if (publicBytesRead != publicKey.Length || privateBytesRead != privateKey.Length ||
+                    rsaPublic.KeySize != input.Size ||
+                    !publicParameters.Modulus.AsSpan().SequenceEqual(privatePublicParameters.Modulus) ||
+                    !publicParameters.Exponent.AsSpan().SequenceEqual(privatePublicParameters.Exponent))
+                {
+                    throw new UserFriendlyException(message);
+                }
+            }
+            catch (Exception exception) when (exception is FormatException or CryptographicException or ArgumentException)
+            {
+                throw new UserFriendlyException(message);
+            }
+            finally
+            {
+                if (privateKey != null)
+                {
+                    CryptographicOperations.ZeroMemory(privateKey);
+                }
+            }
         }
 
         /// <summary>

@@ -46,6 +46,34 @@ public class DefaultSegmentIdServiceTest
     }
 
     [Fact]
+    public async Task Generator_Uses_The_Final_Full_Segment_When_The_Next_Step_Would_Overflow()
+    {
+        var info = new MinIdInfo(Guid.NewGuid(), "orders", long.MaxValue - 4, 3, 1, 0);
+        _repository.FindByBizTypeAsync("orders", Arg.Any<CancellationToken>()).Returns(info);
+        var options = new MinIdOptions();
+        var generator = new DefaultMinIdGenerator("orders", Options.Create(options), Create(options));
+
+        Assert.Equal(long.MaxValue - 3, await generator.NextIdAsync());
+        Assert.Equal(long.MaxValue - 2, await generator.NextIdAsync());
+        Assert.Equal(long.MaxValue - 1, await generator.NextIdAsync());
+        await _repository.Received(1).FindByBizTypeAsync("orders", Arg.Any<CancellationToken>());
+        var failure = await Assert.ThrowsAsync<AbpException>(() => generator.NextIdAsync());
+        Assert.IsType<OverflowException>(failure.InnerException);
+    }
+
+    [Fact]
+    public async Task Invalid_Stored_Alignment_Does_Not_Reserve_Another_Segment()
+    {
+        var info = new MinIdInfo(Guid.NewGuid(), "orders", 50, 10, 2, 2);
+        _repository.FindByBizTypeAsync("orders", Arg.Any<CancellationToken>()).Returns(info);
+
+        await Assert.ThrowsAsync<AbpException>(() => Create(new MinIdOptions()).GetNextSegmentIdAsync("orders"));
+
+        Assert.Equal(50, info.MaxId);
+        await _repository.DidNotReceive().UpdateAsync(Arg.Any<MinIdInfo>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task Allocation_Overflow_Preserves_Maximum_And_Rolls_Back_Without_Writing()
     {
         var info = new MinIdInfo(Guid.NewGuid(), "orders", long.MaxValue - 5, 10, 1, 0);

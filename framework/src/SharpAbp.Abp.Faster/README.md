@@ -351,6 +351,17 @@ After Restart:
           This is why idempotent processing is critical!
 ```
 
+### Unreadable records
+
+`ReadAsync` returns valid records in the normal list and failed deserializations in
+`UnreadableEntries`. The latter includes the original bytes and address ranges. Inspect
+it even when the normal list is empty. `GetPositions()` includes only valid records.
+Consumers that quarantine bad records can save the bytes and then explicitly acknowledge
+their addresses using `CommitAsync`. For strict retention, set
+`ForceCompleteGapTimeoutMillis`, `MaxCompletedRanges`, and `AddressMatchTolerance` to
+zero. The existing gap completion settings can otherwise advance the checkpoint past
+an unreadable record before it is explicitly acknowledged.
+
 ### Best Practices for Gap Handling
 
 #### 1. Implement Idempotent Processing

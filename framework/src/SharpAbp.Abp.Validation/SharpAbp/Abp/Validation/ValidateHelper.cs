@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using Volo.Abp.Validation;
 
@@ -41,7 +42,7 @@ namespace SharpAbp.Abp.Validation
         }
 
         /// <summary>
-        /// Validates that a string value represents a valid integer.
+        /// Validates that a string value represents a valid Int32.
         /// </summary>
         /// <param name="result">The validation result to add errors to</param>
         /// <param name="provider">The provider name for error context</param>
@@ -49,7 +50,7 @@ namespace SharpAbp.Abp.Validation
         /// <param name="value">The value to validate</param>
         public static void ShouldInt(IAbpValidationResult result, string provider, string name, string value)
         {
-            if (!IsInteger(value))
+            if (!int.TryParse(value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out _) || !IsInteger(value))
             {
                 result.Errors.Add(new ValidationResult($"[{provider}-{name}] value is not a int type value : '{value}' ."));
             }

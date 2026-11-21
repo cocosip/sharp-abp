@@ -737,9 +737,22 @@ namespace SharpAbp.Abp.Faster
 
                 if (entry.Data != null)
                 {
+                    T? data;
+                    try
+                    {
+                        data = Serializer.Deserialize<T>(entry.Data);
+                    }
+                    catch (Exception exception) when (exception is not OutOfMemoryException and not OperationCanceledException)
+                    {
+                        entries.AddUnreadable(entry);
+                        Logger.LogError("Cannot deserialize log record at {Address} for {EntryType}. Error type: {ErrorType}",
+                            entry.CurrentAddress, typeof(T).FullName, exception.GetType().FullName);
+                        continue;
+                    }
+
                     entries.Add(new LogEntry<T>
                     {
-                        Data = Serializer.Deserialize<T>(entry.Data),
+                        Data = data,
                         CurrentAddress = entry.CurrentAddress,
                         NextAddress = entry.NextAddress,
                     });

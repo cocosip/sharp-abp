@@ -45,6 +45,7 @@ public class AliyunFileProviderTest : AbpFileStoringAllTestBase
         Assert.Equal("file", result);
         Assert.Equal("bucket", sent.BucketName);
         Assert.Equal("file", sent.Key);
+        Assert.Equal("true", sent.Metadata.HttpMetadata["x-oss-forbid-overwrite"]);
         Assert.Same(content, sent.Content);
         Assert.True(content.CanRead);
     }
@@ -55,6 +56,20 @@ public class AliyunFileProviderTest : AbpFileStoringAllTestBase
         using var content = new MemoryStream([1]);
         await Assert.ThrowsAsync<FileAlreadyExistsException>(() => new TestAliyunProvider(ServiceProvider, CreateClient(true).Object)
             .SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", content, "bin")));
+    }
+
+    [Theory]
+    [InlineData(VersioningStatus.Enabled)]
+    [InlineData(VersioningStatus.Suspended)]
+    public async Task Save_Rejects_No_Overwrite_When_Versioning_Has_Been_Enabled(VersioningStatus status)
+    {
+        var client = CreateClient(false);
+        client.Setup(x => x.GetBucketVersioning("bucket"))
+            .Returns(CreateSdkResult<GetBucketVersioningResult>((nameof(GetBucketVersioningResult.Status), status)));
+        using var input = new MemoryStream([1]);
+
+        await Assert.ThrowsAsync<NotSupportedException>(() => new TestAliyunProvider(ServiceProvider, client.Object)
+            .SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", input, "bin")));
     }
 
     [Theory]
@@ -151,11 +166,12 @@ public class AliyunFileProviderTest : AbpFileStoringAllTestBase
             .Returns(CreateSdkResult<CompleteMultipartUploadResult>());
 
         Assert.Equal("file", await new TestAliyunProvider(ServiceProvider, client.Object)
-            .SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", input, "bin", true)));
+            .SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", input, "bin")));
         Assert.Equal(3, parts.Count);
         Assert.Equal(new byte[] { 1, 2 }, parts[0]);
         Assert.Equal(new byte[] { 3, 4 }, parts[1]);
         Assert.Equal(new byte[] { 5 }, parts[2]);
+        Assert.Equal("true", completed.Metadata.HttpMetadata["x-oss-forbid-overwrite"]);
         Assert.Equal(new[] { "etag-1", "etag-2", "etag-3" }, completed.PartETags.Select(part => part.ETag));
     }
 
@@ -183,6 +199,8 @@ public class AliyunFileProviderTest : AbpFileStoringAllTestBase
         var client = new Mock<IOss>(MockBehavior.Strict);
         client.Setup(x => x.DoesBucketExist("bucket")).Returns(true);
         client.Setup(x => x.DoesObjectExist("bucket", "file")).Returns(exists);
+        client.Setup(x => x.GetBucketVersioning("bucket"))
+            .Returns(CreateSdkResult<GetBucketVersioningResult>((nameof(GetBucketVersioningResult.Status), VersioningStatus.Off)));
         return client;
     }
 

@@ -9,6 +9,16 @@ namespace SharpAbp.Abp.Faster
     /// <typeparam name="T">The type of data stored in the log entries. Must be a class.</typeparam>
     public class LogEntryList<T> : List<LogEntry<T>> where T : class
     {
+        private List<BufferedLogEntry>? _unreadableEntries;
+
+        /// <summary>
+        /// Records that could not be deserialized. GetPositions excludes these records.
+        /// </summary>
+        public IReadOnlyList<BufferedLogEntry> UnreadableEntries =>
+            _unreadableEntries ?? (IReadOnlyList<BufferedLogEntry>)System.Array.Empty<BufferedLogEntry>();
+
+        internal void AddUnreadable(BufferedLogEntry entry) => (_unreadableEntries ??= []).Add(entry);
+
         /// <summary>
         /// Extracts position information from all log entries in the collection.
         /// </summary>

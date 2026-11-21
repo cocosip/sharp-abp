@@ -45,18 +45,16 @@ public class MinioFileProviderTest : AbpFileStoringAllTestBase
     private static IMinioClient Client(HttpClient http) => new MinioClient().WithEndpoint("storage.test:9000")
         .WithCredentials("unit-access", "unit-secret").WithRegion("us-east-1").WithHttpClient(http).Build();
 
-    [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task Save_Sends_The_Normalized_Bucket_And_Content_And_Preserves_Input(bool overwrite)
+    [Fact]
+    public async Task Save_Sends_The_Normalized_Bucket_And_Content_And_Preserves_Input()
     {
-        using var transport = new StorageTransport { ObjectExists = overwrite };
+        using var transport = new StorageTransport();
         using var http = new HttpClient(transport);
         using var client = Client(http);
         using var input = new MemoryStream([1, 2, 3]);
         var provider = Provider(client);
 
-        Assert.Equal("file", await provider.SaveAsync(new FileProviderSaveArgs("fallback", _configuration, "file", input, "bin", overwrite)));
+        Assert.Equal("file", await provider.SaveAsync(new FileProviderSaveArgs("fallback", _configuration, "file", input, "bin", true)));
 
         var request = Assert.Single(transport.Requests, request => request.Method == HttpMethod.Put);
         Assert.Equal("/bucket/file", request.Path);
@@ -66,15 +64,15 @@ public class MinioFileProviderTest : AbpFileStoringAllTestBase
     }
 
     [Fact]
-    public async Task Save_Rejects_Existing_Objects_Unless_Overwrite_Is_Enabled()
+    public async Task Save_Rejects_Unsupported_Conditional_Create_Without_A_Request()
     {
         using var transport = new StorageTransport();
         using var http = new HttpClient(transport);
         using var client = Client(http);
         using var input = new MemoryStream([1]);
-        await Assert.ThrowsAsync<FileAlreadyExistsException>(() => Provider(client)
+        await Assert.ThrowsAsync<NotSupportedException>(() => Provider(client)
             .SaveAsync(new FileProviderSaveArgs("fallback", _configuration, "file", input, "bin")));
-        Assert.DoesNotContain(transport.Requests, request => request.Method == HttpMethod.Put);
+        Assert.Empty(transport.Requests);
         Assert.True(input.CanRead);
     }
 

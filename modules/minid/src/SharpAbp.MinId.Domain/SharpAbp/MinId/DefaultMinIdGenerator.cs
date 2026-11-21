@@ -135,13 +135,14 @@ namespace SharpAbp.MinId
         {
             while (true)
             {
-                if (_current == null)
+                var current = _current;
+                if (current == null)
                 {
                     await LoadCurrentAsync();
                     continue;
                 }
 
-                var (code, id) = _current.NextId();
+                var (code, id) = current.NextId();
 
                 if (code == ResultCodeConsts.Over)
                 {
@@ -149,7 +150,7 @@ namespace SharpAbp.MinId
                 }
                 else
                 {
-                    if (code == ResultCodeConsts.Loading)
+                    if (code == ResultCodeConsts.Loading && current.MaxId < long.MaxValue)
                     {
                         await LoadNextAsync();
                     }

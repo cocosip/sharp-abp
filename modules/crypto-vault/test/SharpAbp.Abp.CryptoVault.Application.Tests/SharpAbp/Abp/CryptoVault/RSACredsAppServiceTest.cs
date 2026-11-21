@@ -1,5 +1,6 @@
 using SharpAbp.Abp.Crypto.RSA;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Validation;
 using Xunit;
 
@@ -73,6 +74,27 @@ namespace SharpAbp.Abp.CryptoVault
             Assert.NotEqual(rsaCreds.PrivateKey, createDto.PrivateKey);
             Assert.Equal(decryptKey.PublicKey, createDto.PublicKey);
             Assert.Equal(decryptKey.PrivateKey, createDto.PrivateKey);
+        }
+
+        [Fact]
+        public async Task Import_Rejects_Invalid_Format_Mismatched_Pair_And_Wrong_Size()
+        {
+            var keyPair = _rsaEncryptionService.GenerateRSAKeyPair(1024);
+            var anotherPair = _rsaEncryptionService.GenerateRSAKeyPair(1024);
+            var input = new CreateRSACredsDto
+            {
+                Size = 1024,
+                PublicKey = "invalid",
+                PrivateKey = keyPair.ExportPrivateKey()
+            };
+
+            await Assert.ThrowsAsync<UserFriendlyException>(() => _rsaCredsAppService.CreateAsync(input));
+            input.PublicKey = anotherPair.ExportPublicKey();
+            await Assert.ThrowsAsync<UserFriendlyException>(() => _rsaCredsAppService.CreateAsync(input));
+            input.PublicKey = keyPair.ExportPublicKey();
+            input.Size = 2048;
+            await Assert.ThrowsAsync<UserFriendlyException>(() => _rsaCredsAppService.CreateAsync(input));
+            Assert.Empty(await _rsaCredsAppService.GetListAsync());
         }
 
         [Fact]

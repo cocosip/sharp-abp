@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon.S3;
@@ -107,6 +108,10 @@ namespace SharpAbp.Abp.FileStoring.Aws
                     return await PutObjectAsync(amazonS3Client, containerName, objectKey, args);
                 }
 
+            }
+            catch (AmazonS3Exception ex) when (!args.OverrideExisting && ex.StatusCode == HttpStatusCode.PreconditionFailed)
+            {
+                throw new FileAlreadyExistsException($"File '{args.FileId}' already exists in the container '{containerName}'.", ex);
             }
             finally
             {
@@ -327,7 +332,8 @@ namespace SharpAbp.Abp.FileStoring.Aws
             {
                 BucketName = containerName,
                 Key = objectKey,
-                InputStream = args.FileStream
+                InputStream = args.FileStream,
+                IfNoneMatch = args.OverrideExisting ? null : "*"
             }, args.CancellationToken);
             return args.FileId;
         }
@@ -407,7 +413,8 @@ namespace SharpAbp.Abp.FileStoring.Aws
                     BucketName = containerName,
                     Key = objectKey,
                     UploadId = uploadId,
-                    PartETags = partETags
+                    PartETags = partETags,
+                    IfNoneMatch = args.OverrideExisting ? null : "*"
                 }, args.CancellationToken);
 
                 Logger.LogInformation("Multipart upload completed for file '{FileId}' with key '{ObjectKey}'. ETag: {ETag}",
@@ -419,7 +426,8 @@ namespace SharpAbp.Abp.FileStoring.Aws
             {
                 Logger.LogError(ex, "Multipart upload failed for file '{FileId}' with UploadId '{UploadId}'. Bucket: {BucketName}, Key: {ObjectKey}",
                     args.FileId, uploadId, containerName, objectKey);
-                await AbortMultipartUploadSilentlyAsync(amazonS3Client, containerName, objectKey, uploadId, args.CancellationToken);
+                using var abortTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+                await AbortMultipartUploadSilentlyAsync(amazonS3Client, containerName, objectKey, uploadId, abortTimeout.Token);
                 throw;
             }
         }

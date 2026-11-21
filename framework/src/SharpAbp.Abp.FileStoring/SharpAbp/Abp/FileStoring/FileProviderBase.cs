@@ -1,5 +1,9 @@
 ﻿﻿using JetBrains.Annotations;
+using System;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
@@ -122,24 +126,95 @@ namespace SharpAbp.Abp.FileStoring
             CancellationToken cancellationToken = default)
         {
             Check.NotNull(stream, nameof(stream));
+            await TryWriteToFileAsync(path, async (output, token) =>
+            {
+                await stream.CopyToAsync(output, token);
+                return true;
+            }, cancellationToken);
+        }
+
+        protected async Task<bool> TryWriteToFileAsync(
+            string path,
+            Func<Stream, CancellationToken, Task<bool>> writeAsync,
+            CancellationToken cancellationToken)
+        {
             Check.NotNullOrWhiteSpace(path, nameof(path));
 
-            var directory = Path.GetDirectoryName(path);
-            if (!string.IsNullOrWhiteSpace(directory))
+            cancellationToken.ThrowIfCancellationRequested();
+            var destination = Path.GetFullPath(path);
+            var directory = Path.GetDirectoryName(destination) ?? throw new IOException("The download destination must be a file path.");
+            var canReplace = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            if (!canReplace && File.Exists(destination))
             {
-                Directory.CreateDirectory(directory);
+                throw UnixReplacementNotSupported();
             }
 
-            using var fs = new FileStream(
-                path,
-                FileMode.Create,
-                FileAccess.Write,
-                FileShare.None,
-                81920,
-                useAsync: true);
+            Directory.CreateDirectory(directory);
+            var stagingPath = Path.Combine(directory, $".sharpabp-{Guid.NewGuid():N}.tmp");
+            var stagingCreated = false;
 
-            await stream.CopyToAsync(fs, cancellationToken);
-            await fs.FlushAsync(cancellationToken);
+            try
+            {
+                using (var output = new FileStream(stagingPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 81920, useAsync: true))
+                {
+                    stagingCreated = true;
+                    if (!await writeAsync(output, cancellationToken))
+                    {
+                        return false;
+                    }
+
+                    await output.FlushAsync(cancellationToken);
+                }
+
+                cancellationToken.ThrowIfCancellationRequested();
+                if (!canReplace)
+                {
+                    // POSIX link publishes the staged file atomically and fails if the destination exists.
+                    if (Link(stagingPath, destination) != 0)
+                    {
+                        var error = Marshal.GetLastWin32Error();
+                        if (File.Exists(destination))
+                        {
+                            throw UnixReplacementNotSupported();
+                        }
+                        throw new IOException("The download could not be published as a new file.", new Win32Exception(error));
+                    }
+                    return true;
+                }
+
+                try
+                {
+                    File.Move(stagingPath, destination);
+                }
+                catch (IOException) when (File.Exists(destination))
+                {
+                    File.Replace(stagingPath, destination, null);
+                }
+
+                stagingCreated = false;
+                return true;
+            }
+            finally
+            {
+                if (stagingCreated)
+                {
+                    try
+                    {
+                        File.Delete(stagingPath);
+                    }
+                    catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+                    {
+                        Trace.TraceWarning("Failed to remove temporary download file '{0}': {1}", stagingPath, ex.Message);
+                    }
+                }
+            }
         }
+
+        private static NotSupportedException UnixReplacementNotSupported() =>
+            new NotSupportedException("Replacing an existing download on this platform cannot preserve its ownership and access controls.");
+
+        // CharSet.Ansi marshals strings as UTF-8 on Unix and is available on .NET Standard 2.0.
+        [DllImport("libc", EntryPoint = "link", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true)]
+        private static extern int Link(string existingPath, string newPath);
     }
 }

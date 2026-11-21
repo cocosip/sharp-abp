@@ -40,6 +40,12 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
 
         public override async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
+            if (await ShouldSkipAsync(context, next))
+            {
+                await next(context);
+                return;
+            }
+
             try
             {
                 var identifier = context.Request.Headers[AspNetCoreOptions.TransformSecurityIdentifierName].ToString();

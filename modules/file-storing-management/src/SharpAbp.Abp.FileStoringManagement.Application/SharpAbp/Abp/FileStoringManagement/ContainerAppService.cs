@@ -131,6 +131,7 @@ namespace SharpAbp.Abp.FileStoringManagement
                 values);
 
             await ContainerRepository.InsertAsync(container);
+            await LazyServiceProvider.LazyGetRequiredService<IFileStoringContainerCacheManager>().RemoveAsync(container.Name);
 
             return ObjectMapper.Map<FileStoringContainer, ContainerDto>(container);
         }

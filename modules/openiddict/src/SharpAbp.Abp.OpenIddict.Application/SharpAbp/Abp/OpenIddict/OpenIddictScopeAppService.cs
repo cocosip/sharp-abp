@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Domain.Entities;
+using Volo.Abp.ObjectExtending;
 using Volo.Abp.OpenIddict.Scopes;
 
 namespace SharpAbp.Abp.OpenIddict
@@ -29,6 +30,8 @@ namespace SharpAbp.Abp.OpenIddict
         /// Gets the OpenIddict scope repository
         /// </summary>
         protected IOpenIddictScopeRepository OpenIddictScopeRepository { get; }
+
+        private IOpenIddictScopeManager ScopeManager => LazyServiceProvider.LazyGetRequiredService<IOpenIddictScopeManager>();
         /// <summary>
         /// Initializes a new instance of the <see cref="OpenIddictScopeAppService"/> class
         /// </summary>
@@ -122,10 +125,8 @@ namespace SharpAbp.Abp.OpenIddict
                 Description = input.Description,
             };
 
-            foreach (var extraProperty in input.ExtraProperties)
-            {
-                model.ExtraProperties.Add(extraProperty.Key, extraProperty.Value);
-            }
+            ExtensibleObjectMapper.MapExtraPropertiesTo<CreateOpenIddictScopeDto, OpenIddictScope>(
+                input.ExtraProperties, model.ExtraProperties, MappingPropertyDefinitionChecks.Both);
 
             await OpenIddictScopeStore.SetPropertiesAsync(model, input.Properties.ToImmutableDictionary(), CancellationToken.None);
             await OpenIddictScopeStore.SetResourcesAsync(model, input.Resources.ToImmutableArray(), CancellationToken.None);
@@ -136,7 +137,8 @@ namespace SharpAbp.Abp.OpenIddict
             var displayNames = new Dictionary<CultureInfo, string>(input.DisplayNames.Select(x => new KeyValuePair<CultureInfo, string>(new CultureInfo(x.Key), x.Value)));
             await OpenIddictScopeStore.SetDisplayNamesAsync(model, displayNames.ToImmutableDictionary(), CancellationToken.None);
 
-            await OpenIddictScopeStore.CreateAsync(model, CancellationToken.None);
+            await ScopeManager.CreateAsync(model);
+            await InvalidateLegacyScopeCacheAsync(model);
 
             return await ToScopeDtoAsync(model);
         }
@@ -155,17 +157,16 @@ namespace SharpAbp.Abp.OpenIddict
             {
                 throw new EntityNotFoundException(typeof(OpenIddictScope), id);
             }
-            model.ExtraProperties.Clear();
-            foreach (var extraProperty in input.ExtraProperties)
-            {
-                model.ExtraProperties.Add(extraProperty.Key, extraProperty.Value);
-            }
+            var original = new OpenIddictScopeModel { Id = model.Id, Name = model.Name, Resources = model.Resources };
+            ExtensibleObjectMapper.MapExtraPropertiesTo<UpdateOpenIddictScopeDto, OpenIddictScope>(
+                input.ExtraProperties, model.ExtraProperties, MappingPropertyDefinitionChecks.Both);
 
             await OpenIddictScopeStore.SetNameAsync(model, input.Name, CancellationToken.None);
             await OpenIddictScopeStore.SetDisplayNameAsync(model, input.DisplayName, CancellationToken.None);
             await OpenIddictScopeStore.SetDescriptionAsync(model, input.Description, CancellationToken.None);
 
-            await OpenIddictScopeStore.SetPropertiesAsync(model, input.Properties.ToImmutableDictionary(), CancellationToken.None);
+            var properties = await OpenIddictScopeStore.GetPropertiesAsync(model, CancellationToken.None);
+            await OpenIddictScopeStore.SetPropertiesAsync(model, properties.SetItems(input.Properties), CancellationToken.None);
             await OpenIddictScopeStore.SetResourcesAsync(model, input.Resources.ToImmutableArray(), CancellationToken.None);
 
             var descriptions = new Dictionary<CultureInfo, string>(input.Descriptions.Select(x => new KeyValuePair<CultureInfo, string>(new CultureInfo(x.Key), x.Value)));
@@ -174,7 +175,8 @@ namespace SharpAbp.Abp.OpenIddict
             var displayNames = new Dictionary<CultureInfo, string>(input.DisplayNames.Select(x => new KeyValuePair<CultureInfo, string>(new CultureInfo(x.Key), x.Value)));
             await OpenIddictScopeStore.SetDisplayNamesAsync(model, displayNames.ToImmutableDictionary(), CancellationToken.None);
 
-            await OpenIddictScopeStore.UpdateAsync(model, CancellationToken.None);
+            await ScopeManager.UpdateAsync(model);
+            await InvalidateLegacyScopeCacheAsync(original, model);
             return await ToScopeDtoAsync(model, CancellationToken.None);
         }
 
@@ -186,7 +188,32 @@ namespace SharpAbp.Abp.OpenIddict
         [Authorize(OpenIddictPermissions.Scopes.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {
-            await OpenIddictScopeRepository.DeleteAsync(id);
+            var model = await OpenIddictScopeStore.FindByIdAsync(id.ToString("D"), CancellationToken.None);
+            if (model != null)
+            {
+                await ScopeManager.DeleteAsync(model);
+                await InvalidateLegacyScopeCacheAsync(model);
+            }
+        }
+
+        private Task InvalidateLegacyScopeCacheAsync(params OpenIddictScopeModel[] models)
+        {
+            var cache = LazyServiceProvider.LazyGetRequiredService<AbpOpenIddictScopeCache>();
+            async Task InvalidateAsync()
+            {
+                foreach (var model in models)
+                {
+                    await cache.RemoveAsync(model, CancellationToken.None);
+                }
+            }
+
+            if (CurrentUnitOfWork != null)
+            {
+                CurrentUnitOfWork.OnCompleted(InvalidateAsync);
+                return Task.CompletedTask;
+            }
+
+            return InvalidateAsync();
         }
 
         /// <summary>
@@ -204,6 +231,9 @@ namespace SharpAbp.Abp.OpenIddict
                 DisplayName = model.DisplayName,
                 Name = model.Name
             };
+
+            ExtensibleObjectMapper.MapExtraPropertiesTo<OpenIddictScope, OpenIddictScopeDto>(
+                model.ExtraProperties, dto.ExtraProperties, MappingPropertyDefinitionChecks.Both);
 
             dto.Properties = new Dictionary<string, JsonElement>(await OpenIddictScopeStore.GetPropertiesAsync(model, cancellationToken));
 

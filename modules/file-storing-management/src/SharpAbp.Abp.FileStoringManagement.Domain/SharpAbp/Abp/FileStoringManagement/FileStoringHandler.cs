@@ -25,7 +25,7 @@ namespace SharpAbp.Abp.FileStoringManagement
         {
             using (CurrentTenant.Change(eventData.TenantId))
             {
-                await FileStoringContainerCacheManager.RemoveAsync(eventData.OldName);
+                await FileStoringContainerCacheManager.RemoveManyAsync([eventData.OldName, eventData.Name]);
             }
         }
 

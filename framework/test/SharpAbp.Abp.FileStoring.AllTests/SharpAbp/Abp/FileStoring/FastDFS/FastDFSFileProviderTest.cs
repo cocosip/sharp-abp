@@ -71,8 +71,6 @@ public class FastDFSFileProviderTest : AbpFileStoringAllTestBase
         var provider = Provider();
         _client.Setup(client => client.DeleteAsync("file", CancellationToken.None))
             .Returns(missing ? Task.FromException(new FastDFSException("not found")) : Task.CompletedTask);
-        _client.Setup(client => client.DownloadFileAsync("file", "target", CancellationToken.None))
-            .Returns(missing ? Task.FromException(new FastDFSException("not found")) : Task.CompletedTask);
         _client.Setup(client => client.DownloadAsync("file", It.IsAny<Stream>(), CancellationToken.None))
             .Returns<string, Stream, CancellationToken>(async (_, stream, _) =>
             {
@@ -82,7 +80,19 @@ public class FastDFSFileProviderTest : AbpFileStoringAllTestBase
         _client.Setup(client => client.FileExistsAsync("file", CancellationToken.None)).ReturnsAsync(!missing);
 
         Assert.Equal(!missing, await provider.DeleteAsync(new FileProviderDeleteArgs("group1", _configuration, "file")));
-        Assert.Equal(!missing, await provider.DownloadAsync(new FileProviderDownloadArgs("group1", _configuration, "file", "target")));
+        var destination = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+        try
+        {
+            Assert.Equal(!missing, await provider.DownloadAsync(new FileProviderDownloadArgs("group1", _configuration, "file", destination)));
+            if (!missing)
+            {
+                Assert.Equal(new byte[] { 3, 1, 4 }, await File.ReadAllBytesAsync(destination));
+            }
+        }
+        finally
+        {
+            File.Delete(destination);
+        }
         Assert.Equal(!missing, await provider.ExistsAsync(new FileProviderExistsArgs("group1", _configuration, "file")));
         using var result = await provider.GetOrNullAsync(new FileProviderGetArgs("group1", _configuration, "file"));
         if (missing)
@@ -121,6 +131,73 @@ public class FastDFSFileProviderTest : AbpFileStoringAllTestBase
         _configuration.HttpAccess = false;
         Assert.Equal("", await provider.GetAccessUrlAsync(new FileProviderAccessArgs("group1", _configuration, "file")));
         _client.Verify(client => client.GetFileUrlWithTokenAsync("file", 120, null, CancellationToken.None), antiSteal ? Times.Once() : Times.Never());
+    }
+
+    [Fact]
+    public async Task Access_Url_Checks_Existence_And_Rejects_Unsupported_Expiry()
+    {
+        var provider = Provider();
+        using var cancellation = new CancellationTokenSource();
+        var expires = DateTime.UtcNow.AddMinutes(2);
+        _client.Setup(client => client.FileExistsAsync("file", cancellation.Token)).ReturnsAsync(false);
+        Assert.Equal("", await provider.GetAccessUrlAsync(new FileProviderAccessArgs("group1", _configuration, "file", expires, true, cancellation.Token)));
+
+        _client.Setup(client => client.FileExistsAsync("file", cancellation.Token)).ReturnsAsync(true);
+        await Assert.ThrowsAsync<NotSupportedException>(() => provider.GetAccessUrlAsync(new FileProviderAccessArgs("group1", _configuration, "file", expires, true, cancellation.Token)));
+
+        _configuration.GetFastDFSConfiguration().AntiStealCheckToken = true;
+        _client.Setup(client => client.GetFileUrlWithTokenAsync("file", 3600, null, cancellation.Token))
+            .ReturnsAsync("https://storage.test/file?token=test");
+        await Assert.ThrowsAsync<NotSupportedException>(() => provider.GetAccessUrlAsync(new FileProviderAccessArgs("group1", _configuration, "file", expires, true, cancellation.Token)));
+        Assert.Equal("https://storage.test/file?token=test", await provider.GetAccessUrlAsync(new FileProviderAccessArgs("group1", _configuration, "file", checkFileExist: true, cancellationToken: cancellation.Token)));
+    }
+
+    [Fact]
+    public async Task Configuration_Factory_Publishes_Only_After_Registration()
+    {
+        var configuration = _configuration.GetFastDFSConfiguration();
+        var registrationStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var finishRegistration = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        _clients.Setup(factory => factory.RegisterClient("cluster", It.IsAny<FastDFSConfiguration>()))
+            .Returns(() =>
+            {
+                registrationStarted.SetResult();
+                finishRegistration.Task.WaitAsync(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult();
+                return _client.Object;
+            });
+
+        var registration = Task.Run(() => _factory.AddIfNotContains(configuration));
+        try
+        {
+            await registrationStarted.Task.WaitAsync(TimeSpan.FromSeconds(5));
+            Assert.Null(_factory.GetConfiguration("cluster"));
+        }
+        finally
+        {
+            finishRegistration.SetResult();
+        }
+
+        Assert.True(await registration);
+        Assert.Same(configuration, _factory.GetConfiguration("cluster"));
+        Assert.False(_factory.AddIfNotContains(configuration));
+        _clients.Verify(factory => factory.RegisterClient("cluster", It.IsAny<FastDFSConfiguration>()), Times.Once);
+    }
+
+    [Fact]
+    public void Configuration_Factory_Retries_After_Registration_Fails()
+    {
+        var configuration = _configuration.GetFastDFSConfiguration();
+        var failure = new IOException("Registration failed");
+        _clients.SetupSequence(factory => factory.RegisterClient("cluster", It.IsAny<FastDFSConfiguration>()))
+            .Throws(failure)
+            .Returns(_client.Object);
+
+        Assert.Same(failure, Assert.Throws<IOException>(() => _factory.AddIfNotContains(configuration)));
+        Assert.Null(_factory.GetConfiguration("cluster"));
+        Assert.True(_factory.AddIfNotContains(configuration));
+        Assert.False(_factory.AddIfNotContains(configuration));
+        Assert.Same(configuration, _factory.GetConfiguration("cluster"));
+        _clients.Verify(factory => factory.RegisterClient("cluster", It.IsAny<FastDFSConfiguration>()), Times.Exactly(2));
     }
 
     [Theory]

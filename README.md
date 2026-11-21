@@ -13,7 +13,7 @@ See [Testing and coverage](docs/Testing.md) for ABP test conventions and the rep
 
 ## Key Features
 
-- **Multi-Database Support**: MySQL, PostgreSQL, SQL Server, Oracle, SQLite, DM (DaMeng), GaussDB
+- **Multi-Database Support**: MySQL, PostgreSQL, SQL Server, Oracle, SQLite, DM (DaMeng), GaussDB, OceanBase
 - **Multi-ORM Support**: Entity Framework Core, FreeSql, Dapper
 - **File Storage**: Support for 9 storage providers including FileSystem, Aliyun OSS, Azure, AWS, MinIO, KS3, Huawei OBS, FastDFS and S3
 - **Message Queue**: RabbitMQ, Kafka, ActiveMQ (via MassTransit)
@@ -45,7 +45,7 @@ See [Testing and coverage](docs/Testing.md) for ABP test conventions and the rep
 | ---- | ----------- | ------------- |
 | **FreeSql** | EF Core connection/transaction bridge for FreeSql | [docs](/docs/ORM.md#freesql) |
 | **Dapper** | Dapper micro-ORM framework integration | [docs](/docs/ORM.md#dapper) |
-| **EntityFrameworkCore** | EF Core integration (supports DM, GaussDB) | [docs](/docs/ORM.md#entityframeworkcore) |
+| **EntityFrameworkCore** | EF Core integration (supports DM, GaussDB, OceanBase) | [docs](/docs/ORM.md#entityframeworkcore) |
 
 ### File Storage
 
@@ -67,7 +67,7 @@ See [Testing and coverage](docs/Testing.md) for ABP test conventions and the rep
 
 | Name | Description | Documentation |
 | ---- | ----------- | ------------- |
-| **DbConnections** | Multi-database connection management (supports MySQL/PostgreSQL/SQLServer/Oracle/SQLite/DM/GaussDB) | [docs](/docs/DatabaseConnections.md) |
+| **DbConnections** | Multi-database connection management (supports MySQL/PostgreSQL/SQLServer/Oracle/SQLite/DM/GaussDB/OceanBase) | [docs](/docs/DatabaseConnections.md) |
 
 ### Message Queue
 

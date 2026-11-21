@@ -1,6 +1,5 @@
 ﻿using SharpAbp.Abp.AspNetCore.FrontHost;
 using SharpAbp.Abp.AspNetCore.Http;
-using SharpAbp.Abp.AspNetCore.Response;
 using System.Threading.Tasks;
 using Volo.Abp.AspNetCore;
 using Volo.Abp.Modularity;
@@ -20,11 +19,6 @@ namespace SharpAbp.Abp.AspNetCore
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            Configure<AbpHttpResponseHeaderOptions>(options =>
-            {
-                options.IsEnabled = false;
-            });
-
             Configure<AbpFrontHostOptions>(options => { });
 
             Configure<AbpHttpHeadersOptions>(options =>

@@ -8,6 +8,27 @@ namespace SharpAbp.MinId;
 public class SegmentIdOverflowTest
 {
     [Theory]
+    [InlineData(long.MinValue, 3, 2, long.MinValue + 1)]
+    [InlineData(-10, 3, 2, -7L)]
+    [InlineData(-3, 5, 4, -1L)]
+    public void Signed_Alignment_Uses_Nonnegative_Modulo(long previousId, int delta, int remainder, long expected)
+    {
+        var segment = Create(previousId, delta, remainder);
+        Assert.Equal(expected, segment.NextId().Item2);
+        Assert.Equal(expected + delta, segment.NextId().Item2);
+    }
+
+    [Theory]
+    [InlineData(0, 0)]
+    [InlineData(2, 2)]
+    [InlineData(2, -1)]
+    public void Invalid_Stored_Segment_Configuration_Fails_Explicitly(int delta, int remainder)
+    {
+        var segment = Create(0, delta, remainder);
+        Assert.Throws<System.InvalidOperationException>(() => segment.NextId());
+    }
+
+    [Theory]
     [InlineData(1, 0, 1)]
     [InlineData(2, 1, 2)]
     [InlineData(3, 1, 1)]

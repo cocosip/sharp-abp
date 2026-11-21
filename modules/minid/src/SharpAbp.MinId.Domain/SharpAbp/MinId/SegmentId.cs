@@ -1,5 +1,7 @@
 ﻿﻿﻿﻿﻿using System.Threading;
 
+using System;
+
 namespace SharpAbp.MinId
 {
     /// <summary>
@@ -47,7 +49,8 @@ namespace SharpAbp.MinId
         /// </summary>
         public long LoadingId { get; set; }
 
-        private bool _isSetup = false;
+        private volatile bool _isSetup;
+        private bool _alignAtMinimum;
 
         /// <summary>
         /// Determines whether this segment still has available IDs for generation.
@@ -77,34 +80,34 @@ namespace SharpAbp.MinId
                     return;
                 }
 
-                if (CurrentId % Delta == Remainder)
+                if (Delta <= 0 || Remainder < 0 || Remainder >= Delta)
                 {
-                    _isSetup = true;
-                    return;
+                    throw new InvalidOperationException("A MinId segment needs a positive delta and a remainder in [0, delta).");
                 }
 
-                var id = CurrentId;
-
-                // Align the current ID to match the delta/remainder constraint
-                for (int i = 0; i <= Delta; i++)
+                var currentId = Interlocked.Read(ref _currentId);
+                var distance = Delta - GetNextOffset(currentId);
+                if (currentId >= long.MinValue + distance)
                 {
-                    if (_currentId == long.MaxValue)
-                    {
-                        _isExhausted = true;
-                        _isSetup = true;
-                        return;
-                    }
-
-                    id = Interlocked.Increment(ref _currentId);
-                    if (id % Delta == Remainder)
-                    {
-                        // Compensate for the extra increment to avoid wasting an ID
-                        Interlocked.Add(ref _currentId, (0 - Delta));
-                        _isSetup = true;
-                        return;
-                    }
+                    Interlocked.Exchange(ref _currentId, currentId - distance);
                 }
+                else
+                {
+                    _alignAtMinimum = true;
+                }
+                _isSetup = true;
             }
+        }
+
+        private long GetNextOffset(long currentId)
+        {
+            var residue = currentId % Delta;
+            if (residue < 0)
+            {
+                residue += Delta;
+            }
+            var offset = Remainder - residue;
+            return offset > 0 ? offset : offset + Delta;
         }
 
         /// <summary>
@@ -125,13 +128,14 @@ namespace SharpAbp.MinId
             while (true)
             {
                 var currentId = Interlocked.Read(ref _currentId);
-                if (_isExhausted || currentId > long.MaxValue - Delta || currentId + Delta > MaxId)
+                var offset = _alignAtMinimum ? GetNextOffset(currentId) : Delta;
+                if (_isExhausted || currentId > long.MaxValue - offset || currentId + offset > MaxId)
                 {
                     _isExhausted = true;
                     return new(ResultCodeConsts.Over, currentId);
                 }
 
-                id = currentId + Delta;
+                id = currentId + offset;
                 if (Interlocked.CompareExchange(ref _currentId, id, currentId) == currentId)
                 {
                     break;

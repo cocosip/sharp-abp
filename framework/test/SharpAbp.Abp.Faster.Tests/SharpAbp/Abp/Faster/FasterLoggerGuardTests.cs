@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using FASTER.core;
 using System;
@@ -15,6 +16,26 @@ namespace SharpAbp.Abp.Faster;
 
 public class FasterLoggerGuardTests : AbpFasterTestBase
 {
+    [Fact]
+    public async Task Unreadable_Record_Does_Not_Discard_Other_Records_In_The_Batch()
+    {
+        var serializer = GetRequiredService<IObjectSerializer>();
+        using var logger = new BufferedLogger(serializer, GetRequiredService<ICancellationTokenProvider>());
+        await logger.AddAsync(serializer.Serialize(new FasterTestEntry { Id = 1 }), 64, 80);
+        await logger.AddAsync(new byte[] { 0xff }, 80, 96);
+        await logger.AddAsync(serializer.Serialize(new FasterTestEntry { Id = 2 }), 96, 112);
+
+        var batch = await logger.ReadAsync(3);
+
+        Assert.Equal(new[] { 1, 2 }, batch.Select(entry => entry.Data.Id));
+        Assert.Equal(new[] { 64L, 96L }, batch.GetPositions().Select(position => position.Address));
+        var unreadable = Assert.Single(batch.UnreadableEntries);
+        Assert.Equal(80, unreadable.CurrentAddress);
+        Assert.Equal(96, unreadable.NextAddress);
+        Assert.Equal(new byte[] { 0xff }, unreadable.Data);
+        Assert.Equal(2, logger.TotalReadCount);
+    }
+
     [Fact]
     public async Task Uninitialized_Logger_Should_Reject_Writes_Export_And_Forced_Completion()
     {
@@ -179,6 +200,14 @@ public class FasterLoggerGuardTests : AbpFasterTestBase
             }
             directory.Delete(true);
         }
+    }
+
+    private sealed class BufferedLogger(IObjectSerializer serializer, ICancellationTokenProvider tokens)
+        : FasterLogger<FasterTestEntry>(NullLogger<FasterLogger<FasterTestEntry>>.Instance,
+            Microsoft.Extensions.Options.Options.Create(new AbpFasterOptions()), "buffered", new AbpFasterConfiguration(), serializer, tokens)
+    {
+        public ValueTask AddAsync(byte[] data, long address, long nextAddress) =>
+            _pendingChannel.Writer.WriteAsync(new BufferedLogEntry { Data = data, CurrentAddress = address, NextAddress = nextAddress });
     }
 
     private FasterLogger<FasterTestEntry> CreateLogger(string rootPath, Action<FasterLogSettings> configure = null) => new(

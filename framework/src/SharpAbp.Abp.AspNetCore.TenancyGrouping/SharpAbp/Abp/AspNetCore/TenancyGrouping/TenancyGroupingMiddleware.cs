@@ -37,15 +37,18 @@ namespace SharpAbp.Abp.AspNetCore.TenancyGrouping
 
         override protected Task<bool> ShouldSkipAsync(HttpContext context, RequestDelegate next)
         {
-            if (Options.IsEnabled)
-            {
-                return Task.FromResult(false);
-            }
-            return Task.FromResult(true);
+            return Task.FromResult(!Options.IsEnabled ||
+                context.GetEndpoint()?.Metadata.GetMetadata<IgnoreTenancyGroupingAttribute>() != null);
         }
 
         public async override Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
+            if (await ShouldSkipAsync(context, next))
+            {
+                await next(context);
+                return;
+            }
+
             var tenantGroup = await _tenantGroupConfigurationProvider.GetAsync(saveResolveResult: true);
 
             if (tenantGroup?.Id != _currentTenantGroup.Id)

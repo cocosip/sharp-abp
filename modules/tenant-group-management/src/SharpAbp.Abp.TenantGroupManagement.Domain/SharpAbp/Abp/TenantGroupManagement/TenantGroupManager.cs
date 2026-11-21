@@ -109,13 +109,19 @@ namespace SharpAbp.Abp.TenantGroupManagement
         /// <param name="tenantId">The ID of the tenant to add.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>The updated tenant group.</returns>
-        /// <exception cref="UserFriendlyException">Thrown when the tenant is already in the group.</exception>
+        /// <exception cref="UserFriendlyException">Thrown when the tenant already belongs to a group.</exception>
         public virtual async Task<TenantGroup> AddTenantAsync(Guid id, Guid tenantId, CancellationToken cancellationToken = default)
         {
             Logger.LogInformation("Adding tenant to group. TenantGroupId: {TenantGroupId}, TenantId: {TenantId}", id, tenantId);
 
             var tenantGroup = await TenantGroupRepository.GetAsync(id, cancellationToken: cancellationToken);
             ValidateTenant(tenantGroup, tenantId);
+            var existingGroup = await TenantGroupRepository.FindExpectedByTenantIdAsync(
+                tenantId, expectedId: id, includeDetails: false, cancellationToken: cancellationToken);
+            if (existingGroup != null)
+            {
+                throw new UserFriendlyException(Localizer["TenantGroupManagement.DuplicateTenantId", tenantId]);
+            }
             
             tenantGroup.AddTenant(new TenantGroupTenant(GuidGenerator.Create(), tenantGroup.Id, tenantId));
             

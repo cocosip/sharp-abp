@@ -709,6 +709,42 @@ public class DbTenantCodeFilePathBuilder : IFilePathBuilder, ITransientDependenc
 
 ## Provider-Specific Configurations
 
+All providers stage downloads beside the destination before publication, including Azure
+and FastDFS. A failed or cancelled copy leaves a new destination unpublished. Windows
+can replace an existing destination with `File.Replace`. On Unix, pass a new path.
+Downloads to existing files are rejected to preserve ownership, access controls, and
+links. A concurrent Unix writer that creates the destination first keeps its file.
+Use a trusted destination directory and apply the staging-file access rules below.
+Unix destinations require a filesystem that supports hard links within the directory.
+
+### Saving without overwrite
+
+- AWS S3 and S3-compatible providers send `If-None-Match: *` on single uploads
+  and multipart completion. Use an S3-compatible server that enforces this header
+  on both operations. HTTP 412 is reported as `FileAlreadyExistsException`.
+- Azure Blob Storage uses the SDK's conditional create when overwrite is disabled.
+- Aliyun OSS uses `x-oss-forbid-overwrite: true` on single uploads and multipart
+  completion. The bucket must have versioning off, and the application identity needs
+  permission to read the versioning configuration. Keep versioning off throughout
+  uploads because OSS ignores the header once versioning is enabled or suspended.
+- With the current MinIO, KS3 and OBS SDKs, a save with overwrite disabled returns
+  `NotSupportedException` before contacting storage. Pass `overrideExisting: true`
+  only when replacement is acceptable. Otherwise use a provider that supports
+  conditional creation.
+- FastDFS assigns the stored file ID on upload. Use the returned ID for reads and deletes.
+  Access URLs honor `checkFileExist`. FastDFS rejects a caller-specified expiry because
+  the storage server controls anti-steal token expiration.
+
+### Upgrading database-backed container configuration
+
+Tenant entries store tenant-owned containers. A tenant that lacks its own container
+can use an explicitly shared host configuration in the host's cache entry. This
+release changes the cache key format. Upgrade the instances that share a configuration cache
+together because older instances continue to read legacy cached fallback entries.
+Creation evicts any prior cache entry for the name. Cache fills and invalidations from
+a unit of work run after it commits. An overlapping cache miss can still publish an
+older database result after eviction. Entries expire after one hour even with frequent reads.
+
 ### FileSystem Provider
 
 Local file system storage.

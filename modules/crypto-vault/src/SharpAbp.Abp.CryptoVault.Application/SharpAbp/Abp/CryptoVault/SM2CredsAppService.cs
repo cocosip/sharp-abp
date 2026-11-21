@@ -1,12 +1,17 @@
 ﻿﻿using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
+using Org.BouncyCastle.Asn1.GM;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Math;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Domain.Entities;
+using Volo.Abp.EventBus.Local;
 
 namespace SharpAbp.Abp.CryptoVault
 {
@@ -203,6 +208,7 @@ namespace SharpAbp.Abp.CryptoVault
         [Authorize(CryptoVaultPermissions.SM2Creds.Create)]
         public virtual async Task<SM2CredsDto> CreateAsync(CreateSM2CredsDto input)
         {
+            ValidateImportedKey(input);
             var sm2Creds = new SM2Creds(GuidGenerator.Create())
             {
                 Identifier = KeyService.GenerateIdentifier(),
@@ -234,7 +240,44 @@ namespace SharpAbp.Abp.CryptoVault
         [Authorize(CryptoVaultPermissions.SM2Creds.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {
+            await LazyServiceProvider.LazyGetRequiredService<ILocalEventBus>()
+                .PublishAsync(new CryptoVaultKeyDeletingEvent(id), onUnitOfWorkComplete: false);
             await SM2CredsRepository.DeleteAsync(id);
+        }
+
+        private static void ValidateImportedKey(CreateSM2CredsDto input)
+        {
+            const string message = "Import an SM2 key pair in hexadecimal format matching the specified curve.";
+            var curve = GMNamedCurves.GetByName(input.Curve);
+            if (curve == null)
+            {
+                throw new UserFriendlyException(message);
+            }
+
+            byte[] privateKey = null;
+            try
+            {
+                var parameters = new ECDomainParameters(curve);
+                privateKey = Convert.FromHexString(input.PrivateKey);
+                var scalar = new ECPrivateKeyParameters(new BigInteger(privateKey), parameters);
+                var point = new ECPublicKeyParameters(
+                    curve.Curve.DecodePoint(Convert.FromHexString(input.PublicKey)), parameters);
+                if (!parameters.G.Multiply(scalar.D).Equals(point.Q))
+                {
+                    throw new UserFriendlyException(message);
+                }
+            }
+            catch (Exception exception) when (exception is FormatException or ArgumentException or ArithmeticException)
+            {
+                throw new UserFriendlyException(message);
+            }
+            finally
+            {
+                if (privateKey != null)
+                {
+                    CryptographicOperations.ZeroMemory(privateKey);
+                }
+            }
         }
 
         /// <summary>

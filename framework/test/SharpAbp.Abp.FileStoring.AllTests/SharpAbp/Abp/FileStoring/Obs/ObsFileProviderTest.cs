@@ -58,11 +58,12 @@ public class ObsFileProviderTest : AbpFileStoringAllTestBase
         _configuration.GetObsConfiguration().CreateContainerIfNotExists = true;
         using var content = new MemoryStream([1, 2, 3, 4]);
         Assert.False(await provider.ExistsAsync(new FileProviderExistsArgs("bucket", _configuration, "file")));
-        Assert.Equal("file", await provider.SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", content, "bin")));
+        Assert.Equal("file", await provider.SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", content, "bin", true)));
         Assert.Equal(new byte[] { 1, 2, 3, 4 }, server.Objects["file"]);
         Assert.True(await provider.ExistsAsync(new FileProviderExistsArgs("bucket", _configuration, "file")));
         using var duplicate = new MemoryStream([9]);
-        await Assert.ThrowsAsync<FileAlreadyExistsException>(() => provider.SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", duplicate, "bin")));
+        await Assert.ThrowsAsync<NotSupportedException>(() => provider.SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", duplicate, "bin")));
+        Assert.Equal(new byte[] { 1, 2, 3, 4 }, server.Objects["file"]);
         using var copied = await provider.GetOrNullAsync(new FileProviderGetArgs("bucket", _configuration, "file"));
         Assert.Equal(new byte[] { 1, 2, 3, 4 }, ((MemoryStream)copied).ToArray());
         Assert.Equal(0, copied.Position);

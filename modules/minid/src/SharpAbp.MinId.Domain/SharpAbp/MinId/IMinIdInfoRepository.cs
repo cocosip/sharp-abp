@@ -39,6 +39,7 @@ namespace SharpAbp.MinId
         /// A task that represents the asynchronous operation.
         /// The task result contains the first MinId information record matching the criteria if found; otherwise, null.
         /// </returns>
+        // Uniqueness checks include retired rows because their business type names remain reserved.
         Task<MinIdInfo> FindExpectedByBizTypeAsync(string bizType, Guid? expectedId = null, CancellationToken cancellationToken = default);
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Volo.Abp.MultiTenancy;
 
 namespace SharpAbp.Abp.FileStoringManagement
 {
@@ -8,9 +9,10 @@ namespace SharpAbp.Abp.FileStoringManagement
     /// This class is used to store container information in cache to reduce database queries
     /// and improve application response times.
     /// </summary>
+    [IgnoreMultiTenancy]
     public class FileStoringContainerCacheItem
     {
-        private const string CacheKeyFormat = "t:{0},n:{1}";
+        private const string CacheKeyFormat = "v2,t:{0},n:{1}";
 
         /// <summary>
         /// Gets or sets the unique identifier of the file storing container.

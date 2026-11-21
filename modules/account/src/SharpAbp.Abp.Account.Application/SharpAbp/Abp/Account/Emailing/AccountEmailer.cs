@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.Extensions.Localization;
@@ -47,20 +46,31 @@ namespace SharpAbp.Abp.Account.Emailing
             Debug.Assert(CurrentTenant.Id == user.TenantId, "This method can only work for current tenant!");
 
             var url = await AppUrlProvider.GetResetPasswordUrlAsync(appName);
+            var fragmentStart = url.IndexOf('#');
+            var fragment = fragmentStart < 0 ? "" : url[fragmentStart..];
+            var baseUrl = fragmentStart < 0 ? url : url[..fragmentStart];
+            var queryStart = baseUrl.IndexOf('?');
+            var path = queryStart < 0 ? baseUrl : baseUrl[..queryStart];
+            var parameters = HttpUtility.ParseQueryString(queryStart < 0 ? "" : baseUrl[(queryStart + 1)..]);
 
             //TODO: Use AbpAspNetCoreMultiTenancyOptions to get the key
-            var link = $"{url}?userId={user.Id}&{TenantResolverConsts.DefaultTenantKey}={user.TenantId}&resetToken={UrlEncoder.Default.Encode(resetToken)}";
+            parameters["userId"] = user.Id.ToString();
+            parameters[TenantResolverConsts.DefaultTenantKey] = user.TenantId?.ToString() ?? "";
+            parameters["resetToken"] = resetToken;
+            parameters.Remove("returnUrl");
+            parameters.Remove("returnUrlHash");
 
             if (!returnUrl.IsNullOrEmpty())
             {
-                link += "&returnUrl=" + NormalizeReturnUrl(returnUrl);
+                parameters["returnUrl"] = NormalizeReturnUrl(returnUrl);
             }
 
             if (!returnUrlHash.IsNullOrEmpty())
             {
-                link += "&returnUrlHash=" + returnUrlHash;
+                parameters["returnUrlHash"] = returnUrlHash;
             }
 
+            var link = $"{path}?{parameters}{fragment}";
             var emailContent = await TemplateRenderer.RenderAsync(
                 AccountEmailTemplates.PasswordResetLink,
                 new { link = link }
@@ -83,20 +93,15 @@ namespace SharpAbp.Abp.Account.Emailing
             //Handling openid connect login
             if (returnUrl.StartsWith("/connect/authorize/callback", StringComparison.OrdinalIgnoreCase))
             {
-                if (returnUrl.Contains("?"))
+                var queryStart = returnUrl.IndexOf('?');
+                var fragmentStart = returnUrl.IndexOf('#');
+                if (queryStart >= 0 && (fragmentStart < 0 || queryStart < fragmentStart))
                 {
-                    var queryPart = returnUrl.Split('?')[1];
-                    var queryParameters = queryPart.Split('&');
-                    foreach (var queryParameter in queryParameters)
+                    var query = returnUrl[(queryStart + 1)..(fragmentStart < 0 ? returnUrl.Length : fragmentStart)];
+                    var values = HttpUtility.ParseQueryString(query).GetValues("redirect_uri");
+                    if (values != null)
                     {
-                        if (queryParameter.Contains("="))
-                        {
-                            var queryParam = queryParameter.Split('=');
-                            if (queryParam[0] == "redirect_uri")
-                            {
-                                return HttpUtility.UrlDecode(queryParam[1]);
-                            }
-                        }
+                        return values[0];
                     }
                 }
             }

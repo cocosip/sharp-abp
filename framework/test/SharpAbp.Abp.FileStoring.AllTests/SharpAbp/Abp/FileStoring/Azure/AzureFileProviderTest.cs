@@ -105,7 +105,7 @@ public class AzureFileProviderTest : AbpFileStoringAllTestBase
     }
 
     [Fact]
-    public async Task Missing_Container_Is_Created_When_Configured_And_Download_Uses_The_Sdk_Path()
+    public async Task Missing_Container_Is_Created_When_Configured_And_Download_Streams_To_Destination()
     {
         var container = new Mock<BlobContainerClient>(MockBehavior.Strict);
         var blob = new Mock<BlobClient>(MockBehavior.Strict);
@@ -127,9 +127,22 @@ public class AzureFileProviderTest : AbpFileStoringAllTestBase
         var response = new Mock<Response>();
         response.SetupGet(value => value.IsError).Returns(false);
         using var cancellation = new CancellationTokenSource();
-        blob.Setup(client => client.DownloadToAsync("target.bin", cancellation.Token)).ReturnsAsync(response.Object);
-        Assert.True(await provider.DownloadAsync(new FileProviderDownloadArgs("bucket", _configuration, "file", "target.bin", cancellation.Token)));
-        blob.Verify(client => client.DownloadToAsync("target.bin", cancellation.Token), Times.Once);
+        var destination = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+        blob.Setup(client => client.DownloadToAsync(It.IsAny<Stream>(), cancellation.Token))
+            .Returns<Stream, CancellationToken>(async (output, token) =>
+            {
+                await output.WriteAsync(new byte[] { 1, 2, 3 }, token);
+                return response.Object;
+            });
+        try
+        {
+            Assert.True(await provider.DownloadAsync(new FileProviderDownloadArgs("bucket", _configuration, "file", destination, cancellation.Token)));
+            Assert.Equal(new byte[] { 1, 2, 3 }, await File.ReadAllBytesAsync(destination));
+        }
+        finally
+        {
+            File.Delete(destination);
+        }
     }
 
     [Fact]

@@ -23,7 +23,7 @@ namespace SharpAbp.MinId
 
         public async Task SeedAsync(DataSeedContext context)
         {
-            if (await _minIdInfoRepository.GetCountAsync(default) > 0)
+            if (await _minIdInfoRepository.FindExpectedByBizTypeAsync(bizType: null) != null)
             {
                 return;
             }

@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -43,9 +44,14 @@ namespace SharpAbp.Abp.FileStoring
                 throw new NotSupportedException();
             }
 
-            public Task WriteToFileAsync(Stream stream, string path)
+            public Task WriteToFileAsync(Stream stream, string path, CancellationToken cancellationToken = default)
             {
-                return TryWriteToFileAsync(stream, path);
+                return TryWriteToFileAsync(stream, path, cancellationToken);
+            }
+
+            public Task<bool> WriteToFileAsync(string path, Func<Stream, CancellationToken, Task<bool>> writeAsync)
+            {
+                return TryWriteToFileAsync(path, writeAsync, CancellationToken.None);
             }
 
             public Task<int> ReadToBufferAsync(Stream stream, byte[] buffer)
@@ -67,8 +73,99 @@ namespace SharpAbp.Abp.FileStoring
             }
         }
 
+        private sealed class InterruptedCopyStream(CancellationTokenSource? cancellation) : MemoryStream
+        {
+            public override async Task CopyToAsync(Stream destination, int bufferSize, CancellationToken cancellationToken)
+            {
+                await destination.WriteAsync(new byte[] { 1, 2, 3 }, cancellationToken);
+                cancellation?.Cancel();
+                cancellationToken.ThrowIfCancellationRequested();
+                throw new IOException("Source read failed");
+            }
+        }
+
+        [Theory]
+        [InlineData(false, false)]
+        [InlineData(false, true)]
+        [InlineData(true, false)]
+        [InlineData(true, true)]
+        public async Task TryWriteToFileAsync_Should_Leave_Destination_Unchanged_After_Interrupted_Copy(
+            bool existing, bool cancel)
+        {
+            var directory = Directory.CreateTempSubdirectory("sharpabp-download-");
+            var path = Path.Combine(directory.FullName, "destination.txt");
+            try
+            {
+                if (existing)
+                {
+                    await File.WriteAllTextAsync(path, "existing");
+                }
+
+                using var cancellation = new CancellationTokenSource();
+                using var stream = new InterruptedCopyStream(cancel ? cancellation : null);
+                var provider = new TestFileProvider();
+                if (existing && !OperatingSystem.IsWindows())
+                {
+                    await Assert.ThrowsAsync<NotSupportedException>(() => provider.WriteToFileAsync(stream, path));
+                    Assert.False(cancellation.IsCancellationRequested);
+                }
+                else if (cancel)
+                {
+                    await Assert.ThrowsAnyAsync<OperationCanceledException>(
+                        () => provider.WriteToFileAsync(stream, path, cancellation.Token));
+                }
+                else
+                {
+                    await Assert.ThrowsAsync<IOException>(() => provider.WriteToFileAsync(stream, path));
+                }
+
+                if (existing)
+                {
+                    Assert.Equal("existing", await File.ReadAllTextAsync(path));
+                    Assert.Single(directory.GetFileSystemInfos());
+                }
+                else
+                {
+                    Assert.Empty(directory.GetFileSystemInfos());
+                }
+            }
+            finally
+            {
+                directory.Delete(true);
+            }
+        }
+
         [Fact]
-        public async Task TryWriteToFileAsync_Should_Overwrite_Existing_File_Content()
+        public async Task Unix_Download_Does_Not_Replace_A_File_Created_During_Copy()
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            var directory = Directory.CreateTempSubdirectory("sharpabp-download-race-");
+            var path = Path.Combine(directory.FullName, "destination.txt");
+            try
+            {
+                var provider = new TestFileProvider();
+                await Assert.ThrowsAsync<NotSupportedException>(() => provider.WriteToFileAsync(path, async (output, token) =>
+                {
+                    await output.WriteAsync(Encoding.UTF8.GetBytes("download"), token);
+                    await File.WriteAllTextAsync(path, "other writer", token);
+                    return true;
+                }));
+
+                Assert.Equal("other writer", await File.ReadAllTextAsync(path));
+                Assert.Single(directory.GetFileSystemInfos());
+            }
+            finally
+            {
+                directory.Delete(true);
+            }
+        }
+
+        [Fact]
+        public async Task TryWriteToFileAsync_Should_Replace_Existing_File_Only_On_Windows()
         {
             var provider = new TestFileProvider();
             var path = Path.Combine(Path.GetTempPath(), $"sharpabp-fileprovider-{Guid.NewGuid():N}.txt");
@@ -78,10 +175,16 @@ namespace SharpAbp.Abp.FileStoring
                 await File.WriteAllTextAsync(path, "existing-long-content");
 
                 await using var stream = new MemoryStream(Encoding.UTF8.GetBytes("new"));
-                await provider.WriteToFileAsync(stream, path);
-
-                var content = await File.ReadAllTextAsync(path);
-                Assert.Equal("new", content);
+                if (OperatingSystem.IsWindows())
+                {
+                    await provider.WriteToFileAsync(stream, path);
+                    Assert.Equal("new", await File.ReadAllTextAsync(path));
+                }
+                else
+                {
+                    await Assert.ThrowsAsync<NotSupportedException>(() => provider.WriteToFileAsync(stream, path));
+                    Assert.Equal("existing-long-content", await File.ReadAllTextAsync(path));
+                }
             }
             finally
             {

@@ -11,46 +11,44 @@ namespace SharpAbp.Abp.MapTenancyManagement
 {
     public class MapTenancyStoreInMemoryCache : IMapTenancyStoreInMemoryCache, ISingletonDependency
     {
-        protected List<MapTenancyTenant> Tenants { get; }
+        private volatile MapTenancyTenant[] _tenants = [];
+        protected List<MapTenancyTenant> Tenants => _tenants.Select(Copy).ToList();
         public string CacheStamp { get; set; }
         public SemaphoreSlim SyncSemaphore { get; } = new(1, 1);
         public DateTime? LastCheckTime { get; set; }
 
-        public MapTenancyStoreInMemoryCache()
-        {
-            Tenants = [];
-        }
-
         public Task FillAsync(List<MapTenant> mapTenants)
         {
-            Tenants.Clear();
-            var tenants = mapTenants.Select(x => new MapTenancyTenant(x.TenantId, x.TenantName, x.Code, x.MapCode)).ToList();
-            Tenants.AddRange(tenants);
+            _tenants = mapTenants.Select(x => new MapTenancyTenant(x.TenantId, x.TenantName, x.Code, x.MapCode)).ToArray();
             return Task.CompletedTask;
         }
 
         public virtual MapTenancyTenant GetByTenantIdOrNull(Guid tenantId)
         {
             Check.NotNull(tenantId, nameof(tenantId));
-            return Tenants.FirstOrDefault(x => x.TenantId == tenantId);
+            return Copy(_tenants.FirstOrDefault(x => x.TenantId == tenantId));
         }
 
         public virtual MapTenancyTenant GetByCodeOrNull([NotNull] string code)
         {
             Check.NotNullOrWhiteSpace(code, nameof(code));
-            return Tenants.FirstOrDefault(x => x.Code == code);
+            return Copy(_tenants.FirstOrDefault(x => x.Code == code));
         }
 
         public virtual MapTenancyTenant GetByMapCodeOrNull([NotNull] string mapCode)
         {
             Check.NotNullOrWhiteSpace(mapCode, nameof(mapCode));
-            return Tenants.FirstOrDefault(x => x.MapCode == mapCode);
+            return Copy(_tenants.FirstOrDefault(x => x.MapCode == mapCode));
         }
 
         public virtual IReadOnlyList<MapTenancyTenant> GetAll()
         {
-            return Tenants;
+            return Tenants.AsReadOnly();
         }
 
+        private static MapTenancyTenant Copy(MapTenancyTenant tenant)
+        {
+            return tenant == null ? null : new MapTenancyTenant(tenant.TenantId, tenant.TenantName, tenant.Code, tenant.MapCode);
+        }
     }
 }

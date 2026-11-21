@@ -1,4 +1,9 @@
+using System;
 using System.Threading.Tasks;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using SharpAbp.Abp.TenantGroupManagement.EntityFrameworkCore;
+using Volo.Abp;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.TenantManagement;
 using Xunit;
@@ -13,6 +18,45 @@ namespace SharpAbp.Abp.TenantGroupManagement
         {
             _tenantAppService = GetRequiredService<ITenantAppService>();
             _tenantGroupAppService = new TenantGroupController(GetRequiredService<ITenantGroupAppService>());
+        }
+
+        [Fact]
+        public async Task AddTenant_Rejects_Membership_In_Another_Group()
+        {
+            var first = await _tenantGroupAppService.CreateAsync(new CreateTenantGroupDto { Name = "first", IsActive = true });
+            var second = await _tenantGroupAppService.CreateAsync(new CreateTenantGroupDto { Name = "second", IsActive = true });
+            var input = new AddTenantDto { TenantId = Guid.NewGuid() };
+
+            await _tenantGroupAppService.AddTenantAsync(first.Id, input);
+
+            await Assert.ThrowsAsync<UserFriendlyException>(() => _tenantGroupAppService.AddTenantAsync(second.Id, input));
+            Assert.Single((await _tenantGroupAppService.GetAsync(first.Id)).Tenants);
+            Assert.Empty((await _tenantGroupAppService.GetAsync(second.Id)).Tenants);
+        }
+
+        [Fact]
+        public async Task Relational_Schema_Rejects_The_Same_Tenant_In_Two_Groups()
+        {
+            await using var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+            await using var dbContext = new MembershipDbContext(
+                new DbContextOptionsBuilder<MembershipDbContext>().UseSqlite(connection).Options);
+            await dbContext.Database.EnsureCreatedAsync();
+
+            var tenantId = Guid.NewGuid();
+            var first = new TenantGroup(Guid.NewGuid(), "first", "FIRST", true);
+            var second = new TenantGroup(Guid.NewGuid(), "second", "SECOND", true);
+            first.AddTenant(new TenantGroupTenant(Guid.NewGuid(), first.Id, tenantId));
+            second.AddTenant(new TenantGroupTenant(Guid.NewGuid(), second.Id, tenantId));
+            dbContext.AddRange(first, second);
+
+            var error = await Assert.ThrowsAsync<DbUpdateException>(() => dbContext.SaveChangesAsync());
+            Assert.Equal(2067, Assert.IsType<SqliteException>(error.InnerException).SqliteExtendedErrorCode);
+        }
+
+        private sealed class MembershipDbContext(DbContextOptions<MembershipDbContext> options) : DbContext(options)
+        {
+            protected override void OnModelCreating(ModelBuilder modelBuilder) => modelBuilder.ConfigureTenantGroupManagement();
         }
 
         [Fact]

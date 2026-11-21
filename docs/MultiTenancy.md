@@ -227,6 +227,19 @@ Without the management module, groups can be supplied from configuration through
 `AbpDefaultTenantGroupStoreOptions.Groups`. Additional resolvers are added to
 `AbpTenantGroupResolveOptions.TenantResolvers`.
 
+For ASP.NET Core, call `UseTenancyGrouping()` after `UseRouting()` and after the
+middleware that resolves the current tenant. An MVC action or controller marked
+with `[IgnoreTenancyGrouping]` skips group resolution. Minimal API endpoints can
+opt out with `.WithMetadata(new IgnoreTenancyGroupingAttribute())`. The
+middleware reads metadata from the selected endpoint.
+
+For a grouped tenant, the default database uses the group's default connection
+string when configured, then the tenant's default, then the host's default.
+Named requests keep their existing order of group-specific name, mapped group
+database when enabled for tenants, group default, and ABP's tenant or host
+fallback. Review hosts that relied on the host default when a grouped tenant
+already has a dedicated default database.
+
 ### Usage Example
 
 #### Manage Tenant Groups
@@ -268,6 +281,48 @@ public class TenantGroupService : ApplicationService
 `ITenantGroupAppService` also exposes `UpdateAsync`, `DeleteAsync`, `RemoveTenantAsync`,
 `GetDefaultConnectionStringAsync`, `UpdateDefaultConnectionStringAsync` and
 `DeleteDefaultConnectionStringAsync`.
+
+#### Tenant Membership Migration
+
+A tenant can belong to one group. Before applying the schema change, run the
+preflight on each database that holds tenant groups. Use the table or collection
+names and identifier casing configured by the host. Keep membership writes
+paused while resolving duplicates and installing the unique index.
+
+For relational databases, use the application's EF Core migration project.
+The model replaces the unique index on `(TenantGroupId, TenantId)` with a unique
+index on `TenantId`. Review the generated migration for the configured provider.
+This query lists tenant IDs with multiple memberships.
+
+```sql
+SELECT TenantId, COUNT(*) AS MembershipCount
+FROM AbpTenantGroupTenants
+GROUP BY TenantId
+HAVING COUNT(*) > 1;
+```
+
+For MongoDB, inspect the `Tenants` array embedded in each tenant group document.
+The following example uses the default collection and BSON field names.
+
+```javascript
+db.AbpTenantGroups.aggregate([
+  { $unwind: "$Tenants" },
+  { $group: {
+    _id: "$Tenants.TenantId",
+    membershipCount: { $sum: 1 },
+    groupIds: { $addToSet: "$_id" }
+  } },
+  { $match: { membershipCount: { $gt: 1 } } }
+])
+```
+
+Resolve each reported membership according to the intended group and rerun the
+preflight. The upgrade leaves existing membership records in place. Once the
+preflight is clean, run the EF Core migration or call
+`CreateUniqueTenantMembershipIndexAsync()` on the MongoDB tenant group
+collection from the host's migration job. The partial MongoDB index permits
+multiple empty groups. MongoDB's multikey uniqueness applies across documents,
+and the membership write guard rejects a repeated tenant in the same group.
 
 #### Connection String HTTP Migration
 

@@ -65,6 +65,7 @@ namespace SharpAbp.MinId.EntityFrameworkCore
             Guid? expectedId = null,
             CancellationToken cancellationToken = default)
         {
+            using var includeRetired = DataFilter.Disable<ISoftDelete>();
             return await (await GetDbSetAsync())
                 .WhereIf(!bizType.IsNullOrWhiteSpace(), item => item.BizType == bizType)
                 .WhereIf(expectedId.HasValue, item => item.Id != expectedId.Value)

@@ -36,6 +36,8 @@ External sign-in identifies existing users by the stored provider and subject. A
 
 Automatic account creation from an external login also respects `SharpAbp.Account.IsSelfRegistrationEnabled`; disabling registration does not prevent an already linked external identity from signing in.
 
+Password-reset links preserve the configured reset URL's query values and fragment. The account service supplies its own `userId`, tenant, reset token, return URL and return fragment fields. OIDC callback return URLs continue to use the decoded `redirect_uri` when present.
+
 Login and registration use the normal Identity sign-in checks, including configured email/account confirmation, lockout and two-factor authentication. A newly registered account and its external login link remain registered when confirmation or another sign-in check denies authentication; no application cookie is issued. Confirmation and recovery flows remain the host application's responsibility. Override `TwoFactorLoginResultAsync` on the login and registration page models to continue an application-specific two-factor flow; the default returns to login without authenticating. Existing registration hooks keep their signatures; overrides that perform sign-in must set `RegistrationSignInResult` to the checked result rather than call `SignInAsync` directly.
 
 ---
@@ -107,6 +109,10 @@ dotnet add package SharpAbp.Abp.OpenIddict.HttpApi
 ```
 
 The module exposes `IOpenIddictApplicationAppService` and `IOpenIddictScopeAppService` for managing clients and scopes.
+
+Client and scope writes merge the supplied entries in the JSON `Properties` bag with the stored values. Extra properties use ABP's extension definitions on both the request DTO and persisted entity. To expose an extra property in a response, register it on the entity and response DTO. Updates retain stored extension values outside the request's defined fields.
+
+Scope changes use the OpenIddict manager for validation. On hosts that load `SharpAbp.Abp.OpenIddict.Domain`, scope manager lookups read the configured database directly and follow its transaction isolation. The application service removes previous ABP scope cache entries after a successful unit-of-work commit. Enable the SharpAbp domain module on every host that resolves scopes and use a database with consistent read-after-write behavior. Client and token cache settings remain independent.
 
 ---
 
@@ -202,6 +208,22 @@ public class IdGenerationService : ApplicationService
 ```
 
 Business types and segment allocations are managed through `IMinIdInfoAppService` and `IMinIdTokenAppService`.
+Set `Remainder` to a nonnegative value smaller than both `Delta` and `Step`. The generator
+uses the nonnegative mathematical residue modulo `Delta`, including for negative IDs.
+`Step` controls the width of each reserved segment. A step at least as large as the delta
+ensures each segment contains a matching ID. Before deployment, correct persisted rows with
+a nonpositive step or delta, a negative remainder, or a remainder at least as large as the delta.
+
+MinId business type names are permanent. Increase `MaxId` only when intentionally advancing
+the sequence, and treat its current value as the highest reserved ID. Deleting a business
+type retires it and keeps its name reserved in the database. Already reserved IDs may still
+be issued by running processes. Use a new business type name for a new sequence.
+
+Before deploying, add the non-null boolean `IsDeleted` column with a false default to the
+configured MinId information table using your host's EF Core migration. Keep the unique
+`BizType` index across active and retired records. Bring all MinId writers onto the upgraded
+version before retiring business types. Restore tombstones for names previously hard-deleted
+only when you have reliable allocation history. Keep those names out of reuse otherwise.
 
 > **Upgrading existing databases:** `MinIdInfo` now has a `ConcurrencyStamp` column used for optimistic concurrency. Add a non-null `ConcurrencyStamp` string column (max length 40) with an empty-string default, then regenerate the consumer application's EF Core migration or apply the equivalent SQL before deploying this version.
 >
@@ -549,6 +571,10 @@ public class RsaKeyService : ApplicationService
 ```
 
 SM2 keys use `ISM2CredsAppService` with `CreateSM2CredsDto`, `GenerateSM2CredsDto`, `SM2CredsDto`, and `SM2CredsKeyDto`.
+
+RSA imports accept a base64 DER SubjectPublicKeyInfo public key and PKCS#1 private key. The supplied size must match the key pair. SM2 imports accept a hexadecimal encoded elliptic-curve point and private scalar in the format returned by the SharpAbp export helpers. The point must match the scalar on the supplied curve. Validation applies to new imports. For existing records, identify and rotate unusable keys before removing them.
+
+When the host loads both CryptoVault and TransformSecurityManagement, the CryptoVault delete operation rejects keys referenced by persisted transform-security credentials, including expired records. Before retiring a key, pause issuance that could select it, wait for in-flight issuance, and remove the relevant credential records after their retention period. The guard runs in the deletion host and checks its configured credential store. It cannot coordinate concurrent issuance across hosts or separate stores.
 
 ---
 

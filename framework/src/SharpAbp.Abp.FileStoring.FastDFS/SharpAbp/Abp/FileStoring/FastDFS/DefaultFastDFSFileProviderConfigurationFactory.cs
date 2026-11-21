@@ -28,20 +28,22 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
 
         public bool AddIfNotContains(FastDFSFileProviderConfiguration configuration)
         {
-            if (_configurationDict.ContainsKey(configuration.ClusterName))
+            var clusterName = configuration.ClusterName;
+            if (_configurationDict.ContainsKey(clusterName))
             {
                 return false;
             }
 
             lock (_syncObject)
             {
-                if (!_configurationDict.TryAdd(configuration.ClusterName, configuration))
+                if (_configurationDict.ContainsKey(clusterName))
                 {
                     return false;
                 }
 
                 var fastDFSConfig = BuildFastDFSConfiguration(configuration);
-                _clientFactory.RegisterClient(configuration.ClusterName, fastDFSConfig);
+                _clientFactory.RegisterClient(clusterName, fastDFSConfig);
+                _configurationDict[clusterName] = configuration;
                 return true;
             }
         }

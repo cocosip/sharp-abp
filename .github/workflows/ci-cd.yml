@@ -42,8 +42,10 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/v')
       id: version
       shell: bash
+      env:
+        RELEASE_TAG: ${{ github.ref_name }}
       run: |
-        tag="${{ github.ref_name }}"
+        tag="$RELEASE_TAG"
         version="${tag#v}"
         declared=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' common.props | head -n 1)
         if [ "$declared" != "$version" ]; then
@@ -174,8 +176,11 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/v')
       id: release_notes
       shell: bash
+      env:
+        RELEASE_TAG: ${{ steps.version.outputs.TAG }}
+        RELEASE_VERSION: ${{ steps.version.outputs.VERSION }}
       run: |
-        current_tag="${{ steps.version.outputs.TAG }}"
+        current_tag="$RELEASE_TAG"
 
         # 获取上一个 tag
         previous_tag=$(git describe --tags --abbrev=0 "$current_tag^" 2>/dev/null || echo "")
@@ -203,12 +208,12 @@ jobs:
         delimiter="EOF_DELIMITER_$RANDOM"
         {
           echo "NOTES<<$delimiter"
-          echo "## SharpAbp ${{ steps.version.outputs.VERSION }}"
+          echo "## SharpAbp $RELEASE_VERSION"
           echo ""
           echo "### 📦 NuGet Packages"
           echo "This release has been published to NuGet.org. You can install the packages using:"
           echo '```bash'
-          echo "dotnet add package <PackageName> --version ${{ steps.version.outputs.VERSION }}"
+          echo "dotnet add package <PackageName> --version $RELEASE_VERSION"
           echo '```'
           echo ""
           echo "### 📝 What's Changed"

@@ -64,31 +64,55 @@ namespace SharpAbp.Abp.DbConnections
                 throw new AbpException($"Database provider '{dbConnectionInfo.DatabaseProvider}' is not supported. Please check your configuration.");
             }
 
-            using var scope = ServiceProvider.CreateScope();
-
-            // Creators explicitly listed in the options take precedence over conventionally registered ones.
-            var handledCreatorTypes = new HashSet<Type>();
-            foreach (var creatorType in Options.Creators)
+            IDbConnection? connection = null;
+            try
             {
-                var creator = (IDbConnectionCreator)ActivatorUtilities.CreateInstance(scope.ServiceProvider, creatorType);
-                handledCreatorTypes.Add(creatorType);
-                if (creator.IsMatch(dbConnectionName, dbConnectionInfo))
-                {
-                    return await creator.CreateAsync(dbConnectionName, dbConnectionInfo);
-                }
-            }
+                await using var scope = ServiceProvider.CreateAsyncScope();
 
-            foreach (var creator in scope.ServiceProvider.GetServices<IDbConnectionCreator>())
+                // Creators explicitly listed in the options take precedence over conventionally registered ones.
+                var handledCreatorTypes = new HashSet<Type>();
+                foreach (var creatorType in Options.Creators)
+                {
+                    var creator = (IDbConnectionCreator)ActivatorUtilities.CreateInstance(scope.ServiceProvider, creatorType);
+                    try
+                    {
+                        handledCreatorTypes.Add(creatorType);
+                        if (creator.IsMatch(dbConnectionName, dbConnectionInfo))
+                        {
+                            return connection = await creator.CreateAsync(dbConnectionName, dbConnectionInfo);
+                        }
+                    }
+                    finally
+                    {
+                        await DisposeAsync(creator);
+                    }
+                }
+
+                foreach (var creator in scope.ServiceProvider.GetServices<IDbConnectionCreator>())
+                {
+                    if (handledCreatorTypes.Add(creator.GetType()) && creator.IsMatch(dbConnectionName, dbConnectionInfo))
+                    {
+                        return connection = await creator.CreateAsync(dbConnectionName, dbConnectionInfo);
+                    }
+                }
+
+                var internalCreator = ServiceProvider.GetRequiredKeyedService<IInternalDbConnectionCreator>(dbConnectionInfo.DatabaseProvider);
+                return connection = internalCreator.Create(dbConnectionInfo);
+            }
+            catch (Exception cleanupError) when (connection != null)
             {
-                if (handledCreatorTypes.Add(creator.GetType()) && creator.IsMatch(dbConnectionName, dbConnectionInfo))
+                // Cleanup failed before ownership could transfer to the caller.
+                try
                 {
-                    return await creator.CreateAsync(dbConnectionName, dbConnectionInfo);
+                    await DisposeAsync(connection);
                 }
-            }
+                catch (Exception connectionCleanupError)
+                {
+                    throw new AggregateException(cleanupError, connectionCleanupError);
+                }
 
-            //InternalDbConnectionCreator
-            var internalCreator = ServiceProvider.GetRequiredKeyedService<IInternalDbConnectionCreator>(dbConnectionInfo.DatabaseProvider);
-            return internalCreator.Create(dbConnectionInfo);
+                throw;
+            }
         }
 
         /// <summary>
@@ -107,6 +131,17 @@ namespace SharpAbp.Abp.DbConnections
             }
             var internalCreator = ServiceProvider.GetKeyedService<IInternalDbConnectionCreator>(dbConnectionInfo.DatabaseProvider);
             return Task.FromResult(internalCreator?.Create(dbConnectionInfo));
+        }
+
+        private static ValueTask DisposeAsync(object resource)
+        {
+            if (resource is IAsyncDisposable asyncDisposable)
+            {
+                return asyncDisposable.DisposeAsync();
+            }
+
+            (resource as IDisposable)?.Dispose();
+            return default;
         }
     }
 }

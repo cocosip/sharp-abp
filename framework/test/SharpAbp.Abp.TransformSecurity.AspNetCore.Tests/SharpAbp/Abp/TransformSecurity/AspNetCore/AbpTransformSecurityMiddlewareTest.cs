@@ -14,10 +14,38 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
     public class AbpTransformSecurityMiddlewareTest
     {
         [Fact]
+        public async Task InvokeAsync_Skips_Handlers_When_Disabled()
+        {
+            var aspNetCoreOptions = new AbpTransformSecurityAspNetCoreOptions();
+            aspNetCoreOptions.MiddlewareHandlers.Add(typeof(IAbpTransformSecurityMiddlewareHandler));
+            var handler = new Mock<IAbpTransformSecurityMiddlewareHandler>();
+            var serviceProvider = new Mock<IServiceProvider>();
+            serviceProvider
+                .Setup(value => value.GetService(typeof(IAbpTransformSecurityMiddlewareHandler)))
+                .Returns(handler.Object);
+            var middleware = new AbpTransformSecurityMiddleware(
+                NullLogger<AbpTransformSecurityMiddleware>.Instance,
+                Options.Create(new AbpTransformSecurityOptions()),
+                Options.Create(aspNetCoreOptions),
+                serviceProvider.Object);
+            var context = new DefaultHttpContext();
+
+            await middleware.InvokeAsync(context, request =>
+            {
+                request.Response.StatusCode = StatusCodes.Status204NoContent;
+                return Task.CompletedTask;
+            });
+
+            Assert.Equal(StatusCodes.Status204NoContent, context.Response.StatusCode);
+            handler.Verify(value => value.HandleAsync(It.IsAny<HttpContext>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Fact]
         public async Task InvokeAsync_Should_Not_Leak_Exception_Details()
         {
             // Arrange
-            var transformOptions = Options.Create(new AbpTransformSecurityOptions());
+            var transformOptions = Options.Create(new AbpTransformSecurityOptions { IsEnabled = true });
             var aspNetCoreOptions = new AbpTransformSecurityAspNetCoreOptions();
             aspNetCoreOptions.MiddlewareHandlers.Add(typeof(IAbpTransformSecurityMiddlewareHandler));
 
@@ -56,7 +84,7 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
         public async Task InvokeAsync_Should_Forward_RequestAborted_Token()
         {
             // Arrange
-            var transformOptions = Options.Create(new AbpTransformSecurityOptions());
+            var transformOptions = Options.Create(new AbpTransformSecurityOptions { IsEnabled = true });
             var aspNetCoreOptions = new AbpTransformSecurityAspNetCoreOptions();
             aspNetCoreOptions.MiddlewareHandlers.Add(typeof(IAbpTransformSecurityMiddlewareHandler));
 
@@ -93,7 +121,7 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
         public async Task InvokeAsync_Should_Not_Treat_Request_Cancellation_As_Server_Error()
         {
             // Arrange
-            var transformOptions = Options.Create(new AbpTransformSecurityOptions());
+            var transformOptions = Options.Create(new AbpTransformSecurityOptions { IsEnabled = true });
             var aspNetCoreOptions = new AbpTransformSecurityAspNetCoreOptions();
             aspNetCoreOptions.MiddlewareHandlers.Add(typeof(IAbpTransformSecurityMiddlewareHandler));
 
@@ -138,7 +166,7 @@ namespace SharpAbp.Abp.TransformSecurity.AspNetCore
         [Fact]
         public async Task InvokeAsync_Should_Map_Request_Errors_To_BadRequest()
         {
-            var transformOptions = Options.Create(new AbpTransformSecurityOptions());
+            var transformOptions = Options.Create(new AbpTransformSecurityOptions { IsEnabled = true });
             var aspNetCoreOptions = new AbpTransformSecurityAspNetCoreOptions();
             aspNetCoreOptions.MiddlewareHandlers.Add(typeof(IAbpTransformSecurityMiddlewareHandler));
 

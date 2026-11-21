@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Aliyun.OSS;
+using Aliyun.OSS.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Volo.Abp.DependencyInjection;
@@ -90,6 +91,11 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
                     }
                 }
 
+                if (!args.OverrideExisting && ossClient.GetBucketVersioning(containerName).Status != VersioningStatus.Off)
+                {
+                    throw new NotSupportedException("Aliyun OSS requires bucket versioning to be off for conditional object creation.");
+                }
+
                 if (args.Configuration.EnableAutoMultiPartUpload && args.FileStream?.Length > args.Configuration.MultiPartUploadMinFileSize)
                 {
                     return await MultiPartUploadAsync(ossClient, containerName, objectKey, args);
@@ -98,6 +104,10 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
                 {
                     return await PutObjectAsync(ossClient, containerName, objectKey, args);
                 }
+            }
+            catch (OssException ex) when (!args.OverrideExisting && ex.ErrorCode == "FileAlreadyExists")
+            {
+                throw new FileAlreadyExistsException($"File '{args.FileId}' already exists in the container '{containerName}'.", ex);
             }
             finally
             {
@@ -258,6 +268,10 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
             FileProviderSaveArgs args)
         {
             var request = new PutObjectRequest(containerName, objectKey, args.FileStream);
+            if (!args.OverrideExisting)
+            {
+                request.Metadata = CreateNoOverwriteMetadata();
+            }
             await Task<PutObjectResult>.Factory.FromAsync(
                 (callback, state) => ossClient.BeginPutObject(request, callback, state),
                 ossClient.EndPutObject,
@@ -338,6 +352,10 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
                 }
 
                 var completeMultipartUploadRequest = new CompleteMultipartUploadRequest(containerName, objectKey, uploadId);
+                if (!args.OverrideExisting)
+                {
+                    completeMultipartUploadRequest.Metadata = CreateNoOverwriteMetadata();
+                }
                 foreach (var partETag in partETags)
                 {
                     completeMultipartUploadRequest.PartETags.Add(partETag);
@@ -355,6 +373,13 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
                 AbortMultipartUploadSilently(ossClient, containerName, objectKey, uploadId);
                 throw;
             }
+        }
+
+        private static ObjectMetadata CreateNoOverwriteMetadata()
+        {
+            var metadata = new ObjectMetadata();
+            metadata.AddHeader("x-oss-forbid-overwrite", "true");
+            return metadata;
         }
 
         protected virtual void AbortMultipartUploadSilently(

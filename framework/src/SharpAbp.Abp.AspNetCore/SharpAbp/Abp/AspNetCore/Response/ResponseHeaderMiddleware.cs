@@ -26,6 +26,12 @@ namespace SharpAbp.Abp.AspNetCore.Response
 
         public override async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
+            if (await ShouldSkipAsync(context, next))
+            {
+                await next(context);
+                return;
+            }
+
             if (Options.Headers.Count > 0)
             {
                 foreach (var header in Options.Headers)

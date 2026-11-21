@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Xunit;
 
 namespace SharpAbp.Abp.CryptoVault
@@ -56,6 +57,27 @@ namespace SharpAbp.Abp.CryptoVault
 
             var sm2CredsList2 = await _sm2CredsAppService.GetListAsync(curve: Sm2EncryptionNames.CurveWapip192v1);
             Assert.Empty(sm2CredsList2);
+        }
+
+        [Fact]
+        public async Task Import_Rejects_Invalid_Format_Mismatched_Pair_And_Wrong_Curve()
+        {
+            var keyPair = _sm2EncryptionService.GenerateSm2KeyPair();
+            var anotherPair = _sm2EncryptionService.GenerateSm2KeyPair();
+            var input = new CreateSM2CredsDto
+            {
+                Curve = Sm2EncryptionNames.CurveSm2p256v1,
+                PublicKey = "invalid",
+                PrivateKey = keyPair.ExportPrivateKey()
+            };
+
+            await Assert.ThrowsAsync<UserFriendlyException>(() => _sm2CredsAppService.CreateAsync(input));
+            input.PublicKey = anotherPair.ExportPublicKey();
+            await Assert.ThrowsAsync<UserFriendlyException>(() => _sm2CredsAppService.CreateAsync(input));
+            input.PublicKey = keyPair.ExportPublicKey();
+            input.Curve = Sm2EncryptionNames.CurveWapip192v1;
+            await Assert.ThrowsAsync<UserFriendlyException>(() => _sm2CredsAppService.CreateAsync(input));
+            Assert.Empty(await _sm2CredsAppService.GetListAsync());
         }
 
         [Fact]

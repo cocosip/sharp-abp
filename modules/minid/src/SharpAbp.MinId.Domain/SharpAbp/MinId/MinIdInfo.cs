@@ -1,5 +1,5 @@
 using System;
-using Volo.Abp.Domain.Entities;
+using Volo.Abp;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace SharpAbp.MinId
@@ -9,8 +9,13 @@ namespace SharpAbp.MinId
     /// This aggregate root manages the ID allocation parameters including maximum ID, step size,
     /// delta modulo, and remainder for distributed unique ID generation.
     /// </summary>
-    public class MinIdInfo : AuditedAggregateRoot<Guid>
+    public class MinIdInfo : AuditedAggregateRoot<Guid>, ISoftDelete
     {
+        /// <summary>
+        /// Retains a retired business type and its allocation watermark.
+        /// </summary>
+        public virtual bool IsDeleted { get; set; }
+
         /// <summary>
         /// Gets or sets the business type identifier that this MinId configuration serves.
         /// This is used to differentiate between different ID generation contexts.

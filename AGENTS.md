@@ -44,14 +44,14 @@ Three long-lived branches, each pinned to one dependency baseline:
 | --- | --- | --- | --- |
 | `master` | .NET 10 / ABP 10.x | Main line; receives merges from `dev`; releases are tagged here | through `dev` only |
 | `dev` | .NET 10 / ABP 10.x | Primary feature development | the only branch that upgrades packages |
-| `net9` | .NET 9 / ABP 9.3.x | Maintenance only: bug and security fixes for the `4.7.x` line | frozen |
+| `net9` | .NET 9 / ABP 9.3.x | Maintenance only: bug and security fixes for the `4.x` line | frozen |
 
 - Feature work happens on `dev` only and then merges into `master`.
 - A bug fixed on `net9` must also reach `dev` when the affected feature exists there and is expected to behave the same, so shared features behave identically on both lines. Land it as a real merge of the `net9` commit into `dev`, not a cherry-pick or a re-implementation; when the migration already rewrote the file, resolve the ABP 9 vs ABP 10 differences in the merge commit and run the affected tests on `dev`. `dev`-only fixes are not back-ported to `net9` unless they close a security issue.
 - Never upgrade packages on `net9`: keep `Directory.Build.props`, `Directory.Packages.props`, and third-party SDK versions as they are. Exceptions are limited to security advisories or hard blockers and must be stated in the commit, for example `net9: pin <package> <reason>`.
 - Adopt a new .NET or ABP major on `dev` by moving `NetCoreFx` and `VoloAbpPackageVersion` in `Directory.Build.props`. Do not open a new branch per .NET version.
-- `common.props` `<Version>` is the single version source: `4.7.x` on `net9`, `6.x` on `dev`/`master`. A release tag `v<Version>` must equal it and point at the built commit; CI fails before building otherwise.
-- Versions track the dependency baseline rather than strict API-compatibility SemVer: `4.7.x` is the .NET 9 / ABP 9.3.x line and `6.x` is the .NET 10 / ABP 10.x line. A major version changes only when the .NET/ABP baseline moves; API changes inside a line ship in that line's next minor or patch release.
+- `common.props` `<Version>` is the single version source for `4.x` on `net9` and `6.x` on `dev`/`master`. A release tag `v<Version>` must equal it and point at the built commit. CI fails before building if either check fails.
+- Package major versions track the dependency baseline. The `4.x` line includes `4.7.x` and `4.8.x` and uses .NET 9 / ABP 9.3.x. The `6.x` line uses .NET 10 / ABP 10.x. API changes within a baseline ship in its next minor or patch release.
 - `BREAKING CHANGE:` footers inside a baseline line are migration notes for the next `6.x` release; they do not require a major version. Document the migration in the commit body and release it with the line's next version.
 
 CI/CD conventions in `.github/workflows/ci-cd.yml`:

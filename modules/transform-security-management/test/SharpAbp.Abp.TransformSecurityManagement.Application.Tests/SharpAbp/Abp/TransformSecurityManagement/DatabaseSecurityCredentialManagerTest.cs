@@ -1,8 +1,12 @@
+using Microsoft.Extensions.Options;
 using SharpAbp.Abp.CryptoVault;
 using SharpAbp.Abp.TransformSecurity;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp;
+using Volo.Abp.Guids;
+using Volo.Abp.Timing;
 using Xunit;
 
 namespace SharpAbp.Abp.TransformSecurityManagement
@@ -49,6 +53,60 @@ namespace SharpAbp.Abp.TransformSecurityManagement
             Assert.Equal(Guid.Parse(credential.GetReferenceId()!), info.CredsId);
             Assert.Equal(AbpTransformSecurityNames.RSA, info.KeyType);
             Assert.Equal("Login", info.BizType);
+        }
+
+        [Fact]
+        public async Task Vault_Deletion_Rejects_A_Key_Referenced_By_Transform_Security()
+        {
+            await _rsaCredsAppService.GenerateAsync(new GenerateRSACredsDto { Count = 1, Size = 2048 });
+            var credential = await _securityCredentialManager.GenerateAsync("Login");
+            var keyId = Guid.Parse(credential.GetReferenceId());
+
+            await Assert.ThrowsAsync<UserFriendlyException>(() => _rsaCredsAppService.DeleteAsync(keyId));
+            Assert.NotNull(await _rsaCredsAppService.GetAsync(keyId));
+
+            var info = await WithUnitOfWorkAsync(() => _securityCredentialInfoRepository.FindByIdentifierAsync(credential.Identifier));
+            await GetRequiredService<ISecurityCredentialInfoAppService>().DeleteAsync(info.Id);
+            await _rsaCredsAppService.DeleteAsync(keyId);
+            Assert.Empty(await _rsaCredsAppService.GetListAsync());
+        }
+
+        [Fact]
+        public async Task GenerateAsync_Forwards_Cancellation_To_The_Store()
+        {
+            await _rsaCredsAppService.GenerateAsync(new GenerateRSACredsDto { Count = 1, Size = 2048 });
+            var store = new RecordingStore();
+            var manager = new DatabaseSecurityCredentialManager(
+                GetRequiredService<IOptions<AbpTransformSecurityOptions>>(),
+                GetRequiredService<IOptions<AbpTransformSecurityRSAOptions>>(),
+                GetRequiredService<IOptions<AbpTransformSecuritySM2Options>>(),
+                GetRequiredService<IGuidGenerator>(),
+                GetRequiredService<IClock>(),
+                GetRequiredService<IKeyService>(),
+                store,
+                GetRequiredService<IRSACredsRepository>(),
+                GetRequiredService<ISM2CredsRepository>());
+            using var cancellation = new CancellationTokenSource();
+
+            await manager.GenerateAsync("Login", cancellation.Token);
+
+            Assert.Equal(cancellation.Token, store.WriteToken);
+        }
+
+        private sealed class RecordingStore : ISecurityCredentialStore
+        {
+            public CancellationToken WriteToken { get; private set; }
+
+            public Task<SecurityCredential> GetAsync(string identifier, CancellationToken cancellationToken = default)
+            {
+                throw new NotSupportedException();
+            }
+
+            public Task SetAsync(SecurityCredential credential, CancellationToken cancellationToken = default)
+            {
+                WriteToken = cancellationToken;
+                return Task.CompletedTask;
+            }
         }
 
         [Fact]

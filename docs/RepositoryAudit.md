@@ -215,3 +215,126 @@ flows, cloud storage, Redis, broker, external database, cross-process revocation
 durability acceptance. Public extension points were not removed merely because the repository
 has no direct caller. Fixed cache grace periods also remain time-based rather than tracking
 active storage operations; long-running operations need separate lifetime acceptance.
+
+## Follow-up audit — 2026-11-21
+
+Reviewed `maintenance/code-quality` starting at `0f7720f6`, including the preceding
+hardening changes. The inventory reconciled 12 solutions, 152 production projects,
+38 test projects, and their checked-in project references and documentation file links.
+The source review traced shared request, persistence, tenancy, cache, connection,
+allocation, and storage paths across the framework and 11 business modules. The operating
+assumptions were concurrent requests, multiple application instances, and shared storage
+and databases. Vendor-specific code and generated artifacts received targeted checks.
+
+### Changes applied
+
+| Area | Correction |
+| --- | --- |
+| File downloads | On Windows the shared downloader stages bytes beside the destination and closes the stage before publication. Failed or canceled copies preserve existing content. |
+| AWS and S3 | Failed multipart uploads use an independent 10-second abort token, so request cancellation still allows cleanup. |
+| FastDFS | The configuration factory publishes an entry after client registration succeeds. Later calls can retry a failed registration. |
+| Identity | Locking, unlocking, and changing two-factor authentication now report failed Identity operations to callers. |
+| Transform-security management | Credential generation forwards the caller's cancellation token to persistence. |
+| MinId | Requests also validate the remainder against `Delta`. The generator serves reserved IDs before attempting the next allocation when another full segment would overflow. |
+| ASP.NET Core | Response headers, tenant grouping, and transform-security middleware honor their own `IsEnabled` setting. Adding `UseResponseHeader()` applies configured headers by default. |
+| Database connections | The name-based factory disposes explicitly constructed creators and supports async disposal for its child scope. A connection returned successfully belongs to its caller. |
+| Release workflow | Bash reads the release tag and version from environment variables. The version and checkout gates still apply. |
+| Cleanup | Removed an unused private FrontHost path helper. README provider summaries now include OceanBase. |
+
+### Findings for review
+
+| ID | Observed behavior and decision |
+| --- | --- |
+| Q1 | **Tenant file configuration can stay stale.** A tenant lookup caches host fallback under the requesting tenant's key. Host events evict only the host key, and repeated reads extend the tenant copy's one-hour sliding expiry. Tenant creation and a rename into an already cached name also need an invalidation policy. Resolve fallback through a shared host cache entry and decide how to retire entries from mixed-version deployments. [FileStoringContainerCacheManager.cs](../modules/file-storing-management/src/SharpAbp.Abp.FileStoringManagement.Domain/SharpAbp/Abp/FileStoringManagement/FileStoringContainerCacheManager.cs) [FileStoringHandler.cs](../modules/file-storing-management/src/SharpAbp.Abp.FileStoringManagement.Domain/SharpAbp/Abp/FileStoringManagement/FileStoringHandler.cs) |
+| Q2 | **Tenant group membership is ambiguous.** The app service's available-tenant query assumes one group per tenant. The write check and database unique index enforce one row per tenant/group pair. Decide how to resolve existing duplicates before enforcing uniqueness per tenant. [TenantGroupManager.cs](../modules/tenant-group-management/src/SharpAbp.Abp.TenantGroupManagement.Domain/SharpAbp/Abp/TenantGroupManagement/TenantGroupManager.cs) |
+| Q3 | **Grouped tenant database routing differs by overload.** Resolving the default name for a tenant in a group with no default group string falls through to the host default. Named lookups can fall back to the tenant resolver. Agree on the precedence for group, tenant, and host defaults before changing where existing deployments connect. [TenantGroupConnectionStringResolver.cs](../framework/src/SharpAbp.Abp.TenancyGrouping/SharpAbp/Abp/TenancyGrouping/TenantGroupConnectionStringResolver.cs) |
+| Q4 | **MinId configuration changes can reuse ID ranges.** Updating a business type can lower its persisted `MaxId` while processes still hold reserved IDs. Deleting and recreating the same name has the same coordination concern. Decide whether configuration is monotonic for the lifetime of a name and how to handle an intentional reset. [MinIdInfoManager.cs](../modules/minid/src/SharpAbp.MinId.Domain/SharpAbp/MinId/MinIdInfoManager.cs) [MinIdInfoAppService.cs](../modules/minid/src/SharpAbp.MinId.Application/SharpAbp/MinId/MinIdInfoAppService.cs) |
+| Q5 | **Cloud saves can overwrite despite a no-overwrite request.** Several providers check existence in a separate request before uploading. Two writers can both observe an absent object. Use backend preconditions where available and define how adapters expose unsupported semantics, including multipart completion. [AwsFileProvider.cs](../framework/src/SharpAbp.Abp.FileStoring.Aws/SharpAbp/Abp/FileStoring/Aws/AwsFileProvider.cs) [S3FileProvider.cs](../framework/src/SharpAbp.Abp.FileStoring.S3/SharpAbp/Abp/FileStoring/S3/S3FileProvider.cs) |
+| Q6 | **Azure and FastDFS downloads use separate write paths.** Their SDK-based paths bypass the shared staging fix. Preserve the SDK-specific behavior while staging locally, then verify replacement on supported platforms. FastDFS also accepts signed-URL settings for explicit expiry and existence checks without applying them, so the supported URL contract needs a decision. [AzureFileProvider.cs](../framework/src/SharpAbp.Abp.FileStoring.Azure/SharpAbp/Abp/FileStoring/Azure/AzureFileProvider.cs) [FastDFSFileProvider.cs](../framework/src/SharpAbp.Abp.FileStoring.FastDFS/SharpAbp/Abp/FileStoring/FastDFS/FastDFSFileProvider.cs) |
+| Q7 | **FASTER deserialization failure interrupts batch delivery.** The logger dequeues before deserializing. An unreadable entry can discard earlier results in the same batch and leave delivery state incomplete. Choose whether an unreadable entry is retried, quarantined, or explicitly skipped before changing acknowledgement and reclaim behavior. [FasterLogger.cs](../framework/src/SharpAbp.Abp.Faster/SharpAbp/Abp/Faster/FasterLogger.cs) |
+| Q8 | **Password-reset links depend on the shape of the configured URL.** Manual query assembly breaks when the reset base already contains a query or a nested return URL contains separators. Confirm how existing base query values and the return fragment should compose, then use framework query construction. [AccountEmailer.cs](../modules/account/src/SharpAbp.Abp.Account.Application/SharpAbp/Abp/Account/Emailing/AccountEmailer.cs) |
+| Q9 | **Imported keys can be stored with unusable metadata.** RSA and SM2 import comments promise format and pair checks, while the import actions accept length-valid strings and client-provided size or curve. Decide the accepted key formats and how to treat existing mismatched records. Deleting imported keys can also strand transform-security credentials that reference them, which needs a separate lifecycle policy. [RSACredsAppService.cs](../modules/crypto-vault/src/SharpAbp.Abp.CryptoVault.Application/SharpAbp/Abp/CryptoVault/RSACredsAppService.cs) [SM2CredsAppService.cs](../modules/crypto-vault/src/SharpAbp.Abp.CryptoVault.Application/SharpAbp/Abp/CryptoVault/SM2CredsAppService.cs) [DatabaseSecurityCredentialStore.cs](../modules/transform-security-management/src/SharpAbp.Abp.TransformSecurityManagement.Domain/SharpAbp/Abp/TransformSecurityManagement/DatabaseSecurityCredentialStore.cs) |
+| Q10 | **The IdentityModel override misses upstream grant support.** ABP 10.7.1 handles the device-code grant. SharpAbp's override replaces the grant dispatch and omits that case. Review delegation to base for standard grants and check compatibility for subclasses overriding token-request hooks. [AbpIdentityModelAuthenticationService.cs](../framework/src/SharpAbp.Abp.IdentityModel/SharpAbp/Abp/IdentityModel/AbpIdentityModelAuthenticationService.cs) |
+| Q11 | **The tenancy grouping opt-out has no runtime reader.** The public ignore attribute exists without middleware metadata handling. Decide whether the opt-out applies to MVC metadata, all endpoint metadata, or both, and where endpoint routing must run. [IgnoreTenancyGroupingAttribute.cs](../framework/src/SharpAbp.Abp.TenancyGrouping.Abstractions/SharpAbp/Abp/TenancyGrouping/IgnoreTenancyGroupingAttribute.cs) |
+| Q12 | **OpenIddict extension properties have an incomplete round trip.** The application DTO exposes properties and extra properties that the write path skips. The scope DTO mapping drops stored extra properties. Decide which keys clients may write and how updates merge existing provider-managed properties. [OpenIddictApplicationAppService.cs](../modules/openiddict/src/SharpAbp.Abp.OpenIddict.Application/SharpAbp/Abp/OpenIddict/OpenIddictApplicationAppService.cs) [OpenIddictScopeAppService.cs](../modules/openiddict/src/SharpAbp.Abp.OpenIddict.Application/SharpAbp/Abp/OpenIddict/OpenIddictScopeAppService.cs) |
+| Q13 | **Unsupported database provider names can persist.** Management accepts an arbitrary provider string and the runtime resolver parses the enum when it builds a connection. Decide whether persistence requires a known enum value or a provider registered by the host, and how to repair older records. [DatabaseDbConnectionInfoResolver.cs](../modules/dbconnections/src/SharpAbp.Abp.DbConnectionsManagement.Domain/SharpAbp/Abp/DbConnectionsManagement/DatabaseDbConnectionInfoResolver.cs) |
+| Q14 | **MinId alignment cost grows with the configured delta.** `SegmentId.Setup` scans candidates under a lock. A large valid delta can turn setup into a long CPU loop. Modular arithmetic can compute the next candidate directly. Define signed-range and legacy-invalid-row behavior before replacing the calculation. [SegmentId.cs](../modules/minid/src/SharpAbp.MinId.Domain/SharpAbp/MinId/SegmentId.cs) |
+| Q15 | **The .NET 9 maintenance version differs from the policy text.** The local `net9` ref and `v4.8.0` use 4.8.0, while `AGENTS.md` still says the baseline is the 4.7.x line. Confirm the intended wording across both baselines. The dependency baseline and existing release tags remain as recorded. |
+| Q16 | **Provider configuration can pass validation and fail at startup.** Integer settings use a lexical check that accepts values outside the Int32 range. Their readers convert to Int32. Apply range validation to the Int32 fields and preserve the public lexical helper's contract. [ValidateHelper.cs](../framework/src/SharpAbp.Abp.Validation/SharpAbp/Abp/Validation/ValidateHelper.cs) [S3FileProviderValuesValidator.cs](../framework/src/SharpAbp.Abp.FileStoring.S3/SharpAbp/Abp/FileStoring/S3/S3FileProviderValuesValidator.cs) |
+| Q17 | **Administrative OpenIddict scope updates can leave stale runtime lookups.** The current write path uses the store directly. A warmed manager lookup can retain an old name after a rename or delete. The upstream manager updates its cache before the outer ABP transaction commits, so routing writes through it directly can expose rolled-back values. Validate writes through the manager and coordinate cache changes with transaction completion and multi-instance invalidation. [OpenIddictScopeAppService.cs](../modules/openiddict/src/SharpAbp.Abp.OpenIddict.Application/SharpAbp/Abp/OpenIddict/OpenIddictScopeAppService.cs) |
+| Q18 | **Map tenancy exposes mutable shared cache results.** Refresh clears and repopulates the same list, and lookup methods return shared objects. Concurrent consumers can see the list change during enumeration, and caller mutations affect subsequent results. Define snapshot semantics and update the tests that currently assert shared object identity. [MapTenancyStoreInMemoryCache.cs](../modules/map-tenancy-management/src/SharpAbp.Abp.MapTenancyManagement.Domain/SharpAbp/Abp/MapTenancyManagement/MapTenancyStoreInMemoryCache.cs) |
+| Q19 | **Unix downloads still write in place.** Supporting atomic replacement on Unix also requires preserving file ownership and access controls. Swapping the file while copying only the mode bits can change who can read it. Define symlink, hardlink and metadata behavior for all supported runtime targets before switching. [FileProviderBase.cs](../framework/src/SharpAbp.Abp.FileStoring/SharpAbp/Abp/FileStoring/FileProviderBase.cs) |
+
+The earlier private-key storage decision still applies under R2 above. File-client retirement
+continues to use a time-based grace period. Multi-instance use needs a decision on tracking
+active operations before retiring clients.
+
+### Validation
+
+The final Windows Release run built all 12 solutions with zero warnings and errors.
+Across 38 test projects, 2,263 tests passed, none failed, and one real Redis test was
+skipped because `SHARP_ABP_OPERATION_REDIS` was unset. Repository line coverage was
+87.34% (19,236 of 22,025 lines) across all 152 production projects, passing the 85%
+gate. Branch coverage was 72.91%. The run used `scripts/Test-Coverage.ps1` and wrote
+reports to `artifacts/coverage/maintenance-code-quality-final-20261121`.
+
+The README package check, Actionlint, five coverage-script unit tests, and
+`git diff --check` passed. Local Bash smoke checks exercised the tag version gate,
+the checkout mismatch gate, and release-note generation. A concurrent build initially
+locked a shared output DLL. The final serial run completed successfully.
+
+The middleware tests exercise their invocation paths. Storage SDK tests use substitutes.
+SQLite is used where the existing module tests have a relational fixture. Linux runtime
+behavior, real cloud or database servers, external identity providers, and publication to
+NuGet.org were outside the validation environment.
+
+## Approved remediation
+
+| Finding | Result |
+| --- | --- |
+| Q1 | Tenant and host containers use separate cache entries. Tenant lookups fall back to the shared host entry, and committed writes invalidate the affected names. Cache keys use the tenant ID regardless of the ambient unit of work. |
+| Q2 | The service rejects a second group membership. The EF model enforces uniqueness on the tenant ID. MongoDB hosts can install the unique membership index after checking for duplicates. |
+| Q3 | A group without a default connection string uses the normal tenant-aware connection resolver before falling back to the host. |
+| Q4 | Business type names and their allocation watermark survive retirement. Updates reject renames and lower watermarks, and seed initialization counts retired rows. Apply the `IsDeleted` migration before deploying. |
+| Q5 | Supported object stores submit a conditional write with the upload. Adapters without verifiable atomic support reject the no-overwrite request. |
+| Q6 | Azure and FastDFS publish downloads through the shared staged copy path. FastDFS checks existence when requested. It rejects a caller-specified expiry because the server also applies its own token TTL. |
+| Q7 | A corrupt record returns its bytes and address in `UnreadableEntries`. Valid records in the batch remain available for processing and acknowledgement. The existing gap settings control retention until explicit acknowledgement. |
+| Q8 | Password reset links preserve unrelated query values and the base fragment. The emailer replaces reserved reset parameters and encodes nested URLs and fragments. |
+| Q9 | Imported RSA and SM2 pairs are checked against their declared key metadata. The cohosted transform-security reference check blocks deletion of referenced keys. Quiesce issuance across hosts before key retirement when the stores lack a shared transaction or lock. |
+| Q10 | Standard grants use the upstream IdentityModel dispatch, including device authorization. The external credentials grant keeps its existing custom request path. |
+| Q11 | The tenant grouping middleware honours the ignore attribute in endpoint metadata when routing runs before it. |
+| Q12 | OpenIddict JSON property updates merge supplied keys and retain omitted keys. Extra properties follow ABP's source and destination definitions. |
+| Q13 | Connection management validates provider names and stores their canonical spelling. The runtime can still read older defined numeric values. |
+| Q14 | MinId aligns in constant time across signed ranges. Invalid persisted alignment settings fail before allocation advances the watermark. |
+| Q15 | The branch policy documents .NET 9 and ABP 9.3.x as the `4.x` line, including the existing `4.8.x` releases. |
+| Q16 | Storage fields that require an Int32 reject overflow during validation. |
+| Q17 | Scope manager reads use the store directly on upgraded hosts. Scope writes use the manager and evict legacy cache entries after commit. Rollback leaves the persisted scope and its legacy cache entries intact. |
+| Q18 | Map tenancy publishes whole snapshots and returns detached values. Earlier results can be enumerated independently of a later refresh. |
+| Q19 | Downloads stage data beside the destination. Windows publishes with move or replace. Unix publishes through an exclusive hard link on the same filesystem, preserving existing destinations even when another writer creates one during the download. |
+
+Upgrade details are in [Business modules](BusinessModules.md), [Multi-tenancy](MultiTenancy.md),
+[File storage](FileStorage.md), and the [FASTER README](../framework/src/SharpAbp.Abp.Faster/README.md).
+
+The integrated Windows Release run built all 12 solutions with zero warnings and errors.
+Across 38 test projects, 2,307 tests passed, none failed, and one Redis integration test
+was skipped because `SHARP_ABP_OPERATION_REDIS` was unset. Repository line coverage was
+87.61% (19,434 of 22,182 lines), passing the 85% gate. Branch coverage was 73.53%.
+Results are in `artifacts/coverage/approved-remediation-20261121`.
+
+The local run covers SQLite constraints and rollback, storage SDK request construction,
+and Windows filesystem publication. Live MongoDB index installation, multi-instance
+coordination, external storage backends, and Unix file semantics remain unverified.
+
+### Pre-commit review
+
+Configured response headers apply by default once the middleware is added, with an
+explicit disable option. OpenIddict accepts a null application property bag and
+retains stored values. Container reads inside a unit of work publish cache values
+only after commit, and entries expire after one hour even if frequently accessed.
+Concurrent cross-process fills can still race invalidation within that interval.
+
+The final Windows Release run passed all 12 solution builds with zero warnings and
+errors. Across 38 test projects, 2,311 tests passed and one real Redis test was
+skipped. Line coverage was 87.58% (19,427 of 22,182 lines). The Unix hard-link
+publication path and race regression require a Unix runtime. See
+`artifacts/coverage/precommit-final-20261121` for the generated reports.

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Volo.Abp.Validation;
@@ -43,8 +44,8 @@ namespace SharpAbp.MinId
 
         /// <summary>
         /// The remainder value used in ID generation.
-        /// Used to ensure IDs generated for this business type satisfy the condition (ID % Step == Remainder).
-        /// Must be between 0 and Step-1.
+        /// Generated IDs satisfy ID % Delta == Remainder.
+        /// Must be nonnegative and smaller than both Delta and Step.
         /// </summary>
         [Required]
         public int Remainder { get; set; }
@@ -71,9 +72,10 @@ namespace SharpAbp.MinId
                 yield return new ValidationResult($"Invalid Delta value '{Delta}'. The Delta must be greater than 0.");
             }
 
-            if (Remainder < 0 || Remainder >= Step)
+            var remainderLimit = Math.Min(Delta, Step);
+            if (Remainder < 0 || (remainderLimit > 0 && Remainder >= remainderLimit))
             {
-                yield return new ValidationResult($"Invalid Remainder value '{Remainder}'. The Remainder must be between 0 and Step-1 ({Step - 1}).");
+                yield return new ValidationResult($"Invalid Remainder value '{Remainder}'. The Remainder must be nonnegative and smaller than both Delta ({Delta}) and Step ({Step}).");
             }
 
             yield break;

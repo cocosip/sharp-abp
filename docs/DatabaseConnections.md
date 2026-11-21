@@ -6,6 +6,12 @@ Multi-database connection management module supporting dynamic database connecti
 
 Core module for managing multiple database connections with support for MySQL, PostgreSQL, SQL Server, Oracle, SQLite, DM (DaMeng), GaussDB and OceanBase.
 
+Database connection management accepts a single `DatabaseProvider` enum name and stores its
+canonical spelling. Inspect existing records for unknown names or combined values and update
+them to the intended provider. Defined numeric values from older records remain readable and
+should be saved as names on the next edit. Install the matching provider module on each host
+that creates the connections.
+
 ### Installation
 
 ```bash

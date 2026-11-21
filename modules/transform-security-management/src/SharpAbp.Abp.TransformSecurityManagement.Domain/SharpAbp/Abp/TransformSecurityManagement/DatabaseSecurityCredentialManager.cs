@@ -153,7 +153,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
             {
                 throw new AbpException($"Unsupported encryption algorithm '{Options.EncryptionAlgo}'. Only 'RSA' and 'SM2' encryption algorithms are supported.");
             }
-            await SecurityCredentialStore.SetAsync(credential);
+            await SecurityCredentialStore.SetAsync(credential, cancellationToken);
             return credential;
         }
 

@@ -82,16 +82,14 @@ namespace SharpAbp.MinId
 
             var minIdInfo = await MinIdInfoRepository.GetAsync(id, cancellationToken: cancellationToken);
 
-            // Check for business type conflicts only if the business type is changing
-            if (minIdInfo.BizType != bizType)
+            if (!string.Equals(minIdInfo.BizType, bizType, StringComparison.Ordinal))
             {
-                var queryMinIdInfo = await MinIdInfoRepository.FindExpectedByBizTypeAsync(bizType, id, cancellationToken);
-                if (queryMinIdInfo != null)
-                {
-                    var errorMessage = $"Cannot update MinId configuration: Business type '{bizType}' already exists in another configuration (ID: {queryMinIdInfo.Id}). Each business type must be unique.";
-                    Logger.LogWarning("Failed to update MinId configuration due to duplicate business type: {BizType} (existing ID: {ExistingId})", bizType, queryMinIdInfo.Id);
-                    throw new UserFriendlyException(errorMessage);
-                }
+                throw new UserFriendlyException("A MinId business type cannot be renamed. Create a new business type instead.");
+            }
+
+            if (maxId < minIdInfo.MaxId)
+            {
+                throw new UserFriendlyException("The MinId maximum cannot be lowered below the last reserved ID.");
             }
 
             var oldBizType = minIdInfo.BizType;

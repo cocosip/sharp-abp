@@ -101,6 +101,10 @@ namespace SharpAbp.Abp.FileStoring.S3
 
                 return fileId;
             }
+            catch (AmazonS3Exception ex) when (!args.OverrideExisting && ex.StatusCode == HttpStatusCode.PreconditionFailed)
+            {
+                throw new FileAlreadyExistsException($"File '{args.FileId}' already exists in the container '{containerName}'.", ex);
+            }
             finally
             {
                 lease.Return();
@@ -268,6 +272,7 @@ namespace SharpAbp.Abp.FileStoring.S3
                 InputStream = args.FileStream,
                 AutoCloseStream = false,
                 UseChunkEncoding = configuration.UseChunkEncoding,
+                IfNoneMatch = args.OverrideExisting ? null : "*",
             };
             await client.PutObjectAsync(putObjectRequest, args.CancellationToken);
             Logger.LogInformation("Successfully uploaded single file '{FileId}' to S3. Bucket: {BucketName}, Key: {ObjectKey}", 
@@ -341,7 +346,8 @@ namespace SharpAbp.Abp.FileStoring.S3
                     BucketName = containerName,
                     Key = objectKey,
                     UploadId = uploadId,
-                    PartETags = partETags
+                    PartETags = partETags,
+                    IfNoneMatch = args.OverrideExisting ? null : "*"
                 };
 
                 var completeMultipartUploadResponse = await client.CompleteMultipartUploadAsync(completeMultipartUploadRequest, args.CancellationToken);
@@ -353,7 +359,8 @@ namespace SharpAbp.Abp.FileStoring.S3
             {
                 Logger.LogError(ex, "Multipart upload failed for file '{FileId}' with UploadId '{UploadId}'. Bucket: {BucketName}, Key: {ObjectKey}",
                     args.FileId, uploadId, containerName, objectKey);
-                await AbortMultipartUploadSilentlyAsync(client, containerName, objectKey, uploadId, args.CancellationToken);
+                using var abortTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+                await AbortMultipartUploadSilentlyAsync(client, containerName, objectKey, uploadId, abortTimeout.Token);
                 throw;
             }
         }

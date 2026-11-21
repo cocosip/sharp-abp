@@ -39,7 +39,7 @@ public class KS3FileProviderTest : AbpFileStoringAllTestBase
         using var content = new MemoryStream([1, 2, 3]);
 
         Assert.Equal("file", await new TestKS3Provider(ServiceProvider, client.Object)
-            .SaveAsync(new FileProviderSaveArgs("fallback", _configuration, "file", content, "bin")));
+            .SaveAsync(new FileProviderSaveArgs("fallback", _configuration, "file", content, "bin", true)));
 
         Assert.Equal("bucket", created.BucketName);
         Assert.Equal("bucket", sent.BucketName);
@@ -49,11 +49,13 @@ public class KS3FileProviderTest : AbpFileStoringAllTestBase
     }
 
     [Fact]
-    public async Task Save_Should_Reject_Existing_File_Without_Overwrite()
+    public async Task Save_Should_Reject_Unsupported_Conditional_Create_Without_A_Request()
     {
         using var content = new MemoryStream([1]);
-        await Assert.ThrowsAsync<FileAlreadyExistsException>(() => new TestKS3Provider(ServiceProvider, CreateClient(true, true).Object)
+        var client = new Mock<IKS3>(MockBehavior.Strict);
+        await Assert.ThrowsAsync<NotSupportedException>(() => new TestKS3Provider(ServiceProvider, client.Object)
             .SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", content, "bin")));
+        client.VerifyNoOtherCalls();
     }
 
     [Theory]
@@ -158,7 +160,7 @@ public class KS3FileProviderTest : AbpFileStoringAllTestBase
         client.Setup(x => x.AbortMultipartUpload(It.IsAny<AbortMultipartUploadRequest>())).Callback<AbortMultipartUploadRequest>(request => aborted = request).Throws(new IOException("Abort failed"));
 
         var actual = await Assert.ThrowsAsync<IOException>(() => new TestKS3Provider(ServiceProvider, client.Object)
-            .SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", input, "bin")));
+            .SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", input, "bin", true)));
 
         Assert.Same(error, actual);
         Assert.Equal("bucket", aborted.BucketName);

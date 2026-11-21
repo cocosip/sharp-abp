@@ -10,6 +10,25 @@ namespace SharpAbp.MinId;
 
 public class DefaultMinIdGeneratorTest
 {
+    [Fact]
+    public async Task Final_Segment_Returns_Reserved_Ids_Before_Reporting_Exhaustion()
+    {
+        var service = Substitute.For<ISegmentIdService>();
+        service.GetNextSegmentIdAsync("orders", Arg.Any<CancellationToken>()).Returns(
+            Task.FromResult(new SegmentId
+            {
+                CurrentId = long.MaxValue - 2, MaxId = long.MaxValue, Delta = 1, LoadingId = long.MaxValue - 1
+            }),
+            Task.FromException<SegmentId>(new OverflowException()));
+        var generator = new DefaultMinIdGenerator("orders", Options.Create(new MinIdOptions()), service);
+
+        Assert.Equal(long.MaxValue - 1, await generator.NextIdAsync());
+        Assert.Equal(long.MaxValue, await generator.NextIdAsync());
+        await service.Received(1).GetNextSegmentIdAsync("orders", Arg.Any<CancellationToken>());
+        var exception = await Assert.ThrowsAsync<AbpException>(() => generator.NextIdAsync());
+        Assert.IsType<OverflowException>(exception.InnerException);
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]

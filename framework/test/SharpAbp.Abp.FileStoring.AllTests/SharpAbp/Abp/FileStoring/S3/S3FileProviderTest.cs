@@ -48,6 +48,7 @@ public class S3FileProviderTest : AbpFileStoringAllTestBase
         Assert.Equal("file", result);
         Assert.Equal("bucket", sent.BucketName);
         Assert.Equal("file", sent.Key);
+        Assert.Equal("*", sent.IfNoneMatch);
         Assert.Same(input, sent.InputStream);
         Assert.False(sent.AutoCloseStream);
         Assert.True(sent.UseChunkEncoding);
@@ -154,13 +155,47 @@ public class S3FileProviderTest : AbpFileStoringAllTestBase
             .ReturnsAsync(new CompleteMultipartUploadResponse { Key = "file", ETag = "complete" });
 
         Assert.Equal("file", await new TestS3Provider(ServiceProvider, client.Object)
-            .SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", input, "bin", true)));
+            .SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", input, "bin")));
         Assert.Equal(3, parts.Count);
         Assert.Equal(new byte[] { 1, 2 }, parts[0]);
         Assert.Equal(new byte[] { 3, 4 }, parts[1]);
         Assert.Equal(new byte[] { 5 }, parts[2]);
         Assert.Equal("upload", completed.UploadId);
+        Assert.Equal("*", completed.IfNoneMatch);
         Assert.Equal(new[] { "etag-1", "etag-2", "etag-3" }, completed.PartETags.Select(x => x.ETag));
+    }
+
+    [Fact]
+    public async Task Cancelled_Multipart_Should_Abort_With_An_Independent_Token()
+    {
+        _configuration.EnableAutoMultiPartUpload = true;
+        _configuration.MultiPartUploadMinFileSize = 1;
+        _configuration.MultiPartUploadShardingSize = 2;
+        using var input = new MemoryStream([1, 2, 3]);
+        using var cancellation = new CancellationTokenSource();
+        var client = CreateClient(false);
+        client.Setup(x => x.InitiateMultipartUploadAsync("bucket", "file", cancellation.Token))
+            .ReturnsAsync(new InitiateMultipartUploadResponse { UploadId = "upload" });
+        client.Setup(x => x.UploadPartAsync(It.IsAny<UploadPartRequest>(), cancellation.Token))
+            .Returns(() =>
+            {
+                cancellation.Cancel();
+                return Task.FromCanceled<UploadPartResponse>(cancellation.Token);
+            });
+        var aborted = false;
+        client.Setup(x => x.AbortMultipartUploadAsync(It.IsAny<AbortMultipartUploadRequest>(), It.IsAny<CancellationToken>()))
+            .Returns((AbortMultipartUploadRequest request, CancellationToken cleanupToken) =>
+            {
+                cleanupToken.ThrowIfCancellationRequested();
+                aborted = request.UploadId == "upload";
+                return Task.FromResult(new AbortMultipartUploadResponse());
+            });
+
+        var error = await Assert.ThrowsAnyAsync<OperationCanceledException>(() => new TestS3Provider(ServiceProvider, client.Object)
+            .SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", input, "bin", cancellationToken: cancellation.Token)));
+
+        Assert.Equal(cancellation.Token, error.CancellationToken);
+        Assert.True(aborted);
     }
 
     [Fact]
