@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Xunit;
@@ -10,8 +12,9 @@ namespace SharpAbp.Abp.Faster
 {
     public class FasterLoggerTests : AbpFasterTestBase
     {
-        // Delay longer than CommitIntervalMillis(100ms) + CompleteIntervalMillis(200ms)
-        private const int CommitWaitMs = 400;
+        private static readonly TimeSpan TestTimeout = TimeSpan.FromSeconds(10);
+
+        private readonly DirectoryInfo _logDirectory = Directory.CreateTempSubdirectory("sharp-abp-faster-");
 
         private readonly IFasterLoggerFactory _factory;
         private readonly IFasterLogger<FasterTestEntry> _logger;
@@ -19,9 +22,22 @@ namespace SharpAbp.Abp.Faster
 
         public FasterLoggerTests()
         {
+            GetRequiredService<IOptions<AbpFasterOptions>>().Value.RootPath = _logDirectory.FullName;
             _factory = GetRequiredService<IFasterLoggerFactory>();
             _logName = FasterLogNameAttribute.GetLogName<FasterTestEntry>();
             _logger = _factory.GetOrCreate<FasterTestEntry>(_logName);
+        }
+
+        public override void Dispose()
+        {
+            try
+            {
+                base.Dispose();
+            }
+            finally
+            {
+                _logDirectory.Delete(true);
+            }
         }
 
         [Fact]
@@ -69,14 +85,8 @@ namespace SharpAbp.Abp.Faster
         [Fact]
         public async Task WriteAsync_ThenCommit_ShouldAdvanceCommittedUntilAddress()
         {
-            var beforeAddress = _logger.CommittedUntilAddress;
-
-            await _logger.WriteAsync(new FasterTestEntry { Id = 100, Value = "commit-test" });
-
-            // Wait for background commit task
-            await Task.Delay(CommitWaitMs);
-
-            Assert.True(_logger.CommittedUntilAddress > beforeAddress);
+            var address = await _logger.WriteAsync(new FasterTestEntry { Id = 100, Value = "commit-test" });
+            await WaitForCommitAsync(_logger, address);
         }
 
         [Fact]
@@ -84,13 +94,8 @@ namespace SharpAbp.Abp.Faster
         {
             await _logger.WriteAsync(new FasterTestEntry { Id = 200, Value = "read-test" });
 
-            // Wait for commit + scan to push into channel
-            await Task.Delay(CommitWaitMs);
-
-            var entries = await _logger.ReadAsync(count: 1);
-
-            Assert.NotEmpty(entries);
-            Assert.NotNull(entries[0].Data);
+            var entries = await ReadEntriesAsync(_logger, 1);
+            Assert.Equal(200, entries[0].Data!.Id);
             Assert.True(entries[0].CurrentAddress >= 0);
             Assert.True(entries[0].NextAddress > entries[0].CurrentAddress);
         }
@@ -99,10 +104,7 @@ namespace SharpAbp.Abp.Faster
         public async Task CommitAsync_ShouldTrackPositions()
         {
             await _logger.WriteAsync(new FasterTestEntry { Id = 300, Value = "commit-pos-test" });
-            await Task.Delay(CommitWaitMs);
-
-            var entries = await _logger.ReadAsync(count: 1);
-            Assert.NotEmpty(entries);
+            var entries = await ReadEntriesAsync(_logger, 1);
 
             await _logger.CommitAsync(entries.GetPositions());
 
@@ -112,8 +114,8 @@ namespace SharpAbp.Abp.Faster
         [Fact]
         public async Task ExportAsync_ShouldCreateFile_WhenDataExists()
         {
-            await _logger.WriteAsync(new FasterTestEntry { Id = 400, Value = "export-test" });
-            await Task.Delay(CommitWaitMs);
+            var address = await _logger.WriteAsync(new FasterTestEntry { Id = 400, Value = "export-test" });
+            await WaitForCommitAsync(_logger, address);
 
             var exportDir = Path.Combine(Path.GetTempPath(), $"faster-export-{Guid.NewGuid():N}");
             try
@@ -135,21 +137,17 @@ namespace SharpAbp.Abp.Faster
         [Fact]
         public async Task ExportAsync_ShouldSplitFiles_WhenEntriesExceedPerFileLimit()
         {
-            // Write 5 entries
-            for (var i = 0; i < 5; i++)
-            {
-                await _logger.WriteAsync(new FasterTestEntry { Id = 500 + i, Value = $"split-{i}" });
-            }
-            await Task.Delay(CommitWaitMs);
+            var addresses = await _logger.BatchWriteAsync(Enumerable.Range(0, 5)
+                .Select(i => new FasterTestEntry { Id = 500 + i, Value = $"split-{i}" }).ToList());
+            await WaitForCommitAsync(_logger, addresses[^1]);
 
             var exportDir = Path.Combine(Path.GetTempPath(), $"faster-export-{Guid.NewGuid():N}");
             try
             {
                 var result = await _logger.ExportAsync(exportDir, _logger.BeginAddress, entriesPerFile: 2);
 
-                Assert.True(result.Count >= 5);
-                // 5 entries with 2 per file = at least 3 files
-                Assert.True(result.FilePaths.Count >= 3);
+                Assert.Equal(5, result.Count);
+                Assert.Equal(new[] { 2, 2, 1 }, result.FilePaths.Select(path => File.ReadLines(path).Count()));
             }
             finally
             {
@@ -161,8 +159,6 @@ namespace SharpAbp.Abp.Faster
         [Fact]
         public async Task ExportAsync_NoNewData_ShouldReturnZeroCount()
         {
-            await Task.Delay(CommitWaitMs);
-
             var committedAddress = _logger.CommittedUntilAddress;
             var exportDir = Path.Combine(Path.GetTempPath(), $"faster-export-{Guid.NewGuid():N}");
             try
@@ -183,8 +179,8 @@ namespace SharpAbp.Abp.Faster
         [Fact]
         public async Task ExportAsync_FilesShouldContainJsonLines()
         {
-            await _logger.WriteAsync(new FasterTestEntry { Id = 600, Value = "json-check" });
-            await Task.Delay(CommitWaitMs);
+            var address = await _logger.WriteAsync(new FasterTestEntry { Id = 600, Value = "json-check" });
+            await WaitForCommitAsync(_logger, address);
 
             var exportDir = Path.Combine(Path.GetTempPath(), $"faster-export-{Guid.NewGuid():N}");
             try
@@ -208,23 +204,24 @@ namespace SharpAbp.Abp.Faster
         [Fact]
         public async Task ExportAsync_IncrementalExport_ShouldOnlyExportNewData()
         {
-            await _logger.WriteAsync(new FasterTestEntry { Id = 700, Value = "incremental-1" });
-            await Task.Delay(CommitWaitMs);
+            var firstAddress = await _logger.WriteAsync(new FasterTestEntry { Id = 700, Value = "incremental-1" });
+            await WaitForCommitAsync(_logger, firstAddress);
 
             var exportDir = Path.Combine(Path.GetTempPath(), $"faster-export-{Guid.NewGuid():N}");
             try
             {
                 // First export
                 var result1 = await _logger.ExportAsync(exportDir, _logger.BeginAddress);
+                Assert.Equal(1, result1.Count);
 
                 // Write more data
-                await _logger.WriteAsync(new FasterTestEntry { Id = 701, Value = "incremental-2" });
-                await Task.Delay(CommitWaitMs);
+                var secondAddress = await _logger.WriteAsync(new FasterTestEntry { Id = 701, Value = "incremental-2" });
+                await WaitForCommitAsync(_logger, secondAddress);
 
                 // Second incremental export starting from where we left off
                 var result2 = await _logger.ExportAsync(exportDir, result1.ToAddress);
 
-                Assert.True(result2.Count >= 1);
+                Assert.Equal(1, result2.Count);
                 // Incremental export should not overlap with the first export
                 Assert.True(result2.FromAddress >= result1.ToAddress);
             }
@@ -256,12 +253,11 @@ namespace SharpAbp.Abp.Faster
                 .ToList();
 
             await concurrentLogger.BatchWriteAsync(ids);
-            await Task.Delay(CommitWaitMs);
 
             var readers = Enumerable.Range(0, 3)
                 .Select(_ => Task.Run(async () =>
                 {
-                    var batch = await concurrentLogger.ReadAsync(4);
+                    var batch = await ReadEntriesAsync(concurrentLogger, 4);
                     await concurrentLogger.CommitAsync(batch.GetPositions());
                     return batch.Select(x => x.Data!.Id).ToList();
                 }))
@@ -285,19 +281,14 @@ namespace SharpAbp.Abp.Faster
                 new FasterLateCommitTestEntry { Id = 1 },
                 new FasterLateCommitTestEntry { Id = 2 }
             });
-            await Task.Delay(CommitWaitMs);
-
-            var entries = await lateCommitLogger.ReadAsync(2);
-            Assert.Equal(2, entries.Count);
+            var entries = await ReadEntriesAsync(lateCommitLogger, 2);
 
             var first = entries[0];
             var second = entries[1];
 
             await lateCommitLogger.CommitAsync(new[] { new Position(second.CurrentAddress, second.NextAddress) });
             await lateCommitLogger.ForceCommitGap(first.CurrentAddress, first.NextAddress);
-            await Task.Delay(CommitWaitMs * 2);
-
-            Assert.True(lateCommitLogger.TruncateBeforeAddress >= second.NextAddress);
+            await WaitForAddressAsync(() => lateCommitLogger.TruncateBeforeAddress, second.NextAddress);
 
             var committedBeforeLateCommit = lateCommitLogger.TotalCommittedRanges;
             var rangesBeforeLateCommit = lateCommitLogger.CompletedRangeCount;
@@ -360,20 +351,42 @@ namespace SharpAbp.Abp.Faster
                 new FasterRangeLimitTestEntry { Id = 3 },
                 new FasterRangeLimitTestEntry { Id = 4 }
             });
-            await Task.Delay(CommitWaitMs);
-
-            var entries = await rangeLimitLogger.ReadAsync(4);
-            Assert.Equal(4, entries.Count);
+            var entries = await ReadEntriesAsync(rangeLimitLogger, 4);
 
             await rangeLimitLogger.CommitAsync(entries.Skip(1).Select(x => new Position(x.CurrentAddress, x.NextAddress)));
-            await Task.Delay(CommitWaitMs * 3);
-
-            Assert.True(rangeLimitLogger.TruncateBeforeAddress >= entries[^1].NextAddress);
+            await WaitForAddressAsync(() => rangeLimitLogger.TruncateBeforeAddress, entries[^1].NextAddress);
 
             var committedBeforeLateCommit = rangeLimitLogger.TotalCommittedRanges;
             await rangeLimitLogger.CommitAsync(new[] { new Position(entries[0].CurrentAddress, entries[0].NextAddress) });
 
             Assert.Equal(committedBeforeLateCommit, rangeLimitLogger.TotalCommittedRanges);
+        }
+
+        private static Task WaitForCommitAsync<T>(IFasterLogger<T> logger, long entryAddress) where T : class =>
+            WaitForAddressAsync(() => logger.CommittedUntilAddress, entryAddress + 1);
+
+        private static async Task WaitForAddressAsync(Func<long> getAddress, long minimumAddress)
+        {
+            var timer = Stopwatch.StartNew();
+            while (getAddress() < minimumAddress && timer.Elapsed < TestTimeout)
+            {
+                await Task.Delay(20);
+            }
+
+            var address = getAddress();
+            Assert.True(address >= minimumAddress, $"Log address reached {address}, expected at least {minimumAddress}.");
+        }
+
+        private static async Task<LogEntryList<T>> ReadEntriesAsync<T>(IFasterLogger<T> logger, int count) where T : class
+        {
+            using var timeout = new CancellationTokenSource(TestTimeout);
+            var entries = new LogEntryList<T>();
+            while (entries.Count < count)
+            {
+                entries.AddRange(await logger.ReadAsync(count - entries.Count, timeout.Token));
+            }
+
+            return entries;
         }
     }
 }

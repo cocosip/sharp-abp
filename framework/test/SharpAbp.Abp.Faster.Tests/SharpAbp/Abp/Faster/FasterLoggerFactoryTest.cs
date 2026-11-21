@@ -58,22 +58,34 @@ public class FasterLoggerFactoryTest
     [Fact]
     public async Task Disposal_Waits_For_InFlight_Logger_And_Disposes_It_Once()
     {
-        using var entered = new ManualResetEventSlim();
+        var timeout = TimeSpan.FromSeconds(10);
+        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         using var release = new ManualResetEventSlim();
-        var factory = new LifecycleFactory { Entered = entered, Release = release };
-        var get = Task.Run(() => factory.GetOrCreate<FasterTestEntry>("pending"));
-        Assert.True(entered.Wait(TimeSpan.FromSeconds(10)));
-        var disposal = Task.Run(() => factory.Dispose());
+        var factory = new LifecycleFactory
+        {
+            OnCreate = () =>
+            {
+                entered.SetResult();
+                Assert.True(release.Wait(timeout));
+            }
+        };
+        var get = Task.Factory.StartNew(() => factory.GetOrCreate<FasterTestEntry>("pending"),
+            CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+        Task disposal;
         try
         {
+            await entered.Task.WaitAsync(timeout);
+            disposal = Task.Factory.StartNew(factory.Dispose,
+                CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
             Assert.NotSame(disposal, await Task.WhenAny(disposal, Task.Delay(100)));
         }
         finally
         {
             release.Set();
         }
-        await get.WaitAsync(TimeSpan.FromSeconds(10));
-        await disposal.WaitAsync(TimeSpan.FromSeconds(10));
+
+        await get.WaitAsync(timeout);
+        await disposal.WaitAsync(timeout);
         Assert.Equal(1, factory.Disposals);
         factory.Dispose();
         Assert.Equal(1, factory.Disposals);
@@ -110,8 +122,6 @@ public class FasterLoggerFactoryTest
 
     private sealed class LifecycleFactory : DefaultFasterLoggerFactory
     {
-        public ManualResetEventSlim Entered { get; init; }
-        public ManualResetEventSlim Release { get; init; }
         public bool ThrowOnDispose { get; set; }
         public Action OnCreate { get; set; }
         public int Disposals;
@@ -125,8 +135,6 @@ public class FasterLoggerFactoryTest
         protected override IFasterLogger<T> CreateLogger<T>(string name)
         {
             OnCreate?.Invoke();
-            Entered?.Set();
-            if (Release != null) Assert.True(Release.Wait(TimeSpan.FromSeconds(10)));
             var logger = new Mock<IFasterLogger<T>>();
             logger.Setup(x => x.Dispose()).Callback(() =>
             {
