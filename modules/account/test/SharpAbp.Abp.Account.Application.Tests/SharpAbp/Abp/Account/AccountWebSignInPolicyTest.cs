@@ -150,6 +150,82 @@ public class AccountWebSignInPolicyTest : AccountWebTest
         }
     }
 
+    [Theory]
+    [InlineData(false, "success", false)]
+    [InlineData(true, "success", false)]
+    [InlineData(false, "confirmation", false)]
+    [InlineData(true, "confirmation", false)]
+    [InlineData(false, "locked", false)]
+    [InlineData(true, "locked", false)]
+    [InlineData(false, "two-factor", false)]
+    [InlineData(true, "two-factor", false)]
+    [InlineData(false, "confirmation", true)]
+    [InlineData(true, "confirmation", true)]
+    public async Task Existing_Registration_Hooks_Use_Actual_Checked_SignIn_Without_Requiring_A_New_Result_Property(
+        bool external, string outcome, bool alreadyAuthenticated)
+    {
+        using var unit = GetRequiredService<IUnitOfWorkManager>().Begin(requiresNew: true, isTransactional: false);
+        var user = await CreateUserAsync();
+        if (external)
+        {
+            (await Users.AddLoginAsync(user, ExternalInfo("web@example.com"))).CheckErrors();
+        }
+        if (outcome == "locked")
+        {
+            (await Users.SetLockoutEnabledAsync(user, true)).CheckErrors();
+            (await Users.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddMinutes(10))).CheckErrors();
+        }
+        else if (outcome == "two-factor")
+        {
+            user.SetEmailConfirmed(true);
+            (await Users.UpdateAsync(user)).CheckErrors();
+            (await Users.SetTwoFactorEnabledAsync(user, true)).CheckErrors();
+        }
+        await unit.SaveChangesAsync();
+        var authentication = Substitute.For<IAuthenticationService>();
+        var signIn = RealSignIn(authentication, requireConfirmedEmail: outcome == "confirmation");
+        if (alreadyAuthenticated)
+        {
+            signIn.Context.User = await signIn.CreateUserPrincipalAsync(user);
+        }
+        var page = Page(new ExistingCheckedRegistrationModel(Account, user)
+        {
+            IsExternalLogin = external, ReturnUrl = "/profile", ReturnUrlHash = "#registered",
+            Input = new RegisterModel.PostInput { EmailAddress = "web@example.com" }
+        });
+        page.SignInManager = signIn;
+
+        var response = await page.OnPostAsync();
+
+        if (outcome == "success")
+        {
+            Assert.Equal("/profile#registered", Assert.IsType<RedirectResult>(response).Url);
+            Assert.Empty(Alerts);
+            await authentication.Received(1).SignInAsync(Arg.Any<HttpContext>(), IdentityConstants.ApplicationScheme,
+                Arg.Any<ClaimsPrincipal>(), Arg.Any<AuthenticationProperties>());
+        }
+        else
+        {
+            Assert.Equal("./Login", Assert.IsType<RedirectToPageResult>(response).PageName);
+            await authentication.DidNotReceive().SignInAsync(Arg.Any<HttpContext>(), IdentityConstants.ApplicationScheme,
+                Arg.Any<ClaimsPrincipal>(), Arg.Any<AuthenticationProperties>());
+        }
+    }
+
+    private sealed class ExistingCheckedRegistrationModel(IAccountAppService account, IdentityUser user) : RegisterModel(account)
+    {
+        protected override async Task RegisterLocalUserAsync()
+        {
+            await SignInManager.PasswordSignInAsync(user, "P@ssW0rd", isPersistent: true, lockoutOnFailure: true);
+        }
+
+        protected override async Task RegisterExternalUserAsync(ExternalLoginInfo externalLoginInfo, string emailAddress)
+        {
+            await SignInManager.ExternalLoginSignInAsync(externalLoginInfo.LoginProvider, externalLoginInfo.ProviderKey,
+                isPersistent: true, bypassTwoFactor: false);
+        }
+    }
+
     private LoginModel LoginPage(SignInManager<IdentityUser> signIn)
     {
         var page = Page(new LoginModel(Schemes, Options.Create(new AbpAccountOptions()), GetRequiredService<IOptions<IdentityOptions>>()));

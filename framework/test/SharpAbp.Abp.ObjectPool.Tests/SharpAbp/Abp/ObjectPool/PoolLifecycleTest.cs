@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.ObjectPool;
@@ -31,7 +32,6 @@ public class PoolLifecycleTest
     [Theory]
     [InlineData(0)]
     [InlineData(1)]
-    [InlineData(2)]
     public void Initialization_Rejects_Lifecycle_Mutation_Without_Changing_Owner_State(int operation)
     {
         var owner = new PoolOrchestrator();
@@ -43,8 +43,7 @@ public class PoolLifecycleTest
             rejection = Record.Exception(() =>
             {
                 if (operation == 0) owner.Dispose();
-                else if (operation == 1) owner.RemoveAll();
-                else owner.RemovePool<Item>("existing");
+                else owner.RemoveAll();
             });
             return new Policy();
         });
@@ -53,6 +52,60 @@ public class PoolLifecycleTest
         Assert.NotNull(owner.GetPool("still-usable", new Policy()));
         owner.Dispose();
         Assert.Equal(1, retained.Disposals);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Policy_Factory_Can_Retire_An_Unrelated_Initialized_Pool(bool runtimeType)
+    {
+        using var owner = new PoolOrchestrator();
+        var retained = new Item();
+        var previous = owner.GetPool("previous", new Policy());
+        previous.Return(retained);
+
+        var replacement = owner.GetPool<Item>("replacement", () =>
+        {
+            Assert.True(runtimeType
+                ? owner.RemovePool(typeof(Item), "previous")
+                : owner.RemovePool<Item>("previous"));
+            Assert.False(owner.RemovePool<Item>("missing"));
+            return new Policy();
+        });
+
+        Assert.Equal(1, retained.Disposals);
+        Assert.Throws<ObjectDisposedException>(() => previous.Get());
+        Assert.NotNull(replacement.Get());
+        Assert.Same(replacement, owner.GetPool("replacement", new Policy()));
+    }
+
+    [Fact]
+    public void Policy_Factory_Cannot_Remove_Its_Own_Pool_And_Can_Still_Complete()
+    {
+        using var owner = new PoolOrchestrator();
+        var retained = new Item();
+        owner.GetAsyncObjectPool("creating", new AsyncPolicy()).Return(retained);
+        var pool = owner.GetPool<Item>("creating", () =>
+        {
+            Assert.Throws<InvalidOperationException>(() => owner.RemovePool<Item>("creating"));
+            Assert.Equal(0, retained.Disposals);
+            return new Policy();
+        });
+
+        Assert.Same(pool, owner.GetPool("creating", new Policy()));
+        Assert.True(owner.RemovePool<Item>("creating"));
+        Assert.Equal(1, retained.Disposals);
+    }
+
+    [Fact]
+    public void Cached_Pool_Does_Not_Run_The_Protected_Metadata_Factory_Again()
+    {
+        using var owner = new MetadataFactoryOrchestrator();
+
+        var pool = owner.GetPool("existing", new Policy());
+
+        Assert.Same(pool, owner.GetPool("existing", new Policy()));
+        Assert.Equal(1, owner.MetadataCreations);
     }
 
     [Fact]
@@ -204,6 +257,109 @@ public class PoolLifecycleTest
         Assert.Equal(1, item.Disposals);
     }
 
+    [Fact]
+    public async Task Shutdown_During_Synchronous_Creation_Does_Not_Block_AsyncOnly_Cleanup_On_The_Caller_Context()
+    {
+        using var context = new QueuedSynchronizationContext();
+        using var returned = new ManualResetEventSlim();
+        var item = new AsyncOnlyItem();
+        AsyncObjectPool<AsyncOnlyItem> pool = null;
+        pool = new AsyncObjectPool<AsyncOnlyItem>(new CallbackAsyncOnlyPolicy(() =>
+        {
+            pool.Dispose();
+            return item;
+        }), 1);
+        Task<AsyncOnlyItem> result = null;
+        var caller = new Thread(() =>
+        {
+            SynchronizationContext.SetSynchronizationContext(context);
+            result = pool.GetAsync().AsTask();
+            returned.Set();
+        }) { IsBackground = true };
+
+        caller.Start();
+        try
+        {
+            Assert.True(context.CallbackAvailable.Wait(TimeSpan.FromSeconds(5)));
+            Assert.True(returned.Wait(TimeSpan.FromSeconds(2)), "GetAsync blocked the caller while async cleanup awaited its context.");
+        }
+        finally
+        {
+            context.Drain();
+            Assert.True(caller.Join(TimeSpan.FromSeconds(5)));
+        }
+
+        await Assert.ThrowsAsync<ObjectDisposedException>(() => result);
+        Assert.Equal(1, item.Disposals);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    public void Synchronous_Pool_Cleanup_Completes_AsyncOnly_Disposal_On_The_Caller_Context(int operation)
+    {
+        using var context = new QueuedSynchronizationContext();
+        using var started = new ManualResetEventSlim();
+        using var returned = new ManualResetEventSlim();
+        var item = new AsyncOnlyItem();
+        Action cleanup;
+        if (operation == 0)
+        {
+            var owner = new PoolOrchestrator();
+            owner.GetAsyncObjectPool("retained", new CallbackAsyncOnlyPolicy(() => item)).Return(item);
+            cleanup = owner.Dispose;
+        }
+        else if (operation == 1)
+        {
+            var pool = new AsyncObjectPool<AsyncOnlyItem>(new CallbackAsyncOnlyPolicy(() => item), 0);
+            cleanup = () => pool.Return(item);
+        }
+        else
+        {
+            var pool = new BoundedObjectPool<AsyncOnlyItem>(new AsyncOnlySyncPolicy(), operation == 2 ? 0 : 1);
+            if (operation == 3) pool.Return(item);
+            cleanup = operation == 2 ? () => pool.Return(item) : pool.Dispose;
+        }
+        Exception error = null;
+        var restoredContext = false;
+        var caller = new Thread(() =>
+        {
+            SynchronizationContext.SetSynchronizationContext(context);
+            started.Set();
+            try
+            {
+                cleanup();
+                restoredContext = ReferenceEquals(context, SynchronizationContext.Current);
+            }
+            catch (Exception exception)
+            {
+                error = exception;
+            }
+            finally
+            {
+                returned.Set();
+            }
+        }) { IsBackground = true };
+
+        caller.Start();
+        try
+        {
+            Assert.True(started.Wait(TimeSpan.FromSeconds(5)));
+            Assert.True(returned.Wait(TimeSpan.FromSeconds(2)), "Synchronous pool cleanup blocked the caller's context.");
+        }
+        finally
+        {
+            context.Drain();
+            Assert.True(caller.Join(TimeSpan.FromSeconds(5)));
+        }
+
+        Assert.Null(error);
+        Assert.True(restoredContext);
+        Assert.Equal(1, item.Disposals);
+    }
+
     private sealed class Item : IDisposable
     {
         public bool ThrowOnDispose { get; init; }
@@ -219,6 +375,20 @@ public class PoolLifecycleTest
     {
         public Item Create() => new();
         public bool Return(Item item) => true;
+    }
+
+    private sealed class MetadataFactoryOrchestrator : PoolOrchestrator
+    {
+        public int MetadataCreations { get; private set; }
+
+        protected override PoolMetadata GetOrCreateMetadata(PoolKey key, Func<Lazy<PoolMetadata>> metadataFactory)
+        {
+            return base.GetOrCreateMetadata(key, () =>
+            {
+                MetadataCreations++;
+                return metadataFactory();
+            });
+        }
     }
 
     private sealed class AsyncPolicy : IAsyncObjectPoolPolicy<Item>
@@ -242,6 +412,37 @@ public class PoolLifecycleTest
     {
         public ValueTask<AsyncOnlyItem> CreateAsync() => new(pending);
         public bool Return(AsyncOnlyItem item) => true;
+    }
+
+    private sealed class CallbackAsyncOnlyPolicy(Func<AsyncOnlyItem> create) : IAsyncObjectPoolPolicy<AsyncOnlyItem>
+    {
+        public ValueTask<AsyncOnlyItem> CreateAsync() => new(create());
+        public bool Return(AsyncOnlyItem item) => true;
+    }
+
+    private sealed class AsyncOnlySyncPolicy : IPooledObjectPolicy<AsyncOnlyItem>
+    {
+        public AsyncOnlyItem Create() => new();
+        public bool Return(AsyncOnlyItem item) => true;
+    }
+
+    private sealed class QueuedSynchronizationContext : SynchronizationContext, IDisposable
+    {
+        private readonly ConcurrentQueue<(SendOrPostCallback Callback, object State)> _callbacks = new();
+        public ManualResetEventSlim CallbackAvailable { get; } = new();
+
+        public override void Post(SendOrPostCallback callback, object state)
+        {
+            _callbacks.Enqueue((callback, state));
+            CallbackAvailable.Set();
+        }
+
+        public void Drain()
+        {
+            while (_callbacks.TryDequeue(out var pending)) pending.Callback(pending.State);
+        }
+
+        public void Dispose() => CallbackAvailable.Dispose();
     }
 
     private sealed class CallbackItem(Func<Task> callback) : IAsyncDisposable

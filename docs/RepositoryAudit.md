@@ -1,5 +1,133 @@
 # Repository audit — 2026-11-20
 
+## Non-storage functional re-review — 2026-11-22
+
+The second pass tests the behavior of the non-storage changes in
+`11bfc94e..260fea8c`, including extension hooks and connected consumers. Documenting a
+breaking change did not establish that it was necessary. New regressions exercise the
+actual failing operation before its correction, rather than accepting yesterday's test
+expectations as the contract.
+
+| Area | Reproduced failure and correction |
+| --- | --- |
+| Object-pool callbacks | A policy factory could no longer retire an unrelated initialized pool. Permit initialized/missing targets; still reject waiting on unfinished pools or shutting down the initializing owner. |
+| Object-pool metadata | A protected creation callback ran on cache hits, repeating initialization side effects. Restore cache-miss-only execution outside the registry lock. |
+| Async pool shutdown | A synchronously completing creation could block its caller's synchronization context while synchronously disposing an async-only item. Await disposal in the async creation path. |
+| OpenIddict deletion | Manager deletion committed an independent transaction, so outer rollback left the application permanently deleted. Use an ambient-aware application store with token cascade and evict the manager cache after commit as well as during deletion. |
+| OpenIddict JSON properties | Explicit replacement and empty bags could no longer remove stored keys; scope null input threw. Replace explicitly supplied bags, preserve omitted/null input, and retain trusted additions from protected model-building hooks. DTO dictionaries remain initialized for existing callers. |
+| Registration hooks | A legacy override successfully signed in through the real Identity manager, but the page redirected to login because the new result property was unset. Recognize a newly issued application principal when no explicit result was supplied; retain confirmation, lockout and 2FA denial checks. |
+| MinId host authentication | MinId credentials consumed the host's bearer header. Support a separate `X-MinId-Token` while retaining bearer-token fallback for existing simple clients. Host authorization remains enforced. |
+| MinId clients and implementers | Real ABP dynamic proxies could not find the old lookup method, and custom interface implementations required a new method. Restore the original signature over POST with a JSON string body; offer the DTO convenience call as an extension without adding a required interface member. |
+| MinId database matching | An added ordinal business-name check rejected a row that the configured database collation matched. Let the repository determine business-name matching; continue comparing the secret exactly. |
+| MinId admin edits | After a real segment reservation, an ordinary edit carrying a previously fetched maximum was rejected. Preserve the greater persisted/requested watermark and apply the other configuration changes. |
+| MinId local batches | The remote batch ceiling also rejected trusted in-process calls above 1,000. Keep the application/HTTP limit and restore positive-count domain calls. |
+| RSA imports | The vault rejected PKCS#8 and PEM formats exported by the Crypto module itself. Accept the supported formats, preserve the stored strings, and retain key-role, pair, size and complete-payload validation. |
+| Database provider inputs | Defined numeric values such as `0` (SQL Server) and `1` (MySQL) were incorrectly rejected. Accept defined enum values and store canonical names; continue rejecting unknown/combined values. |
+
+The connected review also identified two pre-existing defects, separate from yesterday's
+regressions: synchronous pool cleanup could deadlock on async-only items, and transform
+credentials could not use valid PEM/PKCS#8 vault keys. ABP's context-pumping cleanup bridge
+and runtime-only key normalization correct these separately. Already compatible key strings
+remain unchanged, and native RSA conversion runs only for formats that require it. These
+are not counted as newly introduced defects.
+
+### Functional validation and review limits
+
+The final Windows Release run of `scripts/Test-Coverage.ps1` completed successfully:
+all 12 solutions built with zero warnings/errors; 38 projects produced 2,369 passed,
+zero failed, and three skipped tests. The skips are the two Unix filesystem cases and
+the unconfigured real Redis acceptance test. Repository line coverage is 87.64%
+(19,534 of 22,289 lines) across the 152-project inventory. Final evidence is under
+`artifacts/coverage/deep-functional-review-20261122`; the build/test log and focused
+regressions are under `artifacts/review-2026-11-22-deep` and
+`artifacts/regression-review/deep`.
+
+The focused evidence includes real ABP API discovery/dynamic proxies and built-in
+protected bearer authentication; a legacy interface implementation compiled without the
+new lookup member; real Identity sign-in success/denial paths; actual SQLite transaction
+rollback and token cascades; ABP JSON deserialization followed by persisted property
+updates; both styles of protected model-building hooks; a real segment reservation
+followed by an admin edit; key import/storage/runtime encryption roundtrips; and
+deterministic synchronization-context shutdown cases. Failed tests were observed before
+the corresponding fixes. A fresh independent source review found no remaining actionable
+blocker in the non-storage corrections, and `git diff --check` passed.
+
+FASTER, FreeRedis, MassTransit, IdentityModel, tenant routing and connection creation were
+traced through their changed callers and dependency behavior; no additional concrete
+regression was confirmed. Their local automated suites passed in the integrated run.
+This does not establish external broker/Redis/OAuth/database behavior, distributed cache
+coordination, Unix runtime semantics, stress limits or old published-package binary
+compatibility. The loopback authentication evidence is not external JWT/OIDC acceptance.
+No claim is made that every possible custom override or host configuration is covered.
+
+### Retained behavior changes
+
+MinId URL credentials remain rejected; lookup credentials travel in a body and generation
+credentials in a header. Remote batch counts remain bounded. Business types cannot be
+renamed/recreated after retirement, and reserved ID watermarks cannot move backward;
+otherwise old and new generators can issue duplicate IDs. The `IsDeleted` column and
+unique tenant-membership index still require host migrations. Terminal factory disposal
+still rejects subsequent creation. These limits follow the credential, identifier and
+ownership rules; the corrections above remove restrictions that were not needed for them.
+
+## Regression re-review — 2026-11-22
+
+This review revisits all 198 changed paths in `11bfc94e..260fea8c`, covering the
+November 21 commits `bcea06c5`, `0f7720f6`, and `260fea8c`. Source review included
+changed contracts, their callers, tests, and installed dependency behavior where relevant.
+The historical passing runs below did not establish behavioral compatibility: several
+storage tests had been changed to expect rejection instead of exercising a normal save.
+
+| Regression | Correction |
+| --- | --- |
+| OBS, KS3, and MinIO rejected every default no-overwrite save without checking storage. | Restore the server existence check for the calculated bucket/key. Upload when absent; reject an existing object with `FileAlreadyExistsException`; allow explicit overwrite. The separate check and write still have the original concurrency limitation. |
+| Aliyun saves added a bucket-versioning read permission and refused versioned buckets. | Remove that query and blanket refusal. Keep the object check and forbid-overwrite header. Versioned buckets do not gain an atomic no-overwrite guarantee. |
+| Unix downloads refused existing destinations and required hard links even for new files. | Move completed new files into place. Overwrite an existing Unix destination through its opened inode after staging, preserving its metadata and link identity. Final local write failures can leave partial content. |
+| FastDFS URL generation rejected every supplied expiry, even for public URLs. | Accept the argument as before; use configured token settings or a public URL. A caller-specific expiry remains unenforced. |
+| The protected map-tenancy `Tenants` list became a detached copy, silently discarding subclass mutations. | Restore the stable protected backing list; synchronize base reads/fills and keep public return values detached. Subclasses must synchronize concurrent list access on `Tenants`. |
+
+Restoring KS3's existence check also exposed an older helper defect: every object HEAD
+exception was treated as absence, while an actual missing-bucket exception escaped.
+The helper now handles both SDK and raw HTTP 404 responses as missing and propagates
+permission/network failures. Explicit overwrite bypasses object-existence checks;
+regressions exercise this for OBS, KS3, and MinIO.
+
+Other compatibility changes remain material, even where the previous audit documented
+them. Existing consumers must account for:
+
+- MinId generation credentials moving from query parameters to the bearer header;
+  administrative lookup/listing moving to POST bodies; remote batches restricted to 1–1,000;
+  business names and watermarks no longer resettable; and the new `IsDeleted` column.
+- Tenant connection-string updates requiring a JSON string body and tenant-group
+  membership requiring a unique index.
+- Registration subclasses using checked sign-in. An explicit `RegistrationSignInResult`
+  takes precedence; legacy Identity hooks that issue a new application principal also work.
+  Hooks using another custom authentication mechanism must report their checked result.
+- Terminal resource-factory disposal and rejection of lifecycle mutation inside an
+  active initialization callback when it would wait on unfinished pools or the whole owner.
+
+### Re-review validation
+
+`scripts/Test-Coverage.ps1 -ResultsDirectory artifacts/coverage/re-review-20261122 -ReportOnly`
+completed successfully on Windows in Release configuration. All 12 solutions built with
+zero warnings/errors; 38 test projects produced 2,316 passed, zero failed, and three
+skipped results. Skips are the two Unix-only filesystem tests and the real Redis
+two-process acceptance test, which lacks `SHARP_ABP_OPERATION_REDIS`. Repository line
+coverage is 87.59% (19,434 of 22,188 lines) across the 152-project inventory.
+
+Regression-first runs reproduced eight storage failures before the initial provider
+fixes, the explicit FastDFS-expiry refusal, the protected-list mutation failure, and
+three KS3 metadata-error/missing-bucket failures. The final storage suite passed 245
+tests with two Unix skips; the map-tenancy module passed all 25 tests. Independent source
+review of the resulting diff found no remaining concrete blocker. `git diff --check`
+passed. Raw evidence is in `artifacts/review-2026-11-22` and the coverage directory above.
+
+Live cloud services, external identity providers, distributed caches, MongoDB index
+installation, and Unix runtime semantics require separate acceptance evidence. Source
+review is not a guarantee that all defects have been found. The sections below retain
+earlier audit evidence; the corrections and limits above supersede conflicting historical
+descriptions.
+
 ## Scope and evidence
 
 SharpAbp supplies reusable ABP infrastructure packages and business modules. This audit
@@ -86,11 +214,13 @@ network-filesystem behavior and power-loss/crash durability are not established 
 
 ### R4 — Applied: credentials moved out of URLs
 
-MinId generation reads an opaque credential from `Authorization: Bearer <minid-token>`.
+MinId generation reads an opaque credential from `X-MinId-Token`, or from
+`Authorization: Bearer <minid-token>` when no separate header is supplied.
 Query-token inputs are rejected. Administrative token lookup/filtering uses JSON request
 bodies, retaining the administrator's normal user authorization header. The old token-bearing
-GET lookup route was removed; `FindAsync(FindMinIdTokenDto)` supports updated remote .NET
-clients while the old `FindByTokenAsync` remains local only. Tenant-group and hybrid-tenant
+GET lookup route was removed; both the DTO lookup and the original `FindByTokenAsync`
+signature use POST body credentials. `FindAsync(FindMinIdTokenDto)` remains a convenience
+extension without adding a required interface member. Tenant-group and hybrid-tenant
 connection-string updates bind JSON string bodies while retaining C# method signatures.
 
 See [MinId HTTP migration](BusinessModules.md#credential-transport-and-limits) and
@@ -113,8 +243,9 @@ that validation still fails. This is ABP/SQLite evidence, not distributed real-s
 
 ### R6 — Applied: bounded ID batches
 
-The application service and domain generator both reject counts outside 1–1,000 before
-allocating IDs. HTTP parameter validation rejects unsupported counts as bad requests.
+The application service rejects counts outside 1–1,000 before allocating IDs. HTTP
+parameter validation rejects unsupported counts as bad requests. Trusted in-process
+domain callers retain positive-count bulk allocation without the remote ceiling.
 There is no silent adjustment of zero/negative input. The constant is shared through
 `MinIdUtil.MaxBatchSize`. Boundary and allocation-avoidance regressions exercise these paths.
 
@@ -147,8 +278,9 @@ owner lifecycle locks. Cleanup proceeds across failures and surfaces aggregated 
 Late async pool items and incompletely initialized FASTER loggers are released. The
 file-client cache also continues cleanup after one client throws.
 
-Lifecycle mutation from the same owner's active initialization callback is rejected before
-state changes; normal cleanup callbacks may access reusable owners. The active-callback
+Lifecycle mutation that would wait on its own active initialization is rejected before
+state changes; object-pool callbacks can retire unrelated initialized pools. Normal cleanup
+callbacks may access reusable owners. The active-callback
 scope ends for inherited background contexts when initialization completes. See
 [resource ownership](Core.md) and the [FASTER README](../framework/src/SharpAbp.Abp.Faster/README.md).
 Deterministic tests cover races, callback reentrancy, async cleanup, errors, retry and disposal.
@@ -295,22 +427,22 @@ NuGet.org were outside the validation environment.
 | Q1 | Tenant and host containers use separate cache entries. Tenant lookups fall back to the shared host entry, and committed writes invalidate the affected names. Cache keys use the tenant ID regardless of the ambient unit of work. |
 | Q2 | The service rejects a second group membership. The EF model enforces uniqueness on the tenant ID. MongoDB hosts can install the unique membership index after checking for duplicates. |
 | Q3 | A group without a default connection string uses the normal tenant-aware connection resolver before falling back to the host. |
-| Q4 | Business type names and their allocation watermark survive retirement. Updates reject renames and lower watermarks, and seed initialization counts retired rows. Apply the `IsDeleted` migration before deploying. |
-| Q5 | Supported object stores submit a conditional write with the upload. Adapters without verifiable atomic support reject the no-overwrite request. |
-| Q6 | Azure and FastDFS publish downloads through the shared staged copy path. FastDFS checks existence when requested. It rejects a caller-specified expiry because the server also applies its own token TTL. |
+| Q4 | Business type names and their allocation watermark survive retirement. Updates reject renames and retain the greater requested/persisted watermark while applying metadata edits. Seed initialization counts retired rows. Apply the `IsDeleted` migration before deploying. |
+| Q5 | Supported object stores submit a conditional write with the upload. The regression re-review above restores existence checks and normal uploads for OBS, KS3, and MinIO; their check and write are not atomic. |
+| Q6 | Azure and FastDFS use the shared staged copy path. FastDFS checks existence when requested and accepts an expiry argument without enforcing a caller-specific deadline. |
 | Q7 | A corrupt record returns its bytes and address in `UnreadableEntries`. Valid records in the batch remain available for processing and acknowledgement. The existing gap settings control retention until explicit acknowledgement. |
 | Q8 | Password reset links preserve unrelated query values and the base fragment. The emailer replaces reserved reset parameters and encodes nested URLs and fragments. |
 | Q9 | Imported RSA and SM2 pairs are checked against their declared key metadata. The cohosted transform-security reference check blocks deletion of referenced keys. Quiesce issuance across hosts before key retirement when the stores lack a shared transaction or lock. |
 | Q10 | Standard grants use the upstream IdentityModel dispatch, including device authorization. The external credentials grant keeps its existing custom request path. |
 | Q11 | The tenant grouping middleware honours the ignore attribute in endpoint metadata when routing runs before it. |
-| Q12 | OpenIddict JSON property updates merge supplied keys and retain omitted keys. Extra properties follow ABP's source and destination definitions. |
-| Q13 | Connection management validates provider names and stores their canonical spelling. The runtime can still read older defined numeric values. |
+| Q12 | OpenIddict JSON properties support explicit replacement/clear and omitted/null preservation, including trusted model-building additions. Extra properties follow ABP's source and destination definitions. |
+| Q13 | Connection management accepts recognized provider names or defined numeric values and stores canonical names. Unknown/combined values are rejected. |
 | Q14 | MinId aligns in constant time across signed ranges. Invalid persisted alignment settings fail before allocation advances the watermark. |
 | Q15 | The branch policy documents .NET 9 and ABP 9.3.x as the `4.x` line, including the existing `4.8.x` releases. |
 | Q16 | Storage fields that require an Int32 reject overflow during validation. |
 | Q17 | Scope manager reads use the store directly on upgraded hosts. Scope writes use the manager and evict legacy cache entries after commit. Rollback leaves the persisted scope and its legacy cache entries intact. |
-| Q18 | Map tenancy publishes whole snapshots and returns detached values. Earlier results can be enumerated independently of a later refresh. |
-| Q19 | Downloads stage data beside the destination. Windows publishes with move or replace. Unix publishes through an exclusive hard link on the same filesystem, preserving existing destinations even when another writer creates one during the download. |
+| Q18 | Map tenancy returns detached public values. Earlier results can be enumerated independently of a later refresh. The protected mutable list contract is preserved. |
+| Q19 | Downloads stage data beside the destination. New files use move; Windows replacements use replace. Unix overwrites existing files after staging, retaining inode metadata but without atomic final publication. |
 
 Upgrade details are in [Business modules](BusinessModules.md), [Multi-tenancy](MultiTenancy.md),
 [File storage](FileStorage.md), and the [FASTER README](../framework/src/SharpAbp.Abp.Faster/README.md).

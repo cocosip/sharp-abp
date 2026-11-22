@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using SharpAbp.Abp.Crypto.RSA;
 using SharpAbp.Abp.CryptoVault;
 using SharpAbp.Abp.TransformSecurity;
 using System;
@@ -53,6 +54,42 @@ namespace SharpAbp.Abp.TransformSecurityManagement
             Assert.Equal(Guid.Parse(credential.GetReferenceId()!), info.CredsId);
             Assert.Equal(AbpTransformSecurityNames.RSA, info.KeyType);
             Assert.Equal("Login", info.BizType);
+        }
+
+        [Theory]
+        [InlineData(false, true)]
+        [InlineData(true, false)]
+        [InlineData(true, true)]
+        public async Task Imported_Rsa_Formats_Work_For_Generated_And_Reloaded_Transform_Credentials(bool pkcs8, bool pem)
+        {
+            var rsa = GetRequiredService<IRSAEncryptionService>();
+            var pair = rsa.GenerateRSAKeyPair(2048);
+            var publicKey = pem ? pair.ExportPublicKeyToPem() : pair.ExportPublicKey();
+            var privateKey = pem
+                ? (pkcs8 ? pair.ExportPrivateKeyPkcs8ToPem() : pair.ExportPrivateKeyToPem())
+                : pair.ExportPrivateKeyPkcs8();
+            var saved = await _rsaCredsAppService.CreateAsync(new CreateRSACredsDto
+            {
+                Size = 2048, PublicKey = publicKey, PrivateKey = privateKey
+            });
+
+            var generated = await _securityCredentialManager.GenerateAsync("Login");
+
+            const string plaintext = "imported-vault-key-through-transform-security";
+            var generatedCiphertext = rsa.EncryptFromBase64(generated.PublicKey, plaintext);
+            Assert.Equal(plaintext, rsa.DecryptFromBase64(generated.PrivateKey, generatedCiphertext));
+            var restored = await GetRequiredService<ISecurityCredentialStore>().GetAsync(generated.Identifier);
+            Assert.Equal(generated.PublicKey, restored.PublicKey);
+            Assert.Equal(generated.PrivateKey, restored.PrivateKey);
+            Assert.Equal(saved.Id.ToString("N"), restored.GetReferenceId());
+            Assert.Equal(generated.GetRSAKeySize(), restored.GetRSAKeySize());
+            Assert.Equal(generated.GetRSAPadding(), restored.GetRSAPadding());
+            var encryption = GetRequiredService<ISecurityEncryptionService>();
+            var persistedCiphertext = await encryption.EncryptAsync(plaintext, restored.Identifier);
+            Assert.Equal(plaintext, await encryption.DecryptAsync(persistedCiphertext, restored.Identifier));
+            var original = await _rsaCredsAppService.GetDecryptKey(saved.Id);
+            Assert.Equal(publicKey, original.PublicKey);
+            Assert.Equal(privateKey, original.PrivateKey);
         }
 
         [Fact]

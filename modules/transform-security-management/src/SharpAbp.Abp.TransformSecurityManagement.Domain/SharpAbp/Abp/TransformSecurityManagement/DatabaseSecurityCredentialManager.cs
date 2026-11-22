@@ -135,6 +135,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
                 credential.SetReferenceId(rsaCreds.Id.ToString("N"));
                 credential.PublicKey = KeyService.DecryptKey(rsaCreds.PublicKey, rsaCreds.PassPhrase, rsaCreds.Salt);
                 credential.PrivateKey = KeyService.DecryptKey(rsaCreds.PrivateKey, rsaCreds.PassPhrase, rsaCreds.Salt);
+                RsaCredentialKeyNormalizer.Normalize(credential);
 
             }
             else if (Options.EncryptionAlgo.Equals("SM2", StringComparison.OrdinalIgnoreCase))

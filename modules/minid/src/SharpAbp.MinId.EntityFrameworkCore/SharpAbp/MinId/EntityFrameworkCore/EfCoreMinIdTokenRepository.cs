@@ -32,7 +32,7 @@ namespace SharpAbp.MinId.EntityFrameworkCore
 
         /// <summary>
         /// Finds a MinId authentication token by its business type and token value.
-        /// This method performs a case-sensitive exact match search for both the business type and token value.
+        /// Equality follows the database collation; authentication also compares the returned token case-sensitively.
         /// Used for token validation and authentication scenarios.
         /// </summary>
         /// <param name="bizType">The business type identifier associated with the token. Cannot be null or whitespace.</param>

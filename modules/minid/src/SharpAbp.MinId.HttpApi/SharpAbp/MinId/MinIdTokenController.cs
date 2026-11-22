@@ -45,8 +45,8 @@ namespace SharpAbp.MinId
         /// <param name="bizType">The business type of the token.</param>
         /// <param name="token">The token value.</param>
         /// <returns>The MinId token data transfer object.</returns>
-        [NonAction]
-        public async Task<MinIdTokenDto> FindByTokenAsync(string bizType, [DisableAuditing] string token)
+        [HttpPost("lookup")]
+        public async Task<MinIdTokenDto> FindByTokenAsync(string bizType, [FromBody, DisableAuditing] string token)
         {
             return await _minIdTokenAppService.FindByTokenAsync(bizType, token);
         }
@@ -54,7 +54,7 @@ namespace SharpAbp.MinId
         [HttpPost("find-by-token")]
         public Task<MinIdTokenDto> FindAsync([FromBody] FindMinIdTokenDto input)
         {
-            return _minIdTokenAppService.FindAsync(input);
+            return _minIdTokenAppService.FindByTokenAsync(input.BizType, input.Token);
         }
 
         /// <summary>

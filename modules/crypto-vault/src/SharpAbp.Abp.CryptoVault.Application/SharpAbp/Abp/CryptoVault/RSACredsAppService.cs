@@ -242,20 +242,35 @@ namespace SharpAbp.Abp.CryptoVault
 
         private static void ValidateImportedKey(CreateRSACredsDto input)
         {
-            const string message = "Import an RSA key pair in base64 DER format matching the specified key size.";
+            const string message = "Import a matching RSA key pair in PEM or base64 DER format with the specified key size.";
             byte[] privateKey = null;
             try
             {
-                var publicKey = Convert.FromBase64String(input.PublicKey);
-                privateKey = Convert.FromBase64String(input.PrivateKey);
                 using var rsaPublic = RSA.Create();
                 using var rsaPrivate = RSA.Create();
-                rsaPublic.ImportSubjectPublicKeyInfo(publicKey, out var publicBytesRead);
-                rsaPrivate.ImportRSAPrivateKey(privateKey, out var privateBytesRead);
+                if (!TryImportPem(rsaPublic, input.PublicKey, "PUBLIC KEY", "RSA PUBLIC KEY"))
+                {
+                    var publicKey = Convert.FromBase64String(input.PublicKey);
+                    rsaPublic.ImportSubjectPublicKeyInfo(publicKey, out var bytesRead);
+                    if (bytesRead != publicKey.Length) throw new CryptographicException();
+                }
+                if (!TryImportPem(rsaPrivate, input.PrivateKey, "PRIVATE KEY", "RSA PRIVATE KEY"))
+                {
+                    privateKey = Convert.FromBase64String(input.PrivateKey);
+                    int bytesRead;
+                    try
+                    {
+                        rsaPrivate.ImportRSAPrivateKey(privateKey, out bytesRead);
+                    }
+                    catch (CryptographicException)
+                    {
+                        rsaPrivate.ImportPkcs8PrivateKey(privateKey, out bytesRead);
+                    }
+                    if (bytesRead != privateKey.Length) throw new CryptographicException();
+                }
                 var publicParameters = rsaPublic.ExportParameters(false);
                 var privatePublicParameters = rsaPrivate.ExportParameters(false);
-                if (publicBytesRead != publicKey.Length || privateBytesRead != privateKey.Length ||
-                    rsaPublic.KeySize != input.Size ||
+                if (rsaPublic.KeySize != input.Size ||
                     !publicParameters.Modulus.AsSpan().SequenceEqual(privatePublicParameters.Modulus) ||
                     !publicParameters.Exponent.AsSpan().SequenceEqual(privatePublicParameters.Exponent))
                 {
@@ -272,6 +287,43 @@ namespace SharpAbp.Abp.CryptoVault
                 {
                     CryptographicOperations.ZeroMemory(privateKey);
                 }
+            }
+        }
+
+        private static bool TryImportPem(RSA rsa, string key, string label, string alternativeLabel)
+        {
+            var pem = key.AsSpan().Trim();
+            if (!PemEncoding.TryFind(pem, out var fields)) return false;
+            if (fields.Location.Start.GetOffset(pem.Length) != 0 || fields.Location.End.GetOffset(pem.Length) != pem.Length ||
+                (!pem[fields.Label].SequenceEqual(label.AsSpan()) && !pem[fields.Label].SequenceEqual(alternativeLabel.AsSpan())))
+            {
+                throw new CryptographicException();
+            }
+            var encodedKey = Convert.FromBase64String(pem[fields.Base64Data].ToString());
+            try
+            {
+                int bytesRead;
+                switch (pem[fields.Label].ToString())
+                {
+                    case "PUBLIC KEY":
+                        rsa.ImportSubjectPublicKeyInfo(encodedKey, out bytesRead);
+                        break;
+                    case "RSA PUBLIC KEY":
+                        rsa.ImportRSAPublicKey(encodedKey, out bytesRead);
+                        break;
+                    case "PRIVATE KEY":
+                        rsa.ImportPkcs8PrivateKey(encodedKey, out bytesRead);
+                        break;
+                    default:
+                        rsa.ImportRSAPrivateKey(encodedKey, out bytesRead);
+                        break;
+                }
+                if (bytesRead != encodedKey.Length) throw new CryptographicException();
+                return true;
+            }
+            finally
+            {
+                CryptographicOperations.ZeroMemory(encodedKey);
             }
         }
 

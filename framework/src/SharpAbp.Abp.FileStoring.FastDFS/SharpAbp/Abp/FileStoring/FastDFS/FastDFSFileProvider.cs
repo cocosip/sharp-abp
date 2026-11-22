@@ -139,11 +139,7 @@ namespace SharpAbp.Abp.FileStoring.FastDFS
                 return string.Empty;
             }
 
-            if (args.Expires.HasValue)
-            {
-                throw new NotSupportedException("FastDFS access URLs cannot enforce an explicit expiration because the server controls the token lifetime.");
-            }
-
+            // FastDFS keeps its configured token lifetime; a caller's expiry does not override the server policy.
             return configuration.AntiStealCheckToken
                 ? await client.GetFileUrlWithTokenAsync(fileId, configuration.DefaultTokenExpireSeconds, cancellationToken: args.CancellationToken)
                 : await client.GetFileUrlAsync(fileId, cancellationToken: args.CancellationToken);

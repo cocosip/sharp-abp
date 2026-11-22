@@ -710,12 +710,13 @@ public class DbTenantCodeFilePathBuilder : IFilePathBuilder, ITransientDependenc
 ## Provider-Specific Configurations
 
 All providers stage downloads beside the destination before publication, including Azure
-and FastDFS. A failed or cancelled copy leaves a new destination unpublished. Windows
-can replace an existing destination with `File.Replace`. On Unix, pass a new path.
-Downloads to existing files are rejected to preserve ownership, access controls, and
-links. A concurrent Unix writer that creates the destination first keeps its file.
-Use a trusted destination directory and apply the staging-file access rules below.
-Unix destinations require a filesystem that supports hard links within the directory.
+and FastDFS. A failed or cancelled source copy leaves the destination unchanged. New
+files publish with `File.Move`; hard-link support is not required. Windows replaces an
+existing destination with `File.Replace`. On Unix, an existing destination is opened
+and overwritten after staging completes, retaining its inode, ownership, access controls,
+and links. Failure during that final local write can leave partial content; Unix overwrite
+does not provide atomic publication. Use a trusted destination directory and apply the
+staging-file access rules below.
 
 ### Saving without overwrite
 
@@ -724,16 +725,22 @@ Unix destinations require a filesystem that supports hard links within the direc
   on both operations. HTTP 412 is reported as `FileAlreadyExistsException`.
 - Azure Blob Storage uses the SDK's conditional create when overwrite is disabled.
 - Aliyun OSS uses `x-oss-forbid-overwrite: true` on single uploads and multipart
-  completion. The bucket must have versioning off, and the application identity needs
-  permission to read the versioning configuration. Keep versioning off throughout
-  uploads because OSS ignores the header once versioning is enabled or suspended.
-- With the current MinIO, KS3 and OBS SDKs, a save with overwrite disabled returns
-  `NotSupportedException` before contacting storage. Pass `overrideExisting: true`
-  only when replacement is acceptable. Otherwise use a provider that supports
-  conditional creation.
+  completion, in addition to the existing object-existence check. Saving does not query
+  bucket versioning or require permission to read it. OSS ignores this header when
+  versioning is enabled or suspended; atomic no-overwrite requires versioning to stay off.
+- MinIO, KS3 and OBS query storage for the calculated bucket and object key when
+  `overrideExisting` is false (the default). A missing object uploads normally; an
+  existing object raises `FileAlreadyExistsException`. With `overrideExisting: true`,
+  the object-existence query is skipped and the existing object may be replaced.
+  Their existence check and upload are separate
+  requests, so competing writers can still race; this is not an atomic conditional write.
+  KS3 treats only a verified HTTP 404 as missing; metadata permission and transport
+  errors stop the operation instead of permitting a potentially destructive upload.
 - FastDFS assigns the stored file ID on upload. Use the returned ID for reads and deletes.
-  Access URLs honor `checkFileExist`. FastDFS rejects a caller-specified expiry because
-  the storage server controls anti-steal token expiration.
+  Access URLs honor `checkFileExist`. As before, a supplied `expires` does not change
+  the URL: public access uses a plain URL, and anti-steal access uses
+  `DefaultTokenExpireSeconds`. Configure server token rules as well; this provider does
+  not promise enforcement of a caller-specified deadline.
 
 ### Upgrading database-backed container configuration
 

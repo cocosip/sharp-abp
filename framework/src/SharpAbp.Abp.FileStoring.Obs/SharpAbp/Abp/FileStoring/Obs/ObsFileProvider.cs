@@ -61,11 +61,6 @@ namespace SharpAbp.Abp.FileStoring.Obs
 
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
-            if (!args.OverrideExisting)
-            {
-                throw new NotSupportedException("Obs does not support conditional object creation through this SDK. Use an explicit overwrite only when replacement is acceptable.");
-            }
-
             var containerName = GetContainerName(args);
             var objectKey = ObsFileNameCalculator.Calculate(args);
 
@@ -75,6 +70,11 @@ namespace SharpAbp.Abp.FileStoring.Obs
 
             try
             {
+                if (!args.OverrideExisting && await FileExistsAsync(obsClient, containerName, objectKey))
+                {
+                    throw new FileAlreadyExistsException($"File '{args.FileId}' already exists in the container '{containerName}'.");
+                }
+
                 if (obsConfiguration.CreateContainerIfNotExists)
                 {
                     if (!await HeadBucketAsync(obsClient, containerName))

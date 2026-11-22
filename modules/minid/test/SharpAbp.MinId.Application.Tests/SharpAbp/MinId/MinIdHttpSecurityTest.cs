@@ -30,7 +30,7 @@ public class MinIdHttpSecurityTest : IAsyncLifetime
     {
         _generator.NextIdAsync("orders").Returns(42L);
         _generator.NextIdAsync("orders", 3).Returns(new List<long> { 42, 43, 44 });
-        _tokens.FindAsync(Arg.Any<FindMinIdTokenDto>()).Returns(new MinIdTokenDto { BizType = "orders", Token = "lookupsecret" });
+        _tokens.FindByTokenAsync("orders", "lookupsecret").Returns(new MinIdTokenDto { BizType = "orders", Token = "lookupsecret" });
         _tokens.GetPagedListAsync(Arg.Any<MinIdTokenPagedRequestDto>()).Returns(new PagedResultDto<MinIdTokenDto>());
         var builder = WebApplication.CreateBuilder();
         builder.WebHost.UseKestrel().UseUrls("http://127.0.0.1:0");
@@ -83,7 +83,7 @@ public class MinIdHttpSecurityTest : IAsyncLifetime
         using var response = await _client.PostAsJsonAsync("api/minid/minid-token/find-by-token", new { BizType = "orders", Token = "lookupsecret" });
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        await _tokens.Received().FindAsync(Arg.Is<FindMinIdTokenDto>(input => input.BizType == "orders" && input.Token == "lookupsecret"));
+        await _tokens.Received().FindByTokenAsync("orders", "lookupsecret");
     }
 
     [Fact]

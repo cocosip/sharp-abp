@@ -39,7 +39,7 @@ public class KS3FileProviderTest : AbpFileStoringAllTestBase
         using var content = new MemoryStream([1, 2, 3]);
 
         Assert.Equal("file", await new TestKS3Provider(ServiceProvider, client.Object)
-            .SaveAsync(new FileProviderSaveArgs("fallback", _configuration, "file", content, "bin", true)));
+            .SaveAsync(new FileProviderSaveArgs("fallback", _configuration, "file", content, "bin")));
 
         Assert.Equal("bucket", created.BucketName);
         Assert.Equal("bucket", sent.BucketName);
@@ -49,13 +49,69 @@ public class KS3FileProviderTest : AbpFileStoringAllTestBase
     }
 
     [Fact]
-    public async Task Save_Should_Reject_Unsupported_Conditional_Create_Without_A_Request()
+    public async Task Explicit_Overwrite_Uploads_Without_An_Existence_Request()
+    {
+        var client = new Mock<IKS3>(MockBehavior.Strict);
+        byte[] uploaded = null;
+        client.Setup(x => x.PutObject(It.IsAny<PutObjectRequest>())).Returns<PutObjectRequest>(request =>
+        {
+            using var copy = new MemoryStream();
+            request.InputStream.CopyTo(copy);
+            uploaded = copy.ToArray();
+            return new PutObjectResult();
+        });
+        using var content = new MemoryStream([1, 2, 3]);
+
+        Assert.Equal("file", await new TestKS3Provider(ServiceProvider, client.Object)
+            .SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", content, "bin", true)));
+        Assert.Equal(new byte[] { 1, 2, 3 }, uploaded);
+        client.Verify(x => x.HeadBucket(It.IsAny<HeadBucketRequest>()), Times.Never);
+        client.Verify(x => x.HeadObject(It.IsAny<HeadObjectRequest>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Save_Does_Not_Upload_When_The_Object_Check_Fails()
+    {
+        var client = CreateClient(true, false);
+        var failure = new IOException("Object metadata request failed");
+        client.Setup(x => x.HeadObject(It.IsAny<HeadObjectRequest>())).Throws(failure);
+        using var content = new MemoryStream([1]);
+
+        Assert.Same(failure, await Assert.ThrowsAsync<IOException>(() => new TestKS3Provider(ServiceProvider, client.Object)
+            .SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", content, "bin"))));
+        client.Verify(x => x.PutObject(It.IsAny<PutObjectRequest>()), Times.Never);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Save_Does_Not_Upload_When_Metadata_Access_Is_Forbidden(bool bucketCheck)
+    {
+        var client = CreateClient(true, false);
+        var failure = new global::KS3.KS3Exception.ServiceException("Metadata access forbidden") { StatusCode = 403 };
+        if (bucketCheck)
+        {
+            client.Setup(x => x.HeadBucket(It.IsAny<HeadBucketRequest>())).Throws(failure);
+        }
+        else
+        {
+            client.Setup(x => x.HeadObject(It.IsAny<HeadObjectRequest>())).Throws(failure);
+        }
+        using var content = new MemoryStream([1]);
+
+        Assert.Same(failure, await Assert.ThrowsAsync<global::KS3.KS3Exception.ServiceException>(() => new TestKS3Provider(ServiceProvider, client.Object)
+            .SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", content, "bin"))));
+        client.Verify(x => x.PutObject(It.IsAny<PutObjectRequest>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Save_Should_Reject_Duplicate_Without_Overwrite()
     {
         using var content = new MemoryStream([1]);
-        var client = new Mock<IKS3>(MockBehavior.Strict);
-        await Assert.ThrowsAsync<NotSupportedException>(() => new TestKS3Provider(ServiceProvider, client.Object)
+        var client = CreateClient(true, true);
+        await Assert.ThrowsAsync<FileAlreadyExistsException>(() => new TestKS3Provider(ServiceProvider, client.Object)
             .SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", content, "bin")));
-        client.VerifyNoOtherCalls();
+        client.Verify(x => x.PutObject(It.IsAny<PutObjectRequest>()), Times.Never);
     }
 
     [Theory]
@@ -136,7 +192,7 @@ public class KS3FileProviderTest : AbpFileStoringAllTestBase
         });
 
         Assert.Equal("file", await new TestKS3Provider(ServiceProvider, client.Object)
-            .SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", input, "bin", true)));
+            .SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", input, "bin")));
         Assert.Equal(3, parts.Count);
         Assert.Equal(new byte[] { 1, 2 }, parts[0]);
         Assert.Equal(new byte[] { 3, 4 }, parts[1]);
@@ -171,7 +227,15 @@ public class KS3FileProviderTest : AbpFileStoringAllTestBase
     private static Mock<IKS3> CreateClient(bool bucketExists, bool objectExists)
     {
         var client = new Mock<IKS3>(MockBehavior.Strict);
-        client.Setup(x => x.HeadBucket(It.IsAny<HeadBucketRequest>())).Returns(new HeadBucketResult { StatueCode = bucketExists ? HttpStatusCode.OK : HttpStatusCode.NotFound });
+        var bucketHead = client.Setup(x => x.HeadBucket(It.IsAny<HeadBucketRequest>()));
+        if (bucketExists)
+        {
+            bucketHead.Returns(new HeadBucketResult { StatueCode = HttpStatusCode.OK });
+        }
+        else
+        {
+            bucketHead.Throws(new global::KS3.KS3Exception.ServiceException("Missing bucket") { StatusCode = 404 });
+        }
         var head = client.Setup(x => x.HeadObject(It.IsAny<HeadObjectRequest>()));
         if (objectExists)
         {
@@ -179,7 +243,7 @@ public class KS3FileProviderTest : AbpFileStoringAllTestBase
         }
         else
         {
-            head.Throws(new IOException("Missing object"));
+            head.Throws(new global::KS3.KS3Exception.ServiceException("Missing object") { StatusCode = 404 });
         }
         return client;
     }

@@ -102,6 +102,7 @@ namespace SharpAbp.Abp.TransformSecurityManagement
                 var rsaCreds = await RSACredsRepository.GetAsync(securityCredentialInfo.CredsId, cancellationToken: cancellationToken);
                 securityCredential.PublicKey = KeyService.DecryptKey(rsaCreds.PublicKey, rsaCreds.PassPhrase, rsaCreds.Salt);
                 securityCredential.PrivateKey = KeyService.DecryptKey(rsaCreds.PrivateKey, rsaCreds.PassPhrase, rsaCreds.Salt);
+                RsaCredentialKeyNormalizer.Normalize(securityCredential);
             }
             else if (securityCredentialInfo.KeyType.Equals("SM2", StringComparison.OrdinalIgnoreCase))
             {

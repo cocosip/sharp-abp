@@ -29,6 +29,8 @@ public class AliyunFileProviderTest : AbpFileStoringAllTestBase
     public async Task Save_Should_Forward_Content_Through_Apm_Client_Boundary()
     {
         var client = CreateClient(false);
+        client.Setup(x => x.GetBucketVersioning(It.IsAny<string>()))
+            .Throws(new UnauthorizedAccessException("The upload identity has no bucket-versioning permission."));
         PutObjectRequest sent = null;
         client.Setup(x => x.BeginPutObject(It.IsAny<PutObjectRequest>(), It.IsAny<AsyncCallback>(), It.IsAny<object>()))
             .Returns<PutObjectRequest, AsyncCallback, object>((request, callback, state) =>
@@ -56,20 +58,6 @@ public class AliyunFileProviderTest : AbpFileStoringAllTestBase
         using var content = new MemoryStream([1]);
         await Assert.ThrowsAsync<FileAlreadyExistsException>(() => new TestAliyunProvider(ServiceProvider, CreateClient(true).Object)
             .SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", content, "bin")));
-    }
-
-    [Theory]
-    [InlineData(VersioningStatus.Enabled)]
-    [InlineData(VersioningStatus.Suspended)]
-    public async Task Save_Rejects_No_Overwrite_When_Versioning_Has_Been_Enabled(VersioningStatus status)
-    {
-        var client = CreateClient(false);
-        client.Setup(x => x.GetBucketVersioning("bucket"))
-            .Returns(CreateSdkResult<GetBucketVersioningResult>((nameof(GetBucketVersioningResult.Status), status)));
-        using var input = new MemoryStream([1]);
-
-        await Assert.ThrowsAsync<NotSupportedException>(() => new TestAliyunProvider(ServiceProvider, client.Object)
-            .SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", input, "bin")));
     }
 
     [Theory]

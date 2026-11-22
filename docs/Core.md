@@ -278,10 +278,13 @@ Callers must return borrowed items even when a pool has been removed or disposed
 Pending asynchronous item creation releases its result if the pool shuts down before creation finishes.
 Cleanup attempts every retained item and pool before reporting an `AggregateException`, including async-only
 disposable items through the existing disposal path. Repeated disposal does not dispose resources again.
-Lifecycle changes (`RemovePool`, `RemoveAll`, or `Dispose`) from an active policy initialization callback
-throw `InvalidOperationException` before changing the registry or shutdown state. Cleanup callbacks run
-outside registry locks and may access the reusable orchestrator. Background work started during
-initialization may request lifecycle changes after initialization finishes.
+An active policy initialization callback may remove an unrelated, fully initialized pool or a missing
+pool. Removing an unfinished pool, removing all pools, or disposing the owner from that callback
+throws `InvalidOperationException` because it could wait on the active initialization itself.
+Metadata creation callbacks run only on cache misses. Late asynchronous creation awaits async-only
+item cleanup; synchronous return/disposal uses ABP's context-pumping bridge for async-only items.
+Cleanup callbacks run outside registry locks and may access the reusable orchestrator. Background
+work started during initialization may request lifecycle changes after initialization finishes.
 
 ---
 

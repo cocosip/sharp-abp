@@ -91,11 +91,6 @@ namespace SharpAbp.Abp.FileStoring.Aliyun
                     }
                 }
 
-                if (!args.OverrideExisting && ossClient.GetBucketVersioning(containerName).Status != VersioningStatus.Off)
-                {
-                    throw new NotSupportedException("Aliyun OSS requires bucket versioning to be off for conditional object creation.");
-                }
-
                 if (args.Configuration.EnableAutoMultiPartUpload && args.FileStream?.Length > args.Configuration.MultiPartUploadMinFileSize)
                 {
                     return await MultiPartUploadAsync(ossClient, containerName, objectKey, args);

@@ -38,7 +38,9 @@ Automatic account creation from an external login also respects `SharpAbp.Accoun
 
 Password-reset links preserve the configured reset URL's query values and fragment. The account service supplies its own `userId`, tenant, reset token, return URL and return fragment fields. OIDC callback return URLs continue to use the decoded `redirect_uri` when present.
 
-Login and registration use the normal Identity sign-in checks, including configured email/account confirmation, lockout and two-factor authentication. A newly registered account and its external login link remain registered when confirmation or another sign-in check denies authentication; no application cookie is issued. Confirmation and recovery flows remain the host application's responsibility. Override `TwoFactorLoginResultAsync` on the login and registration page models to continue an application-specific two-factor flow; the default returns to login without authenticating. Existing registration hooks keep their signatures; overrides that perform sign-in must set `RegistrationSignInResult` to the checked result rather than call `SignInAsync` directly.
+Login and registration use the normal Identity sign-in checks, including configured email/account confirmation, lockout and two-factor authentication. A newly registered account and its external login link remain registered when confirmation or another sign-in check denies authentication; no application cookie is issued. Confirmation and recovery flows remain the host application's responsibility. Override `TwoFactorLoginResultAsync` on the login and registration page models to continue an application-specific two-factor flow; the default returns to login without authenticating.
+
+Existing registration hooks keep their signatures. Overrides that complete a checked sign-in continue to redirect successfully when Identity issues a new application principal; an authenticated principal already present before registration does not count as a new sign-in. Overrides can set `RegistrationSignInResult` explicitly to pass confirmation, lockout or two-factor outcomes to the page. Use checked Identity sign-in methods rather than `SignInAsync`, which bypasses those policies.
 
 ---
 
@@ -110,9 +112,13 @@ dotnet add package SharpAbp.Abp.OpenIddict.HttpApi
 
 The module exposes `IOpenIddictApplicationAppService` and `IOpenIddictScopeAppService` for managing clients and scopes.
 
-Client and scope writes merge the supplied entries in the JSON `Properties` bag with the stored values. Extra properties use ABP's extension definitions on both the request DTO and persisted entity. To expose an extra property in a response, register it on the entity and response DTO. Updates retain stored extension values outside the request's defined fields.
+Client and scope updates preserve the JSON `Properties` bag when the request omits it or supplies `null`. An explicit object replaces the bag, so omitted keys are removed and `{}` clears all keys. The DTO collections remain initialized for .NET callers using `Properties.Add`; adding entries supplies a replacement bag. Assign an empty dictionary to clear the bag from a direct .NET call. Serializers that emit an initialized empty collection send an explicit `{}`; set `Properties` to `null` or omit the member to preserve stored values. Protected `BuildModel` overrides can still add server properties before persistence, including when the client omits the bag.
+
+Extra properties use ABP's extension definitions on both the request DTO and persisted entity. To expose an extra property in a response, register it on the entity and response DTO. Updates retain stored extension values outside the request's defined fields.
 
 Scope changes use the OpenIddict manager for validation. On hosts that load `SharpAbp.Abp.OpenIddict.Domain`, scope manager lookups read the configured database directly and follow its transaction isolation. The application service removes previous ABP scope cache entries after a successful unit-of-work commit. Enable the SharpAbp domain module on every host that resolves scopes and use a database with consistent read-after-write behavior. Client and token cache settings remain independent.
+
+Deleting a client and its tokens participates in the caller's transaction. A rollback restores both; a successful commit also evicts application cache entries that another host may have refilled before the deletion committed.
 
 ---
 
@@ -215,8 +221,10 @@ ensures each segment contains a matching ID. Before deployment, correct persiste
 a nonpositive step or delta, a negative remainder, or a remainder at least as large as the delta.
 
 MinId business type names are permanent. Increase `MaxId` only when intentionally advancing
-the sequence, and treat its current value as the highest reserved ID. Deleting a business
-type retires it and keeps its name reserved in the database. Already reserved IDs may still
+the sequence, and treat its current value as the highest reserved ID. Updating configuration
+with an older `MaxId` retains the persisted watermark while applying the other fields, so
+an allocation between an administrator's read and edit does not block the edit or reset IDs.
+Deleting a business type retires it and keeps its name reserved in the database. Already reserved IDs may still
 be issued by running processes. Use a new business type name for a new sequence.
 
 Before deploying, add the non-null boolean `IsDeleted` column with a false default to the
@@ -229,33 +237,39 @@ only when you have reliable allocation history. Keep those names out of reuse ot
 >
 ### Credential transport and limits
 
-**Breaking HTTP migration:** all five ID endpoints under `/api/minid/id` read their MinId
-credential from `Authorization: Bearer <minid-token>`. Query-string `token` credentials are
-rejected, including when a valid header is also present. These are opaque MinId credentials,
-not OpenIddict access tokens; hosts with a global JWT-only policy must configure the ID
-routes' authentication/authorization policy accordingly rather than send credentials in URLs.
+All five ID endpoints under `/api/minid/id` accept a MinId credential in `X-MinId-Token`.
+This leaves `Authorization` available for the host's normal JWT or OpenIddict access token.
+The existing `Authorization: Bearer <minid-token>` transport remains available when the host
+does not require a separate user access token. Query-string `token` credentials are rejected,
+including when a valid header is also present. MinId credentials are opaque strings;
+the host's normal authentication and authorization policies still apply.
 
 ```http
 GET /api/minid/id/batch-nextId?bizType=orders&batchSize=100 HTTP/1.1
-Authorization: Bearer <minid-token>
+Authorization: Bearer <host-access-token>
+X-MinId-Token: <minid-token>
 ```
 
-The application service and domain generator both reject batch sizes outside **1–1,000**
-before allocating IDs. HTTP validation returns a bad request for an unsupported count.
-Existing in-process method signatures remain available, but invalid counts are no longer
-silently raised to one.
+The application service and HTTP endpoints reject batch sizes outside **1–1,000** before
+allocating IDs. HTTP validation returns a bad request for an unsupported count. Trusted
+in-process callers of `IMinIdGenerator.NextIdAsync(batchSize)` can still request any positive
+batch size. Nonpositive counts are rejected rather than silently raised to one.
 
 Administrative token lookup now uses `POST /api/minid/minid-token/find-by-token` with
 `{"bizType":"orders","token":"<minid-token>"}` as its JSON body. Use
-`IMinIdTokenAppService.FindAsync(FindMinIdTokenDto)` from updated remote .NET clients;
-custom implementations of that interface must add this method. `FindByTokenAsync` remains
-available locally but is no longer a remote action. Its old token-bearing GET route was
-removed. Token listing/filtering now uses `POST /api/minid/minid-token/search` with a
-`MinIdTokenPagedRequestDto` JSON body instead of GET query parameters. Administrative
+the `FindAsync(FindMinIdTokenDto)` extension on `IMinIdTokenAppService` for convenient
+lookup without adding a new required interface member. Existing .NET HTTP proxy
+calls to `FindByTokenAsync(bizType, token)` continue to work through
+`POST /api/minid/minid-token/lookup?bizType=orders`, with the token as a JSON string body.
+Its old token-bearing GET route was removed. Token listing/filtering now uses
+`POST /api/minid/minid-token/search` with a `MinIdTokenPagedRequestDto` JSON body instead of
+GET query parameters. Administrative
 requests retain their normal user authorization header separately from the body credential.
 
-Tokens are checked against persisted state for every validation; positive cache entries
-are ignored, including late entries written after revocation. Route these checks to the
+Business type matching follows the repository database's collation, while token secrets
+are compared case-sensitively after lookup. Tokens are checked against persisted state for
+every validation; positive cache entries are ignored, including late entries written after
+revocation. Route these checks to the
 authoritative primary database, and do not reuse a long-lived snapshot transaction for
 authentication. Previously authorized in-flight requests may finish. Existing legacy cache
 invalidations still run after successful transaction completion for older cache consumers;
@@ -266,8 +280,8 @@ receive stable messages; unexpected failures contain a reference ID without back
 Server diagnostics retain the reference, exception type and stack without copying arbitrary
 exception messages that may contain credentials. Cancellation is propagated rather than
 converted into a server-failure envelope. Production hosts must keep ABP detailed exception
-responses disabled and redact Authorization headers, request bodies and any legacy URL
-credentials in reverse-proxy/APM/access logs.
+responses disabled and redact Authorization and X-MinId-Token headers, request bodies and
+any legacy URL credentials in reverse-proxy/APM/access logs.
 
 ---
 
@@ -572,7 +586,12 @@ public class RsaKeyService : ApplicationService
 
 SM2 keys use `ISM2CredsAppService` with `CreateSM2CredsDto`, `GenerateSM2CredsDto`, `SM2CredsDto`, and `SM2CredsKeyDto`.
 
-RSA imports accept a base64 DER SubjectPublicKeyInfo public key and PKCS#1 private key. The supplied size must match the key pair. SM2 imports accept a hexadecimal encoded elliptic-curve point and private scalar in the format returned by the SharpAbp export helpers. The point must match the scalar on the supplied curve. Validation applies to new imports. For existing records, identify and rotate unusable keys before removing them.
+RSA imports accept the formats produced by the Crypto module: base64 DER SubjectPublicKeyInfo public keys, PKCS#1 or PKCS#8 private keys, and the corresponding unencrypted PEM keys. Imported strings retain their original format when decrypted again. Public and private roles, matching key pairs, and the supplied key size are validated. SM2 imports accept a hexadecimal encoded elliptic-curve point and private scalar in the format returned by the SharpAbp export helpers. The point must match the scalar on the supplied curve. Validation applies to new imports. For existing records, identify and rotate unusable keys before removing them.
+
+Database-backed transform credentials convert PEM/PKCS#8 RSA material to their runtime
+SPKI/PKCS#1 representation during generation and reload. Vault key strings remain in
+their original format. Already compatible SPKI/PKCS#1 strings remain unchanged; only
+formats requiring conversion perform native RSA import/export in this normalization step.
 
 When the host loads both CryptoVault and TransformSecurityManagement, the CryptoVault delete operation rejects keys referenced by persisted transform-security credentials, including expired records. Before retiring a key, pause issuance that could select it, wait for in-flight issuance, and remove the relevant credential records after their retention period. The guard runs in the deletion host and checks its configured credential store. It cannot coordinate concurrent issuance across hosts or separate stores.
 

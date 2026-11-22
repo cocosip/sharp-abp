@@ -61,7 +61,14 @@ namespace SharpAbp.Abp.ObjectPool
                 if (!_disposed) return item;
             }
 
-            PooledItemDisposer.Dispose(item);
+            if (item is IAsyncDisposable asyncDisposable && item is not IDisposable)
+            {
+                await asyncDisposable.DisposeAsync().ConfigureAwait(false);
+            }
+            else
+            {
+                PooledItemDisposer.Dispose(item);
+            }
             throw new ObjectDisposedException(GetType().Name);
         }
 

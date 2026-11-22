@@ -134,7 +134,7 @@ public class FastDFSFileProviderTest : AbpFileStoringAllTestBase
     }
 
     [Fact]
-    public async Task Access_Url_Checks_Existence_And_Rejects_Unsupported_Expiry()
+    public async Task Access_Url_Checks_Existence_And_Accepts_Expiry_Using_Configured_Server_Token_Settings()
     {
         var provider = Provider();
         using var cancellation = new CancellationTokenSource();
@@ -143,12 +143,14 @@ public class FastDFSFileProviderTest : AbpFileStoringAllTestBase
         Assert.Equal("", await provider.GetAccessUrlAsync(new FileProviderAccessArgs("group1", _configuration, "file", expires, true, cancellation.Token)));
 
         _client.Setup(client => client.FileExistsAsync("file", cancellation.Token)).ReturnsAsync(true);
-        await Assert.ThrowsAsync<NotSupportedException>(() => provider.GetAccessUrlAsync(new FileProviderAccessArgs("group1", _configuration, "file", expires, true, cancellation.Token)));
+        _client.Setup(client => client.GetFileUrlAsync("file", null, cancellation.Token))
+            .ReturnsAsync("https://storage.test/file");
+        Assert.Equal("https://storage.test/file", await provider.GetAccessUrlAsync(new FileProviderAccessArgs("group1", _configuration, "file", expires, true, cancellation.Token)));
 
         _configuration.GetFastDFSConfiguration().AntiStealCheckToken = true;
         _client.Setup(client => client.GetFileUrlWithTokenAsync("file", 3600, null, cancellation.Token))
             .ReturnsAsync("https://storage.test/file?token=test");
-        await Assert.ThrowsAsync<NotSupportedException>(() => provider.GetAccessUrlAsync(new FileProviderAccessArgs("group1", _configuration, "file", expires, true, cancellation.Token)));
+        Assert.Equal("https://storage.test/file?token=test", await provider.GetAccessUrlAsync(new FileProviderAccessArgs("group1", _configuration, "file", expires, true, cancellation.Token)));
         Assert.Equal("https://storage.test/file?token=test", await provider.GetAccessUrlAsync(new FileProviderAccessArgs("group1", _configuration, "file", checkFileExist: true, cancellationToken: cancellation.Token)));
     }
 

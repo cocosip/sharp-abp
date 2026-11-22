@@ -164,11 +164,14 @@ namespace SharpAbp.MinId
         /// This method efficiently generates multiple IDs by calling NextIdAsync sequentially
         /// for the specified number of times.
         /// </summary>
-        /// <param name="batchSize">The number of unique identifiers to generate, between 1 and 1000.</param>
+        /// <param name="batchSize">The positive number of unique identifiers to generate.</param>
         /// <returns>A task containing a list of unique identifiers.</returns>
         public virtual async Task<List<long>> NextIdAsync(int batchSize)
         {
-            MinIdUtil.CheckBatchSize(batchSize);
+            if (batchSize < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(batchSize), "Batch size must be positive.");
+            }
             var ids = new List<long>(batchSize);
             for (var i = 0; i < batchSize; i++)
             {

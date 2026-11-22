@@ -10,6 +10,8 @@ namespace SharpAbp.Abp.OpenIddict
 {
     public class CreateOrUpdateOpenIddictApplicationDto : ExtensibleObject
     {
+        private Dictionary<string, JsonElement> _properties = new();
+        private bool _propertiesProvided;
         /// <summary>
         /// Gets or sets the client identifier associated with the current application.
         /// </summary>
@@ -58,7 +60,17 @@ namespace SharpAbp.Abp.OpenIddict
         /// Gets or sets the additional properties serialized as a JSON object,
         /// or <c>null</c> if no bag was associated with the current scope.
         /// </summary>
-        public Dictionary<string, JsonElement> Properties { get; set; }
+        public Dictionary<string, JsonElement> Properties
+        {
+            get => _properties;
+            set
+            {
+                _properties = value;
+                _propertiesProvided = true;
+            }
+        }
+
+        public bool ShouldReplaceProperties() => _properties != null && (_propertiesProvided || _properties.Count > 0);
 
         /// <summary>
         /// DisplayNames
@@ -99,7 +111,6 @@ namespace SharpAbp.Abp.OpenIddict
 
         public CreateOrUpdateOpenIddictApplicationDto()
         {
-            Properties = new Dictionary<string, JsonElement>();
             DisplayNames = new Dictionary<string, string>();
             RedirectUris = new List<string>();
             PostLogoutRedirectUris = new List<string>();

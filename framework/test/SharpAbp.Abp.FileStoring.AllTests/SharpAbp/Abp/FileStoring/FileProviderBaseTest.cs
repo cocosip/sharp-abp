@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.IO;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,6 +9,28 @@ using Xunit;
 
 namespace SharpAbp.Abp.FileStoring
 {
+    public sealed class UnixFactAttribute : FactAttribute
+    {
+        public UnixFactAttribute()
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                Skip = "Requires a Unix filesystem.";
+            }
+        }
+    }
+
+    public sealed class UnixTheoryAttribute : TheoryAttribute
+    {
+        public UnixTheoryAttribute()
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                Skip = "Requires a Unix filesystem.";
+            }
+        }
+    }
+
     public class FileProviderBaseTest
     {
         private sealed class TestFileProvider : FileProviderBase
@@ -104,12 +127,7 @@ namespace SharpAbp.Abp.FileStoring
                 using var cancellation = new CancellationTokenSource();
                 using var stream = new InterruptedCopyStream(cancel ? cancellation : null);
                 var provider = new TestFileProvider();
-                if (existing && !OperatingSystem.IsWindows())
-                {
-                    await Assert.ThrowsAsync<NotSupportedException>(() => provider.WriteToFileAsync(stream, path));
-                    Assert.False(cancellation.IsCancellationRequested);
-                }
-                else if (cancel)
+                if (cancel)
                 {
                     await Assert.ThrowsAnyAsync<OperationCanceledException>(
                         () => provider.WriteToFileAsync(stream, path, cancellation.Token));
@@ -135,27 +153,29 @@ namespace SharpAbp.Abp.FileStoring
             }
         }
 
-        [Fact]
-        public async Task Unix_Download_Does_Not_Replace_A_File_Created_During_Copy()
+        [UnixFact]
+        [UnsupportedOSPlatform("windows")]
+        public async Task Unix_Download_Preserves_Permissions_Of_A_File_Created_During_Copy()
         {
-            if (OperatingSystem.IsWindows())
-            {
-                return;
-            }
-
             var directory = Directory.CreateTempSubdirectory("sharpabp-download-race-");
             var path = Path.Combine(directory.FullName, "destination.txt");
             try
             {
                 var provider = new TestFileProvider();
-                await Assert.ThrowsAsync<NotSupportedException>(() => provider.WriteToFileAsync(path, async (output, token) =>
+                var mode = UnixFileMode.UserRead | UnixFileMode.UserWrite;
+                Assert.True(await provider.WriteToFileAsync(path, async (output, token) =>
                 {
                     await output.WriteAsync(Encoding.UTF8.GetBytes("download"), token);
                     await File.WriteAllTextAsync(path, "other writer", token);
+                    if (!OperatingSystem.IsWindows())
+                    {
+                        File.SetUnixFileMode(path, mode);
+                    }
                     return true;
                 }));
 
-                Assert.Equal("other writer", await File.ReadAllTextAsync(path));
+                Assert.Equal("download", await File.ReadAllTextAsync(path));
+                Assert.Equal(mode, File.GetUnixFileMode(path));
                 Assert.Single(directory.GetFileSystemInfos());
             }
             finally
@@ -165,7 +185,7 @@ namespace SharpAbp.Abp.FileStoring
         }
 
         [Fact]
-        public async Task TryWriteToFileAsync_Should_Replace_Existing_File_Only_On_Windows()
+        public async Task TryWriteToFileAsync_Should_Replace_Existing_File_And_Truncate_Old_Content()
         {
             var provider = new TestFileProvider();
             var path = Path.Combine(Path.GetTempPath(), $"sharpabp-fileprovider-{Guid.NewGuid():N}.txt");
@@ -175,16 +195,8 @@ namespace SharpAbp.Abp.FileStoring
                 await File.WriteAllTextAsync(path, "existing-long-content");
 
                 await using var stream = new MemoryStream(Encoding.UTF8.GetBytes("new"));
-                if (OperatingSystem.IsWindows())
-                {
-                    await provider.WriteToFileAsync(stream, path);
-                    Assert.Equal("new", await File.ReadAllTextAsync(path));
-                }
-                else
-                {
-                    await Assert.ThrowsAsync<NotSupportedException>(() => provider.WriteToFileAsync(stream, path));
-                    Assert.Equal("existing-long-content", await File.ReadAllTextAsync(path));
-                }
+                await provider.WriteToFileAsync(stream, path);
+                Assert.Equal("new", await File.ReadAllTextAsync(path));
             }
             finally
             {
@@ -192,6 +204,42 @@ namespace SharpAbp.Abp.FileStoring
                 {
                     File.Delete(path);
                 }
+            }
+        }
+
+        [UnixTheory]
+        [InlineData(false)]
+        [InlineData(true)]
+        [UnsupportedOSPlatform("windows")]
+        public async Task Unix_Download_Preserves_Symbolic_Link_And_Creates_Or_Updates_Its_Target(bool existingTarget)
+        {
+            var directory = Directory.CreateTempSubdirectory("sharpabp-download-link-");
+            var target = Path.Combine(directory.FullName, "target.txt");
+            var path = Path.Combine(directory.FullName, "destination.txt");
+            try
+            {
+                var mode = UnixFileMode.UserRead | UnixFileMode.UserWrite;
+                if (existingTarget)
+                {
+                    await File.WriteAllTextAsync(target, "existing-long-content");
+                    File.SetUnixFileMode(target, mode);
+                }
+                File.CreateSymbolicLink(path, target);
+                using var stream = new MemoryStream(Encoding.UTF8.GetBytes("new"));
+
+                await new TestFileProvider().WriteToFileAsync(stream, path);
+
+                Assert.Equal(target, new FileInfo(path).LinkTarget);
+                Assert.Equal("new", await File.ReadAllTextAsync(target));
+                if (existingTarget)
+                {
+                    Assert.Equal(mode, File.GetUnixFileMode(target));
+                }
+                Assert.Equal(2, directory.GetFileSystemInfos().Length);
+            }
+            finally
+            {
+                directory.Delete(true);
             }
         }
 

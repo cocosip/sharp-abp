@@ -58,6 +58,32 @@ public class MapTenancyStoreInMemoryCacheTest
     }
 
     [Fact]
+    public async Task Derived_Cache_Can_Add_Remove_And_Clear_Protected_Tenants()
+    {
+        var cache = new MutableMapTenancyStoreInMemoryCache();
+        var first = new MapTenant(Guid.NewGuid(), Guid.NewGuid(), "first", "code-one", "map-one");
+        var second = new MapTenancyTenant(Guid.NewGuid(), "second", "code-two", "map-two");
+        await cache.FillAsync([first]);
+
+        cache.AddTenant(second);
+
+        Assert.Equal(second.TenantId, cache.GetByCodeOrNull(second.Code)?.TenantId);
+        Assert.Equal(second.TenantId, cache.GetByMapCodeOrNull(second.MapCode)?.TenantId);
+        Assert.Equal(second.TenantId, cache.GetByTenantIdOrNull(second.TenantId)?.TenantId);
+        Assert.Equal(2, cache.GetAll().Count);
+
+        cache.RemoveTenant(first.TenantId);
+
+        Assert.Null(cache.GetByTenantIdOrNull(first.TenantId));
+        Assert.Equal(second.TenantId, Assert.Single(cache.GetAll()).TenantId);
+
+        cache.ClearTenants();
+
+        Assert.Null(cache.GetByCodeOrNull(second.Code));
+        Assert.Empty(cache.GetAll());
+    }
+
+    [Fact]
     public void Cache_Item_Maps_All_Fields_And_Rejects_Null_Entity()
     {
         var entity = new MapTenant(Guid.NewGuid(), Guid.NewGuid(), "tenant", "code", "map");
@@ -69,5 +95,32 @@ public class MapTenancyStoreInMemoryCacheTest
         Assert.Equal(entity.Code, item.Code);
         Assert.Equal(entity.MapCode, item.MapCode);
         Assert.Throws<ArgumentNullException>(() => MapTenantExtensions.AsCacheItem(null));
+    }
+
+    private sealed class MutableMapTenancyStoreInMemoryCache : MapTenancyStoreInMemoryCache
+    {
+        public void AddTenant(MapTenancyTenant tenant)
+        {
+            lock (Tenants)
+            {
+                Tenants.Add(tenant);
+            }
+        }
+
+        public void RemoveTenant(Guid tenantId)
+        {
+            lock (Tenants)
+            {
+                Tenants.RemoveAll(tenant => tenant.TenantId == tenantId);
+            }
+        }
+
+        public void ClearTenants()
+        {
+            lock (Tenants)
+            {
+                Tenants.Clear();
+            }
+        }
     }
 }

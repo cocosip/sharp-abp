@@ -57,11 +57,6 @@ namespace SharpAbp.Abp.FileStoring.Minio
 
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
-            if (!args.OverrideExisting)
-            {
-                throw new NotSupportedException("Minio does not support conditional object creation through this SDK. Use an explicit overwrite only when replacement is acceptable.");
-            }
-
             var objectKey = MinioFileNameCalculator.Calculate(args);
             var containerName = GetContainerName(args);
 
@@ -71,6 +66,10 @@ namespace SharpAbp.Abp.FileStoring.Minio
 
             try
             {
+                if (!args.OverrideExisting && await FileExistsAsync(minioClient, containerName, objectKey, args.CancellationToken))
+                {
+                    throw new FileAlreadyExistsException($"File '{args.FileId}' already exists in the container '{containerName}'.");
+                }
 
                 if (minioConfiguration.CreateBucketIfNotExists)
                 {

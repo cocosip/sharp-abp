@@ -68,11 +68,6 @@ namespace SharpAbp.Abp.FileStoring.KS3
 
         public override async Task<string> SaveAsync(FileProviderSaveArgs args)
         {
-            if (!args.OverrideExisting)
-            {
-                throw new NotSupportedException("KS3 does not support conditional object creation through this SDK. Use an explicit overwrite only when replacement is acceptable.");
-            }
-
             var containerName = GetContainerName(args);
             var objectKey = KS3FileNameCalculator.Calculate(args);
 
@@ -82,6 +77,10 @@ namespace SharpAbp.Abp.FileStoring.KS3
 
             try
             {
+                if (!args.OverrideExisting && FileExists(ks3Client, containerName, objectKey))
+                {
+                    throw new FileAlreadyExistsException($"File '{args.FileId}' already exists in the container '{containerName}'.");
+                }
 
                 if (ks3Configuration.CreateContainerIfNotExists)
                 {
@@ -252,37 +251,49 @@ namespace SharpAbp.Abp.FileStoring.KS3
 
         protected virtual bool BucketExist(IKS3 ks3, string containerName)
         {
-            var headBucket = ks3.HeadBucket(containerName);
-            if (headBucket.StatueCode == HttpStatusCode.OK)
+            try
             {
-                return true;
+                var headBucket = ks3.HeadBucket(containerName);
+                if (headBucket.StatueCode == HttpStatusCode.OK)
+                {
+                    return true;
+                }
+                if (headBucket.StatueCode == HttpStatusCode.NotFound)
+                {
+                    return false;
+                }
+                throw new IOException($"KS3 bucket existence check returned HTTP {(int)headBucket.StatueCode}.");
             }
-            return false;
+            catch (Exception ex) when (IsNotFound(ex))
+            {
+                return false;
+            }
         }
 
         protected virtual bool FileExists(IKS3 ks3, string containerName, string fileName)
         {
-            var headBucket = ks3.HeadBucket(containerName);
-            if (headBucket.StatueCode == HttpStatusCode.OK)
+            if (BucketExist(ks3, containerName))
             {
                 try
                 {
-                    var headObject = ks3.HeadObject(new HeadObjectRequest
+                    ks3.HeadObject(new HeadObjectRequest
                     {
                         BucketName = containerName,
                         ObjectKey = fileName
                     });
                     return true;
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (IsNotFound(ex))
                 {
-                    Logger.LogError(ex, "Failed to check existence of object '{FileName}' in KS3 bucket '{ContainerName}'. Error: {ErrorMessage}", 
-                        fileName, containerName, ex.Message);
                     return false;
                 }
             }
             return false;
         }
+
+        private static bool IsNotFound(Exception exception) =>
+            exception is global::KS3.KS3Exception.ServiceException serviceException && serviceException.StatusCode == 404 ||
+            exception is WebException webException && webException.Response is HttpWebResponse response && response.StatusCode == HttpStatusCode.NotFound;
 
         protected virtual Task<string> PutObjectAsync(
             IKS3 ks3,

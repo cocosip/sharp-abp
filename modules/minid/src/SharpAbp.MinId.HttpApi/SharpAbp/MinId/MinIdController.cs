@@ -18,8 +18,18 @@ namespace SharpAbp.MinId
 
         protected virtual string GetBearerToken(string authorization)
         {
-            if (HttpContext?.Request.Query.ContainsKey("token") == true ||
-                !AuthenticationHeaderValue.TryParse(authorization, out var header) ||
+            if (HttpContext?.Request.Query.ContainsKey("token") == true)
+            {
+                throw new AbpAuthorizationException("MinId tokens must be sent in a request header.");
+            }
+
+            var separateToken = HttpContext?.Request.Headers["X-MinId-Token"].ToString();
+            if (!string.IsNullOrWhiteSpace(separateToken))
+            {
+                return separateToken;
+            }
+
+            if (!AuthenticationHeaderValue.TryParse(authorization, out var header) ||
                 !string.Equals(header.Scheme, "Bearer", StringComparison.OrdinalIgnoreCase) ||
                 string.IsNullOrWhiteSpace(header.Parameter))
             {

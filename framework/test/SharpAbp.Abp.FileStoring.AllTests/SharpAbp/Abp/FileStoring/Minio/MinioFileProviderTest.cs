@@ -45,34 +45,49 @@ public class MinioFileProviderTest : AbpFileStoringAllTestBase
     private static IMinioClient Client(HttpClient http) => new MinioClient().WithEndpoint("storage.test:9000")
         .WithCredentials("unit-access", "unit-secret").WithRegion("us-east-1").WithHttpClient(http).Build();
 
-    [Fact]
-    public async Task Save_Sends_The_Normalized_Bucket_And_Content_And_Preserves_Input()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Save_Sends_The_Normalized_Bucket_And_Content_And_Preserves_Input(bool overrideExisting)
     {
-        using var transport = new StorageTransport();
+        using var transport = new StorageTransport { ObjectExists = overrideExisting };
         using var http = new HttpClient(transport);
         using var client = Client(http);
         using var input = new MemoryStream([1, 2, 3]);
         var provider = Provider(client);
 
-        Assert.Equal("file", await provider.SaveAsync(new FileProviderSaveArgs("fallback", _configuration, "file", input, "bin", true)));
+        Assert.Equal("file", await provider.SaveAsync(new FileProviderSaveArgs("fallback", _configuration, "file", input, "bin", overrideExisting)));
 
         var request = Assert.Single(transport.Requests, request => request.Method == HttpMethod.Put);
         Assert.Equal("/bucket/file", request.Path);
         Assert.Equal(new byte[] { 1, 2, 3 }, request.Body);
         Assert.True(input.CanRead);
         Assert.False(transport.Disposed);
+        Assert.Equal(!overrideExisting, transport.Requests.Any(request => request.Method == HttpMethod.Head && request.Path == "/bucket/file"));
     }
 
     [Fact]
-    public async Task Save_Rejects_Unsupported_Conditional_Create_Without_A_Request()
+    public async Task Save_Without_Overwrite_Uploads_A_Missing_Object()
+    {
+        using var transport = new StorageTransport { ObjectExists = false };
+        using var http = new HttpClient(transport);
+        using var client = Client(http);
+        using var input = new MemoryStream([1, 2, 3]);
+        Assert.Equal("file", await Provider(client)
+            .SaveAsync(new FileProviderSaveArgs("fallback", _configuration, "file", input, "bin")));
+        Assert.Equal(new byte[] { 1, 2, 3 }, Assert.Single(transport.Requests, request => request.Method == HttpMethod.Put).Body);
+    }
+
+    [Fact]
+    public async Task Save_Rejects_Duplicate_Without_Overwrite()
     {
         using var transport = new StorageTransport();
         using var http = new HttpClient(transport);
         using var client = Client(http);
         using var input = new MemoryStream([1]);
-        await Assert.ThrowsAsync<NotSupportedException>(() => Provider(client)
+        await Assert.ThrowsAsync<FileAlreadyExistsException>(() => Provider(client)
             .SaveAsync(new FileProviderSaveArgs("fallback", _configuration, "file", input, "bin")));
-        Assert.Empty(transport.Requests);
+        Assert.DoesNotContain(transport.Requests, request => request.Method == HttpMethod.Put);
         Assert.True(input.CanRead);
     }
 

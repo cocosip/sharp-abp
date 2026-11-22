@@ -1,7 +1,12 @@
+using System.Data;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
+using NSubstitute;
 using Volo.Abp;
 using Volo.Abp.Data;
 using Volo.Abp.Domain.Entities;
+using Volo.Abp.Uow;
 using Xunit;
 
 namespace SharpAbp.MinId;
@@ -26,8 +31,9 @@ public class MinIdManagementTest : MinIdApplicationTestBase
         var service = GetRequiredService<IMinIdInfoAppService>();
         var input = new CreateMinIdInfoDto { BizType = "billing", MaxId = 100, Step = 10, Delta = 1 };
         var created = await service.CreateAsync(input);
-        await Assert.ThrowsAsync<UserFriendlyException>(() => service.UpdateAsync(created.Id,
-            new UpdateMinIdInfoDto { BizType = input.BizType, MaxId = 99, Step = 10, Delta = 1 }));
+        var updated = await service.UpdateAsync(created.Id,
+            new UpdateMinIdInfoDto { BizType = input.BizType, MaxId = 99, Step = 10, Delta = 1 });
+        Assert.Equal(100, updated.MaxId);
         await Assert.ThrowsAsync<UserFriendlyException>(() => service.UpdateAsync(created.Id,
             new UpdateMinIdInfoDto { BizType = "renamed", MaxId = 100, Step = 10, Delta = 1 }));
         Assert.Equal(100, (await service.GetAsync(created.Id)).MaxId);
@@ -36,6 +42,43 @@ public class MinIdManagementTest : MinIdApplicationTestBase
 
         Assert.Empty(await service.GetListAsync(bizType: input.BizType));
         await Assert.ThrowsAsync<UserFriendlyException>(() => service.CreateAsync(input));
+    }
+
+    [Fact]
+    public async Task Editing_A_Fetched_Configuration_After_Allocation_Keeps_The_Reserved_Watermark()
+    {
+        var service = GetRequiredService<IMinIdInfoAppService>();
+        var created = await service.CreateAsync(new CreateMinIdInfoDto
+        {
+            BizType = "billing", MaxId = 100, Step = 10, Delta = 1
+        });
+        var fetched = await service.GetAsync(created.Id);
+        var realManager = GetRequiredService<IUnitOfWorkManager>();
+        var sqliteManager = Substitute.For<IUnitOfWorkManager>();
+        sqliteManager.Begin(Arg.Any<AbpUnitOfWorkOptions>(), true).Returns(call =>
+        {
+            var options = call.Arg<AbpUnitOfWorkOptions>();
+            // SQLite supports Serializable, rather than the allocator's ReadCommitted isolation level.
+            options.IsolationLevel = IsolationLevel.Serializable;
+            return realManager.Begin(options, requiresNew: true);
+        });
+        var allocator = new DefaultSegmentIdService(NullLogger<DefaultSegmentIdService>.Instance,
+            Options.Create(new MinIdOptions()), sqliteManager, GetRequiredService<IMinIdInfoRepository>());
+        var reserved = await allocator.GetNextSegmentIdAsync("billing");
+        Assert.Equal(110, reserved.MaxId);
+
+        var updated = await service.UpdateAsync(created.Id, new UpdateMinIdInfoDto
+        {
+            BizType = fetched.BizType, MaxId = fetched.MaxId, Step = 20, Delta = 2, Remainder = 1
+        });
+
+        Assert.Equal(110, updated.MaxId);
+        Assert.Equal(20, updated.Step);
+        Assert.Equal(2, updated.Delta);
+        Assert.Equal(1, updated.Remainder);
+        var next = await allocator.GetNextSegmentIdAsync("billing");
+        Assert.Equal(110, next.CurrentId);
+        Assert.Equal(130, next.MaxId);
     }
 
     [Fact]

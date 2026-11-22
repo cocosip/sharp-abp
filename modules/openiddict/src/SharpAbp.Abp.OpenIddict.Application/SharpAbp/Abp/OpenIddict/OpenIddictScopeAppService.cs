@@ -165,8 +165,10 @@ namespace SharpAbp.Abp.OpenIddict
             await OpenIddictScopeStore.SetDisplayNameAsync(model, input.DisplayName, CancellationToken.None);
             await OpenIddictScopeStore.SetDescriptionAsync(model, input.Description, CancellationToken.None);
 
-            var properties = await OpenIddictScopeStore.GetPropertiesAsync(model, CancellationToken.None);
-            await OpenIddictScopeStore.SetPropertiesAsync(model, properties.SetItems(input.Properties), CancellationToken.None);
+            if (input.ShouldReplaceProperties())
+            {
+                await OpenIddictScopeStore.SetPropertiesAsync(model, input.Properties.ToImmutableDictionary(), CancellationToken.None);
+            }
             await OpenIddictScopeStore.SetResourcesAsync(model, input.Resources.ToImmutableArray(), CancellationToken.None);
 
             var descriptions = new Dictionary<CultureInfo, string>(input.Descriptions.Select(x => new KeyValuePair<CultureInfo, string>(new CultureInfo(x.Key), x.Value)));

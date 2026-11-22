@@ -409,13 +409,22 @@ namespace SharpAbp.Abp.ObjectPool
 
         protected virtual PoolMetadata GetOrCreateMetadata(PoolKey key, Func<Lazy<PoolMetadata>> metadataFactory)
         {
-            var candidate = metadataFactory();
             Lazy<PoolMetadata> lazy;
             lock (_lifecycle)
             {
                 ThrowIfDisposed();
-                lazy = PoolMetadatas.GetOrAdd(key, candidate);
-                _initializing.Add(lazy);
+                PoolMetadatas.TryGetValue(key, out lazy!);
+                if (lazy != null) _initializing.Add(lazy);
+            }
+            if (lazy == null)
+            {
+                var candidate = metadataFactory();
+                lock (_lifecycle)
+                {
+                    ThrowIfDisposed();
+                    lazy = PoolMetadatas.GetOrAdd(key, candidate);
+                    _initializing.Add(lazy);
+                }
             }
             var previous = _initialization.Value;
             var scope = new InitializationScope(previous);
@@ -440,11 +449,11 @@ namespace SharpAbp.Abp.ObjectPool
 
         protected virtual bool RemovePoolCore(PoolKey key)
         {
-            RejectInitializationMutation();
             Lazy<PoolMetadata> lazy;
             bool started;
             lock (_lifecycle)
             {
+                if (PoolMetadatas.TryGetValue(key, out var existing)) RejectInitializationMutation(existing);
                 if (!PoolMetadatas.TryRemove(key, out lazy!)) return false;
                 started = lazy.IsValueCreated || _initializing.Contains(lazy);
             }
@@ -454,7 +463,14 @@ namespace SharpAbp.Abp.ObjectPool
 
         private int RemovePools(IEnumerable<PoolKey> keys)
         {
-            RejectInitializationMutation();
+            // Validate both sync and async entries before removing either one.
+            lock (_lifecycle)
+            {
+                foreach (var key in keys)
+                {
+                    if (PoolMetadatas.TryGetValue(key, out var lazy)) RejectInitializationMutation(lazy);
+                }
+            }
             var removed = 0;
             var errors = new List<Exception>();
             foreach (var key in keys)
@@ -478,8 +494,10 @@ namespace SharpAbp.Abp.ObjectPool
             if (_disposed) throw new ObjectDisposedException(GetType().Name);
         }
 
-        private void RejectInitializationMutation()
+        private void RejectInitializationMutation(Lazy<PoolMetadata>? target = null)
         {
+            // An initialized pool can be retired without waiting on a policy factory.
+            if (target?.IsValueCreated == true) return;
             for (var scope = _initialization.Value; scope != null; scope = scope.Parent)
             {
                 if (Volatile.Read(ref scope.Active) != 0)

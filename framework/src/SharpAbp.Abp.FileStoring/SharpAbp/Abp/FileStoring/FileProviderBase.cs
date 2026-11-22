@@ -1,6 +1,5 @@
 ﻿﻿using JetBrains.Annotations;
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -143,12 +142,6 @@ namespace SharpAbp.Abp.FileStoring
             cancellationToken.ThrowIfCancellationRequested();
             var destination = Path.GetFullPath(path);
             var directory = Path.GetDirectoryName(destination) ?? throw new IOException("The download destination must be a file path.");
-            var canReplace = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            if (!canReplace && File.Exists(destination))
-            {
-                throw UnixReplacementNotSupported();
-            }
-
             Directory.CreateDirectory(directory);
             var stagingPath = Path.Combine(directory, $".sharpabp-{Guid.NewGuid():N}.tmp");
             var stagingCreated = false;
@@ -167,28 +160,26 @@ namespace SharpAbp.Abp.FileStoring
                 }
 
                 cancellationToken.ThrowIfCancellationRequested();
-                if (!canReplace)
-                {
-                    // POSIX link publishes the staged file atomically and fails if the destination exists.
-                    if (Link(stagingPath, destination) != 0)
-                    {
-                        var error = Marshal.GetLastWin32Error();
-                        if (File.Exists(destination))
-                        {
-                            throw UnixReplacementNotSupported();
-                        }
-                        throw new IOException("The download could not be published as a new file.", new Win32Exception(error));
-                    }
-                    return true;
-                }
-
                 try
                 {
                     File.Move(stagingPath, destination);
                 }
-                catch (IOException) when (File.Exists(destination))
+                catch (IOException) when (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || File.Exists(destination))
                 {
-                    File.Replace(stagingPath, destination, null);
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        File.Replace(stagingPath, destination, null);
+                    }
+                    else
+                    {
+                        // Preserve the existing inode's owner, permissions and links; final local writes are not atomic.
+                        using var input = new FileStream(stagingPath, FileMode.Open, FileAccess.Read, FileShare.Read, 81920, useAsync: true);
+                        using var output = new FileStream(destination, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None, 81920, useAsync: true);
+                        await input.CopyToAsync(output, cancellationToken);
+                        output.SetLength(output.Position);
+                        await output.FlushAsync(cancellationToken);
+                        return true;
+                    }
                 }
 
                 stagingCreated = false;
@@ -210,11 +201,5 @@ namespace SharpAbp.Abp.FileStoring
             }
         }
 
-        private static NotSupportedException UnixReplacementNotSupported() =>
-            new NotSupportedException("Replacing an existing download on this platform cannot preserve its ownership and access controls.");
-
-        // CharSet.Ansi marshals strings as UTF-8 on Unix and is available on .NET Standard 2.0.
-        [DllImport("libc", EntryPoint = "link", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true)]
-        private static extern int Link(string existingPath, string newPath);
     }
 }

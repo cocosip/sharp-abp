@@ -36,7 +36,7 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
         [BindProperty(SupportsGet = true)]
         public string ExternalLoginAuthSchema { get; set; }
 
-        protected SignInResult RegistrationSignInResult { get; set; } = SignInResult.Failed;
+        protected SignInResult RegistrationSignInResult { get; set; }
 
         public RegisterModel(IAccountAppService accountAppService)
         {
@@ -82,7 +82,8 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
             try
             {
                 await CheckSelfRegistrationAsync();
-                RegistrationSignInResult = SignInResult.Failed;
+                RegistrationSignInResult = null;
+                var originalPrincipal = SignInManager.Context.User;
 
                 if (IsExternalLogin)
                 {
@@ -99,6 +100,11 @@ namespace SharpAbp.Abp.Account.Web.Pages.Account
                 {
                     await RegisterLocalUserAsync();
                 }
+
+                RegistrationSignInResult ??= !ReferenceEquals(originalPrincipal, SignInManager.Context.User) &&
+                    SignInManager.IsSignedIn(SignInManager.Context.User)
+                    ? SignInResult.Success
+                    : SignInResult.Failed;
 
                 if (RegistrationSignInResult.RequiresTwoFactor)
                 {

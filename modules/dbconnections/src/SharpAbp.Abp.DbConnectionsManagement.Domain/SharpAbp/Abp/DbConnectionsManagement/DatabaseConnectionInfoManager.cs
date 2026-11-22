@@ -116,7 +116,7 @@ namespace SharpAbp.Abp.DbConnectionsManagement
         {
             var trimmed = name?.Trim();
             if (Enum.TryParse<DatabaseProvider>(trimmed, ignoreCase: true, out var provider)
-                && string.Equals(trimmed, Enum.GetName(provider), StringComparison.OrdinalIgnoreCase))
+                && Enum.IsDefined(provider) && !trimmed.Contains(','))
             {
                 return provider.ToString();
             }

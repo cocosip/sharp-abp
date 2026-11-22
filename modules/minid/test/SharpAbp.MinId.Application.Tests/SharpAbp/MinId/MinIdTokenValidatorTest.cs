@@ -1,12 +1,46 @@
+using System;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
+using SharpAbp.MinId.EntityFrameworkCore;
 using Volo.Abp;
 using Volo.Abp.Caching;
+using Volo.Abp.EntityFrameworkCore;
+using Volo.Abp.Uow;
 using Xunit;
 
 namespace SharpAbp.MinId;
 
 public class MinIdTokenValidatorTest : MinIdApplicationTestBase
 {
+    [Fact]
+    public async Task Validation_Respects_Database_Business_Type_Collation_While_Keeping_Tokens_Case_Sensitive()
+    {
+        using var unitOfWork = GetRequiredService<IUnitOfWorkManager>().Begin(requiresNew: true, isTransactional: false);
+        var context = await GetRequiredService<IDbContextProvider<MinIdDbContext>>().GetDbContextAsync();
+        var tableName = context.Model.FindEntityType(typeof(MinIdToken)).GetTableName();
+        var createTable = context.Database.GenerateCreateScript().Split(';')
+            .Single(statement => statement.Contains($"CREATE TABLE \"{tableName}\""))
+            .Replace("\"BizType\" TEXT", "\"BizType\" TEXT COLLATE NOCASE")
+            .Replace("\"Token\" TEXT", "\"Token\" TEXT COLLATE NOCASE");
+        await context.Database.OpenConnectionAsync();
+        using (var command = context.Database.GetDbConnection().CreateCommand())
+        {
+            command.CommandText = "DROP TABLE " + context.GetService<ISqlGenerationHelper>().DelimitIdentifier(tableName);
+            await command.ExecuteNonQueryAsync();
+        }
+        await context.Database.ExecuteSqlRawAsync(createTable);
+        var repository = GetRequiredService<IMinIdTokenRepository>();
+        await repository.InsertAsync(new MinIdToken(Guid.NewGuid(), "Orders", "CaseSensitiveToken", "collation test"), autoSave: true);
+
+        Assert.NotNull(await repository.FindByTokenAsync("ORDERS", "CaseSensitiveToken"));
+        var validator = GetRequiredService<IMinIdTokenValidator>();
+        Assert.True(await validator.ValidateAsync("ORDERS", "CaseSensitiveToken"));
+        Assert.False(await validator.ValidateAsync("ORDERS", "casesensitivetoken"));
+    }
+
     [Fact]
     public async Task Revocation_Is_Not_Undone_By_A_Late_Cache_Write()
     {

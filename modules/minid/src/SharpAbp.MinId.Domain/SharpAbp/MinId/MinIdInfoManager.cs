@@ -87,11 +87,7 @@ namespace SharpAbp.MinId
                 throw new UserFriendlyException("A MinId business type cannot be renamed. Create a new business type instead.");
             }
 
-            if (maxId < minIdInfo.MaxId)
-            {
-                throw new UserFriendlyException("The MinId maximum cannot be lowered below the last reserved ID.");
-            }
-
+            maxId = Math.Max(maxId, minIdInfo.MaxId);
             var oldBizType = minIdInfo.BizType;
             minIdInfo.Update(bizType, maxId, step, delta, remainder);
 

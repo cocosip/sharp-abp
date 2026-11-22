@@ -208,10 +208,14 @@ namespace SharpAbp.Abp.OpenIddict
             {
                 throw new EntityNotFoundException(typeof(OpenIddictApplication), id);
             }
+            var replaceProperties = input.ShouldReplaceProperties();
             var buildModel = await BuildModel(input);
-            var properties = await ApplicationManager.GetPropertiesAsync(model);
-            var incomingProperties = await ApplicationManager.GetPropertiesAsync(buildModel);
-            await OpenIdApplicationStore.SetPropertiesAsync(buildModel, properties.SetItems(incomingProperties), CancellationToken.None);
+            if (!replaceProperties)
+            {
+                var properties = await ApplicationManager.GetPropertiesAsync(model);
+                var builtProperties = await ApplicationManager.GetPropertiesAsync(buildModel);
+                await OpenIdApplicationStore.SetPropertiesAsync(buildModel, properties.SetItems(builtProperties), CancellationToken.None);
+            }
             if (buildModel.ClientSecret.IsNullOrWhiteSpace() &&
                 !string.Equals(input.ClientType, OpenIddictConstants.ClientTypes.Public, StringComparison.OrdinalIgnoreCase))
             {
@@ -260,6 +264,11 @@ namespace SharpAbp.Abp.OpenIddict
             }
 
             await ApplicationManager.DeleteAsync(application);
+            if (CurrentUnitOfWork != null)
+            {
+                var cache = LazyServiceProvider.LazyGetRequiredService<IOpenIddictApplicationCache<OpenIddictApplicationModel>>();
+                CurrentUnitOfWork.OnCompleted(() => cache.RemoveAsync(application.As<OpenIddictApplicationModel>(), CancellationToken.None).AsTask());
+            }
         }
 
         /// <summary>

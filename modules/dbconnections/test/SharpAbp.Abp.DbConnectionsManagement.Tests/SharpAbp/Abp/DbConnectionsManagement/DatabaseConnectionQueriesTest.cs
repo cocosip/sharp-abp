@@ -9,7 +9,7 @@ public class DatabaseConnectionQueriesTest : DbConnectionsManagementTestBase
 {
     [Theory]
     [InlineData("unknown")]
-    [InlineData("0")]
+    [InlineData("999")]
     [InlineData("MySql, PostgreSql")]
     public async Task Create_And_Update_Reject_Invalid_Provider_Names(string provider)
     {
@@ -27,6 +27,25 @@ public class DatabaseConnectionQueriesTest : DbConnectionsManagementTestBase
         {
             Name = "valid", DatabaseProvider = provider, ConnectionString = "example-value"
         }));
+    }
+
+    [Fact]
+    public async Task Defined_Numeric_Providers_Remain_Writable_And_Are_Normalized()
+    {
+        var service = GetRequiredService<IDatabaseConnectionInfoAppService>();
+        var created = await service.CreateAsync(new CreateDatabaseConnectionInfoDto
+        {
+            Name = "legacy-numeric", DatabaseProvider = "0", ConnectionString = "example-value"
+        });
+        Assert.Equal("SqlServer", (await service.GetAsync(created.Id)).DatabaseProvider);
+
+        await service.UpdateAsync(created.Id, new UpdateDatabaseConnectionInfoDto
+        {
+            Name = "legacy-numeric", DatabaseProvider = "1", ConnectionString = "updated-value"
+        });
+        var updated = await service.GetAsync(created.Id);
+        Assert.Equal("MySql", updated.DatabaseProvider);
+        Assert.Equal("updated-value", updated.ConnectionString);
     }
 
     [Fact]

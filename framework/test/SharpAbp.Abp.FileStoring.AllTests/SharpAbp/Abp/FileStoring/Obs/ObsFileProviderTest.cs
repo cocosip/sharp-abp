@@ -58,11 +58,11 @@ public class ObsFileProviderTest : AbpFileStoringAllTestBase
         _configuration.GetObsConfiguration().CreateContainerIfNotExists = true;
         using var content = new MemoryStream([1, 2, 3, 4]);
         Assert.False(await provider.ExistsAsync(new FileProviderExistsArgs("bucket", _configuration, "file")));
-        Assert.Equal("file", await provider.SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", content, "bin", true)));
+        Assert.Equal("file", await provider.SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", content, "bin")));
         Assert.Equal(new byte[] { 1, 2, 3, 4 }, server.Objects["file"]);
         Assert.True(await provider.ExistsAsync(new FileProviderExistsArgs("bucket", _configuration, "file")));
         using var duplicate = new MemoryStream([9]);
-        await Assert.ThrowsAsync<NotSupportedException>(() => provider.SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", duplicate, "bin")));
+        await Assert.ThrowsAsync<FileAlreadyExistsException>(() => provider.SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", duplicate, "bin")));
         Assert.Equal(new byte[] { 1, 2, 3, 4 }, server.Objects["file"]);
         using var copied = await provider.GetOrNullAsync(new FileProviderGetArgs("bucket", _configuration, "file"));
         Assert.Equal(new byte[] { 1, 2, 3, 4 }, ((MemoryStream)copied).ToArray());
@@ -85,6 +85,21 @@ public class ObsFileProviderTest : AbpFileStoringAllTestBase
     }
 
     [Fact]
+    public async Task Explicit_Overwrite_Uploads_Without_An_Existence_Request()
+    {
+        await using var server = new ObsLoopbackServer { BucketExists = true };
+        server.Objects["file"] = [9];
+        var client = CreateClient(server);
+        var provider = new TestObsProvider(ServiceProvider, client);
+        using var content = new MemoryStream([1, 2, 3]);
+
+        Assert.Equal("file", await provider.SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", content, "bin", true)));
+        Assert.Equal(new byte[] { 1, 2, 3 }, server.Objects["file"]);
+        Assert.Equal(0, server.HeadRequests);
+        Assert.Null(server.Failure);
+    }
+
+    [Fact]
     public async Task Sdk_Loopback_Multipart_Should_Send_Bytes_From_Current_Position_And_Complete()
     {
         await using var server = new ObsLoopbackServer { BucketExists = true };
@@ -96,7 +111,7 @@ public class ObsFileProviderTest : AbpFileStoringAllTestBase
         using var content = new MemoryStream([0, 1, 2, 3, 4, 5]);
         content.Position = 1;
 
-        Assert.Equal("file", await provider.SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", content, "bin", true)));
+        Assert.Equal("file", await provider.SaveAsync(new FileProviderSaveArgs("bucket", _configuration, "file", content, "bin")));
 
         Assert.Equal(new byte[] { 1, 2 }, server.Parts[1]);
         Assert.Equal(new byte[] { 3, 4 }, server.Parts[2]);
@@ -147,6 +162,7 @@ public class ObsFileProviderTest : AbpFileStoringAllTestBase
         private readonly Task _loop;
         public string Url { get; }
         public bool BucketExists { get; set; }
+        public int HeadRequests { get; private set; }
         public ConcurrentDictionary<string, byte[]> Objects { get; } = new();
         public ConcurrentDictionary<int, byte[]> Parts { get; } = new();
         public string CompletionXml { get; private set; }
@@ -204,6 +220,7 @@ public class ObsFileProviderTest : AbpFileStoringAllTestBase
             string xml = null;
             if (request.HttpMethod == "HEAD")
             {
+                HeadRequests++;
                 response.StatusCode = BucketExists && (key == null || Objects.ContainsKey(key)) ? 200 : 404;
             }
             else if (request.HttpMethod == "PUT" && key == null)

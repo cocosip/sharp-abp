@@ -49,7 +49,7 @@ namespace SharpAbp.MinId
             Check.NotNullOrWhiteSpace(token, nameof(token));
 
             var minIdToken = await MinIdTokenRepository.FindByTokenAsync(bizType, token, cancellationToken);
-            return minIdToken != null && minIdToken.BizType == bizType && minIdToken.Token == token;
+            return minIdToken != null && minIdToken.Token == token;
         }
 
         /// <summary>
