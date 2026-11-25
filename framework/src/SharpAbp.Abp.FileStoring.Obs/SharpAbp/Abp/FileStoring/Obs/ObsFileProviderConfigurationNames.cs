@@ -9,6 +9,8 @@
         public const string BucketName = "Obs.BucketName";
         public const string AccessKeyId = "Obs.AccessKeyId";
         public const string AccessKeySecret = "Obs.AccessKeySecret";
+        public const string AuthType = "Obs.AuthType";
+        public const string AuthTypeNegotiation = "Obs.AuthTypeNegotiation";
 
         public const string CreateContainerIfNotExists = "Obs.CreateContainerIfNotExists";
     }

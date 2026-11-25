@@ -47,6 +47,40 @@ public class ObsFileProviderTest : AbpFileStoringAllTestBase
         Assert.Equal("bucket.obs.example.invalid", signed.Host);
         Assert.Contains("test-access", signed.Query);
         Assert.DoesNotContain("test-secret", signed.AbsoluteUri);
+        Assert.DoesNotContain("X-Amz-Algorithm", signed.Query);
+    }
+
+    [Fact]
+    public void Factory_Should_Use_Configured_AuthType()
+    {
+        var configuration = _configuration.GetObsConfiguration();
+        configuration.Endpoint = "http://obs.example.invalid";
+        configuration.AccessKeyId = "test-access";
+        configuration.AccessKeySecret = "test-secret";
+        configuration.AuthType = "V4";
+        configuration.AuthTypeNegotiation = false;
+
+        var client = GetRequiredService<IObsClientFactory>().Create(configuration);
+        var signed = new Uri(client.CreateTemporarySignature(new CreateTemporarySignatureRequest
+        {
+            BucketName = "bucket",
+            ObjectKey = "file",
+            Expires = 60
+        }).SignUrl);
+
+        Assert.Contains("X-Amz-Algorithm=AWS4-HMAC-SHA256", signed.Query);
+    }
+
+    [Fact]
+    public void Factory_Should_Reject_Unknown_AuthType()
+    {
+        var configuration = _configuration.GetObsConfiguration();
+        configuration.Endpoint = "http://obs.example.invalid";
+        configuration.AccessKeyId = "test-access";
+        configuration.AccessKeySecret = "test-secret";
+        configuration.AuthType = "v5";
+
+        Assert.Throws<Volo.Abp.AbpException>(() => GetRequiredService<IObsClientFactory>().Create(configuration));
     }
 
     [Fact]

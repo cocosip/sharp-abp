@@ -74,6 +74,8 @@ namespace SharpAbp.Abp.FileStoring.Obs
                 .AddItem(ObsFileProviderConfigurationNames.BucketName, typeof(string), "bucket1")
                 .AddItem(ObsFileProviderConfigurationNames.AccessKeyId, typeof(string), "")
                 .AddItem(ObsFileProviderConfigurationNames.AccessKeySecret, typeof(string), "")
+                .AddItem(ObsFileProviderConfigurationNames.AuthType, typeof(string), "OBS")
+                .AddItem(ObsFileProviderConfigurationNames.AuthTypeNegotiation, typeof(bool), "true")
                 .AddItem(ObsFileProviderConfigurationNames.CreateContainerIfNotExists, typeof(bool), "false");
 
             return configuration;

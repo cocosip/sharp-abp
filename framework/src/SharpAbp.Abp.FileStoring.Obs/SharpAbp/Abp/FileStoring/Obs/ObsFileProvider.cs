@@ -55,7 +55,9 @@ namespace SharpAbp.Abp.FileStoring.Obs
                 Provider,
                 ("Endpoint", obsConfiguration.Endpoint),
                 ("AccessKeyId", obsConfiguration.AccessKeyId),
-                ("AccessKeySecret", obsConfiguration.AccessKeySecret));
+                ("AccessKeySecret", obsConfiguration.AccessKeySecret),
+                ("AuthType", obsConfiguration.AuthType),
+                ("AuthTypeNegotiation", obsConfiguration.AuthTypeNegotiation));
         }
 
 

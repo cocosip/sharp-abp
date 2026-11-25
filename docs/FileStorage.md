@@ -883,14 +883,18 @@ Configure<AbpFileStoringOptions>(options =>
         container.UseObs(obs =>
         {
             obs.AccessKeyId = "your-access-key";
-            obs.SecretAccessKey = "your-secret-key";
-            obs.Endpoint = "obs.cn-north-4.myhuaweicloud.com";
+            obs.AccessKeySecret = "your-secret-key";
+            obs.Endpoint = "https://obs.cn-north-4.myhuaweicloud.com";
             obs.BucketName = "my-bucket";
-            obs.CreateBucketIfNotExists = true;
+            obs.AuthType = "OBS";               // OBS (default), V2 or V4
+            obs.AuthTypeNegotiation = true;     // default true; set false when AuthType is V2 or V4
+            obs.CreateContainerIfNotExists = true;
         });
     });
 });
 ```
+
+`AuthTypeNegotiation` defaults to `true`, in which case the SDK negotiates `OBS` or `V2` and ignores `AuthType`. Negotiation never selects `V4`, so for a server that only enables V4 authentication configure both `AuthType = "V4"` and `AuthTypeNegotiation = false`; otherwise the SDK negotiates back to `OBS`/`V2` and the server rejects the request. When a container is configured through the management module, the same values are stored as `Obs.AuthType` and `Obs.AuthTypeNegotiation`.
 
 ### KS3 (Kingsoft Cloud) Provider
 

@@ -6,6 +6,8 @@
     "Obs.BucketName": "Bucket name",
     "Obs.AccessKeyId": "AccessKeyId",
     "Obs.AccessKeySecret": "AccessKeySecret",
+    "Obs.AuthType": "Authentication type",
+    "Obs.AuthTypeNegotiation": "Authentication type negotiation",
     "Obs.CreateContainerIfNotExists": "Create bucket if not exists"
   }
 }

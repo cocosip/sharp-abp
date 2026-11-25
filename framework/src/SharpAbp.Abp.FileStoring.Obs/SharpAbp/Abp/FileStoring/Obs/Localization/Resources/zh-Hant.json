@@ -6,6 +6,8 @@
     "Obs.BucketName": "桶名",
     "Obs.AccessKeyId": "AccessKeyId",
     "Obs.AccessKeySecret": "AccessKeySecret",
+    "Obs.AuthType": "認證類型",
+    "Obs.AuthTypeNegotiation": "認證類型協商",
     "Obs.CreateContainerIfNotExists": "自動建桶"
   }
 }
